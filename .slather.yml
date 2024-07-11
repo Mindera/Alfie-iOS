@@ -1,0 +1,13 @@
+# .slather.yml
+
+coverage_service: html
+xcodeproj: ./DavidJones/DavidJones.xcodeproj
+scheme: DavidJones
+source_directory: ./DavidJones
+output_directory: ./coverage_report
+binary_basename: DavidJones
+ignore:
+  - '../Library/Developer/Xcode/DerivedData/*'
+  - '**/DerivedData/*' 
+  - '**/Localizable*.swift'
+  - '**/Mock*.swift'

@@ -1,0 +1,29 @@
+{
+  "schemaNamespace" : "BFFGraphApi",
+  "input" : {
+    "operationSearchPaths" : [
+      "**/*.graphql"
+    ],
+    "schemaSearchPaths" : [
+      "**/*.graphqls"
+    ]
+  },
+  "output" : {
+    "testMocks" : {
+        "swiftPackage" : {
+            "targetName": "BFFGraphMocks"
+        }
+    },
+    "schemaTypes" : {
+      "path" : "./BFFGraphApi",
+      "moduleType" : {
+        "swiftPackageManager" : {
+        }
+      }
+    },
+    "operations" : {
+      "inSchemaModule" : {
+      }
+    }
+  }
+}

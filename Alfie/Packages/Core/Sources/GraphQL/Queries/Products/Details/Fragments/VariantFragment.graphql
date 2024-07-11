@@ -1,0 +1,16 @@
+fragment VariantFragment on Variant {
+    sku
+    size {
+        ...SizeTreeFragment
+    }
+    colour {
+        id
+    }
+    attributes {
+        ...AttributesFragment
+    }
+    stock
+    price {
+        ...PriceFragment
+    }
+}

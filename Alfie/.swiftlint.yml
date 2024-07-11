@@ -1,0 +1,120 @@
+included:
+  - Alfie
+  - Packages
+excluded:
+  - .build
+  - scripts
+  - DerivedData
+  - Packages/Mocks
+  - Packages/Core/.build
+  - Packages/Core/.swiftpm
+  - Packages/Core/BFFGraphApi
+  - Packages/Core/Tests
+  - Packages/Core/Package.swift
+  - Packages/StyleGuide/.build
+  - Packages/StyleGuide/.swiftpm
+  - Packages/StyleGuide/Tests
+  - Packages/StyleGuide/Package.swift
+  - Packages/StyleGuide/.build
+  - Packages/StyleGuide/.swiftpm
+  - Packages/Models/.build
+  - Packages/Models/.swiftpm
+  - Packages/Models/Package.swift
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+opt_in_rules:
+  - all
+disabled_rules:
+  - attributes
+  - accessibility_trait_for_button
+  - anonymous_argument_in_multiline_closure
+  - anyobject_protocol
+  - closure_body_length
+  - conditional_returns_on_newline
+  - convenience_type
+  - discouraged_optional_collection
+  - explicit_acl
+  - explicit_enum_raw_value
+  - explicit_top_level_acl
+  - explicit_type_interface
+  - file_types_order
+  - file_name
+  - force_unwrapping
+  - function_default_parameter_at_end
+  - implicitly_unwrapped_optional
+  - indentation_width
+  - inert_defer
+  - missing_docs
+  - multiline_arguments
+  - multiline_arguments_brackets
+  - multiline_function_chains
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - nesting
+  - no_extension_access_modifier
+  - no_grouping_extension
+  - no_magic_numbers
+  - prefer_nimble
+  - prefer_self_in_static_references
+  - prefixed_toplevel_constant
+  - required_deinit
+  - self_binding
+  - sorted_imports
+  - strict_fileprivate
+  - switch_case_on_newline
+  - trailing_closure
+  - type_contents_order
+  - unused_capture_list
+  - vertical_whitespace_between_cases
+  - legacy_objc_type
+  - discouraged_optional_boolean
+  - accessibility_label_for_image
+  - lower_acl_than_parent
+  - fatal_error
+  - unavailable_function
+  - number_separator
+  - cyclomatic_complexity
+  - nslocalizedstring_require_bundle
+  - shorthand_optional_binding
+  - pattern_matching_keywords
+  - vertical_parameter_alignment_on_call
+  - extension_access_modifier
+  - sorted_enum_cases
+  - redundant_self_in_closure
+  - superfluous_else
+identifier_name:
+  min_length: 2
+  validates_start_with_lowercase: warning
+large_tuple: 3
+function_body_length: 200
+type_body_length: 400
+trailing_comma:
+  mandatory_comma: true
+switch_case_alignment:
+  indented_cases: true
+line_length:
+  warning: 250
+  error: 300
+  ignores_comments: true
+  ignores_interpolated_strings: true
+  ignores_function_declarations: true
+  ignores_urls: true
+custom_rules:
+  fatal_error:
+    name: Fatal Error
+    excluded: "Tests/*"
+    message: Prefer using `queuedFatalError` over `fatalError` to avoid leaking compiler host machine paths.
+    regex: \bfatalError\b
+    match_kinds:
+      - identifier
+  debug_Mocks:
+    name: Debug Mock
+    excluded: "Tests/*"
+    message: Preview should only work on Debug
+    regex: '^\}\n*\#Preview$'
+    severity: error
+unused_import:
+  always_keep_imports:
+    - SwiftSyntaxBuilder

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDMlWRJYL_P5xdz837Y-JCifj6tqItdFdo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>135458332827</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.mindera.alfie.debug</string>
+	<key>PROJECT_ID</key>
+	<string>mindera-alfie</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mindera-alfie.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<true/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:135458332827:ios:c49379c8588ea2eca5e63e</string>
+</dict>
+</plist>

@@ -1,0 +1,48 @@
+{
+  "configurations" : [
+    {
+      "id" : "20424B3A-EF4F-4106-BE63-B7C5B43C321F",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "skippedTests" : [
+        "AppStartupServiceTests\/test_currentScreen_is_eventually_landing()"
+      ],
+      "target" : {
+        "containerPath" : "container:Alfie.xcodeproj",
+        "identifier" : "BE8B02332B616979007AE489",
+        "name" : "AlfieTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Core",
+        "identifier" : "CoreTests",
+        "name" : "CoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Navigation",
+        "identifier" : "NavigationTests",
+        "name" : "NavigationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/StyleGuide",
+        "identifier" : "StyleGuideTests",
+        "name" : "StyleGuideTests"
+      }
+    }
+  ],
+  "version" : 1
+}

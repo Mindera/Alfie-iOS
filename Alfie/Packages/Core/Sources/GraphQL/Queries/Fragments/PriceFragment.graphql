@@ -1,0 +1,8 @@
+fragment PriceFragment on Price {
+    amount {
+        ...MoneyFragment
+    }
+    was {
+        ...MoneyFragment
+    }
+}

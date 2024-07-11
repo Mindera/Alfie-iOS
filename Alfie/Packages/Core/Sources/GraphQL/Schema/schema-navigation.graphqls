@@ -1,0 +1,54 @@
+extend type Query {
+  "Retrieve a navigation menu by its handle."
+  navigation("The nav menu's handle." handle: String!): NavMenu
+  "Retrieve a list of the navigation handles."
+  navigationHandles: [String!]!
+}
+
+"A Nav menu representing a hierarchy of hyperlinks (items)."
+type NavMenu {
+  "The menu's handle."
+  handle: String!
+  "The menu's child items."
+  items: [NavMenuItem!]!
+  "The menu's attributes, a dynamic list of key-value pairs."
+  attributes: [KeyValuePair]
+}
+
+"A menu item within a parent menu."
+type NavMenuItem {
+  "The menu item's title."
+  title: String!
+  "The menu item's type."
+  type: NavMenuItemType!
+  "The menu item's URL."
+  url: String
+  "The menu item's media."
+  media: Media
+  "The menu item's child items."
+  items: [NavMenuItem!]
+  "The menu item's attributes, a dynamic list of key-value pairs."
+  attributes: [KeyValuePair]
+}
+
+"A menu item type."
+enum NavMenuItemType {
+  "An account page/screen link."
+  ACCOUNT
+  "A home page/screen link."
+  HOME
+  "A product listing link."
+  LISTING
+  "A product link."
+  PRODUCT
+  "A search link."
+  SEARCH
+  "A page link."
+  PAGE
+  "An http external link."
+  EXTERNAL_HTTP
+  "A wishlist page/screen link."
+  WISHLIST
+
+  # More types to be added as needed.
+}

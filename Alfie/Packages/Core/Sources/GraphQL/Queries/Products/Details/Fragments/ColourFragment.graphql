@@ -1,0 +1,10 @@
+fragment ColourFragment on Colour {
+    id
+    name
+    swatch {
+        ...ImageFragment
+    }
+    media {
+        ...MediaFragment
+    }
+}

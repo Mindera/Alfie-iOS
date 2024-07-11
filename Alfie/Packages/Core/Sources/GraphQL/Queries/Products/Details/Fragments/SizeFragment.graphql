@@ -1,0 +1,29 @@
+fragment SizeTreeFragment on Size {
+    ...SizeFragment
+    sizeGuide {
+        ...SizeGuideTreeFragment
+    }
+}
+
+fragment SizeFragment on Size {
+    id
+    value
+    scale
+    description
+}
+
+fragment SizeGuideTreeFragment on SizeGuide {
+    ...SizeGuideFragment
+    sizes {
+        ...SizeFragment
+        sizeGuide {
+            ...SizeGuideFragment
+        }
+    }
+}
+
+fragment SizeGuideFragment on SizeGuide {
+    id
+    name
+    description
+}

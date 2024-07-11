@@ -1,0 +1,12 @@
+fragment SuggestionProductFragment on SuggestionProduct {
+      id
+      name
+      brandName
+      media {
+        ...MediaFragment
+      }
+      price {
+        ...PriceFragment
+      }
+      slug
+}
