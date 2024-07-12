@@ -181,6 +181,7 @@
 		49F5B9402B8CE2A000472A23 /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
 		49F5B9432B8E293200472A23 /* Common */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Common; sourceTree = "<group>"; };
 		8451DCCB2C049C60001BD45A /* Alfie.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Alfie.xctestplan; path = Alfie/Alfie.xctestplan; sourceTree = SOURCE_ROOT; };
+		8483A2612C4159390099A94F /* FeatureToggles */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = FeatureToggles; sourceTree = "<group>"; };
 		A10132F62B6BB72500A4C9C8 /* Navigation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Navigation; sourceTree = "<group>"; };
 		A10971422B973C5E003BE2A3 /* ThemedButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThemedButton+Extension.swift"; sourceTree = "<group>"; };
 		A1233ED72BBDCCE0002C3847 /* RecentsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentsServiceTests.swift; sourceTree = "<group>"; };
@@ -794,6 +795,7 @@
 		BEA12B7C2B62665B00DA7608 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
+				8483A2612C4159390099A94F /* FeatureToggles */,
 				49F5B9432B8E293200472A23 /* Common */,
 				A10132F62B6BB72500A4C9C8 /* Navigation */,
 				BA076BA82B70DD7E0005E0EE /* Mocks */,
