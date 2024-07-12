@@ -232,6 +232,8 @@ extension ProductDetailsView {
 
             colorSelector
 
+            sizeSelector
+
             descriptionTab
                 .padding(.vertical, Spacing.space200)
 
@@ -360,6 +362,13 @@ extension ProductDetailsView {
                     .id(selectedColor.id)
                 }
             }
+        }
+    }
+
+    @ViewBuilder private var sizeSelector: some View {
+        if viewModel.shouldShow(section: .sizeSelector) {
+            Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
+                .foregroundStyle(Colors.primary.mono900)
         }
     }
 

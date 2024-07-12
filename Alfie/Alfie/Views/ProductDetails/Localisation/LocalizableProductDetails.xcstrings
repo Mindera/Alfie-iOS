@@ -143,6 +143,17 @@
           }
         }
       }
+    },
+    "KeySize" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

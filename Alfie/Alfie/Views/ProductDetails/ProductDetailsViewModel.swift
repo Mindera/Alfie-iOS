@@ -103,6 +103,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             case .titleHeader:
                 return state.isLoading && productName.isEmpty
             case .colorSelector,
+                 .sizeSelector,
                  .mediaCarousel,
                  .complementaryInfo:
                 return state.isLoading
@@ -115,7 +116,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     func shouldShow(section: ProductDetailsSection) -> Bool {
         switch section {
             case .titleHeader,
-                 .colorSelector:
+                 .colorSelector,
+                 .sizeSelector:
                 return true
             case .complementaryInfo:
                 return !complementaryInfoToShow.isEmpty
@@ -184,6 +186,9 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     private func buildColorSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
+        // Mapping sizes for testing purposes
+        let variantsForSelectedColor = product.variants.filter { $0.colour?.id == selectedVariant?.colour?.id }
+
         colorSelectionSubscription?.cancel()
 
         let colorSwatches = buildColorSwatches(product: product)

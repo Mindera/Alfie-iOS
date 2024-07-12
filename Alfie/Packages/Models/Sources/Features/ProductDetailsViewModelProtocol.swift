@@ -26,6 +26,7 @@ public enum ProductDetailsViewErrorType: Error, CaseIterable {
 public enum ProductDetailsSection {
     case titleHeader
     case colorSelector
+    case sizeSelector
     case mediaCarousel
     case complementaryInfo
     case productDescription
