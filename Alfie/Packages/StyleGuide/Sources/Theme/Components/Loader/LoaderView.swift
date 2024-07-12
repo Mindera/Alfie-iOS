@@ -11,12 +11,14 @@ public struct LoaderView: View {
         case light
 
         var color: Color {
+            // swiftlint:disable vertical_whitespace_between_cases
             switch self {
-                case .dark:
-                    return Colors.primary.black
-                case .light:
-                    return Colors.primary.white
+            case .dark:
+                return Colors.primary.black
+            case .light:
+                return Colors.primary.white
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
@@ -33,13 +35,20 @@ public struct LoaderView: View {
     private let labelTitle: String
     private let style: CircleStyle
 
-    public init(circleDiameter: CircleDiameter, style: CircleStyle = .dark, labelHidden: Bool = true, labelTitle: String = "Loading") {
+    public init(
+        circleDiameter: CircleDiameter,
+        style: CircleStyle = .dark,
+        labelHidden: Bool = true,
+        labelTitle: String = "Loading"
+    ) {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch circleDiameter {
-            case .defaultSmall:
-                self.circleDiameter = Constants.smallCircleDiameter
-            case let .custom(cgSize):
-                self.circleDiameter = cgSize
+        case .defaultSmall:
+            self.circleDiameter = Constants.smallCircleDiameter
+        case .custom(let cgSize):
+            self.circleDiameter = cgSize
         }
+        // swiftlint:enable vertical_whitespace_between_cases
 
         self.labelHidden = labelHidden
         self.labelTitle = labelTitle
@@ -50,9 +59,14 @@ public struct LoaderView: View {
         VStack(spacing: Constants.circlesToLabelSpacing) {
             HStack(spacing: Constants.circleSpacing) {
                 ForEach(0 ..< Constants.numberOfCircles, id: \.self) { index in
-                    AnimatedCircle(style: style, animationTime: Constants.animationTime,
-                                   delayBeforeFirstAnimation: Constants.animationTime / Double(Constants.numberOfCircles) * Double(index))
-                        .frame(width: circleDiameter, height: circleDiameter)
+                    let delay = Constants.animationTime / Double(Constants.numberOfCircles) * Double(index)
+
+                    AnimatedCircle(
+                        style: style,
+                        animationTime: Constants.animationTime,
+                        delayBeforeFirstAnimation: delay
+                    )
+                    .frame(width: circleDiameter, height: circleDiameter)
                 }
             }
 

@@ -17,12 +17,14 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         case brands = "/brands"
 
         var destination: CategoriesNavigationDestination {
+            // swiftlint:disable vertical_whitespace_between_cases
             switch self {
-                case .services:
-                    .services
-                case .brands:
-                    .brands
+            case .services:
+                .services
+            case .brands:
+                .brands
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
@@ -30,13 +32,18 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     private let openCategorySubject: PassthroughSubject<CategoriesNavigationDestination, Never> = .init()
     private lazy var placeholders: [NavigationItem] = {
         (0..<Constants.placeholderItemCount).map { _ in
-                .init(id: UUID().uuidString,
-                      type: .page,
-                      title: String(repeating: " ", count: .random(in: Constants.placeholderTitleLowerBound...Constants.placeholderTitleUpperBound)),
-                      url: nil,
-                      media: nil,
-                      items: nil,
-                      attributes: nil)
+            .init(
+                id: UUID().uuidString,
+                type: .page,
+                title: String(
+                    repeating: " ",
+                    count: .random(in: Constants.placeholderTitleLowerBound...Constants.placeholderTitleUpperBound)
+                ),
+                url: nil,
+                media: nil,
+                items: nil,
+                attributes: nil
+            )
         }
     }()
 
@@ -84,7 +91,9 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     func didSelectCategory(_ category: NavigationItem) {
         // Special categories
-        if let specialCategory = SpecialCategories.allCases.first(where: { $0.rawValue == category.url?.lowercased() }) {
+        if let specialCategory = SpecialCategories.allCases.first(
+            where: { $0.rawValue == category.url?.lowercased() }
+        ) {
             openCategorySubject.send(specialCategory.destination)
             return
         }
@@ -105,21 +114,21 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
 
         switch category.type {
-            case .listing:
-                openCategorySubject.send(.plp(category: categoryUrl.deletingPrefix("/")))
-            case .externalHttp,
-                 .home,
-                 .page,
-                 .product,
-                 .search,
-                 .account,
-                 .wishlist:
-                // Temporarily open a webview with this category, until we have all screens
-                let paths = categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }
-                paths.forEach { path in
-                    url = url.appending(component: path)
-                }
-                openCategorySubject.send(.web(url: url, title: category.title))
+        case .listing:
+            openCategorySubject.send(.plp(category: categoryUrl.deletingPrefix("/")))
+        case .externalHttp,
+            .home,
+            .page,
+            .product,
+            .search,
+            .account,
+            .wishlist:
+            // Temporarily open a webview with this category, until we have all screens
+            let paths = categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }
+            paths.forEach { path in
+                url = url.appending(component: path)
+            }
+            openCategorySubject.send(.web(url: url, title: category.title))
         }
     }
 

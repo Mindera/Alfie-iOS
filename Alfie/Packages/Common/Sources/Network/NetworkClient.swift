@@ -8,8 +8,7 @@ public final class NetworkClient: NetworkClientProtocol {
     private let logRequests: Bool
     private let logResponses: Bool
 
-    public init(logRequests: Bool = true,
-                logResponses: Bool = true) {
+    public init(logRequests: Bool = true, logResponses: Bool = true) {
         self.logRequests = logRequests
         self.logResponses = logResponses
     }
@@ -19,8 +18,10 @@ public final class NetworkClient: NetworkClientProtocol {
     public func getData<T: Decodable>(from url: URL, authenticationToken: String?) async throws -> T {
         var request = URLRequest(url: url)
         if let authenticationToken {
-            request.setValue(authorizationHeader(token: authenticationToken),
-                             forHTTPHeaderField: Headers.authorization.rawValue)
+            request.setValue(
+                authorizationHeader(token: authenticationToken),
+                forHTTPHeaderField: Headers.authorization.rawValue
+            )
         }
 
         if logRequests {
@@ -50,8 +51,10 @@ public final class NetworkClient: NetworkClientProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         if let authenticationToken {
-            request.setValue(authorizationHeader(token: authenticationToken),
-                             forHTTPHeaderField: Headers.authorization.rawValue)
+            request.setValue(
+                authorizationHeader(token: authenticationToken),
+                forHTTPHeaderField: Headers.authorization.rawValue
+            )
         }
 
         if logRequests {

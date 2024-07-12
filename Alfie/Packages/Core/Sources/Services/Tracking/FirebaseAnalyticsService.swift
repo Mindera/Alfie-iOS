@@ -1,5 +1,5 @@
-import Models
 import FirebaseAnalytics
+import Models
 
 public final class FirebaseAnalyticsService: TrackingProviderProtocol {
     public let id: String = "com.firebase.analytics"

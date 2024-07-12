@@ -9,14 +9,16 @@ public enum PaginatedViewState<Value, StateError: Error> {
 
 public extension PaginatedViewState {
     var value: Value? {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .loadingFirstPage(let value),
-                 .success(let value),
-                 .loadingNextPage(let value):
-                return value
-            case.error:
-                return nil
+        case .loadingFirstPage(let value),
+            .success(let value),
+            .loadingNextPage(let value):
+            return value
+        case.error:
+            return nil
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     var isLoadingFirstPage: Bool {
@@ -48,7 +50,7 @@ public extension PaginatedViewState {
     }
 
     var failure: StateError? {
-        guard case let .error(type) = self else {
+        guard case .error(let type) = self else {
             return nil
         }
         return type

@@ -69,8 +69,7 @@ public struct ThemedSegmentView: View {
                     icon
                         .resizable()
                         .renderingMode(.template)
-                        .frame(width: Constants.iconWidth,
-                               height: Constants.iconHeight)
+                        .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                         .padding(.trailing, type == .compact ? Spacing.space050 : Spacing.space100)
                         .foregroundStyle(currectSelected == segment ? Colors.primary.black : Colors.primary.mono500)
                 }
@@ -83,11 +82,11 @@ public struct ThemedSegmentView: View {
         }
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier(AccessibilityId.segmentedOption)
-        .`if`(currectSelected == segment, whenTrue: { segment in
-            segment.accessibilityAddTraits(.isSelected)
-        }, whenFalse: { segment in
-            segment.accessibilityRemoveTraits(.isSelected)
-        })
+        .if(
+            currectSelected == segment,
+            whenTrue: { segment in segment.accessibilityAddTraits(.isSelected) },
+            whenFalse: { segment in segment.accessibilityRemoveTraits(.isSelected) }
+        )
         .contentShape(Rectangle())
         .animation(.emphasizedDecelerate, value: currectSelected)
         .onTapGesture {
@@ -104,10 +103,7 @@ public struct Segment: Identifiable, Equatable, Hashable {
     public let icon: Image?
     public let object: Any
 
-    public init(id: String = UUID().uuidString,
-                title: String,
-                icon: Image? = nil,
-                _ object: Any) {
+    public init(id: String = UUID().uuidString, title: String, icon: Image? = nil, _ object: Any) {
         self.id = id
         self.title = title
         self.icon = icon

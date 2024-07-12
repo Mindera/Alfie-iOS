@@ -25,24 +25,24 @@ struct AppUpdateDemoView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, Spacing.space200)
-        .alert(softAppUpdateInfo?.title ?? "", isPresented: $isShowingAppUpdateAlert, actions: {
-            SoftAppUpdateAlertActionsView(update: softAppUpdateInfo)
-        }, message: {
-            SoftAppUpdateAlertMessageView(update: softAppUpdateInfo)
-        })
+        .alert(
+            softAppUpdateInfo?.title ?? "",
+            isPresented: $isShowingAppUpdateAlert,
+            actions: { SoftAppUpdateAlertActionsView(update: softAppUpdateInfo) },
+            message: { SoftAppUpdateAlertMessageView(update: softAppUpdateInfo) }
+        )
     }
 
     // MARK: - Private
 
-    @ViewBuilder
-    private var softAppUpdate: some View {
+    @ViewBuilder private var softAppUpdate: some View {
         DemoHelper.demoSectionHeader(title: "Soft Update")
             .padding(.top, Spacing.space200)
 
         if let softUpdate = configurationService.softAppUpdateInfo {
-            ThemedButton(text: "Open", action: {
+            ThemedButton(text: "Open") {
                 isShowingAppUpdateAlert = true
-            })
+            }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.top, -Spacing.space700)
 
@@ -52,19 +52,18 @@ struct AppUpdateDemoView: View {
         }
     }
 
-    @ViewBuilder
-    private var forceAppUpdate: some View {
+    @ViewBuilder private var forceAppUpdate: some View {
         DemoHelper.demoSectionHeader(title: "Force Update")
             .padding(.top, Spacing.space400)
 
         if let forceUpdate = configurationService.forceAppUpdateInfo {
-            ThemedButton(text: "Open", action: {
+            ThemedButton(text: "Open") {
                 coordinator.closeDebugMenu()
                 // delay to perform the animated fullscreen dismiss
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     coordinator.openForceAppUpdate()
                 }
-            })
+            }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.top, -Spacing.space700)
 
@@ -118,9 +117,11 @@ struct AppUpdateDemoView: View {
 #if DEBUG
 #Preview {
     ScrollView {
-        AppUpdateDemoView(configurationService: MockConfigurationService(
-            forceAppUpdateInfo: .fixture(minimumAppVersion: .init("2.0.0")),
-            softAppUpdateInfo: .fixture(minimumAppVersion: .init("2.5.0")))
+        AppUpdateDemoView(
+            configurationService: MockConfigurationService(
+                forceAppUpdateInfo: .fixture(minimumAppVersion: .init("2.0.0")),
+                softAppUpdateInfo: .fixture(minimumAppVersion: .init("2.5.0"))
+            )
         )
     }
 }

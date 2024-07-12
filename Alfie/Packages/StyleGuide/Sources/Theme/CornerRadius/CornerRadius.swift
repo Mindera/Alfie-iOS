@@ -4,7 +4,7 @@ import Foundation
 
 // MARK: - CornerRadius
 
-public struct CornerRadius {
+public enum CornerRadius {
     /// 0pt
     public static let none: CGFloat = 0.0
     /// 2pt

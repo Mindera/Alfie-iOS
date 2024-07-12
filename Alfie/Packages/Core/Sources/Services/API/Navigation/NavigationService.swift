@@ -18,8 +18,8 @@ public final class NavigationService: NavigationServiceProtocol {
 private extension NavigationItemsScreen {
     var handle: NavigationHandle {
         switch self {
-            case .shop:
-                return .header
+        case .shop:
+            return .header
         }
     }
 }

@@ -17,21 +17,21 @@ struct EndpointSelectionView: View {
         VStack(alignment: .leading, spacing: Spacing.space250) {
             DemoHelper.demoSectionHeader(title: "Choose Environment")
 
-            RadioButtonList(values: viewModel.availableEndpointOptions,
-                            disabledValues: .constant(viewModel.disabledEndpointOptions),
-                            selectedValue: $viewModel.selectedEndpointOption,
-                            verticalSpacing: Spacing.space300)
-            
-            ThemedInput($viewModel.customEndpointUrl,
-                        isDisabled: .constant(viewModel.isInputDisabled))
+            RadioButtonList(
+                values: viewModel.availableEndpointOptions,
+                disabledValues: .constant(viewModel.disabledEndpointOptions),
+                selectedValue: $viewModel.selectedEndpointOption,
+                verticalSpacing: Spacing.space300
+            )
+
+            ThemedInput($viewModel.customEndpointUrl, isDisabled: .constant(viewModel.isInputDisabled))
 
             HStack {
                 Spacer()
-                ThemedButton(text: "Save and Restart",
-                             isDisabled: .constant(viewModel.isSaveDisabled),
-                             action: {
-                    viewModel.didTapSave()
-                })
+                ThemedButton(
+                    text: "Save and Restart",
+                    isDisabled: .constant(viewModel.isSaveDisabled)
+                ) { viewModel.didTapSave() }
                 Spacer()
             }
 
@@ -41,25 +41,29 @@ struct EndpointSelectionView: View {
         .snackbarView(configuration: $snackbarConfig)
         .onChange(of: viewModel.shouldShowUrlError) { shouldShowUrlError in
             if shouldShowUrlError {
-                snackbarConfig = .init(type: .error,
-                                       text: "Invalid endpoint URL",
-                                       showCloseButton: true,
-                                       icon: Icon.warning.image,
-                                       onDismiss: { viewModel.didDismissError() })
+                // swiftlint:disable:next trailing_closure
+                snackbarConfig = .init(
+                    type: .error,
+                    text: "Invalid endpoint URL",
+                    showCloseButton: true,
+                    icon: Icon.warning.image,
+                    onDismiss: { viewModel.didDismissError() }
+                )
             } else {
                 snackbarConfig = nil
             }
         }
         .onChange(of: viewModel.shouldShowSuccess) { shouldShowSuccess in
             if shouldShowSuccess {
-                snackbarConfig = .init(type: .success,
-                                       text: "Done. The app will now restart automatically.",
-                                       showCloseButton: false,
-                                       showFromTop: true,
-                                       autoDismissTime: 4,
-                                       onDismiss: {
-                    coordinator.closeEndpointSelection()
-                })
+                // swiftlint:disable:next trailing_closure
+                snackbarConfig = .init(
+                    type: .success,
+                    text: "Done. The app will now restart automatically.",
+                    showCloseButton: false,
+                    showFromTop: true,
+                    autoDismissTime: 4,
+                    onDismiss: { coordinator.closeEndpointSelection() }
+                )
             } else {
                 snackbarConfig = nil
             }

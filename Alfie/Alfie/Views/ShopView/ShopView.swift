@@ -15,9 +15,11 @@ enum ShopViewTab: String, CaseIterable {
     case services
 }
 
-struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol,
-                BrandsViewModel: BrandsViewModelProtocol,
-                ServicesViewModel: WebViewModelProtocol>: View {
+struct ShopView<
+    CategoriesViewModel: CategoriesViewModelProtocol,
+    BrandsViewModel: BrandsViewModelProtocol,
+    ServicesViewModel: WebViewModelProtocol
+>: View {
     @ViewBuilder private let categoriesView: CategoriesView<CategoriesViewModel>
     @ViewBuilder private let brandsView: BrandsView<BrandsViewModel>
     @ViewBuilder private let servicesView: WebView<ServicesViewModel>
@@ -30,10 +32,12 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol,
     @State private var activeTab: ShopViewTab
     @State private var isVisible = false
 
-    init(categoriesViewModel: CategoriesViewModel,
-         brandsViewModel: BrandsViewModel,
-         servicesViewModel: ServicesViewModel,
-         initialTab tab: ShopViewTab = .categories) {
+    init(
+        categoriesViewModel: CategoriesViewModel,
+        brandsViewModel: BrandsViewModel,
+        servicesViewModel: ServicesViewModel,
+        initialTab tab: ShopViewTab = .categories
+    ) {
         self.categoriesViewModel = categoriesViewModel
         // Initialize the categories view to ignore local links (i.e. Shop tab links like Brands and Services)
         // as those will be handled by this view directly
@@ -73,22 +77,24 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol,
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .withToolbar(for: .tab(.shop()))
-        .onReceive(tabCoordinator.shopViewTabUpdatePublisher.receive(on: DispatchQueue.main), perform: { tab in
+        .onReceive(tabCoordinator.shopViewTabUpdatePublisher.receive(on: DispatchQueue.main)) { tab in
             guard let tab else {
                 return
             }
             switchTabIfNecessary(tab, withAnimation: false)
-        })
-        .onReceive(categoriesViewModel.openCategoryPublisher.receive(on: DispatchQueue.main), perform: { destination in
+        }
+        .onReceive(categoriesViewModel.openCategoryPublisher.receive(on: DispatchQueue.main)) { destination in
+            // swiftlint:disable vertical_whitespace_between_cases
             switch destination {
-                case .brands:
-                    switchTabIfNecessary(.brands, withAnimation: true)
-                case .services:
-                    switchTabIfNecessary(.services, withAnimation: true)
-                default:
-                    break
+            case .brands:
+                switchTabIfNecessary(.brands, withAnimation: true)
+            case .services:
+                switchTabIfNecessary(.services, withAnimation: true)
+            default:
+                break
             }
-        })
+            // swiftlint:enable vertical_whitespace_between_cases
+        }
         .onChange(of: activeTab) { _ in
             hideKeyboard()
         }
@@ -125,15 +131,18 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol,
 // MARK: Localisation
 
 extension ShopViewTab {
+    // swiftlint:disable:next strict_fileprivate
     fileprivate var title: String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .categories:
-                LocalizableShop.$categories
-            case .brands:
-                LocalizableShop.$brands
-            case .services:
-                LocalizableShop.$services
+        case .categories:
+            LocalizableShop.$categories
+        case .brands:
+            LocalizableShop.$brands
+        case .services:
+            LocalizableShop.$services
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -156,10 +165,20 @@ private enum Constants {
 
 #if DEBUG
 #Preview {
-    ShopView(categoriesViewModel: MockCategoriesViewModel(state: .success(.init(categories: [])), categories: NavigationItem.fixtures),
-             brandsViewModel: MockBrandsViewModel(),
-             servicesViewModel: WebViewModel(url: URL(string: "https://www.alfieproj.com/services/store-services"), dependencies: MockWebDependencyContainer()))
-        .environmentObject(Coordinator())
-        .environmentObject(TabCoordinator(tabs: [], activeTab: .shop(tab: .categories), serviceProvider: MockServiceProvider()))
+    ShopView(
+        categoriesViewModel: MockCategoriesViewModel(
+            state: .success(.init(categories: [])),
+            categories: NavigationItem.fixtures
+        ),
+        brandsViewModel: MockBrandsViewModel(),
+        servicesViewModel: WebViewModel(
+            url: URL(string: "https://www.alfieproj.com/services/store-services"),
+            dependencies: MockWebDependencyContainer()
+        )
+    )
+    .environmentObject(Coordinator())
+    .environmentObject(
+        TabCoordinator(tabs: [], activeTab: .shop(tab: .categories), serviceProvider: MockServiceProvider())
+    )
 }
 #endif

@@ -30,14 +30,16 @@ final class DefaultDeepLinkParser: DeepLinkParserProtocol {
         let path = url.cleanPath.lowercased()
 
         // Shop cases
+        // swiftlint:disable vertical_whitespace_between_cases
         switch path {
-            case PathComponents.shopBrands.rawValue:
-                return .init(type: .shop(route: ThemedURL.brands.path), fullUrl: url)
-            case PathComponents.shopServices.rawValue:
-                return .init(type: .shop(route: ThemedURL.services.path), fullUrl: url)
-            default:
-                break
+        case PathComponents.shopBrands.rawValue:
+            return .init(type: .shop(route: ThemedURL.brands.path), fullUrl: url)
+        case PathComponents.shopServices.rawValue:
+            return .init(type: .shop(route: ThemedURL.services.path), fullUrl: url)
+        default:
+            break
         }
+        // swiftlint:enable vertical_whitespace_between_cases
 
         let components = url.cleanPathComponents
 
@@ -46,19 +48,24 @@ final class DefaultDeepLinkParser: DeepLinkParserProtocol {
         }
 
         switch component {
-            case PathComponents.home.rawValue:
-                return .init(type: .home, fullUrl: url)
-            case PathComponents.shop.rawValue:
-                return .init(type: .shop(route: nil), fullUrl: url)
-            case PathComponents.bag.rawValue:
-                return .init(type: .bag, fullUrl: url)
-            case PathComponents.wishlist.rawValue:
-                return .init(type: .wishlist, fullUrl: url)
-            case PathComponents.account.rawValue:
-                return .init(type: .account, fullUrl: url)
-            default:
-                let normalisedWebUrl = url.httpSecureUrl(using: configuration)
-                return DeepLink(type: .webView(url: normalisedWebUrl), fullUrl: url)
+        case PathComponents.home.rawValue:
+            return .init(type: .home, fullUrl: url)
+
+        case PathComponents.shop.rawValue:
+            return .init(type: .shop(route: nil), fullUrl: url)
+
+        case PathComponents.bag.rawValue:
+            return .init(type: .bag, fullUrl: url)
+
+        case PathComponents.wishlist.rawValue:
+            return .init(type: .wishlist, fullUrl: url)
+
+        case PathComponents.account.rawValue:
+            return .init(type: .account, fullUrl: url)
+
+        default:
+            let normalisedWebUrl = url.httpSecureUrl(using: configuration)
+            return DeepLink(type: .webView(url: normalisedWebUrl), fullUrl: url)
         }
     }
 }

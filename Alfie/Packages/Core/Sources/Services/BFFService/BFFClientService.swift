@@ -14,28 +14,45 @@ public final class BFFClientService: BFFClientServiceProtocol {
     private let dependencies: BFFClientDependencyContainerProtocol
     private let baseUrl: Foundation.URL
 
-    public init(url: Foundation.URL,
-                sessionConfiguration: URLSessionConfiguration = .default,
-                logRequests: Bool = true,
-                dependencies: BFFClientDependencyContainerProtocol) {
+    public init(
+        url: Foundation.URL,
+        sessionConfiguration: URLSessionConfiguration = .default,
+        logRequests: Bool = true,
+        dependencies: BFFClientDependencyContainerProtocol
+    ) {
         self.dependencies = dependencies
         self.baseUrl = url
 
         let client = URLSessionClient(sessionConfiguration: sessionConfiguration)
         let cache = InMemoryNormalizedCache()
         let store = ApolloStore(cache: cache)
-        let provider = NetworkInterceptorProvider(client: client,
-                                                  store: store,
-                                                  reachabilityService: dependencies.reachabilityService,
-                                                  logRequests: logRequests)
-        let transport = RequestChainNetworkTransport(interceptorProvider: provider, endpointURL: url.appending(path: BFFEndpoint.graphQL.rawValue))
+        let provider = NetworkInterceptorProvider(
+            client: client,
+            store: store,
+            reachabilityService: dependencies.reachabilityService,
+            logRequests: logRequests
+        )
+        let transport = RequestChainNetworkTransport(
+            interceptorProvider: provider,
+            endpointURL: url.appending(path: BFFEndpoint.graphQL.rawValue)
+        )
         self.apolloClient = ApolloClient(networkTransport: transport, store: store)
     }
 
     // MARK: - BFFClientServiceProtocol
 
-    public func getHeaderNav(handle: NavigationHandle, includeSubItems: Bool, includeMedia: Bool) async throws -> [NavigationItem] {
-        guard let items = try await executeFetch(GetHeaderNavQuery(handle: handle.rawValue, fetchMedia: includeMedia, fetchSubItems: includeSubItems)).navigation?.items else {
+    public func getHeaderNav(
+        handle: NavigationHandle,
+        includeSubItems: Bool,
+        includeMedia: Bool
+    ) async throws -> [NavigationItem] {
+        guard let items = try await executeFetch(
+            GetHeaderNavQuery(
+                handle: handle.rawValue,
+                fetchMedia: includeMedia,
+                fetchSubItems: includeSubItems
+            )
+        ).navigation?.items else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return items.convertToNavigationItems()
@@ -55,7 +72,8 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 limit: limit,
                 categoryId: categoryId.map { .some($0) } ?? .none,
                 query: query.map { .some($0) } ?? .none
-            )).productListing
+            )
+        ).productListing
         else {
             throw BFFRequestError(type: .emptyResponse)
         }
@@ -107,25 +125,26 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     private static func resultAsFailure<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> BFFRequestError? {
         switch result {
-            case .success(let result):
-                if let errors = result.errors, !errors.isEmpty {
-                    return BFFRequestError(type: .generic, message: errors.first?.message)
-                } else {
-                    return nil
-                }
-            case .failure(let error):
-                if let bffError = error as? BFFRequestError {
-                    return bffError
-                } else {
-                    return BFFRequestError(type: .generic, error: error)
-                }
+        case .success(let result):
+            if let errors = result.errors, !errors.isEmpty {
+                return BFFRequestError(type: .generic, message: errors.first?.message)
+            } else {
+                return nil
+            }
+
+        case .failure(let error):
+            if let bffError = error as? BFFRequestError {
+                return bffError
+            } else {
+                return BFFRequestError(type: .generic, error: error)
+            }
         }
     }
 
     private static func resultAsSuccess<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> GraphQLResult<Data>? {
         guard
             case .success(let success) = result,
-            success.errors == nil || success.errors!.isEmpty
+            success.errors == nil || success.errors?.isEmpty == true
         else {
             return nil
         }

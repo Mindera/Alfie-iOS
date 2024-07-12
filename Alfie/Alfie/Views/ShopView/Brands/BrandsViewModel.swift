@@ -2,8 +2,8 @@ import Combine
 import Common
 import Core
 import Foundation
-import OrderedCollections
 import Models
+import OrderedCollections
 
 final class BrandsViewModel: BrandsViewModelProtocol {
     private enum Constants {
@@ -15,9 +15,14 @@ final class BrandsViewModel: BrandsViewModelProtocol {
     private let brandsService: BrandsServiceProtocol
     private lazy var placeholders: [Brand] = {
         (0..<Constants.placeholderItemCount).map { _ in
-            .init(id: UUID().uuidString,
-                  name: String(repeating: " ", count: .random(in: Constants.placeholderTitleLowerBound...Constants.placeholderTitleUpperBound)),
-                  slug: "")
+            .init(
+                id: UUID().uuidString,
+                name: String(
+                    repeating: " ",
+                    count: .random(in: Constants.placeholderTitleLowerBound...Constants.placeholderTitleUpperBound)
+                ),
+                slug: ""
+            )
         }
     }()
     @Published private(set) var state: ViewState<OrderedDictionary<String, [Brand]>, BrandsViewErrorType> = .loading
@@ -27,7 +32,8 @@ final class BrandsViewModel: BrandsViewModelProtocol {
     private(set) lazy var indexVisibilityPublisher: AnyPublisher<Bool, Never> = searchFocusStateSubject
         .map { [weak self] isFocused in
             isFocused ? false : self?.searchText.isEmpty == true
-        }.eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
 
     init(brandsService: BrandsServiceProtocol) {
         self.brandsService = brandsService
@@ -103,16 +109,17 @@ final class BrandsViewModel: BrandsViewModelProtocol {
             return
         }
 
-        let sortedBrands = validatedBrands.sorted(by: { $0.name < $1.name })
+        let sortedBrands = validatedBrands.sorted { $0.name < $1.name }
 
         let brandsPerLetterDictionary: [String: [Brand]] = {
-            Dictionary(grouping: sortedBrands, by: {
-                let normalizedName = $0.name.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            Dictionary(grouping: sortedBrands) {
+                let normalizedName = $0.name
+                    .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
                 guard let character = normalizedName.first else {
                     return ""
                 }
                 return character.uppercased()
-            })
+            }
         }()
 
         state = .success(OrderedDictionary(uniqueKeysWithValues: brandsPerLetterDictionary))

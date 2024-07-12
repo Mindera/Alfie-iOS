@@ -64,11 +64,11 @@ struct ThemedToggleStyle: ToggleStyle {
     }
 
     private func borderColor(_ configuration: Configuration) -> Color {
-        configuration.isOn ? isDisable ? ColorToggle.toggleBorderOnDisabled : ColorToggle.toggleBorderOn : isDisable ? ColorToggle.toggleBorderOffDisabled : ColorToggle.toggleBorderOff
+        configuration.isOn ? isDisable ? ColorToggle.toggleBorderOnDisabled : ColorToggle.toggleBorderOn : isDisable ? ColorToggle.toggleBorderOffDisabled : ColorToggle.toggleBorderOff // swiftlint:disable:this line_length
     }
 
     private func backgroundColor(_ configuration: Configuration) -> Color {
-        configuration.isOn ? isDisable ? ColorToggle.toggleBackgroundOnDisabled : ColorToggle.toggleBackgroundOn : isDisable ? ColorToggle.toggleBackgroundOffDisabled : ColorToggle.toggleBackgroundOff
+        configuration.isOn ? isDisable ? ColorToggle.toggleBackgroundOnDisabled : ColorToggle.toggleBackgroundOn : isDisable ? ColorToggle.toggleBackgroundOffDisabled : ColorToggle.toggleBackgroundOff // swiftlint:disable:this line_length
     }
 
     private func circleColor(_: Configuration) -> Color {
@@ -94,23 +94,18 @@ private enum ColorToggle {
 #Preview {
     @State var isOn = true
     return VStack {
-        ThemedToggleView(isOn: .constant(false), label: {
-            Text("This is a toggle")
-        })
+        ThemedToggleView(isOn: .constant(false)) { Text("This is a toggle") }
 
-        ThemedToggleView(isOn: .constant(true), label: {
+        ThemedToggleView(isOn: .constant(true)) {
             HStack {
                 Text("This is a toggle")
                 Icon.arrowLeft.image
             }
-        })
+        }
 
-        ThemedToggleView(isOn: .constant(false), isDisabled: .constant(true), label: {
-            Text("This is a toggle")
-        })
+        ThemedToggleView(isOn: .constant(false), isDisabled: .constant(true)) { Text("This is a toggle") }
 
-        ThemedToggleView(isOn: .constant(true), isDisabled: .constant(true), label: {
-            Text("This is a toggle")
-        })
-    }.padding(.horizontal, 20)
+        ThemedToggleView(isOn: .constant(true), isDisabled: .constant(true)) { Text("This is a toggle") }
+    }
+    .padding(.horizontal, 20)
 }

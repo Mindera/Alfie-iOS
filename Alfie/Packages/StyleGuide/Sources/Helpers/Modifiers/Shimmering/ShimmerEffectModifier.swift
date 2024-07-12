@@ -12,13 +12,15 @@ struct ShimmerEffectModifier: ViewModifier {
     private let disabledWhileShimmering: Bool
     private let animateOnStateTransition: Bool
 
-    init(isLoading: Binding<Bool>,
-         cornerRadius: CGFloat = 0,
-         blurRadius: CGFloat = 0,
-         customLighterShimmerColor: Color? = nil,
-         customDarkerShimmerColor: Color? = nil,
-         disabledWhileShimmering: Bool,
-         animateOnStateTransition: Bool = true) {
+    init(
+        isLoading: Binding<Bool>,
+        cornerRadius: CGFloat = 0,
+        blurRadius: CGFloat = 0,
+        customLighterShimmerColor: Color? = nil,
+        customDarkerShimmerColor: Color? = nil,
+        disabledWhileShimmering: Bool,
+        animateOnStateTransition: Bool = true
+    ) {
         self._isLoading = isLoading
         self.shouldShowShimmer = isLoading.wrappedValue
         self.cornerRadius = cornerRadius
@@ -27,7 +29,7 @@ struct ShimmerEffectModifier: ViewModifier {
         self.darkerShimmerColor = customDarkerShimmerColor ?? Colors.primary.mono300
         self.disabledWhileShimmering = disabledWhileShimmering
         self.animateOnStateTransition = animateOnStateTransition
-     }
+    }
 
     func body(content: Content) -> some View {
         if shouldShowShimmer {

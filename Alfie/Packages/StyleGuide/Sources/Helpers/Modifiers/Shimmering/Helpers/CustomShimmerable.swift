@@ -27,26 +27,29 @@ extension CustomShimmerable {
 // MARK: Overloads:
 extension CustomShimmerable {
     public func shimmering(while loading: Binding<Bool>, disabledWhileShimmering: Bool = true) -> some View {
-        self
-            .modifier(
-                ShimmerEffectModifier(isLoading: loading,
-                                      cornerRadius: cornerRadius,
-                                      customLighterShimmerColor: customLighterShimmerColor,
-                                      customDarkerShimmerColor: customDarkerShimmerColor,
-                                      disabledWhileShimmering: disabledWhileShimmering)
+        self.modifier(
+            ShimmerEffectModifier(
+                isLoading: loading,
+                cornerRadius: cornerRadius,
+                customLighterShimmerColor: customLighterShimmerColor,
+                customDarkerShimmerColor: customDarkerShimmerColor,
+                disabledWhileShimmering: disabledWhileShimmering
             )
+        )
     }
 }
 
 extension CustomShimmerable {
-    public func shimmeringMultiline(while loading: Binding<Bool>,
-                                    lines: Int = 5,
-                                    lineMaxRandomPadding: CGFloat = 0,
-                                    lineSpacing: CGFloat? = nil,
-                                    font: UIFont,
-                                    disabledWhileShimmering: Bool = true) -> some View {
-        self
-            .modifier(MultilineShimmerEffectModifier(
+    public func shimmeringMultiline(
+        while loading: Binding<Bool>,
+        lines: Int = 5,
+        lineMaxRandomPadding: CGFloat = 0,
+        lineSpacing: CGFloat? = nil,
+        font: UIFont,
+        disabledWhileShimmering: Bool = true
+    ) -> some View {
+        self.modifier(
+            MultilineShimmerEffectModifier(
                 isLoading: loading,
                 cornerRadius: cornerRadius,
                 customLighterShimmerColor: customLighterShimmerColor,
@@ -55,7 +58,8 @@ extension CustomShimmerable {
                 font: font,
                 lineMaxRandomPadding: lineMaxRandomPadding,
                 lineSpacing: lineSpacing ?? font.lineHeight / 5,
-                disabledWhileShimmering: disabledWhileShimmering)
+                disabledWhileShimmering: disabledWhileShimmering
             )
+        )
     }
 }

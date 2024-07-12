@@ -12,14 +12,16 @@ public struct HorizontalProductCard: View {
     private let size: String
     private let priceType: PriceType
 
-    public init(image: URL?,
-                designer: String = "",
-                name: String = "",
-                colorTitle: String = "",
-                color: String = "",
-                sizeTitle: String = "",
-                size: String = "",
-                priceType: PriceType) {
+    public init(
+        image: URL?,
+        designer: String = "",
+        name: String = "",
+        colorTitle: String = "",
+        color: String = "",
+        sizeTitle: String = "",
+        size: String = "",
+        priceType: PriceType
+    ) {
         self.image = image
         self.designer = designer
         self.name = name
@@ -30,9 +32,7 @@ public struct HorizontalProductCard: View {
         self.priceType = priceType
     }
 
-    init(product: Product,
-         colorTitle: String = "",
-         sizeTitle: String = "") {
+    init(product: Product, colorTitle: String = "", sizeTitle: String = "") {
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name
@@ -70,18 +70,18 @@ public struct HorizontalProductCard: View {
         Spacer()
     }
 
-    @ViewBuilder
-    private var productImageView: some View {
+    @ViewBuilder private var productImageView: some View {
         VStack {
-            RemoteImage(url: image, success: { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-            }, placeholder: {
-                Colors.primary.mono050
-            }, failure: { _ in
-                Colors.primary.mono050
-            })
+            RemoteImage(
+                url: image,
+                success: { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                },
+                placeholder: { Colors.primary.mono050 },
+                failure: { _ in Colors.primary.mono050 }
+            )
         }
         .frame(width: Constants.productImageWidth, height: Constants.productImageHeight)
     }
@@ -124,10 +124,10 @@ public struct HorizontalProductCard: View {
     }
 
     private var productPriceView: some View {
-        PriceComponentView(type: priceType,
-                           configuration: .init(preferredDistribution: .horizontal,
-                                                size: .small,
-                                                textAlignment: .leading))
+        PriceComponentView(
+            type: priceType,
+            configuration: .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
+        )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.productPrice)
     }
@@ -162,5 +162,6 @@ private enum Constants {
         color: "104",
         sizeTitle: "Size:",
         size: "No size",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD"))
+        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+    )
 }

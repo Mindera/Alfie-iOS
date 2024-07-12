@@ -4,8 +4,7 @@ public struct SizingSelectorComponentView: View {
     @ObservedObject private var configuration: SizingSelectorConfiguration
     private let layoutConfiguration: SwatchLayoutConfiguration
 
-    public init(configuration: SizingSelectorConfiguration,
-                layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: SizingSelectorConfiguration, layoutConfiguration: SwatchLayoutConfiguration) {
         self.configuration = configuration
         self.layoutConfiguration = layoutConfiguration
     }
@@ -29,20 +28,23 @@ public struct SizingSelectorComponentView: View {
         }
     }
 
-    @ViewBuilder
-    private var container: some View {
+    @ViewBuilder private var container: some View {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch layoutConfiguration.arrangement {
-            case .horizontal(let itemSpacing, let scrollable):
-                horizontalSwatches(itemSpacing: itemSpacing, scrollable: scrollable)
-            case .chips(let horizontalSpacing, let verticalSpacing):
-                chipsSwatches(horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
-            case .grid(let columns, let columnWidth):
-                gridSwatches(columns: columns, columnWidth: columnWidth)
+        case .horizontal(let itemSpacing, let scrollable):
+            horizontalSwatches(itemSpacing: itemSpacing, scrollable: scrollable)
+        case .chips(let horizontalSpacing, let verticalSpacing):
+            chipsSwatches(horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
+        case .grid(let columns, let columnWidth):
+            gridSwatches(columns: columns, columnWidth: columnWidth)
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private func gridSwatches(columns: Int, columnWidth: CGFloat) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: columnWidth), alignment: .topLeading), count: columns)) {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(minimum: columnWidth), alignment: .topLeading), count: columns)
+        ) {
             swatches()
         }
     }
@@ -90,7 +92,8 @@ public struct SizingSelectorComponentView: View {
                 .init(name: "XXL", state: .outOfStock),
                 .init(name: "XXXL", state: .unavailable),
                 .init(name: "XXXXL", state: .available),
-            ]),
+            ]
+        ),
         layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
     )
 }
@@ -108,10 +111,11 @@ public struct SizingSelectorComponentView: View {
                 .init(name: "XXL", state: .outOfStock),
                 .init(name: "XXXL", state: .unavailable),
                 .init(name: "XXXXL", state: .available),
-            ]),
-        layoutConfiguration: .init(arrangement: .chips(
-            itemHorizontalSpacing: Spacing.space200,
-            itemVerticalSpacing: Spacing.space200))
+            ]
+        ),
+        layoutConfiguration: .init(
+            arrangement: .chips(itemHorizontalSpacing: Spacing.space200, itemVerticalSpacing: Spacing.space200)
+        )
     )
 }
 
@@ -128,7 +132,8 @@ public struct SizingSelectorComponentView: View {
                 .init(name: "XXL", state: .outOfStock),
                 .init(name: "XXXL", state: .unavailable),
                 .init(name: "XXXXL", state: .available),
-            ]),
+            ]
+        ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))
     )
 }

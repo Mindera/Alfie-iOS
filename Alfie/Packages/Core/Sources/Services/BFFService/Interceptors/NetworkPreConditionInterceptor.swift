@@ -18,13 +18,15 @@ final class NetworkPreConditionInterceptor: ApolloInterceptor {
         completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
     ) where Operation: GraphQLOperation {
         guard reachabilityService.isNetworkAvailable else {
-            chain.handleErrorAsync(BFFRequestError(type: .noInternet, error: nil), request: request, response: response, completion: completion)
+            chain.handleErrorAsync(
+                BFFRequestError(type: .noInternet, error: nil),
+                request: request,
+                response: response,
+                completion: completion
+            )
             return
         }
 
-        chain.proceedAsync(request: request,
-                           response: response,
-                           interceptor: self,
-                           completion: completion)
+        chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
     }
 }

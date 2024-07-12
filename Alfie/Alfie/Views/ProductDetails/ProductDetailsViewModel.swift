@@ -55,9 +55,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     var shareConfiguration: ShareConfiguration? {
-        guard let product,
-              let selectedVariant,
-              state.isSuccess
+        guard
+            let product,
+            let selectedVariant,
+            state.isSuccess
         else {
             return nil
         }
@@ -67,11 +68,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         let shareSubject = productName + " " + LocalizableProductDetails.$shareTitleFrom
-        let shareMessage = "\n" + productTitle + "\n" + productName + "\n" + selectedVariant.price.amount.amountFormatted + "\n"
+        let selectedVariantAmount = selectedVariant.price.amount.amountFormatted
+        let shareMessage = "\n" + productTitle + "\n" + productName + "\n" + selectedVariantAmount + "\n"
 
-        return ShareConfiguration(url: url,
-                                  message: shareMessage,
-                                  subject: shareSubject)
+        return ShareConfiguration(url: url, message: shareMessage, subject: shareSubject)
     }
 
     var shouldShowMediaPaginatedControl: Bool {
@@ -100,43 +100,47 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     func shouldShowLoading(for section: ProductDetailsSection) -> Bool {
         switch section {
-            case .titleHeader:
-                return state.isLoading && productName.isEmpty
-            case .colorSelector,
-                 .mediaCarousel,
-                 .complementaryInfo:
-                return state.isLoading
-            case .productDescription,
-                 .addToBag:
-                return false
+        case .titleHeader:
+            return state.isLoading && productName.isEmpty
+        case .colorSelector,
+            .mediaCarousel,
+            .complementaryInfo:
+            return state.isLoading
+        case .productDescription,
+            .addToBag:
+            return false
         }
     }
 
     func shouldShow(section: ProductDetailsSection) -> Bool {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch section {
-            case .titleHeader,
-                 .colorSelector:
-                return true
-            case .complementaryInfo:
-                return !complementaryInfoToShow.isEmpty
-            case .mediaCarousel:
-                return state.isLoading || !productImageUrls.isEmpty
-            case .productDescription:
-                return !productDescription.isEmpty
-            case .addToBag:
-                return state.isSuccess
+        case .titleHeader,
+            .colorSelector:
+            return true
+        case .complementaryInfo:
+            return !complementaryInfoToShow.isEmpty
+        case .mediaCarousel:
+            return state.isLoading || !productImageUrls.isEmpty
+        case .productDescription:
+            return !productDescription.isEmpty
+        case .addToBag:
+            return state.isSuccess
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature? {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch type {
-            case .delivery:
-                return nil
-            case .paymentOptions:
-                return .paymentOptions
-            case .returns:
-                return .returnOptions
+        case .delivery:
+            return nil
+        case .paymentOptions:
+            return .paymentOptions
+        case .returns:
+            return .returnOptions
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     var productHasStock: Bool {
@@ -190,12 +194,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         var selectedSwatch: ColorSwatch?
         if let selectedVariant {
-            selectedSwatch = colorSwatches.first(where: { $0.id == selectedVariant.colour?.id })
+            selectedSwatch = colorSwatches.first { $0.id == selectedVariant.colour?.id }
         }
 
-        colorSelectionConfiguration = .init(selectedTitle: "",
-                                            items: colorSwatches,
-                                            selectedItem: selectedSwatch)
+        colorSelectionConfiguration = .init(selectedTitle: "", items: colorSwatches, selectedItem: selectedSwatch)
         colorSelectionSubscription = colorSelectionConfiguration.$selectedItem
             .receive(on: DispatchQueue.main)
             .dropFirst()
@@ -217,12 +219,9 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 type = .color(Colors.primary.black)
             }
 
-            let isAvailable = product.variants.contains(where: { $0.colour?.id == color.id && $0.stock > 0 })
+            let isAvailable = product.variants.contains { $0.colour?.id == color.id && $0.stock > 0 }
 
-            return ColorSwatch(id: color.id,
-                               name: color.name,
-                               type: type,
-                               isDisabled: !isAvailable)
+            return ColorSwatch(id: color.id, name: color.name, type: type, isDisabled: !isAvailable)
         }
     }
 
@@ -235,10 +234,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             guard let color = variant.colour, !productColors.contains(where: { $0.id == color.id }) else {
                 return
             }
-            productColors.append(Product.Colour(id: color.id,
-                                                swatch: color.swatch,
-                                                name: color.name,
-                                                media: color.media))
+            productColors
+                .append(Product.Colour(id: color.id, swatch: color.swatch, name: color.name, media: color.media))
         }
         return productColors
     }

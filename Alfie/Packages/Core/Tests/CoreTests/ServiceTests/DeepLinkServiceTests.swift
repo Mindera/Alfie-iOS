@@ -128,7 +128,7 @@ final class DeepLinkServiceTests: XCTestCase {
         }
         handler.onHandleDeepLinkCalled = { deepLink in
             expectation.fulfill()
-            guard case let .webView(url) = deepLink.type else {
+            guard case .webView(let url) = deepLink.type else {
                 XCTFail("Unexpected deeplink type \(deepLink)")
                 return
             }
@@ -196,7 +196,7 @@ final class DeepLinkServiceTests: XCTestCase {
             true
         }
         handler1.onHandleDeepLinkCalled = { deepLink in
-            guard case let .webView(url) = deepLink.type else {
+            guard case .webView(let url) = deepLink.type else {
                 XCTFail("Unexpected deeplink type \(deepLink)")
                 calledExpectation.fulfill()
                 return

@@ -56,13 +56,16 @@ struct BrazeDemoView: View {
 // temp stuff for local notification
 extension BrazeDemoView {
     private func presentLocalNotificationIfPossible() async {
-        notificationsAuthorized = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .authorized
+        notificationsAuthorized = await UNUserNotificationCenter
+            .current()
+            .notificationSettings()
+            .authorizationStatus == .authorized
         showNotificationTriggeredAlert = true
         try? await UNUserNotificationCenter.current().add(notificationRequest(delay: delayForAlert))
     }
 
     private var notificationTriggerAlertMessage: String {
-        notificationsAuthorized ? "Notification scheduled. Please wait approximately 3 seconds." : "You must enable notifications first."
+        notificationsAuthorized ? "Notification scheduled. Please wait approximately 3 seconds." : "You must enable notifications first." // swiftlint:disable:this line_length
     }
 
     private func notificationRequest(delay: Double) -> UNNotificationRequest {
@@ -70,8 +73,10 @@ extension BrazeDemoView {
         notificationContent.title = "Quality never goes out of style!"
         notificationContent.body = "Discover new season pieces to love now and forever."
 
-        return UNNotificationRequest(identifier: UUID().uuidString,
-                                     content: notificationContent,
-                                     trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false))
+        return UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: notificationContent,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
+        )
     }
 }

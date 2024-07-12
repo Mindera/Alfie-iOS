@@ -11,21 +11,23 @@ public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderPro
     public var isReady: Bool { isReadySubject.value }
     public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
 
-    public init(remoteConfig: RemoteConfig = RemoteConfig.remoteConfig(),
-                remoteConfigSettings: RemoteConfigSettings = RemoteConfigSettings(),
-                minimumFetchInterval: TimeInterval) {
+    public init(
+        remoteConfig: RemoteConfig = RemoteConfig.remoteConfig(),
+        remoteConfigSettings: RemoteConfigSettings = RemoteConfigSettings(),
+        minimumFetchInterval: TimeInterval
+    ) {
         self.remoteConfig = remoteConfig
         self.remoteConfigSettings = remoteConfigSettings
         self.remoteConfigSettings.minimumFetchInterval = minimumFetchInterval
 
         remoteConfig.configSettings = remoteConfigSettings
-        remoteConfig.fetchAndActivate(completionHandler: { [weak self] _, error in
+        remoteConfig.fetchAndActivate { [weak self] _, error in
             if let error {
                 logError("Firebase remote configuration fetch and activate failed with error: \(error.localizedDescription)")
             } else {
                 self?.isReadySubject.value = true
             }
-        })
+        }
     }
 
     // MARK: - ConfigurationProviderProtocol

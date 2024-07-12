@@ -1,6 +1,6 @@
-import SwiftUI
-import OrderedCollections
 import Common
+import OrderedCollections
+import SwiftUI
 
 private enum Constants {
     static let minTransitionOpacity: CGFloat = 0.8
@@ -19,12 +19,14 @@ public struct TabbedView<Content>: View where Content: View {
 
     /// - Parameters:
     ///   - lazyLoading: always true on iOS 16!
-    public init(currentIndex: Binding<Int>,
-                theme: TabControl.Theme,
-                configuration: TabControl.Configuration,
-                lazyLoading: Bool = true,
-                swipeToSwitchTabEnabled: Bool = true,
-                tabs: OrderedDictionary<TabControl.TabOption, Content>) {
+    public init(
+        currentIndex: Binding<Int>,
+        theme: TabControl.Theme,
+        configuration: TabControl.Configuration,
+        lazyLoading: Bool = true,
+        swipeToSwitchTabEnabled: Bool = true,
+        tabs: OrderedDictionary<TabControl.TabOption, Content>
+    ) {
         self._currentIndex = currentIndex
         self.theme = theme
         self.configuration = configuration
@@ -35,16 +37,12 @@ public struct TabbedView<Content>: View where Content: View {
 
     public var body: some View {
         VStack {
-            TabControl(theme: theme,
-                       configuration: configuration,
-                       options: options,
-                       currentIndex: $currentIndex)
+            TabControl(theme: theme, configuration: configuration, options: options, currentIndex: $currentIndex)
             tabbedCarousel
         }
     }
 
-    @ViewBuilder
-    private var tabbedCarousel: some View {
+    @ViewBuilder private var tabbedCarousel: some View {
         if #available(iOS 17.0, *) {
             ScrollView(.horizontal, showsIndicators: false) {
                 if lazyLoading {
@@ -69,7 +67,8 @@ public struct TabbedView<Content>: View where Content: View {
             TabView(selection: $currentIndex) {
                 ForEach(Array(tabs.enumerated()), id: \.0) { _, tab in
                     tab.value
-                        .gesture(swipeToSwitchTabEnabled ? nil : DragGesture()) // this doesnt do anything, its just a simple hack to disable the swipe on iOS 16
+                    // this doesnt do anything, its just a simple hack to disable the swipe on iOS 16
+                        .gesture(swipeToSwitchTabEnabled ? nil : DragGesture())
                         .accessibilityIdentifier(tab.key.accessibilityId.orEmpty)
                 }
             }
@@ -83,8 +82,8 @@ public struct TabbedView<Content>: View where Content: View {
     }
 
     @available(iOS 17.0, *)
-    @ViewBuilder
-    private var stackContent: some View {
+    // swiftlint:disable:next attributes
+    @ViewBuilder private var stackContent: some View {
         ForEach(Array(tabs.enumerated()), id: \.0) { _, tab in
             tab.value
                 .accessibilityIdentifier(tab.key.accessibilityId.orEmpty)

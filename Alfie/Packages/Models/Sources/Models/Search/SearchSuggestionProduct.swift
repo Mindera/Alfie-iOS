@@ -14,12 +14,7 @@ public struct SearchSuggestionProduct: Identifiable, Equatable, Hashable {
     /// For building a navigation link to the product.
     public let slug: String
 
-    public init(id: String,
-                name: String,
-                brandName: String,
-                media: [Media],
-                price: Price,
-                slug: String) {
+    public init(id: String, name: String, brandName: String, media: [Media], price: Price, slug: String) {
         self.id = id
         self.name = name
         self.brandName = brandName

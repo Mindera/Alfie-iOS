@@ -1,5 +1,5 @@
-import Models
 import Foundation
+import Models
 
 final class EndpointSelectionViewModel: ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol

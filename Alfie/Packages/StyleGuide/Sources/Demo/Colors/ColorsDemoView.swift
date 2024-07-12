@@ -142,8 +142,10 @@ private extension Color {
         }
 
         let descriptionString = "\(self)"
-        let results = regex.matches(in: descriptionString,
-                                    range: NSRange(descriptionString.startIndex..., in: descriptionString))
+        let results = regex.matches(
+            in: descriptionString,
+            range: NSRange(descriptionString.startIndex..., in: descriptionString)
+        )
 
         let matches = results.map {
             guard let range = Range($0.range, in: descriptionString) else {
@@ -157,5 +159,5 @@ private extension Color {
         }
 
         return match.replacingOccurrences(of: "\"", with: "")
-   }
+    }
 }

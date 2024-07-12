@@ -11,7 +11,7 @@ public enum WebViewState {
 
 public extension WebViewState {
     var url: URL? {
-        guard case let .ready(url) = self else {
+        guard case .ready(let url) = self else {
             return nil
         }
         return url
@@ -53,14 +53,14 @@ public extension WebViewState {
     }
 
     var failure: WebViewErrorType? {
-        guard case let .error(type) = self else {
+        guard case .error(let type) = self else {
             return nil
         }
         return type
     }
 
     var navigationOperation: WebViewNavigationOperation? {
-        guard case let .needsNavigation(operation) = self else {
+        guard case .needsNavigation(let operation) = self else {
             return nil
         }
         return operation

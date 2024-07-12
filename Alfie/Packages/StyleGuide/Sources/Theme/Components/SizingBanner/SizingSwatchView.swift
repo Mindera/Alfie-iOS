@@ -30,7 +30,10 @@ public struct SizingSwatchView: View {
 
                         RoundedRectangle(cornerRadius: CornerRadius.xs)
                             .inset(by: Constants.borderLineWidth)
-                            .stroke(item.state == .available ? Colors.primary.black : Constants.disabledStateColor, lineWidth: Constants.borderLineWidth)
+                            .stroke(
+                                item.state == .available ? Colors.primary.black : Constants.disabledStateColor,
+                                lineWidth: Constants.borderLineWidth
+                            )
 
                         outOfStockSlashView
                     }
@@ -45,8 +48,7 @@ public struct SizingSwatchView: View {
         return isSelected ? Colors.primary.white : Colors.primary.black
     }
 
-    @ViewBuilder
-    private var outOfStockSlashView: some View {
+    @ViewBuilder private var outOfStockSlashView: some View {
         if item.state == .outOfStock {
             theme.shape.unavailableCrossedOutShape()
                 .stroke(Constants.disabledStateColor, style: StrokeStyle(lineWidth: Constants.borderLineWidth))
