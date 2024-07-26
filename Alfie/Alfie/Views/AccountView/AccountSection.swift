@@ -13,17 +13,17 @@ enum AccountSection: CaseIterable {
     var title: String {
         switch self {
         case .myDetails:
-            return "My Details"
+            "My Details"
         case .myOrders:
-            return "My Orders"
+            "My Orders"
         case .wallet:
-            return "Wallet"
+            "Wallet"
         case .myAddressBook:
-            return "My Address Book"
+            "My Address Book"
         case .wishlist:
-            return "Wishlist"
+            "Wishlist"
         case .signOut:
-            return "Sign Out"
+            "Sign Out"
         }
     }
 

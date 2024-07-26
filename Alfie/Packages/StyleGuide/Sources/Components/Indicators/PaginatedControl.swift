@@ -45,7 +45,7 @@ public struct PaginatedControl: View {
                         .font(Font(theme.font.tiny.normal))
                         .foregroundStyle(configuration.textColor)
                         .animation(.emphasized, value: selectedIndex)
-                    // safe width to avoid view self sizing for every change
+                        // safe width to avoid view self sizing for every change
                         .frame(minWidth: 16, alignment: .trailing)
                 }
 

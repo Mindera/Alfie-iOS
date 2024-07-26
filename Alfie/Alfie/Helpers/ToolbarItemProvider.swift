@@ -47,6 +47,7 @@ enum ToolbarItemProvider {
                     style: .leftText(LocalizableWishList.$title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
+
             case .webView,
                 .webFeature,
                 .account,
@@ -85,6 +86,7 @@ enum ToolbarItemProvider {
 
             case .productDetails:
                 EmptyView() // Set by the view, as the title depends on each individual product
+
             case .productListing(let configuration):
                 ThemedToolbarTitle(
                     style: .text(configuration.category.orEmpty),

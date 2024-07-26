@@ -40,11 +40,9 @@ struct AppUpdateDemoView: View {
             .padding(.top, Spacing.space200)
 
         if let softUpdate = configurationService.softAppUpdateInfo {
-            ThemedButton(text: "Open") {
-                isShowingAppUpdateAlert = true
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .padding(.top, -Spacing.space700)
+            ThemedButton(text: "Open") { isShowingAppUpdateAlert = true }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.top, -Spacing.space700)
 
             appUpdateInfoView(softUpdate, isActive: configurationService.isSoftAppUpdateAvailable)
         } else {

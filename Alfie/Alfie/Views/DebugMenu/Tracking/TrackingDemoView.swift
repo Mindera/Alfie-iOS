@@ -27,7 +27,7 @@ struct TrackingDemoView: View {
                                     Text.build(theme.font.paragraph.bold(trackedEvent.name ?? ""))
                                     Text.build(
                                         theme.font.paragraph.normal(
-                                        "(" + trackedTime(from: trackedEvent.trackedDate) + ")"
+                                            "(" + trackedTime(from: trackedEvent.trackedDate) + ")"
                                         )
                                     )
                                 }
@@ -35,12 +35,10 @@ struct TrackingDemoView: View {
                                     Text.build(theme.font.small.normal("Providers:"))
                                     Text.build(
                                         theme.font.small.normal(
-                                            (
-                                                trackedEvent
-                                                    .providers
-                                                    .map { $0.replacingOccurrences(of: "com.", with: "").capitalized }
-                                                    .joined(separator: " ")
-                                            )
+                                            trackedEvent
+                                                .providers
+                                                .map { $0.replacingOccurrences(of: "com.", with: "").capitalized }
+                                                .joined(separator: " ")
                                         )
                                     )
                                 }

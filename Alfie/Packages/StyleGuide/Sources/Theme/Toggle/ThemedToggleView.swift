@@ -64,11 +64,15 @@ struct ThemedToggleStyle: ToggleStyle {
     }
 
     private func borderColor(_ configuration: Configuration) -> Color {
-        configuration.isOn ? isDisable ? ColorToggle.toggleBorderOnDisabled : ColorToggle.toggleBorderOn : isDisable ? ColorToggle.toggleBorderOffDisabled : ColorToggle.toggleBorderOff // swiftlint:disable:this line_length
+        configuration.isOn
+        ? isDisable ? ColorToggle.toggleBorderOnDisabled : ColorToggle.toggleBorderOn
+        : isDisable ? ColorToggle.toggleBorderOffDisabled : ColorToggle.toggleBorderOff
     }
 
     private func backgroundColor(_ configuration: Configuration) -> Color {
-        configuration.isOn ? isDisable ? ColorToggle.toggleBackgroundOnDisabled : ColorToggle.toggleBackgroundOn : isDisable ? ColorToggle.toggleBackgroundOffDisabled : ColorToggle.toggleBackgroundOff // swiftlint:disable:this line_length
+        configuration.isOn
+        ? isDisable ? ColorToggle.toggleBackgroundOnDisabled : ColorToggle.toggleBackgroundOn
+        : isDisable ? ColorToggle.toggleBackgroundOffDisabled : ColorToggle.toggleBackgroundOff
     }
 
     private func circleColor(_: Configuration) -> Color {

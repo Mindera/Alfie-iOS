@@ -99,6 +99,7 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
 
         case .productListing(let configuration):
             coordinator.openProductListing(configuration: configuration)
+
         case .search,
             .recentSearches,
             .debugMenu:
@@ -158,19 +159,18 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
 
 extension TabScreen {
     var title: LocalizedStringResource {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .home:
             LocalizableGeneral.home
-
         case .shop:
             LocalizableGeneral.shop
-
         case .wishlist:
             LocalizableGeneral.wishlist
-
         case .bag:
             LocalizableGeneral.bag
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     var icon: Icon {

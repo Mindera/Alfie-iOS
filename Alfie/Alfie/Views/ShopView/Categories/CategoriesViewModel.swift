@@ -116,6 +116,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         switch category.type {
         case .listing:
             openCategorySubject.send(.plp(category: categoryUrl.deletingPrefix("/")))
+
         case .externalHttp,
             .home,
             .page,

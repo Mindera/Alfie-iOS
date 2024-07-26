@@ -46,15 +46,15 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        guard let items = try await executeFetch(
+        let items = try await executeFetch(
             GetHeaderNavQuery(
                 handle: handle.rawValue,
                 fetchMedia: includeMedia,
                 fetchSubItems: includeSubItems
             )
-        ).navigation?.items else {
-            throw BFFRequestError(type: .emptyResponse)
-        }
+        ).navigation?.items
+
+        guard let items else { throw BFFRequestError(type: .emptyResponse) }
         return items.convertToNavigationItems()
     }
 
@@ -126,18 +126,18 @@ public final class BFFClientService: BFFClientServiceProtocol {
     private static func resultAsFailure<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> BFFRequestError? {
         switch result {
         case .success(let result):
-            if let errors = result.errors, !errors.isEmpty {
-                return BFFRequestError(type: .generic, message: errors.first?.message)
-            } else {
+            guard
+                let errors = result.errors,
+                !errors.isEmpty
+            else {
                 return nil
             }
 
+            return BFFRequestError(type: .generic, message: errors.first?.message)
+
         case .failure(let error):
-            if let bffError = error as? BFFRequestError {
-                return bffError
-            } else {
-                return BFFRequestError(type: .generic, error: error)
-            }
+            guard let bffError = error as? BFFRequestError else { return BFFRequestError(type: .generic, error: error) }
+            return bffError
         }
     }
 

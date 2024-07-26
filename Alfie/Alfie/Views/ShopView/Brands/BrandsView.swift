@@ -369,9 +369,7 @@ private enum Constants {
     return BrandsView(
         viewModel: MockBrandsViewModel(
             state: .success(
-                OrderedDictionary(
-                    grouping: brands
-                ) {
+                OrderedDictionary(grouping: brands) {
                     guard let firstCharacter = $0.name.first else { return "" }
                     return String(firstCharacter)
                 }

@@ -65,7 +65,9 @@ extension BrazeDemoView {
     }
 
     private var notificationTriggerAlertMessage: String {
-        notificationsAuthorized ? "Notification scheduled. Please wait approximately 3 seconds." : "You must enable notifications first." // swiftlint:disable:this line_length
+        notificationsAuthorized
+        ? "Notification scheduled. Please wait approximately 3 seconds."
+        : "You must enable notifications first."
     }
 
     private func notificationRequest(delay: Double) -> UNNotificationRequest {
