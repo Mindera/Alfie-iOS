@@ -66,8 +66,8 @@ extension BrazeDemoView {
 
     private var notificationTriggerAlertMessage: String {
         notificationsAuthorized
-        ? "Notification scheduled. Please wait approximately 3 seconds."
-        : "You must enable notifications first."
+            ? "Notification scheduled. Please wait approximately 3 seconds."
+            : "You must enable notifications first."
     }
 
     private func notificationRequest(delay: Double) -> UNNotificationRequest {
