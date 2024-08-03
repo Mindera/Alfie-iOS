@@ -9,19 +9,19 @@ public struct SnapCarouselDemoView: View {
             DemoHelper.demoSectionHeader(title: "PDP Image Gallery")
                 .padding(.horizontal, Spacing.space200)
                 .padding(.bottom, Spacing.space0)
-            SnapCarousel(itemIndex: $index,
-                         items: {
+            SnapCarousel(
+                itemIndex: $index
+            ) {
                 imageNames.map { name in
                     Image(name, bundle: .module)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .cornerRadius(CornerRadius.s)
                 }
-            })
-            PaginatedControl(configuration: .init(),
-                             itemsCount: 4,
-                             selectedIndex: $index)
-            .frame(maxHeight: Spacing.space200)
+            }
+
+            PaginatedControl(configuration: .init(), itemsCount: 4, selectedIndex: $index)
+                .frame(maxHeight: Spacing.space200)
         }
         Spacer()
     }

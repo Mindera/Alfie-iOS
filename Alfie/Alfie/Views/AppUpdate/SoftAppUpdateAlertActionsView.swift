@@ -25,8 +25,11 @@ struct SoftAppUpdateAlertActionsView: View {
 
 #if DEBUG
 #Preview {
-    SoftAppUpdateAlertActionsView(update: .fixture(
-        confirmActionText: "Update now",
-        cancelActionText: "Later"))
+    SoftAppUpdateAlertActionsView(
+        update: .fixture(
+            confirmActionText: "Update now",
+            cancelActionText: "Later"
+        )
+    )
 }
 #endif

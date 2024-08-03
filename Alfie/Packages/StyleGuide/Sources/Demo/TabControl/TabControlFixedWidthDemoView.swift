@@ -13,10 +13,14 @@ struct TabControlFixedWidthDemoView: View {
     }
     var body: some View {
         VStack {
-            TabControl(theme: theme,
-                       configuration: .fixedSize(horizontalMargins: padding),
-                       options: currentOptions.map { TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil) },
-                       currentIndex: $currentIndex)
+            TabControl(
+                theme: theme,
+                configuration: .fixedSize(horizontalMargins: padding),
+                options: currentOptions.map {
+                    TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil)
+                },
+                currentIndex: $currentIndex
+            )
 
             TabView(selection: $currentIndex) {
                 ForEach(Array(currentOptions.enumerated()), id: \.0) { _, value in

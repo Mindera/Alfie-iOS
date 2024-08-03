@@ -45,44 +45,57 @@ struct ColorBannerDemoView: View {
             VStack(spacing: Spacing.space250) {
                 Spacer()
                 section(title: "Color Swatches - Scrollable") {
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedTitle,
-                                                                    items: Self.items),
-                                               layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100)))
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedTitle,
-                                                                    items: Self.itemsSmall),
-                                               layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100)))
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
+                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
+                    )
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
+                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
+                    )
                 }
 
                 Spacer()
 
                 section(title: "Color Swatches - Chips") {
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedTitle,
-                                                                    items: Self.items),
-                                               layoutConfiguration: .init(arrangement: .chips(itemHorizontalSpacing: Spacing.space100,
-                                                                                              itemVerticalSpacing: Spacing.space100)))
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedTitle,
-                                                                    items: Self.itemsSmall),
-                                               layoutConfiguration: .init(arrangement: .chips(itemHorizontalSpacing: Spacing.space100,
-                                                                                              itemVerticalSpacing: Spacing.space100)))
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
+                        layoutConfiguration: .init(
+                            arrangement: .chips(
+                                itemHorizontalSpacing: Spacing.space100, itemVerticalSpacing: Spacing.space100
+                            )
+                        )
+                    )
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
+                        layoutConfiguration: .init(
+                            arrangement: .chips(
+                                itemHorizontalSpacing: Spacing.space100, itemVerticalSpacing: Spacing.space100
+                            )
+                        )
+                    )
                 }
 
                 Spacer()
 
                 section(title: "Color Swatches - Grid") {
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedTitle,
-                                                                    items: Self.items),
-                                               layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50)))
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedTitle,
-                                                                    items: Self.itemsSmall),
-                                               layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50)))
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
+                        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
+                    )
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
+                        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
+                    )
                 }
 
                 Spacer()
 
                 section(title: "Image Swatches - Grid") {
-                    ColorSelectorComponentView(configuration: .init(selectedTitle: Self.selectedImageTitle,
-                                                                    items: Self.itemsImage),
-                                               layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50)))
+                    ColorSelectorComponentView(
+                        configuration: .init(selectedTitle: Self.selectedImageTitle, items: Self.itemsImage),
+                        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
+                    )
                 }
 
                 Spacer()

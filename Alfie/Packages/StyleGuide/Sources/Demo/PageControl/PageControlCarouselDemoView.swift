@@ -34,25 +34,42 @@ struct PageControlCarouselDemoView: View {
 
     var body: some View {
         VStack(spacing: Spacing.space250) {
-            colorCarouselComponent(title: "Progress Indicators - Small Dots", colorIndex: $smallSelectedIndex, size: 8, colors: smallColors)
-            colorCarouselComponent(title: "Progress Indicators - Medium Dots", colorIndex: $mediumSelectedIndex, size: 12, colors: mediumColors)
-            colorCarouselComponent(title: "Progress Indicators - Large Dots", colorIndex: $largeSelectedIndex, size: 16, colors: largeColors)
+            colorCarouselComponent(
+                title: "Progress Indicators - Small Dots",
+                colorIndex: $smallSelectedIndex,
+                size: 8,
+                colors: smallColors
+            )
+            colorCarouselComponent(
+                title: "Progress Indicators - Medium Dots",
+                colorIndex: $mediumSelectedIndex,
+                size: 12,
+                colors: mediumColors
+            )
+            colorCarouselComponent(
+                title: "Progress Indicators - Large Dots",
+                colorIndex: $largeSelectedIndex,
+                size: 16,
+                colors: largeColors
+            )
             VStack(spacing: Spacing.space0) {
                 DemoHelper.demoSectionHeader(title: "Progress Indicators - Custom Dots")
                     .padding(.bottom, Spacing.space400)
                 carousel(colorIndex: $customSelectedIndex, colors: customColors)
-                ThemedPageControl(data: customColors,
-                                  selectedIndex: .init(
-                                    get: { customSelectedIndex ?? 0 },
-                                    set: { customSelectedIndex = $0 }),
-                                  configuration: .init(spacing: 5), customControl: { _, isSelected in
+                ThemedPageControl(
+                    data: customColors,
+                    selectedIndex: .init(
+                        get: { customSelectedIndex ?? 0 },
+                        set: { customSelectedIndex = $0 }
+                    ),
+                    configuration: .init(spacing: 5)
+                ) { _, isSelected in
                     let configuration = ThemedPageControlConfiguration(size: 16)
                     Rectangle()
                         .fill(isSelected ? configuration.selectedColor : configuration.color)
                         .frame(width: configuration.size, height: configuration.size)
-                        .animation(.linear(duration: configuration.animationDuration),
-                                   value: isSelected)
-                })
+                        .animation(.linear(duration: configuration.animationDuration), value: isSelected)
+                }
             }
             Spacer()
         }
@@ -86,9 +103,11 @@ struct PageControlCarouselDemoView: View {
             DemoHelper.demoSectionHeader(title: title)
                 .padding(.bottom, Spacing.space400)
             carousel(colorIndex: colorIndex, colors: colors)
-            ThemedPageControl(data: colors,
-                              selectedIndex: Binding(colorIndex) ?? .constant(0),
-                              configuration: .init(size: size, spacing: 5))
+            ThemedPageControl(
+                data: colors,
+                selectedIndex: Binding(colorIndex) ?? .constant(0),
+                configuration: .init(size: size, spacing: 5)
+            )
         }
     }
 }

@@ -1,7 +1,9 @@
 import SwiftUI
 
-public struct CoordinatedView<Coordinator: CoordinatorProtocol,
-                              ViewFactory: ViewFactoryProtocol<Coordinator.Screen>>: View {
+public struct CoordinatedView<
+    Coordinator: CoordinatorProtocol,
+    ViewFactory: ViewFactoryProtocol<Coordinator.Screen>
+>: View {
     private let rootScreen: Coordinator.Screen
     private let rootView: ViewFactory.ViewForScreen
 
@@ -22,9 +24,9 @@ public struct CoordinatedView<Coordinator: CoordinatorProtocol,
         ZStack {
             NavigationStack(path: $navigationAdapter.path) {
                 rootView
-                    .navigationDestination(for: Coordinator.Screen.self, destination: { screen in
+                    .navigationDestination(for: Coordinator.Screen.self) { screen in
                         viewFactory.view(for: screen)
-                    })
+                    }
                     .sheet(isPresented: $navigationAdapter.isPresentingSheet) {
                         navigationStack(for: navigationAdapter.sheet)
                     }
@@ -47,9 +49,9 @@ private extension CoordinatedView {
         NavigationStack(path: $navigationAdapter.modalPath) {
             if let modal {
                 viewFactory.view(for: modal)
-                    .navigationDestination(for: Coordinator.Screen.self, destination: { screen in
+                    .navigationDestination(for: Coordinator.Screen.self) { screen in
                         viewFactory.view(for: screen)
-                })
+                    }
             }
         }.environmentObject(coordinator)
     }

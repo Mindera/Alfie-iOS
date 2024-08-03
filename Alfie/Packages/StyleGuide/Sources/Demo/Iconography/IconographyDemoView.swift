@@ -11,7 +11,7 @@ struct IconographyDemoView: View {
                 columns: Array(repeating: GridItem(.flexible(), alignment: .top), count: 4),
                 spacing: Spacing.space400
             ) {
-                ForEach(Icon.allCases, id: \.rawValue, content: { icon in
+                ForEach(Icon.allCases, id: \.rawValue) { icon in
                     VStack {
                         icon.image
                             .resizable()
@@ -23,7 +23,7 @@ struct IconographyDemoView: View {
                             .foregroundStyle(Colors.primary.mono900)
                             .font(.caption2)
                     }
-                })
+                }
             }
             .padding(.horizontal, Spacing.space200)
 

@@ -14,6 +14,7 @@ final class AppState: ObservableObject {
 @main
 struct AlfieApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     @StateObject private var appState = AppState.shared
 
     init() {
@@ -25,15 +26,19 @@ struct AlfieApp: App {
             if ProcessInfo.isRunningTests {
                 EmptyView()
             } else {
-                RootView(coordinator: appDelegate.tabCoordinator,
-                         startupScreenProvider: AppStartupService(configurationService: appDelegate.serviceProvider.configurationService),
-                         configurationService: appDelegate.serviceProvider.configurationService)
+                RootView(
+                    coordinator: appDelegate.tabCoordinator,
+                    startupScreenProvider: AppStartupService(
+                        configurationService: appDelegate.serviceProvider.configurationService
+                    ),
+                    configurationService: appDelegate.serviceProvider.configurationService
+                )
                 .onAppear {
                     setupDeepLinkHandlers()
                 }
-                .onOpenURL(perform: { url in
+                .onOpenURL { url in
                     open(url: url)
-                })
+                }
                 .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
                     userActivity.webpageURL.map {
                         open(url: $0)
@@ -47,8 +52,10 @@ struct AlfieApp: App {
     // MARK: - Deep Linking
 
     private func setupDeepLinkHandlers() {
-        let deepLinkHandler = DeepLinkHandler(configurationService: appDelegate.serviceProvider.configurationService,
-                                              coordinator: appDelegate.tabCoordinator)
+        let deepLinkHandler = DeepLinkHandler(
+            configurationService: appDelegate.serviceProvider.configurationService,
+            coordinator: appDelegate.tabCoordinator
+        )
         appDelegate.serviceProvider.deepLinkService.update(handlers: [deepLinkHandler])
     }
 

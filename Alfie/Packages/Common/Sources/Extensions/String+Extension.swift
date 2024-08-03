@@ -38,11 +38,13 @@ extension Optional where Wrapped == String {
     }
 
     public var orEmpty: String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .some(let value):
-                return value
-            case .none:
-                return ""
+        case .some(let value):
+            return value
+        case .none:
+            return ""
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

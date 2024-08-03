@@ -1,5 +1,5 @@
-import Models
 import Core
+import Models
 #if DEBUG
 import Mocks
 #endif
@@ -40,9 +40,7 @@ struct DebugMenuView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    ThemedToolbarButton(icon: .close, action: {
-                        coordinator.closeDebugMenu()
-                    })
+                    ThemedToolbarButton(icon: .close) { coordinator.closeDebugMenu() }
                 }
                 ToolbarItem(placement: .principal) {
                     ThemedToolbarTitle(style: .logo)
@@ -61,29 +59,39 @@ struct DebugMenuView: View {
     @ViewBuilder
     private func navigateTo(_ destination: DebugNavigation) -> some View {
         switch destination {
-            case .catalogue:
-                StyleGuideDemoView()
-                    .modifier(ContainerDemoViewModifier(embedInScrollView: false))
-            case .deeplinking:
-                DeepLinkDemoView()
-                    .modifier(ContainerDemoViewModifier(headerTitle: "Deep Linking"))
-            case .tracking:
-                TrackingDemoView(trackedEvents: serviceProvider.trackingService.trackedEvents)
-                    .modifier(ContainerDemoViewModifier(headerTitle: "Analytics"))
-            case .appUpdate:
-                AppUpdateDemoView(configurationService: serviceProvider.configurationService)
-                    .modifier(ContainerDemoViewModifier(headerTitle: "Force & Soft Update"))
-            case .brazeInfo:
-                BrazeDemoView(brazeUserId: BrazeConstants.userID)
-                    .modifier(ContainerDemoViewModifier(headerTitle: "Braze Push"))
-            case .logs:
-                LogsView()
-                    .modifier(ContainerDemoViewModifier(headerTitle: "Logs",
-                                                        embedInScrollView: false))
-            case .endpoint:
-                EndpointSelectionView(viewModel: EndpointSelectionViewModel(apiEndpointService: serviceProvider.apiEndpointService))
-                    .modifier(ContainerDemoViewModifier(headerTitle: "Environment",
-                                                    embedInScrollView: false))
+        case .catalogue:
+            StyleGuideDemoView()
+                .modifier(ContainerDemoViewModifier(embedInScrollView: false))
+
+        case .deeplinking:
+            DeepLinkDemoView()
+                .modifier(ContainerDemoViewModifier(headerTitle: "Deep Linking"))
+
+        case .tracking:
+            TrackingDemoView(trackedEvents: serviceProvider.trackingService.trackedEvents)
+                .modifier(ContainerDemoViewModifier(headerTitle: "Analytics"))
+
+        case .appUpdate:
+            AppUpdateDemoView(configurationService: serviceProvider.configurationService)
+                .modifier(ContainerDemoViewModifier(headerTitle: "Force & Soft Update"))
+
+        case .brazeInfo:
+            BrazeDemoView(brazeUserId: BrazeConstants.userID)
+                .modifier(ContainerDemoViewModifier(headerTitle: "Braze Push"))
+
+        case .logs:
+            LogsView()
+                .modifier(
+                    ContainerDemoViewModifier(headerTitle: "Logs", embedInScrollView: false)
+                )
+
+        case .endpoint:
+            EndpointSelectionView(
+                viewModel: EndpointSelectionViewModel(apiEndpointService: serviceProvider.apiEndpointService)
+            )
+            .modifier(
+                ContainerDemoViewModifier(headerTitle: "Environment", embedInScrollView: false)
+            )
         }
     }
 

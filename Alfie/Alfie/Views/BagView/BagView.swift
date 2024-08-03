@@ -1,6 +1,6 @@
 import Models
-import SwiftUI
 import StyleGuide
+import SwiftUI
 #if DEBUG
 import Mocks
 #endif

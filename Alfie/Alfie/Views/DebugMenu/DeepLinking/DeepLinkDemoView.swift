@@ -1,9 +1,10 @@
+import Common
 import StyleGuide
 import SwiftUI
 
 struct DeepLinkDemoView: View {
     @State private var customWebPath: String = "sale"
-    private let baseUrl = URL(string: "alfie://mock-server-rose.vercel.app/")!
+    private let baseUrl = URL.fromString("alfie://mock-server-rose.vercel.app/")
     private var webViewUrl: URL {
         baseUrl.appending(path: customWebPath)
     }
@@ -17,16 +18,16 @@ struct DeepLinkDemoView: View {
 
         var label: String {
             switch self {
-                case .home:
-                    return "Home"
-                case .shop:
-                    return "Shop"
-                case .bag:
-                    return "Bag"
-                case .wishlist:
-                    return "Wishlist"
-                case .account:
-                    return "Account"
+            case .home:
+                return "Home"
+            case .shop:
+                return "Shop"
+            case .bag:
+                return "Bag"
+            case .wishlist:
+                return "Wishlist"
+            case .account:
+                return "Account"
             }
         }
     }
@@ -45,36 +46,38 @@ struct DeepLinkDemoView: View {
 
         var label: String {
             switch self {
-                case .designer:
-                    return "Designer"
-                case .women:
-                    return "Women"
-                case .men:
-                    return "Men"
-                case .shoes:
-                    return "Shoes"
-                case .bagsAndAccessories:
-                    return "Bags & Accessories"
-                case .beauty:
-                    return "Beauty"
-                case .kids:
-                    return "Kids"
-                case .homeAndFood:
-                    return "Home & Food"
-                case .electrical:
-                    return "Electrical"
-                case .sale:
-                    return "Sale"
+            case .designer:
+                return "Designer"
+            case .women:
+                return "Women"
+            case .men:
+                return "Men"
+            case .shoes:
+                return "Shoes"
+            case .bagsAndAccessories:
+                return "Bags & Accessories"
+            case .beauty:
+                return "Beauty"
+            case .kids:
+                return "Kids"
+            case .homeAndFood:
+                return "Home & Food"
+            case .electrical:
+                return "Electrical"
+            case .sale:
+                return "Sale"
             }
         }
 
         var subCategories: [SubCategoriesLinks] {
+            // swiftlint:disable vertical_whitespace_between_cases
             switch self {
-                case .women:
-                    return [.dresses]
-                default:
-                    return []
+            case .women:
+                return [.dresses]
+            default:
+                return []
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
@@ -83,22 +86,22 @@ struct DeepLinkDemoView: View {
 
         var label: String {
             switch self {
-                case .dresses:
-                    return "Dresses"
+            case .dresses:
+                return "Dresses"
             }
         }
 
         var prefix: String {
             switch self {
-                case .dresses:
-                    return "clothing"
+            case .dresses:
+                return "clothing"
             }
         }
 
         var subSubCategories: [SubSubCategoriesLinks] {
             switch self {
-                case .dresses:
-                    return [.maxiDresses]
+            case .dresses:
+                return [.maxiDresses]
             }
         }
     }
@@ -108,8 +111,8 @@ struct DeepLinkDemoView: View {
 
         var label: String {
             switch self {
-                case .maxiDresses:
-                    return "Maxi Dresses"
+            case .maxiDresses:
+                return "Maxi Dresses"
             }
         }
     }
@@ -120,20 +123,22 @@ struct DeepLinkDemoView: View {
 
         var label: String {
             switch self {
-                case .earthPolo:
-                    return "The Earth Polo"
-                case .sleeveTshirt:
-                    return "Ao Short Sleeve T-shirt"
+            case .earthPolo:
+                return "The Earth Polo"
+            case .sleeveTshirt:
+                return "Ao Short Sleeve T-shirt"
             }
         }
 
         var parameters: [URLQueryItem] {
+            // swiftlint:disable vertical_whitespace_between_cases
             switch self {
-                case .earthPolo:
-                    return [URLQueryItem(name: "nav", value: "885035")]
-                case .sleeveTshirt:
-                    return []
+            case .earthPolo:
+                return [URLQueryItem(name: "nav", value: "885035")]
+            case .sleeveTshirt:
+                return []
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
@@ -144,12 +149,12 @@ struct DeepLinkDemoView: View {
 
         var label: String {
             switch self {
-                case .shop:
-                    return "Shop"
-                case .brands:
-                    return "Brands"
-                case .services:
-                    return "Services"
+            case .shop:
+                return "Shop"
+            case .brands:
+                return "Brands"
+            case .services:
+                return "Services"
             }
         }
     }
@@ -168,54 +173,49 @@ struct DeepLinkDemoView: View {
 
     // MARK: - Private
 
-    @ViewBuilder
-    private var mainTabsOptions: some View {
+    @ViewBuilder private var mainTabsOptions: some View {
         DemoHelper.demoSectionHeader(title: "Main Tabs")
             .padding(.bottom, Spacing.space200)
 
-        ForEach(TabLinks.allCases, id: \.self, content: { link in
+        ForEach(TabLinks.allCases, id: \.self) { link in
             ThemedButton(text: link.label, style: .underline) {
                 open(url: baseUrl.appending(component: link.rawValue))
             }
-        })
+        }
     }
 
-    @ViewBuilder
-    private var categoriesOptions: some View {
+    @ViewBuilder private var categoriesOptions: some View {
         DemoHelper.demoSectionHeader(title: "Categories")
             .padding(.vertical, Spacing.space200)
 
-        ForEach(CategoriesLinks.allCases, id: \.self, content: { category in
+        ForEach(CategoriesLinks.allCases, id: \.self) { category in
             categoryView(category)
-        })
+        }
     }
 
-    @ViewBuilder
-    private var shopOptions: some View {
+    @ViewBuilder private var shopOptions: some View {
         DemoHelper.demoSectionHeader(title: "Shop")
             .padding(.vertical, Spacing.space200)
 
-        ForEach(ShopLinks.allCases, id: \.self, content: { shopLink in
+        ForEach(ShopLinks.allCases, id: \.self) { shopLink in
             ThemedButton(text: shopLink.label, style: .underline) {
                 open(url: buildShopUrl(shopLink: shopLink))
             }
-        })
+        }
     }
 
-    @ViewBuilder
-    private var productOptions: some View {
+    @ViewBuilder private var productOptions: some View {
         DemoHelper.demoSectionHeader(title: "Product Details")
             .padding(.vertical, Spacing.space200)
 
-        ForEach(ProductLinks.allCases, id: \.self, content: { product in
+        ForEach(ProductLinks.allCases, id: \.self) { product in
             ThemedButton(text: product.label, style: .underline) {
                 open(url: buildUrl(product: product))
             }
-        })
+        }
     }
 
-    @ViewBuilder
-    private var customDeeplinkOption: some View {
+    @ViewBuilder private var customDeeplinkOption: some View {
         DemoHelper.demoSectionHeader(title: "Custom")
             .padding(.vertical, Spacing.space200)
 
@@ -240,46 +240,61 @@ struct DeepLinkDemoView: View {
 
     // MARK: - Categories
 
-    @ViewBuilder private func categoryView(_ category: CategoriesLinks) -> some View {
+    @ViewBuilder
+    private func categoryView(_ category: CategoriesLinks) -> some View {
         VStack(alignment: .leading, spacing: Spacing.space200) {
             ThemedButton(text: category.label, style: .underline) {
                 open(url: buildUrl(category: category))
             }
 
-            ForEach(category.subCategories, id: \.self, content: { subCategory in
+            ForEach(category.subCategories, id: \.self) { subCategory in
                 subCategoryView(subCategory, parentCategory: category)
-            })
+            }
         }
     }
 
-    @ViewBuilder private func subCategoryView(_ subCategory: SubCategoriesLinks,
-                                              parentCategory: CategoriesLinks) -> some View {
+    @ViewBuilder
+    private func subCategoryView(
+        _ subCategory: SubCategoriesLinks,
+        parentCategory: CategoriesLinks
+    ) -> some View {
         VStack(alignment: .leading, spacing: Spacing.space200) {
             ThemedButton(text: subCategory.label, style: .underline) {
                 open(url: buildUrl(category: parentCategory, subCategory: subCategory))
             }
 
-            ForEach(subCategory.subSubCategories, id: \.self, content: { subSubCategory in
+            ForEach(subCategory.subSubCategories, id: \.self) { subSubCategory in
                 subSubCategoryView(subSubCategory, parentSubCategory: subCategory, parentCategory: parentCategory)
-            })
-        }
-        .padding(.leading, Spacing.space300)
-    }
-
-    @ViewBuilder private func subSubCategoryView(_ subSubCategory: SubSubCategoriesLinks,
-                                                 parentSubCategory: SubCategoriesLinks,
-                                                 parentCategory: CategoriesLinks) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space200) {
-            ThemedButton(text: subSubCategory.label, style: .underline) {
-                open(url: buildUrl(category: parentCategory, subCategory: parentSubCategory, subSubCategory: subSubCategory))
             }
         }
         .padding(.leading, Spacing.space300)
     }
 
-    private func buildUrl(category: CategoriesLinks,
-                          subCategory: SubCategoriesLinks? = nil,
-                          subSubCategory: SubSubCategoriesLinks? = nil) -> URL {
+    @ViewBuilder
+    private func subSubCategoryView(
+        _ subSubCategory: SubSubCategoriesLinks,
+        parentSubCategory: SubCategoriesLinks,
+        parentCategory: CategoriesLinks
+    ) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.space200) {
+            ThemedButton(text: subSubCategory.label, style: .underline) {
+                open(
+                    url: buildUrl(
+                        category: parentCategory,
+                        subCategory: parentSubCategory,
+                        subSubCategory: subSubCategory
+                    )
+                )
+            }
+        }
+        .padding(.leading, Spacing.space300)
+    }
+
+    private func buildUrl(
+        category: CategoriesLinks,
+        subCategory: SubCategoriesLinks? = nil,
+        subSubCategory: SubSubCategoriesLinks? = nil
+    ) -> URL {
         var url = baseUrl.appending(component: category.rawValue)
 
         if let subCategory {

@@ -5,14 +5,14 @@ public enum Media {
     case video(MediaVideo)
 
     public var asImage: MediaImage? {
-        guard case let .image(image) = self else {
+        guard case .image(let image) = self else {
             return nil
         }
         return image
     }
 
     public var asVideo: MediaVideo? {
-        guard case let .video(video) = self else {
+        guard case .video(let video) = self else {
             return nil
         }
         return video

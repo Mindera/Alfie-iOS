@@ -13,12 +13,17 @@ struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         ScrollView {
             VStack(spacing: Spacing.space0) {
                 ForEach(viewModel.sectionList, id: \.self) { section in
-                    AccountSectionView(for: section,
-                                       hiddenDividerTop: section == viewModel.sectionList.first,
-                                       hiddenDividerBottom: section != viewModel.sectionList.last)
-                        .modifier(TapHighlightableModifier(action: {
-                            navigateToSection(section)
-                        }, accessibilityId: section.accessibilityId))
+                    AccountSectionView(
+                        for: section,
+                        hiddenDividerTop: section == viewModel.sectionList.first,
+                        hiddenDividerBottom: section != viewModel.sectionList.last
+                    )
+                    .modifier(
+                        TapHighlightableModifier(
+                            action: { navigateToSection(section) },
+                            accessibilityId: section.accessibilityId
+                        )
+                    )
                 }
             }
         }
@@ -39,21 +44,23 @@ private enum AccessibilityId {
 }
 
 private extension AccountSection {
-   var accessibilityId: String {
+    var accessibilityId: String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .myDetails:
-                AccessibilityId.myDetailsSection
-            case .myOrders:
-                AccessibilityId.myOrdersSection
-            case .wallet:
-                AccessibilityId.walletSection
-            case .myAddressBook:
-                AccessibilityId.addressBookSection
-            case .wishlist:
-                AccessibilityId.wishlistSection
-            case .signOut:
-                AccessibilityId.signOutSection
+        case .myDetails:
+            AccessibilityId.myDetailsSection
+        case .myOrders:
+            AccessibilityId.myOrdersSection
+        case .wallet:
+            AccessibilityId.walletSection
+        case .myAddressBook:
+            AccessibilityId.addressBookSection
+        case .wishlist:
+            AccessibilityId.wishlistSection
+        case .signOut:
+            AccessibilityId.signOutSection
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 

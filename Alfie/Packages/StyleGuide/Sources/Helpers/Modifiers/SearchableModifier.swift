@@ -6,103 +6,113 @@ import SwiftUI
 
 public enum PullToSearchConfig {
     // swiftlint:disable:next enum_case_associated_values_count
-    case enabled(scrollOffset: Binding<CGPoint>, searchBarMaxScaleFactor: CGFloat = 1.05, searchBarMinOpacity: CGFloat = 1, animateOffset: Bool = false, searchFocusThreshold: CGFloat = -80)
+    case enabled(
+        scrollOffset: Binding<CGPoint>,
+        searchBarMaxScaleFactor: CGFloat = 1.05,
+        searchBarMinOpacity: CGFloat = 1,
+        animateOffset: Bool = false,
+        searchFocusThreshold: CGFloat = -80
+    )
     case disabled
 
+    // swiftlint:disable vertical_whitespace_between_cases
     var isEnabled: Bool {
         switch self {
-            case .enabled:
-                return true
-            case .disabled:
-                return false
+        case .enabled:
+            return true
+        case .disabled:
+            return false
         }
     }
 
     var searchBarMaxScaleFactor: CGFloat {
         switch self {
-            case .enabled(_, let searchBarMaxScaleFactor, _, _, _):
-                return searchBarMaxScaleFactor
-            case .disabled:
-                return 1
+        case .enabled(_, let searchBarMaxScaleFactor, _, _, _):
+            return searchBarMaxScaleFactor
+        case .disabled:
+            return 1
         }
     }
 
     var searchBarMinOpacity: CGFloat {
         switch self {
-            case .enabled(_, _, let searchBarMinOpacity, _, _):
-                return searchBarMinOpacity
-            case .disabled:
-                return 1
+        case .enabled(_, _, let searchBarMinOpacity, _, _):
+            return searchBarMinOpacity
+        case .disabled:
+            return 1
         }
     }
 
     var searchFocusThreshold: CGFloat? {
         switch self {
-            case .enabled(_, _, _, _, let searchFocusThreshold):
-                return searchFocusThreshold
-            case .disabled:
-                return nil
+        case .enabled(_, _, _, _, let searchFocusThreshold):
+            return searchFocusThreshold
+        case .disabled:
+            return nil
         }
     }
 
     var animateOffset: Bool {
         switch self {
-            case .enabled(_, _, _, let animateOffset, _):
-                return animateOffset
-            case .disabled:
-                return false
+        case .enabled(_, _, _, let animateOffset, _):
+            return animateOffset
+        case .disabled:
+            return false
         }
     }
+    // swiftlint:enable vertical_whitespace_between_cases
 }
 
 public enum SearchBarTransition: Equatable, Hashable {
     case growFromTrailingIcon
     case matchedGeometryEffect(id: String, namespace: Namespace.ID)
 
+    // swiftlint:disable vertical_whitespace_between_cases
     var namespace: Namespace.ID? {
         switch self {
-            case .matchedGeometryEffect(_, let namespace):
-                namespace
-            case .growFromTrailingIcon:
-                nil
+        case .matchedGeometryEffect(_, let namespace):
+            namespace
+        case .growFromTrailingIcon:
+            nil
         }
     }
 
     var geometryEffectID: String? {
         switch self {
-            case .matchedGeometryEffect(let id, _):
-                id
-            case .growFromTrailingIcon:
-                nil
+        case .matchedGeometryEffect(let id, _):
+            id
+        case .growFromTrailingIcon:
+            nil
         }
     }
 
     var autofocusDelay: CGFloat {
         switch self {
-            case .matchedGeometryEffect:
-                0.0
-            case .growFromTrailingIcon:
-                0.1
+        case .matchedGeometryEffect:
+            0.0
+        case .growFromTrailingIcon:
+            0.1
         }
     }
 
     var isGrowFromTrailingIcon: Bool {
         switch self {
-            case .growFromTrailingIcon:
-                true
-            case .matchedGeometryEffect:
-                false
+        case .growFromTrailingIcon:
+            true
+        case .matchedGeometryEffect:
+            false
         }
     }
 
     var shouldAnimateSearchBarAppearance: Bool {
         switch self {
-            case .growFromTrailingIcon:
-                false
-            case .matchedGeometryEffect:
-                true
+        case .growFromTrailingIcon:
+            false
+        case .matchedGeometryEffect:
+            true
         }
     }
+    // swiftlint:enable vertical_whitespace_between_cases
 }
 
 // MARK: - SearchableModifier
@@ -138,25 +148,27 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
         ResultsView.self != EmptyView.self
     }
 
-    public init(placeholder: String,
-                placeholderOnFocus: String,
-                searchText: Binding<String>,
-                pullToSearchConfig: PullToSearchConfig,
-                theme: ThemedSearchBarView.Theme,
-                dismissConfiguration: ThemedSearchBarView.DismissConfiguration,
-                verticalSpacing: CGFloat,
-                showCancelButton: Bool = true,
-                contentOverlayColorWhenFocused: Color?,
-                showDivider: Bool = false,
-                autoFocus: Bool = false,
-                inputAccessibilityId: String? = nil,
-                clearAccessibilityId: String? = nil,
-                transition: SearchBarTransition? = nil,
-                hapticsService: HapticsServiceProtocol = HapticsService.instance,
-                @ViewBuilder resultsView: @escaping () -> ResultsView = { EmptyView() },
-                onCancel: (() -> Void)? = nil,
-                onSubmit: ((String) -> Void)? = nil,
-                onFocusChange: ((Bool) -> Void)? = nil) {
+    public init(
+        placeholder: String,
+        placeholderOnFocus: String,
+        searchText: Binding<String>,
+        pullToSearchConfig: PullToSearchConfig,
+        theme: ThemedSearchBarView.Theme,
+        dismissConfiguration: ThemedSearchBarView.DismissConfiguration,
+        verticalSpacing: CGFloat,
+        showCancelButton: Bool = true,
+        contentOverlayColorWhenFocused: Color?,
+        showDivider: Bool = false,
+        autoFocus: Bool = false,
+        inputAccessibilityId: String? = nil,
+        clearAccessibilityId: String? = nil,
+        transition: SearchBarTransition? = nil,
+        hapticsService: HapticsServiceProtocol = HapticsService.instance,
+        @ViewBuilder resultsView: @escaping () -> ResultsView = { EmptyView() },
+        onCancel: (() -> Void)? = nil,
+        onSubmit: ((String) -> Void)? = nil,
+        onFocusChange: ((Bool) -> Void)? = nil
+    ) {
         self.placeholder = placeholder
         self.placeholderOnFocus = placeholderOnFocus
         _searchText = searchText
@@ -176,13 +188,17 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
         self.transition = transition
         self.verticalSpacing = verticalSpacing
         self._animatingTransition = State(initialValue: transition != nil)
-        self._showSearchBar = State(initialValue: transition?.shouldAnimateSearchBarAppearance == false || transition == nil)
+        self._showSearchBar = State(
+            initialValue: transition?.shouldAnimateSearchBarAppearance == false || transition == nil
+        )
+        // swiftlint:disable vertical_whitespace_between_cases
         switch pullToSearchConfig {
-            case .enabled(let scrollOffset, _, _, _, _):
-                _scrollOffset = scrollOffset
-            case .disabled:
-                _scrollOffset = .constant(.zero)
+        case .enabled(let scrollOffset, _, _, _, _):
+            _scrollOffset = scrollOffset
+        case .disabled:
+            _scrollOffset = .constant(.zero)
         }
+        // swiftlint:enable vertical_whitespace_between_cases
 
         if transition != nil {
             self.searchBarOpacity = 1
@@ -195,32 +211,37 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
     public func body(content: Content) -> some View {
         VStack(spacing: Spacing.space0) {
             if showSearchBar {
-                ThemedSearchBarView(searchText: $searchText,
-                                    placeholder: placeholder,
-                                    placeholderOnFocus: placeholderOnFocus,
-                                    theme: theme,
-                                    dismissConfiguration: dismissConfiguration,
-                                    autoFocusWhenAppearing: autoFocus ? .on(delay: transition?.autofocusDelay ?? 0.0) : .off,
-                                    inputAccessibilityId: inputAccessibilityId,
-                                    clearAccessibilityId: clearAccessibilityId,
-                                    onCancelTap: onCancelButtonTapped,
-                                    onSubmitTap: { onSubmit?(searchText) },
-                                    onFocusChange: onFocusChange)
-                .optionalMatchedGeometryEffect(id: transition?.geometryEffectID,
-                                               in: transition?.namespace)
+                let isGrowFromTrailingIconAnimation = animatingTransition && transition?.isGrowFromTrailingIcon == true
+                ThemedSearchBarView(
+                    searchText: $searchText,
+                    placeholder: placeholder,
+                    placeholderOnFocus: placeholderOnFocus,
+                    theme: theme,
+                    dismissConfiguration: dismissConfiguration,
+                    autoFocusWhenAppearing: autoFocus ? .on(delay: transition?.autofocusDelay ?? 0.0) : .off,
+                    inputAccessibilityId: inputAccessibilityId,
+                    clearAccessibilityId: clearAccessibilityId,
+                    onCancelTap: onCancelButtonTapped,
+                    onSubmitTap: { onSubmit?(searchText) },
+                    onFocusChange: onFocusChange
+                )
+                .optionalMatchedGeometryEffect(id: transition?.geometryEffectID, in: transition?.namespace)
                 .focused($searchBarFocused)
                 .padding(.horizontal, Spacing.space200)
-                .padding(.bottom, verticalSpacing) // verticalSpacing is not applied to the VStack because if you have many items on content, it will affect all of them
-                .scaleEffect(.init(width: (animatingTransition && transition?.isGrowFromTrailingIcon == true) ? 0.1 : searchBarScale,
-                                   height: searchBarScale),
-                             anchor: transition?.isGrowFromTrailingIcon == true ? .trailing : .center)
+                // verticalSpacing is not applied to the VStack because if you have many items on content, it will affect all of them
+                .padding(.bottom, verticalSpacing)
+                .scaleEffect(
+                    .init(
+                        width: isGrowFromTrailingIconAnimation ? 0.1 : searchBarScale,
+                        height: searchBarScale
+                    ),
+                    anchor: transition?.isGrowFromTrailingIcon == true ? .trailing : .center
+                )
                 .opacity(searchBarOpacity)
                 .offset(y: searchBarYOffset)
                 .task {
                     if animatingTransition {
-                        withAnimation(.standardDecelerate) {
-                            animatingTransition = false
-                        }
+                        withAnimation(.standardDecelerate) { animatingTransition = false }
                     }
                 }
             }
@@ -236,9 +257,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
                             contentOverlayColorWhenFocused?
                                 .transition(.opacity)
                                 .edgesIgnoringSafeArea(.bottom)
-                                .onTapGesture {
-                                    searchBarFocused = false
-                                }
+                                .onTapGesture { searchBarFocused = false }
                             resultsView()
                         }
                     }
@@ -253,8 +272,9 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
             }
         }
         .onChange(of: scrollOffset) { newValue in
-            guard pullToSearchConfig.isEnabled,
-                  let threshold = pullToSearchConfig.searchFocusThreshold
+            guard
+                pullToSearchConfig.isEnabled,
+                let threshold = pullToSearchConfig.searchFocusThreshold
             else {
                 return
             }
@@ -266,9 +286,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
         .onChange(of: searchBarFocused) { newValue in
             updateOpacity(for: scrollOffset.y, threshold: pullToSearchConfig.searchFocusThreshold)
 
-            guard containsResultsView else {
-                return
-            }
+            guard containsResultsView else { return }
 
             withAnimation(.easeOut) {
                 showOverlay = newValue
@@ -341,33 +359,35 @@ extension SearchableModifier {
         }
 
         switch searchBarFocused {
-            case true: // if it's focused, opacity is default (1.0)
-                if searchBarOpacity != 1 {
-                    withAnimation(.emphasizedDecelerate) {
-                        searchBarOpacity = 1
-                    }
+        case true: // if it's focused, opacity is default (1.0)
+            if searchBarOpacity != 1 {
+                withAnimation(.emphasizedDecelerate) {
+                    searchBarOpacity = 1
                 }
-            case false where scrollViewYOffset >= 0: // if not focused, but also not being pulled, opacity is searchBarMinOpacity
-                if searchBarOpacity != searchBarMinOpacity {
-                    withAnimation(.standardDecelerate) {
-                        searchBarOpacity = searchBarMinOpacity
-                    }
+            }
+            // if not focused, but also not being pulled, opacity is searchBarMinOpacity
+        case false where scrollViewYOffset >= 0:
+            if searchBarOpacity != searchBarMinOpacity {
+                withAnimation(.standardDecelerate) {
+                    searchBarOpacity = searchBarMinOpacity
                 }
-            default: // if it's not focused but being pulled, we calculate the dynamic opacity value
-                guard let threshold else {
-                    return
-                }
-                let normalizedScrollOffset = (-scrollViewYOffset / abs(threshold))
-                withAnimation(.standardAccelerate) {
-                    searchBarOpacity = searchBarMinOpacity + normalizedScrollOffset * (1 - searchBarMinOpacity)
-                }
+            }
+        default: // if it's not focused but being pulled, we calculate the dynamic opacity value
+            guard let threshold else {
+                return
+            }
+            let normalizedScrollOffset = (-scrollViewYOffset / abs(threshold))
+            withAnimation(.standardAccelerate) {
+                searchBarOpacity = searchBarMinOpacity + normalizedScrollOffset * (1 - searchBarMinOpacity)
+            }
         }
     }
 
     private func updateSearchBarYOffset(for scrollViewYOffset: CGFloat) {
-        guard pullToSearchConfig.isEnabled,
-              pullToSearchConfig.animateOffset,
-              scrollOffset.y < 0
+        guard
+            pullToSearchConfig.isEnabled,
+            pullToSearchConfig.animateOffset,
+            scrollOffset.y < 0
         else {
             searchBarYOffset = 0
             return

@@ -201,7 +201,7 @@ final class CategoriesViewModelTests: XCTestCase {
             sut.didSelectCategory(fixture)
         })
 
-        guard let destination, case let .web(url, _) = destination else {
+        guard let destination, case .web(let url, _) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
             return
         }
@@ -218,7 +218,7 @@ final class CategoriesViewModelTests: XCTestCase {
             sut.didSelectCategory(fixture)
         })
 
-        guard let destination, case let .web(url, title) = destination else {
+        guard let destination, case .web(let url, let title) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
             return
         }
@@ -235,7 +235,7 @@ final class CategoriesViewModelTests: XCTestCase {
             sut.didSelectCategory(fixture)
         })
 
-        guard let destination, case let .plp(category) = destination else {
+        guard let destination, case .plp(let category) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
             return
         }
@@ -264,7 +264,7 @@ final class CategoriesViewModelTests: XCTestCase {
             sut.didSelectCategory(fixture)
         })
 
-        guard let destination, case let .subCategories(subCategories, parentCategory) = destination else {
+        guard let destination, case .subCategories(let subCategories, let parentCategory) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
             return
         }

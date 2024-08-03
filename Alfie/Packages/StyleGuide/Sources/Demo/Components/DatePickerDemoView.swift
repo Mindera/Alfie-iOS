@@ -77,16 +77,18 @@ private struct DatePickerModifier: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         switch type {
-            case .graphical:
-                content
-                    .datePickerStyle(.graphical)
-                    .frame(width: 320, height: 420, alignment: .top)
-            case .wheel:
-                content
-                    .datePickerStyle(.wheel)
-            case .compact:
-                content
-                    .datePickerStyle(.compact)
+        case .graphical:
+            content
+                .datePickerStyle(.graphical)
+                .frame(width: 320, height: 420, alignment: .top)
+
+        case .wheel:
+            content
+                .datePickerStyle(.wheel)
+
+        case .compact:
+            content
+                .datePickerStyle(.compact)
         }
     }
 }

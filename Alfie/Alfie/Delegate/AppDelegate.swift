@@ -12,9 +12,11 @@ import Mocks
 // MARK: - AppDelegate
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, AppDelegateProtocol {
+    // swiftlint:disable implicitly_unwrapped_optional
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
     var tabCoordinator: TabCoordinator!
+    // swiftlint:enable implicitly_unwrapped_optional
     static var braze: Braze?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -52,9 +54,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 serviceProvider.notificationsService.start()
             }
         }
-        tabCoordinator = TabCoordinator(tabs: TabScreen.allCases,
-                                        activeTab: .home(),
-                                        serviceProvider: serviceProvider)
+        tabCoordinator = TabCoordinator(tabs: TabScreen.allCases, activeTab: .home(), serviceProvider: serviceProvider)
     }
 
     // MARK: - Notifications
@@ -64,14 +64,23 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        serviceProvider.notificationsService.application(didReceiveRemoteNotification: userInfo, completionHandler: completionHandler)
+        serviceProvider.notificationsService.application(
+            didReceiveRemoteNotification: userInfo,
+            completionHandler: completionHandler
+        )
     }
 
     func userNotificationCenter(_ application: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        serviceProvider.notificationsService.userNotificationCenter(didReceive: response, completionHandler: completionHandler)
+        serviceProvider.notificationsService.userNotificationCenter(
+            didReceive: response,
+            completionHandler: completionHandler
+        )
     }
 
     func userNotificationCenter(_ notificationCenter: UNUserNotificationCenter, willPresent: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        serviceProvider.notificationsService.userNotificationCenter(willPresent: willPresent, completionHandler: completionHandler)
+        serviceProvider.notificationsService.userNotificationCenter(
+            willPresent: willPresent,
+            completionHandler: completionHandler
+        )
     }
 }

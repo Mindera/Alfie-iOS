@@ -1,5 +1,5 @@
-import SwiftUI
 import Models
+import SwiftUI
 
 public struct RemoteImage<Success: View, Failure: View, Placeholder: View>: View {
     private let urlRequest: URLRequest?
@@ -30,23 +30,27 @@ public struct RemoteImage<Success: View, Failure: View, Placeholder: View>: View
         @ViewBuilder failure: @escaping (Error) -> Failure
     ) {
         let urlRequest = url.map { URLRequest(url: $0) }
-        self.init(urlRequest: urlRequest,
-                  transaction: transaction,
-                  success: success,
-                  placeholder: placeholder,
-                  failure: failure)
+        self.init(
+            urlRequest: urlRequest,
+            transaction: transaction,
+            success: success,
+            placeholder: placeholder,
+            failure: failure
+        )
     }
 
     public var body: some View {
         RemoteImageWrapper<LazyImageView>(urlRequest: urlRequest, transaction: transaction) { state in
+            // swiftlint:disable vertical_whitespace_between_cases
             switch state {
-                case .empty:
-                    placeholder()
-                case .success(let image):
-                    success(image)
-                case .failure(let error):
-                    failure(error)
+            case .empty:
+                placeholder()
+            case .success(let image):
+                success(image)
+            case .failure(let error):
+                failure(error)
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 }
@@ -59,11 +63,18 @@ public extension RemoteImage where Failure == EmptyView, Placeholder == EmptyVie
     }
 
     init(url: URL?, transaction: Transaction = Transaction(), @ViewBuilder success: @escaping (Image) -> Success) {
-        let urlRequest = url == nil ? nil : URLRequest(url: url!)
-        self.init(urlRequest: urlRequest,
-                  transaction: transaction,
-                  success: success,
-                  placeholder: { EmptyView() },
-                  failure: { _ in EmptyView() })
+        var urlRequest: URLRequest?
+
+        if let url {
+            urlRequest = URLRequest(url: url)
+        }
+
+        self.init(
+            urlRequest: urlRequest,
+            transaction: transaction,
+            success: success,
+            placeholder: { EmptyView() },
+            failure: { _ in EmptyView() }
+        )
     }
 }

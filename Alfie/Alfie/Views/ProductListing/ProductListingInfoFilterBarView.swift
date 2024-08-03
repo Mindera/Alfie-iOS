@@ -28,13 +28,13 @@ struct ProductListingFilterBarView: View {
             Spacer()
             listTypeView
         }
-        .onChange(of: isLoading(), perform: { newValue in
+        .onChange(of: isLoading()) { newValue in
             if !newValue {
                 withAnimation {
                     opacity = Constants.fullOpacityResults
                 }
             }
-        })
+        }
         .padding(.horizontal, Spacing.space200)
         .frame(minHeight: Constants.barMinHeight)
     }

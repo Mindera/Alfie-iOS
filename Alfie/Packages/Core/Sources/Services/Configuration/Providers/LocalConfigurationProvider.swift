@@ -22,7 +22,10 @@ public final class LocalConfigurationProvider: ConfigurationProviderProtocol {
     }
 
     public func data(for key: ConfigurationKey) -> Data? {
-        guard let localConfig, localConfig.has(key: key.rawValue), let value = localConfig[key.rawValue] as? [String: [Any]] else {
+        guard
+            let localConfig, localConfig.has(key: key.rawValue),
+            let value = localConfig[key.rawValue] as? [String: [Any]]
+        else {
             return nil
         }
 
@@ -53,9 +56,11 @@ public final class LocalConfigurationProvider: ConfigurationProviderProtocol {
     // MARK: - Private
 
     private func loadConfig() {
-        guard let path = Bundle.main.path(forResource: "local_config", ofType: "json"),
-              let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-              let object = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any] else {
+        guard
+            let path = Bundle.main.path(forResource: "local_config", ofType: "json"),
+            let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+            let object = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any]
+        else {
             return
         }
 

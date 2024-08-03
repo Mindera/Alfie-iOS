@@ -3,7 +3,7 @@ import Foundation
 extension URL {
     public var cleanPathComponents: [String] {
         self.pathComponents
-            .drop(while: { $0 == "/" })
+            .drop { $0 == "/" }
             .map { $0.lowercased() }
     }
 
@@ -26,6 +26,6 @@ extension URL {
     }
 
     public static func fromString(_ string: String) -> URL {
-        URL(string: string) ?? URL(fileURLWithPath: "")
+        URL(string: string) ?? URL(filePath: "")
     }
 }

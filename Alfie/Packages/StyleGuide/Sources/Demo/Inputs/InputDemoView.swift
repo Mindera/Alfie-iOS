@@ -18,26 +18,49 @@ struct InputDemoView: View {
                 DemoHelper.demoSectionHeader(title: "Input Fields")
 
                 ThemedInput($textA, isDisabled: $isDisabled)
-                ThemedInput($textB, title: "Title", placeholder: "E.g. John", isDisabled: $isDisabled, isRequired: $isRequired, icon: iconSelected)
-                ThemedInput($textC, title: "Title", status: .info("Must be at least 8 characters long and include 1 number."), limit: textLimit, isDisabled: $isDisabled, isRequired: $isRequired, icon: iconSelected)
-                ThemedInput($textD, title: "Title", status: .success("Must be at least 8 characters long and include 1 number."), limit: textLimit, isDisabled: $isDisabled, isRequired: $isRequired, icon: iconSelected)
-                ThemedInput($textE, title: "Title", status: .error("Must be at least 8 characters long and include 1 number."), limit: textLimit, isDisabled: $isDisabled, isRequired: $isRequired, icon: iconSelected)
+                ThemedInput(
+                    $textB,
+                    title: "Title",
+                    placeholder: "E.g. John",
+                    isDisabled: $isDisabled,
+                    isRequired: $isRequired,
+                    icon: iconSelected
+                )
+                ThemedInput(
+                    $textC,
+                    title: "Title",
+                    status: .info("Must be at least 8 characters long and include 1 number."),
+                    limit: textLimit,
+                    isDisabled: $isDisabled,
+                    isRequired: $isRequired,
+                    icon: iconSelected
+                )
+                ThemedInput(
+                    $textD,
+                    title: "Title",
+                    status: .success("Must be at least 8 characters long and include 1 number."),
+                    limit: textLimit,
+                    isDisabled: $isDisabled,
+                    isRequired: $isRequired,
+                    icon: iconSelected
+                )
+                ThemedInput(
+                    $textE,
+                    title: "Title",
+                    status: .error("Must be at least 8 characters long and include 1 number."),
+                    limit: textLimit,
+                    isDisabled: $isDisabled,
+                    isRequired: $isRequired,
+                    icon: iconSelected
+                )
 
                 DemoHelper.demoSectionHeader(title: "Options")
                     .padding(.top, Spacing.space400)
 
-                ThemedToggleView(isOn: $isDisabled, label: {
-                    Text.build(theme.font.small.bold("Disabled"))
-                })
-                ThemedToggleView(isOn: $isRequired, label: {
-                    Text.build(theme.font.small.bold("Required"))
-                })
-                ThemedToggleView(isOn: $hasLimit, label: {
-                    Text.build(theme.font.small.bold("Counter"))
-                })
-                ThemedToggleView(isOn: $hasIcon, label: {
-                    Text.build(theme.font.small.bold("Show Icon"))
-                })
+                ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disabled")) }
+                ThemedToggleView(isOn: $isRequired) { Text.build(theme.font.small.bold("Required")) }
+                ThemedToggleView(isOn: $hasLimit) { Text.build(theme.font.small.bold("Counter")) }
+                ThemedToggleView(isOn: $hasIcon) { Text.build(theme.font.small.bold("Show Icon")) }
                 HStack {
                     Text.build(theme.font.small.bold("Icon"))
                     Spacer()

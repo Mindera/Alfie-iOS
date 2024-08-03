@@ -8,10 +8,12 @@ final class NetworkInterceptorProvider: InterceptorProvider {
     private let reachabilityService: ReachabilityServiceProtocol
     private let logRequests: Bool
 
-    init(client: URLSessionClient,
-         store: ApolloStore,
-         reachabilityService: ReachabilityServiceProtocol,
-         logRequests: Bool) {
+    init(
+        client: URLSessionClient,
+        store: ApolloStore,
+        reachabilityService: ReachabilityServiceProtocol,
+        logRequests: Bool
+    ) {
         self.store = store
         self.client = client
         self.reachabilityService = reachabilityService

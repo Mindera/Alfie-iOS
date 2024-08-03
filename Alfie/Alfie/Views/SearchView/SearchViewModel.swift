@@ -69,21 +69,25 @@ final class SearchViewModel: SearchViewModelProtocol {
 
 extension SearchViewModel {
     private func configureSubscriptions() {
+        // swiftlint:disable:next trailing_closure
         $searchText
             .handleEvents(receiveOutput: { [weak self] _ in
                 if self?.state == .noResults {
-                    self?.state = .loading // To avoid the UI updating before the debounce in the subscription below, otherwise we will see the "no results for <term>" even before the search takes place
+                    // To avoid the UI updating before the debounce in the subscription below, otherwise we will see the "no results for <term>" even before the search takes place
+                    self?.state = .loading
                 }
             })
             .debounce(for: .seconds(Constants.searchDebounceIntervalInSeconds), scheduler: dependencies.executionQueue)
             .sink { [weak self] searchText in
                 self?.handleChange(on: searchText)
-            }.store(in: &subscriptions)
+            }
+            .store(in: &subscriptions)
 
         dependencies.recentsService?.recentSearchesPublisher
             .sink { [weak self] _ in
                 self?.handleEmptyText()
-            }.store(in: &subscriptions)
+            }
+            .store(in: &subscriptions)
     }
 }
 

@@ -8,7 +8,7 @@ public class DefaultShapeProvider: ShapeProviderProtocol {
     }
 }
 
-private struct DefaultShapes {
+private enum DefaultShapes {
     struct SlashLine: Shape {
         func path(in rect: CGRect) -> Path {
             var path = Path()

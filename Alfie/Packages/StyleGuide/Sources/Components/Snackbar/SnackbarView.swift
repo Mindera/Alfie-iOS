@@ -32,16 +32,18 @@ public struct SnackbarViewConfiguration: Equatable {
     ///   - lineLimit: the line limit for the text displayed (default is 2)
     ///   - onActionTap: an option closure to be called when the user taps the action button (the snackbar won't dismiss automatically)
     ///   - onDismiss: an optional closure to be called when the snackbar is dismissed, either automatically of by the user
-    public init(type: SnackbarViewType = .info,
-                text: String,
-                showCloseButton: Bool = false,
-                icon: Image? = Icon.checkmark.image,
-                actionButtonLabel: String? = nil,
-                showFromTop: Bool = false,
-                autoDismissTime: TimeInterval? = 5,
-                lineLimit: Int = 2,
-                onActionTap: (() -> Void)? = nil,
-                onDismiss: (() -> Void)? = nil) {
+    public init(
+        type: SnackbarViewType = .info,
+        text: String,
+        showCloseButton: Bool = false,
+        icon: Image? = Icon.checkmark.image,
+        actionButtonLabel: String? = nil,
+        showFromTop: Bool = false,
+        autoDismissTime: TimeInterval? = 5,
+        lineLimit: Int = 2,
+        onActionTap: (() -> Void)? = nil,
+        onDismiss: (() -> Void)? = nil
+    ) {
         self.type = type
         self.text = text
         self.showCloseButton = showCloseButton
@@ -129,60 +131,80 @@ public struct SnackbarView: View {
 
     private var backgroundColor: Color {
         switch configuration.type {
-            case .info:
-                return Colors.primary.black
-            case .success:
-                return Colors.secondary.green100
-            case .error:
-                return Colors.secondary.red100
+        case .info:
+            return Colors.primary.black
+
+        case .success:
+            return Colors.secondary.green100
+
+        case .error:
+            return Colors.secondary.red100
         }
     }
 
     private var foregroundColor: Color {
         switch configuration.type {
-            case .info:
-                return Colors.primary.white
-            case .success:
-                return Colors.secondary.green800
-            case .error:
-                return Colors.secondary.red800
+        case .info:
+            return Colors.primary.white
+
+        case .success:
+            return Colors.secondary.green800
+
+        case .error:
+            return Colors.secondary.red800
         }
     }
 }
 
 #Preview {
     VStack {
-        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message",
-                                                              showCloseButton: true,
-                                                              actionButtonLabel: "Action"))
+        SnackbarView(
+            configuration: SnackbarViewConfiguration(
+                text: "Text message",
+                showCloseButton: true,
+                actionButtonLabel: "Action"
+            )
+        )
 
-        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message with multiple lines",
-                                                              showCloseButton: true,
-                                                              actionButtonLabel: "Action"))
+        SnackbarView(
+            configuration: SnackbarViewConfiguration(
+                text: "Text message with multiple lines",
+                showCloseButton: true,
+                actionButtonLabel: "Action"
+            )
+        )
 
-        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message",
-                                                              actionButtonLabel: "Action"))
+        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message", actionButtonLabel: "Action"))
 
-        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message",
-                                                              actionButtonLabel: "Action"))
+        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message", actionButtonLabel: "Action"))
 
         SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message without accessories"))
 
-        SnackbarView(configuration: SnackbarViewConfiguration(text: "Text message with multiple lines without accessories"))
+        SnackbarView(
+            configuration: SnackbarViewConfiguration(text: "Text message with multiple lines without accessories")
+        )
 
-        SnackbarView(configuration: SnackbarViewConfiguration(type: .success,
-                                                              text: "Success message",
-                                                              showCloseButton: true))
+        SnackbarView(
+            configuration: SnackbarViewConfiguration(type: .success, text: "Success message", showCloseButton: true)
+        )
 
-        SnackbarView(configuration: SnackbarViewConfiguration(type: .success,
-                                                              text: "Success message",
-                                                              showCloseButton: true,
-                                                              actionButtonLabel: "Action"))
+        SnackbarView(
+            configuration: SnackbarViewConfiguration(
+                type: .success,
+                text: "Success message",
+                showCloseButton: true,
+                actionButtonLabel: "Action"
+            )
+        )
 
-        SnackbarView(configuration: SnackbarViewConfiguration(type: .error,
-                                                              text: "Error message",
-                                                              showCloseButton: true,
-                                                              actionButtonLabel: "Action"))
+        SnackbarView(
+            configuration: SnackbarViewConfiguration(
+                type: .error,
+                text: "Error message",
+                showCloseButton: true,
+                actionButtonLabel: "Action"
+            )
+        )
     }
     .padding(.horizontal, Spacing.space100)
 }

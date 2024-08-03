@@ -7,9 +7,13 @@ extension Storage: StorageProtocol {
     }
 
     private func easyStashExpiry(from storageExpiry: StorageExpiry) -> Storage.Expiry {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch storageExpiry {
-            case .never: return .never
-            case .timeInterval(let value): return .maxAge(maxAge: value)
+        case .never:
+            .never
+        case .timeInterval(let value):
+            .maxAge(maxAge: value)
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

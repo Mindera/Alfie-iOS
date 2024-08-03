@@ -8,7 +8,7 @@ public enum ViewState<Value, StateError: Error> {
 
 public extension ViewState {
     var value: Value? {
-        guard case let .success(value) = self else {
+        guard case .success(let value) = self else {
             return nil
         }
         return value
@@ -36,7 +36,7 @@ public extension ViewState {
     }
 
     var failure: StateError? {
-        guard case let .error(type) = self else {
+        guard case .error(let type) = self else {
             return nil
         }
         return type

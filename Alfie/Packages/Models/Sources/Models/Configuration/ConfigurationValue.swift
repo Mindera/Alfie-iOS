@@ -29,9 +29,11 @@ public struct ConfigurationVersion: Codable {
         case guestUsersConfig = "guest_users"
     }
 
-    public init(minimumAppVersion: Version,
-                registeredUsersConfig: ConfigurationUserConfig,
-                guestUsersConfig: ConfigurationUserConfig) {
+    public init(
+        minimumAppVersion: Version,
+        registeredUsersConfig: ConfigurationUserConfig,
+        guestUsersConfig: ConfigurationUserConfig
+    ) {
         self.minimumAppVersion = minimumAppVersion
         self.registeredUsersConfig = registeredUsersConfig
         self.guestUsersConfig = guestUsersConfig
@@ -64,13 +66,19 @@ public struct ConfigurationValue {
     public private(set) var appUpdate: ConfigurationAppUpdate?
 
     public init?(rawValue: Any) {
-        if let dataValue = rawValue as? Data, let value = try? JSONDecoder().decode(ConfigurationVersions.self, from: dataValue) {
+        if
+            let dataValue = rawValue as? Data,
+            let value = try? JSONDecoder().decode(ConfigurationVersions.self, from: dataValue) {
             self.versionsValue = value
-        } else if let dataValue = rawValue as? Data, let value = try? JSONDecoder().decode(ConfigurationAppUpdate.self, from: dataValue) {
+        } else if
+            let dataValue = rawValue as? Data,
+            let value = try? JSONDecoder().decode(ConfigurationAppUpdate.self, from: dataValue) {
             self.appUpdate = value
         } else if let boolValue = rawValue as? Bool {
             self.boolValue = boolValue
-        } else if let dataValue = rawValue as? Data, let boolValue = String(data: dataValue, encoding: .utf8).flatMap(Bool.init) {
+        } else if
+            let dataValue = rawValue as? Data,
+            let boolValue = String(data: dataValue, encoding: .utf8).flatMap(Bool.init) {
             self.boolValue = boolValue
         } else {
             assertionFailure("Tried to create ConfigurationValue with unexpected value type: \(rawValue)")

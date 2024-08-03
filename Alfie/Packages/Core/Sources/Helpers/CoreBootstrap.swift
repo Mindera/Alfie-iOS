@@ -1,9 +1,9 @@
-import Foundation
+import Common
 import FirebaseCore
 import FirebaseCrashlytics
-import Common
+import Foundation
 
-public final class CoreBootstrap {
+public enum CoreBootstrap {
     public static func bootstrap() {
         // Setup loggers: default system console and Firebase Crashlytics
         // but don't add the system logger when running App Store release builds

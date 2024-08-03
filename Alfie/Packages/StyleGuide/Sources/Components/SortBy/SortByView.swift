@@ -51,7 +51,10 @@ public struct SortByView: View {
                                 }
                                 .overlay {
                                     RoundedRectangle(cornerRadius: CornerRadius.s)
-                                        .stroke(colorForOptionBorder(option.value), lineWidth: Constants.borderLineWidth)
+                                        .stroke(
+                                            colorForOptionBorder(option.value),
+                                            lineWidth: Constants.borderLineWidth
+                                        )
                                 }
                             }
                             .padding(.vertical, Constants.scrollBuffer)

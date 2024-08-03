@@ -9,16 +9,14 @@ struct ToggleDemoView: View {
         VStack(spacing: Spacing.space250) {
             DemoHelper.demoSectionHeader(title: "Toggle")
 
-            ThemedToggleView(isOn: $isOn, isDisabled: $isDisabled, label: {
+            ThemedToggleView(isOn: $isOn, isDisabled: $isDisabled) {
                 Text.build(theme.font.small.bold("This is a toggle"))
-            })
+            }
 
             DemoHelper.demoSectionHeader(title: "Options")
                 .padding(.top, Spacing.space400)
 
-            ThemedToggleView(isOn: $isDisabled, label: {
-                Text.build(theme.font.small.bold("Disable"))
-            })
+            ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disable")) }
 
             Spacer()
         }

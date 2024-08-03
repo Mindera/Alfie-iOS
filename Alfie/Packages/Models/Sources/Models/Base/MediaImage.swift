@@ -8,9 +8,7 @@ public struct MediaImage {
     /// The location of the image as a URL.
     public let url: URL
 
-    public init(alt: String?,
-                mediaContentType: MediaContentType,
-                url: URL) {
+    public init(alt: String?, mediaContentType: MediaContentType, url: URL) {
         self.alt = alt
         self.mediaContentType = mediaContentType
         self.url = url

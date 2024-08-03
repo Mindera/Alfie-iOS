@@ -1,5 +1,5 @@
-import UIKit
 import SwiftUI
+import UIKit
 
 public struct ZoomableCarouselConfiguration {
     let isPresented: Binding<Bool>
@@ -7,10 +7,12 @@ public struct ZoomableCarouselConfiguration {
     let maxZoomScale: CGFloat
     let doubleTapZoomScale: CGFloat
 
-    public init(isPresented: Binding<Bool>,
-                minZoomScale: CGFloat = 1,
-                maxZoomScale: CGFloat = 3,
-                doubleTapZoomScale: CGFloat = 3) {
+    public init(
+        isPresented: Binding<Bool>,
+        minZoomScale: CGFloat = 1,
+        maxZoomScale: CGFloat = 3,
+        doubleTapZoomScale: CGFloat = 3
+    ) {
         self.isPresented = isPresented
         self.minZoomScale = minZoomScale
         self.maxZoomScale = maxZoomScale

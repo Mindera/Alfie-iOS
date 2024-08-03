@@ -9,10 +9,12 @@ public struct ColorSelectorComponentView: View {
 
     /// - Parameters:
     ///   - size: ReadOnly
-    public init(configuration: ColorSelectorConfiguration,
-                swatchesSize: ColorSwatchView.SwatchSize = .large,
-                layoutConfiguration: SwatchLayoutConfiguration,
-                frameSize: Binding<CGSize>? = nil) {
+    public init(
+        configuration: ColorSelectorConfiguration,
+        swatchesSize: ColorSwatchView.SwatchSize = .large,
+        layoutConfiguration: SwatchLayoutConfiguration,
+        frameSize: Binding<CGSize>? = nil
+    ) {
         self.configuration = configuration
         self.swatchesSize = swatchesSize
         self.layoutConfiguration = layoutConfiguration
@@ -39,20 +41,23 @@ public struct ColorSelectorComponentView: View {
         }
     }
 
-    @ViewBuilder
-    private var container: some View {
+    @ViewBuilder private var container: some View {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch layoutConfiguration.arrangement {
-            case .horizontal(let itemSpacing, let scrollable):
-                horizontalSwatches(itemSpacing: itemSpacing, scrollable: scrollable)
-            case .chips(let horizontalSpacing, let verticalSpacing):
-                chipsSwatches(horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
-            case .grid(let columns, let columnWidth):
-                gridSwatches(columns: columns, columnWidth: columnWidth)
+        case .horizontal(let itemSpacing, let scrollable):
+            horizontalSwatches(itemSpacing: itemSpacing, scrollable: scrollable)
+        case .chips(let horizontalSpacing, let verticalSpacing):
+            chipsSwatches(horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
+        case .grid(let columns, let columnWidth):
+            gridSwatches(columns: columns, columnWidth: columnWidth)
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private func gridSwatches(columns: Int, columnWidth: CGFloat) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: columnWidth), alignment: .topLeading), count: columns)) {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(minimum: columnWidth), alignment: .topLeading), count: columns)
+        ) {
             swatches()
         }
     }
@@ -79,8 +84,7 @@ public struct ColorSelectorComponentView: View {
     @ViewBuilder
     private func swatches() -> some View {
         ForEach(configuration.items) { item in
-            ColorSwatchView(item: item, swatchSize: swatchesSize,
-                            isSelected: configuration.selectedItem == item)
+            ColorSwatchView(item: item, swatchSize: swatchesSize, isSelected: configuration.selectedItem == item)
                 .onTapGesture {
                     configuration.selectedItem = item
                 }
@@ -89,51 +93,71 @@ public struct ColorSelectorComponentView: View {
 }
 
 #Preview("Grid") {
-    ColorSelectorComponentView(configuration: .init(selectedTitle: "Color:",
-                                                    items: [.init(name: "Black", type: .color(Colors.primary.black)),
-                                                            .init(name: "Gray", type: .color(.gray)),
-                                                            .init(name: "Red", type: .color(.red)),
-                                                            .init(name: "Green", type: .color(.green)),
-                                                            .init(name: "Blue", type: .color(.blue)),
-                                                            .init(name: "Yellow", type: .color(.yellow)),
-                                                    ]),
-                               layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44)))
+    ColorSelectorComponentView(
+        configuration: .init(
+            selectedTitle: "Color:",
+            items: [
+                .init(name: "Black", type: .color(Colors.primary.black)),
+                .init(name: "Gray", type: .color(.gray)),
+                .init(name: "Red", type: .color(.red)),
+                .init(name: "Green", type: .color(.green)),
+                .init(name: "Blue", type: .color(.blue)),
+                .init(name: "Yellow", type: .color(.yellow)),
+            ]
+        ),
+        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44))
+    )
 }
 
 #Preview("Grid - No title") {
-    ColorSelectorComponentView(configuration: .init(selectedTitle: "Color:",
-                                                    items: [.init(name: "Black", type: .color(Colors.primary.black)),
-                                                            .init(name: "Gray", type: .color(.gray)),
-                                                            .init(name: "Red", type: .color(.red)),
-                                                            .init(name: "Green", type: .color(.green)),
-                                                            .init(name: "Blue", type: .color(.blue)),
-                                                            .init(name: "Yellow", type: .color(.yellow)),
-                                                    ]),
-                               layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44),
-                                                          hideSelectionTitle: true))
+    ColorSelectorComponentView(
+        configuration: .init(
+            selectedTitle: "Color:",
+            items: [
+                .init(name: "Black", type: .color(Colors.primary.black)),
+                .init(name: "Gray", type: .color(.gray)),
+                .init(name: "Red", type: .color(.red)),
+                .init(name: "Green", type: .color(.green)),
+                .init(name: "Blue", type: .color(.blue)),
+                .init(name: "Yellow", type: .color(.yellow)),
+            ]
+        ),
+        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44), hideSelectionTitle: true)
+    )
 }
 
 #Preview("Chips") {
-    ColorSelectorComponentView(configuration: .init(selectedTitle: "Color:",
-                                                    items: [.init(name: "Black", type: .color(Colors.primary.black)),
-                                                            .init(name: "Gray", type: .color(.gray)),
-                                                            .init(name: "Red", type: .color(.red)),
-                                                            .init(name: "Green", type: .color(.green)),
-                                                            .init(name: "Blue", type: .color(.blue)),
-                                                            .init(name: "Yellow", type: .color(.yellow)),
-                                                    ]),
-                               layoutConfiguration: .init(arrangement: .chips(itemHorizontalSpacing: Spacing.space200,
-                                                                              itemVerticalSpacing: Spacing.space200)))
+    ColorSelectorComponentView(
+        configuration: .init(
+            selectedTitle: "Color:",
+            items: [
+                .init(name: "Black", type: .color(Colors.primary.black)),
+                .init(name: "Gray", type: .color(.gray)),
+                .init(name: "Red", type: .color(.red)),
+                .init(name: "Green", type: .color(.green)),
+                .init(name: "Blue", type: .color(.blue)),
+                .init(name: "Yellow", type: .color(.yellow)),
+            ]
+        ),
+        layoutConfiguration: .init(
+            arrangement: .chips(itemHorizontalSpacing: Spacing.space200, itemVerticalSpacing: Spacing.space200)
+        )
+    )
 }
 
 #Preview("Scrollable Single Row") {
-    ColorSelectorComponentView(configuration: .init(selectedTitle: "Color:",
-                                                    items: [.init(name: "Black", type: .color(Colors.primary.black)),
-                                                            .init(name: "Gray", type: .color(.gray)),
-                                                            .init(name: "Red", type: .color(.red)),
-                                                            .init(name: "Green", type: .color(.green)),
-                                                            .init(name: "Blue", type: .color(.blue)),
-                                                            .init(name: "Yellow", type: .color(.yellow)),
-                                                    ]),
-                               layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200)))
+    ColorSelectorComponentView(
+        configuration: .init(
+            selectedTitle: "Color:",
+            items: [
+                .init(name: "Black", type: .color(Colors.primary.black)),
+                .init(name: "Gray", type: .color(.gray)),
+                .init(name: "Red", type: .color(.red)),
+                .init(name: "Green", type: .color(.green)),
+                .init(name: "Blue", type: .color(.blue)),
+                .init(name: "Yellow", type: .color(.yellow)),
+            ]
+        ),
+        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))
+    )
 }

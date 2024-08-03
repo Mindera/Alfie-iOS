@@ -11,9 +11,13 @@ final class BagViewModel: BagViewModelProtocol {
     // MARK: - BagViewModelProtocol
 
     public func webViewModel() -> any WebViewModelProtocol {
-        WebViewModel(webFeature: .bag,
-                     dependencies: WebDependencyContainer(deepLinkService: dependencies.deepLinkService,
-                                                          webViewConfigurationService: dependencies.webViewConfigurationService,
-                                                          webUrlProvider: dependencies.webUrlProvider))
+        WebViewModel(
+            webFeature: .bag,
+            dependencies: WebDependencyContainer(
+                deepLinkService: dependencies.deepLinkService,
+                webViewConfigurationService: dependencies.webViewConfigurationService,
+                webUrlProvider: dependencies.webUrlProvider
+            )
+        )
     }
 }

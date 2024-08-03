@@ -6,8 +6,10 @@ enum BagTrackingEvent: EventProtocol {
 
     var name: String {
         switch self {
-            case .didTapCheckout: "did_tap_checkout"
-            case .addToWishlist: "add_to_wishlist"
+        case .didTapCheckout:
+            "did_tap_checkout"
+        case .addToWishlist:
+            "add_to_wishlist"
         }
     }
 

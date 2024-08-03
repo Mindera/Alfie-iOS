@@ -54,7 +54,7 @@ struct BadgeDemoView: View {
                     .frame(width: 44, height: 44)
                     .badgeView(badgeValue: $badgeValue)
                 Spacer()
-                ThemedButton(text: "Add to bag", action: {})
+                ThemedButton(text: "Add to bag") {}
                     .badgeView(badgeValue: $badgeValue)
                 Spacer()
                 Circle()
@@ -68,39 +68,39 @@ struct BadgeDemoView: View {
             VStack(spacing: 20) {
                 HStack {
                     Spacer()
-                    ThemedButton(text: "Toggle", action: {
+                    ThemedButton(text: "Toggle") {
                         if badgeValue != nil {
                             badgeValue = nil
                         } else {
                             badgeValue = 1
                         }
-                    })
+                    }
 
                     Spacer()
-                    ThemedButton(text: "Max", action: {
+                    ThemedButton(text: "Max") {
                         badgeValue = 100
-                    })
+                    }
                     Spacer()
-                    ThemedButton(text: "Indicator", action: {
+                    ThemedButton(text: "Indicator") {
                         badgeValue = 0
-                    })
+                    }
                     Spacer()
                 }
                 HStack {
                     Spacer()
-                    ThemedButton(text: "Increase", action: {
+                    ThemedButton(text: "Increase") {
                         if let currentValue = badgeValue {
                             badgeValue = min(currentValue + 1, 100)
                         } else {
                             badgeValue = 1
                         }
-                    })
+                    }
                     Spacer()
-                    ThemedButton(text: "Decrease", action: {
+                    ThemedButton(text: "Decrease") {
                         if let currentValue = badgeValue {
                             badgeValue = max(currentValue - 1, 1)
                         }
-                    })
+                    }
                     Spacer()
                 }
             }

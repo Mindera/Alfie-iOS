@@ -7,8 +7,10 @@ public final class NotificationsService: NSObject, NotificationsServiceProtocol,
     let braze: BrazeProtocolService
     let notificationCenter: UserNotificationServiceProtocol
 
-    public init(braze: BrazeProtocolService = BrazeProtocol(),
-                notificationCenter: UserNotificationServiceProtocol = UserNotificationService()) {
+    public init(
+        braze: BrazeProtocolService = BrazeProtocol(),
+        notificationCenter: UserNotificationServiceProtocol = UserNotificationService()
+    ) {
         self.braze = braze
         self.notificationCenter = notificationCenter
     }

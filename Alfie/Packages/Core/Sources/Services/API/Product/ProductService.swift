@@ -21,10 +21,12 @@ public final class ProductService: ProductServiceProtocol {
     }
 
     public func productListing(offset: Int, limit: Int, categoryId: String?, query: String?) async throws -> ProductListing {
-        guard let productListing = try? await bffClient.productListing(offset: offset,
-                                                                       limit: limit,
-                                                                       categoryId: categoryId,
-                                                                       query: query)
+        guard let productListing = try? await bffClient.productListing(
+            offset: offset,
+            limit: limit,
+            categoryId: categoryId,
+            query: query
+        )
         else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query)))
         }

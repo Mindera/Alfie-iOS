@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct DemoHelper {
+public enum DemoHelper {
     public static func demoHeader(title: String) -> some View {
         Text.build(ThemeProvider.shared.font.small.normal(title))
     }

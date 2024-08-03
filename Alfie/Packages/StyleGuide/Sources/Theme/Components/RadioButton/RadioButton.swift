@@ -1,6 +1,6 @@
-import SwiftUI
 import Core
 import Models
+import SwiftUI
 
 public enum RadioButtonState {
     case selected
@@ -12,14 +12,16 @@ public enum RadioButtonState {
     }
 
     var correspondingIcon: ButtonIcon {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .selected:
-                return ButtonIcon.radioButtonSelected
-            case .unselected:
-                return ButtonIcon.radioButtonUnselected
-            case .disabled:
-                return ButtonIcon.radioButtonDisabled
+        case .selected:
+            return ButtonIcon.radioButtonSelected
+        case .unselected:
+            return ButtonIcon.radioButtonUnselected
+        case .disabled:
+            return ButtonIcon.radioButtonDisabled
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -32,19 +34,22 @@ struct RadioButton: View {
         static let iconSize: CGFloat = 21
     }
 
-    public init(state: Binding<RadioButtonState>,
-                text: Binding<String>,
-                hapticsService: HapticsServiceProtocol = HapticsService.instance) {
+    public init(
+        state: Binding<RadioButtonState>,
+        text: Binding<String>,
+        hapticsService: HapticsServiceProtocol = HapticsService.instance
+    ) {
         self._state = state
         self._text = text
         self.hapticsService = hapticsService
     }
 
-    public init(state: Binding<RadioButtonState>,
-                text: String,
-                hapticsService: HapticsServiceProtocol = HapticsService.instance) {
-        self.init(state: state,
-                  text: .constant(text))
+    public init(
+        state: Binding<RadioButtonState>,
+        text: String,
+        hapticsService: HapticsServiceProtocol = HapticsService.instance
+    ) {
+        self.init(state: state, text: .constant(text))
     }
 
     public var body: some View {
@@ -53,7 +58,7 @@ struct RadioButton: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
-            
+
             Text.build(theme.font.paragraph.normal(text))
         }
         .foregroundColor(state.isDisabled ? Colors.primary.mono400 : Colors.primary.mono900)

@@ -10,8 +10,7 @@ public final class BFFClientDependencyContainer: BFFClientDependencyContainerPro
     public var reachabilityService: ReachabilityServiceProtocol
     public var restNetworkClient: NetworkClientProtocol
 
-    public init(reachabilityService: ReachabilityServiceProtocol,
-                restNetworkClient: NetworkClientProtocol) {
+    public init(reachabilityService: ReachabilityServiceProtocol, restNetworkClient: NetworkClientProtocol) {
         self.reachabilityService = reachabilityService
         self.restNetworkClient = restNetworkClient
     }

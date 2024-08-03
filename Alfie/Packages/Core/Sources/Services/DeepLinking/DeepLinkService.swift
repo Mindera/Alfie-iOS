@@ -1,15 +1,17 @@
+import Common
 import Foundation
 import Models
-import Common
 
 public final class DeepLinkService: DeepLinkServiceProtocol {
     private var handlers: [DeepLinkHandlerProtocol]
     private let parsers: [DeepLinkParserProtocol]
     private let linkConfiguration: LinkConfigurationProtocol
 
-    public init(parsers: [DeepLinkParserProtocol],
-                handlers: [DeepLinkHandlerProtocol] = [],
-                configuration: LinkConfigurationProtocol) {
+    public init(
+        parsers: [DeepLinkParserProtocol],
+        handlers: [DeepLinkHandlerProtocol] = [],
+        configuration: LinkConfigurationProtocol
+    ) {
         self.parsers = parsers
         self.handlers = handlers
         self.linkConfiguration = configuration
@@ -34,7 +36,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
             return false
         }
 
-        return handlers.contains(where: { $0.canHandleDeepLink(deepLink) })
+        return handlers.contains { $0.canHandleDeepLink(deepLink) }
     }
 
     public func openUrls(_ urls: [URL]) {

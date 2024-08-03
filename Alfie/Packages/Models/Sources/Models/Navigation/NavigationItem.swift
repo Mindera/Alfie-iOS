@@ -20,13 +20,15 @@ public struct NavigationItem: Equatable, Hashable {
     public let items: [NavigationItem]?
     public let attributes: [String: String]?
 
-    public init(id: String = UUID().uuidString,
-                type: NavigationItemType,
-                title: String,
-                url: String?,
-                media: Media?,
-                items: [NavigationItem]?,
-                attributes: AttributeCollection?) {
+    public init(
+        id: String = UUID().uuidString,
+        type: NavigationItemType,
+        title: String,
+        url: String?,
+        media: Media?,
+        items: [NavigationItem]?,
+        attributes: AttributeCollection?
+    ) {
         self.id = id
         self.type = type
         self.title = title

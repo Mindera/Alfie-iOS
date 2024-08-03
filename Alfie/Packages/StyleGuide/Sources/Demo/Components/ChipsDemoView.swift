@@ -13,30 +13,25 @@ struct ChipsDemoView: View {
                 .padding(.bottom, Spacing.space400)
             VStack(spacing: Spacing.space0) {
                 Spacer()
-                Chip(configuration: .init(type: isLarge ? .large : .small,
-                                          label: "Label",
-                                          counter: counterValue,
-                                          showCloseButton: isCloseable,
-                                          isDisabled: $isDisabled,
-                                          isSelected: $isSelected,
-                                          onCloseTap: { }))
+                Chip(
+                    configuration: .init(
+                        type: isLarge ? .large : .small,
+                        label: "Label",
+                        counter: counterValue,
+                        showCloseButton: isCloseable,
+                        isDisabled: $isDisabled,
+                        isSelected: $isSelected
+                    ) { }
+                )
                 Spacer()
             }
             .frame(height: 50)
             .padding(.bottom, Spacing.space400)
             DemoHelper.demoSectionHeader(title: "Options")
-            ThemedToggleView(isOn: $isLarge, label: {
-                Text.build(theme.font.small.bold("Large"))
-            })
-            ThemedToggleView(isOn: $isCloseable, label: {
-                Text.build(theme.font.small.bold("Closeable"))
-            })
-            ThemedToggleView(isOn: $isDisabled, label: {
-                Text.build(theme.font.small.bold("Disabled"))
-            })
-            ThemedToggleView(isOn: $isSelected, label: {
-                Text.build(theme.font.small.bold("Selected"))
-            })
+            ThemedToggleView(isOn: $isLarge) { Text.build(theme.font.small.bold("Large")) }
+            ThemedToggleView(isOn: $isCloseable) { Text.build(theme.font.small.bold("Closeable")) }
+            ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disabled")) }
+            ThemedToggleView(isOn: $isSelected) { Text.build(theme.font.small.bold("Selected")) }
 
             DemoHelper.demoSectionHeader(title: "Counter")
                 .padding(.top, 20)
@@ -44,39 +39,35 @@ struct ChipsDemoView: View {
             VStack(spacing: 20) {
                 HStack {
                     Spacer()
-                    ThemedButton(text: "Toggle", action: {
+                    ThemedButton(text: "Toggle") {
                         if counterValue != nil {
                             counterValue = nil
                         } else {
                             counterValue = 1
                         }
-                    })
+                    }
 
                     Spacer()
-                    ThemedButton(text: "Max", action: {
-                        counterValue = 100
-                    })
+                    ThemedButton(text: "Max") { counterValue = 100 }
                     Spacer()
-                    ThemedButton(text: "Min", action: {
-                        counterValue = 0
-                    })
+                    ThemedButton(text: "Min") { counterValue = 0 }
                     Spacer()
                 }
                 HStack {
                     Spacer()
-                    ThemedButton(text: "Increase", action: {
+                    ThemedButton(text: "Increase") {
                         if let currentValue = counterValue {
                             counterValue = min(currentValue + 1, 100)
                         } else {
                             counterValue = 0
                         }
-                    })
+                    }
                     Spacer()
-                    ThemedButton(text: "Decrease", action: {
+                    ThemedButton(text: "Decrease") {
                         if let currentValue = counterValue {
                             counterValue = max(currentValue - 1, 0)
                         }
-                    })
+                    }
                     Spacer()
                 }
             }

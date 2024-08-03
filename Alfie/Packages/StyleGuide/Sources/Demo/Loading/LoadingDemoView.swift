@@ -5,33 +5,35 @@ struct LoadingDemoView: View {
     @State private var showLabel = true
 
     var body: some View {
-		ScrollView {
-			VStack(spacing: Spacing.space250) {
-                componentPreview(LoaderView(circleDiameter: .defaultSmall, labelHidden: !showLabel),
-								 title: "Loading - Default",
-								 description: "",
-								 showStepper: false)
-				componentPreview(LoaderView(circleDiameter: .custom(number), labelHidden: !showLabel),
-								 title: "Loading - Custom",
-								 showStepper: true)
+        ScrollView {
+            VStack(spacing: Spacing.space250) {
+                componentPreview(
+                    LoaderView(circleDiameter: .defaultSmall, labelHidden: !showLabel),
+                    title: "Loading - Default",
+                    description: "",
+                    showStepper: false
+                )
+                componentPreview(
+                    LoaderView(circleDiameter: .custom(number), labelHidden: !showLabel),
+                    title: "Loading - Custom",
+                    showStepper: true
+                )
 
-				VStack(spacing: Spacing.space200) {
+                VStack(spacing: Spacing.space200) {
                     DemoHelper.demoSectionHeader(title: "Loading - Logo")
-					ThemedLoaderView(labelHidden: !showLabel)
-				}
+                    ThemedLoaderView(labelHidden: !showLabel)
+                }
 
                 DemoHelper.demoSectionHeader(title: "Options")
                     .padding(.top, Spacing.space250)
-                ThemedToggleView(isOn: $showLabel, label: {
-                    Text.build(theme.font.paragraph.normal("Show loading label"))
-                })
+                ThemedToggleView(isOn: $showLabel) { Text.build(theme.font.paragraph.normal("Show loading label")) }
 
                 Stepper(value: $number, in: 1...100, step: 4) {
                     Text.build(theme.font.small.bold("Custom size"))
                 }
-			}
-			.padding(Spacing.space200)
-		}
+            }
+            .padding(Spacing.space200)
+        }
         .navigationTitle("Loading")
     }
 

@@ -10,10 +10,7 @@ public struct SearchSuggestionBrand: Identifiable, Equatable, Hashable {
     /// Slugified name of the brand.
     public let slug: String
 
-    public init(id: String = UUID().uuidString,
-                name: String,
-                slug: String,
-                resultCount: Int) {
+    public init(id: String = UUID().uuidString, name: String, slug: String, resultCount: Int) {
         self.id = id
         self.name = name
         self.slug = slug

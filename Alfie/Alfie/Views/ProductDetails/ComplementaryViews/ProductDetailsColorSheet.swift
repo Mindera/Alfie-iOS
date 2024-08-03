@@ -1,6 +1,6 @@
-import SwiftUI
-import StyleGuide
 import Models
+import StyleGuide
+import SwiftUI
 #if DEBUG
 import Mocks
 #endif
@@ -51,9 +51,11 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                             isPresented = false
                         } label: {
                             HStack(spacing: Spacing.space200) {
-                                ColorSwatchView(item: item,
-                                                swatchSize: .normal,
-                                                isSelected: viewModel.colorSelectionConfiguration.selectedItem == item)
+                                ColorSwatchView(
+                                    item: item,
+                                    swatchSize: .normal,
+                                    isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
+                                )
 
                                 Text.build(theme.font.paragraph.normal(item.name.capitalized))
 
@@ -74,11 +76,14 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                 .padding(.horizontal, Spacing.space200)
                 .padding(.vertical, Spacing.space100)
             }
-            .searchable(placeholder: LocalizableProductDetails.$searchColors,
-                        placeholderOnFocus: LocalizableProductDetails.$searchColors,
-                        searchText: $searchText, theme: .soft,
-                        dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
-                        verticalSpacing: Spacing.space200)
+            .searchable(
+                placeholder: LocalizableProductDetails.$searchColors,
+                placeholderOnFocus: LocalizableProductDetails.$searchColors,
+                searchText: $searchText,
+                theme: .soft,
+                dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
+                verticalSpacing: Spacing.space200
+            )
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
@@ -87,8 +92,10 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
 
 #if DEBUG
 #Preview {
-    ProductDetailsColorSheet(viewModel: MockProductDetailsViewModel(),
-                             isPresented: .constant(true),
-                             searchText: .constant(""))
+    ProductDetailsColorSheet(
+        viewModel: MockProductDetailsViewModel(),
+        isPresented: .constant(true),
+        searchText: .constant("")
+    )
 }
 #endif

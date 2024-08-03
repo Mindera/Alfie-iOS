@@ -52,34 +52,42 @@ final class Coordinator: ObservableObject, CoordinatorProtocol {
     }
 
     public func onSubmit(_ searchTerm: String) {
-        let configuration = ProductListingScreenConfiguration(category: nil,
-                                                              searchText: searchTerm,
-                                                              urlQueryParameters: nil,
-                                                              mode: .searchResults)
+        let configuration = ProductListingScreenConfiguration(
+            category: nil,
+            searchText: searchTerm,
+            urlQueryParameters: nil,
+            mode: .searchResults
+        )
         navigationAdapter.push(.productListing(configuration: configuration))
     }
 
     public func didTap(_ recentSearch: RecentSearch) {
-        let configuration = ProductListingScreenConfiguration(category: nil,
-                                                              searchText: recentSearch.value,
-                                                              urlQueryParameters: nil,
-                                                              mode: .searchResults)
+        let configuration = ProductListingScreenConfiguration(
+            category: nil,
+            searchText: recentSearch.value,
+            urlQueryParameters: nil,
+            mode: .searchResults
+        )
         navigationAdapter.push(.productListing(configuration: configuration))
     }
 
     public func didTap(_ suggestedKeyword: SearchSuggestionKeyword) {
-        let configuration = ProductListingScreenConfiguration(category: nil,
-                                                              searchText: suggestedKeyword.term,
-                                                              urlQueryParameters: nil,
-                                                              mode: .searchResults)
+        let configuration = ProductListingScreenConfiguration(
+            category: nil,
+            searchText: suggestedKeyword.term,
+            urlQueryParameters: nil,
+            mode: .searchResults
+        )
         navigationAdapter.push(.productListing(configuration: configuration))
     }
 
     public func didTap(_ suggestedBrand: SearchSuggestionBrand) {
-        let configuration = ProductListingScreenConfiguration(category: suggestedBrand.slug,
-                                                              searchText: nil,
-                                                              urlQueryParameters: nil,
-                                                              mode: .searchResults)
+        let configuration = ProductListingScreenConfiguration(
+            category: suggestedBrand.slug,
+            searchText: nil,
+            urlQueryParameters: nil,
+            mode: .searchResults
+        )
         navigationAdapter.push(.productListing(configuration: configuration))
     }
 

@@ -13,15 +13,17 @@ public struct ThemedButton: View {
     private let action: () -> Void
     private let isFullWidth: Bool
 
-    public init(text: String,
-                type: ButtonType = .medium,
-                style: ButtonTheme = .primary,
-                leadingAsset: Icon? = nil,
-                trailingAsset: Icon? = nil,
-                isDisabled: Binding<Bool> = .constant(false),
-                isLoading: Binding<Bool> = .constant(false),
-                isFullWidth: Bool = false,
-                action: @escaping () -> Void) {
+    public init(
+        text: String,
+        type: ButtonType = .medium,
+        style: ButtonTheme = .primary,
+        leadingAsset: Icon? = nil,
+        trailingAsset: Icon? = nil,
+        isDisabled: Binding<Bool> = .constant(false),
+        isLoading: Binding<Bool> = .constant(false),
+        isFullWidth: Bool = false,
+        action: @escaping () -> Void
+    ) {
         self.text = text
         self.type = type
         self.style = style
@@ -54,37 +56,55 @@ public struct ThemedButton: View {
             }
         }
         .disabled(isDisabled)
-        .buttonStyle(ThemedButtonStyle(style: style,
-                                       type: type,
-                                       isDisabled: isDisabled,
-                                       isLoading: isLoading,
-                                       leadingAsset: leadingAsset,
-                                       trailingAsset: trailingAsset))
+        .buttonStyle(
+            ThemedButtonStyle(
+                style: style,
+                type: type,
+                isDisabled: isDisabled,
+                isLoading: isLoading,
+                leadingAsset: leadingAsset,
+                trailingAsset: trailingAsset
+            )
+        )
     }
 
     func textFor(_ text: String) -> AttributedString {
         switch type {
-            case .small:
-                switch style {
-                    case .primary, .secondary, .tertiary:
-                        theme.font.small.bold(text)
-                    case .underline:
-                        theme.font.small.boldUnderline(text)
-                }
-            case .medium:
-                switch style {
-                    case .primary, .secondary, .tertiary:
-                        theme.font.paragraph.bold(text)
-                    case .underline:
-                        theme.font.paragraph.boldUnderline(text)
-                }
-            case .big:
-                switch style {
-                    case .primary, .secondary, .tertiary:
-                        theme.font.header.h3(text)
-                    case .underline:
-                        theme.font.header.h3Underline(text)
-                }
+        case .small:
+            // swiftlint:disable vertical_whitespace_between_cases
+            switch style {
+            case .primary,
+                .secondary,
+                .tertiary:
+                theme.font.small.bold(text)
+            case .underline:
+                theme.font.small.boldUnderline(text)
+            }
+            // swiftlint:enable vertical_whitespace_between_cases
+
+        case .medium:
+            // swiftlint:disable vertical_whitespace_between_cases
+            switch style {
+            case .primary,
+                .secondary,
+                .tertiary:
+                theme.font.paragraph.bold(text)
+            case .underline:
+                theme.font.paragraph.boldUnderline(text)
+            }
+            // swiftlint:enable vertical_whitespace_between_cases
+
+        case .big:
+            // swiftlint:disable vertical_whitespace_between_cases
+            switch style {
+            case .primary,
+                .secondary,
+                .tertiary:
+                theme.font.header.h3(text)
+            case .underline:
+                theme.font.header.h3Underline(text)
+            }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 }
@@ -97,14 +117,16 @@ public enum ButtonType {
     case big
 
     var height: CGFloat {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .small:
-                return Constants.smallHeight
-            case .medium:
-                return Constants.mediumHeight
-            case .big:
-                return Constants.bigHeight
+        case .small:
+            return Constants.smallHeight
+        case .medium:
+            return Constants.mediumHeight
+        case .big:
+            return Constants.bigHeight
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -172,15 +194,25 @@ private struct ThemedButtonStyle: ButtonStyle {
     }
 
     private func background(_ configuration: Self.Configuration) -> Color {
-        isDisabled ? style.spec.backgroundDisabledColor : configuration.isPressed ? style.spec.backgroundPressedColor : style.spec.backgroundColor
+        let backgroundDisabledColor = style.spec.backgroundDisabledColor
+        let backgroundPressedColor = style.spec.backgroundPressedColor
+        let backgroundColor = style.spec.backgroundColor
+
+        return isDisabled ? backgroundDisabledColor : configuration.isPressed ? backgroundPressedColor : backgroundColor
     }
 
     private func textColor(_ configuration: Self.Configuration) -> Color {
-        isDisabled ? style.spec.textDisabledColor : configuration.isPressed ? style.spec.textPressedColor : style.spec.textColor
+        let textDisabledColor = style.spec.textDisabledColor
+        let textPressedColor = style.spec.textPressedColor
+
+        return isDisabled ? textDisabledColor : configuration.isPressed ? textPressedColor : style.spec.textColor
     }
 
     private func borderColor(_ configuration: Self.Configuration) -> Color {
-        isDisabled ? style.spec.borderDisabledColor : configuration.isPressed ? style.spec.borderPressedColor : style.spec.borderColor
+        let borderDisabledColor = style.spec.borderDisabledColor
+        let borderPressedColor = style.spec.borderPressedColor
+
+        return isDisabled ? borderDisabledColor : configuration.isPressed ? borderPressedColor : style.spec.borderColor
     }
 
     private var styleLoading: LoaderView.CircleStyle {
@@ -190,69 +222,95 @@ private struct ThemedButtonStyle: ButtonStyle {
 
 #Preview("Button Primary") {
     VStack {
-        ThemedButton(text: "Primary", action: {})
-        ThemedButton(text: "Primary", leadingAsset: .chevronLeft, action: {})
-        ThemedButton(text: "Primary", trailingAsset: .chevronRight, action: {})
-        ThemedButton(text: "Primary", leadingAsset: .heart, trailingAsset: .chevronRight, isLoading: .constant(true), action: {})
-        ThemedButton(text: "Primary", leadingAsset: .heart, trailingAsset: .chevronRight, isDisabled: .constant(true), action: {})
+        ThemedButton(text: "Primary") {}
+        ThemedButton(text: "Primary", leadingAsset: .chevronLeft) {}
+        ThemedButton(text: "Primary", trailingAsset: .chevronRight) {}
+        ThemedButton(text: "Primary", leadingAsset: .heart, trailingAsset: .chevronRight, isLoading: .constant(true)) {}
+        ThemedButton(text: "Primary", leadingAsset: .heart, trailingAsset: .chevronRight, isDisabled: .constant(true)) {
+        }
     }
 }
 
 #Preview("Button Secondary") {
     VStack {
-        ThemedButton(text: "Secondary", style: .secondary, action: {})
-        ThemedButton(text: "Secondary", style: .secondary, leadingAsset: .chevronLeft, action: {})
-        ThemedButton(text: "Secondary", style: .secondary, trailingAsset: .chevronRight, isLoading: .constant(true), action: {})
-        ThemedButton(text: "Secondary", style: .secondary, leadingAsset: .heart, trailingAsset: .chevronRight, action: {})
-        ThemedButton(text: "Secondary", style: .secondary, leadingAsset: .heart, trailingAsset: .chevronRight, isDisabled: .constant(true), isLoading: .constant(true), action: {})
+        ThemedButton(text: "Secondary", style: .secondary) {}
+        ThemedButton(text: "Secondary", style: .secondary, leadingAsset: .chevronLeft) {}
+        ThemedButton(text: "Secondary", style: .secondary, trailingAsset: .chevronRight, isLoading: .constant(true)) {}
+        ThemedButton(text: "Secondary", style: .secondary, leadingAsset: .heart, trailingAsset: .chevronRight) {}
+        ThemedButton(
+            text: "Secondary",
+            style: .secondary,
+            leadingAsset: .heart,
+            trailingAsset: .chevronRight,
+            isDisabled: .constant(true),
+            isLoading: .constant(true)
+        ) {}
     }
 }
 
 #Preview("Button Tertiary") {
     VStack {
-        ThemedButton(text: "Tertiary", style: .tertiary, action: {})
-        ThemedButton(text: "Tertiary", style: .tertiary, leadingAsset: .chevronLeft, action: {})
-        ThemedButton(text: "Tertiary", style: .tertiary, trailingAsset: .chevronRight, action: {})
-        ThemedButton(text: "Tertiary", style: .tertiary, leadingAsset: .heart, trailingAsset: .chevronRight, action: {})
-        ThemedButton(text: "Tertiary", style: .tertiary, leadingAsset: .heart, trailingAsset: .chevronRight, isDisabled: .constant(true), action: {})
+        ThemedButton(text: "Tertiary", style: .tertiary) {}
+        ThemedButton(text: "Tertiary", style: .tertiary, leadingAsset: .chevronLeft) {}
+        ThemedButton(text: "Tertiary", style: .tertiary, trailingAsset: .chevronRight) {}
+        ThemedButton(text: "Tertiary", style: .tertiary, leadingAsset: .heart, trailingAsset: .chevronRight) {}
+        ThemedButton(
+            text: "Tertiary",
+            style: .tertiary,
+            leadingAsset: .heart,
+            trailingAsset: .chevronRight,
+            isDisabled: .constant(true)
+        ) {}
     }
 }
 
 #Preview("Button underline") {
     VStack {
-        ThemedButton(text: "Underline", style: .underline, action: {})
-        ThemedButton(text: "Underline", style: .underline, leadingAsset: .chevronLeft, action: {})
-        ThemedButton(text: "Underline", style: .underline, trailingAsset: .chevronRight, action: {})
-        ThemedButton(text: "Underline", style: .underline, leadingAsset: .heart, trailingAsset: .chevronRight, action: {})
-        ThemedButton(text: "Underline", style: .underline, leadingAsset: .heart, trailingAsset: .chevronRight, isDisabled: .constant(true), action: {})
+        ThemedButton(text: "Underline", style: .underline) {}
+        ThemedButton(text: "Underline", style: .underline, leadingAsset: .chevronLeft) {}
+        ThemedButton(text: "Underline", style: .underline, trailingAsset: .chevronRight) {}
+        ThemedButton(text: "Underline", style: .underline, leadingAsset: .heart, trailingAsset: .chevronRight) {}
+        ThemedButton(
+            text: "Underline",
+            style: .underline,
+            leadingAsset: .heart,
+            trailingAsset: .chevronRight,
+            isDisabled: .constant(true)
+        ) {}
     }
 }
 
 extension ThemedButton: CustomShimmerable {
     public var cornerRadius: CGFloat {
         switch style {
-            case .primary, .secondary:
-                return Constants.cornerRadius
-            case .tertiary, .underline:
-                return 0
+        case .primary,
+            .secondary:
+            return Constants.cornerRadius
+        case .tertiary,
+            .underline:
+            return 0
         }
     }
 
     public var customLighterShimmerColor: Color? {
         switch style {
-            case .primary:
-                return Colors.primary.mono600
-            case .secondary, .tertiary, .underline:
-                return nil
+        case .primary:
+            return Colors.primary.mono600
+        case .secondary,
+            .tertiary,
+            .underline:
+            return nil
         }
     }
 
     public var customDarkerShimmerColor: Color? {
         switch style {
-            case .primary:
-                return Colors.primary.mono900
-            case .secondary, .tertiary, .underline:
-                return nil
+        case .primary:
+            return Colors.primary.mono900
+        case .secondary,
+            .tertiary,
+            .underline:
+            return nil
         }
     }
 }

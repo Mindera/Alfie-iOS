@@ -11,16 +11,16 @@ extension PriceType {
     init(from product: Product) {
         if let range = product.priceRange {
             if let high = range.high {
-                self = .range(lowerBound: range.low.amountFormatted,
-                              upperBound: high.amountFormatted,
-                              separator: "-")
+                self = .range(lowerBound: range.low.amountFormatted, upperBound: high.amountFormatted, separator: "-")
             } else {
                 self = .default(price: range.low.amountFormatted)
             }
         } else {
             if let salePreviousPrice = product.defaultVariant.price.was {
-                self = .sale(fullPrice: salePreviousPrice.amountFormatted,
-                             finalPrice: product.defaultVariant.price.amount.amountFormatted)
+                self = .sale(
+                    fullPrice: salePreviousPrice.amountFormatted,
+                    finalPrice: product.defaultVariant.price.amount.amountFormatted
+                )
             } else {
                 self = .default(price: product.defaultVariant.price.amount.amountFormatted)
             }
@@ -34,14 +34,18 @@ public extension PriceType {
     }
 
     static func formattedSale(fullPrice: Double, finalPrice: Double, currencyCode: String) -> PriceType {
-        .sale(fullPrice: fullPrice.formatted(.currency(code: currencyCode)),
-              finalPrice: finalPrice.formatted(.currency(code: currencyCode)))
+        .sale(
+            fullPrice: fullPrice.formatted(.currency(code: currencyCode)),
+            finalPrice: finalPrice.formatted(.currency(code: currencyCode))
+        )
     }
 
     static func formattedRange(lowerBound: Double, upperBound: Double, currencyCode: String, separator: String = "-") -> PriceType {
-        .range(lowerBound: lowerBound.formatted(.currency(code: currencyCode)),
-               upperBound: upperBound.formatted(.currency(code: currencyCode)),
-               separator: separator)
+        .range(
+            lowerBound: lowerBound.formatted(.currency(code: currencyCode)),
+            upperBound: upperBound.formatted(.currency(code: currencyCode)),
+            separator: separator
+        )
     }
 }
 
@@ -60,9 +64,7 @@ public struct PriceConfiguration {
     public let size: PriceSize
     public let textAlignment: TextAlignment
 
-    public init(preferredDistribution: PriceDistribution,
-                size: PriceSize,
-                textAlignment: TextAlignment = .trailing) {
+    public init(preferredDistribution: PriceDistribution, size: PriceSize, textAlignment: TextAlignment = .trailing) {
         self.preferredDistribution = preferredDistribution
         self.size = size
         self.textAlignment = textAlignment
@@ -76,40 +78,51 @@ public struct PriceComponentView: View {
     private enum Constants {
         static let verticalRangeSeparatorHeight: CGFloat = 4
 
+        // swiftlint:disable vertical_whitespace_between_cases
         static func defaultTextSize(for size: PriceSize) -> CGFloat {
             switch size {
-                case .small: 14
-                case .large: 16
+            case .small:
+                14
+            case .large:
+                16
             }
         }
         static func saleFullPriceTextSize(for size: PriceSize) -> CGFloat {
             switch size {
-                case .small: 12
-                case .large: 14
+            case .small:
+                12
+            case .large:
+                14
             }
         }
         static func saleFinalPriceTextSize(for size: PriceSize) -> CGFloat {
             switch size {
-                case .small: 14
-                case .large: 16
+            case .small:
+                14
+            case .large:
+                16
             }
         }
         static func verticalRangeTextSize(for size: PriceSize) -> CGFloat {
             switch size {
-                case .small: 12
-                case .large: 14
+            case .small:
+                12
+            case .large:
+                14
             }
         }
         static func horizontalRangeTextSize(for size: PriceSize) -> CGFloat {
             switch size {
-                case .small: 14
-                case .large: 16
+            case .small:
+                14
+            case .large:
+                16
             }
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
-    public init(type: PriceType,
-                configuration: PriceConfiguration) {
+    public init(type: PriceType, configuration: PriceConfiguration) {
         self.type = type
         self.configuration = configuration
     }
@@ -117,13 +130,15 @@ public struct PriceComponentView: View {
     public var body: some View {
         VStack {
             switch type {
-                case let .default(price):
-                    defaultPrice(price, textSize: Constants.defaultTextSize(for: configuration.size))
-                        .accessibilityIdentifier(AccessibilityId.priceFull)
-                case let .sale(fullPrice, finalPrice):
-                    salePrice(fullPrice: fullPrice, finalPrice: finalPrice)
-                case let .range(lowerBound, upperBound, separator):
-                    rangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
+            case .default(let price):
+                defaultPrice(price, textSize: Constants.defaultTextSize(for: configuration.size))
+                    .accessibilityIdentifier(AccessibilityId.priceFull)
+
+            case .sale(let fullPrice, let finalPrice):
+                salePrice(fullPrice: fullPrice, finalPrice: finalPrice)
+
+            case .range(let lowerBound, let upperBound, let separator):
+                rangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
             }
         }
     }
@@ -140,13 +155,14 @@ public struct PriceComponentView: View {
     @ViewBuilder
     private func salePrice(fullPrice: String, finalPrice: String) -> some View {
         switch configuration.preferredDistribution {
-            case .vertical:
+        case .vertical:
+            verticalSalePrice(fullPrice: fullPrice, finalPrice: finalPrice)
+
+        case .horizontal:
+            ViewThatFits(in: .horizontal) {
+                horizontalSalePrice(fullPrice: fullPrice, finalPrice: finalPrice)
                 verticalSalePrice(fullPrice: fullPrice, finalPrice: finalPrice)
-            case .horizontal:
-                ViewThatFits(in: .horizontal) {
-                    horizontalSalePrice(fullPrice: fullPrice, finalPrice: finalPrice)
-                    verticalSalePrice(fullPrice: fullPrice, finalPrice: finalPrice)
-                }
+            }
         }
     }
 
@@ -183,13 +199,14 @@ public struct PriceComponentView: View {
     @ViewBuilder
     private func rangePrice(lowerBound: String, upperBound: String, separator: String) -> some View {
         switch configuration.preferredDistribution {
-            case .vertical:
+        case .vertical:
+            verticalRangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
+
+        case .horizontal:
+            ViewThatFits(in: .horizontal) {
+                horizontalRangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
                 verticalRangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
-            case .horizontal:
-                ViewThatFits(in: .horizontal) {
-                    horizontalRangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
-                    verticalRangePrice(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
-                }
+            }
         }
     }
 
@@ -223,11 +240,16 @@ public struct PriceComponentView: View {
 
 private extension TextAlignment {
     var horizontalAlignment: HorizontalAlignment {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .leading: .leading
-            case .center: .center
-            case .trailing: .trailing
+        case .leading:
+            .leading
+        case .center:
+            .center
+        case .trailing:
+            .trailing
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -239,16 +261,19 @@ private enum AccessibilityId {
 
 #Preview {
     VStack {
-        PriceComponentView(type: .default(price: "50€"),
-                           configuration: .init(preferredDistribution: .horizontal,
-                                                size: .small))
+        PriceComponentView(
+            type: .default(price: "50€"),
+            configuration: .init(preferredDistribution: .horizontal, size: .small)
+        )
 
-        PriceComponentView(type: .sale(fullPrice: "100€", finalPrice: "50€"),
-                           configuration: .init(preferredDistribution: .horizontal,
-                                                size: .small))
+        PriceComponentView(
+            type: .sale(fullPrice: "100€", finalPrice: "50€"),
+            configuration: .init(preferredDistribution: .horizontal, size: .small)
+        )
 
-        PriceComponentView(type: .range(lowerBound: "50€", upperBound: "100€", separator: "-"),
-                           configuration: .init(preferredDistribution: .horizontal,
-                                                size: .small))
+        PriceComponentView(
+            type: .range(lowerBound: "50€", upperBound: "100€", separator: "-"),
+            configuration: .init(preferredDistribution: .horizontal, size: .small)
+        )
     }
 }

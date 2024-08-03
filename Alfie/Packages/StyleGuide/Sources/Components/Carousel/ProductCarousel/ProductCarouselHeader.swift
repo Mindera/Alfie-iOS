@@ -7,11 +7,13 @@ struct ProductCarouselHeader: View {
     private let ctaStyle: ButtonTheme
     private let ctaAction: (() -> Void)?
 
-    init(title: String? = nil,
-         subtitle: String? = nil,
-         ctaTitle: String? = nil,
-         ctaStyle: ButtonTheme = .underline,
-         ctaAction: (() -> Void)? = nil) {
+    init(
+        title: String? = nil,
+        subtitle: String? = nil,
+        ctaTitle: String? = nil,
+        ctaStyle: ButtonTheme = .underline,
+        ctaAction: (() -> Void)? = nil
+    ) {
         self.title = title
         self.subtitle = subtitle
         self.ctaTitle = ctaTitle
@@ -44,8 +46,10 @@ struct ProductCarouselHeader: View {
 }
 
 #Preview {
-    ProductCarouselHeader(title: "New In",
-                          subtitle: "Get a latest in fashion",
-                          ctaTitle: "See All",
-                          ctaStyle: .underline)
+    ProductCarouselHeader(
+        title: "New In",
+        subtitle: "Get a latest in fashion",
+        ctaTitle: "See All",
+        ctaStyle: .underline
+    )
 }

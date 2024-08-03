@@ -26,19 +26,27 @@ public struct ThemedDivider: View {
         static let thinThickness = 1.0
         static let thickThickness = 2.0
     }
-    
-    public static var horizontalThin = ThemedDivider(configuration: .init(orientation: .horizontal,
-                                                                          thickness: Constants.thinThickness,
-                                                                          color: Colors.primary.mono100))
-    public static var verticalThin = ThemedDivider(configuration: .init(orientation: .vertical,
-                                                                        thickness: Constants.thinThickness,
-                                                                        color: Colors.primary.mono100))
-    public static var horizontalThick = ThemedDivider(configuration: .init(orientation: .horizontal,
-                                                                           thickness: Constants.thickThickness,
-                                                                           color: Colors.primary.mono100))
-    public static var verticalThick = ThemedDivider(configuration: .init(orientation: .vertical,
-                                                                         thickness: Constants.thickThickness,
-                                                                         color: Colors.primary.mono100))
+
+    public static var horizontalThin = ThemedDivider(
+        configuration: .init(
+            orientation: .horizontal,
+            thickness: Constants.thinThickness,
+            color: Colors.primary.mono100
+        )
+    )
+    public static var verticalThin = ThemedDivider(
+        configuration: .init(orientation: .vertical, thickness: Constants.thinThickness, color: Colors.primary.mono100)
+    )
+    public static var horizontalThick = ThemedDivider(
+        configuration: .init(
+            orientation: .horizontal,
+            thickness: Constants.thickThickness,
+            color: Colors.primary.mono100
+        )
+    )
+    public static var verticalThick = ThemedDivider(
+        configuration: .init(orientation: .vertical, thickness: Constants.thickThickness, color: Colors.primary.mono100)
+    )
     private let configuration: ThemedDividerConfiguration
 
     public init(configuration: ThemedDividerConfiguration) {
@@ -48,8 +56,10 @@ public struct ThemedDivider: View {
     public var body: some View {
         Rectangle()
             .fill(configuration.color)
-            .frame(maxWidth: configuration.orientation == .horizontal ? .infinity : configuration.thickness,
-                   maxHeight: configuration.orientation == .vertical ? .infinity : configuration.thickness)
+            .frame(
+                maxWidth: configuration.orientation == .horizontal ? .infinity : configuration.thickness,
+                maxHeight: configuration.orientation == .vertical ? .infinity : configuration.thickness
+            )
     }
 }
 
@@ -75,13 +85,13 @@ public struct ThemedDivider: View {
         .frame(height: 50)
         Spacer()
         HStack {
-            ThemedDivider(configuration: .init(orientation: .horizontal,
-                                               thickness: 5.0,
-                                               color: Colors.secondary.orange400))
+            ThemedDivider(
+                configuration: .init(orientation: .horizontal, thickness: 5.0, color: Colors.secondary.orange400)
+            )
             Spacer()
-            ThemedDivider(configuration: .init(orientation: .vertical,
-                                               thickness: 5.0,
-                                               color: Colors.secondary.orange400))
+            ThemedDivider(
+                configuration: .init(orientation: .vertical, thickness: 5.0, color: Colors.secondary.orange400)
+            )
         }
         .frame(height: 50)
     }

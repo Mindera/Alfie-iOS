@@ -16,8 +16,7 @@ public struct ProgressBar: View {
     }
 
     public init(progress: Binding<Double>, total: Double) {
-        self.init(progress: progress,
-                  total: .constant(total))
+        self.init(progress: progress, total: .constant(total))
     }
 
     public var body: some View {
@@ -63,7 +62,6 @@ public struct ProgressBar: View {
 }
 
 #Preview {
-    ProgressBar(progress: .constant(50),
-                total: .constant(100))
-    .padding()
+    ProgressBar(progress: .constant(50), total: .constant(100))
+        .padding()
 }

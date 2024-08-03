@@ -1,6 +1,6 @@
 import Models
-import SwiftUI
 import StyleGuide
+import SwiftUI
 #if DEBUG
 import Mocks
 #endif
@@ -28,38 +28,41 @@ struct SearchView<ViewModel: SearchViewModelProtocol>: View {
         .onDisappear {
             viewModel.viewDidDisappear()
         }
-        .searchable(placeholder: LocalizableSearch.$searchBarPlaceholder,
-                    placeholderOnFocus: LocalizableSearch.$searchBarPlaceholderFocused,
-                    searchText: $viewModel.searchText,
-                    pullToSearchConfig: .disabled,
-                    theme: .softLarge,
-                    dismissConfiguration: .init(type: .back),
-                    contentOverlayColorWhenFocused: Colors.primary.white,
-                    showDivider: true,
-                    autoFocus: true,
-                    transition: transition,
-                    onCancel: { onCancel() },
-                    onSubmit: { _ in onSubmit() })
+        .searchable(
+            placeholder: LocalizableSearch.$searchBarPlaceholder,
+            placeholderOnFocus: LocalizableSearch.$searchBarPlaceholderFocused,
+            searchText: $viewModel.searchText,
+            pullToSearchConfig: .disabled,
+            theme: .softLarge,
+            dismissConfiguration: .init(type: .back),
+            contentOverlayColorWhenFocused: Colors.primary.white,
+            showDivider: true,
+            autoFocus: true,
+            transition: transition,
+            onCancel: { onCancel() },
+            onSubmit: { _ in onSubmit() }
+        )
     }
 }
 
 // MARK: - Views
 
 extension SearchView {
-    @ViewBuilder
-    private var searchContentView: some View {
+    @ViewBuilder private var searchContentView: some View {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch viewModel.state {
-            case .empty:
-                emptyView
-            case .loading:
-                loadingView
-            case .noResults:
-                noResultsView
-            case .recentSearches:
-                viewFactory.view(for: .recentSearches)
-            case .success:
-                resultsView
+        case .empty:
+            emptyView
+        case .loading:
+            loadingView
+        case .noResults:
+            noResultsView
+        case .recentSearches:
+            viewFactory.view(for: .recentSearches)
+        case .success:
+            resultsView
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private var loadingView: some View {
@@ -111,12 +114,8 @@ extension SearchView {
                 suggestionBrands
                 suggestionProducts
 
-                ThemedButton(text: LocalizableSearch.$suggestionsMore,
-                             style: .secondary,
-                             action: {
-                    onSubmit()
-                })
-                .accessibilityIdentifier(AccessibilityId.moreProductsCta)
+                ThemedButton(text: LocalizableSearch.$suggestionsMore, style: .secondary) { onSubmit() }
+                    .accessibilityIdentifier(AccessibilityId.moreProductsCta)
             }
             .padding(Spacing.space200)
         }
@@ -163,7 +162,8 @@ extension SearchView {
                 LazyVGrid(
                     columns: Array(
                         repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
-                        count: Constants.productCardsPerLine),
+                        count: Constants.productCardsPerLine
+                    ),
                     spacing: Spacing.space200
                 ) {
                     ForEach(viewModel.suggestionProducts) { product in
@@ -197,10 +197,12 @@ extension SearchView {
 
     private func suggestionEntry(text: String) -> some View {
         HStack(spacing: Spacing.space0) {
-            Text.build(theme.font.paragraph.normal(text),
-                       highlighting: viewModel.searchText,
-                       font: theme.font.paragraph.bold,
-                       color: Colors.primary.black)
+            Text.build(
+                theme.font.paragraph.normal(text),
+                highlighting: viewModel.searchText,
+                font: theme.font.paragraph.bold,
+                color: Colors.primary.black
+            )
             .foregroundStyle(Colors.primary.mono900)
             Spacer()
         }
@@ -208,9 +210,10 @@ extension SearchView {
     }
 
     private func productCardView(_ product: Product) -> some View {
-        VerticalProductCard(configuration: .init(size: .medium, hidePrice: true, hideAction: true),
-                            product: product,
-                            onUserAction: { _, _ in })
+        VerticalProductCard(
+            configuration: .init(size: .medium, hidePrice: true, hideAction: true),
+            product: product
+        ) { _, _ in }
         .onTapGesture {
             coordinator.openDetails(for: product)
         }
@@ -287,11 +290,17 @@ private enum Constants {
 }
 
 #Preview("Results") {
-    SearchView(viewModel: MockSearchViewModel(state: .success(suggestion: .fixture()),
-                                              searchText: "polo",
-                                              suggestionTerms: [.fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")],
-                                              suggestionBrands: [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")],
-                                              suggestionProducts: Product.fixtures))
-        .environmentObject(Coordinator())
+    SearchView(
+        viewModel: MockSearchViewModel(
+            state: .success(suggestion: .fixture()),
+            searchText: "polo",
+            suggestionTerms: [
+                .fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")
+            ],
+            suggestionBrands: [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")],
+            suggestionProducts: Product.fixtures
+        )
+    )
+    .environmentObject(Coordinator())
 }
 #endif

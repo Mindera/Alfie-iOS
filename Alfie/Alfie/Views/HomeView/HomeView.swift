@@ -1,6 +1,6 @@
 import Models
-import SwiftUI
 import StyleGuide
+import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var coordinador: Coordinator
@@ -22,22 +22,27 @@ struct HomeView: View {
     var body: some View {
         VStack {
             if !coordinador.navigationAdapter.isPresentingFullScreenOverlay {
-                ThemedSearchBarView(searchText: .constant(""),
-                                    placeholder: LocalizableHome.$searchBarPlaceholder,
-                                    theme: .soft,
-                                    dismissConfiguration: .init(type: .back, accessibilityId: Constants.cancelAccessibilityId),
-                                    inputAccessibilityId: Constants.searchAccessibility)
-                    .matchedGeometryEffect(id: Constants.searchBarGeometryID,
-                                           in: animation)
-                    .disabled(true)
-                    .onTapGesture {
-                        coordinador.navigationAdapter.presentFullscreenOverlay(
-                            with: .search(transition: .matchedGeometryEffect(id: Constants.searchBarGeometryID,
-                                                             namespace: animation))
+                ThemedSearchBarView(
+                    searchText: .constant(""),
+                    placeholder: LocalizableHome.$searchBarPlaceholder,
+                    theme: .soft,
+                    dismissConfiguration: .init(type: .back, accessibilityId: Constants.cancelAccessibilityId),
+                    inputAccessibilityId: Constants.searchAccessibility
+                )
+                .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
+                .disabled(true)
+                .onTapGesture {
+                    coordinador.navigationAdapter.presentFullscreenOverlay(
+                        with: .search(
+                            transition: .matchedGeometryEffect(
+                                id: Constants.searchBarGeometryID,
+                                namespace: animation
+                            )
                         )
-                    }
-                    .padding(.horizontal, Spacing.space200)
-                    .padding(.vertical, Spacing.space100)
+                    )
+                }
+                .padding(.horizontal, Spacing.space200)
+                .padding(.vertical, Spacing.space100)
             }
             Spacer()
             Icon.home.image

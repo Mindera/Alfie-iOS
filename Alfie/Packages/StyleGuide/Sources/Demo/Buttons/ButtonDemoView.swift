@@ -15,34 +15,40 @@ struct ButtonDemoView: View {
         VStack(spacing: Spacing.space250) {
             DemoHelper.demoSectionHeader(title: "Button")
 
-            ThemedButton(text: text, type: .small,
-                         style: style,
-                         leadingAsset: showIconLeft ? iconLeft : nil,
-                         trailingAsset: showIconRight ? iconRight : nil,
-                         isDisabled: $isDisabled,
-                         isLoading: $isLoading,
-                         isFullWidth: isFullWidth,
-                         action: {})
+            ThemedButton(
+                text: text,
+                type: .small,
+                style: style,
+                leadingAsset: showIconLeft ? iconLeft : nil,
+                trailingAsset: showIconRight ? iconRight : nil,
+                isDisabled: $isDisabled,
+                isLoading: $isLoading,
+                isFullWidth: isFullWidth
+            ) {}
             .padding(.vertical, Spacing.space100)
 
-            ThemedButton(text: text, type: .medium,
-                         style: style,
-                         leadingAsset: showIconLeft ? iconLeft : nil,
-                         trailingAsset: showIconRight ? iconRight : nil,
-                         isDisabled: $isDisabled,
-                         isLoading: $isLoading,
-                         isFullWidth: isFullWidth,
-                         action: {})
+            ThemedButton(
+                text: text,
+                type: .medium,
+                style: style,
+                leadingAsset: showIconLeft ? iconLeft : nil,
+                trailingAsset: showIconRight ? iconRight : nil,
+                isDisabled: $isDisabled,
+                isLoading: $isLoading,
+                isFullWidth: isFullWidth
+            ) {}
             .padding(.vertical, Spacing.space100)
 
-            ThemedButton(text: text, type: .big,
-                         style: style,
-                         leadingAsset: showIconLeft ? iconLeft : nil,
-                         trailingAsset: showIconRight ? iconRight : nil,
-                         isDisabled: $isDisabled,
-                         isLoading: $isLoading,
-                         isFullWidth: isFullWidth,
-                         action: {})
+            ThemedButton(
+                text: text,
+                type: .big,
+                style: style,
+                leadingAsset: showIconLeft ? iconLeft : nil,
+                trailingAsset: showIconRight ? iconRight : nil,
+                isDisabled: $isDisabled,
+                isLoading: $isLoading,
+                isFullWidth: isFullWidth
+            ) {}
             .padding(.vertical, Spacing.space100)
 
             DemoHelper.demoSectionHeader(title: "Options")
@@ -71,9 +77,9 @@ struct ButtonDemoView: View {
                 }
             }
 
-            ThemedToggleView(isOn: $showIconLeft, label: {
+            ThemedToggleView(isOn: $showIconLeft) {
                 Text.build(theme.font.small.bold("Icon on the left"))
-            })
+            }
 
             HStack {
                 Text.build(theme.font.small.bold("Icon"))
@@ -93,9 +99,9 @@ struct ButtonDemoView: View {
             }
             .disabled(!showIconLeft)
 
-            ThemedToggleView(isOn: $showIconRight, label: {
+            ThemedToggleView(isOn: $showIconRight) {
                 Text.build(theme.font.small.bold("Icon on the right"))
-            })
+            }
 
             HStack {
                 Text.build(theme.font.small.bold("Icon"))
@@ -115,17 +121,17 @@ struct ButtonDemoView: View {
             }
             .disabled(!showIconRight)
 
-            ThemedToggleView(isOn: $isDisabled, label: {
+            ThemedToggleView(isOn: $isDisabled) {
                 Text.build(theme.font.small.bold("Disabled"))
-            })
+            }
 
-            ThemedToggleView(isOn: $isLoading, label: {
+            ThemedToggleView(isOn: $isLoading) {
                 Text.build(theme.font.small.bold("Loading"))
-            })
+            }
 
-            ThemedToggleView(isOn: $isFullWidth, label: {
+            ThemedToggleView(isOn: $isFullWidth) {
                 Text.build(theme.font.small.bold("Full width"))
-            })
+            }
 
             Spacer()
         }

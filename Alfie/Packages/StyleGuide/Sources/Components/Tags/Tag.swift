@@ -8,11 +8,13 @@ public struct TagConfiguration {
 
     public let onCloseTap: (() -> Void)?
 
-    public init(label: String,
-                showCloseButton: Bool = false,
-                icon: Image? = nil,
-                color: Color = Colors.primary.mono800,
-                onCloseTap: (() -> Void)? = nil) {
+    public init(
+        label: String,
+        showCloseButton: Bool = false,
+        icon: Image? = nil,
+        color: Color = Colors.primary.mono800,
+        onCloseTap: (() -> Void)? = nil
+    ) {
         self.label = label
         self.showCloseButton = showCloseButton
         self.icon = icon
@@ -47,8 +49,7 @@ public struct Tag: View {
                 if let icon = configuration.icon {
                     icon
                         .resizable()
-                        .frame(width: Constants.iconWidth,
-                               height: Constants.iconHeight)
+                        .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                 }
                 Text.build(theme.font.paragraph.normal(configuration.label))
                 if configuration.showCloseButton {
@@ -57,8 +58,7 @@ public struct Tag: View {
                     }, label: {
                         Icon.close.image
                             .resizable()
-                            .frame(width: Constants.closeWidth,
-                                   height: Constants.closeHeight)
+                            .frame(width: Constants.closeWidth, height: Constants.closeHeight)
                     })
                 }
             }
@@ -67,10 +67,7 @@ public struct Tag: View {
         .background(Colors.primary.mono100)
         .cornerRadius(Constants.cornerRadius)
         .frame(height: Constants.height)
-        .shadow(color: Colors.primary.black.opacity(0.1),
-                radius: 4,
-                x: 2,
-                y: 2)
+        .shadow(color: Colors.primary.black.opacity(0.1), radius: 4, x: 2, y: 2)
     }
 }
 

@@ -70,7 +70,8 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
                 route: navigationRoute,
                 query: url.queryParameters
             ),
-            fullUrl: normalisedWebUrl)
+            fullUrl: normalisedWebUrl
+        )
     }
 
     /// Returns optional navigation route

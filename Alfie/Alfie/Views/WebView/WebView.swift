@@ -4,6 +4,7 @@ import StyleGuide
 import SwiftUI
 import WebKit
 #if DEBUG
+import Common
 import Mocks
 #endif
 
@@ -51,9 +52,9 @@ struct WebView<ViewModel: WebViewModelProtocol>: View {
                 .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.paragraph.normal(LocalizableWebView.errorGenericMessage))
                 .foregroundStyle(Colors.primary.mono600)
-            ThemedButton(text: LocalizableWebView.$errorButtonLabel, isFullWidth: true, action: {
+            ThemedButton(text: LocalizableWebView.$errorButtonLabel, isFullWidth: true) {
                 viewModel.tryAgain()
-            })
+            }
         }
     }
 }
@@ -126,9 +127,7 @@ private struct WebViewRepresentable<ViewModel: WebViewModelProtocol>: UIViewRepr
             var head = document.getElementsByTagName('head')[0];
             head.appendChild(meta);
         """
-        let script = WKUserScript(source: source,
-                                  injectionTime: .atDocumentEnd,
-                                  forMainFrameOnly: true)
+        let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         webView.configuration.userContentController.addUserScript(script)
     }
 
@@ -142,25 +141,31 @@ private struct WebViewRepresentable<ViewModel: WebViewModelProtocol>: UIViewRepr
 
         // MARK: - WKNavigationDelegate
 
+        // swiftlint:disable:next implicitly_unwrapped_optional
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             parent.viewModel.webViewStarted()
         }
 
+        // swiftlint:disable:next implicitly_unwrapped_optional
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             parent.viewModel.webViewFinished()
         }
 
+        // swiftlint:disable:next implicitly_unwrapped_optional
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             parent.viewModel.webViewFailed()
         }
 
+        // swiftlint:disable:next implicitly_unwrapped_optional
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             parent.viewModel.webViewFailed()
         }
 
-        func webView(_ webView: WKWebView,
-                     decidePolicyFor navigationAction: WKNavigationAction,
-                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
             guard
                 let url = navigationAction.request.url,
                 parent.viewModel.canOpenUrl(url)
@@ -177,7 +182,7 @@ private struct WebViewRepresentable<ViewModel: WebViewModelProtocol>: UIViewRepr
 
 #if DEBUG
 #Preview("Ready") {
-    WebView(viewModel: MockWebViewModel(state: .ready(URL(string: "https://www.alfieproj.com/")!)))
+    WebView(viewModel: MockWebViewModel(state: .ready(URL.fromString("https://www.alfieproj.com/"))))
         .environmentObject(Coordinator())
 }
 

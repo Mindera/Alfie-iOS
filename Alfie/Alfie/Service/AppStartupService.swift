@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 import Models
 import OrderedCollections
 
@@ -32,7 +32,7 @@ final class AppStartupService: AppStartupServiceProtocol {
     }
 
     private var prioritisedScreen: AppStartupScreen {
-        appStartupScreenCondition.first(where: { $0.value })?.key ?? .error
+        appStartupScreenCondition.first { $0.value }?.key ?? .error
     }
 
     init(configurationService: ConfigurationServiceProtocol) {

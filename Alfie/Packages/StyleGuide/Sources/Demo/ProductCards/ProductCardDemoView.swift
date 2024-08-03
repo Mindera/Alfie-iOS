@@ -38,59 +38,64 @@ extension ProductCardDemoView {
     private var productCardListXS: some View {
         VStack(alignment: .leading, spacing: Spacing.space200) {
             ForEach(Product.fixtures) { product in
-                HorizontalProductCard(product: product,
-                                      colorTitle: "Color:",
-                                      sizeTitle: "Size:")
+                HorizontalProductCard(product: product, colorTitle: "Color:", sizeTitle: "Size:")
             }
         }
     }
 
-    @ViewBuilder
-    private var productCardListS: some View {
+    @ViewBuilder private var productCardListS: some View {
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: Spacing.space0),
-            progressBarConfiguration: .init(horizontalPadding: Spacing.space800),
-            content: {
-                HStack(alignment: .top, spacing: Spacing.space150) {
-                    ForEach(Product.fixtures) { product in
-                        VerticalProductCard(configuration: .init(size: .small),
-                                            product: product,
-                                            onUserAction: { _, _ in })
-                    }
+            progressBarConfiguration: .init(horizontalPadding: Spacing.space800)
+        ) {
+            HStack(alignment: .top, spacing: Spacing.space150) {
+                ForEach(Product.fixtures) { product in
+                    VerticalProductCard(configuration: .init(size: .small), product: product) { _, _ in }
                 }
-            })
-    }
-
-    @ViewBuilder
-    private var productCardListMedium: some View {
-        let columns = switch horizontalSizeClass {
-                        case .regular:
-                            orientation.isLandscape ? 4 : 3
-                        default:
-                            2
-        }
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top), count: columns), spacing: Spacing.space200) {
-            ForEach(Product.fixtures) { product in
-                VerticalProductCard(configuration: .init(size: .medium),
-                                    product: product,
-                                    onUserAction: { _, _ in })
             }
         }
     }
 
-    @ViewBuilder
-    private var productCardListLarge: some View {
+    @ViewBuilder private var productCardListMedium: some View {
+        // swiftlint:disable vertical_whitespace_between_cases
         let columns = switch horizontalSizeClass {
-                        case .regular:
-                            orientation.isLandscape ? 3 : 2
-                        default:
-                            1
+        case .regular:
+            orientation.isLandscape ? 4 : 3
+        default:
+            2
         }
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top), count: columns), spacing: Spacing.space200) {
+        // swiftlint:enable vertical_whitespace_between_cases
+        LazyVGrid(
+            columns: Array(
+                repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
+                count: columns
+            ),
+            spacing: Spacing.space200
+        ) {
             ForEach(Product.fixtures) { product in
-                VerticalProductCard(configuration: .init(size: .large),
-                                    product: product,
-                                    onUserAction: { _, _ in })
+                VerticalProductCard(configuration: .init(size: .medium), product: product) { _, _ in }
+            }
+        }
+    }
+
+    @ViewBuilder private var productCardListLarge: some View {
+        // swiftlint:disable vertical_whitespace_between_cases
+        let columns = switch horizontalSizeClass {
+        case .regular:
+            orientation.isLandscape ? 3 : 2
+        default:
+            1
+        }
+        // swiftlint:enable vertical_whitespace_between_cases
+        LazyVGrid(
+            columns: Array(
+                repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
+                count: columns
+            ),
+            spacing: Spacing.space200
+        ) {
+            ForEach(Product.fixtures) { product in
+                VerticalProductCard(configuration: .init(size: .large), product: product) { _, _ in }
             }
         }
     }

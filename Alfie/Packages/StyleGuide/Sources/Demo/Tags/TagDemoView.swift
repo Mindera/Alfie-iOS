@@ -32,21 +32,19 @@ struct TagDemoView: View {
 
                 DemoHelper.demoSectionHeader(title: "Demo")
 
-                ThemedButton(text: "Add Tag", action: {
+                ThemedButton(text: "Add Tag") {
                     var newTag = generateTag()
                     while tags.contains(newTag) {
                         newTag = generateTag()
                     }
                     tags.append(newTag)
-                })
+                }
 
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space150, content: {
-                    ForEach(tags, id: \.self, content: { tag in
-                        Tag(configuration: .init(label: tag,
-                                                 showCloseButton: true,
-                                                 onCloseTap: { tags.removeAll(where: { $0 == tag }) }))
-                    })
-                })
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space150) {
+                    ForEach(tags, id: \.self) { tag in
+                        Tag(configuration: .init(label: tag, showCloseButton: true) { tags.removeAll { $0 == tag } })
+                    }
+                }
 
                 Spacer()
             }

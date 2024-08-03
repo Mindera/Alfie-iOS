@@ -1,6 +1,6 @@
 import Models
-import SwiftUI
 import StyleGuide
+import SwiftUI
 #if DEBUG
 import Mocks
 #endif
@@ -55,9 +55,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
             .padding(.horizontal, Spacing.space300)
         }
         .padding(.vertical, Spacing.space100)
-        .modifier(TapHighlightableModifier(action: {
-            coordinator.didTap(recentSearch)
-        }))
+        .modifier(TapHighlightableModifier { coordinator.didTap(recentSearch) })
         .accessibilityIdentifier(AccessibilityId.recentSearchItem)
     }
 

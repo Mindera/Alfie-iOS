@@ -1,6 +1,6 @@
 import Models
-import SwiftUI
 import StyleGuide
+import SwiftUI
 
 // swiftlint:disable:next generic_type_name
 struct RootView<StartupScreenProvider: AppStartupServiceProtocol>: View {
@@ -8,9 +8,11 @@ struct RootView<StartupScreenProvider: AppStartupServiceProtocol>: View {
     private let configurationService: ConfigurationServiceProtocol
     private let coordinator: TabCoordinator
 
-    init(coordinator: TabCoordinator,
-         startupScreenProvider: StartupScreenProvider,
-         configurationService: ConfigurationServiceProtocol) {
+    init(
+        coordinator: TabCoordinator,
+        startupScreenProvider: StartupScreenProvider,
+        configurationService: ConfigurationServiceProtocol
+    ) {
         _startupScreenProvider = StateObject(wrappedValue: startupScreenProvider)
         self.coordinator = coordinator
         self.configurationService = configurationService
@@ -29,18 +31,21 @@ extension RootView {
     @ViewBuilder
     private func view(for screen: AppStartupScreen) -> some View {
         switch screen {
-            case .loading:
-                ThemedLoaderView(labelHidden: true, labelTitle: LocalizableGeneral.$loading)
-                    .transition(.opacity)
-            case .error:
-                Text("Error!") // TODO: Replace with actual error screen
-            case .forceUpdate:
-                if let configuration = configurationService.forceAppUpdateInfo {
-                    ForceAppUpdateView(configuration: configuration)
-                }
-            case .landing:
-                TabBarView(configurationService: configurationService)
-                    .transition(.opacity)
+        case .loading:
+            ThemedLoaderView(labelHidden: true, labelTitle: LocalizableGeneral.$loading)
+                .transition(.opacity)
+
+        case .error:
+            Text("Error!") // TODO: Replace with actual error screen
+
+        case .forceUpdate:
+            if let configuration = configurationService.forceAppUpdateInfo {
+                ForceAppUpdateView(configuration: configuration)
+            }
+
+        case .landing:
+            TabBarView(configurationService: configurationService)
+                .transition(.opacity)
         }
     }
 }

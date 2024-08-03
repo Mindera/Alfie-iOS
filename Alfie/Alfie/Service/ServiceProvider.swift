@@ -26,8 +26,7 @@ final class ServiceProvider: ServiceProviderProtocol {
 
     init() {
         self.userDefaults = UserDefaults.standard
-        self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance,
-                                                     userDefaults: userDefaults)
+        self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost)
 
         // Assuming Australia for now, to be revised later
@@ -36,28 +35,39 @@ final class ServiceProvider: ServiceProviderProtocol {
         authenticationService = AuthenticationService()
         trackingService = TrackingService(providers: [FirebaseAnalyticsService()])
 
-        let firebaseProvider = FirebaseRemoteConfigurationProvider(minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800)
+        let firebaseProvider = FirebaseRemoteConfigurationProvider(
+            minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800
+        )
         let localProvider = LocalConfigurationProvider()
-        configurationService = ConfigurationService(providers: [firebaseProvider, localProvider], // Order matters!
-                                                    authenticationService: authenticationService,
-                                                    country: defaultInitializationCountry)
+        configurationService = ConfigurationService(
+            providers: [firebaseProvider, localProvider], // Order matters!
+            authenticationService: authenticationService,
+            country: defaultInitializationCountry
+        )
         deepLinkService = DeepLinkService(configuration: LinkConfiguration())
         hapticsService = HapticsService.instance
         reachabilityService = ReachabilityService(monitor: ReachabilityMonitor())
         storageService = StorageService()
-        recentsService = RecentsService(autoSaveEnabled: false,
-                                        storageService: storageService,
-                                        storageKey: ThemedStorageKey.recentSearches.rawValue)
+        recentsService = RecentsService(
+            autoSaveEnabled: false,
+            storageService: storageService,
+            storageKey: ThemedStorageKey.recentSearches.rawValue
+        )
 
         // BFF API (GraphQL + REST)
-        let restClient = NetworkClient(logRequests: true, logResponses: true) // Pass false if you wish to remove console clutter
-        let bffDependencies = BFFClientDependencyContainer(reachabilityService: reachabilityService,
-                                                           restNetworkClient: restClient)
+        // Pass false if you wish to remove console clutter
+        let restClient = NetworkClient(logRequests: true, logResponses: true)
+        let bffDependencies = BFFClientDependencyContainer(
+            reachabilityService: reachabilityService,
+            restNetworkClient: restClient
+        )
         let apiUrl = apiEndpointService.apiEndpoint(for: apiEndpointService.currentApiEndpoint)
         log("Initializing BFF API with endpoint \(apiUrl.absoluteString)")
-        let bffClient = BFFClientService(url: apiUrl,
-                                         logRequests: true, // Pass false if you wish to remove console clutter
-                                         dependencies: bffDependencies)
+        let bffClient = BFFClientService(
+            url: apiUrl,
+            logRequests: true, // Pass false if you wish to remove console clutter
+            dependencies: bffDependencies
+        )
         notificationsService = NotificationsService()
 
         // API Services

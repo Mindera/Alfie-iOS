@@ -7,7 +7,8 @@ final class WebViewModel: WebViewModelProtocol {
     let title: String
     private let dependencies: WebDependencyContainerProtocol
     @Published private(set) var state: WebViewState = .empty
-    private let urlChangeHandler: ((URL) -> Bool)? // Handler should return true if it handled the URL, false to allow the webview to handle it
+    // Handler should return true if it handled the URL, false to allow the webview to handle it
+    private let urlChangeHandler: ((URL) -> Bool)?
 
     var shouldNavigateBack: Bool {
         guard let operation = state.navigationOperation else {
@@ -17,10 +18,12 @@ final class WebViewModel: WebViewModelProtocol {
         return operation == .back
     }
 
-    init(url: URL?,
-         title: String? = nil,
-         dependencies: WebDependencyContainerProtocol,
-         urlChangeHandler: ((URL) -> Bool)? = nil) {
+    init(
+        url: URL?,
+        title: String? = nil,
+        dependencies: WebDependencyContainerProtocol,
+        urlChangeHandler: ((URL) -> Bool)? = nil
+    ) {
         self.url = url
         self.webFeature = nil
         self.title = title ?? ""
@@ -28,10 +31,12 @@ final class WebViewModel: WebViewModelProtocol {
         self.urlChangeHandler = urlChangeHandler
     }
 
-    init(webFeature: WebFeature,
-         title: String? = nil,
-         dependencies: WebDependencyContainerProtocol,
-         urlChangeHandler: ((URL) -> Bool)? = nil) {
+    init(
+        webFeature: WebFeature,
+        title: String? = nil,
+        dependencies: WebDependencyContainerProtocol,
+        urlChangeHandler: ((URL) -> Bool)? = nil
+    ) {
         self.url = nil
         self.webFeature = webFeature
         self.title = title ?? ""

@@ -10,10 +10,12 @@ public struct Carousel<Content: View>: View {
     /// This index does not reflect the visible image Index, and should not be relied upon. It's purely made for the infinite scrolling illusion
     @State private var actualCurrentIndex: Int = 0
 
-    public init(currentIndex: Binding<Int>,
-                aspectRatio: CGFloat? = nil,
-                infiniteScrollingEnabled: Bool = true,
-                _ childViews: () -> [Content]) {
+    public init(
+        currentIndex: Binding<Int>,
+        aspectRatio: CGFloat? = nil,
+        infiniteScrollingEnabled: Bool = true,
+        _ childViews: () -> [Content]
+    ) {
         self.uniqueChildViews = childViews()
         self._currentIndex = currentIndex
         self.aspectRatio = aspectRatio
@@ -47,7 +49,8 @@ public struct Carousel<Content: View>: View {
             ThemedPageControl(
                 data: uniqueChildViews,
                 selectedIndex: $currentIndex,
-                configuration: .default)
+                configuration: .default
+            )
         }
         .task {
             actualCurrentIndex = infiniteScrollingEnabled ? 1 : 0
