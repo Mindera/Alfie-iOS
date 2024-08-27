@@ -49,12 +49,12 @@ extension DeepLink.LinkType {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .productList,
-            .productDetail,
-            .bag,
-            .shop,
-            .home,
-            .wishlist,
-            .account:
+             .productDetail, // swiftlint:disable:this indentation_width
+             .bag,
+             .shop,
+             .home,
+             .wishlist,
+             .account:
             return false
         default:
             return true

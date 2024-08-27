@@ -103,11 +103,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         case .titleHeader:
             return state.isLoading && productName.isEmpty
         case .colorSelector,
-            .mediaCarousel,
-            .complementaryInfo:
+             .mediaCarousel, // swiftlint:disable:this indentation_width
+             .complementaryInfo:
             return state.isLoading
         case .productDescription,
-            .addToBag:
+             .addToBag: // swiftlint:disable:this indentation_width
             return false
         }
     }
@@ -116,7 +116,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         // swiftlint:disable vertical_whitespace_between_cases
         switch section {
         case .titleHeader,
-            .colorSelector:
+             .colorSelector: // swiftlint:disable:this indentation_width
             return true
         case .complementaryInfo:
             return !complementaryInfoToShow.isEmpty

@@ -64,7 +64,7 @@ struct LogsView: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch logLevel {
         case .debug,
-            .info:
+             .info: // swiftlint:disable:this indentation_width
             return Colors.primary.black
         case .warning:
             return Colors.secondary.yellow400
@@ -80,7 +80,7 @@ struct LogsView: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch logLevel {
         case .debug,
-            .info:
+             .info: // swiftlint:disable:this indentation_width
             return Image(systemName: "info.circle")
         case .warning:
             return Image(systemName: "exclamationmark.triangle")

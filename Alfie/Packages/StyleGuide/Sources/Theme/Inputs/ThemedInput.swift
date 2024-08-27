@@ -175,7 +175,7 @@ private struct ThemedTextStyle: TextFieldStyle {
     private var barColor: Color {
         switch status {
         case .empty,
-            .info:
+             .info: // swiftlint:disable:this indentation_width
             let primaryMono200Color = Colors.primary.mono200
             let primaryMono300Color = Colors.primary.mono300
             let primaryMono900Color = Colors.primary.mono900

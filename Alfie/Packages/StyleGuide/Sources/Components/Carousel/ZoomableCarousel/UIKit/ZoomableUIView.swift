@@ -180,8 +180,8 @@ final class ZoomableUIView<Content: View>: UIScrollView, UIScrollViewDelegate, U
             sender.setTranslation(.zero, in: self)
 
         case .ended,
-            .cancelled,
-            .failed:
+             .cancelled, // swiftlint:disable:this indentation_width
+             .failed:
             if sender.state != .failed && normalizedDismissalPercentage > 1 {
                 configuration.isPresented.wrappedValue = false
             } else {

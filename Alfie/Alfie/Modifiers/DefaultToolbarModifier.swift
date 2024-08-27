@@ -37,9 +37,9 @@ struct DefaultToolbarModifier: ViewModifier {
         // swiftlint:disable vertical_whitespace_between_cases
         switch screen {
         case .tab(.shop),
-            .tab(.wishlist),
-            .tab(.bag),
-            .tab(.home):
+             .tab(.wishlist), // swiftlint:disable:this indentation_width
+             .tab(.bag),
+             .tab(.home):
             false
         default:
             true

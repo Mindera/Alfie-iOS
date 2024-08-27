@@ -39,7 +39,7 @@ public struct VerticalProductCardConfiguration {
         case .small:
             .fixed(size: 130)
         case .medium,
-            .large:
+             .large: // swiftlint:disable:this indentation_width
             .flexible
         }
     }
@@ -69,7 +69,7 @@ public struct VerticalProductCardConfiguration {
     var textFont: UIFont {
         switch size {
         case .small,
-            .medium:
+             .medium: // swiftlint:disable:this indentation_width
             ThemeProvider.shared.font.small.normal
         case .large:
             ThemeProvider.shared.font.paragraph.normal
@@ -218,7 +218,7 @@ public struct VerticalProductCard: View {
         case .small:
             EmptyView()
         case .medium,
-            .large:
+             .large: // swiftlint:disable:this indentation_width
             let topTrailingEdgePadding = configuration.size == .medium ? Spacing.space050 : Spacing.space100
             let iconSize = configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 

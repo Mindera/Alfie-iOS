@@ -12,10 +12,10 @@ public extension PaginatedViewState {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .loadingFirstPage(let value),
-            .success(let value),
-            .loadingNextPage(let value):
+             .success(let value), // swiftlint:disable:this indentation_width
+             .loadingNextPage(let value):
             return value
-        case.error:
+        case .error:
             return nil
         }
         // swiftlint:enable vertical_whitespace_between_cases

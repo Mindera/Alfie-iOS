@@ -90,8 +90,8 @@ struct SkeletonDemoView: View {
                 Spacer()
             }
         case .compact,
-            .none,
-            .some:
+             .none, // swiftlint:disable:this indentation_width
+             .some:
             VStack {
                 first()
                 second()

@@ -118,12 +118,12 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
             openCategorySubject.send(.plp(category: categoryUrl.deletingPrefix("/")))
 
         case .externalHttp,
-            .home,
-            .page,
-            .product,
-            .search,
-            .account,
-            .wishlist:
+             .home, // swiftlint:disable:this indentation_width
+             .page,
+             .product,
+             .search,
+             .account,
+             .wishlist:
             // Temporarily open a webview with this category, until we have all screens
             let paths = categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }
             paths.forEach { path in

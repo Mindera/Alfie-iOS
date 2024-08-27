@@ -206,7 +206,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch failure {
         case .generic,
-            .noInternet:
+             .noInternet: // swiftlint:disable:this indentation_width
             return LocalizableProductDetails.$errorGenericMessage
         case .notFound:
             return LocalizableProductDetails.$errorNotFoundMessage

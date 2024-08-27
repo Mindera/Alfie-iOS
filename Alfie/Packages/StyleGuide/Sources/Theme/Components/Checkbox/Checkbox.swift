@@ -17,7 +17,7 @@ public enum CheckboxState {
         case .selected:
             true
         case .unselected,
-            .disabled:
+             .disabled: // swiftlint:disable:this indentation_width
             false
         }
     }
@@ -93,7 +93,7 @@ public struct Checkbox: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch state {
         case .selected,
-            .unselected:
+             .unselected: // swiftlint:disable:this indentation_width
             hapticsService.trigger(.selectionChanged)
         case .disabled:
             hapticsService.trigger(.notification(.error))

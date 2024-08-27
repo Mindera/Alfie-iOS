@@ -101,8 +101,8 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
             coordinator.openProductListing(configuration: configuration)
 
         case .search,
-            .recentSearches,
-            .debugMenu:
+             .recentSearches, // swiftlint:disable:this indentation_width
+             .debugMenu:
             break
 
         case .productDetails(let type):

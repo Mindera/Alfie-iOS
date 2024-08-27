@@ -284,10 +284,10 @@ extension ThemedButton: CustomShimmerable {
     public var cornerRadius: CGFloat {
         switch style {
         case .primary,
-            .secondary:
+             .secondary: // swiftlint:disable:this indentation_width
             return Constants.cornerRadius
         case .tertiary,
-            .underline:
+             .underline: // swiftlint:disable:this indentation_width
             return 0
         }
     }
@@ -297,8 +297,8 @@ extension ThemedButton: CustomShimmerable {
         case .primary:
             return Colors.primary.mono600
         case .secondary,
-            .tertiary,
-            .underline:
+             .tertiary, // swiftlint:disable:this indentation_width
+             .underline:
             return nil
         }
     }
@@ -308,8 +308,8 @@ extension ThemedButton: CustomShimmerable {
         case .primary:
             return Colors.primary.mono900
         case .secondary,
-            .tertiary,
-            .underline:
+             .tertiary, // swiftlint:disable:this indentation_width
+             .underline:
             return nil
         }
     }
