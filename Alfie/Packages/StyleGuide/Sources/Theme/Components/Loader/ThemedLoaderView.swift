@@ -18,11 +18,11 @@ public struct ThemedLoaderView: View {
 	public var body: some View {
 		VStack(spacing: Spacing.space150) {
 			if let url = Bundle.module.url(forResource: Constants.logoFileName, withExtension: "gif") {
-				AnimatedGifImage(url: url,
-								 imageSize: .init(
-									width: Constants.logoSize,
-									height: Constants.logoSize),
-								 animationDuration: Constants.animationTime)
+                AnimatedGifImage(
+                    url: url,
+                    imageSize: .init(width: Constants.logoSize, height: Constants.logoSize),
+                    animationDuration: Constants.animationTime
+                )
 				.frame(width: Constants.logoSize, height: Constants.logoSize)
 			}
 
@@ -51,11 +51,7 @@ private struct AnimatedGifImage: UIViewRepresentable {
 
 	func makeUIView(context: Self.Context) -> UIView {
 		let containerView = UIView(frame: .zero)
-		let animationImageView = UIImageView(frame: .init(
-			x: 0,
-			y: 0,
-			width: imageSize.width,
-			height: imageSize.height))
+        let animationImageView = UIImageView(frame: .init(x: 0, y: 0, width: imageSize.width, height: imageSize.height))
 
 		animationImageView.clipsToBounds = true
 		animationImageView.autoresizesSubviews = true

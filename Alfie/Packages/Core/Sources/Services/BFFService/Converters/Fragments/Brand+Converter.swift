@@ -3,8 +3,6 @@ import Models
 
 extension BrandFragment {
     func convertToBrand() -> Brand {
-        Brand(id: id,
-              name: name,
-              slug: slug)
+        Brand(id: id, name: name, slug: slug)
     }
 }

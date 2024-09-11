@@ -32,9 +32,7 @@ public struct Money {
     /// The amount formatted according to the client locale (e.g. $1.23).
     public let amountFormatted: String
 
-    public init(currencyCode: String,
-                amount: Int,
-                amountFormatted: String) {
+    public init(currencyCode: String, amount: Int, amountFormatted: String) {
         self.currencyCode = currencyCode
         self.amount = amount
         self.amountFormatted = amountFormatted

@@ -17,8 +17,10 @@ struct TabBarView: View {
     private let hapticsService: HapticsServiceProtocol
     private(set) static var size: CGSize = .zero
 
-    init(configurationService: ConfigurationServiceProtocol,
-         hapticsService: HapticsServiceProtocol = HapticsService.instance) {
+    init(
+        configurationService: ConfigurationServiceProtocol,
+        hapticsService: HapticsServiceProtocol = HapticsService.instance
+    ) {
         self.configurationService = configurationService
         self.hapticsService = hapticsService
     }
@@ -41,11 +43,12 @@ struct TabBarView: View {
                 tabCoordinator.enableNavigation(isActive: true)
                 checkAppUpdateConfiguration()
             }
-            .alert(appUpdateRecommended?.title ?? "", isPresented: $isShowingAppUpdateAlert, actions: {
-                SoftAppUpdateAlertActionsView(update: appUpdateRecommended)
-            }, message: {
-                SoftAppUpdateAlertMessageView(update: appUpdateRecommended)
-            })
+            .alert(
+                appUpdateRecommended?.title ?? "",
+                isPresented: $isShowingAppUpdateAlert,
+                actions: { SoftAppUpdateAlertActionsView(update: appUpdateRecommended) },
+                message: { SoftAppUpdateAlertMessageView(update: appUpdateRecommended) }
+            )
             .accentColor(Colors.primary.black)
             .padding(.bottom, Spacing.space150)
 
@@ -82,16 +85,18 @@ struct TabBarView: View {
 
 extension TabScreen {
     var correspondingScreen: Screen {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .home:
-                Screen.tab(.home())
-            case .shop:
-                Screen.tab(.shop())
-            case .bag:
-                Screen.tab(.bag)
-            case .wishlist:
-                Screen.tab(.wishlist)
+        case .home:
+            Screen.tab(.home())
+        case .shop:
+            Screen.tab(.shop())
+        case .bag:
+            Screen.tab(.bag)
+        case .wishlist:
+            Screen.tab(.wishlist)
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -100,7 +105,9 @@ extension TabScreen {
     VStack {
         let serviceProvider = MockServiceProvider()
         TabBarView(configurationService: serviceProvider.configurationService)
-            .environmentObject(TabCoordinator(tabs: TabScreen.allCases, activeTab: .home(), serviceProvider: serviceProvider))
+            .environmentObject(
+                TabCoordinator(tabs: TabScreen.allCases, activeTab: .home(), serviceProvider: serviceProvider)
+            )
     }
 }
 #endif

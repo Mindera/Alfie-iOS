@@ -27,18 +27,20 @@ public struct Product: Identifiable, Equatable, Hashable {
     /// Colour objects also include the Product media for each color.
     public let colours: [Colour]?
 
-    public init(id: String = UUID().uuidString,
-                styleNumber: String,
-                name: String,
-                brand: Brand,
-                shortDescription: String,
-                longDescription: String? = nil,
-                slug: String,
-                priceRange: PriceRange? = nil,
-                attributes: AttributeCollection? = nil,
-                defaultVariant: Variant,
-                variants: [Variant],
-                colours: [Colour]? = nil) {
+    public init(
+        id: String = UUID().uuidString,
+        styleNumber: String,
+        name: String,
+        brand: Brand,
+        shortDescription: String,
+        longDescription: String? = nil,
+        slug: String,
+        priceRange: PriceRange? = nil,
+        attributes: AttributeCollection? = nil,
+        defaultVariant: Variant,
+        variants: [Variant],
+        colours: [Colour]? = nil
+    ) {
         self.id = id
         self.styleNumber = styleNumber
         self.name = name
@@ -84,12 +86,14 @@ extension Product {
             colour?.media ?? []
         }
 
-        public init(sku: String,
-                    size: ProductSize?,
-                    colour: Colour?,
-                    attributes: AttributeCollection?,
-                    stock: Int,
-                    price: Price) {
+        public init(
+            sku: String,
+            size: ProductSize?,
+            colour: Colour?,
+            attributes: AttributeCollection?,
+            stock: Int,
+            price: Price
+        ) {
             self.sku = sku
             self.size = size
             self.colour = colour
@@ -109,10 +113,7 @@ extension Product {
         /// The product images for the colour
         public let media: [Media]?
 
-        public init(id: String = UUID().uuidString,
-                    swatch: MediaImage?,
-                    name: String,
-                    media: [Media]?) {
+        public init(id: String = UUID().uuidString, swatch: MediaImage?, name: String, media: [Media]?) {
             self.id = id
             self.swatch = swatch
             self.name = name
@@ -132,11 +133,13 @@ extension Product {
         /// The size guide that includes this size.
         public let sizeGuide: SizeGuide?
 
-        public init(id: String = UUID().uuidString,
-                    value: String,
-                    scale: String?,
-                    description: String?,
-                    sizeGuide: SizeGuide?) {
+        public init(
+            id: String = UUID().uuidString,
+            value: String,
+            scale: String?,
+            description: String?,
+            sizeGuide: SizeGuide?
+        ) {
             self.id = id
             self.value = value
             self.scale = scale
@@ -155,10 +158,7 @@ extension Product {
         /// The ordered list of sizes that make up this size guide.
         public let sizes: [ProductSize]
 
-        public init(id: String = UUID().uuidString,
-                    name: String,
-                    description: String?,
-                    sizes: [ProductSize]) {
+        public init(id: String = UUID().uuidString, name: String, description: String?, sizes: [ProductSize]) {
             self.id = id
             self.name = name
             self.description = description

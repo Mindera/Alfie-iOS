@@ -39,6 +39,5 @@ public struct PickerMenu<Content: View>: View {
 }
 
 #Preview {
-    PickerMenu(isModalPresented: .constant(false),
-               selectedOptionView: { Text("Selected Option") })
+    PickerMenu(isModalPresented: .constant(false)) { Text("Selected Option") }
 }

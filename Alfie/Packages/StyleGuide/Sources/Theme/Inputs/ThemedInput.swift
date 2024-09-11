@@ -12,14 +12,16 @@ public struct ThemedInput: View {
     private let limit: Int?
     private let icon: Icon?
 
-    public init(_ text: Binding<String>,
-                title: String? = nil,
-                placeholder: String? = nil,
-                status: InputStatus = .empty,
-                limit: Int? = nil,
-                isDisabled: Binding<Bool> = .constant(false),
-                isRequired: Binding<Bool> = .constant(false),
-                icon: Icon? = nil) {
+    public init(
+        _ text: Binding<String>,
+        title: String? = nil,
+        placeholder: String? = nil,
+        status: InputStatus = .empty,
+        limit: Int? = nil,
+        isDisabled: Binding<Bool> = .constant(false),
+        isRequired: Binding<Bool> = .constant(false),
+        icon: Icon? = nil
+    ) {
         _text = text
         self.title = title
         self.placeholder = placeholder
@@ -32,11 +34,21 @@ public struct ThemedInput: View {
 
     public var body: some View {
         TextField("\(placeholder ?? "")", text: $text)
-            .textFieldStyle(ThemedTextStyle(title: title, status: status, isDisabled: isDisabled, isRequired: isRequired, limit: limit, count: .init(get: { text.count }, set: { _ in }), icon: icon ))
-            .onChange(of: text, perform: { newValue in
+            .textFieldStyle(
+                ThemedTextStyle(
+                    title: title,
+                    status: status,
+                    isDisabled: isDisabled,
+                    isRequired: isRequired,
+                    limit: limit,
+                    count: .init(get: { text.count }, set: { _ in }),
+                    icon: icon
+                )
+            )
+            .onChange(of: text) { newValue in
                 guard let limit else { return }
                 text = "\(newValue.prefix(limit))"
-            })
+            }
     }
 }
 
@@ -120,37 +132,39 @@ private struct ThemedTextStyle: TextFieldStyle {
         }
     }
 
-    @ViewBuilder
-    var statusLabel: some View {
+    @ViewBuilder var statusLabel: some View {
         switch status {
-            case .empty:
-                EmptyView()
-            case .info(let string):
+        case .empty:
+            EmptyView()
+
+        case .info(let string):
+            Text.build(theme.font.small.normal(string))
+                .foregroundColor(shouldApplyDisabledColor(for: Colors.primary.mono500))
+                .lineLimit(2)
+
+        case .success(let string):
+            HStack(alignment: .top, spacing: Spacing.space025) {
+                Icon.checkmark.image
+                    .renderingMode(.template)
+                    .resizable()
+                    .frame(width: Constants.iconSize, height: Constants.iconSize)
+                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
                 Text.build(theme.font.small.normal(string))
-                    .foregroundColor(shouldApplyDisabledColor(for: Colors.primary.mono500))
+                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
                     .lineLimit(2)
-            case .success(let string):
-                HStack(alignment: .top, spacing: Spacing.space025) {
-                    Icon.checkmark.image
-                        .renderingMode(.template)
-                        .resizable()
-                        .frame(width: Constants.iconSize, height: Constants.iconSize)
-                        .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
-                    Text.build(theme.font.small.normal(string))
-                        .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
-                        .lineLimit(2)
-                }
-            case .error(let string):
-                HStack(alignment: .top, spacing: Spacing.space025) {
-                    Icon.info.image
-                        .renderingMode(.template)
-                        .resizable()
-                        .frame(width: Constants.iconSize, height: Constants.iconSize)
-                        .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
-                    Text.build(theme.font.small.normal(string))
-                        .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
-                        .lineLimit(2)
-                }
+            }
+
+        case .error(let string):
+            HStack(alignment: .top, spacing: Spacing.space025) {
+                Icon.info.image
+                    .renderingMode(.template)
+                    .resizable()
+                    .frame(width: Constants.iconSize, height: Constants.iconSize)
+                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
+                Text.build(theme.font.small.normal(string))
+                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
+                    .lineLimit(2)
+            }
         }
     }
 
@@ -160,13 +174,19 @@ private struct ThemedTextStyle: TextFieldStyle {
 
     private var barColor: Color {
         switch status {
-            case .empty,
-                 .info:
-                return isDisabled ? Colors.primary.mono200 : !isFocused ? Colors.primary.mono300 : Colors.primary.mono900
-            case .success:
-                return shouldApplyDisabledColor(for: Colors.secondary.green800)
-            case .error:
-                return shouldApplyDisabledColor(for: Colors.secondary.red800)
+        case .empty,
+             .info: // swiftlint:disable:this indentation_width
+            let primaryMono200Color = Colors.primary.mono200
+            let primaryMono300Color = Colors.primary.mono300
+            let primaryMono900Color = Colors.primary.mono900
+
+            return isDisabled ? primaryMono200Color : !isFocused ? primaryMono300Color : primaryMono900Color
+
+        case .success:
+            return shouldApplyDisabledColor(for: Colors.secondary.green800)
+
+        case .error:
+            return shouldApplyDisabledColor(for: Colors.secondary.red800)
         }
     }
 }
@@ -192,7 +212,11 @@ public enum InputStatus {
     case error(String)
 
     var hasInfo: Bool {
-        if case .empty = self { return false } else { return true }
+        if case .empty = self {
+            false
+        } else {
+            true
+        }
     }
 }
 
@@ -208,27 +232,56 @@ public enum InputStatus {
             Spacer()
             ThemedDivider.horizontalThin
             Spacer()
-            ThemedInput(.constant("Text"), title: "Title", status: .info("Must be at least 8 characters long and include 1 number. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasell ma ligula"))
+            ThemedInput(
+                .constant("Text"),
+                title: "Title",
+                status: .info(
+                    "Must be at least 8 characters long and include 1 number. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasell ma ligula" // swiftlint:disable:this line_length
+                )
+            )
             Spacer()
             ThemedDivider.horizontalThin
             Spacer()
-            ThemedInput(.constant("Text"), title: "Title", status: .success("Must be at least 8 characters long and include 1 number."))
+            ThemedInput(
+                .constant("Text"),
+                title: "Title",
+                status: .success("Must be at least 8 characters long and include 1 number.")
+            )
             Spacer()
             ThemedDivider.horizontalThin
             Spacer()
-            ThemedInput(.constant("Text"), title: "Title", status: .error("Must be at least 8 characters long and include 1 number."))
+            ThemedInput(
+                .constant("Text"),
+                title: "Title",
+                status: .error("Must be at least 8 characters long and include 1 number.")
+            )
             Spacer()
             ThemedDivider.horizontalThin
             Spacer()
-            ThemedInput(.constant("Text"), title: "Title", status: .info("Must be at least 8 characters long and include 1 number."), isDisabled: .constant(true))
+            ThemedInput(
+                .constant("Text"),
+                title: "Title",
+                status: .info("Must be at least 8 characters long and include 1 number."),
+                isDisabled: .constant(true)
+            )
             Spacer()
             ThemedDivider.horizontalThin
             Spacer()
-            ThemedInput(.constant("Text"), title: "Title", status: .success("Must be at least 8 characters long and include 1 number."), isDisabled: .constant(true))
+            ThemedInput(
+                .constant("Text"),
+                title: "Title",
+                status: .success("Must be at least 8 characters long and include 1 number."),
+                isDisabled: .constant(true)
+            )
             Spacer()
             ThemedDivider.horizontalThin
             Spacer()
-            ThemedInput(.constant("Text"), title: "Title", status: .error("Must be at least 8 characters long and include 1 number."), isDisabled: .constant(true))
+            ThemedInput(
+                .constant("Text"),
+                title: "Title",
+                status: .error("Must be at least 8 characters long and include 1 number."),
+                isDisabled: .constant(true)
+            )
         }
         .padding(.horizontal, 16)
     }

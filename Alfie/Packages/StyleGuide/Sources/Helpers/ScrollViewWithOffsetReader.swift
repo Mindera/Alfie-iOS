@@ -24,8 +24,10 @@ public struct ScrollViewWithOffsetReader<Content: View>: View {
         ScrollView(scrollViewAxis) {
             VStack(spacing: Spacing.space0) {
                 GeometryReader { proxy in
-                    Color.clear.preference(key: ScrollViewOffsetPreferenceKey.self,
-                                           value: proxy.frame(in: .named(coordinateSpace)).origin)
+                    Color.clear.preference(
+                        key: ScrollViewOffsetPreferenceKey.self,
+                        value: proxy.frame(in: .named(coordinateSpace)).origin
+                    )
                 }
                 .frame(width: 0, height: 0)
                 content

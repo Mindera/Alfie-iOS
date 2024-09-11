@@ -6,8 +6,7 @@ public final class WebURLProvider: WebURLProviderProtocol {
     public var host: String
     public var scheme: String
 
-    public init(scheme: String = "https",
-                host: String) {
+    public init(scheme: String = "https", host: String) {
         self.scheme = scheme
         self.host = host
     }

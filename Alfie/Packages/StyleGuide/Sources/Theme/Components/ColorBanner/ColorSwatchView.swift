@@ -44,29 +44,32 @@ public struct ColorSwatchView: View {
         .background {
             ZStack {
                 switch item.type {
-                    case .image(let image):
-                        image
-                            .resizable()
-                            .clipShape(Circle())
-                            .clipped(antialiased: true)
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: size, height: size)
-                    case .color(let color):
-                        RoundedRectangle(cornerRadius: size / 2)
-                            .fill(color)
-                    case .url(let url):
-                        RemoteImage(url: url, success: { image in
+                case .image(let image):
+                    image
+                        .resizable()
+                        .clipShape(Circle())
+                        .clipped(antialiased: true)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: size, height: size)
+
+                case .color(let color):
+                    RoundedRectangle(cornerRadius: size / 2)
+                        .fill(color)
+
+                case .url(let url):
+                    RemoteImage(
+                        url: url,
+                        success: { image in
                             image
                                 .resizable()
                                 .clipShape(Circle())
                                 .clipped(antialiased: true)
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: size, height: size)
-                        }, placeholder: {
-                            Colors.primary.mono050
-                        }, failure: { _ in
-                            Colors.primary.black
-                        })
+                        },
+                        placeholder: { Colors.primary.mono050 },
+                        failure: { _ in Colors.primary.black }
+                    )
                 }
 
                 if item.isDisabled {
@@ -83,14 +86,16 @@ public struct ColorSwatchView: View {
     }
 
     private var size: CGFloat {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch swatchSize {
-            case .small:
-                Constants.swatchSmallSize
-            case .normal:
-                Constants.swatchNormalSize
-            case .large:
-                Constants.swatchLargeSize
+        case .small:
+            Constants.swatchSmallSize
+        case .normal:
+            Constants.swatchNormalSize
+        case .large:
+            Constants.swatchLargeSize
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -101,6 +106,10 @@ public struct ColorSwatchView: View {
 
         ColorSwatchView(item: .init(name: "Selected", type: .color(.green)), swatchSize: .normal, isSelected: true)
 
-        ColorSwatchView(item: .init(name: "Selected", type: .color(.green), isDisabled: true), swatchSize: .normal, isSelected: true)
+        ColorSwatchView(
+            item: .init(name: "Selected", type: .color(.green), isDisabled: true),
+            swatchSize: .normal,
+            isSelected: true
+        )
     }
 }

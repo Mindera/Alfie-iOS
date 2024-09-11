@@ -14,8 +14,7 @@ public final class BrazeProtocol: BrazeProtocolService {
     }
 
     public func start(_ notificationCenter: UserNotificationServiceProtocol = UserNotificationService()) {
-        let configuration = Braze.Configuration(apiKey: BrazeConstants.apiKey,
-                                                endpoint: BrazeConstants.endPoint)
+        let configuration = Braze.Configuration(apiKey: BrazeConstants.apiKey, endpoint: BrazeConstants.endPoint)
         #if DEBUG
         configuration.logger.level = .debug
         #endif
@@ -33,8 +32,10 @@ public final class BrazeProtocol: BrazeProtocolService {
             completionHandler(.noData)
             return
         }
-        _ = braze.notifications.handleBackgroundNotification(userInfo: userInfo,
-                                                             fetchCompletionHandler: completionHandler)
+        _ = braze.notifications.handleBackgroundNotification(
+            userInfo: userInfo,
+            fetchCompletionHandler: completionHandler
+        )
     }
 
     public func receiveResponse(didReceive: UNNotificationResponse, completionHandler: @escaping () -> Void) {
@@ -43,8 +44,7 @@ public final class BrazeProtocol: BrazeProtocolService {
             return
         }
 
-        _ = braze.notifications.handleUserNotification(response: didReceive,
-                                                       withCompletionHandler: completionHandler)
+        _ = braze.notifications.handleUserNotification(response: didReceive, withCompletionHandler: completionHandler)
     }
 
     private func setUserID() {

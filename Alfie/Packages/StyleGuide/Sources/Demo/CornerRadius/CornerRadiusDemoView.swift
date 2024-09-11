@@ -64,9 +64,7 @@ struct CornerRadiusDemoView: View {
         }
     }
 
-    private func cornerRadiusView(label: String,
-                                  radius: CGFloat,
-                                  isSquare: Bool = false) -> some View {
+    private func cornerRadiusView(label: String, radius: CGFloat, isSquare: Bool = false) -> some View {
         Text.build(theme.font.small.normal(label))
             .padding()
             .overlay(

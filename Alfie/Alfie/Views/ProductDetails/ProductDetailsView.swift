@@ -1,12 +1,13 @@
 import Combine
 import Core
 #if DEBUG
+import Common
 import Mocks
 #endif
 import Models
+import OrderedCollections
 import StyleGuide
 import SwiftUI
-import OrderedCollections
 
 struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
@@ -20,7 +21,8 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @State private var viewSize: CGSize = .zero
     @State private var colorSelectorSize: CGSize = .zero
     @State private var bottomSheetCurrentDetent = PresentationDetent.height(0)
-    @State private var bottomSheetDetentBeforeNavigation: PresentationDetent? // store the detents before navigation to restore afterwards
+    // store the detents before navigation to restore afterwards
+    @State private var bottomSheetDetentBeforeNavigation: PresentationDetent?
     @State private var bottomSheetDetents: OrderedSet<PresentationDetent> = [PresentationDetent.height(0)]
     @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
@@ -82,8 +84,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         }
     }
 
-    @ViewBuilder
-    private var pdpView: some View {
+    @ViewBuilder private var pdpView: some View {
         if isIpad {
             legacyPDPView
         } else {
@@ -95,20 +96,24 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         }
     }
 
-    @ViewBuilder
-    private var paginatedControl: some View {
+    @ViewBuilder private var paginatedControl: some View {
         if viewModel.shouldShowMediaPaginatedControl {
-            PaginatedControl(configuration: .init(),
-                             itemsCount: viewModel.productImageUrls.count,
-                             selectedIndex: $currentMediaIndex)
+            PaginatedControl(
+                configuration: .init(),
+                itemsCount: viewModel.productImageUrls.count,
+                selectedIndex: $currentMediaIndex
+            )
             .frame(maxHeight: Spacing.space200)
-            .shimmering(while: shimmeringBinding(for: .mediaCarousel),
-                        animateOnStateTransition: false,
-                        cornerRadius: CornerRadius.m)
+            .shimmering(
+                while: shimmeringBinding(for: .mediaCarousel),
+                animateOnStateTransition: false,
+                cornerRadius: CornerRadius.m
+            )
         }
     }
 
     @available(iOS 16.4, *)
+    // swiftlint:disable:next attributes
     private var iPhonePDPView: some View {
         VStack {
             mediaCarousel
@@ -181,14 +186,16 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch type {
-            case .delivery:
-                return LocalizableProductDetails.$complementaryInfoDelivery
-            case .paymentOptions:
-                return LocalizableProductDetails.$complementaryInfoPayment
-            case .returns:
-                return LocalizableProductDetails.$complementaryInfoReturns
+        case .delivery:
+            return LocalizableProductDetails.$complementaryInfoDelivery
+        case .paymentOptions:
+            return LocalizableProductDetails.$complementaryInfoPayment
+        case .returns:
+            return LocalizableProductDetails.$complementaryInfoReturns
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private var errorMessage: String {
@@ -196,23 +203,26 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
             return ""
         }
 
+        // swiftlint:disable vertical_whitespace_between_cases
         switch failure {
-            case .generic,
-                 .noInternet:
-                return LocalizableProductDetails.$errorGenericMessage
-            case .notFound:
-                return LocalizableProductDetails.$errorNotFoundMessage
+        case .generic,
+             .noInternet: // swiftlint:disable:this indentation_width
+            return LocalizableProductDetails.$errorGenericMessage
+        case .notFound:
+            return LocalizableProductDetails.$errorNotFoundMessage
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
 // MARK: - Sections
 extension ProductDetailsView {
     @available(iOS 16.4, *)
+    // swiftlint:disable:next attributes
     private var popupView: some View {
         VStack {
             ScrollView(showsIndicators: false) {
-               complementaryViews
+                complementaryViews
                     .padding([.horizontal, .top], Spacing.space200)
             }
 
@@ -246,23 +256,22 @@ extension ProductDetailsView {
             SnapCarousel(
                 areItemsLoading: shimmeringBinding(for: .mediaCarousel),
                 itemIndex: $currentMediaIndex,
-                shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
-                items: {
-                    viewModel.productImageUrls.map { url in
-                        RemoteImage(url: url, success: { image in
+                shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex
+            ) {
+                viewModel.productImageUrls.map { url in
+                    RemoteImage(
+                        url: url,
+                        success: { image in
                             image
                                 .resizable()
-                                .onTapGesture {
-                                    isMediaFullScreen = true
-                                }
-                        }, placeholder: {
-                            Colors.primary.mono050
-                        }, failure: { _ in
-                            Colors.primary.black
-                        })
-                        .cornerRadius(CornerRadius.s)
-                    }
-                })
+                                .onTapGesture { isMediaFullScreen = true }
+                        },
+                        placeholder: { Colors.primary.mono050 },
+                        failure: { _ in Colors.primary.black }
+                    )
+                    .cornerRadius(CornerRadius.s)
+                }
+            }
             .padding(.top, Spacing.space200)
             .padding(.bottom, viewModel.hasSingleImage ? Spacing.space200 : Spacing.space0)
             .disabled(isMediaFullScreen)
@@ -273,18 +282,18 @@ extension ProductDetailsView {
     }
 
     private var fullscreenMediaCarousel: some View {
-        ZoomableCarousel(currentIndex: $currentMediaIndex,
-                         configuration: .init(isPresented: $isMediaFullScreen)) {
+        ZoomableCarousel(currentIndex: $currentMediaIndex, configuration: .init(isPresented: $isMediaFullScreen)) {
             viewModel.productImageUrls.map { url in
-                RemoteImage(url: url, success: { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                }, placeholder: {
-                    Colors.primary.mono050
-                }, failure: { _ in
-                    Colors.primary.black
-                })
+                RemoteImage(
+                    url: url,
+                    success: { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                    },
+                    placeholder: { Colors.primary.mono050 },
+                    failure: { _ in Colors.primary.black }
+                )
             }
         }
     }
@@ -302,9 +311,7 @@ extension ProductDetailsView {
     }
 
     private var colorSheet: some View {
-        ProductDetailsColorSheet(viewModel: viewModel,
-                                 isPresented: $showColorSheet,
-                                 searchText: $colorSheetSearchText)
+        ProductDetailsColorSheet(viewModel: viewModel, isPresented: $showColorSheet, searchText: $colorSheetSearchText)
     }
 
     @ViewBuilder private var colorSelector: some View {
@@ -321,7 +328,11 @@ extension ProductDetailsView {
                             showColorSheet = true
                         }, label: {
                             HStack {
-                                Text.build(theme.font.small.normal(viewModel.colorSelectionConfiguration.selectedItem?.name.capitalized ?? ""))
+                                Text.build(
+                                    theme.font.small.normal(
+                                        viewModel.colorSelectionConfiguration.selectedItem?.name.capitalized ?? ""
+                                    )
+                                )
                                     .foregroundStyle(Colors.primary.mono900)
                                 if canShowColorPickers {
                                     Icon.chevronDown.image
@@ -336,12 +347,17 @@ extension ProductDetailsView {
                     if canShowColorPickers {
                         ColorSelectorComponentView(
                             configuration: viewModel.colorSelectionConfiguration,
-                            layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100, scrollable: false),
-                                                       hideSelectionTitle: true,
-                                                       hideOnSingleColor: false),
-                            frameSize: .init(get: { .zero }, set: { colorSwatchesFrameSize in
-                                hasSpaceForSizeSelector = colorSwatchesFrameSize.width < colorSelectorSize.width
-                            })
+                            layoutConfiguration: .init(
+                                arrangement: .horizontal(itemSpacing: Spacing.space100, scrollable: false),
+                                hideSelectionTitle: true,
+                                hideOnSingleColor: false
+                            ),
+                            frameSize: .init(
+                                get: { .zero },
+                                set: { colorSwatchesFrameSize in
+                                    hasSpaceForSizeSelector = colorSwatchesFrameSize.width < colorSelectorSize.width
+                                }
+                            )
                         )
                         .frame(minHeight: Constants.minColorSelectorHeight, alignment: .leading)
                     }
@@ -376,10 +392,12 @@ extension ProductDetailsView {
     @ViewBuilder private var descriptionTab: some View {
         if viewModel.shouldShow(section: .productDescription) {
             VStack(alignment: .leading, spacing: Spacing.space200) {
-                TabControl(theme: .dark,
-                           configuration: .fixedSize(horizontalMargins: Spacing.space200),
-                           options: [TabControl.TabOption(title: LocalizableProductDetails.$productDescription)],
-                           currentIndex: $currentDescriptionTabIndex)
+                TabControl(
+                    theme: .dark,
+                    configuration: .fixedSize(horizontalMargins: Spacing.space200),
+                    options: [TabControl.TabOption(title: LocalizableProductDetails.$productDescription)],
+                    currentIndex: $currentDescriptionTabIndex
+                )
 
                 Text.build(theme.font.paragraph.normal(viewModel.productDescription))
                     .foregroundStyle(Colors.primary.black)
@@ -390,14 +408,17 @@ extension ProductDetailsView {
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
             VStack(spacing: Spacing.space0) {
-                ThemedButton(text: viewModel.productHasStock ? LocalizableProductDetails.$addToBag : LocalizableProductDetails.$outOfStock,
-                         isDisabled: .init(get: {
-                             !viewModel.productHasStock
-                         }, set: { _ in }),
-                         isFullWidth: true,
-                         action: {
-                             viewModel.didTapAddToBag()
-                         })
+                let addToBagText = LocalizableProductDetails.$addToBag
+                let outOfStockText = LocalizableProductDetails.$outOfStock
+
+                ThemedButton(
+                    text: viewModel.productHasStock ? addToBagText : outOfStockText,
+                    isDisabled: .init(
+                        get: { !viewModel.productHasStock },
+                        set: { _ in }
+                    ),
+                    isFullWidth: true
+                ) { viewModel.didTapAddToBag() }
             }
             .padding(.vertical, Spacing.space100)
             .padding(.horizontal, Spacing.space200)
@@ -414,9 +435,9 @@ extension ProductDetailsView {
                 .foregroundColor(Colors.primary.black)
             Text.build(theme.font.paragraph.normal(errorMessage))
                 .foregroundColor(Colors.primary.mono600)
-            ThemedButton(text: LocalizableProductDetails.$errorButtonBackLabel, isFullWidth: true, action: {
+            ThemedButton(text: LocalizableProductDetails.$errorButtonBackLabel, isFullWidth: true) {
                 coordinator.didTapBackButton()
-            })
+            }
         }
     }
 
@@ -443,14 +464,14 @@ extension ProductDetailsView {
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }
             .frame(minHeight: Constants.complementaryInfoCellMinHeight)
-            .modifier(TapHighlightableModifier(action: {
-                guard let feature = viewModel.complementaryInfoWebFeature(for: type) else {
-                    return
+            .modifier(
+                TapHighlightableModifier {
+                    guard let feature = viewModel.complementaryInfoWebFeature(for: type) else { return }
+                    showDetailsSheet = false
+                    bottomSheetDetentBeforeNavigation = bottomSheetCurrentDetent
+                    coordinator.open(webFeature: feature)
                 }
-                showDetailsSheet = false
-                bottomSheetDetentBeforeNavigation = bottomSheetCurrentDetent
-                coordinator.open(webFeature: feature)
-            }))
+            )
 
             ThemedDivider.horizontalThin
         }
@@ -470,29 +491,38 @@ private enum Constants {
 
 #if DEBUG
 #Preview("Loaded") {
-    ProductDetailsView(viewModel: MockProductDetailsViewModel(
-        state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
-        productName: "Nolita SW Signature Loafer",
-        productImageUrls: [
-            URL(string: "https://www.alfieproj.com/productimages/thumb/2/2666503_22841458_13891527.jpg")!,
-            URL(string: "https://www.alfieproj.com/productimages/thumb/2/2666503_22841458_13891527.jpg")!,
-        ],
-        productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.",
-        colorSelectionConfiguration: .init(items: [
-            .init(name: "", type: .url(URL(string: "https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg")!)),
-            .init(name: "", type: .url(URL(string: "https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg")!)),
-            .init(name: "", type: .color(.green), isDisabled: true),
-            .init(name: "", type: .color(.red)),
-        ]),
-        complementaryInfoToShow: [.paymentOptions, .returns]))
+    ProductDetailsView(
+        viewModel: MockProductDetailsViewModel(
+            state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
+            productName: "Nolita SW Signature Loafer",
+            productImageUrls: [
+                URL.fromString("https://www.alfieproj.com/productimages/thumb/2/2666503_22841458_13891527.jpg"),
+                URL.fromString("https://www.alfieproj.com/productimages/thumb/2/2666503_22841458_13891527.jpg"),
+            ],
+            productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
+            colorSelectionConfiguration: .init(
+                items: [
+                    .init(name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg"))),
+                    .init(name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg"))),
+                    .init(name: "", type: .color(.green), isDisabled: true),
+                    .init(name: "", type: .color(.red)),
+                ]
+            ),
+            complementaryInfoToShow: [.paymentOptions, .returns]
+        )
+    )
     .environmentObject(Coordinator())
 }
 
 #Preview("Loading") {
-    ProductDetailsView(viewModel: MockProductDetailsViewModel(complementaryInfoToShow: [.paymentOptions, .returns],
-                                                              onShouldShowLoadingForSectionCalled: { _ in true },
-                                                              onShouldShowSectionCalled: { section in section != .addToBag }))
-        .environmentObject(Coordinator())
+    ProductDetailsView(
+        viewModel: MockProductDetailsViewModel(
+            complementaryInfoToShow: [.paymentOptions, .returns],
+            onShouldShowLoadingForSectionCalled: { _ in true },
+            onShouldShowSectionCalled: { section in section != .addToBag }
+        )
+    )
+    .environmentObject(Coordinator())
 }
 
 #Preview("Error - Not found") {
@@ -504,4 +534,4 @@ private enum Constants {
     ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
     .environmentObject(Coordinator())
 }
-#endif
+#endif // swiftlint:disable:this file_length

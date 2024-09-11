@@ -62,120 +62,155 @@ public struct StyleGuideDemoView: View {
     @ViewBuilder
     private func navigateTo(_ destination: DemoNavigation) -> some View {
         switch destination {
-            case .cornerRadius:
-                CornerRadiusDemoView()
+        case .cornerRadius:
+            CornerRadiusDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .typography:
+            TypographyDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .color:
+            ColorsDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .icons:
+            IconographyDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .badges:
+            BadgeDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .spacings:
+            SpacingDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .dividers:
+            DividerDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .tags:
+            TagDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .snackbars:
+            SnackbarDemoView() // Don't apply the modifier here, the view has tabs for demo purposes
+        case .buttons:
+            ButtonDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .toggle:
+            ToggleDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .datePicker:
+            DatePickerDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .shadows:
+            ShadowDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .progressBar:
+            ProgressBarDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .inputs:
+            InputDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .loading:
+            LoadingDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .sizingSwaches:
+            SizingBannerDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .colorSwatches:
+            ColorBannerDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .checkboxes:
+            CheckboxesDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .radioButtonsList:
+            RadioListDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .pageControl:
+            if #available(iOS 17.0, *) {
+                PageControlCarouselDemoView()
                     .modifier(ContainerDemoViewModifier())
-            case .typography:
-                TypographyDemoView()
+            } else {
+                PageControlDemoView()
                     .modifier(ContainerDemoViewModifier())
-            case .color:
-                ColorsDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .icons:
-                IconographyDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .badges:
-                BadgeDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .spacings:
-                SpacingDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .dividers:
-                DividerDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .tags:
-                TagDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .snackbars:
-                SnackbarDemoView() // Don't apply the modifier here, the view has tabs for demo purposes
-            case .buttons:
-                ButtonDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .toggle:
-                ToggleDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .datePicker:
-                DatePickerDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .shadows:
-                ShadowDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .progressBar:
-                ProgressBarDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .inputs:
-                InputDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .loading:
-                LoadingDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .sizingSwaches:
-                SizingBannerDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .colorSwatches:
-                ColorBannerDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .checkboxes:
-                CheckboxesDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .radioButtonsList:
-                RadioListDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .pageControl:
-                if #available(iOS 17.0, *) {
-                    PageControlCarouselDemoView()
-                        .modifier(ContainerDemoViewModifier())
-                } else {
-                    PageControlDemoView()
-                        .modifier(ContainerDemoViewModifier())
-                }
-            case .modal:
-                ModalDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .motion:
-                MotionDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .accordion:
-                AccordionDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .search:
-                SearchBarDemoView()
-                    .modifier(ContainerDemoViewModifier(embedInScrollView: false))
-            case .skeleton:
-                SkeletonDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .sortBy:
-                DemoSortByView()
-                    .modifier(ContainerDemoViewModifier())
-            case .toolbar:
-                ToolbarDemoView()
-            case .pdpImageGallery:
-                CarouselDemoView()
-                    .modifier(ContainerDemoViewModifier(embedInScrollView: false))
-            case .pdpSnapImageGallery:
-                SnapCarouselDemoView()
-                    .modifier(ContainerDemoViewModifier(embedInScrollView: false))
-            case .productCard:
-                ProductCardDemoView()
-                    .modifier(ContainerDemoViewModifier(embedInScrollView: false))
-            case .productCarousel:
-                ProductCarouselDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .chips:
-                ChipsDemoView()
-                    .modifier(ContainerDemoViewModifier(embedInScrollView: false))
-            case .price:
-                PriceComponentDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .tabControlIntrisicWidth:
-                TabControlIntrinsicWidthDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .tabControlFixedWidth:
-                TabControlFixedWidthDemoView()
-                    .modifier(ContainerDemoViewModifier())
-            case .segments:
-                SegmentsDemoView()
-                    .modifier(ContainerDemoViewModifier())
+            }
+
+        case .modal:
+            ModalDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .motion:
+            MotionDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .accordion:
+            AccordionDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .search:
+            SearchBarDemoView()
+                .modifier(ContainerDemoViewModifier(embedInScrollView: false))
+
+        case .skeleton:
+            SkeletonDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .sortBy:
+            DemoSortByView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .toolbar:
+            ToolbarDemoView()
+
+        case .pdpImageGallery:
+            CarouselDemoView()
+                .modifier(ContainerDemoViewModifier(embedInScrollView: false))
+
+        case .pdpSnapImageGallery:
+            SnapCarouselDemoView()
+                .modifier(ContainerDemoViewModifier(embedInScrollView: false))
+
+        case .productCard:
+            ProductCardDemoView()
+                .modifier(ContainerDemoViewModifier(embedInScrollView: false))
+
+        case .productCarousel:
+            ProductCarouselDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .chips:
+            ChipsDemoView()
+                .modifier(ContainerDemoViewModifier(embedInScrollView: false))
+
+        case .price:
+            PriceComponentDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .tabControlIntrisicWidth:
+            TabControlIntrinsicWidthDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .tabControlFixedWidth:
+            TabControlFixedWidthDemoView()
+                .modifier(ContainerDemoViewModifier())
+
+        case .segments:
+            SegmentsDemoView()
+                .modifier(ContainerDemoViewModifier())
         }
     }
 

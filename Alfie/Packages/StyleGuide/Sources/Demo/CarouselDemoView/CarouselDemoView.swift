@@ -35,8 +35,7 @@ struct CarouselDemoView: View {
             Spacer()
         }
         .fullScreenCover(isPresented: $isFullScreen) {
-            ZoomableCarousel(currentIndex: $currentIndex,
-                             configuration: .init(isPresented: $isFullScreen)) {
+            ZoomableCarousel(currentIndex: $currentIndex, configuration: .init(isPresented: $isFullScreen)) {
                 (0...Constants.imageCount - 1).map {
                     Image("CarouselImage\($0)", bundle: .module)
                         .resizable()

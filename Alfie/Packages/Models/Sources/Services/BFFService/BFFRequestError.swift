@@ -26,17 +26,22 @@ public struct BFFRequestError: Error {
 
     public var isNotFound: Bool {
         switch type {
-            case let .product(subType):
-                switch subType {
-                    case .noProduct, .noProducts:
-                        return true
-                    default:
-                        return false
-                }
-            case .emptyResponse:
+        case .product(let subType):
+            // swiftlint:disable vertical_whitespace_between_cases
+            switch subType {
+            case .noProduct,
+                .noProducts:
                 return true
             default:
                 return false
+            }
+            // swiftlint:enable vertical_whitespace_between_cases
+
+        case .emptyResponse:
+            return true
+
+        default:
+            return false
         }
     }
 }

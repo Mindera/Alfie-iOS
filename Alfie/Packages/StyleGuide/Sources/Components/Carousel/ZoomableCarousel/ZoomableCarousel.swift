@@ -14,9 +14,11 @@ public struct ZoomableCarousel<Content: View>: View {
     private let slidePublisher: AnyPublisher<Void, Never>
     private let slideSubject: PassthroughSubject<Void, Never> = .init()
 
-    public init(currentIndex: Binding<Int>,
-                configuration: ZoomableCarouselConfiguration,
-                _ childViews: () -> [Content]) {
+    public init(
+        currentIndex: Binding<Int>,
+        configuration: ZoomableCarouselConfiguration,
+        _ childViews: () -> [Content]
+    ) {
         self._currentIndex = currentIndex
         self.configuration = configuration
         self.childViews = childViews()
@@ -24,10 +26,12 @@ public struct ZoomableCarousel<Content: View>: View {
     }
 
     public var body: some View {
-        ZoomableCarouselRepresentable(currentIndex: $currentIndex,
-                                      childViews: childViews,
-                                      configuration: configuration,
-                                      slidePublisher: slidePublisher)
+        ZoomableCarouselRepresentable(
+            currentIndex: $currentIndex,
+            childViews: childViews,
+            configuration: configuration,
+            slidePublisher: slidePublisher
+        )
         .edgesIgnoringSafeArea(.all)
         .overlay {
             VStack {
@@ -49,10 +53,12 @@ public struct ZoomableCarousel<Content: View>: View {
                 Spacer()
 
                 if childViews.count > 1 {
-                    PaginatedControl(configuration: .init(),
-                                     itemsCount: childViews.count,
-                                     selectedIndex: $currentIndex,
-                                     slideSubject: slideSubject)
+                    PaginatedControl(
+                        configuration: .init(),
+                        itemsCount: childViews.count,
+                        selectedIndex: $currentIndex,
+                        slideSubject: slideSubject
+                    )
                     .padding(Spacing.space200)
                     .background(Colors.primary.white.opacity(Constants.backgroundOpacity))
                     .cornerRadius(CornerRadius.s)

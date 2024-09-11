@@ -150,7 +150,7 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
         let testUrl = try XCTUnwrap(URL(string: link))
         let queryParameters = testUrl.queryParameters
         let result = sut.parseUrl(testUrl)
-        guard case let .productDetail(id, description, route, query) = result?.type else {
+        guard case .productDetail(let id, let description, let route, let query) = result?.type else {
             XCTFail()
             return
         }

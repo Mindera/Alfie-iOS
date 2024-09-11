@@ -42,37 +42,35 @@ struct ToolbarDemoView: View {
 
                 DemoHelper.demoSectionHeader(title: "Title")
 
-                ThemedToggleView(isOn: $showLogo, label: {
-                    Text.build(theme.font.small.bold("Show logo"))
-                })
+                ThemedToggleView(isOn: $showLogo) { Text.build(theme.font.small.bold("Show logo")) }
 
-                ThemedToggleView(isOn: $leftAlign, label: {
-                    Text.build(theme.font.small.bold("Show nav title"))
-                })
+                ThemedToggleView(isOn: $leftAlign) { Text.build(theme.font.small.bold("Show nav title")) }
 
-                ThemedToggleView(isOn: $alwaysShowDivider, isDisabled: $darkMode, label: {
+                ThemedToggleView(isOn: $alwaysShowDivider, isDisabled: $darkMode) {
                     Text.build(theme.font.small.bold("Always show divider"))
-                })
+                }
 
-                ThemedToggleView(isOn: $darkMode, label: {
-                    Text.build(theme.font.small.bold("Dark mode"))
-                })
+                ThemedToggleView(isOn: $darkMode) { Text.build(theme.font.small.bold("Dark mode")) }
 
                 DemoHelper.demoSectionHeader(title: "Controls (Left / Right)")
                     .padding(.top, Spacing.space250)
 
                 HStack(spacing: Spacing.space0) {
-                    RadioButtonList(values: ToolbarButtonMode.allCases,
-                                    disabledValues: .constant([]),
-                                    selectedValue: $leftMode,
-                                    verticalSpacing: Spacing.space300)
+                    RadioButtonList(
+                        values: ToolbarButtonMode.allCases,
+                        disabledValues: .constant([]),
+                        selectedValue: $leftMode,
+                        verticalSpacing: Spacing.space300
+                    )
 
                     Spacer()
 
-                    RadioButtonList(values: ToolbarButtonMode.allCases,
-                                    disabledValues: .constant([]),
-                                    selectedValue: $rightMode,
-                                    verticalSpacing: Spacing.space300)
+                    RadioButtonList(
+                        values: ToolbarButtonMode.allCases,
+                        disabledValues: .constant([]),
+                        selectedValue: $rightMode,
+                        verticalSpacing: Spacing.space300
+                    )
                 }
 
                 Spacer()
@@ -84,16 +82,16 @@ struct ToolbarDemoView: View {
             principalToolbarContent
             trailingToolbarContent
         }
-        .onChange(of: leftAlign, perform: { newValue in
+        .onChange(of: leftAlign) { newValue in
             if newValue {
                 showLogo = false
             }
-        })
-        .onChange(of: showLogo, perform: { newValue in
+        }
+        .onChange(of: showLogo) { newValue in
             if newValue {
                 leftAlign = false
             }
-        })
+        }
         .toolbarBackground(darkMode ? Colors.primary.mono900 : Colors.primary.white)
         .toolbarBackground(alwaysShowDivider ? .visible : .automatic, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
@@ -108,19 +106,24 @@ struct ToolbarDemoView: View {
     private var leadingToolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarLeading) {
             if leftAlign {
-                ThemedToolbarTitle(style: .leftText("Alfie"), tint: !darkMode ? Colors.primary.mono900 : Colors.primary.white)
+                ThemedToolbarTitle(
+                    style: .leftText("Alfie"),
+                    tint: !darkMode ? Colors.primary.mono900 : Colors.primary.white
+                )
             } else {
                 if let mode = leftMode, mode != .hidden {
-                    ThemedToolbarButton(icon: mode.isIcon ? .arrowLeft : nil,
-                                        text: mode.isText ? "Back" : nil,
-                                        tint: darkMode ? Colors.primary.white : Colors.primary.mono900,
-                                        action: { dismiss() })
+                    ThemedToolbarButton(
+                        icon: mode.isIcon ? .arrowLeft : nil,
+                        text: mode.isText ? "Back" : nil,
+                        tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                    ) { dismiss() }
 
                     if mode.isMulti {
-                        ThemedToolbarButton(icon: mode.isIcon && mode != .multiMixed ? .store : nil,
-                                            text: mode.isText || mode == .multiMixed ? "Shop" : nil,
-                                            tint: darkMode ? Colors.primary.white : Colors.primary.mono900,
-                                            action: {})
+                        ThemedToolbarButton(
+                            icon: mode.isIcon && mode != .multiMixed ? .store : nil,
+                            text: mode.isText || mode == .multiMixed ? "Shop" : nil,
+                            tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                        ) {}
                     }
                 }
             }
@@ -132,8 +135,10 @@ struct ToolbarDemoView: View {
             if leftAlign {
                 Spacer()
             } else {
-                ThemedToolbarTitle(style: showLogo ? .logo : .text("Alfie"),
-                                   tint: darkMode ? Colors.primary.white : Colors.primary.mono900)
+                ThemedToolbarTitle(
+                    style: showLogo ? .logo : .text("Alfie"),
+                    tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                )
             }
         }
     }
@@ -141,16 +146,18 @@ struct ToolbarDemoView: View {
     private var trailingToolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
             if let mode = rightMode, mode != .hidden {
-                ThemedToolbarButton(icon: mode.isIcon ? .bag : nil,
-                                text: mode.isText ? "Bag" : nil,
-                                tint: darkMode ? Colors.primary.white : Colors.primary.mono900,
-                                action: {})
+                ThemedToolbarButton(
+                    icon: mode.isIcon ? .bag : nil,
+                    text: mode.isText ? "Bag" : nil,
+                    tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                ) {}
 
                 if mode.isMulti {
-                    ThemedToolbarButton(icon: mode.isIcon && mode != .multiMixed ? .chat : nil,
-                                    text: mode.isText || mode == .multiMixed ? "Chat" : nil,
-                                    tint: darkMode ? Colors.primary.white : Colors.primary.mono900,
-                                    action: {})
+                    ThemedToolbarButton(
+                        icon: mode.isIcon && mode != .multiMixed ? .chat : nil,
+                        text: mode.isText || mode == .multiMixed ? "Chat" : nil,
+                        tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                    ) {}
                 }
             }
         }
