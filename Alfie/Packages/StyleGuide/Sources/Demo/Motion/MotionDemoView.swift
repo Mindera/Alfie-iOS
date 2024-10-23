@@ -68,17 +68,17 @@ struct MotionDemoView: View {
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .leading))
-                        .foregroundColor(Colors.secondary.blue300)
+                        .foregroundStyle(Colors.secondary.blue300)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .bottom))
-                        .foregroundColor(Colors.secondary.blue500)
+                        .foregroundStyle(Colors.secondary.blue500)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .trailing))
-                        .foregroundColor(Colors.secondary.blue700)
+                        .foregroundStyle(Colors.secondary.blue700)
                 }
             }
             .padding(Spacing.space200)

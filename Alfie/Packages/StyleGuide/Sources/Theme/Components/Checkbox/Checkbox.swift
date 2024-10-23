@@ -82,7 +82,7 @@ public struct Checkbox: View {
 
             Text.build(theme.font.paragraph.normal(text))
         }
-        .foregroundColor(state.isDisabled ? Colors.primary.mono400 : Colors.primary.mono900)
+        .foregroundStyle(state.isDisabled ? Colors.primary.mono400 : Colors.primary.mono900)
         .onTapGesture {
             playAppropriateHaptics()
             state.toggleIfEnabled()

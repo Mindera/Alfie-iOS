@@ -96,7 +96,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
             HStack {
                 ForEach(1...3, id: \.self) { index in
                     Rectangle()
-                        .foregroundColor(Colors.primary.mono300)
+                        .foregroundStyle(Colors.primary.mono300)
                         .cornerRadius(CornerRadius.m)
                         .frame(width: 110, height: 300)
                         .overlay {
@@ -115,7 +115,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
             HStack {
                 ForEach(1...10, id: \.self) { index in
                     Rectangle()
-                        .foregroundColor(Colors.primary.mono300)
+                        .foregroundStyle(Colors.primary.mono300)
                         .cornerRadius(CornerRadius.m)
                         .frame(width: 200, height: 300)
                         .overlay {

@@ -31,7 +31,7 @@ struct SearchBarDemoView: View {
                                 .padding(.top, 5)
                             Text("Description \(index)")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundStyle(.gray)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 10)
                         }

@@ -43,6 +43,7 @@ public struct ZoomableCarousel<Content: View>: View {
                         .scaledToFit()
                         .frame(width: Constants.closeIconSize, height: Constants.closeIconSize)
                         .padding(Spacing.space050)
+                        .foregroundStyle(Colors.primary.mono900)
                         .background(Colors.primary.white.opacity(Constants.closeIconBackgroundOpacity))
                         .clipShape(Circle())
                 })

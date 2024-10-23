@@ -433,9 +433,9 @@ extension ProductDetailsView {
                 .fill(Colors.primary.mono200)
                 .frame(width: Constants.errorViewCircleSize, height: Constants.errorViewCircleSize)
             Text.build(theme.font.header.h2(LocalizableProductDetails.errorTitle))
-                .foregroundColor(Colors.primary.black)
+                .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.paragraph.normal(errorMessage))
-                .foregroundColor(Colors.primary.mono600)
+                .foregroundStyle(Colors.primary.mono600)
             ThemedButton(text: LocalizableProductDetails.$errorButtonBackLabel, isFullWidth: true) {
                 coordinator.didTapBackButton()
             }

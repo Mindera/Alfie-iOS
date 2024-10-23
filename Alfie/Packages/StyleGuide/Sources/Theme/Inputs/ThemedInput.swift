@@ -83,17 +83,17 @@ private struct ThemedTextStyle: TextFieldStyle {
                     if let title {
                         Text.build(theme.font.paragraph.normal(title))
                             .lineLimit(1)
-                            .foregroundColor(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
+                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
                     }
                     if isRequired {
                         Text.build(theme.font.paragraph.normal("*"))
-                            .foregroundColor(isDisabled ? Colors.primary.mono200 : Colors.secondary.red800)
+                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.secondary.red800)
                             .padding(.leading, Spacing.space025)
                     }
                     if let limit {
                         Spacer()
                         Text.build(theme.font.paragraph.normal("\(count)/\(limit)"))
-                            .foregroundColor(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
+                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
                     }
                 }
                 .padding(.bottom, Spacing.space100)
@@ -120,7 +120,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                             .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
                             .padding(.trailing, Constants.inputPadding)
-                            .foregroundColor(isDisabled ? Colors.primary.mono200 : Colors.primary.mono900)
+                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono900)
                     }
                 }
             }
@@ -140,7 +140,7 @@ private struct ThemedTextStyle: TextFieldStyle {
 
         case .info(let string):
             Text.build(theme.font.small.normal(string))
-                .foregroundColor(shouldApplyDisabledColor(for: Colors.primary.mono500))
+                .foregroundStyle(shouldApplyDisabledColor(for: Colors.primary.mono500))
                 .lineLimit(2)
 
         case .success(let string):
@@ -150,9 +150,9 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
-                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.green800))
                 Text.build(theme.font.small.normal(string))
-                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.green800))
                     .lineLimit(2)
             }
 
@@ -163,9 +163,9 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
-                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.red800))
                 Text.build(theme.font.small.normal(string))
-                    .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.red800))
                     .lineLimit(2)
             }
         }

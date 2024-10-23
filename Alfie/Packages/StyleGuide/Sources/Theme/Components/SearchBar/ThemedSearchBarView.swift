@@ -306,7 +306,7 @@ public struct ThemedSearchBarView: View {
             .resizable()
             .scaledToFit()
             .frame(width: Constants.trailingIconSize, height: Constants.trailingIconSize)
-            .foregroundColor(theme.iconColor)
+            .foregroundStyle(theme.iconColor)
             .transition(.scale(scale: 0, anchor: .trailing))
     }
 

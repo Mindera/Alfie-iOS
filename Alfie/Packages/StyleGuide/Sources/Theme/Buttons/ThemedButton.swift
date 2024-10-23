@@ -175,7 +175,7 @@ private struct ThemedButtonStyle: ButtonStyle {
         }
         .frame(height: type.height)
         .padding(.horizontal, Spacing.space100)
-        .foregroundColor(textColor(configuration))
+        .foregroundStyle(textColor(configuration))
         .background(background(configuration))
         .cornerRadius(Constants.cornerRadius)
         .overlay(

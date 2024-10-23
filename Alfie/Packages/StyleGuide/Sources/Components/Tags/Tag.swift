@@ -61,6 +61,7 @@ public struct Tag: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: Constants.closeWidth, height: Constants.closeHeight)
+                            .foregroundStyle(Colors.primary.black)
                     })
                 }
             }

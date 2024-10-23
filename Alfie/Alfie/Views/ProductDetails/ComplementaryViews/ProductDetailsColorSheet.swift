@@ -37,6 +37,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                         .resizable()
                         .scaledToFit()
                         .frame(size: Constants.sheetCloseIconSize)
+                        .foregroundStyle(Colors.primary.mono900)
                 }
             }
             .padding([.top, .horizontal], Spacing.space200)
