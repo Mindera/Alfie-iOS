@@ -337,6 +337,7 @@ extension ProductDetailsView {
                                 if canShowColorPickers {
                                     Icon.chevronDown.image
                                         .resizable()
+                                        .scaledToFit()
                                         .frame(size: Constants.colorChevronSize)
                                 }
                             }
@@ -456,9 +457,9 @@ extension ProductDetailsView {
                     Icon.chevronRight.image
                         .renderingMode(.template)
                         .resizable()
-                        .foregroundStyle(Colors.primary.black)
+                        .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(Colors.primary.black)
                         .padding(.trailing, Spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)

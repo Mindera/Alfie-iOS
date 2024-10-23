@@ -132,8 +132,8 @@ public struct TabControl: View {
                         value.image?
                             .renderingMode(.template)
                             .resizable()
+                            .scaledToFit()
                             .frame(width: Constants.imageSize, height: Constants.imageSize)
-                            .aspectRatio(contentMode: .fit)
 
                         Text.build(theme.font.paragraph.bold(value.title))
                             .lineLimit(1)

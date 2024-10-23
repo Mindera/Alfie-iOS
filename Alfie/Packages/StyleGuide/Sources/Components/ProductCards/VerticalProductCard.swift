@@ -227,6 +227,7 @@ public struct VerticalProductCard: View {
             }, label: {
                 Icon.heart.image
                     .resizable()
+                    .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
             })
             .padding([.top, .trailing], topTrailingEdgePadding)

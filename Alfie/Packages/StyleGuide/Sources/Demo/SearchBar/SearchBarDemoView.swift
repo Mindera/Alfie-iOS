@@ -24,7 +24,7 @@ struct SearchBarDemoView: View {
                         VStack {
                             Image("DemoProductImage", bundle: .module)
                                 .resizable()
-                                .aspectRatio(contentMode: .fit)
+                                .scaledToFit()
                                 .cornerRadius(8)
                             Text("Product \(index)")
                                 .font(.headline)

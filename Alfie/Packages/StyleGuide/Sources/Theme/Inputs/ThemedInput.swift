@@ -115,8 +115,9 @@ private struct ThemedTextStyle: TextFieldStyle {
                         .frame(height: Constants.inputHeight)
                     if let icon {
                         icon.image
-                            .resizable()
                             .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
                             .padding(.trailing, Constants.inputPadding)
                             .foregroundColor(isDisabled ? Colors.primary.mono200 : Colors.primary.mono900)
@@ -147,6 +148,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                 Icon.checkmark.image
                     .renderingMode(.template)
                     .resizable()
+                    .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
                     .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.green800))
                 Text.build(theme.font.small.normal(string))
@@ -159,6 +161,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                 Icon.info.image
                     .renderingMode(.template)
                     .resizable()
+                    .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
                     .foregroundColor(shouldApplyDisabledColor(for: Colors.secondary.red800))
                 Text.build(theme.font.small.normal(string))

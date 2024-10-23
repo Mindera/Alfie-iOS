@@ -14,7 +14,7 @@ struct SkeletonDemoView: View {
                 bodyType {
                     Image("DemoProductImage", bundle: .module)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .scaledToFit()
                         .shimmering(while: $isImageLoading)
                 } second: {
                     VStack(alignment: .leading, spacing: Spacing.space100) {

@@ -40,6 +40,7 @@ public struct ZoomableCarousel<Content: View>: View {
                 }, label: {
                     Icon.close.image
                         .resizable()
+                        .scaledToFit()
                         .frame(width: Constants.closeIconSize, height: Constants.closeIconSize)
                         .padding(Spacing.space050)
                         .background(Colors.primary.white.opacity(Constants.closeIconBackgroundOpacity))

@@ -35,11 +35,11 @@ public struct SortByView: View {
                                 HStack(spacing: Spacing.space100) {
                                     if let icon = option.icon {
                                         icon.image
-                                            .resizable()
                                             .renderingMode(.template)
-                                            .tint(Colors.primary.mono900)
+                                            .resizable()
+                                            .scaledToFit()
                                             .frame(size: Constants.iconSize)
-                                            .aspectRatio(contentMode: .fit)
+                                            .tint(Colors.primary.mono900)
                                             .padding(.vertical, Spacing.space150)
                                             .padding(.leading, Spacing.space150)
                                     }

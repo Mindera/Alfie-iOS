@@ -35,6 +35,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                 } label: {
                     Icon.close.image
                         .resizable()
+                        .scaledToFit()
                         .frame(size: Constants.sheetCloseIconSize)
                 }
             }
@@ -64,6 +65,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                                 if viewModel.colorSelectionConfiguration.selectedItem == item {
                                     Icon.checkmark.image
                                         .resizable()
+                                        .scaledToFit()
                                         .frame(size: Constants.colorCheckmarkSize)
                                 }
                             }

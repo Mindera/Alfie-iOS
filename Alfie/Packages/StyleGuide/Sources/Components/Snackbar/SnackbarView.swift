@@ -94,8 +94,9 @@ public struct SnackbarView: View {
                     icon
                         .renderingMode(.template)
                         .resizable()
-                        .foregroundStyle(foregroundColor)
+                        .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
+                        .foregroundStyle(foregroundColor)
                 }
                 Text.build(theme.font.paragraph.normal(configuration.text))
                     .foregroundColor(foregroundColor)
@@ -118,8 +119,9 @@ public struct SnackbarView: View {
                         Icon.close.image
                             .renderingMode(.template)
                             .resizable()
-                            .foregroundStyle(foregroundColor)
+                            .scaledToFit()
                             .frame(width: Constants.iconWidth, height: Constants.iconHeight)
+                            .foregroundStyle(foregroundColor)
                     })
                 }
             }

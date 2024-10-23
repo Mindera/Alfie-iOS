@@ -61,9 +61,9 @@ public struct ThemedToolbarButton: View {
                 LoaderView(circleDiameter: .defaultSmall, labelHidden: true)
             } else if let icon {
                 icon.image
-                    .resizable()
                     .renderingMode(.template)
-                    .aspectRatio(contentMode: .fit)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(tint)
                     .badgeView(badgeValue: $badgeValue)

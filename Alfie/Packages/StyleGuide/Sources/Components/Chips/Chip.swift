@@ -78,8 +78,9 @@ public struct Chip: View {
                             Icon.close.image
                                 .renderingMode(.template)
                                 .resizable()
-                                .foregroundStyle(textColor)
+                                .scaledToFit()
                                 .frame(width: Constants.closeWidth, height: Constants.closeHeight)
+                                .foregroundStyle(textColor)
                         }
                         .frame(maxHeight: .infinity)
                     })

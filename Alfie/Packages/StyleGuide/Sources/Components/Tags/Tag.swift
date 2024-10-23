@@ -49,6 +49,7 @@ public struct Tag: View {
                 if let icon = configuration.icon {
                     icon
                         .resizable()
+                        .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                 }
                 Text.build(theme.font.paragraph.normal(configuration.label))
@@ -58,6 +59,7 @@ public struct Tag: View {
                     }, label: {
                         Icon.close.image
                             .resizable()
+                            .scaledToFit()
                             .frame(width: Constants.closeWidth, height: Constants.closeHeight)
                     })
                 }

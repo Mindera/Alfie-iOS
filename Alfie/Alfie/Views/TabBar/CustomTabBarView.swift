@@ -68,8 +68,9 @@ struct TabBarItemView: View {
                 Color.clear.frame(height: Constants.lineHeight)
             }
             tab.icon.image
-                .resizable()
                 .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
                 .frame(size: Constants.iconSize)
                 .foregroundStyle(tab == currentTab ? Colors.primary.black : Colors.primary.mono300)
                 .badgeView(badgeValue: $badgeValue)

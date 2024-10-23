@@ -56,7 +56,7 @@ struct RadioButton: View {
         HStack(spacing: Spacing.space150) {
             state.correspondingIcon.image
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
 
             Text.build(theme.font.paragraph.normal(text))

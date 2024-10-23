@@ -28,8 +28,9 @@ public struct ThemedToolbarTitle: View {
         switch style {
         case .logo:
             Image("Logo")
-                .resizable()
                 .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
                 .frame(maxWidth: Constants.logoWidth, maxHeight: Constants.logoHeight)
                 .foregroundColor(tint)
                 .accessibilityIdentifier(accessibilityId)

@@ -68,6 +68,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
             Icon.close.image
                 .renderingMode(.template)
                 .resizable()
+                .scaledToFit()
                 .frame(width: Spacing.space200, height: Spacing.space200)
                 .foregroundStyle(Colors.primary.mono900)
         })

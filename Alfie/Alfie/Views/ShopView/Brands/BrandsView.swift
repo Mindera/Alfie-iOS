@@ -198,8 +198,8 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             .renderingMode(.template)
             .resizable()
             .foregroundStyle(Colors.primary.black)
+            .scaledToFit()
             .frame(width: Constants.iconSize, height: Constants.iconSize)
-            .aspectRatio(contentMode: .fit)
     }
 }
 
