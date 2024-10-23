@@ -6,7 +6,7 @@ struct WishListView: View {
         VStack {
             Icon.heart.image
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: 75)
             Text.build(theme.font.header.h3(LocalizableWishList.title))
         }

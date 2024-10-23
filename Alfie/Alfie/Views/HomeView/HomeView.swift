@@ -47,7 +47,7 @@ struct HomeView: View {
             Spacer()
             Icon.home.image
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: 75)
             Text.build(theme.font.header.h3(LocalizableHome.title))
             Checkbox(state: $loggedInCheckboxState, text: "Logged In")

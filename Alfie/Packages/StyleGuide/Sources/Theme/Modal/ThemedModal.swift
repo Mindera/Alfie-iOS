@@ -54,8 +54,9 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                 onDismiss()
                                             } label: {
                                                 Icon.close.image
-                                                    .resizable()
                                                     .renderingMode(.template)
+                                                    .resizable()
+                                                    .scaledToFit()
                                                     .frame(
                                                         width: Constants.iconCloseSize,
                                                         height: Constants.iconCloseSize

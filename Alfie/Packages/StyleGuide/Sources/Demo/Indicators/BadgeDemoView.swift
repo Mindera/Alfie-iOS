@@ -9,20 +9,23 @@ struct BadgeDemoView: View {
 
             HStack {
                 Icon.bag.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 20, height: 20)
                     .badgeView(badgeValue: $badgeValue)
                 Spacer()
                 Icon.bag.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 40, height: 40)
                     .badgeView(badgeValue: $badgeValue)
                 Spacer()
                 Icon.bag.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 50, height: 50)
                     .badgeView(badgeValue: $badgeValue)
             }
@@ -30,20 +33,23 @@ struct BadgeDemoView: View {
 
             HStack {
                 Icon.store.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 20, height: 20)
                     .badgeView(badgeValue: $badgeValue)
                 Spacer()
                 Icon.store.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 40, height: 40)
                     .badgeView(badgeValue: $badgeValue)
                 Spacer()
                 Icon.store.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 50, height: 50)
                     .badgeView(badgeValue: $badgeValue)
             }
@@ -111,8 +117,9 @@ struct BadgeDemoView: View {
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Icon.bell.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 20, height: 20)
                     .badgeView(badgeValue: $badgeValue)
             }
@@ -125,7 +132,7 @@ struct BadgeDemoView: View {
                 .fill(.black)
             Text.build(theme.font.small.bold(label))
                 .padding()
-                .foregroundColor(Colors.primary.white)
+                .foregroundStyle(Colors.primary.white)
         }
         .frame(width: 110, height: 44)
     }

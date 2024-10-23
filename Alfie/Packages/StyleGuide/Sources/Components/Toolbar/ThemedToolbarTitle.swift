@@ -28,10 +28,11 @@ public struct ThemedToolbarTitle: View {
         switch style {
         case .logo:
             Image("Logo")
-                .resizable()
                 .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
                 .frame(maxWidth: Constants.logoWidth, maxHeight: Constants.logoHeight)
-                .foregroundColor(tint)
+                .foregroundStyle(tint)
                 .accessibilityIdentifier(accessibilityId)
 
         case .leftText(let text, let subtitle):
@@ -43,7 +44,7 @@ public struct ThemedToolbarTitle: View {
 
                 if let subtitle {
                     Text.build(theme.font.tiny.normal(subtitle))
-                        .foregroundColor(Colors.primary.mono500)
+                        .foregroundStyle(Colors.primary.mono500)
                 }
             }
             .padding(.vertical, Spacing.space200)

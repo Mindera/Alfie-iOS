@@ -95,16 +95,16 @@ public struct HorizontalProductCard: View {
     private var productNameView: some View {
         Text.build(theme.font.small.normal(name))
             .lineLimit(Constants.productNameLineLimit)
-            .foregroundColor(Colors.primary.mono500)
+            .foregroundStyle(Colors.primary.mono500)
             .accessibilityIdentifier(AccessibilityId.productName)
     }
 
     private var productColorView: some View {
         HStack(spacing: Spacing.space100) {
             Text.build(theme.font.tiny.normal(colorTitle))
-                .foregroundColor(Colors.primary.mono500)
+                .foregroundStyle(Colors.primary.mono500)
             Text.build(theme.font.tiny.normal(color))
-                .foregroundColor(Colors.primary.mono700)
+                .foregroundStyle(Colors.primary.mono700)
         }
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
@@ -114,9 +114,9 @@ public struct HorizontalProductCard: View {
     private var productSizeView: some View {
         HStack(spacing: Spacing.space100) {
             Text.build(theme.font.tiny.normal(sizeTitle))
-                .foregroundColor(Colors.primary.mono500)
+                .foregroundStyle(Colors.primary.mono500)
             Text.build(theme.font.tiny.normal(size))
-                .foregroundColor(Colors.primary.mono700)
+                .foregroundStyle(Colors.primary.mono700)
         }
         .lineLimit(Constants.productSizeLineLimit)
         .accessibilityElement(children: .contain)

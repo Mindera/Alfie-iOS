@@ -67,8 +67,9 @@ public struct ThemedSegmentView: View {
                 Spacer()
                 if let icon = segment.icon {
                     icon
-                        .resizable()
                         .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                         .padding(.trailing, type == .compact ? Spacing.space050 : Spacing.space100)
                         .foregroundStyle(currectSelected == segment ? Colors.primary.black : Colors.primary.mono500)

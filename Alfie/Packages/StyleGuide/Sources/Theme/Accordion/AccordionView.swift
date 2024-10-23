@@ -85,10 +85,11 @@ struct MyDisclosureStyle: DisclosureGroupStyle {
                     configuration.label
                     Spacer()
                     Icon.chevronDown.image
-                        .resizable()
                         .renderingMode(.template)
-                        .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
+                        .resizable()
+                        .scaledToFit()
                         .frame(width: 16, height: 16)
+                        .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
                         .rotationEffect(.degrees(configuration.isExpanded ? 0 : -90))
                         .animation(.easeInOut(duration: 0.3), value: configuration.isExpanded)
                 }

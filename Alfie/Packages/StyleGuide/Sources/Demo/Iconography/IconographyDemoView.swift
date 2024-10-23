@@ -14,9 +14,9 @@ struct IconographyDemoView: View {
                 ForEach(Icon.allCases, id: \.rawValue) { icon in
                     VStack {
                         icon.image
-                            .resizable()
                             .renderingMode(.template)
-                            .aspectRatio(contentMode: .fit)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundStyle(Colors.primary.mono900)
                             .frame(width: 40, height: 40)
                         Text.build(theme.font.tiny.normal(icon.literalName))

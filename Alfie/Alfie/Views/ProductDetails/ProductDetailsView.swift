@@ -337,6 +337,7 @@ extension ProductDetailsView {
                                 if canShowColorPickers {
                                     Icon.chevronDown.image
                                         .resizable()
+                                        .scaledToFit()
                                         .frame(size: Constants.colorChevronSize)
                                 }
                             }
@@ -432,9 +433,9 @@ extension ProductDetailsView {
                 .fill(Colors.primary.mono200)
                 .frame(width: Constants.errorViewCircleSize, height: Constants.errorViewCircleSize)
             Text.build(theme.font.header.h2(LocalizableProductDetails.errorTitle))
-                .foregroundColor(Colors.primary.black)
+                .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.paragraph.normal(errorMessage))
-                .foregroundColor(Colors.primary.mono600)
+                .foregroundStyle(Colors.primary.mono600)
             ThemedButton(text: LocalizableProductDetails.$errorButtonBackLabel, isFullWidth: true) {
                 coordinator.didTapBackButton()
             }
@@ -456,9 +457,9 @@ extension ProductDetailsView {
                     Icon.chevronRight.image
                         .renderingMode(.template)
                         .resizable()
-                        .foregroundStyle(Colors.primary.black)
+                        .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(Colors.primary.black)
                         .padding(.trailing, Spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)

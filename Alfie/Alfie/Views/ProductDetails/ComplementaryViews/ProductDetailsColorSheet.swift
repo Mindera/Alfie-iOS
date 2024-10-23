@@ -35,7 +35,9 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                 } label: {
                     Icon.close.image
                         .resizable()
+                        .scaledToFit()
                         .frame(size: Constants.sheetCloseIconSize)
+                        .foregroundStyle(Colors.primary.mono900)
                 }
             }
             .padding([.top, .horizontal], Spacing.space200)
@@ -64,6 +66,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
                                 if viewModel.colorSelectionConfiguration.selectedItem == item {
                                     Icon.checkmark.image
                                         .resizable()
+                                        .scaledToFit()
                                         .frame(size: Constants.colorCheckmarkSize)
                                 }
                             }

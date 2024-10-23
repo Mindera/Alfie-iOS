@@ -94,11 +94,12 @@ public struct SnackbarView: View {
                     icon
                         .renderingMode(.template)
                         .resizable()
-                        .foregroundStyle(foregroundColor)
+                        .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
+                        .foregroundStyle(foregroundColor)
                 }
                 Text.build(theme.font.paragraph.normal(configuration.text))
-                    .foregroundColor(foregroundColor)
+                    .foregroundStyle(foregroundColor)
                     .padding(Spacing.space200)
                     .lineLimit(configuration.lineLimit)
                 Spacer()
@@ -107,7 +108,7 @@ public struct SnackbarView: View {
                         configuration.onActionTap?()
                     }, label: {
                         Text.build(theme.font.paragraph.bold(actionButtonLabel))
-                            .foregroundColor(foregroundColor)
+                            .foregroundStyle(foregroundColor)
                             .padding(Spacing.space200)
                     })
                 }
@@ -118,8 +119,9 @@ public struct SnackbarView: View {
                         Icon.close.image
                             .renderingMode(.template)
                             .resizable()
-                            .foregroundStyle(foregroundColor)
+                            .scaledToFit()
                             .frame(width: Constants.iconWidth, height: Constants.iconHeight)
+                            .foregroundStyle(foregroundColor)
                     })
                 }
             }

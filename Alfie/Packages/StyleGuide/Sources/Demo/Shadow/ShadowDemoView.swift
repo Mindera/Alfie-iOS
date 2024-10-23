@@ -60,7 +60,7 @@ struct ShadowDemoView: View {
                 .cornerRadius(CornerRadius.s)
                 .shadow(type)
             Text.build(theme.font.small.normal(label))
-                .foregroundColor(Colors.primary.mono400)
+                .foregroundStyle(Colors.primary.mono400)
         }
     }
 }

@@ -44,11 +44,11 @@ struct LogsView: View {
                     icon(for: log.level)
                         .resizable()
                         .frame(width: 25, height: 25)
-                        .foregroundColor(color(for: log.level))
+                        .foregroundStyle(color(for: log.level))
                     VStack(alignment: .leading) {
                         HStack {
                             Text.build(theme.font.paragraph.bold(log.level.rawValue))
-                                .foregroundColor(color(for: log.level))
+                                .foregroundStyle(color(for: log.level))
                             Text.build(theme.font.small.normal("(\(log.date.formatted(date: .omitted, time: .standard)))"))
                         }
 

@@ -65,10 +65,10 @@ public struct Chip: View {
                 .background(RoundedRectangle(cornerRadius: CornerRadius.full).fill(backgroundColor))
             HStack(spacing: Spacing.space100) {
                 Text.build(theme.font.small.normal(configuration.label))
-                    .foregroundColor(textColor)
+                    .foregroundStyle(textColor)
                 if let counterLabel {
                     Text.build(theme.font.small.normal(counterLabel))
-                        .foregroundColor(textColor)
+                        .foregroundStyle(textColor)
                 }
                 if configuration.showCloseButton {
                     Button(action: {
@@ -78,8 +78,9 @@ public struct Chip: View {
                             Icon.close.image
                                 .renderingMode(.template)
                                 .resizable()
-                                .foregroundStyle(textColor)
+                                .scaledToFit()
                                 .frame(width: Constants.closeWidth, height: Constants.closeHeight)
+                                .foregroundStyle(textColor)
                         }
                         .frame(maxHeight: .infinity)
                     })

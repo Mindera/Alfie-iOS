@@ -35,8 +35,9 @@ public struct PaginatedControl: View {
             } label: {
                 Icon.chevronLeft.image
                     .resizable()
-                    .tint(configuration.tintColor)
+                    .scaledToFit()
                     .frame(width: Constants.chevronIconSize, height: Constants.chevronIconSize)
+                    .tint(configuration.tintColor)
             }
 
             HStack(spacing: Spacing.space0) {
@@ -62,8 +63,9 @@ public struct PaginatedControl: View {
             } label: {
                 Icon.chevronRight.image
                     .resizable()
-                    .tint(configuration.tintColor)
+                    .scaledToFit()
                     .frame(width: Constants.chevronIconSize, height: Constants.chevronIconSize)
+                    .tint(configuration.tintColor)
             }
         }
     }

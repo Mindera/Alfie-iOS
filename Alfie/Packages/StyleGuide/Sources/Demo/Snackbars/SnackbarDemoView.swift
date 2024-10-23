@@ -74,7 +74,7 @@ struct SnackbarDemoView: View {
                 .fill(.black)
             Text.build(theme.font.paragraph.bold(label))
                 .padding()
-                .foregroundColor(Colors.primary.white)
+                .foregroundStyle(Colors.primary.white)
         }
         .frame(width: 180, height: 36)
     }

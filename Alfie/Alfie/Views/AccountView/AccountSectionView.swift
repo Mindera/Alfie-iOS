@@ -23,8 +23,8 @@ struct AccountSectionView: View {
                 Spacer()
                 Icon.chevronRight.image
                     .resizable()
+                    .scaledToFit()
                     .frame(width: AccountConstants.iconSize, height: AccountConstants.iconSize)
-                    .aspectRatio(contentMode: .fit)
                     .accessibilityIdentifier(AccessibilityId.actionIcon)
             }
             .frame(minHeight: AccountConstants.sectionHeight)
@@ -36,8 +36,8 @@ struct AccountSectionView: View {
 
     private func iconForImage(_ image: Image) -> some View {
         image.resizable()
+            .scaledToFit()
             .frame(width: AccountConstants.iconSize, height: AccountConstants.iconSize)
-            .aspectRatio(contentMode: .fit)
             .accessibilityIdentifier(AccessibilityId.sectionIcon)
     }
 
