@@ -11,6 +11,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productName: String = ""
     public var productImageUrls: [URL] = []
     public var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
+    public var sizeSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?

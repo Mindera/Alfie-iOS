@@ -32,6 +32,10 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         viewModel.colorSelectionConfiguration.items.count > 1
     }
 
+    private var canShowSizePickers: Bool {
+        viewModel.sizeSelectionConfiguration.items.count > 1
+    }
+
     // TODO: remove showFailureState (created for snapshot purposes)
     init(viewModel: ViewModel, showFailureState: Bool = false) {
         _showFailureState = State(initialValue: showFailureState)
@@ -369,6 +373,13 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .sizeSelector) {
             Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
                 .foregroundStyle(Colors.primary.mono900)
+
+            if canShowSizePickers {
+                SizingSelectorComponentView(
+                    configuration: viewModel.sizeSelectionConfiguration,
+                    layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
+                )
+            }
         }
     }
 

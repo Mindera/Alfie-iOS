@@ -1,3 +1,4 @@
+import Models
 import SwiftUI
 
 public struct SizingSwatchView: View {

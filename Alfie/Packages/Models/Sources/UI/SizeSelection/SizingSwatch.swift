@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct SizingSwatch: Equatable, Identifiable {
-    public let id: UUID = .init()
+    public let id: String
     public let name: String
     public let state: ItemState
 
@@ -11,7 +11,8 @@ public struct SizingSwatch: Equatable, Identifiable {
         case outOfStock
     }
 
-    public init(name: String, state: ItemState) {
+    public init(id: String = UUID().uuidString, name: String, state: ItemState) {
+        self.id = id
         self.name = name
         self.state = state
     }
@@ -32,20 +33,5 @@ public struct SwatchLayoutConfiguration {
         self.arrangement = arrangement
         self.hideSelectionTitle = hideSelectionTitle
         self.hideOnSingleColor = hideOnSingleColor
-    }
-}
-
-public class SizingSelectorConfiguration: ObservableObject {
-    /// Title to display before the currently selected size name
-    public let selectedTitle: String
-    /// Sizing items to display as swatches in the banner. Won't be shown if empty or containing a single size
-    public let items: [SizingSwatch]
-    /// The currently selected size, if `items` is not empty, then a size with the same name must exist there
-    @Published public var selectedItem: SizingSwatch?
-
-    public init(selectedTitle: String, items: [SizingSwatch], selectedItem: SizingSwatch? = nil) {
-        self.selectedTitle = selectedTitle
-        self.items = items
-        self.selectedItem = selectedItem
     }
 }
