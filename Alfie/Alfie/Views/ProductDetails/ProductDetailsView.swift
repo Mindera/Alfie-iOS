@@ -377,7 +377,7 @@ extension ProductDetailsView {
             if canShowSizePickers {
                 SizingSelectorComponentView(
                     configuration: viewModel.sizeSelectionConfiguration,
-                    layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
+                    layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
                 )
             }
         }

@@ -43,7 +43,7 @@ public struct SizingSelectorComponentView: View {
     }
 
     private func gridSwatches(columns: Int, columnWidth: CGFloat) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: columnWidth), alignment: .topLeading), count: columns)) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns)) {
             swatches()
         }
     }
@@ -73,7 +73,8 @@ public struct SizingSelectorComponentView: View {
                     .onTapGesture {
                         configuration.selectedItem = item
                     }
-            }.disabled(item.state != .available)
+            }
+            .disabled(item.state != .available)
         }
     }
 }

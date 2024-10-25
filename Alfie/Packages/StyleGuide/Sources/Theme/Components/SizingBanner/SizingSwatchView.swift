@@ -18,25 +18,24 @@ public struct SizingSwatchView: View {
     }
 
     public var body: some View {
-        VStack {
-            Text.build(theme.font.paragraph.normal(item.name))
-                .lineLimit(1)
-                .padding(.vertical, Constants.insetVertical)
-                .padding(.horizontal, Constants.insetHorizontal)
-                .foregroundStyle(textColor)
-                .background(
-                    ZStack {
-                        RoundedRectangle(cornerRadius: CornerRadius.xs)
-                            .fill(isSelected ? Colors.primary.black : .clear)
+        Text.build(theme.font.paragraph.normal(item.name))
+            .frame(maxWidth: .infinity)
+            .lineLimit(1)
+            .padding(.vertical, Constants.insetVertical)
+            .padding(.horizontal, Constants.insetHorizontal)
+            .foregroundStyle(textColor)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: CornerRadius.xs)
+                        .fill(isSelected ? Colors.primary.black : .clear)
 
-                        RoundedRectangle(cornerRadius: CornerRadius.xs)
-                            .inset(by: Constants.borderLineWidth)
-                            .stroke(item.state == .available ? Colors.primary.black : Constants.disabledStateColor, lineWidth: Constants.borderLineWidth)
+                    RoundedRectangle(cornerRadius: CornerRadius.xs)
+                        .inset(by: Constants.borderLineWidth)
+                        .stroke(item.state == .available ? Colors.primary.black : Constants.disabledStateColor, lineWidth: Constants.borderLineWidth)
 
-                        outOfStockSlashView
-                    }
-                )
-        }
+                    outOfStockSlashView
+                }
+            )
     }
 
     private var textColor: Color {

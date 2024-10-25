@@ -265,8 +265,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return sizes.map { size in
             let isAvailable = product.variants.contains(where: { $0.size?.id == size.id && $0.stock > 0 })
 
-            // TODO: Handle out of stock state if needed
-            return SizingSwatch(name: size.value, state: isAvailable ? .available : .unavailable)
+            // TODO: Handle unavailable state if needed
+            return SizingSwatch(id: size.id, name: size.value, state: isAvailable ? .available : .outOfStock)
         }
     }
 
