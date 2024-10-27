@@ -33,7 +33,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     }
 
     private var canShowSizePickers: Bool {
-        viewModel.sizeSelectionConfiguration.items.count > 1
+        viewModel.sizingSelectionConfiguration.items.count >= 1
     }
 
     // TODO: remove showFailureState (created for snapshot purposes)
@@ -309,6 +309,7 @@ extension ProductDetailsView {
 
     private var colorSheet: some View {
         ProductDetailsColorSheet(viewModel: viewModel,
+                                 type: .color,
                                  isPresented: $showColorSheet,
                                  searchText: $colorSheetSearchText)
     }
@@ -376,7 +377,7 @@ extension ProductDetailsView {
 
             if canShowSizePickers {
                 SizingSelectorComponentView(
-                    configuration: viewModel.sizeSelectionConfiguration,
+                    configuration: viewModel.sizingSelectionConfiguration,
                     layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
                 )
             }

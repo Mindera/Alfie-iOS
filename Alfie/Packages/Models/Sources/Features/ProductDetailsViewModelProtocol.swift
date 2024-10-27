@@ -53,7 +53,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
     var colorSelectionConfiguration: ColorSelectorConfiguration { get }
-    var sizeSelectionConfiguration: SizingSelectorConfiguration { get }
+    var sizingSelectionConfiguration: SizingSelectorConfiguration { get }
     var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] { get }
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
@@ -65,4 +65,5 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
     func didTapAddToBag()
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
+    func sizingSwatches(filteredBy searchTerm: String) -> [SizingSwatch]
 }

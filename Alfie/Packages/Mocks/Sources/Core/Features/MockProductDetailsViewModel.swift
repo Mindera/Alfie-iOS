@@ -11,7 +11,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productName: String = ""
     public var productImageUrls: [URL] = []
     public var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
-    public var sizeSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
+    public var sizingSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
@@ -68,5 +68,10 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var onColorSwatchesFilteredByCalled: ((String) -> [Models.ColorSwatch])?
     public func colorSwatches(filteredBy searchTerm: String) -> [Models.ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
+    }
+    
+    public var onSizingSwatchesFilteredByCalled: ((String) -> [Models.SizingSwatch])?
+    public func sizingSwatches(filteredBy searchTerm: String) -> [Models.SizingSwatch] {
+        onSizingSwatchesFilteredByCalled?(searchTerm) ?? sizingSelectionConfiguration.items
     }
 }

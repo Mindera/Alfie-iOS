@@ -10,15 +10,23 @@ private enum Constants {
     static let colorCheckmarkSize: CGFloat = 16
 }
 
+enum ModalSheetType {
+    case color
+    case size
+}
+
 struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     @Binding private var isPresented: Bool
     @Binding private var searchText: String
+    
+    private let type: ModalSheetType
 
-    internal init(viewModel: ViewModel, isPresented: Binding<Bool>, searchText: Binding<String>) {
+    internal init(viewModel: ViewModel, type: ModalSheetType, isPresented: Binding<Bool>, searchText: Binding<String>) {
         self._viewModel = StateObject(wrappedValue: viewModel)
         self._isPresented = isPresented
         self._searchText = searchText
+        self.type = type
     }
 
     var body: some View {
@@ -88,6 +96,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
 #if DEBUG
 #Preview {
     ProductDetailsColorSheet(viewModel: MockProductDetailsViewModel(),
+                             type: .color,
                              isPresented: .constant(true),
                              searchText: .constant(""))
 }

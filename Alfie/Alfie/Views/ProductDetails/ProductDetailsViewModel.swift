@@ -13,7 +13,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     @Published private(set) var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
     private(set) var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
-    private(set) var sizeSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
+    private(set) var sizingSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
     public let productId: String
 
     private var product: Product? {
@@ -90,7 +90,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         if let baseProduct {
             buildColorSelectionConfiguration(product: baseProduct, selectedVariant: baseProduct.defaultVariant)
-            buildSizeSelectionConfiguration(product: baseProduct, selectedVariant: baseProduct.defaultVariant)
+            buildSizingSelectionConfiguration(product: baseProduct, selectedVariant: baseProduct.defaultVariant)
         }
     }
 
@@ -156,6 +156,14 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             colorSelectionConfiguration.items
         } else {
             colorSelectionConfiguration.items.filter { $0.name.localizedCaseInsensitiveContains(searchTerm) }
+        }
+    }
+    
+    func sizingSwatches(filteredBy searchTerm: String) -> [SizingSwatch] {
+        if searchTerm.isEmpty {
+            sizingSelectionConfiguration.items
+        } else {
+            sizingSelectionConfiguration.items.filter { $0.name.localizedCaseInsensitiveContains(searchTerm) }
         }
     }
 
@@ -247,21 +255,21 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return productColors
     }
 
-    private func buildSizeSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
-        let sizeSwatches = buildSizeSwatches(product: product)
+    private func buildSizingSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
+        let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
 
         var selectedSwatch: SizingSwatch?
         if let selectedVariant {
-            selectedSwatch = sizeSwatches.first(where: { $0.id == selectedVariant.size?.id })
+            selectedSwatch = sizingSwatches.first(where: { $0.id == selectedVariant.size?.id })
         }
 
-        sizeSelectionConfiguration = .init(selectedTitle: "",
-                                            items: sizeSwatches,
+        sizingSelectionConfiguration = .init(selectedTitle: "",
+                                            items: sizingSwatches,
                                             selectedItem: selectedSwatch)
     }
 
-    private func buildSizeSwatches(product: Product) -> [SizingSwatch] {
-        let sizes = buildVariantSizes(product: product)
+    private func buildSizingSwatches(product: Product, selectedVariant: Product.Variant?) -> [SizingSwatch] {
+        let sizes = buildVariantSizes(product: product, selectedVariant: selectedVariant)
         return sizes.map { size in
             let isAvailable = product.variants.contains(where: { $0.size?.id == size.id && $0.stock > 0 })
 
@@ -270,9 +278,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
     }
 
-    private func buildVariantSizes(product: Product) -> [Product.ProductSize] {
+    private func buildVariantSizes(product: Product, selectedVariant: Product.Variant?) -> [Product.ProductSize] {
+        let variantsForSelectedColor = product.variants.filter { $0.colour?.id == selectedVariant?.colour?.id }
         var productSizes = [Product.ProductSize]()
-        product.variants.forEach { variant in
+        variantsForSelectedColor.forEach { variant in
             guard let size = variant.size, !productSizes.contains(where: { $0.id == size.id }) else {
                 return
             }
