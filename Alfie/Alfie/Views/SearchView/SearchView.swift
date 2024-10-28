@@ -78,9 +78,9 @@ extension SearchView {
             Spacer()
             imageForIcon(Icon.search)
             Text.build(theme.font.paragraph.bold(LocalizableSearch.searchEmptyTitle))
-                .foregroundColor(Colors.primary.black)
+                .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.small.normal(LocalizableSearch.searchEmptyMessage))
-                .foregroundColor(Colors.primary.black)
+                .foregroundStyle(Colors.primary.black)
             Spacer()
         }
         .accessibilityElement(children: .combine)
@@ -90,14 +90,14 @@ extension SearchView {
     private var noResultsView: some View {
         VStack(alignment: .leading, spacing: Spacing.space400) {
             Text.build(theme.font.paragraph.normal(LocalizableSearch.searchNoResults(for: viewModel.searchText)))
-                .foregroundColor(Colors.primary.mono900)
+                .foregroundStyle(Colors.primary.mono900)
             Text.build(theme.font.paragraph.normal(LocalizableSearch.searchNoResultsHelp))
-                .foregroundColor(Colors.primary.mono900)
+                .foregroundStyle(Colors.primary.mono900)
             Button(action: {
                 openBrands()
             }, label: {
                 Text.build(theme.font.paragraph.normalUnderline(LocalizableSearch.searchNoResultsLink))
-                    .foregroundColor(Colors.primary.mono900)
+                    .foregroundStyle(Colors.primary.mono900)
             })
             .accessibilityIdentifier(AccessibilityId.brandsListLink)
             Spacer()
@@ -183,8 +183,8 @@ extension SearchView {
             .renderingMode(.template)
             .resizable()
             .foregroundStyle(Colors.primary.black)
+            .scaledToFit()
             .frame(width: Constants.iconSize, height: Constants.iconSize)
-            .aspectRatio(contentMode: .fit)
     }
 
     private func suggestionHeader(text: String) -> some View {

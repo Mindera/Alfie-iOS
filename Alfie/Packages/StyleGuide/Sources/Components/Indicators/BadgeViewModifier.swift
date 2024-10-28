@@ -40,7 +40,7 @@ public struct BadgeViewModifier: ViewModifier {
                                 .stroke(Colors.primary.white, lineWidth: Constants.borderLineWidth)
                                 .frame(height: Constants.badgeHeight)
                             Text.build(theme.font.tiny.normal(helper.badgeLabel))
-                                .foregroundColor(Colors.primary.white)
+                                .foregroundStyle(Colors.primary.white)
                                 .padding(.all, Constants.textPadding)
                         }
                         .frame(height: Constants.badgeHeight)

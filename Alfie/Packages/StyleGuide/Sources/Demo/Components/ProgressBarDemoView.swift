@@ -14,7 +14,7 @@ struct ProgressBarDemoView: View {
                 HStack {
                     ForEach(0..<40) { _ in
                         Rectangle()
-                            .foregroundColor(Colors.primary.mono300)
+                            .foregroundStyle(Colors.primary.mono300)
                             .cornerRadius(CornerRadius.m)
                             .frame(width: 120, height: 120)
                     }

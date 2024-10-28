@@ -304,8 +304,9 @@ public struct ThemedSearchBarView: View {
         image
             .renderingMode(.template)
             .resizable()
+            .scaledToFit()
             .frame(width: Constants.trailingIconSize, height: Constants.trailingIconSize)
-            .foregroundColor(theme.iconColor)
+            .foregroundStyle(theme.iconColor)
             .transition(.scale(scale: 0, anchor: .trailing))
     }
 
@@ -323,8 +324,9 @@ public struct ThemedSearchBarView: View {
                 dismissBlock()
             } label: {
                 Icon.arrowLeft.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .tint(Colors.primary.mono900)
                     .frame(size: Constants.cancelIconSize)
             }

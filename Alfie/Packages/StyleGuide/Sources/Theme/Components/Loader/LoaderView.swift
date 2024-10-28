@@ -105,7 +105,7 @@ private struct AnimatedCircle: View {
                     isAppearing.toggle()
                 }
             }
-            .foregroundColor(style.color)
+            .foregroundStyle(style.color)
             .opacity(isAppearing ? 1.0 : Constants.minOpacity)
             .scaleEffect(isAppearing ? 1.0 : Constants.minScale)
     }

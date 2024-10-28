@@ -105,8 +105,8 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 .renderingMode(.template)
                 .resizable()
                 .foregroundStyle(Colors.primary.black)
+                .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
-                .aspectRatio(contentMode: .fit)
             Text.build(theme.font.paragraph.bold(LocalizableCategories.errorTitle))
                 .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.small.normal(LocalizableCategories.errorMessage))
@@ -125,9 +125,9 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 Icon.chevronRight.image
                     .renderingMode(.template)
                     .resizable()
-                    .foregroundStyle(foregroundColor)
+                    .scaledToFit()
                     .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(foregroundColor)
             }
             .frame(height: Constants.categoryViewHeight)
 

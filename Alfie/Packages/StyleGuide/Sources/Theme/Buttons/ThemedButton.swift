@@ -158,9 +158,9 @@ private struct ThemedButtonStyle: ButtonStyle {
                 leadingAsset.image
                     .renderingMode(.template)
                     .resizable()
-                    .foregroundStyle(textColor(configuration))
+                    .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
-                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(textColor(configuration))
             }
             configuration.label
                 .padding(.vertical, Spacing.space200)
@@ -169,13 +169,13 @@ private struct ThemedButtonStyle: ButtonStyle {
                     .renderingMode(.template)
                     .resizable()
                     .tint(textColor(configuration))
+                    .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
-                    .aspectRatio(contentMode: .fit)
             }
         }
         .frame(height: type.height)
         .padding(.horizontal, Spacing.space100)
-        .foregroundColor(textColor(configuration))
+        .foregroundStyle(textColor(configuration))
         .background(background(configuration))
         .cornerRadius(Constants.cornerRadius)
         .overlay(

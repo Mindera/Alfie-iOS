@@ -227,7 +227,9 @@ public struct VerticalProductCard: View {
             }, label: {
                 Icon.heart.image
                     .resizable()
+                    .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
+                    .foregroundStyle(Colors.primary.black)
             })
             .padding([.top, .trailing], topTrailingEdgePadding)
             .accessibilityIdentifier(AccessibilityId.productWishlistButton)

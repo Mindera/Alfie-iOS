@@ -31,7 +31,7 @@ struct TabControlIntrinsicWidthDemoView: View {
                         .fill(Colors.primary.mono300)
                         .overlay {
                             Text.build(theme.font.paragraph.bold(value))
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                         }
                         .frame(width: 300, height: 350)
                 }
