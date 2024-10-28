@@ -417,11 +417,16 @@ extension ProductDetailsView {
                         showSizeSheet = true
                     }, label: {
                         HStack {
-                            Text.build(theme.font.small.normal(viewModel.sizingSelectionConfiguration.selectedItem?.name.capitalized ?? ""))
+                            Text.build(
+                                theme.font.small.normal(
+                                    viewModel.sizingSelectionConfiguration.selectedItem?.name.capitalized ?? ""
+                                )
+                            )
                                 .foregroundStyle(Colors.primary.mono900)
                             if canShowSizePickers {
                                 Icon.chevronDown.image
                                     .resizable()
+                                    .scaledToFit()
                                     .frame(size: Constants.colorChevronSize)
                             }
                         }
