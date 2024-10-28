@@ -17,10 +17,12 @@ public class TypographyProvider: TypographyProviderProtocol {
     public var small: TypographySmallProtocol
     public var tiny: TypographyTinyProtocol
 
-    public init(header: TypographyHeaderProtocol = TypographyHeader(),
-                paragraph: TypographyParagraphProtocol = TypographyParagraph(),
-                small: TypographySmallProtocol = TypographySmall(),
-                tiny: TypographyTinyProtocol = TypographyTiny()) {
+    public init(
+        header: TypographyHeaderProtocol = TypographyHeader(),
+        paragraph: TypographyParagraphProtocol = TypographyParagraph(),
+        small: TypographySmallProtocol = TypographySmall(),
+        tiny: TypographyTinyProtocol = TypographyTiny()
+    ) {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             try? FontManager.registerAll()
         }

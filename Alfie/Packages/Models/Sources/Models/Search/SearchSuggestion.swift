@@ -10,10 +10,12 @@ public struct SearchSuggestion: Identifiable, Equatable, Hashable {
     /// An array of suggested products.
     public let products: [SearchSuggestionProduct]
 
-    public init(id: String = UUID().uuidString,
-                brands: [SearchSuggestionBrand],
-                keywords: [SearchSuggestionKeyword],
-                products: [SearchSuggestionProduct]) {
+    public init(
+        id: String = UUID().uuidString,
+        brands: [SearchSuggestionBrand],
+        keywords: [SearchSuggestionKeyword],
+        products: [SearchSuggestionProduct]
+    ) {
         self.id = id
         self.brands = brands
         self.keywords = keywords

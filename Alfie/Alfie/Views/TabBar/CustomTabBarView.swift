@@ -19,10 +19,13 @@ struct CustomTabBarView: View {
             Divider()
             HStack(spacing: Spacing.space0) {
                 ForEach(tabs, id: \.id) { tab in
-                    TabBarItemView(tab: tab, currentTab: $currentTab, badgeValue: .init(get: { badgeValueFor(tab) }, set: { _ in }), namespace: namespace.self)
-                        .simultaneousGesture(TapGesture().onEnded({ _ in
-                            badgeNumbers[tab] = nil
-                        }))
+                    TabBarItemView(
+                        tab: tab,
+                        currentTab: $currentTab,
+                        badgeValue: .init(get: { badgeValueFor(tab) }, set: { _ in }),
+                        namespace: namespace.self
+                    )
+                    .simultaneousGesture(TapGesture().onEnded { _ in badgeNumbers[tab] = nil })
                 }
             }
         }
@@ -60,14 +63,14 @@ struct TabBarItemView: View {
                 Colors.primary.mono900
                     .frame(height: Constants.lineHeight)
                     .offset(y: Constants.offsetLineSelected)
-                    .matchedGeometryEffect(id: Constants.effectID,
-                                           in: namespace)
+                    .matchedGeometryEffect(id: Constants.effectID, in: namespace)
             } else {
                 Color.clear.frame(height: Constants.lineHeight)
             }
             tab.icon.image
-                .resizable()
                 .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
                 .frame(size: Constants.iconSize)
                 .foregroundStyle(tab == currentTab ? Colors.primary.black : Colors.primary.mono300)
                 .badgeView(badgeValue: $badgeValue)

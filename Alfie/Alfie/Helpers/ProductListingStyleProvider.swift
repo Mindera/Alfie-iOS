@@ -9,8 +9,10 @@ final class ProductListingStyleProvider: ProductListingStyleProviderProtocol {
 
     init(userDefaults: UserDefaultsProtocol) {
         self.userDefaults = userDefaults
-        guard let styleString: String = userDefaults.value(for: savedPlpListStyle),
-              let style = ProductListingListStyle(rawValue: styleString) else {
+        guard
+            let styleString: String = userDefaults.value(for: savedPlpListStyle),
+            let style = ProductListingListStyle(rawValue: styleString)
+        else {
             return
         }
 

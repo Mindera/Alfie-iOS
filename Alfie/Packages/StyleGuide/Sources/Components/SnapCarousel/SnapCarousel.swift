@@ -25,13 +25,15 @@ public struct SnapCarousel<Content: View>: View {
     // Makes copies of the items to make the ilusion of infinite scrolling (if there's only one item, it doesn't replicate)
     @State private var shouldUpdateRealIndex = false
 
-    public init(areItemsLoading: Binding<Bool>? = nil,
-                itemAspectRatio: CGFloat = 0.77,
-                itemIndex: Binding<Int>,
-                itemSpacing: CGFloat = Spacing.space100,
-                minimumScrollVelocity: CGFloat = 40,
-                shouldAnimateRealIndexUpdate: Binding<Bool> = .constant(true),
-                items: @escaping () -> [Content]) {
+    public init(
+        areItemsLoading: Binding<Bool>? = nil,
+        itemAspectRatio: CGFloat = 0.77,
+        itemIndex: Binding<Int>,
+        itemSpacing: CGFloat = Spacing.space100,
+        minimumScrollVelocity: CGFloat = 40,
+        shouldAnimateRealIndexUpdate: Binding<Bool> = .constant(true),
+        items: @escaping () -> [Content]
+    ) {
         self.areItemsLoading = areItemsLoading
         self.shouldAnimateRealIndexUpdate = shouldAnimateRealIndexUpdate
         self.itemAspectRatio = itemAspectRatio
@@ -58,25 +60,29 @@ public struct SnapCarousel<Content: View>: View {
                 ForEach(Array(replicatedItems.enumerated()), id: \.0) { _, item in
                     item
                         .frame(width: abs(itemWidth), height: abs(itemHeight))
-                        .shimmering(while: areItemsLoading ?? .constant(false),
-                                    animateOnStateTransition: true,
-                                    cornerRadius: CornerRadius.m)
+                        .shimmering(
+                            while: areItemsLoading ?? .constant(false),
+                            animateOnStateTransition: true,
+                            cornerRadius: CornerRadius.m
+                        )
                         .scaledToFit()
                 }
             }
             .offset(x: xOffset(with: offsetAdjustmentWidth))
             .highPriorityGesture(DragGesture()
-                .updating($gestureOffset, body: { value, out, _ in
+                .updating($gestureOffset) { value, out, _ in
                     out = value.translation.width
-                })
+                }
                 .onChanged { _ in
                     lockRealIndexAnimationTrigger = true
                 }
                 .onEnded { value in
-                    handleFinishedDragGesture(with: value.translation.width,
-                                              and: value.velocity.width,
-                                              and: itemWidth,
-                                              and: offsetAdjustmentWidth)
+                    handleFinishedDragGesture(
+                        with: value.translation.width,
+                        and: value.velocity.width,
+                        and: itemWidth,
+                        and: offsetAdjustmentWidth
+                    )
                 })
             .onAppear {
                 self.itemHeight = itemHeight
@@ -133,8 +139,7 @@ extension SnapCarousel {
     }
 
     // Handles an external change of the index (eg. paginated controls)
-    private func handleExternalIndexUpdate(with newIndex: Int,
-                                           and lockRealIndexAnimationTrigger: Bool) {
+    private func handleExternalIndexUpdate(with newIndex: Int, and lockRealIndexAnimationTrigger: Bool) {
         guard !lockRealIndexAnimationTrigger else {
             return
         }
@@ -149,10 +154,12 @@ extension SnapCarousel {
         }
     }
 
-    private func handleFinishedDragGesture(with translationWidth: CGFloat,
-                                           and velocity: CGFloat,
-                                           and itemWidth: CGFloat,
-                                           and offsetAdjusmentWidth: CGFloat) {
+    private func handleFinishedDragGesture(
+        with translationWidth: CGFloat,
+        and velocity: CGFloat,
+        and itemWidth: CGFloat,
+        and offsetAdjusmentWidth: CGFloat
+    ) {
         let progress = -translationWidth / offsetAdjusmentWidth
         // There are two ways in which the user can swipe, either by putting enough velocity on the swipe, or by swipe enough distance
         guard abs(velocity) > minimumScrollVelocity || abs(translationWidth) > itemWidth / 2  else {

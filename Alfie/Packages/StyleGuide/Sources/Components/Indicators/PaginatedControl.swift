@@ -14,10 +14,12 @@ public struct PaginatedControl: View {
     private let slideSubject: PassthroughSubject<Void, Never>?
     private let bounds: ClosedRange<Int>
 
-    public init(configuration: PaginatedControlConfiguration,
-                itemsCount: Int,
-                selectedIndex: Binding<Int>,
-                slideSubject: PassthroughSubject<Void, Never>? = nil) {
+    public init(
+        configuration: PaginatedControlConfiguration,
+        itemsCount: Int,
+        selectedIndex: Binding<Int>,
+        slideSubject: PassthroughSubject<Void, Never>? = nil
+    ) {
         self.configuration = configuration
         self.itemsCount = itemsCount
         self._selectedIndex = selectedIndex
@@ -33,8 +35,9 @@ public struct PaginatedControl: View {
             } label: {
                 Icon.chevronLeft.image
                     .resizable()
-                    .tint(configuration.tintColor)
+                    .scaledToFit()
                     .frame(width: Constants.chevronIconSize, height: Constants.chevronIconSize)
+                    .tint(configuration.tintColor)
             }
 
             HStack(spacing: Spacing.space0) {
@@ -43,7 +46,8 @@ public struct PaginatedControl: View {
                         .font(Font(theme.font.tiny.normal))
                         .foregroundStyle(configuration.textColor)
                         .animation(.emphasized, value: selectedIndex)
-                        .frame(minWidth: 16, alignment: .trailing) // safe width to avoid view self sizing for every change
+                        // safe width to avoid view self sizing for every change
+                        .frame(minWidth: 16, alignment: .trailing)
                 }
 
                 Text.build(theme.font.tiny.normal(configuration.pageSeparator))
@@ -59,8 +63,9 @@ public struct PaginatedControl: View {
             } label: {
                 Icon.chevronRight.image
                     .resizable()
-                    .tint(configuration.tintColor)
+                    .scaledToFit()
                     .frame(width: Constants.chevronIconSize, height: Constants.chevronIconSize)
+                    .tint(configuration.tintColor)
             }
         }
     }

@@ -49,46 +49,52 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
         .onAppear {
             viewModel.viewDidAppear()
         }
-        .onReceive(viewModel.openCategoryPublisher.receive(on: DispatchQueue.main), perform: { destination in
+        .onReceive(viewModel.openCategoryPublisher.receive(on: DispatchQueue.main)) { destination in
             switch destination {
-                case .plp(let category):
-                    coordinator.openProductListing(configuration: .init(category: category,
-                                                                        searchText: nil,
-                                                                        urlQueryParameters: nil,
-                                                                        mode: .listing))
-                case .web(let url, let title):
-                    coordinator.open(url: url, title: title)
-                case .services:
-                    if !ignoreLocalNavigation {
-                        coordinator.openStoreServices()
-                    }
-                case .brands:
-                    if !ignoreLocalNavigation {
-                        coordinator.openBrands()
-                    }
-                case .subCategories(let subCategories, let parent):
-                    coordinator.openCategories(subCategories, title: parent.title)
+            case .plp(let category):
+                coordinator.openProductListing(
+                    configuration: .init(
+                        category: category,
+                        searchText: nil,
+                        urlQueryParameters: nil,
+                        mode: .listing
+                    )
+                )
+
+            case .web(let url, let title):
+                coordinator.open(url: url, title: title)
+
+            case .services:
+                if !ignoreLocalNavigation {
+                    coordinator.openStoreServices()
+                }
+
+            case .brands:
+                if !ignoreLocalNavigation {
+                    coordinator.openBrands()
+                }
+
+            case .subCategories(let subCategories, let parent):
+                coordinator.openCategories(subCategories, title: parent.title)
             }
-        })
+        }
     }
 
     // MARK: - Subviews
 
     private func categoryView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title,
-                           isShimmering: false,
-                           foregroundColor: Colors.primary.mono800)
-            .modifier(TapHighlightableModifier(action: {
-                withAnimation(.standard) {
-                    viewModel.didSelectCategory(category)
+        categoriesListItem(for: category.title, isShimmering: false, foregroundColor: Colors.primary.mono800)
+            .modifier(
+                TapHighlightableModifier {
+                    withAnimation(.standard) {
+                        viewModel.didSelectCategory(category)
+                    }
                 }
-            }))
+            )
     }
 
     private func placeholderView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title,
-                           isShimmering: true,
-                           foregroundColor: Colors.primary.mono300)
+        categoriesListItem(for: category.title, isShimmering: true, foregroundColor: Colors.primary.mono300)
     }
 
     private var errorView: some View {
@@ -99,8 +105,8 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 .renderingMode(.template)
                 .resizable()
                 .foregroundStyle(Colors.primary.black)
+                .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
-                .aspectRatio(contentMode: .fit)
             Text.build(theme.font.paragraph.bold(LocalizableCategories.errorTitle))
                 .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.small.normal(LocalizableCategories.errorMessage))
@@ -109,9 +115,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
         }
     }
 
-    private func categoriesListItem(for text: String,
-                                    isShimmering: Bool,
-                                    foregroundColor: Color) -> some View {
+    private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color) -> some View {
         VStack(spacing: Spacing.space0) {
             HStack {
                 Text.build(theme.font.paragraph.normal(text))
@@ -121,9 +125,9 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 Icon.chevronRight.image
                     .renderingMode(.template)
                     .resizable()
-                    .foregroundStyle(foregroundColor)
+                    .scaledToFit()
                     .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                    .aspectRatio(contentMode: .fit)
+                    .foregroundStyle(foregroundColor)
             }
             .frame(height: Constants.categoryViewHeight)
 
@@ -170,9 +174,10 @@ private struct CategoriesToolbarModifier: ViewModifier {
 
 #if DEBUG
 #Preview("Success") {
-    CategoriesView(viewModel: MockCategoriesViewModel(state: .success(.init(categories: [])),
-                                                             categories: NavigationItem.fixtures))
-        .environmentObject(Coordinator())
+    CategoriesView(
+        viewModel: MockCategoriesViewModel(state: .success(.init(categories: [])), categories: NavigationItem.fixtures)
+    )
+    .environmentObject(Coordinator())
 }
 
 #Preview("Loading") {

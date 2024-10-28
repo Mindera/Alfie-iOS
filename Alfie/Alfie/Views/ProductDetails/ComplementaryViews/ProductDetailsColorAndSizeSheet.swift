@@ -1,6 +1,6 @@
-import SwiftUI
-import StyleGuide
 import Models
+import StyleGuide
+import SwiftUI
 #if DEBUG
 import Mocks
 #endif
@@ -23,12 +23,14 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
     private let type: SheetType
 
     private var title: String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .color:
             LocalizableProductDetails.$color
         case .size:
             LocalizableProductDetails.$size
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     internal init(viewModel: ViewModel, type: SheetType, isPresented: Binding<Bool>, searchText: Binding<String> = Binding.constant("")) {
@@ -52,7 +54,9 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
                 } label: {
                     Icon.close.image
                         .resizable()
+                        .scaledToFit()
                         .frame(size: Constants.sheetCloseIconSize)
+                        .foregroundStyle(Colors.primary.mono900)
                 }
             }
             .padding([.top, .horizontal], Spacing.space200)
@@ -69,12 +73,14 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
 
 private extension ProductDetailsColorAndSizeSheet {
     @ViewBuilder var itemsView: some View {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .color:
             colorItemsView
         case .size:
             sizeItemsView
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     @ViewBuilder var colorItemsView: some View {
@@ -86,9 +92,11 @@ private extension ProductDetailsColorAndSizeSheet {
                         isPresented = false
                     } label: {
                         HStack(spacing: Spacing.space200) {
-                            ColorSwatchView(item: item,
-                                            swatchSize: .normal,
-                                            isSelected: viewModel.colorSelectionConfiguration.selectedItem == item)
+                            ColorSwatchView(
+                                item: item,
+                                swatchSize: .normal,
+                                isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
+                            )
 
                             Text.build(theme.font.paragraph.normal(item.name.capitalized))
 
@@ -107,12 +115,14 @@ private extension ProductDetailsColorAndSizeSheet {
             .padding(.horizontal, Spacing.space200)
             .padding(.vertical, Spacing.space100)
         }
-        .searchable(placeholder: LocalizableProductDetails.$searchColors,
-                    placeholderOnFocus: LocalizableProductDetails.$searchColors,
-                    searchText: $searchText,
-                    theme: .soft,
-                    dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
-                    verticalSpacing: Spacing.space200)
+        .searchable(
+            placeholder: LocalizableProductDetails.$searchColors,
+            placeholderOnFocus: LocalizableProductDetails.$searchColors,
+            searchText: $searchText,
+            theme: .soft,
+            dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
+            verticalSpacing: Spacing.space200
+        )
     }
 
     @ViewBuilder var sizeItemsView: some View {
@@ -146,15 +156,18 @@ private extension ProductDetailsColorAndSizeSheet {
     @ViewBuilder var checkmark: some View {
         Icon.checkmark.image
             .resizable()
+            .scaledToFit()
             .frame(size: Constants.colorCheckmarkSize)
     }
 }
 
 #if DEBUG
 #Preview {
-    ProductDetailsColorAndSizeSheet(viewModel: MockProductDetailsViewModel(),
-                             type: .color,
-                             isPresented: .constant(true),
-                             searchText: .constant(""))
+    ProductDetailsColorAndSizeSheet(
+        viewModel: MockProductDetailsViewModel(),
+        type: .color,
+        isPresented: .constant(true),
+        searchText: .constant("")
+    )
 }
 #endif

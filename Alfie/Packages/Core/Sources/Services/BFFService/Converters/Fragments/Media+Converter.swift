@@ -17,13 +17,14 @@ public extension MediaFragment {
 
 extension ImageFragment {
     func convertToImage() -> MediaImage? {
-        guard url.isNotBlank, let url = URL(string: url) else {
+        guard
+            url.isNotBlank,
+            let url = URL(string: url)
+        else {
             return nil
         }
 
-        return MediaImage(alt: alt,
-                          mediaContentType: .image,
-                          url: url)
+        return MediaImage(alt: alt, mediaContentType: .image, url: url)
     }
 }
 
@@ -36,29 +37,33 @@ private extension MediaFragment.AsImage {
 private extension MediaFragment.AsVideo {
     func convertToVideo() -> MediaVideo? {
         let sources: [VideoSource] = sources.compactMap { source -> VideoSource? in
-            guard source.url.isNotBlank, let url = URL(string: source.url) else {
+            guard
+                source.url.isNotBlank,
+                let url = URL(string: source.url)
+            else {
                 return nil
             }
 
-            return VideoSource(format: VideoSource.VideoFormat(from: source),
-                               mimeType: source.mimeType,
-                               url: url)
+            return VideoSource(format: VideoSource.VideoFormat(from: source), mimeType: source.mimeType, url: url)
         }
         let previewImage = previewImage?.fragments.imageFragment.convertToImage()
-        return MediaVideo(alt: alt,
-                          mediaContentType: .video,
-                          previewImage: previewImage,
-                          sources: sources)
+        return MediaVideo(alt: alt, mediaContentType: .video, previewImage: previewImage, sources: sources)
     }
 }
 
 private extension VideoSource.VideoFormat {
     init(from source: MediaFragment.AsVideo.Source) {
+        // swiftlint:disable vertical_whitespace_between_cases
         self = switch source.format {
-                case .mp4: .mp4
-                case .webm: .webm
-                case .case: .unknown
-                case .unknown: .unknown
+        case .mp4:
+            .mp4
+        case .webm:
+            .webm
+        case .case:
+            .unknown
+        case .unknown:
+            .unknown
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

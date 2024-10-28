@@ -10,10 +10,12 @@ struct ZoomableCarouselRepresentable<Content: View> {
     private let configuration: ZoomableCarouselConfiguration
     private let slidePublisher: AnyPublisher<Void, Never>
 
-    public init(currentIndex: Binding<Int>,
-                childViews: [Content],
-                configuration: ZoomableCarouselConfiguration,
-                slidePublisher: AnyPublisher<Void, Never>) {
+    public init(
+        currentIndex: Binding<Int>,
+        childViews: [Content],
+        configuration: ZoomableCarouselConfiguration,
+        slidePublisher: AnyPublisher<Void, Never>
+    ) {
         self._currentIndex = currentIndex
         self.childViews = childViews
         self.configuration = configuration
@@ -23,10 +25,12 @@ struct ZoomableCarouselRepresentable<Content: View> {
 
 extension ZoomableCarouselRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> ViewControllerType {
-        .init(currentIndex: $currentIndex,
-              slidePublisher: slidePublisher,
-              configuration: configuration,
-              items: childViews)
+        .init(
+            currentIndex: $currentIndex,
+            slidePublisher: slidePublisher,
+            configuration: configuration,
+            items: childViews
+        )
     }
 
     func updateUIViewController(_ uiViewController: UIKitZoomableCarouselViewController<Content>, context: Context) {}

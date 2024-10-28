@@ -24,19 +24,26 @@ struct DefaultToolbarModifier: ViewModifier {
             .toolbar {
                 ToolbarItemProvider.leadingItems(for: screen, coordinator: coordinator)
                 ToolbarItemProvider.principalItems(for: screen, coordinator: coordinator)
-                ToolbarItemProvider.trailingItems(for: screen,
-                                                  coordinator: coordinator,
-                                                  isPresentingDebugMenu: $coordinator.isPresentingDebugMenu)
+                ToolbarItemProvider.trailingItems(
+                    for: screen,
+                    coordinator: coordinator,
+                    isPresentingDebugMenu: $coordinator.isPresentingDebugMenu
+                )
             }
             .modifier(ThemedToolbarModifier(showDivider: hasDivider))
     }
 
     private var hasDivider: Bool {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch screen {
-            case .tab(.shop), .tab(.wishlist), .tab(.bag), .tab(.home):
-                false
-            default:
-                true
+        case .tab(.shop),
+             .tab(.wishlist), // swiftlint:disable:this indentation_width
+             .tab(.bag),
+             .tab(.home):
+            false
+        default:
+            true
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

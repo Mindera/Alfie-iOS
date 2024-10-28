@@ -27,11 +27,13 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
     public private(set) var providerBecameAvailablePublisher: AnyPublisher<Void, Never>
     private var providerReadySubscription: AnyCancellable?
 
-    public init(providers: [ConfigurationProviderProtocol],
-                authenticationService: AuthenticationServiceProtocol?,
-                country: String,
-                appVersion: String = Bundle.main.appVersion,
-                isStoreApp: Bool = ReleaseConfigurator.appConfiguration == .appStore) {
+    public init(
+        providers: [ConfigurationProviderProtocol],
+        authenticationService: AuthenticationServiceProtocol?,
+        country: String,
+        appVersion: String = Bundle.main.appVersion,
+        isStoreApp: Bool = ReleaseConfigurator.appConfiguration == .appStore
+    ) {
         self.providers = providers
         self.authenticationService = authenticationService
         self.currentCountry = country
@@ -42,7 +44,7 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
 
         updateFeatureAvailability()
 
-        self.providerReadySubscription = Publishers.MergeMany(self.providers.map({ $0.isReadyPublisher }))
+        self.providerReadySubscription = Publishers.MergeMany(self.providers.map { $0.isReadyPublisher })
             .sink { [weak self] isReady in
                 if let self, isReady {
                     self.updateFeatureAvailability()
@@ -51,8 +53,7 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
             }
     }
 
-    func updateDependencies(authenticationService: AuthenticationServiceProtocol?,
-                            country: String) {
+    func updateDependencies(authenticationService: AuthenticationServiceProtocol?, country: String) {
         self.authenticationService = authenticationService
         self.currentCountry = country
 
@@ -135,12 +136,14 @@ extension ConfigurationService {
             let rawValue = providerValue(for: .appUpdate),
             let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
             let configuration: ConfigurationAppUpdateInfo = {
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch type {
-                    case .immediate:
-                        return appUpdate.requirements.immediate
-                    case .flexible:
-                        return appUpdate.requirements.flexible
+                case .immediate:
+                    return appUpdate.requirements.immediate
+                case .flexible:
+                    return appUpdate.requirements.flexible
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
             }()
         else {
             return nil
@@ -181,14 +184,20 @@ extension ConfigurationService {
                     return false
                 }
 
-                return checkCountry(version.registeredUsersConfig.countryCodes) && checkReleaseType(version.registeredUsersConfig.releaseTypes)
+                let checkCountry = checkCountry(version.registeredUsersConfig.countryCodes)
+                let checkReleaseType = checkReleaseType(version.registeredUsersConfig.releaseTypes)
+
+                return checkCountry && checkReleaseType
             } else {
                 // If the feature is disabled for guest users and we're a guest user, return false, no need to check anything else
                 guard version.guestUsersConfig.available else {
                     return false
                 }
 
-                return checkCountry(version.guestUsersConfig.countryCodes) && checkReleaseType(version.guestUsersConfig.releaseTypes)
+                let checkCountry = checkCountry(version.guestUsersConfig.countryCodes)
+                let checkReleaseType = checkReleaseType(version.guestUsersConfig.releaseTypes)
+
+                return checkCountry && checkReleaseType
             }
         }
 
@@ -201,7 +210,7 @@ extension ConfigurationService {
             return true
         }
 
-        return countries.contains(where: { $0.lowercased() == currentCountry.lowercased() })
+        return countries.contains { $0.lowercased() == currentCountry.lowercased() }
     }
 
     private func checkReleaseType(_ releaseTypes: [String]) -> Bool {
@@ -209,7 +218,10 @@ extension ConfigurationService {
             return true
         }
 
-        let expectedReleaseType = isStoreApp ? ConfigurationReleaseType.store.rawValue : ConfigurationReleaseType.testflight.rawValue
-        return releaseTypes.contains(where: { $0.caseInsensitiveCompare(expectedReleaseType) == .orderedSame })
+        let storeReleaseType = ConfigurationReleaseType.store.rawValue
+        let testflightReleaseType = ConfigurationReleaseType.testflight.rawValue
+        let expectedReleaseType = isStoreApp ? storeReleaseType : testflightReleaseType
+
+        return releaseTypes.contains { $0.caseInsensitiveCompare(expectedReleaseType) == .orderedSame }
     }
 }

@@ -14,10 +14,12 @@ struct RadioListDemoView: View {
     var body: some View {
         VStack(spacing: Spacing.space250) {
             DemoHelper.demoSectionHeader(title: "Radio Buttons")
-            RadioButtonList(values: RadioListTestValue.allCases,
-                            disabledValues: .constant([.selectionDisabled]),
-                            selectedValue: $selectedValue,
-                            verticalSpacing: Spacing.space300)
+            RadioButtonList(
+                values: RadioListTestValue.allCases,
+                disabledValues: .constant([.selectionDisabled]),
+                selectedValue: $selectedValue,
+                verticalSpacing: Spacing.space300
+            )
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, Spacing.space400)
 

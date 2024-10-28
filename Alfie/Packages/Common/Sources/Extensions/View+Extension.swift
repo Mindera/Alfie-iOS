@@ -36,17 +36,21 @@ extension View {
     }
 
     @ViewBuilder
-    public func optionalMatchedGeometryEffect(id: String?,
-                                              in namespace: Namespace.ID?,
-                                              properties: MatchedGeometryProperties = .frame,
-                                              anchor: UnitPoint = .center,
-                                              isSource: Bool = true) -> some View {
+    public func optionalMatchedGeometryEffect(
+        id: String?,
+        in namespace: Namespace.ID?,
+        properties: MatchedGeometryProperties = .frame,
+        anchor: UnitPoint = .center,
+        isSource: Bool = true
+    ) -> some View {
         if let id, let namespace {
-            self.matchedGeometryEffect(id: id,
-                                       in: namespace,
-                                       properties: properties,
-                                       anchor: anchor,
-                                       isSource: isSource)
+            self.matchedGeometryEffect(
+                id: id,
+                in: namespace,
+                properties: properties,
+                anchor: anchor,
+                isSource: isSource
+            )
         } else {
             self
         }

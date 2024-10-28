@@ -25,13 +25,22 @@ struct TrackingDemoView: View {
                                 HStack {
                                     Text.build(theme.font.paragraph.bold("Event Key:"))
                                     Text.build(theme.font.paragraph.bold(trackedEvent.name ?? ""))
-                                    Text.build(theme.font.paragraph.normal("(" + trackedTime(from: trackedEvent.trackedDate) + ")"))
+                                    Text.build(
+                                        theme.font.paragraph.normal(
+                                            "(" + trackedTime(from: trackedEvent.trackedDate) + ")"
+                                        )
+                                    )
                                 }
                                 HStack {
                                     Text.build(theme.font.small.normal("Providers:"))
-                                    Text.build(theme.font.small.normal((trackedEvent.providers.map {
-                                        $0.replacingOccurrences(of: "com.", with: "").capitalized
-                                    }.joined(separator: " "))))
+                                    Text.build(
+                                        theme.font.small.normal(
+                                            trackedEvent
+                                                .providers
+                                                .map { $0.replacingOccurrences(of: "com.", with: "").capitalized }
+                                                .joined(separator: " ")
+                                        )
+                                    )
                                 }
                             }
                             Spacer().frame(height: 20)

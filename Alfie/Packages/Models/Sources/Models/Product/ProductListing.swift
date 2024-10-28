@@ -17,13 +17,15 @@ public struct ProductListing {
         /// Offset of previous page if page exists
         public let previousPage: Int?
 
-        public init(offset: Int,
-                    limit: Int,
-                    total: Int,
-                    pages: Int,
-                    page: Int,
-                    nextPage: Int? = nil,
-                    previousPage: Int? = nil) {
+        public init(
+            offset: Int,
+            limit: Int,
+            total: Int,
+            pages: Int,
+            page: Int,
+            nextPage: Int? = nil,
+            previousPage: Int? = nil
+        ) {
             self.offset = offset
             self.limit = limit
             self.total = total
@@ -38,9 +40,7 @@ public struct ProductListing {
     public let pagination: Pagination
     public let products: [Product]
 
-    public init(title: String,
-                pagination: Pagination,
-                products: [Product]) {
+    public init(title: String, pagination: Pagination, products: [Product]) {
         self.title = title
         self.pagination = pagination
         self.products = products

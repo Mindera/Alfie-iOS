@@ -1,5 +1,5 @@
-import Models
 import Core
+import Models
 import StyleGuide
 import SwiftUI
 #if DEBUG
@@ -30,13 +30,15 @@ struct ForceAppUpdateView: View {
                 Text.build(theme.font.paragraph.bold(configuration.message))
                     .multilineTextAlignment(.center)
 
-                ThemedButton(text: configuration.confirmActionText, type: .big,
-                             style: .primary,
-                             action: {
+                ThemedButton(
+                    text: configuration.confirmActionText,
+                    type: .big,
+                    style: .primary
+                ) {
                     if let url = configuration.url {
                         UIApplication.shared.open(url)
                     }
-                })
+                }
                 .padding(.top, Spacing.space200)
             }
             .padding(.horizontal, Spacing.space400)
@@ -47,11 +49,11 @@ struct ForceAppUpdateView: View {
         .ignoresSafeArea()
     }
 
-    @ViewBuilder
-    var backgroundView: some View {
+    @ViewBuilder var backgroundView: some View {
         RemoteImage(
             url: configuration.backgroundImage,
-            transaction: Transaction(animation: .easeIn(duration: 1))) { image in
+            transaction: Transaction(animation: .easeIn(duration: 1))
+        ) { image in
             image.resizable()
                 .scaledToFill()
         }

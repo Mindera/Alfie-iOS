@@ -5,13 +5,15 @@ import UIKit
 // MARK: - AttributedString
 
 extension AttributedString {
-    public func build(font: UIFont,
-                      lineHeight: CGFloat? = nil,
-                      letterSpacing: CGFloat? = nil,
-                      strike: Bool = false,
-                      isUnderlined: Bool = false,
-                      foregroundColor: Color? = nil,
-                      backgroundColor: Color? = nil) -> AttributedString {
+    public func build(
+        font: UIFont,
+        lineHeight: CGFloat? = nil,
+        letterSpacing: CGFloat? = nil,
+        strike: Bool = false,
+        isUnderlined: Bool = false,
+        foregroundColor: Color? = nil,
+        backgroundColor: Color? = nil
+    ) -> AttributedString {
         guard !characters.isEmpty else {
             return self
         }
@@ -32,7 +34,9 @@ extension AttributedString {
         var attributedString = self
         attributedString.mergeAttributes(container)
         // workaround to avoid "Conformance of 'NSParagraphStyle' to 'Sendable' is unavailable" if setting paragraphStyle in the container
-        attributedString.mergeAttributes(.init([.paragraphStyle: paragraphStyle(attributedString: attributedString, lineHeight: lineHeight)]))
+        attributedString.mergeAttributes(
+            .init([.paragraphStyle: paragraphStyle(attributedString: attributedString, lineHeight: lineHeight)])
+        )
         return attributedString
     }
 
@@ -40,7 +44,12 @@ extension AttributedString {
         let languageCode = UIView.appearance().semanticContentAttribute == .forceLeftToRight ? "en" : "ar"
         let paragraphStyle: NSMutableParagraphStyle = {
             if !attributedString.characters.isEmpty {
-                return NSAttributedString(attributedString).attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
+                return NSAttributedString(attributedString)
+                    .attribute(
+                        .paragraphStyle,
+                        at: 0,
+                        effectiveRange: nil
+                    ) as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
             } else {
                 return NSMutableParagraphStyle()
             }
@@ -56,16 +65,20 @@ extension AttributedString {
 // MARK: - NSAttributedString
 
 extension NSAttributedString {
-    public static func fromHtml(_ htmlString: String,
-                                font: UIFont,
-                                color: UIColor,
-                                lineHeight: CGFloat? = nil,
-                                textAlignment: NSTextAlignment = .left)
-        -> NSAttributedString? {
+    public static func fromHtml(
+        _ htmlString: String,
+        font: UIFont,
+        color: UIColor,
+        lineHeight: CGFloat? = nil,
+        textAlignment: NSTextAlignment = .left
+    ) -> NSAttributedString? {
         let htmlData = htmlString.data(using: .unicode) ?? Data(htmlString.utf8)
-        guard let attributedString = try? NSMutableAttributedString(data: htmlData,
-                                                                    options: [.documentType: NSAttributedString.DocumentType.html],
-                                                                    documentAttributes: nil)
+        guard
+            let attributedString = try? NSMutableAttributedString(
+                data: htmlData,
+                options: [.documentType: NSAttributedString.DocumentType.html],
+                documentAttributes: nil
+            )
         else {
             return NSAttributedString(string: htmlString)
         }
@@ -127,14 +140,14 @@ extension NSAttributedString {
         }
 
         let mutableString: NSMutableAttributedString = .init(attributedString: self)
+        // swiftlint:disable:next legacy_objc_type
         let range = (string.lowercased() as NSString).range(of: selectedString.lowercased())
-        mutableString.addAttribute(.underlineStyle,
-                                   value: NSUnderlineStyle.single.rawValue,
-                                   range: range)
+        mutableString.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
         return AttributedString(mutableString)
     }
 
     public func hightlightedAttributedString(with subString: String, font: UIFont, color: UIColor) -> AttributedString {
+        // swiftlint:disable:next legacy_objc_type
         let range = (self.string.lowercased() as NSString).range(of: subString.lowercased())
         let highlightedSuggestion: NSMutableAttributedString = .init(attributedString: self)
         highlightedSuggestion.addAttribute(NSAttributedString.Key.font, value: font, range: range)
@@ -149,9 +162,11 @@ public extension Text {
     static func build(_ attributedString: AttributedString) -> some View {
         var lineSpacing: CGFloat = 0
 
-        if let font = attributedString.uiKit.font,
-           // equivalent UIKit NSParagraphStyle not available yet in AttributeScopes.SwiftUIAttributes
-           let paragraphStyle = NSAttributedString(attributedString).attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
+        if
+            let font = attributedString.uiKit.font,
+            // equivalent UIKit NSParagraphStyle not available yet in AttributeScopes.SwiftUIAttributes
+            let paragraphStyle = NSAttributedString(attributedString)
+                .attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle {
             lineSpacing = paragraphStyle.lineSpacing - font.pointSize
         }
 
@@ -160,7 +175,10 @@ public extension Text {
     }
 
     static func build(_ attributedString: AttributedString, highlighting: String, font: UIFont, color: Color) -> some View {
-        build(NSAttributedString(attributedString).hightlightedAttributedString(with: highlighting, font: font, color: color.ui))
+        build(
+            NSAttributedString(attributedString)
+                .hightlightedAttributedString(with: highlighting, font: font, color: color.ui)
+        )
     }
 
     private static func format(_ attributedString: AttributedString) -> Text {

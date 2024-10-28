@@ -21,30 +21,33 @@ struct SizingBannerDemoView: View {
                     SizingSelectorComponentView(
                         configuration: .init(
                             selectedTitle: Self.selectedTitle,
-                            items: Self.items),
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100)))
+                            items: Self.items
+                        ),
+                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
+                    )
                 }
 
                 Spacer()
 
                 section(title: "Sizing Swatches - Chips") {
                     SizingSelectorComponentView(
-                        configuration: .init(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.items),
-                        layoutConfiguration: .init(arrangement: .chips(
-                            itemHorizontalSpacing: Spacing.space100,
-                            itemVerticalSpacing: Spacing.space100)))
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
+                        layoutConfiguration: .init(
+                            arrangement: .chips(
+                                itemHorizontalSpacing: Spacing.space100,
+                                itemVerticalSpacing: Spacing.space100
+                            )
+                        )
+                    )
                 }
 
                 Spacer()
 
                 section(title: "Sizing Swatches - Grid") {
                     SizingSelectorComponentView(
-                        configuration: .init(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.items),
-                        layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50)))
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
+                        layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
+                    )
                 }
 
                 Spacer()

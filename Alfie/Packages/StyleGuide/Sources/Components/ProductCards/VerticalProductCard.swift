@@ -16,7 +16,7 @@ public struct VerticalProductCardConfiguration {
         case flexible
 
         var value: CGFloat? {
-            guard case let .fixed(size) = self else {
+            guard case .fixed(let size) = self else {
                 return nil
             }
             return size
@@ -27,61 +27,55 @@ public struct VerticalProductCardConfiguration {
     let hidePrice: Bool
     let hideAction: Bool
 
-    public init(size: Size,
-                hidePrice: Bool = false,
-                hideAction: Bool = false) {
+    public init(size: Size, hidePrice: Bool = false, hideAction: Bool = false) {
         self.size = size
         self.hidePrice = hidePrice
         self.hideAction = hideAction
     }
 
+    // swiftlint:disable vertical_whitespace_between_cases
     var cardSize: CardIntrinsicSize {
         switch size {
-            case .small:
-                .fixed(size: 130)
-            case .medium,
-                 .large:
-                .flexible
+        case .small:
+            .fixed(size: 130)
+        case .medium,
+             .large: // swiftlint:disable:this indentation_width
+            .flexible
         }
     }
 
     var verticalInterSpacing: CGFloat {
         switch size {
-            case .small:
-                Spacing.space100
-            case .medium:
-                Spacing.space150
-            case .large:
-                Spacing.space200
+        case .small:
+            Spacing.space100
+        case .medium:
+            Spacing.space150
+        case .large:
+            Spacing.space200
         }
     }
 
     var priceConfiguration: PriceConfiguration {
         switch size {
-            case .small:
-                .init(preferredDistribution: .horizontal,
-                      size: .small,
-                      textAlignment: .leading)
-            case .medium:
-                .init(preferredDistribution: .horizontal,
-                      size: .large,
-                      textAlignment: .leading)
-            case .large:
-                .init(preferredDistribution: .vertical,
-                      size: .large,
-                      textAlignment: .trailing)
+        case .small:
+            .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
+        case .medium:
+            .init(preferredDistribution: .horizontal, size: .large, textAlignment: .leading)
+        case .large:
+            .init(preferredDistribution: .vertical, size: .large, textAlignment: .trailing)
         }
     }
 
     var textFont: UIFont {
         switch size {
-            case .small,
-                 .medium:
-                ThemeProvider.shared.font.small.normal
-            case .large:
-                ThemeProvider.shared.font.paragraph.normal
+        case .small,
+             .medium: // swiftlint:disable:this indentation_width
+            ThemeProvider.shared.font.small.normal
+        case .large:
+            ThemeProvider.shared.font.paragraph.normal
         }
     }
+    // swiftlint:enable vertical_whitespace_between_cases
 }
 
 // MARK: - Card View
@@ -101,14 +95,16 @@ public struct VerticalProductCard: View {
     private let onUserAction: ProductUserActionHandler
     @Binding public private(set) var isSkeleton: Bool
 
-    public init(configuration: VerticalProductCardConfiguration,
-                productId: String,
-                image: URL?,
-                designer: String,
-                name: String,
-                priceType: PriceType,
-                onUserAction: @escaping ProductUserActionHandler,
-                isSkeleton: Binding<Bool> = .constant(false)) {
+    public init(
+        configuration: VerticalProductCardConfiguration,
+        productId: String,
+        image: URL?,
+        designer: String,
+        name: String,
+        priceType: PriceType,
+        onUserAction: @escaping ProductUserActionHandler,
+        isSkeleton: Binding<Bool> = .constant(false)
+    ) {
         self.configuration = configuration
         self.productId = productId
         self.image = image
@@ -119,10 +115,12 @@ public struct VerticalProductCard: View {
         self._isSkeleton = isSkeleton
     }
 
-    public init(configuration: VerticalProductCardConfiguration,
-                product: Product,
-                onUserAction: @escaping ProductUserActionHandler,
-                isSkeleton: Binding<Bool> = .constant(false)) {
+    public init(
+        configuration: VerticalProductCardConfiguration,
+        product: Product,
+        onUserAction: @escaping ProductUserActionHandler,
+        isSkeleton: Binding<Bool> = .constant(false)
+    ) {
         self.configuration = configuration
         self.productId = product.id
         self.image = product.defaultVariant.media.first?.asImage?.url
@@ -165,17 +163,17 @@ public struct VerticalProductCard: View {
         .accessibilityIdentifier(AccessibilityId.productCard)
     }
 
-    @ViewBuilder
-    private var productImageView: some View {
-        RemoteImage(url: image, success: { image in
-            image
-                .resizable()
-                .aspectRatio(Constants.imageAspectRatio, contentMode: .fit)
-        }, placeholder: {
-            Colors.primary.mono050
-        }, failure: { _ in
-            Colors.primary.mono050
-        })
+    @ViewBuilder private var productImageView: some View {
+        RemoteImage(
+            url: image,
+            success: { image in
+                image
+                    .resizable()
+                    .aspectRatio(Constants.imageAspectRatio, contentMode: .fit)
+            },
+            placeholder: { Colors.primary.mono050 },
+            failure: { _ in Colors.primary.mono050 }
+        )
         .aspectRatio(Constants.imageAspectRatio, contentMode: .fill)
     }
 
@@ -184,18 +182,27 @@ public struct VerticalProductCard: View {
             .font(Font(configuration.textFont))
             .foregroundStyle(Colors.primary.mono900)
             .lineLimit(Constants.productDesignerLineLimit)
-            .shimmeringMultiline(while: $isSkeleton, lines: Constants.productDesignerLineLimit, font: configuration.textFont)
+            .shimmeringMultiline(
+                while: $isSkeleton,
+                lines: Constants.productDesignerLineLimit,
+                font: configuration.textFont
+            )
             .accessibilityIdentifier(AccessibilityId.productDesigner)
     }
 
-    @ViewBuilder
-    private var productNameView: some View {
+    @ViewBuilder private var productNameView: some View {
         Text(name)
             .font(Font(configuration.textFont))
             .foregroundStyle(Colors.primary.mono500)
-            .frame(height: (configuration.textFont.lineHeight * CGFloat(Constants.productNameLineLimit)), alignment: .top)
+            .frame(
+                height: (configuration.textFont.lineHeight * CGFloat(Constants.productNameLineLimit)), alignment: .top
+            )
             .lineLimit(Constants.productNameLineLimit)
-            .shimmeringMultiline(while: $isSkeleton, lines: Constants.productNameLineLimit, font: configuration.textFont)
+            .shimmeringMultiline(
+                while: $isSkeleton,
+                lines: Constants.productNameLineLimit,
+                font: configuration.textFont
+            )
             .accessibilityIdentifier(AccessibilityId.productName)
     }
 
@@ -206,25 +213,26 @@ public struct VerticalProductCard: View {
             .accessibilityIdentifier(AccessibilityId.productPrice)
     }
 
-    @ViewBuilder
-    private var wishlistView: some View {
+    @ViewBuilder private var wishlistView: some View {
         switch configuration.size {
-            case .small:
-                EmptyView()
-            case .medium,
-                 .large:
-                let topTrailingEdgePadding = configuration.size == .medium ? Spacing.space050 : Spacing.space100
-                let iconSize: CGFloat = configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
+        case .small:
+            EmptyView()
+        case .medium,
+             .large: // swiftlint:disable:this indentation_width
+            let topTrailingEdgePadding = configuration.size == .medium ? Spacing.space050 : Spacing.space100
+            let iconSize = configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
-                Button(action: {
-                    onUserAction(productId, .wishlist(isFavorite: true))
-                }, label: {
-                    Icon.heart.image
-                        .resizable()
-                        .frame(width: iconSize, height: iconSize)
-                })
-                .padding([.top, .trailing], topTrailingEdgePadding)
-                .accessibilityIdentifier(AccessibilityId.productWishlistButton)
+            Button(action: {
+                onUserAction(productId, .wishlist(isFavorite: true))
+            }, label: {
+                Icon.heart.image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: iconSize, height: iconSize)
+                    .foregroundStyle(Colors.primary.black)
+            })
+            .padding([.top, .trailing], topTrailingEdgePadding)
+            .accessibilityIdentifier(AccessibilityId.productWishlistButton)
         }
     }
 }
@@ -266,9 +274,8 @@ private enum Constants {
         image: URL(string: "https://www.alfieproj.com/productimages/medium/1/1262024_22313940_13558933.jpg"),
         designer: "Yves Saint Laurent",
         name: "Rouge Pur Couture",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD"),
-        onUserAction: { _, _ in }
-    )
+        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+    ) { _, _ in }
 }
 
 #Preview("Large") {
@@ -278,7 +285,6 @@ private enum Constants {
         image: URL(string: "https://www.alfieproj.com/productimages/medium/1/1262024_22313940_13558933.jpg"),
         designer: "Yves Saint Laurent",
         name: "Rouge Pur Couture",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD"),
-        onUserAction: { _, _ in }
-    )
+        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+    ) { _, _ in }
 }

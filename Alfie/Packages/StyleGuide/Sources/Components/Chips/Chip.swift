@@ -14,13 +14,15 @@ public struct ChipConfiguration {
     public var counter: Int?
     public let onCloseTap: (() -> Void)?
 
-    public init(type: ChipType,
-                label: String,
-                counter: Int? = nil,
-                showCloseButton: Bool = false,
-                isDisabled: Binding<Bool> = .constant(false),
-                isSelected: Binding<Bool> = .constant(false),
-                onCloseTap: (() -> Void)? = nil) {
+    public init(
+        type: ChipType,
+        label: String,
+        counter: Int? = nil,
+        showCloseButton: Bool = false,
+        isDisabled: Binding<Bool> = .constant(false),
+        isSelected: Binding<Bool> = .constant(false),
+        onCloseTap: (() -> Void)? = nil
+    ) {
         self.type = type
         self.label = label
         self.counter = counter
@@ -31,17 +33,11 @@ public struct ChipConfiguration {
     }
 
     public static func small(label: String, onCloseTap: (() -> Void)? = nil) -> ChipConfiguration {
-        ChipConfiguration(type: .small,
-                          label: label,
-                          showCloseButton: onCloseTap != nil,
-                          onCloseTap: onCloseTap)
+        ChipConfiguration(type: .small, label: label, showCloseButton: onCloseTap != nil, onCloseTap: onCloseTap)
     }
 
     public static func large(label: String, onCloseTap: (() -> Void)? = nil) -> ChipConfiguration {
-        ChipConfiguration(type: .large,
-                          label: label,
-                          showCloseButton: onCloseTap != nil,
-                          onCloseTap: onCloseTap)
+        ChipConfiguration(type: .large, label: label, showCloseButton: onCloseTap != nil, onCloseTap: onCloseTap)
     }
 }
 
@@ -69,10 +65,10 @@ public struct Chip: View {
                 .background(RoundedRectangle(cornerRadius: CornerRadius.full).fill(backgroundColor))
             HStack(spacing: Spacing.space100) {
                 Text.build(theme.font.small.normal(configuration.label))
-                    .foregroundColor(textColor)
+                    .foregroundStyle(textColor)
                 if let counterLabel {
                     Text.build(theme.font.small.normal(counterLabel))
-                        .foregroundColor(textColor)
+                        .foregroundStyle(textColor)
                 }
                 if configuration.showCloseButton {
                     Button(action: {
@@ -82,9 +78,9 @@ public struct Chip: View {
                             Icon.close.image
                                 .renderingMode(.template)
                                 .resizable()
+                                .scaledToFit()
+                                .frame(width: Constants.closeWidth, height: Constants.closeHeight)
                                 .foregroundStyle(textColor)
-                                .frame(width: Constants.closeWidth,
-                                       height: Constants.closeHeight)
                         }
                         .frame(maxHeight: .infinity)
                     })
@@ -133,12 +129,14 @@ public struct Chip: View {
     }
 
     private var chipHeight: CGFloat {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch configuration.type {
-            case .small:
-                return Constants.heightSmall
-            case .large:
-                return Constants.heightLarge
+        case .small:
+            return Constants.heightSmall
+        case .large:
+            return Constants.heightLarge
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private var counterLabel: String? {
@@ -158,13 +156,41 @@ public struct Chip: View {
         }
         .padding()
         HStack(spacing: 20) {
-            Chip(configuration: .init(type: .small, label: "Disabled", showCloseButton: false, isDisabled: .constant(true)))
-            Chip(configuration: .init(type: .small, label: "Disabled", showCloseButton: true, isDisabled: .constant(true)))
+            Chip(
+                configuration: .init(
+                    type: .small,
+                    label: "Disabled",
+                    showCloseButton: false,
+                    isDisabled: .constant(true)
+                )
+            )
+            Chip(
+                configuration: .init(
+                    type: .small,
+                    label: "Disabled",
+                    showCloseButton: true,
+                    isDisabled: .constant(true)
+                )
+            )
         }
         .padding()
         HStack(spacing: 20) {
-            Chip(configuration: .init(type: .small, label: "Selected", showCloseButton: false, isSelected: .constant(true)))
-            Chip(configuration: .init(type: .small, label: "Selected", showCloseButton: true, isSelected: .constant(true)))
+            Chip(
+                configuration: .init(
+                    type: .small,
+                    label: "Selected",
+                    showCloseButton: false,
+                    isSelected: .constant(true)
+                )
+            )
+            Chip(
+                configuration: .init(
+                    type: .small,
+                    label: "Selected",
+                    showCloseButton: true,
+                    isSelected: .constant(true)
+                )
+            )
         }
         .padding()
 
@@ -175,13 +201,38 @@ public struct Chip: View {
         }
         .padding()
         HStack(spacing: 20) {
-            Chip(configuration: .init(type: .large, label: "Disabled", showCloseButton: false, isDisabled: .constant(true)))
-            Chip(configuration: .init(type: .large, label: "Disabled", showCloseButton: true, isDisabled: .constant(true)))
+            Chip(
+                configuration: .init(
+                    type: .large,
+                    label: "Disabled",
+                    showCloseButton: false,
+                    isDisabled: .constant(true)
+                )
+            )
+            Chip(
+                configuration: .init(
+                    type: .large,
+                    label: "Disabled",
+                    showCloseButton: true,
+                    isDisabled: .constant(true)
+                )
+            )
         }
         .padding()
         HStack(spacing: 20) {
-            Chip(configuration: .init(type: .large, label: "Selected", showCloseButton: false, isSelected: .constant(true)))
-            Chip(configuration: .init(type: .large, label: "Selected", showCloseButton: true, isSelected: .constant(true)))
+            Chip(
+                configuration: .init(
+                    type: .large,
+                    label: "Selected",
+                    showCloseButton: false,
+                    isSelected: .constant(true)
+                )
+            )
+            Chip(
+                configuration: .init(
+                    type: .large, label: "Selected", showCloseButton: true, isSelected: .constant(true)
+                )
+            )
         }
         .padding()
         Spacer()

@@ -8,7 +8,9 @@ struct PriceComponentDemoView: View {
         case range = "Range"
     }
 
-    @State private var currentPriceType: PriceType = .formattedDefault(Self.lowerPrice, currencyCode: Self.australianDollar)
+    @State private var currentPriceType: PriceType = .formattedDefault(
+        Self.lowerPrice, currencyCode: Self.australianDollar
+    )
     @State private var priceType: PriceTypeNamed = .default
     @State private var priceDistribution: PriceDistribution = .vertical
     @State private var priceSize: PriceSize = .large
@@ -34,19 +36,33 @@ struct PriceComponentDemoView: View {
             VStack {
                 let formattedPriceType: PriceType = {
                     switch priceType {
-                        case .default:
-                            return .formattedDefault(Self.lowerPrice, currencyCode: currencyCode)
-                        case .sale:
-                            return .formattedSale(fullPrice: Self.higherPrice, finalPrice: Self.lowerPrice, currencyCode: currencyCode)
-                        case .range:
-                            return .formattedRange(lowerBound: Self.lowerPrice, upperBound: Self.higherPrice, currencyCode: currencyCode)
+                    case .default:
+                        return .formattedDefault(Self.lowerPrice, currencyCode: currencyCode)
+
+                    case .sale:
+                        return .formattedSale(
+                            fullPrice: Self.higherPrice,
+                            finalPrice: Self.lowerPrice,
+                            currencyCode: currencyCode
+                        )
+
+                    case .range:
+                        return .formattedRange(
+                            lowerBound: Self.lowerPrice,
+                            upperBound: Self.higherPrice,
+                            currencyCode: currencyCode
+                        )
                     }
                 }()
 
-                PriceComponentView(type: formattedPriceType,
-                                   configuration: .init(preferredDistribution: priceDistribution,
-                                                        size: priceSize,
-                                                        textAlignment: textAlignment))
+                PriceComponentView(
+                    type: formattedPriceType,
+                    configuration: .init(
+                        preferredDistribution: priceDistribution,
+                        size: priceSize,
+                        textAlignment: textAlignment
+                    )
+                )
             }
             .frame(height: 60)
             .padding(.vertical, Spacing.space400)
@@ -176,12 +192,12 @@ private extension PriceSize {
 private extension TextAlignment {
     var title: String {
         switch self {
-            case .leading:
-                return "Leading"
-            case .center:
-                return "Center"
-            case .trailing:
-                return "Trailing"
+        case .leading:
+            return "Leading"
+        case .center:
+            return "Center"
+        case .trailing:
+            return "Trailing"
         }
     }
 }

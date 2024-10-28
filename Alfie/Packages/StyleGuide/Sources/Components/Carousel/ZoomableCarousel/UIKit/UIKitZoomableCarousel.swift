@@ -1,7 +1,7 @@
-import UIKit
-import SwiftUI
-import Common
 import Combine
+import Common
+import SwiftUI
+import UIKit
 
 final class UIKitZoomableCarousel<Content: View>: UIScrollView, UIScrollViewDelegate {
     private var didLoad = false
@@ -18,10 +18,12 @@ final class UIKitZoomableCarousel<Content: View>: UIScrollView, UIScrollViewDele
     }
     private var actualCurrentIndex: Int
 
-    init(currentIndex: Binding<Int>,
-         slidePublisher: AnyPublisher<Void, Never>,
-         items: [Content],
-         configuration: ZoomableCarouselConfiguration) {
+    init(
+        currentIndex: Binding<Int>,
+        slidePublisher: AnyPublisher<Void, Never>,
+        items: [Content],
+        configuration: ZoomableCarouselConfiguration
+    ) {
         self._currentIndex = currentIndex
         self.slidePublisher = slidePublisher
         self.items = items
@@ -100,10 +102,12 @@ final class UIKitZoomableCarousel<Content: View>: UIScrollView, UIScrollViewDele
             return nil
         }
 
-        return ZoomableUIView(childView: contentView,
-                              index: index,
-                              dismissHeightMultiplier: 1 / 4,
-                              configuration: configuration)
+        return ZoomableUIView(
+            childView: contentView,
+            index: index,
+            dismissHeightMultiplier: 1 / 4,
+            configuration: configuration
+        )
     }
 
     private func checkIndexOverflow() {
@@ -197,7 +201,7 @@ final class UIKitZoomableCarousel<Content: View>: UIScrollView, UIScrollViewDele
 
         let newVisibleIndex = childViews
             .enumerated()
-            .min(by: { $0.element.visibility(in: scrollView) > $1.element.visibility(in: scrollView) })?.offset
+            .min { $0.element.visibility(in: scrollView) > $1.element.visibility(in: scrollView) }?.offset
 
         guard
             let newVisibleIndex,
@@ -226,7 +230,10 @@ private extension UIView {
     }
 
     func visibility(in scrollView: UIScrollView) -> CGFloat {
-        let visibleRect = CGRect(origin: scrollView.contentOffset, size: CGSize(width: scrollView.bounds.size.width - 1, height: scrollView.bounds.size.height))
+        let visibleRect = CGRect(
+            origin: scrollView.contentOffset,
+            size: CGSize(width: scrollView.bounds.size.width - 1, height: scrollView.bounds.size.height)
+        )
         let subviewFrame = scrollView.convert(frame, from: superview)
         let intersectionRect = visibleRect.intersection(subviewFrame)
         guard !intersectionRect.isNull && intersectionRect.size.height > 0 && intersectionRect.size.width > 0 else {

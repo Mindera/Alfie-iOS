@@ -9,8 +9,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         let horizontalPadding: CGFloat
         let verticalPadding: CGFloat
 
-        public init(horizontalPadding: CGFloat,
-                    verticalPadding: CGFloat = Spacing.space250) {
+        public init(horizontalPadding: CGFloat, verticalPadding: CGFloat = Spacing.space250) {
             self.horizontalPadding = horizontalPadding
             self.verticalPadding = verticalPadding
         }
@@ -25,9 +24,11 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
     @State private var orientation = UIDeviceOrientation.unknown
     @State private var viewportWidth: Double = 0
 
-    public init(scrollViewConfiguration: ScrollViewConfiguration,
-                progressBarConfiguration: ProgressBarConfiguration,
-                content: @escaping () -> Content) {
+    public init(
+        scrollViewConfiguration: ScrollViewConfiguration,
+        progressBarConfiguration: ProgressBarConfiguration,
+        content: @escaping () -> Content
+    ) {
         self.scrollViewConfiguration = scrollViewConfiguration
         self.progressBarConfiguration = progressBarConfiguration
         self.content = content
@@ -40,8 +41,10 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
                     .padding(.horizontal, scrollViewConfiguration.horizontalPadding)
                     .background(GeometryReader { proxy in
                         GeometryReader { proxy in
-                            Color.clear.preference(key: ScrollViewOffsetPreferenceKey.self,
-                                                   value: proxy.frame(in: .named(coordinateSpace)).origin)
+                            Color.clear.preference(
+                                key: ScrollViewOffsetPreferenceKey.self,
+                                value: proxy.frame(in: .named(coordinateSpace)).origin
+                            )
                         }
                         .frame(width: 0, height: 0)
                         .onAppear {
@@ -60,8 +63,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
             .coordinateSpace(name: coordinateSpace)
 
             if scrollableContentWidth > viewportWidth {
-                ProgressBar(progress: $scrollOffset,
-                            total: .constant(scrollableContentWidth - viewportWidth))
+                ProgressBar(progress: $scrollOffset, total: .constant(scrollableContentWidth - viewportWidth))
                 .padding(.horizontal, progressBarConfiguration.horizontalPadding)
                 .padding(.vertical, progressBarConfiguration.verticalPadding)
             }
@@ -89,40 +91,38 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
 
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: Spacing.space200),
-            progressBarConfiguration: .init(horizontalPadding: Spacing.space1000,
-                                            verticalPadding: Spacing.space400),
-            content: {
-                HStack {
-                    ForEach(1...3, id: \.self) { index in
-                        Rectangle()
-                            .foregroundColor(Colors.primary.mono300)
-                            .cornerRadius(CornerRadius.m)
-                            .frame(width: 110, height: 300)
-                            .overlay {
-                                Text("\(index)")
-                            }
-                    }
+            progressBarConfiguration: .init(horizontalPadding: Spacing.space1000, verticalPadding: Spacing.space400)
+        ) {
+            HStack {
+                ForEach(1...3, id: \.self) { index in
+                    Rectangle()
+                        .foregroundStyle(Colors.primary.mono300)
+                        .cornerRadius(CornerRadius.m)
+                        .frame(width: 110, height: 300)
+                        .overlay {
+                            Text("\(index)")
+                        }
                 }
-            })
+            }
+        }
 
         Text("Scrollable area - visible ProgressBar")
 
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: Spacing.space200),
-            progressBarConfiguration: .init(horizontalPadding: Spacing.space1000,
-                                            verticalPadding: Spacing.space400),
-            content: {
-                HStack {
-                    ForEach(1...10, id: \.self) { index in
-                        Rectangle()
-                            .foregroundColor(Colors.primary.mono300)
-                            .cornerRadius(CornerRadius.m)
-                            .frame(width: 200, height: 300)
-                            .overlay {
-                                Text("\(index)")
-                            }
-                    }
+            progressBarConfiguration: .init(horizontalPadding: Spacing.space1000, verticalPadding: Spacing.space400)
+        ) {
+            HStack {
+                ForEach(1...10, id: \.self) { index in
+                    Rectangle()
+                        .foregroundStyle(Colors.primary.mono300)
+                        .cornerRadius(CornerRadius.m)
+                        .frame(width: 200, height: 300)
+                        .overlay {
+                            Text("\(index)")
+                        }
                 }
-            })
+            }
+        }
     }
 }

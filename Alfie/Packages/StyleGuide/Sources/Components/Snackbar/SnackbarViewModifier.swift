@@ -20,7 +20,8 @@ public struct SnackbarViewModifier: ViewModifier {
                         .padding(Spacing.space100)
                 }
                 .animation(.spring(), value: configuration),
-                alignment: alignment)
+                alignment: alignment
+            )
     }
 
     public func dismiss() {
@@ -42,11 +43,13 @@ public struct SnackbarViewModifier: ViewModifier {
     @ViewBuilder private var snackbarView: some View {
         if let configuration {
             VStack {
-                SnackbarView(configuration: configuration, onCloseTap: {
-                    dismiss()
-                })
+                SnackbarView(configuration: configuration) { dismiss() }
             }
-            .transition(AnyTransition.opacity.combined(with: AnyTransition.move(edge: configuration.showFromTop ? .top : .bottom)))
+            .transition(
+                AnyTransition.opacity.combined(
+                    with: AnyTransition.move(edge: configuration.showFromTop ? .top : .bottom)
+                )
+            )
         }
     }
 

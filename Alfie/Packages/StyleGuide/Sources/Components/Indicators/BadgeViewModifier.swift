@@ -31,6 +31,7 @@ public struct BadgeViewModifier: ViewModifier {
             content
                 .overlay(alignment: .topTrailing) {
                     if !helper.isIndicator {
+                        let badgeLabelsOffsetX = CGFloat(helper.badgeLabel.count * Constants.capsuleOffsetXFactor)
                         ZStack(alignment: .center) {
                             RoundedRectangle(cornerRadius: CornerRadius.full)
                                 .fill(Colors.secondary.red700)
@@ -39,23 +40,21 @@ public struct BadgeViewModifier: ViewModifier {
                                 .stroke(Colors.primary.white, lineWidth: Constants.borderLineWidth)
                                 .frame(height: Constants.badgeHeight)
                             Text.build(theme.font.tiny.normal(helper.badgeLabel))
-                                .foregroundColor(Colors.primary.white)
+                                .foregroundStyle(Colors.primary.white)
                                 .padding(.all, Constants.textPadding)
                         }
                         .frame(height: Constants.badgeHeight)
                         .frame(minWidth: Constants.badgeHeight)
                         .fixedSize(horizontal: true, vertical: false)
-                        .offset(x: (Constants.badgeHeight / 2) + CGFloat(helper.badgeLabel.count * Constants.capsuleOffsetXFactor), y: -((Constants.badgeHeight / 2)))
+                        .offset(x: (Constants.badgeHeight / 2) + badgeLabelsOffsetX, y: -((Constants.badgeHeight / 2)))
                     } else {
                         ZStack(alignment: .center) {
                             Circle()
                                 .fill(Colors.secondary.red700)
-                                .frame(width: Constants.indicatorWidth,
-                                       height: Constants.indicatorHeight)
+                                .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
                             RoundedRectangle(cornerRadius: CornerRadius.full)
                                 .stroke(Colors.primary.white, lineWidth: Constants.borderLineWidth)
-                                .frame(width: Constants.indicatorWidth,
-                                       height: Constants.indicatorHeight)
+                                .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
                         }
                         .offset(x: (Constants.indicatorWidth / 2), y: -((Constants.indicatorHeight / 2)))
                     }
