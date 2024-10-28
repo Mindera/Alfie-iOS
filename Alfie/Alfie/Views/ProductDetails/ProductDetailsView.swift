@@ -14,6 +14,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
+    @State private var showSizeSheet = false
     @State private var showDetailsSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var carouselSize: CGSize = .zero
@@ -33,6 +34,10 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     }
 
     private var canShowSizePickers: Bool {
+        viewModel.sizingSelectionConfiguration.items.count > 6
+    }
+
+    private var canShowSizeSelector: Bool {
         viewModel.sizingSelectionConfiguration.items.count >= 1
     }
 
@@ -139,6 +144,10 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
                     colorSheet
                         .presentationBackgroundInteraction(.enabled)
                 })
+                .sheet(isPresented: $showSizeSheet) {
+                    sizeSheet
+                        .presentationBackgroundInteraction(.enabled)
+                }
                 .fullScreenCover(isPresented: $isMediaFullScreen) {
                     fullscreenMediaCarousel
                 }
@@ -308,10 +317,20 @@ extension ProductDetailsView {
     }
 
     private var colorSheet: some View {
-        ProductDetailsColorSheet(viewModel: viewModel,
-                                 type: .color,
-                                 isPresented: $showColorSheet,
-                                 searchText: $colorSheetSearchText)
+        ProductDetailsColorAndSizeSheet(
+            viewModel: viewModel,
+            type: .color,
+            isPresented: $showColorSheet,
+            searchText: $colorSheetSearchText
+        )
+    }
+
+    private var sizeSheet: some View {
+        ProductDetailsColorAndSizeSheet(
+            viewModel: viewModel,
+            type: .size,
+            isPresented: $showSizeSheet
+        )
     }
 
     @ViewBuilder private var colorSelector: some View {
@@ -372,14 +391,36 @@ extension ProductDetailsView {
 
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
-            Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
-                .foregroundStyle(Colors.primary.mono900)
+            VStack(alignment: .leading) {
+                HStack {
+                    Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
+                        .foregroundStyle(Colors.primary.mono900)
+                    Button(action: {
+                        guard canShowSizePickers else {
+                            return
+                        }
+                        showSizeSheet = true
+                    }, label: {
+                        HStack {
+                            Text.build(theme.font.small.normal(viewModel.sizingSelectionConfiguration.selectedItem?.name.capitalized ?? ""))
+                                .foregroundStyle(Colors.primary.mono900)
+                            if canShowSizePickers {
+                                Icon.chevronDown.image
+                                    .resizable()
+                                    .frame(size: Constants.colorChevronSize)
+                            }
+                        }
+                    })
+                    .allowsHitTesting(canShowSizePickers)
+                    .tint(Colors.primary.mono900)
+                }
 
-            if canShowSizePickers {
-                SizingSelectorComponentView(
-                    configuration: viewModel.sizingSelectionConfiguration,
-                    layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
-                )
+                if canShowSizeSelector && !canShowSizePickers {
+                    SizingSelectorComponentView(
+                        configuration: viewModel.sizingSelectionConfiguration,
+                        layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
+                    )
+                }
             }
         }
     }

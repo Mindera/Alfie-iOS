@@ -65,5 +65,4 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
     func didTapAddToBag()
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
-    func sizingSwatches(filteredBy searchTerm: String) -> [SizingSwatch]
 }

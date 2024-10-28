@@ -158,14 +158,6 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             colorSelectionConfiguration.items.filter { $0.name.localizedCaseInsensitiveContains(searchTerm) }
         }
     }
-    
-    func sizingSwatches(filteredBy searchTerm: String) -> [SizingSwatch] {
-        if searchTerm.isEmpty {
-            sizingSelectionConfiguration.items
-        } else {
-            sizingSelectionConfiguration.items.filter { $0.name.localizedCaseInsensitiveContains(searchTerm) }
-        }
-    }
 
     // MARK: - Private
 
