@@ -11,25 +11,6 @@ public struct SizingSelectorComponentView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.space150) {
-            header
-
-            if configuration.items.count > 1 {
-                container
-            }
-        }
-    }
-
-    private var header: some View {
-        HStack(spacing: Spacing.space050) {
-            Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
-                .foregroundStyle(Colors.primary.mono400)
-            Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                .foregroundStyle(Colors.primary.mono900)
-        }
-    }
-
-    @ViewBuilder private var container: some View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch layoutConfiguration.arrangement {
         case .horizontal(let itemSpacing, let scrollable):

@@ -406,40 +406,21 @@ extension ProductDetailsView {
 
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
-            VStack(alignment: .leading) {
-                HStack {
-                    Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
-                        .foregroundStyle(Colors.primary.mono900)
-                    Button(action: {
-                        guard canShowSizePickers else {
-                            return
-                        }
-                        showSizeSheet = true
-                    }, label: {
-                        HStack {
-                            Text.build(
-                                theme.font.small.normal(
-                                    viewModel.sizingSelectionConfiguration.selectedItem?.name.capitalized ?? ""
-                                )
-                            )
-                                .foregroundStyle(Colors.primary.mono900)
-                            if canShowSizePickers {
-                                Icon.chevronDown.image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(size: Constants.colorChevronSize)
-                            }
-                        }
-                    })
-                    .allowsHitTesting(canShowSizePickers)
-                    .tint(Colors.primary.mono900)
-                }
-
-                if canShowSizeSelector && !canShowSizePickers {
-                    SizingSelectorComponentView(
+            VStack(alignment: .leading, spacing: Spacing.space150) {
+                if canShowSizeSelector {
+                    SizingSelectorHeaderView(
                         configuration: viewModel.sizingSelectionConfiguration,
-                        layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
-                    )
+                        isExpandable: canShowSizePickers
+                    ) {
+                        showSizeSheet = true
+                    }
+
+                    if !canShowSizePickers {
+                        SizingSelectorComponentView(
+                            configuration: viewModel.sizingSelectionConfiguration,
+                            layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
+                        )
+                    }
                 }
             }
         }

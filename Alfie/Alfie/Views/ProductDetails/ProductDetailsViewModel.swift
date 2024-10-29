@@ -252,7 +252,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             selectedSwatch = sizingSwatches.first { $0.id == selectedVariant.size?.id }
         }
 
-        sizingSelectionConfiguration = .init(selectedTitle: "", items: sizingSwatches, selectedItem: selectedSwatch)
+        sizingSelectionConfiguration = .init(
+            selectedTitle: LocalizableProductDetails.$size + ":",
+            items: sizingSwatches,
+            selectedItem: selectedSwatch
+        )
     }
 
     private func buildSizingSwatches(product: Product, selectedVariant: Product.Variant?) -> [SizingSwatch] {
