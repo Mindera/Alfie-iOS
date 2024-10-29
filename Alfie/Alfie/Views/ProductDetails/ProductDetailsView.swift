@@ -341,34 +341,14 @@ extension ProductDetailsView {
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             if hasSpaceForSizeSelector {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text.build(theme.font.small.bold(LocalizableProductDetails.$color + ":"))
-                            .foregroundStyle(Colors.primary.mono900)
-                        Button(action: {
-                            guard canShowColorPickers else {
-                                return
-                            }
-                            showColorSheet = true
-                        }, label: {
-                            HStack {
-                                Text.build(
-                                    theme.font.small.normal(
-                                        viewModel.colorSelectionConfiguration.selectedItem?.name.capitalized ?? ""
-                                    )
-                                )
-                                    .foregroundStyle(Colors.primary.mono900)
-                                if canShowColorPickers {
-                                    Icon.chevronDown.image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(size: Constants.colorChevronSize)
-                                }
-                            }
-                        })
-                        .allowsHitTesting(canShowColorPickers)
-                        .tint(Colors.primary.mono900)
+                VStack(alignment: .leading, spacing: Spacing.space150) {
+                    ColorAndSizingSelectorHeaderView(
+                        configuration: viewModel.colorSelectionConfiguration,
+                        isExpandable: canShowColorPickers
+                    ) {
+                        showColorSheet = true
                     }
+
                     if canShowColorPickers {
                         ColorSelectorComponentView(
                             configuration: viewModel.colorSelectionConfiguration,
@@ -408,7 +388,7 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: Spacing.space150) {
                 if canShowSizeSelector {
-                    SizingSelectorHeaderView(
+                    ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.sizingSelectionConfiguration,
                         isExpandable: canShowSizePickers
                     ) {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct SizingSwatch: Equatable, Identifiable {
+public struct SizingSwatch: ColorAndSizingSwatchProtocol {
     public let id: String
     public let name: String
     public let state: ItemState

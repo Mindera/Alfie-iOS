@@ -201,7 +201,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             selectedSwatch = colorSwatches.first { $0.id == selectedVariant.colour?.id }
         }
 
-        colorSelectionConfiguration = .init(selectedTitle: "", items: colorSwatches, selectedItem: selectedSwatch)
+        colorSelectionConfiguration = .init(
+            selectedTitle: LocalizableProductDetails.$color + ":",
+            items: colorSwatches,
+            selectedItem: selectedSwatch
+        )
         colorSelectionSubscription = colorSelectionConfiguration.$selectedItem
             .receive(on: DispatchQueue.main)
             .dropFirst()

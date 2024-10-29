@@ -1,13 +1,13 @@
 import Models
 import SwiftUI
 
-public struct SizingSelectorHeaderView: View {
+public struct ColorAndSizingSelectorHeaderView<Configuration: ColorSizingSelectorConfigurationProtocol>: View {
     var action: (() -> Void)?
 
-    @ObservedObject private var configuration: SizingSelectorConfiguration
+    @ObservedObject private var configuration: Configuration
     private let isExpandable: Bool
 
-    public init(configuration: SizingSelectorConfiguration, isExpandable: Bool, action: (() -> Void)? = nil) {
+    public init(configuration: Configuration, isExpandable: Bool, action: (() -> Void)? = nil) {
         self.configuration = configuration
         self.isExpandable = isExpandable
         self.action = action

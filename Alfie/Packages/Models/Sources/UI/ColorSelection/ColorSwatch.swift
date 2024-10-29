@@ -25,7 +25,7 @@ public enum SwatchType: Equatable {
 
 // MARK: - ColorSwatch
 
-public struct ColorSwatch: Equatable, Identifiable {
+public struct ColorSwatch: ColorAndSizingSwatchProtocol {
     public let id: String
     public let name: String
     public let type: SwatchType

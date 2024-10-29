@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - ColorSelectorConfiguration
 
-public class ColorSelectorConfiguration: ObservableObject {
+public class ColorSelectorConfiguration: ColorSizingSelectorConfigurationProtocol {
     /// Title to display before the currently selected color name
     public let selectedTitle: String
     /// Color items to display as swatches in the banner. Won't be shown if empty or containing a single color

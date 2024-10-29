@@ -23,21 +23,9 @@ public struct ColorSelectorComponentView: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: Spacing.space150) {
-            if !layoutConfiguration.hideSelectionTitle {
-                header
-            }
             if !layoutConfiguration.hideOnSingleColor || configuration.items.count > 1 {
                 container
             }
-        }
-    }
-
-    private var header: some View {
-        HStack(spacing: Spacing.space050) {
-            Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
-                .foregroundStyle(Colors.primary.mono400)
-            Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                .foregroundStyle(Colors.primary.mono900)
         }
     }
 
