@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - ColorSwatchView
 
-public struct ColorSwatchView: View {
+public struct ColorSwatchView<Swatch: ColorSwatchProtocol>: View {
     public enum SwatchSize {
         /// 24pts
         case small
@@ -14,23 +14,14 @@ public struct ColorSwatchView: View {
         case large
     }
 
-    private let item: ColorSwatch
+    private let item: Swatch
     private let isSelected: Bool
     private let swatchSize: SwatchSize
 
-    public init(item: ColorSwatch, swatchSize: SwatchSize, isSelected: Bool) {
+    public init(item: Swatch, swatchSize: SwatchSize, isSelected: Bool) {
         self.item = item
         self.swatchSize = swatchSize
         self.isSelected = isSelected
-    }
-
-    private enum Constants {
-        static let borderInset: CGFloat = 3
-        static let borderLineWidth: CGFloat = 1
-        static let swatchSmallSize: CGFloat = 24
-        static let swatchNormalSize: CGFloat = 32
-        static let swatchLargeSize: CGFloat = 44
-        static let disabledOpacity: CGFloat = 0.75
     }
 
     public var body: some View {
@@ -99,15 +90,28 @@ public struct ColorSwatchView: View {
     }
 }
 
+private enum Constants {
+    static let borderInset: CGFloat = 3
+    static let borderLineWidth: CGFloat = 1
+    static let swatchSmallSize: CGFloat = 24
+    static let swatchNormalSize: CGFloat = 32
+    static let swatchLargeSize: CGFloat = 44
+    static let disabledOpacity: CGFloat = 0.75
+}
+
 @available(iOS 17, *)
 #Preview(traits: .sizeThatFitsLayout) {
     VStack {
-        ColorSwatchView(item: .init(name: "Default", type: .color(.red)), swatchSize: .normal, isSelected: false)
-
-        ColorSwatchView(item: .init(name: "Selected", type: .color(.green)), swatchSize: .normal, isSelected: true)
+        ColorSwatchView(item: ColorSwatch(name: "Default", type: .color(.red)), swatchSize: .normal, isSelected: false)
 
         ColorSwatchView(
-            item: .init(name: "Selected", type: .color(.green), isDisabled: true),
+            item: ColorSwatch(name: "Selected", type: .color(.green)),
+            swatchSize: .normal,
+            isSelected: true
+        )
+
+        ColorSwatchView(
+            item: ColorSwatch(name: "Selected", type: .color(.green), isDisabled: true),
             swatchSize: .normal,
             isSelected: true
         )

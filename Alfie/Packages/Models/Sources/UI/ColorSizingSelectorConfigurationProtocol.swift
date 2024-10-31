@@ -7,5 +7,5 @@ public protocol ColorSizingSelectorConfigurationProtocol: ObservableObject {
     /// Items to display as swatches in the banner. Won't be shown if empty or containing a single item
     var items: [Swatch] { get }
     /// The currently selected item, if `items` is not empty, then a item with the same name must exist there
-    var selectedItem: Swatch? { get }
+    var selectedItem: Swatch? { get set }
 }

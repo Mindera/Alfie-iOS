@@ -1,17 +1,17 @@
 import Models
 import SwiftUI
 
-public struct ColorSelectorComponentView: View {
-    @ObservedObject private var configuration: ColorSelectorConfiguration
+public struct ColorSelectorComponentView<Configuration: ColorSelectorProtocol>: View {
+    @ObservedObject private var configuration: Configuration
     private let layoutConfiguration: SwatchLayoutConfiguration
-    private let swatchesSize: ColorSwatchView.SwatchSize
+    private let swatchesSize: ColorSwatchView<ColorSwatch>.SwatchSize
     private var frameSize: Binding<CGSize>?
 
     /// - Parameters:
     ///   - size: ReadOnly
     public init(
-        configuration: ColorSelectorConfiguration,
-        swatchesSize: ColorSwatchView.SwatchSize = .large,
+        configuration: Configuration,
+        swatchesSize: ColorSwatchView<ColorSwatch>.SwatchSize = .large,
         layoutConfiguration: SwatchLayoutConfiguration,
         frameSize: Binding<CGSize>? = nil
     ) {
@@ -72,17 +72,21 @@ public struct ColorSelectorComponentView: View {
     @ViewBuilder
     private func swatches() -> some View {
         ForEach(configuration.items) { item in
-            ColorSwatchView(item: item, swatchSize: swatchesSize, isSelected: configuration.selectedItem == item)
-                .onTapGesture {
-                    configuration.selectedItem = item
-                }
+            ColorSwatchView(
+                item: ColorSwatch(id: item.id, name: item.name, type: item.type, isDisabled: item.isDisabled),
+                swatchSize: swatchesSize,
+                isSelected: configuration.selectedItem == item
+            )
+            .onTapGesture {
+                configuration.selectedItem = item
+            }
         }
     }
 }
 
 #Preview("Grid") {
     ColorSelectorComponentView(
-        configuration: .init(
+        configuration: ColorSelectorConfiguration(
             selectedTitle: "Color:",
             items: [
                 .init(name: "Black", type: .color(Colors.primary.black)),
@@ -99,7 +103,7 @@ public struct ColorSelectorComponentView: View {
 
 #Preview("Grid - No title") {
     ColorSelectorComponentView(
-        configuration: .init(
+        configuration: ColorSelectorConfiguration(
             selectedTitle: "Color:",
             items: [
                 .init(name: "Black", type: .color(Colors.primary.black)),
@@ -116,7 +120,7 @@ public struct ColorSelectorComponentView: View {
 
 #Preview("Chips") {
     ColorSelectorComponentView(
-        configuration: .init(
+        configuration: ColorSelectorConfiguration(
             selectedTitle: "Color:",
             items: [
                 .init(name: "Black", type: .color(Colors.primary.black)),
@@ -135,7 +139,7 @@ public struct ColorSelectorComponentView: View {
 
 #Preview("Scrollable Single Row") {
     ColorSelectorComponentView(
-        configuration: .init(
+        configuration: ColorSelectorConfiguration(
             selectedTitle: "Color:",
             items: [
                 .init(name: "Black", type: .color(Colors.primary.black)),

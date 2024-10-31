@@ -2,6 +2,13 @@ import SwiftUI
 
 // MARK: - SwatchType
 
+public typealias ColorSwatchProtocol = ColorAndSizingSwatchProtocol & ColorProtocol
+
+public protocol ColorProtocol {
+    var type: SwatchType { get }
+    var isDisabled: Bool { get }
+}
+
 public enum SwatchType: Equatable {
     case image(Image)
     case color(Color)
@@ -25,7 +32,7 @@ public enum SwatchType: Equatable {
 
 // MARK: - ColorSwatch
 
-public struct ColorSwatch: ColorAndSizingSwatchProtocol {
+public struct ColorSwatch: ColorSwatchProtocol {
     public let id: String
     public let name: String
     public let type: SwatchType

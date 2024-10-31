@@ -2,7 +2,7 @@ import Combine
 import Foundation
 import Models
 
-public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
+public class MockProductDetailsViewModel<ColorSelector: ColorSelectorProtocol, SizingSelector: SizingSelectorProtocol>: ProductDetailsViewModelProtocol {
     public var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
 
     public var productId: String = ""
@@ -10,8 +10,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productHasStock: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
-    public var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
-    public var sizingSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
+    public var colorSelectionConfiguration: ColorSelector
+    public var sizingSelectionConfiguration: SizingSelector
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
@@ -24,7 +24,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 productName: String = "",
                 productImageUrls: [URL] = [],
                 productDescription: String = "",
-                colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: []),
+                colorSelectionConfiguration: ColorSelector = ColorSelectorConfiguration(items: []),
+                sizingSelectionConfiguration: SizingSelector = SizingSelectorConfiguration(items: []),
                 complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = [],
                 onShouldShowLoadingForSectionCalled: ((ProductDetailsSection) -> Bool)? = nil,
                 onShouldShowSectionCalled: ((ProductDetailsSection) -> Bool)? = nil) {
@@ -35,6 +36,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.productImageUrls = productImageUrls
         self.productDescription = productDescription
         self.colorSelectionConfiguration = colorSelectionConfiguration
+        self.sizingSelectionConfiguration = sizingSelectionConfiguration
         self.complementaryInfoToShow = complementaryInfoToShow
         self.onShouldShowLoadingForSectionCalled = onShouldShowLoadingForSectionCalled
         self.onShouldShowSectionCalled = onShouldShowSectionCalled
@@ -65,13 +67,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         onDidTapAddToBagCalled?()
     }
 
-    public var onColorSwatchesFilteredByCalled: ((String) -> [Models.ColorSwatch])?
-    public func colorSwatches(filteredBy searchTerm: String) -> [Models.ColorSwatch] {
+    public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSelector.Swatch])?
+    public func colorSwatches(filteredBy searchTerm: String) -> [ColorSelector.Swatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
-    }
-    
-    public var onSizingSwatchesFilteredByCalled: ((String) -> [Models.SizingSwatch])?
-    public func sizingSwatches(filteredBy searchTerm: String) -> [Models.SizingSwatch] {
-        onSizingSwatchesFilteredByCalled?(searchTerm) ?? sizingSelectionConfiguration.items
     }
 }
