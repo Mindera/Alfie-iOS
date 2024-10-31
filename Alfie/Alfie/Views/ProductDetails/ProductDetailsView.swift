@@ -40,7 +40,11 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     }
 
     private var canShowSizeSelector: Bool {
-        viewModel.sizingSelectionConfiguration.items.count >= 1
+        viewModel.sizingSelectionConfiguration.items.count > 1
+    }
+
+    private var isOneSize: Bool {
+        viewModel.sizingSelectionConfiguration.items.count == 1
     }
 
     // TODO: remove showFailureState (created for snapshot purposes)
@@ -401,8 +405,23 @@ extension ProductDetailsView {
                             layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
                         )
                     }
+                } else {
+                    singleSizeView
                 }
             }
+            .shimmering(while: shimmeringBinding(for: .sizeSelector), animateOnStateTransition: false)
+        }
+    }
+
+    @ViewBuilder private var singleSizeView: some View {
+        let sizeText: String = isOneSize
+            ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
+            : LocalizableProductDetails.$oneSize
+        HStack {
+            Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
+                .foregroundStyle(Colors.primary.mono900)
+            Text.build(theme.font.small.normal(sizeText))
+                .foregroundStyle(Colors.primary.mono900)
         }
     }
 
