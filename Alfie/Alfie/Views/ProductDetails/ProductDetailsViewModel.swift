@@ -13,6 +13,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     // In case we already have a full or partial product to show while fetching
     private let baseProduct: Product?
     private var colorSelectionSubscription: AnyCancellable?
+    private var sizingSelectionSubscription: AnyCancellable?
 
     @Published private(set) var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
     private(set) var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
@@ -92,8 +93,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.dependencies = dependencies
 
         if let baseProduct {
-            buildColorSelectionConfiguration(product: baseProduct, selectedVariant: baseProduct.defaultVariant)
-            buildSizingSelectionConfiguration(product: baseProduct, selectedVariant: baseProduct.defaultVariant)
+            buildColorAndSizingSelectionConfigurations(
+                product: baseProduct,
+                selectedVariant: baseProduct.defaultVariant
+            )
         }
     }
 
@@ -190,8 +193,13 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        buildColorSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
+        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: product.defaultVariant)
         state = .success(.init(product: product, selectedVariant: product.defaultVariant))
+    }
+
+    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant?) {
+        buildColorSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
+        buildSizingSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
     }
 
     private func buildColorSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
@@ -252,6 +260,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     private func buildSizingSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
+        sizingSelectionSubscription?.cancel()
+        
         let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
 
         var selectedSwatch: SizingSwatch?
@@ -264,6 +274,15 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             items: sizingSwatches,
             selectedItem: selectedSwatch
         )
+        sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
+            .receive(on: DispatchQueue.main)
+            .dropFirst()
+            .sink { [weak self] sizingSwatch in
+                guard let self, let sizingSwatch else {
+                    return
+                }
+                self.didSelect(sizingSwatch: sizingSwatch)
+            }
     }
 
     private func buildSizingSwatches(product: Product, selectedVariant: Product.Variant?) -> [SizingSwatch] {
@@ -302,9 +321,28 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        // Later when we also have sizes we need to match the variant with both the color and size
-        guard let variant = product.variants.first(where: { $0.colour?.id == colorSwatch.id }) else {
+        guard let variant = product.variants.first(
+            where: { $0.colour?.id == colorSwatch.id && $0.size?.id == selectedVariant?.size?.id }
+        )
+        else {
             log("Unexpected data inconsistency: tried to select color \(colorSwatch.id) on product \(productId) but no variant exists with that color, ignoring selection")
+            return
+        }
+
+        state = .success(.init(product: product, selectedVariant: variant))
+    }
+
+    private func didSelect(sizingSwatch: SizingSwatch) {
+        guard let product else {
+            logError("Tried to select size on inexistent product")
+            return
+        }
+
+        guard let variant = product.variants.first(
+            where: { $0.size?.id == sizingSwatch.id && $0.colour?.id == selectedVariant?.colour?.id }
+        )
+        else {
+            log("Unexpected data inconsistency: tried to select size \(sizingSwatch.id) on product \(productId) but no variant exists with that size, ignoring selection")
             return
         }
 
