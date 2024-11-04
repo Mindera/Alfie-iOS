@@ -261,7 +261,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     private func buildSizingSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
         sizingSelectionSubscription?.cancel()
-        
+
         let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
 
         var selectedSwatch: SizingSwatch?
