@@ -162,6 +162,26 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEqual(sut.productDescription, product.longDescription)
     }
+    
+    func test_price_type_is_nil_when_no_product_is_missing() {
+        initViewModel()
+        XCTAssertNil(sut.priceType)
+    }
+    
+    func test_price_type_is_not_nil_with_sale_product() {
+        initViewModel(product: Product.blazer)
+        XCTAssertEqual(sut.priceType, .sale(fullPrice: "$495.00", finalPrice: "$299.00"))
+    }
+    
+    func test_price_type_is_not_nil_with_range_price_product() {
+        initViewModel(product: Product.hat)
+        XCTAssertEqual(sut.priceType, .range(lowerBound: "$750.00", upperBound: "$850.00", separator: "-"))
+    }
+    
+    func test_price_type_is_not_nil_with_default_price_product() {
+        initViewModel(product: Product.necklace)
+        XCTAssertEqual(sut.priceType, .default(price: "$279.00"))
+    }
 
     // MARK: - Product fetch
 
