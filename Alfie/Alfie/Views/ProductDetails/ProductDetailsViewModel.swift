@@ -87,6 +87,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         productImageUrls.count == 1
     }
 
+    var priceType: PriceType? {
+        guard let product else { return nil }
+        return PriceType(from: product)
+    }
+
     init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {
         self.productId = productId
         baseProduct = product

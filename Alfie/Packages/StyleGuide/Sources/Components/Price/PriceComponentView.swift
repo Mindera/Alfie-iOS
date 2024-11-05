@@ -1,13 +1,7 @@
 import Models
 import SwiftUI
 
-public enum PriceType: Hashable {
-    case `default`(price: String)
-    case sale(fullPrice: String, finalPrice: String)
-    case range(lowerBound: String, upperBound: String, separator: String)
-}
-
-extension PriceType {
+public extension PriceType {
     init(from product: Product) {
         if let range = product.priceRange {
             if let high = range.high {

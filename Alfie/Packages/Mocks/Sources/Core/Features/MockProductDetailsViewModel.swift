@@ -17,6 +17,7 @@ public class MockProductDetailsViewModel<ColorSelector: ColorSelectorProtocol, S
     public var shareConfiguration: ShareConfiguration?
     public var shouldShowMediaPaginatedControl = true
     public var hasSingleImage: Bool = false
+    public var priceType: PriceType? = nil
 
     public init(state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading,
                 productId: String = "",
