@@ -15,26 +15,29 @@ public struct ColorAndSizingSelectorHeaderView<Configuration: ColorSizingSelecto
 
     public var body: some View {
         HStack {
-            Button(action: {
-                guard isExpandable else {
-                    return
-                }
-                action?()
-            }, label: {
-                HStack(spacing: Spacing.space050) {
-                    Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
-                        .foregroundStyle(Colors.primary.mono400)
-                    Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                        .foregroundStyle(Colors.primary.mono900)
+            Button(
+                action: {
+                    guard isExpandable else {
+                        return
+                    }
+                    action?()
+                },
+                label: {
+                    HStack(spacing: Spacing.space050) {
+                        Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
+                            .foregroundStyle(Colors.primary.mono400)
+                        Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
+                            .foregroundStyle(Colors.primary.mono900)
 
-                    if isExpandable {
-                        Icon.chevronDown.image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(size: Constants.chevronSize)
+                        if isExpandable {
+                            Icon.chevronDown.image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(size: Constants.chevronSize)
+                        }
                     }
                 }
-            })
+            )
             .allowsHitTesting(isExpandable)
             .tint(Colors.primary.mono900)
         }
