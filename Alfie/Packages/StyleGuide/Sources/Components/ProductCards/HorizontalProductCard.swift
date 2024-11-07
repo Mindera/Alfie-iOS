@@ -42,7 +42,7 @@ public struct HorizontalProductCard: View {
         } else {
             ""
         }
-        self.priceType = PriceType(from: product)
+        self.priceType = product.priceType
         self.colorTitle = colorTitle
         self.sizeTitle = sizeTitle
     }

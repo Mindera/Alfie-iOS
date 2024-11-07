@@ -43,7 +43,7 @@ public enum ProductDetailsComplementaryInfoType {
 
 // MARK: - PriceType
 
-public enum PriceType: Hashable {
+public enum PriceType {
     case `default`(price: String)
     case sale(fullPrice: String, finalPrice: String)
     case range(lowerBound: String, upperBound: String, separator: String)

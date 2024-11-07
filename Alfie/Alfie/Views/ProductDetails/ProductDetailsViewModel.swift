@@ -88,8 +88,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     var priceType: PriceType? {
-        guard let product else { return nil }
-        return PriceType(from: product)
+        product?.priceType
     }
 
     init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {

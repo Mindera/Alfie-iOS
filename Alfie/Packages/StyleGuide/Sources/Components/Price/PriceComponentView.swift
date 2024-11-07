@@ -2,27 +2,6 @@ import Models
 import SwiftUI
 
 public extension PriceType {
-    init(from product: Product) {
-        if let range = product.priceRange {
-            if let high = range.high {
-                self = .range(lowerBound: range.low.amountFormatted, upperBound: high.amountFormatted, separator: "-")
-            } else {
-                self = .default(price: range.low.amountFormatted)
-            }
-        } else {
-            if let salePreviousPrice = product.defaultVariant.price.was {
-                self = .sale(
-                    fullPrice: salePreviousPrice.amountFormatted,
-                    finalPrice: product.defaultVariant.price.amount.amountFormatted
-                )
-            } else {
-                self = .default(price: product.defaultVariant.price.amount.amountFormatted)
-            }
-        }
-    }
-}
-
-public extension PriceType {
     static func formattedDefault(_ defaultPrice: Double, currencyCode: String) -> PriceType {
         .default(price: defaultPrice.formatted(.currency(code: currencyCode)))
     }
