@@ -1,9 +1,6 @@
 import SwiftUI
 
-public protocol SizingSelectorProtocol: ColorSizingSelectorConfigurationProtocol where Swatch: SizingSwatchProtocol {
-}
-
-public class SizingSelectorConfiguration: SizingSelectorProtocol {
+public class SizingSelectorConfiguration: ColorSizingSelectorConfigurationProtocol {
     /// Title to display before the currently selected size name
     public let selectedTitle: String
     /// Sizing items to display as swatches in the banner. Won't be shown if empty or containing a single size

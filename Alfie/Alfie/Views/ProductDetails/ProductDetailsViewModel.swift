@@ -6,9 +6,6 @@ import Models
 import StyleGuide
 
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
-    typealias ColorSelector = ColorSelectorConfiguration
-    typealias SizingSelector = SizingSelectorConfiguration
-
     private let dependencies: ProductDetailsDependencyContainerProtocol
     // In case we already have a full or partial product to show while fetching
     private let baseProduct: Product?

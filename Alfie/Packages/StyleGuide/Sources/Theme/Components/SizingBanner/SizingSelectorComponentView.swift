@@ -1,11 +1,11 @@
 import Models
 import SwiftUI
 
-public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>: View {
-    @ObservedObject private var configuration: Configuration
+public struct SizingSelectorComponentView: View {
+    @ObservedObject private var configuration: SizingSelectorConfiguration
     private let layoutConfiguration: SwatchLayoutConfiguration
 
-    public init(configuration: Configuration, layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: SizingSelectorConfiguration, layoutConfiguration: SwatchLayoutConfiguration) {
         self.configuration = configuration
         self.layoutConfiguration = layoutConfiguration
     }
@@ -62,17 +62,17 @@ public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>
 
 #Preview("Grid") {
     SizingSelectorComponentView(
-        configuration: SizingSelectorConfiguration(
+        configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(name: "XS", state: .available),
-                .init(name: "S", state: .outOfStock),
-                .init(name: "M", state: .available),
-                .init(name: "L", state: .available),
-                .init(name: "XL", state: .unavailable),
-                .init(name: "XXL", state: .outOfStock),
-                .init(name: "XXXL", state: .unavailable),
-                .init(name: "XXXXL", state: .available),
+                .init(id: UUID().uuidString, name: "XS", state: .available),
+                .init(id: UUID().uuidString, name: "S", state: .outOfStock),
+                .init(id: UUID().uuidString, name: "M", state: .available),
+                .init(id: UUID().uuidString, name: "L", state: .available),
+                .init(id: UUID().uuidString, name: "XL", state: .unavailable),
+                .init(id: UUID().uuidString, name: "XXL", state: .outOfStock),
+                .init(id: UUID().uuidString, name: "XXXL", state: .unavailable),
+                .init(id: UUID().uuidString, name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
@@ -81,17 +81,17 @@ public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>
 
 #Preview("Chips") {
     SizingSelectorComponentView(
-        configuration: SizingSelectorConfiguration(
+        configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(name: "XS", state: .available),
-                .init(name: "S", state: .outOfStock),
-                .init(name: "M", state: .available),
-                .init(name: "L", state: .available),
-                .init(name: "XL", state: .unavailable),
-                .init(name: "XXL", state: .outOfStock),
-                .init(name: "XXXL", state: .unavailable),
-                .init(name: "XXXXL", state: .available),
+                .init(id: UUID().uuidString, name: "XS", state: .available),
+                .init(id: UUID().uuidString, name: "S", state: .outOfStock),
+                .init(id: UUID().uuidString, name: "M", state: .available),
+                .init(id: UUID().uuidString, name: "L", state: .available),
+                .init(id: UUID().uuidString, name: "XL", state: .unavailable),
+                .init(id: UUID().uuidString, name: "XXL", state: .outOfStock),
+                .init(id: UUID().uuidString, name: "XXXL", state: .unavailable),
+                .init(id: UUID().uuidString, name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(
@@ -102,17 +102,17 @@ public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>
 
 #Preview("Scrollable Single Row") {
     SizingSelectorComponentView(
-        configuration: SizingSelectorConfiguration(
+        configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(name: "XS", state: .available),
-                .init(name: "S", state: .outOfStock),
-                .init(name: "M", state: .available),
-                .init(name: "L", state: .available),
-                .init(name: "XL", state: .unavailable),
-                .init(name: "XXL", state: .outOfStock),
-                .init(name: "XXXL", state: .unavailable),
-                .init(name: "XXXXL", state: .available),
+                .init(id: UUID().uuidString, name: "XS", state: .available),
+                .init(id: UUID().uuidString, name: "S", state: .outOfStock),
+                .init(id: UUID().uuidString, name: "M", state: .available),
+                .init(id: UUID().uuidString, name: "L", state: .available),
+                .init(id: UUID().uuidString, name: "XL", state: .unavailable),
+                .init(id: UUID().uuidString, name: "XXL", state: .outOfStock),
+                .init(id: UUID().uuidString, name: "XXXL", state: .unavailable),
+                .init(id: UUID().uuidString, name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))

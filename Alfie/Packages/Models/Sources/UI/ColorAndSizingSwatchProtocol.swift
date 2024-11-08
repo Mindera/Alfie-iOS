@@ -1,4 +1,3 @@
-public protocol ColorAndSizingSwatchProtocol: Equatable, Identifiable {
-    var id: String { get }
+public protocol ColorAndSizingSwatchProtocol: Equatable, Identifiable where ID == String {
     var name: String { get }
 }
