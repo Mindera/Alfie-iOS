@@ -31,7 +31,7 @@ public struct ColorSwatch: ColorAndSizingSwatchProtocol {
     public let type: SwatchType
     public let isDisabled: Bool
 
-    public init(id: String = UUID().uuidString, name: String, type: SwatchType, isDisabled: Bool = false) {
+    public init(id: String, name: String, type: SwatchType, isDisabled: Bool = false) {
         self.id = id
         self.name = name
         self.type = type

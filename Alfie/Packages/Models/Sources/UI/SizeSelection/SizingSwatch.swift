@@ -11,7 +11,7 @@ public struct SizingSwatch: ColorAndSizingSwatchProtocol {
         case outOfStock
     }
 
-    public init(id: String = UUID().uuidString, name: String, state: ItemState) {
+    public init(id: String, name: String, state: ItemState) {
         self.id = id
         self.name = name
         self.state = state

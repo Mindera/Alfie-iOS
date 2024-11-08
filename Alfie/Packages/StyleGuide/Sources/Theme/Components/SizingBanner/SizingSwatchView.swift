@@ -60,12 +60,18 @@ private enum Constants {
 @available(iOS 17, *)
 #Preview(traits: .sizeThatFitsLayout) {
     VStack {
-        SizingSwatchView(item: .init(name: "Default", state: .available), isSelected: false)
+        SizingSwatchView(item: .init(id: UUID().uuidString, name: "Default", state: .available), isSelected: false)
 
-        SizingSwatchView(item: .init(name: "Selected", state: .available), isSelected: true)
+        SizingSwatchView(item: .init(id: UUID().uuidString, name: "Selected", state: .available), isSelected: true)
 
-        SizingSwatchView(item: .init(name: "Unavailable", state: .unavailable), isSelected: false)
+        SizingSwatchView(
+            item: .init(id: UUID().uuidString, name: "Unavailable", state: .unavailable),
+            isSelected: false
+        )
 
-        SizingSwatchView(item: .init(name: "Out of Stock", state: .outOfStock), isSelected: false)
+        SizingSwatchView(
+            item: .init(id: UUID().uuidString, name: "Out of Stock", state: .outOfStock),
+            isSelected: false
+        )
     }
 }
