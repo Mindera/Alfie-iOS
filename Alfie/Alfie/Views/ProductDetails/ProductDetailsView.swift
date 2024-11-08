@@ -546,7 +546,7 @@ private enum Constants {
                 URL.fromString("https://www.alfieproj.com/productimages/thumb/2/2666503_22841458_13891527.jpg"),
             ],
             productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
-            colorSelectionConfiguration: ColorSelectorConfiguration(
+            colorSelectionConfiguration: .init(
                 items: [
                     .init(name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg"))),
                     .init(name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg"))),

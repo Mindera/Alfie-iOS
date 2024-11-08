@@ -46,14 +46,11 @@ struct ColorBannerDemoView: View {
                 Spacer()
                 section(title: "Color Swatches - Scrollable") {
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(selectedTitle: Self.selectedTitle, items: Self.items),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
                     )
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.itemsSmall
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
                         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
                     )
                 }
@@ -62,7 +59,7 @@ struct ColorBannerDemoView: View {
 
                 section(title: "Color Swatches - Chips") {
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(selectedTitle: Self.selectedTitle, items: Self.items),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(
                             arrangement: .chips(
                                 itemHorizontalSpacing: Spacing.space100, itemVerticalSpacing: Spacing.space100
@@ -70,10 +67,7 @@ struct ColorBannerDemoView: View {
                         )
                     )
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.itemsSmall
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
                         layoutConfiguration: .init(
                             arrangement: .chips(
                                 itemHorizontalSpacing: Spacing.space100, itemVerticalSpacing: Spacing.space100
@@ -86,14 +80,11 @@ struct ColorBannerDemoView: View {
 
                 section(title: "Color Swatches - Grid") {
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(selectedTitle: Self.selectedTitle, items: Self.items),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
                     )
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.itemsSmall
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
                         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
                     )
                 }
@@ -102,10 +93,7 @@ struct ColorBannerDemoView: View {
 
                 section(title: "Image Swatches - Grid") {
                     ColorSelectorComponentView(
-                        configuration: ColorSelectorConfiguration(
-                            selectedTitle: Self.selectedImageTitle,
-                            items: Self.itemsImage
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedImageTitle, items: Self.itemsImage),
                         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
                     )
                 }

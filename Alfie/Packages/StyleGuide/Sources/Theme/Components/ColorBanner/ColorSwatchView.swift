@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - ColorSwatchView
 
-public struct ColorSwatchView<Swatch: ColorSwatchProtocol>: View {
+public struct ColorSwatchView: View {
     public enum SwatchSize {
         /// 24pts
         case small
@@ -14,11 +14,11 @@ public struct ColorSwatchView<Swatch: ColorSwatchProtocol>: View {
         case large
     }
 
-    private let item: Swatch
+    private let item: ColorSwatch
     private let isSelected: Bool
     private let swatchSize: SwatchSize
 
-    public init(item: Swatch, swatchSize: SwatchSize, isSelected: Bool) {
+    public init(item: ColorSwatch, swatchSize: SwatchSize, isSelected: Bool) {
         self.item = item
         self.swatchSize = swatchSize
         self.isSelected = isSelected
@@ -102,16 +102,16 @@ private enum Constants {
 @available(iOS 17, *)
 #Preview(traits: .sizeThatFitsLayout) {
     VStack {
-        ColorSwatchView(item: ColorSwatch(name: "Default", type: .color(.red)), swatchSize: .normal, isSelected: false)
+        ColorSwatchView(item: .init(name: "Default", type: .color(.red)), swatchSize: .normal, isSelected: false)
 
         ColorSwatchView(
-            item: ColorSwatch(name: "Selected", type: .color(.green)),
+            item: .init(name: "Selected", type: .color(.green)),
             swatchSize: .normal,
             isSelected: true
         )
 
         ColorSwatchView(
-            item: ColorSwatch(name: "Selected", type: .color(.green), isDisabled: true),
+            item: .init(name: "Selected", type: .color(.green), isDisabled: true),
             swatchSize: .normal,
             isSelected: true
         )

@@ -19,10 +19,7 @@ struct SizingBannerDemoView: View {
             VStack(spacing: Spacing.space250) {
                 section(title: "Sizing Swatches - Scrollable") {
                     SizingSelectorComponentView(
-                        configuration: SizingSelectorConfiguration(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.items
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
                     )
                 }
@@ -31,10 +28,7 @@ struct SizingBannerDemoView: View {
 
                 section(title: "Sizing Swatches - Chips") {
                     SizingSelectorComponentView(
-                        configuration: SizingSelectorConfiguration(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.items
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(
                             arrangement: .chips(
                                 itemHorizontalSpacing: Spacing.space100,
@@ -48,10 +42,7 @@ struct SizingBannerDemoView: View {
 
                 section(title: "Sizing Swatches - Grid") {
                     SizingSelectorComponentView(
-                        configuration: SizingSelectorConfiguration(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.items
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
                     )
                 }

@@ -1,21 +1,15 @@
 import SwiftUI
 
-public typealias SizingSwatchProtocol = ColorAndSizingSwatchProtocol & SizingProtocol
-
-public protocol SizingProtocol {
-    var state: ItemState { get }
-}
-
-public enum ItemState {
-    case available
-    case unavailable
-    case outOfStock
-}
-
-public struct SizingSwatch: SizingSwatchProtocol {
+public struct SizingSwatch: ColorAndSizingSwatchProtocol {
     public let id: String
     public let name: String
     public let state: ItemState
+
+    public enum ItemState {
+        case available
+        case unavailable
+        case outOfStock
+    }
 
     public init(id: String = UUID().uuidString, name: String, state: ItemState) {
         self.id = id

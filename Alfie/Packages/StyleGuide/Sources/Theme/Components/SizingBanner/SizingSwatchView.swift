@@ -1,11 +1,11 @@
 import Models
 import SwiftUI
 
-public struct SizingSwatchView<Swatch: SizingSwatchProtocol>: View {
-    private let item: Swatch
+public struct SizingSwatchView: View {
+    private let item: SizingSwatch
     private let isSelected: Bool
 
-    public init(item: Swatch, isSelected: Bool) {
+    public init(item: SizingSwatch, isSelected: Bool) {
         self.item = item
         self.isSelected = isSelected
     }
@@ -60,12 +60,12 @@ private enum Constants {
 @available(iOS 17, *)
 #Preview(traits: .sizeThatFitsLayout) {
     VStack {
-        SizingSwatchView(item: SizingSwatch(name: "Default", state: .available), isSelected: false)
+        SizingSwatchView(item: .init(name: "Default", state: .available), isSelected: false)
 
-        SizingSwatchView(item: SizingSwatch(name: "Selected", state: .available), isSelected: true)
+        SizingSwatchView(item: .init(name: "Selected", state: .available), isSelected: true)
 
-        SizingSwatchView(item: SizingSwatch(name: "Unavailable", state: .unavailable), isSelected: false)
+        SizingSwatchView(item: .init(name: "Unavailable", state: .unavailable), isSelected: false)
 
-        SizingSwatchView(item: SizingSwatch(name: "Out of Stock", state: .outOfStock), isSelected: false)
+        SizingSwatchView(item: .init(name: "Out of Stock", state: .outOfStock), isSelected: false)
     }
 }

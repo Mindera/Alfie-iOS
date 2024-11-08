@@ -44,9 +44,6 @@ public enum ProductDetailsComplementaryInfoType {
 // MARK: - ProductDetailsViewModelProtocol
 
 public protocol ProductDetailsViewModelProtocol: ObservableObject {
-    associatedtype ColorSelector: ColorSelectorProtocol
-    associatedtype SizingSelector: SizingSelectorProtocol
-
     var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> { get }
 
     var productId: String { get }
@@ -55,8 +52,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productHasStock: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
-    var colorSelectionConfiguration: ColorSelector { get }
-    var sizingSelectionConfiguration: SizingSelector { get }
+    var colorSelectionConfiguration: ColorSelectorConfiguration { get }
+    var sizingSelectionConfiguration: SizingSelectorConfiguration { get }
     var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] { get }
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
@@ -67,5 +64,5 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func shouldShowLoading(for section: ProductDetailsSection) -> Bool
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
     func didTapAddToBag()
-    func colorSwatches(filteredBy searchTerm: String) -> [ColorSelector.Swatch]
+    func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
 }

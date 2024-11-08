@@ -2,7 +2,7 @@ import Combine
 import Foundation
 import Models
 
-public class MockProductDetailsViewModel<ColorSelector: ColorSelectorProtocol, SizingSelector: SizingSelectorProtocol>: ProductDetailsViewModelProtocol {
+public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
 
     public var productId: String = ""
@@ -10,8 +10,8 @@ public class MockProductDetailsViewModel<ColorSelector: ColorSelectorProtocol, S
     public var productHasStock: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
-    public var colorSelectionConfiguration: ColorSelector
-    public var sizingSelectionConfiguration: SizingSelector
+    public var colorSelectionConfiguration: ColorSelectorConfiguration
+    public var sizingSelectionConfiguration: SizingSelectorConfiguration
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
@@ -24,8 +24,8 @@ public class MockProductDetailsViewModel<ColorSelector: ColorSelectorProtocol, S
                 productName: String = "",
                 productImageUrls: [URL] = [],
                 productDescription: String = "",
-                colorSelectionConfiguration: ColorSelector = ColorSelectorConfiguration(items: []),
-                sizingSelectionConfiguration: SizingSelector = SizingSelectorConfiguration(items: []),
+                colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: []),
+                sizingSelectionConfiguration: SizingSelectorConfiguration = .init(items: []),
                 complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = [],
                 onShouldShowLoadingForSectionCalled: ((ProductDetailsSection) -> Bool)? = nil,
                 onShouldShowSectionCalled: ((ProductDetailsSection) -> Bool)? = nil) {
@@ -67,8 +67,8 @@ public class MockProductDetailsViewModel<ColorSelector: ColorSelectorProtocol, S
         onDidTapAddToBagCalled?()
     }
 
-    public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSelector.Swatch])?
-    public func colorSwatches(filteredBy searchTerm: String) -> [ColorSelector.Swatch] {
+    public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?
+    public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
     }
 }

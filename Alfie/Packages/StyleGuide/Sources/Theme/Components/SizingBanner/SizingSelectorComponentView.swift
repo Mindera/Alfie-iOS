@@ -1,11 +1,11 @@
 import Models
 import SwiftUI
 
-public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>: View {
-    @ObservedObject private var configuration: Configuration
+public struct SizingSelectorComponentView: View {
+    @ObservedObject private var configuration: SizingSelectorConfiguration
     private let layoutConfiguration: SwatchLayoutConfiguration
 
-    public init(configuration: Configuration, layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: SizingSelectorConfiguration, layoutConfiguration: SwatchLayoutConfiguration) {
         self.configuration = configuration
         self.layoutConfiguration = layoutConfiguration
     }
@@ -62,7 +62,7 @@ public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>
 
 #Preview("Grid") {
     SizingSelectorComponentView(
-        configuration: SizingSelectorConfiguration(
+        configuration: .init(
             selectedTitle: "Size:",
             items: [
                 .init(name: "XS", state: .available),
@@ -81,7 +81,7 @@ public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>
 
 #Preview("Chips") {
     SizingSelectorComponentView(
-        configuration: SizingSelectorConfiguration(
+        configuration: .init(
             selectedTitle: "Size:",
             items: [
                 .init(name: "XS", state: .available),
@@ -102,7 +102,7 @@ public struct SizingSelectorComponentView<Configuration: SizingSelectorProtocol>
 
 #Preview("Scrollable Single Row") {
     SizingSelectorComponentView(
-        configuration: SizingSelectorConfiguration(
+        configuration: .init(
             selectedTitle: "Size:",
             items: [
                 .init(name: "XS", state: .available),
