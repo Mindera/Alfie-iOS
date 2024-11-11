@@ -85,12 +85,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: UUID().uuidString, name: "Black", type: .color(Colors.primary.black)),
-                .init(id: UUID().uuidString, name: "Gray", type: .color(.gray)),
-                .init(id: UUID().uuidString, name: "Red", type: .color(.red)),
-                .init(id: UUID().uuidString, name: "Green", type: .color(.green)),
-                .init(id: UUID().uuidString, name: "Blue", type: .color(.blue)),
-                .init(id: UUID().uuidString, name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44))
@@ -102,12 +102,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: UUID().uuidString, name: "Black", type: .color(Colors.primary.black)),
-                .init(id: UUID().uuidString, name: "Gray", type: .color(.gray)),
-                .init(id: UUID().uuidString, name: "Red", type: .color(.red)),
-                .init(id: UUID().uuidString, name: "Green", type: .color(.green)),
-                .init(id: UUID().uuidString, name: "Blue", type: .color(.blue)),
-                .init(id: UUID().uuidString, name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44), hideSelectionTitle: true)
@@ -119,12 +119,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: UUID().uuidString, name: "Black", type: .color(Colors.primary.black)),
-                .init(id: UUID().uuidString, name: "Gray", type: .color(.gray)),
-                .init(id: UUID().uuidString, name: "Red", type: .color(.red)),
-                .init(id: UUID().uuidString, name: "Green", type: .color(.green)),
-                .init(id: UUID().uuidString, name: "Blue", type: .color(.blue)),
-                .init(id: UUID().uuidString, name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(
@@ -138,12 +138,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: UUID().uuidString, name: "Black", type: .color(Colors.primary.black)),
-                .init(id: UUID().uuidString, name: "Gray", type: .color(.gray)),
-                .init(id: UUID().uuidString, name: "Red", type: .color(.red)),
-                .init(id: UUID().uuidString, name: "Green", type: .color(.green)),
-                .init(id: UUID().uuidString, name: "Blue", type: .color(.blue)),
-                .init(id: UUID().uuidString, name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))

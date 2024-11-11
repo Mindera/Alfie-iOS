@@ -103,19 +103,19 @@ private enum Constants {
 #Preview(traits: .sizeThatFitsLayout) {
     VStack {
         ColorSwatchView(
-            item: .init(id: UUID().uuidString, name: "Default", type: .color(.red)),
+            item: .init(id: "1", name: "Default", type: .color(.red)),
             swatchSize: .normal,
             isSelected: false
         )
 
         ColorSwatchView(
-            item: .init(id: UUID().uuidString, name: "Selected", type: .color(.green)),
+            item: .init(id: "2", name: "Selected", type: .color(.green)),
             swatchSize: .normal,
             isSelected: true
         )
 
         ColorSwatchView(
-            item: .init(id: UUID().uuidString, name: "Selected", type: .color(.green), isDisabled: true),
+            item: .init(id: "3", name: "Selected", type: .color(.green), isDisabled: true),
             swatchSize: .normal,
             isSelected: true
         )

@@ -4,14 +4,14 @@ import SwiftUI
 struct SizingBannerDemoView: View {
     private static let selectedTitle: String = "Size:"
     private static let items: [SizingSwatch] = [
-        .init(id: UUID().uuidString, name: "XS", state: .available),
-        .init(id: UUID().uuidString, name: "S", state: .outOfStock),
-        .init(id: UUID().uuidString, name: "M", state: .available),
-        .init(id: UUID().uuidString, name: "L", state: .available),
-        .init(id: UUID().uuidString, name: "XL", state: .unavailable),
-        .init(id: UUID().uuidString, name: "XXL", state: .available),
-        .init(id: UUID().uuidString, name: "XXXL", state: .available),
-        .init(id: UUID().uuidString, name: "XXXXL", state: .available),
+        .init(id: "1", name: "XS", state: .available),
+        .init(id: "2", name: "S", state: .outOfStock),
+        .init(id: "3", name: "M", state: .available),
+        .init(id: "4", name: "L", state: .available),
+        .init(id: "5", name: "XL", state: .unavailable),
+        .init(id: "6", name: "XXL", state: .available),
+        .init(id: "7", name: "XXXL", state: .available),
+        .init(id: "8", name: "XXXXL", state: .available),
     ]
 
     var body: some View {

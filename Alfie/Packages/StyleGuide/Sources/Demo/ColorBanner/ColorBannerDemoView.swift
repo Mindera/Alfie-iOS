@@ -5,54 +5,54 @@ struct ColorBannerDemoView: View {
     private static let selectedTitle: String = "Color:"
     private static let selectedImageTitle: String = "Pattern:"
     private static let items: [ColorSwatch] = [
-        .init(id: UUID().uuidString, name: "Black", type: .color(.black)),
-        .init(id: UUID().uuidString, name: "Gray", type: .color(.gray)),
-        .init(id: UUID().uuidString, name: "Red", type: .color(.red), isDisabled: true),
-        .init(id: UUID().uuidString, name: "Green", type: .color(.green)),
-        .init(id: UUID().uuidString, name: "Blue", type: .color(.blue)),
-        .init(id: UUID().uuidString, name: "Yellow", type: .color(.yellow), isDisabled: true),
-        .init(id: UUID().uuidString, name: "Brown", type: .color(.brown), isDisabled: true),
-        .init(id: UUID().uuidString, name: "Orange", type: .color(.orange)),
-        .init(id: UUID().uuidString, name: "Pink", type: .color(.pink)),
+        .init(id: "1", name: "Black", type: .color(.black)),
+        .init(id: "2", name: "Gray", type: .color(.gray)),
+        .init(id: "3", name: "Red", type: .color(.red), isDisabled: true),
+        .init(id: "4", name: "Green", type: .color(.green)),
+        .init(id: "5", name: "Blue", type: .color(.blue)),
+        .init(id: "6", name: "Yellow", type: .color(.yellow), isDisabled: true),
+        .init(id: "7", name: "Brown", type: .color(.brown), isDisabled: true),
+        .init(id: "8", name: "Orange", type: .color(.orange)),
+        .init(id: "9", name: "Pink", type: .color(.pink)),
     ]
 
     private static let itemsSmall: [ColorSwatch] = [
-        .init(id: UUID().uuidString, name: "Black", type: .color(.black)),
-        .init(id: UUID().uuidString, name: "Gray", type: .color(.gray)),
-        .init(id: UUID().uuidString, name: "Red", type: .color(.red), isDisabled: true),
-        .init(id: UUID().uuidString, name: "Green", type: .color(.green)),
-        .init(id: UUID().uuidString, name: "Blue", type: .color(.blue)),
-        .init(id: UUID().uuidString, name: "Yellow", type: .color(.yellow), isDisabled: true),
-        .init(id: UUID().uuidString, name: "Brown", type: .color(.brown), isDisabled: true),
-        .init(id: UUID().uuidString, name: "Orange", type: .color(.orange)),
-        .init(id: UUID().uuidString, name: "Pink", type: .color(.pink)),
+        .init(id: "1", name: "Black", type: .color(.black)),
+        .init(id: "2", name: "Gray", type: .color(.gray)),
+        .init(id: "3", name: "Red", type: .color(.red), isDisabled: true),
+        .init(id: "4", name: "Green", type: .color(.green)),
+        .init(id: "5", name: "Blue", type: .color(.blue)),
+        .init(id: "6", name: "Yellow", type: .color(.yellow), isDisabled: true),
+        .init(id: "7", name: "Brown", type: .color(.brown), isDisabled: true),
+        .init(id: "8", name: "Orange", type: .color(.orange)),
+        .init(id: "9", name: "Pink", type: .color(.pink)),
     ]
 
     private static let itemsImage: [ColorSwatch] = [
-        .init(id: UUID().uuidString, name: "Pattern 1", type: .image(Image("pattern1", bundle: .module))),
-        .init(id: UUID().uuidString, name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
+        .init(id: "1", name: "Pattern 1", type: .image(Image("pattern1", bundle: .module))),
+        .init(id: "2", name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
         .init(
-            id: UUID().uuidString,
+            id: "3",
             name: "Pattern 3",
             type: .image(Image("pattern3", bundle: .module)),
             isDisabled: true
         ),
-        .init(id: UUID().uuidString, name: "Pattern 4", type: .image(Image("pattern4", bundle: .module))),
-        .init(id: UUID().uuidString, name: "Pattern 5", type: .image(Image("pattern5", bundle: .module))),
+        .init(id: "4", name: "Pattern 4", type: .image(Image("pattern4", bundle: .module))),
+        .init(id: "5", name: "Pattern 5", type: .image(Image("pattern5", bundle: .module))),
         .init(
-            id: UUID().uuidString,
+            id: "6",
             name: "Pattern 6",
             type: .image(Image("pattern6", bundle: .module)),
             isDisabled: true
         ),
         .init(
-            id: UUID().uuidString,
+            id: "7",
             name: "Pattern 1",
             type: .image(Image("pattern1", bundle: .module)),
             isDisabled: true
         ),
-        .init(id: UUID().uuidString, name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
-        .init(id: UUID().uuidString, name: "Pattern 3", type: .image(Image("pattern3", bundle: .module))),
+        .init(id: "8", name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
+        .init(id: "9", name: "Pattern 3", type: .image(Image("pattern3", bundle: .module))),
     ]
 
     var body: some View {

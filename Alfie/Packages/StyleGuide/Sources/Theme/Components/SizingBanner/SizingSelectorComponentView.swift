@@ -65,14 +65,14 @@ public struct SizingSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(id: UUID().uuidString, name: "XS", state: .available),
-                .init(id: UUID().uuidString, name: "S", state: .outOfStock),
-                .init(id: UUID().uuidString, name: "M", state: .available),
-                .init(id: UUID().uuidString, name: "L", state: .available),
-                .init(id: UUID().uuidString, name: "XL", state: .unavailable),
-                .init(id: UUID().uuidString, name: "XXL", state: .outOfStock),
-                .init(id: UUID().uuidString, name: "XXXL", state: .unavailable),
-                .init(id: UUID().uuidString, name: "XXXXL", state: .available),
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .outOfStock),
+                .init(id: "3", name: "M", state: .available),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .outOfStock),
+                .init(id: "7", name: "XXXL", state: .unavailable),
+                .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
@@ -84,14 +84,14 @@ public struct SizingSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(id: UUID().uuidString, name: "XS", state: .available),
-                .init(id: UUID().uuidString, name: "S", state: .outOfStock),
-                .init(id: UUID().uuidString, name: "M", state: .available),
-                .init(id: UUID().uuidString, name: "L", state: .available),
-                .init(id: UUID().uuidString, name: "XL", state: .unavailable),
-                .init(id: UUID().uuidString, name: "XXL", state: .outOfStock),
-                .init(id: UUID().uuidString, name: "XXXL", state: .unavailable),
-                .init(id: UUID().uuidString, name: "XXXXL", state: .available),
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .outOfStock),
+                .init(id: "3", name: "M", state: .available),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .outOfStock),
+                .init(id: "7", name: "XXXL", state: .unavailable),
+                .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(
@@ -105,14 +105,14 @@ public struct SizingSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(id: UUID().uuidString, name: "XS", state: .available),
-                .init(id: UUID().uuidString, name: "S", state: .outOfStock),
-                .init(id: UUID().uuidString, name: "M", state: .available),
-                .init(id: UUID().uuidString, name: "L", state: .available),
-                .init(id: UUID().uuidString, name: "XL", state: .unavailable),
-                .init(id: UUID().uuidString, name: "XXL", state: .outOfStock),
-                .init(id: UUID().uuidString, name: "XXXL", state: .unavailable),
-                .init(id: UUID().uuidString, name: "XXXXL", state: .available),
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .outOfStock),
+                .init(id: "3", name: "M", state: .available),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .outOfStock),
+                .init(id: "7", name: "XXXL", state: .unavailable),
+                .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))

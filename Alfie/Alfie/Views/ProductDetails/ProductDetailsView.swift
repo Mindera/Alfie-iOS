@@ -559,10 +559,10 @@ private enum Constants {
             productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
             colorSelectionConfiguration: .init(
                 items: [
-                    .init(id: UUID().uuidString, name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg"))),
-                    .init(id: UUID().uuidString, name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg"))),
-                    .init(id: UUID().uuidString, name: "", type: .color(.green), isDisabled: true),
-                    .init(id: UUID().uuidString, name: "", type: .color(.red)),
+                    .init(id: "1", name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg"))),
+                    .init(id: "2", name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg"))),
+                    .init(id: "3", name: "", type: .color(.green), isDisabled: true),
+                    .init(id: "4", name: "", type: .color(.red)),
                 ]
             ),
             complementaryInfoToShow: [.paymentOptions, .returns]
