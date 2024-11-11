@@ -2,7 +2,7 @@ import Models
 import SwiftUI
 
 public struct ColorSelectorComponentView: View {
-    @ObservedObject private var configuration: ColorSelectorConfiguration
+    @ObservedObject private var configuration: ColorAndSizingSelectorConfiguration<ColorSwatch>
     private let layoutConfiguration: SwatchLayoutConfiguration
     private let swatchesSize: ColorSwatchView.SwatchSize
     private var frameSize: Binding<CGSize>?
@@ -10,7 +10,7 @@ public struct ColorSelectorComponentView: View {
     /// - Parameters:
     ///   - size: ReadOnly
     public init(
-        configuration: ColorSelectorConfiguration,
+        configuration: ColorAndSizingSelectorConfiguration<ColorSwatch>,
         swatchesSize: ColorSwatchView.SwatchSize = .large,
         layoutConfiguration: SwatchLayoutConfiguration,
         frameSize: Binding<CGSize>? = nil

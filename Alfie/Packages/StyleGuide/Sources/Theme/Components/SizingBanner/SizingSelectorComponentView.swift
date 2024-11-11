@@ -2,10 +2,10 @@ import Models
 import SwiftUI
 
 public struct SizingSelectorComponentView: View {
-    @ObservedObject private var configuration: SizingSelectorConfiguration
+    @ObservedObject private var configuration: ColorAndSizingSelectorConfiguration<SizingSwatch>
     private let layoutConfiguration: SwatchLayoutConfiguration
 
-    public init(configuration: SizingSelectorConfiguration, layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: ColorAndSizingSelectorConfiguration<SizingSwatch>, layoutConfiguration: SwatchLayoutConfiguration) {
         self.configuration = configuration
         self.layoutConfiguration = layoutConfiguration
     }

@@ -13,8 +13,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private var sizingSelectionSubscription: AnyCancellable?
 
     @Published private(set) var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
-    private(set) var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
-    private(set) var sizingSelectionConfiguration: SizingSelectorConfiguration = .init(items: [])
+    private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: [])
+    private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: [])
     public let productId: String
 
     private var product: Product? {

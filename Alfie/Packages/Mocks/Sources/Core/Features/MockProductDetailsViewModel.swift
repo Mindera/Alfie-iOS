@@ -10,8 +10,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productHasStock: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
-    public var colorSelectionConfiguration: ColorSelectorConfiguration
-    public var sizingSelectionConfiguration: SizingSelectorConfiguration
+    public var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch>
+    public var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch>
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
@@ -24,8 +24,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 productName: String = "",
                 productImageUrls: [URL] = [],
                 productDescription: String = "",
-                colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: []),
-                sizingSelectionConfiguration: SizingSelectorConfiguration = .init(items: []),
+                colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: []),
+                sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: []),
                 complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = [],
                 onShouldShowLoadingForSectionCalled: ((ProductDetailsSection) -> Bool)? = nil,
                 onShouldShowSectionCalled: ((ProductDetailsSection) -> Bool)? = nil) {

@@ -52,8 +52,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productHasStock: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
-    var colorSelectionConfiguration: ColorSelectorConfiguration { get }
-    var sizingSelectionConfiguration: SizingSelectorConfiguration { get }
+    var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> { get }
+    var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> { get }
     var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] { get }
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
