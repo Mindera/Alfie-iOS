@@ -50,9 +50,10 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     private var canShowSize: Bool {
         guard !viewModel.sizingSelectionConfiguration.items.isEmpty else { return true }
 
-        let productStockCount = viewModel.sizingSelectionConfiguration.items.reduce(0) {
-            $0 + ($1.state != .outOfStock ? 1 : 0)
+        let productStockCount = viewModel.sizingSelectionConfiguration.items.reduce(into: Int()) {
+            $0 += ($1.state != .outOfStock ? 1 : 0)
         }
+
         return productStockCount != 0
     }
 
