@@ -47,6 +47,15 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         viewModel.sizingSelectionConfiguration.items.count == 1
     }
 
+    private var canShowSize: Bool {
+        guard !viewModel.sizingSelectionConfiguration.items.isEmpty else { return true }
+
+        let productStockCount = viewModel.sizingSelectionConfiguration.items.reduce(0) {
+            $0 + ($1.state != .outOfStock ? 1 : 0)
+        }
+        return productStockCount != 0
+    }
+
     // TODO: remove showFailureState (created for snapshot purposes)
     init(viewModel: ViewModel, showFailureState: Bool = false) {
         _showFailureState = State(initialValue: showFailureState)
@@ -259,7 +268,9 @@ extension ProductDetailsView {
 
             colorSelector
 
-            sizeSelector
+            if canShowSize {
+                sizeSelector
+            }
 
             descriptionTab
                 .padding(.vertical, Spacing.space200)
