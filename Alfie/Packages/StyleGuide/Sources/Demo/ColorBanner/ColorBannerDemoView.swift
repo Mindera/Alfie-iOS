@@ -31,26 +31,11 @@ struct ColorBannerDemoView: View {
     private static let itemsImage: [ColorSwatch] = [
         .init(id: "1", name: "Pattern 1", type: .image(Image("pattern1", bundle: .module))),
         .init(id: "2", name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
-        .init(
-            id: "3",
-            name: "Pattern 3",
-            type: .image(Image("pattern3", bundle: .module)),
-            isDisabled: true
-        ),
+        .init(id: "3", name: "Pattern 3", type: .image(Image("pattern3", bundle: .module)), isDisabled: true),
         .init(id: "4", name: "Pattern 4", type: .image(Image("pattern4", bundle: .module))),
         .init(id: "5", name: "Pattern 5", type: .image(Image("pattern5", bundle: .module))),
-        .init(
-            id: "6",
-            name: "Pattern 6",
-            type: .image(Image("pattern6", bundle: .module)),
-            isDisabled: true
-        ),
-        .init(
-            id: "7",
-            name: "Pattern 1",
-            type: .image(Image("pattern1", bundle: .module)),
-            isDisabled: true
-        ),
+        .init(id: "6", name: "Pattern 6", type: .image(Image("pattern6", bundle: .module)), isDisabled: true),
+        .init(id: "7", name: "Pattern 1", type: .image(Image("pattern1", bundle: .module)), isDisabled: true),
         .init(id: "8", name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
         .init(id: "9", name: "Pattern 3", type: .image(Image("pattern3", bundle: .module))),
     ]

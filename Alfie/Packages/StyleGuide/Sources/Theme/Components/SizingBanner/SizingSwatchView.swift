@@ -64,14 +64,8 @@ private enum Constants {
 
         SizingSwatchView(item: .init(id: "2", name: "Selected", state: .available), isSelected: true)
 
-        SizingSwatchView(
-            item: .init(id: "3", name: "Unavailable", state: .unavailable),
-            isSelected: false
-        )
+        SizingSwatchView(item: .init(id: "3", name: "Unavailable", state: .unavailable), isSelected: false)
 
-        SizingSwatchView(
-            item: .init(id: "4", name: "Out of Stock", state: .outOfStock),
-            isSelected: false
-        )
+        SizingSwatchView(item: .init(id: "4", name: "Out of Stock", state: .outOfStock), isSelected: false)
     }
 }
