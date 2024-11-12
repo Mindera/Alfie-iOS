@@ -143,6 +143,7 @@ private extension ProductDetailsColorAndSizeSheet {
                             }
                         }
                     }
+                    .padding(.vertical, Spacing.space100)
                     .tint(Colors.primary.black)
 
                     ThemedDivider.horizontalThin
