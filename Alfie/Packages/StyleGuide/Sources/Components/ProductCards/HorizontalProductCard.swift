@@ -32,7 +32,7 @@ public struct HorizontalProductCard: View {
         self.priceType = priceType
     }
 
-    init(product: Product, colorTitle: String = "", sizeTitle: String = "") {
+    public init(product: Product, colorTitle: String = "", sizeTitle: String = "") {
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name

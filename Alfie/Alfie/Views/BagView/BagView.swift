@@ -6,6 +6,10 @@ import Mocks
 #endif
 
 struct BagView<ViewModel: BagViewModelProtocol>: View {
+    #if DEBUG
+    @EnvironmentObject var bagContent: BagContent
+    #endif
+
     @StateObject private var viewModel: ViewModel
 
     init(viewModel: ViewModel) {
@@ -13,10 +17,23 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     }
 
     var body: some View {
+    #if DEBUG
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.space200) {
+                ForEach(bagContent.products) { product in
+                    HorizontalProductCard(product: product, colorTitle: "Color:", sizeTitle: "Size:")
+                }
+            }
+            .padding(.horizontal, Spacing.space200)
+        }
+        .padding(.vertical, Spacing.space200)
+        .withToolbar(for: .tab(.bag))
+    #else
         if let webViewModel = viewModel.webViewModel() as? WebViewModel {
             WebView(viewModel: webViewModel)
                 .withToolbar(for: .tab(.bag))
         }
+    #endif
     }
 }
 

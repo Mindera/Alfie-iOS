@@ -9,7 +9,16 @@ import Mocks
 
 // MARK: - TabBarView
 
+#if DEBUG
+class BagContent: ObservableObject {
+    @Published var products: [Product] = []
+}
+#endif
+
 struct TabBarView: View {
+    #if DEBUG
+    @StateObject private var bagContent = BagContent()
+    #endif
     @EnvironmentObject private var tabCoordinator: TabCoordinator
     private let configurationService: ConfigurationServiceProtocol
     @State private var isShowingAppUpdateAlert = false
@@ -33,6 +42,9 @@ struct TabBarView: View {
                         .toolbar(tabCoordinator.shouldShowTabBar ? .visible : .hidden, for: .tabBar)
                 }
             }
+            #if DEBUG
+            .environmentObject(bagContent)
+            #endif
             .onChange(of: tabCoordinator.activeTab) { _ in
                 hapticsService.trigger(.selectionChanged)
             }

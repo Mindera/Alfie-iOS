@@ -10,6 +10,9 @@ import StyleGuide
 import SwiftUI
 
 struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
+    #if DEBUG
+    @EnvironmentObject private var bagContent: BagContent
+    #endif
     @StateObject private var viewModel: ViewModel
     @EnvironmentObject var coordinator: Coordinator
     @State private var currentMediaIndex = 0
@@ -476,7 +479,16 @@ extension ProductDetailsView {
                         set: { _ in }
                     ),
                     isFullWidth: true
-                ) { viewModel.didTapAddToBag() }
+                ) {
+                    #if DEBUG
+                        guard case .success(let model) = viewModel.state else {
+                            return
+                        }
+                        bagContent.products.append(model.product)
+                    #else
+                        viewModel.didTapAddToBag()
+                    #endif
+                }
             }
             .padding(.vertical, Spacing.space100)
             .padding(.horizontal, Spacing.space200)
