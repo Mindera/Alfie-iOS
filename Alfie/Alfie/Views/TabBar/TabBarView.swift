@@ -9,6 +9,7 @@ import Mocks
 
 // MARK: - TabBarView
 
+// TODO: Remove MockContent and related code when API is ready
 #if DEBUG
 class MockContent: ObservableObject {
     @Published var bagProducts: [Product] = []
