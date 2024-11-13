@@ -126,7 +126,7 @@ public struct VerticalProductCard: View {
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name
-        self.priceType = PriceType(from: product)
+        self.priceType = product.priceType
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
     }
