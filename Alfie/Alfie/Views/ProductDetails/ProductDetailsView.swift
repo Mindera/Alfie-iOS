@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     #if DEBUG
-    @EnvironmentObject private var bagContent: BagContent
+    @EnvironmentObject private var mockContent: MockContent
     #endif
     @StateObject private var viewModel: ViewModel
     @EnvironmentObject var coordinator: Coordinator
@@ -256,7 +256,12 @@ extension ProductDetailsView {
                     .padding([.horizontal, .top], Spacing.space200)
             }
 
-            addToBag
+            VStack {
+                addToBag
+                addToWishlist
+            }
+            .padding(.vertical, Spacing.space100)
+            .padding(.horizontal, Spacing.space200)
         }
         .presentationDetents(Set(bottomSheetDetents), selection: $bottomSheetCurrentDetent)
         .presentationDragIndicator(.hidden)
@@ -481,17 +486,78 @@ extension ProductDetailsView {
                     isFullWidth: true
                 ) {
                     #if DEBUG
-                        guard case .success(let model) = viewModel.state else {
+                        guard
+                            case .success(let model) = viewModel.state,
+                            !mockContent.bagProducts.contains(
+                                where: {
+                                    $0.defaultVariant.colour?.id == model.selectedVariant.colour?.id &&
+                                    $0.defaultVariant.size?.id == model.selectedVariant.size?.id
+                                }
+                            )
+                        else {
                             return
                         }
-                        bagContent.products.append(model.product)
+                        let product = Product(
+                            styleNumber: model.product.styleNumber,
+                            name: model.product.name,
+                            brand: model.product.brand,
+                            shortDescription: model.product.shortDescription,
+                            longDescription: model.product.longDescription,
+                            slug: model.product.slug,
+                            priceRange: model.product.priceRange,
+                            attributes: model.product.attributes,
+                            defaultVariant: model.selectedVariant,
+                            variants: model.product.variants,
+                            colours: model.product.colours
+                        )
+                        mockContent.bagProducts.append(product)
                     #else
                         viewModel.didTapAddToBag()
                     #endif
                 }
             }
-            .padding(.vertical, Spacing.space100)
-            .padding(.horizontal, Spacing.space200)
+        }
+    }
+
+    @ViewBuilder private var addToWishlist: some View {
+        if viewModel.shouldShow(section: .addToWishlist) {
+            VStack(spacing: Spacing.space0) {
+                ThemedButton(
+                    text: LocalizableProductDetails.$addToWishlist,
+                    style: .secondary,
+                    isFullWidth: true
+                ) {
+                    #if DEBUG
+                        guard
+                            case .success(let model) = viewModel.state,
+                            !mockContent.wishlistProducts.contains(
+                                where: {
+                                    $0.defaultVariant.colour?.id == model.selectedVariant.colour?.id &&
+                                    $0.defaultVariant.size?.id == model.selectedVariant.size?.id
+                                }
+                            )
+                        else {
+                            return
+                        }
+                        let product = Product(
+                            styleNumber: model.product.styleNumber,
+                            name: model.product.name,
+                            brand: model.product.brand,
+                            shortDescription: model.product.shortDescription,
+                            longDescription: model.product.longDescription,
+                            slug: model.product.slug,
+                            priceRange: model.product.priceRange,
+                            attributes: model.product.attributes,
+                            defaultVariant: model.selectedVariant,
+                            variants: model.product.variants,
+                            colours: model.product.colours
+                        )
+                    mockContent.wishlistProducts.append(product)
+                    #else
+                        viewModel.didTapAddToWishlist()
+                    #endif
+                }
+            }
         }
     }
 

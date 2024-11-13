@@ -1,8 +1,28 @@
+import Models
 import StyleGuide
 import SwiftUI
+#if DEBUG
+import Mocks
+#endif
 
 struct WishListView: View {
+    #if DEBUG
+    @EnvironmentObject var mockContent: MockContent
+    #endif
+
     var body: some View {
+    #if DEBUG
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.space200) {
+                ForEach(mockContent.wishlistProducts) { product in
+                    HorizontalProductCard(product: product, colorTitle: "Color:", sizeTitle: "Size:")
+                }
+            }
+            .padding(.horizontal, Spacing.space200)
+        }
+        .padding(.vertical, Spacing.space200)
+        .withToolbar(for: .wishlist)
+    #else
         VStack {
             Icon.heart.image
                 .resizable()
@@ -12,6 +32,7 @@ struct WishListView: View {
         }
         .padding(.horizontal, Spacing.space200)
         .withToolbar(for: .wishlist)
+    #endif
     }
 }
 

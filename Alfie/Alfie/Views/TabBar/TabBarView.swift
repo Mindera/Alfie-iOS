@@ -10,14 +10,15 @@ import Mocks
 // MARK: - TabBarView
 
 #if DEBUG
-class BagContent: ObservableObject {
-    @Published var products: [Product] = []
+class MockContent: ObservableObject {
+    @Published var bagProducts: [Product] = []
+    @Published var wishlistProducts: [Product] = []
 }
 #endif
 
 struct TabBarView: View {
     #if DEBUG
-    @StateObject private var bagContent = BagContent()
+    @StateObject private var mockContent = MockContent()
     #endif
     @EnvironmentObject private var tabCoordinator: TabCoordinator
     private let configurationService: ConfigurationServiceProtocol
@@ -43,7 +44,7 @@ struct TabBarView: View {
                 }
             }
             #if DEBUG
-            .environmentObject(bagContent)
+            .environmentObject(mockContent)
             #endif
             .onChange(of: tabCoordinator.activeTab) { _ in
                 hapticsService.trigger(.selectionChanged)

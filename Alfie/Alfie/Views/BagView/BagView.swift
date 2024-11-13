@@ -7,7 +7,7 @@ import Mocks
 
 struct BagView<ViewModel: BagViewModelProtocol>: View {
     #if DEBUG
-    @EnvironmentObject var bagContent: BagContent
+    @EnvironmentObject var mockContent: MockContent
     #endif
 
     @StateObject private var viewModel: ViewModel
@@ -20,7 +20,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     #if DEBUG
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.space200) {
-                ForEach(bagContent.products) { product in
+                ForEach(mockContent.bagProducts) { product in
                     HorizontalProductCard(product: product, colorTitle: "Color:", sizeTitle: "Size:")
                 }
             }

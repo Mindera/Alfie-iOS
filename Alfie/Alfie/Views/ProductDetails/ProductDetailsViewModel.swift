@@ -113,7 +113,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
              .complementaryInfo:
             return state.isLoading
         case .productDescription,
-             .addToBag: // swiftlint:disable:this indentation_width
+             .addToBag, // swiftlint:disable:this indentation_width
+             .addToWishlist:
             return false
         }
     }
@@ -131,7 +132,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag:
+        case .addToBag,
+             .addToWishlist: // swiftlint:disable:this indentation_width
             return state.isSuccess
         }
         // swiftlint:enable vertical_whitespace_between_cases
@@ -155,6 +157,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     func didTapAddToBag() {
+        // TODO: implement in a future ticket
+    }
+
+    func didTapAddToWishlist() {
         // TODO: implement in a future ticket
     }
 

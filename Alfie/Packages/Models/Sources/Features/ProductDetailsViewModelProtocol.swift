@@ -31,6 +31,7 @@ public enum ProductDetailsSection {
     case complementaryInfo
     case productDescription
     case addToBag
+    case addToWishlist
 }
 
 // MARK: - ProductDetailsComplementaryInfoType
@@ -64,5 +65,6 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func shouldShowLoading(for section: ProductDetailsSection) -> Bool
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
     func didTapAddToBag()
+    func didTapAddToWishlist()
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
 }
