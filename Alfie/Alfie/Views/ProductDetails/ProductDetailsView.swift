@@ -275,6 +275,10 @@ extension ProductDetailsView {
         VStack(alignment: .leading, spacing: Spacing.space100) {
             titleHeader
 
+            Spacer()
+
+            price
+
             colorSelector
 
             if canShowSize {
@@ -344,8 +348,16 @@ extension ProductDetailsView {
                     .foregroundStyle(Colors.primary.black)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
-                // TODO: Add a spacer and the price here in a future ticket
             }
+        }
+    }
+
+    @ViewBuilder private var price: some View {
+        if let priceType = viewModel.priceType {
+            PriceComponentView(
+                type: priceType,
+                configuration: .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
+            )
         }
     }
 

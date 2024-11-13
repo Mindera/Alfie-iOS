@@ -42,6 +42,14 @@ public enum ProductDetailsComplementaryInfoType {
     case returns
 }
 
+// MARK: - PriceType
+
+public enum PriceType {
+    case `default`(price: String)
+    case sale(fullPrice: String, finalPrice: String)
+    case range(lowerBound: String, upperBound: String, separator: String)
+}
+
 // MARK: - ProductDetailsViewModelProtocol
 
 public protocol ProductDetailsViewModelProtocol: ObservableObject {
@@ -59,6 +67,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
     var hasSingleImage: Bool { get }
+    var priceType: PriceType? { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool
