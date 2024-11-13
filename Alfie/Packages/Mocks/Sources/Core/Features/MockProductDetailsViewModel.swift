@@ -10,7 +10,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productHasStock: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
-    public var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
+    public var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch>
+    public var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch>
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
@@ -23,7 +24,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 productName: String = "",
                 productImageUrls: [URL] = [],
                 productDescription: String = "",
-                colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: []),
+                colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: []),
+                sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: []),
                 complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = [],
                 onShouldShowLoadingForSectionCalled: ((ProductDetailsSection) -> Bool)? = nil,
                 onShouldShowSectionCalled: ((ProductDetailsSection) -> Bool)? = nil) {
@@ -34,6 +36,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.productImageUrls = productImageUrls
         self.productDescription = productDescription
         self.colorSelectionConfiguration = colorSelectionConfiguration
+        self.sizingSelectionConfiguration = sizingSelectionConfiguration
         self.complementaryInfoToShow = complementaryInfoToShow
         self.onShouldShowLoadingForSectionCalled = onShouldShowLoadingForSectionCalled
         self.onShouldShowSectionCalled = onShouldShowSectionCalled
@@ -64,8 +67,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         onDidTapAddToBagCalled?()
     }
 
-    public var onColorSwatchesFilteredByCalled: ((String) -> [Models.ColorSwatch])?
-    public func colorSwatches(filteredBy searchTerm: String) -> [Models.ColorSwatch] {
+    public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?
+    public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
     }
 }

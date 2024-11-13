@@ -25,13 +25,13 @@ public enum SwatchType: Equatable {
 
 // MARK: - ColorSwatch
 
-public struct ColorSwatch: Equatable, Identifiable {
+public struct ColorSwatch: ColorAndSizingSwatchProtocol {
     public let id: String
     public let name: String
     public let type: SwatchType
     public let isDisabled: Bool
 
-    public init(id: String = UUID().uuidString, name: String, type: SwatchType, isDisabled: Bool = false) {
+    public init(id: String, name: String, type: SwatchType, isDisabled: Bool = false) {
         self.id = id
         self.name = name
         self.type = type

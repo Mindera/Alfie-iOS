@@ -14,6 +14,8 @@ struct LocalizableProductDetails: LocalizableProtocol {
     @LocalizableResource<Self>(.errorButtonBackLabel) static var errorButtonBackLabel
     @LocalizableResource<Self>(.color) static var color
     @LocalizableResource<Self>(.searchColors) static var searchColors
+    @LocalizableResource<Self>(.size) static var size
+    @LocalizableResource<Self>(.oneSize) static var oneSize
 
     enum Keys: String, LocalizableKeyProtocol {
         case complementaryInfoDelivery = "KeyComplementaryInfoDelivery"
@@ -29,5 +31,7 @@ struct LocalizableProductDetails: LocalizableProtocol {
         case errorButtonBackLabel = "KeyErrorButtonBackLabel"
         case color = "KeyColor"
         case searchColors = "KeySearchColors"
+        case size = "KeySize"
+        case oneSize = "KeyOneSize"
     }
 }

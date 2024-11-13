@@ -100,6 +100,17 @@
         }
       }
     },
+    "KeyOneSize" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One Size"
+          }
+        }
+      }
+    },
     "KeyOutOfStock" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -140,6 +151,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "from Alfie"
+          }
+        }
+      }
+    },
+    "KeySize" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
           }
         }
       }

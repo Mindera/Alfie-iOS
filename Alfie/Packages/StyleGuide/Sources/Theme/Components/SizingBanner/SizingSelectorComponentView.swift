@@ -1,34 +1,16 @@
+import Models
 import SwiftUI
 
 public struct SizingSelectorComponentView: View {
-    @ObservedObject private var configuration: SizingSelectorConfiguration
+    @ObservedObject private var configuration: ColorAndSizingSelectorConfiguration<SizingSwatch>
     private let layoutConfiguration: SwatchLayoutConfiguration
 
-    public init(configuration: SizingSelectorConfiguration, layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: ColorAndSizingSelectorConfiguration<SizingSwatch>, layoutConfiguration: SwatchLayoutConfiguration) {
         self.configuration = configuration
         self.layoutConfiguration = layoutConfiguration
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.space150) {
-            header
-
-            if configuration.items.count > 1 {
-                container
-            }
-        }
-    }
-
-    private var header: some View {
-        HStack(spacing: Spacing.space050) {
-            Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
-                .foregroundStyle(Colors.primary.mono400)
-            Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                .foregroundStyle(Colors.primary.mono900)
-        }
-    }
-
-    @ViewBuilder private var container: some View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch layoutConfiguration.arrangement {
         case .horizontal(let itemSpacing, let scrollable):
@@ -42,9 +24,7 @@ public struct SizingSelectorComponentView: View {
     }
 
     private func gridSwatches(columns: Int, columnWidth: CGFloat) -> some View {
-        LazyVGrid(
-            columns: Array(repeating: GridItem(.flexible(minimum: columnWidth), alignment: .topLeading), count: columns)
-        ) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns)) {
             swatches()
         }
     }
@@ -74,7 +54,8 @@ public struct SizingSelectorComponentView: View {
                     .onTapGesture {
                         configuration.selectedItem = item
                     }
-            }.disabled(item.state != .available)
+            }
+            .disabled(item.state != .available)
         }
     }
 }
@@ -84,14 +65,14 @@ public struct SizingSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(name: "XS", state: .available),
-                .init(name: "S", state: .outOfStock),
-                .init(name: "M", state: .available),
-                .init(name: "L", state: .available),
-                .init(name: "XL", state: .unavailable),
-                .init(name: "XXL", state: .outOfStock),
-                .init(name: "XXXL", state: .unavailable),
-                .init(name: "XXXXL", state: .available),
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .outOfStock),
+                .init(id: "3", name: "M", state: .available),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .outOfStock),
+                .init(id: "7", name: "XXXL", state: .unavailable),
+                .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
@@ -103,14 +84,14 @@ public struct SizingSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(name: "XS", state: .available),
-                .init(name: "S", state: .outOfStock),
-                .init(name: "M", state: .available),
-                .init(name: "L", state: .available),
-                .init(name: "XL", state: .unavailable),
-                .init(name: "XXL", state: .outOfStock),
-                .init(name: "XXXL", state: .unavailable),
-                .init(name: "XXXXL", state: .available),
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .outOfStock),
+                .init(id: "3", name: "M", state: .available),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .outOfStock),
+                .init(id: "7", name: "XXXL", state: .unavailable),
+                .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(
@@ -124,14 +105,14 @@ public struct SizingSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Size:",
             items: [
-                .init(name: "XS", state: .available),
-                .init(name: "S", state: .outOfStock),
-                .init(name: "M", state: .available),
-                .init(name: "L", state: .available),
-                .init(name: "XL", state: .unavailable),
-                .init(name: "XXL", state: .outOfStock),
-                .init(name: "XXXL", state: .unavailable),
-                .init(name: "XXXXL", state: .available),
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .outOfStock),
+                .init(id: "3", name: "M", state: .available),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .outOfStock),
+                .init(id: "7", name: "XXXL", state: .unavailable),
+                .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))

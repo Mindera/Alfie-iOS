@@ -1,16 +1,17 @@
+import Models
 import SwiftUI
 
 struct SizingBannerDemoView: View {
     private static let selectedTitle: String = "Size:"
     private static let items: [SizingSwatch] = [
-        .init(name: "XS", state: .available),
-        .init(name: "S", state: .outOfStock),
-        .init(name: "M", state: .available),
-        .init(name: "L", state: .available),
-        .init(name: "XL", state: .unavailable),
-        .init(name: "XXL", state: .available),
-        .init(name: "XXXL", state: .available),
-        .init(name: "XXXXL", state: .available),
+        .init(id: "1", name: "XS", state: .available),
+        .init(id: "2", name: "S", state: .outOfStock),
+        .init(id: "3", name: "M", state: .available),
+        .init(id: "4", name: "L", state: .available),
+        .init(id: "5", name: "XL", state: .unavailable),
+        .init(id: "6", name: "XXL", state: .available),
+        .init(id: "7", name: "XXXL", state: .available),
+        .init(id: "8", name: "XXXXL", state: .available),
     ]
 
     var body: some View {
@@ -18,10 +19,7 @@ struct SizingBannerDemoView: View {
             VStack(spacing: Spacing.space250) {
                 section(title: "Sizing Swatches - Scrollable") {
                     SizingSelectorComponentView(
-                        configuration: .init(
-                            selectedTitle: Self.selectedTitle,
-                            items: Self.items
-                        ),
+                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
                     )
                 }

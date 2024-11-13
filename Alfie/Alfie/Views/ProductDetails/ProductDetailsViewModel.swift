@@ -10,9 +10,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     // In case we already have a full or partial product to show while fetching
     private let baseProduct: Product?
     private var colorSelectionSubscription: AnyCancellable?
+    private var sizingSelectionSubscription: AnyCancellable?
 
     @Published private(set) var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
-    private(set) var colorSelectionConfiguration: ColorSelectorConfiguration = .init(items: [])
+    private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: [])
+    private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: [])
     public let productId: String
 
     private var product: Product? {
@@ -88,7 +90,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.dependencies = dependencies
 
         if let baseProduct {
-            buildColorSelectionConfiguration(product: baseProduct, selectedVariant: baseProduct.defaultVariant)
+            buildColorAndSizingSelectionConfigurations(
+                product: baseProduct,
+                selectedVariant: baseProduct.defaultVariant
+            )
         }
     }
 
@@ -103,7 +108,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         case .titleHeader:
             return state.isLoading && productName.isEmpty
         case .colorSelector,
-             .mediaCarousel, // swiftlint:disable:this indentation_width
+             .sizeSelector, // swiftlint:disable:this indentation_width
+             .mediaCarousel,
              .complementaryInfo:
             return state.isLoading
         case .productDescription,
@@ -116,7 +122,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         // swiftlint:disable vertical_whitespace_between_cases
         switch section {
         case .titleHeader,
-             .colorSelector: // swiftlint:disable:this indentation_width
+             .colorSelector, // swiftlint:disable:this indentation_width
+             .sizeSelector:
             return true
         case .complementaryInfo:
             return !complementaryInfoToShow.isEmpty
@@ -183,8 +190,13 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        buildColorSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
+        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: product.defaultVariant)
         state = .success(.init(product: product, selectedVariant: product.defaultVariant))
+    }
+
+    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant?) {
+        buildColorSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
+        buildSizingSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
     }
 
     private func buildColorSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
@@ -197,7 +209,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             selectedSwatch = colorSwatches.first { $0.id == selectedVariant.colour?.id }
         }
 
-        colorSelectionConfiguration = .init(selectedTitle: "", items: colorSwatches, selectedItem: selectedSwatch)
+        colorSelectionConfiguration = .init(
+            selectedTitle: LocalizableProductDetails.$color + ":",
+            items: colorSwatches,
+            selectedItem: selectedSwatch
+        )
         colorSelectionSubscription = colorSelectionConfiguration.$selectedItem
             .receive(on: DispatchQueue.main)
             .dropFirst()
@@ -240,15 +256,90 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return productColors
     }
 
+    private func buildSizingSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
+        sizingSelectionSubscription?.cancel()
+
+        let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
+
+        var selectedSwatch: SizingSwatch?
+        if let selectedVariant {
+            selectedSwatch = sizingSwatches.first { $0.id == selectedVariant.size?.id }
+        }
+
+        sizingSelectionConfiguration = .init(
+            selectedTitle: LocalizableProductDetails.$size + ":",
+            items: sizingSwatches,
+            selectedItem: selectedSwatch
+        )
+        sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
+            .receive(on: DispatchQueue.main)
+            .dropFirst()
+            .sink { [weak self] sizingSwatch in
+                guard let self, let sizingSwatch else {
+                    return
+                }
+                self.didSelect(sizingSwatch: sizingSwatch)
+            }
+    }
+
+    private func buildSizingSwatches(product: Product, selectedVariant: Product.Variant?) -> [SizingSwatch] {
+        let sizes = buildVariantSizes(product: product, selectedVariant: selectedVariant)
+        return sizes.map { size in
+            let isAvailable = product.variants.contains { $0.size?.id == size.id && $0.stock > 0 }
+
+            // TODO: Handle unavailable state if needed
+            return SizingSwatch(id: size.id, name: size.value, state: isAvailable ? .available : .outOfStock)
+        }
+    }
+
+    private func buildVariantSizes(product: Product, selectedVariant: Product.Variant?) -> [Product.ProductSize] {
+        let variantsForSelectedColor = product.variants.filter { $0.colour?.id == selectedVariant?.colour?.id }
+        var productSizes = [Product.ProductSize]()
+        variantsForSelectedColor.forEach { variant in
+            guard let size = variant.size, !productSizes.contains(where: { $0.id == size.id }) else {
+                return
+            }
+            productSizes.append(
+                Product.ProductSize(
+                    id: size.id,
+                    value: size.value,
+                    scale: size.scale,
+                    description: size.description,
+                    sizeGuide: size.sizeGuide
+                )
+            )
+        }
+        return productSizes
+    }
+
     private func didSelect(colorSwatch: ColorSwatch) {
         guard let product else {
             logError("Tried to select color on inexistent product")
             return
         }
 
-        // Later when we also have sizes we need to match the variant with both the color and size
-        guard let variant = product.variants.first(where: { $0.colour?.id == colorSwatch.id }) else {
+        guard let variant = product.variants.first(
+            where: { $0.colour?.id == colorSwatch.id && $0.size?.id == selectedVariant?.size?.id }
+        )
+        else {
             log("Unexpected data inconsistency: tried to select color \(colorSwatch.id) on product \(productId) but no variant exists with that color, ignoring selection")
+            return
+        }
+
+        state = .success(.init(product: product, selectedVariant: variant))
+    }
+
+    private func didSelect(sizingSwatch: SizingSwatch) {
+        guard let product else {
+            logError("Tried to select size on inexistent product")
+            return
+        }
+
+        guard let variant = product.variants.first(
+            where: { $0.size?.id == sizingSwatch.id && $0.colour?.id == selectedVariant?.colour?.id }
+        )
+        else {
+            log("Unexpected data inconsistency: tried to select size \(sizingSwatch.id) on product \(productId) but no variant exists with that size, ignoring selection")
             return
         }
 

@@ -15,6 +15,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
+    @State private var showSizeSheet = false
     @State private var showDetailsSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var carouselSize: CGSize = .zero
@@ -32,6 +33,28 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     // There are multiple types of color pickers, but they all depend on the same conditions
     private var canShowColorPickers: Bool {
         viewModel.colorSelectionConfiguration.items.count > 1
+    }
+
+    private var canShowSizePickers: Bool {
+        viewModel.sizingSelectionConfiguration.items.count > 6
+    }
+
+    private var canShowSizeSelector: Bool {
+        viewModel.sizingSelectionConfiguration.items.count > 1
+    }
+
+    private var isOneSize: Bool {
+        viewModel.sizingSelectionConfiguration.items.count == 1
+    }
+
+    private var canShowSize: Bool {
+        guard !viewModel.sizingSelectionConfiguration.items.isEmpty else { return true }
+
+        let productStockCount = viewModel.sizingSelectionConfiguration.items.reduce(into: 0) {
+            $0 += ($1.state != .outOfStock ? 1 : 0)
+        }
+
+        return productStockCount != 0
     }
 
     // TODO: remove showFailureState (created for snapshot purposes)
@@ -140,6 +163,10 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
                     colorSheet
                         .presentationBackgroundInteraction(.enabled)
                 })
+                .sheet(isPresented: $showSizeSheet) {
+                    sizeSheet
+                        .presentationBackgroundInteraction(.enabled)
+                }
                 .fullScreenCover(isPresented: $isMediaFullScreen) {
                     fullscreenMediaCarousel
                 }
@@ -242,6 +269,10 @@ extension ProductDetailsView {
 
             colorSelector
 
+            if canShowSize {
+                sizeSelector
+            }
+
             descriptionTab
                 .padding(.vertical, Spacing.space200)
 
@@ -311,40 +342,29 @@ extension ProductDetailsView {
     }
 
     private var colorSheet: some View {
-        ProductDetailsColorSheet(viewModel: viewModel, isPresented: $showColorSheet, searchText: $colorSheetSearchText)
+        ProductDetailsColorAndSizeSheet(
+            viewModel: viewModel,
+            type: .color,
+            isPresented: $showColorSheet,
+            searchText: $colorSheetSearchText
+        )
+    }
+
+    private var sizeSheet: some View {
+        ProductDetailsColorAndSizeSheet(viewModel: viewModel, type: .size, isPresented: $showSizeSheet)
     }
 
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             if hasSpaceForSizeSelector {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text.build(theme.font.small.bold(LocalizableProductDetails.$color + ":"))
-                            .foregroundStyle(Colors.primary.mono900)
-                        Button(action: {
-                            guard canShowColorPickers else {
-                                return
-                            }
-                            showColorSheet = true
-                        }, label: {
-                            HStack {
-                                Text.build(
-                                    theme.font.small.normal(
-                                        viewModel.colorSelectionConfiguration.selectedItem?.name.capitalized ?? ""
-                                    )
-                                )
-                                    .foregroundStyle(Colors.primary.mono900)
-                                if canShowColorPickers {
-                                    Icon.chevronDown.image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(size: Constants.colorChevronSize)
-                                }
-                            }
-                        })
-                        .allowsHitTesting(canShowColorPickers)
-                        .tint(Colors.primary.mono900)
+                VStack(alignment: .leading, spacing: Spacing.space150) {
+                    ColorAndSizingSelectorHeaderView(
+                        configuration: viewModel.colorSelectionConfiguration,
+                        isExpandable: canShowColorPickers
+                    ) {
+                        showColorSheet = true
                     }
+
                     if canShowColorPickers {
                         ColorSelectorComponentView(
                             configuration: viewModel.colorSelectionConfiguration,
@@ -377,6 +397,43 @@ extension ProductDetailsView {
                     .id(selectedColor.id)
                 }
             }
+        }
+    }
+
+    @ViewBuilder private var sizeSelector: some View {
+        if viewModel.shouldShow(section: .sizeSelector) {
+            VStack(alignment: .leading, spacing: Spacing.space150) {
+                if canShowSizeSelector {
+                    ColorAndSizingSelectorHeaderView(
+                        configuration: viewModel.sizingSelectionConfiguration,
+                        isExpandable: canShowSizePickers
+                    ) {
+                        showSizeSheet = true
+                    }
+
+                    if !canShowSizePickers {
+                        SizingSelectorComponentView(
+                            configuration: viewModel.sizingSelectionConfiguration,
+                            layoutConfiguration: .init(arrangement: .grid(columns: 3, columnWidth: 60))
+                        )
+                    }
+                } else {
+                    singleSizeView
+                }
+            }
+            .shimmering(while: shimmeringBinding(for: .sizeSelector), animateOnStateTransition: false)
+        }
+    }
+
+    @ViewBuilder private var singleSizeView: some View {
+        let sizeText: String = isOneSize
+            ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
+            : LocalizableProductDetails.$oneSize
+        HStack {
+            Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
+                .foregroundStyle(Colors.primary.mono900)
+            Text.build(theme.font.small.normal(sizeText))
+                .foregroundStyle(Colors.primary.mono900)
         }
     }
 
@@ -503,10 +560,10 @@ private enum Constants {
             productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
             colorSelectionConfiguration: .init(
                 items: [
-                    .init(name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg"))),
-                    .init(name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg"))),
-                    .init(name: "", type: .color(.green), isDisabled: true),
-                    .init(name: "", type: .color(.red)),
+                    .init(id: "1", name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22579704_13941430.jpg"))),
+                    .init(id: "2", name: "", type: .url(URL.fromString("https://www.alfieproj.com/productimages/thumb/3/2479864_22005770_9866399.jpg"))),
+                    .init(id: "3", name: "", type: .color(.green), isDisabled: true),
+                    .init(id: "4", name: "", type: .color(.red)),
                 ]
             ),
             complementaryInfoToShow: [.paymentOptions, .returns]

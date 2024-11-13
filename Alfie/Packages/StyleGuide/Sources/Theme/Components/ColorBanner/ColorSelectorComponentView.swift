@@ -2,7 +2,7 @@ import Models
 import SwiftUI
 
 public struct ColorSelectorComponentView: View {
-    @ObservedObject private var configuration: ColorSelectorConfiguration
+    @ObservedObject private var configuration: ColorAndSizingSelectorConfiguration<ColorSwatch>
     private let layoutConfiguration: SwatchLayoutConfiguration
     private let swatchesSize: ColorSwatchView.SwatchSize
     private var frameSize: Binding<CGSize>?
@@ -10,7 +10,7 @@ public struct ColorSelectorComponentView: View {
     /// - Parameters:
     ///   - size: ReadOnly
     public init(
-        configuration: ColorSelectorConfiguration,
+        configuration: ColorAndSizingSelectorConfiguration<ColorSwatch>,
         swatchesSize: ColorSwatchView.SwatchSize = .large,
         layoutConfiguration: SwatchLayoutConfiguration,
         frameSize: Binding<CGSize>? = nil
@@ -23,21 +23,9 @@ public struct ColorSelectorComponentView: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: Spacing.space150) {
-            if !layoutConfiguration.hideSelectionTitle {
-                header
-            }
             if !layoutConfiguration.hideOnSingleColor || configuration.items.count > 1 {
                 container
             }
-        }
-    }
-
-    private var header: some View {
-        HStack(spacing: Spacing.space050) {
-            Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
-                .foregroundStyle(Colors.primary.mono400)
-            Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                .foregroundStyle(Colors.primary.mono900)
         }
     }
 
@@ -97,12 +85,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(name: "Black", type: .color(Colors.primary.black)),
-                .init(name: "Gray", type: .color(.gray)),
-                .init(name: "Red", type: .color(.red)),
-                .init(name: "Green", type: .color(.green)),
-                .init(name: "Blue", type: .color(.blue)),
-                .init(name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44))
@@ -114,12 +102,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(name: "Black", type: .color(Colors.primary.black)),
-                .init(name: "Gray", type: .color(.gray)),
-                .init(name: "Red", type: .color(.red)),
-                .init(name: "Green", type: .color(.green)),
-                .init(name: "Blue", type: .color(.blue)),
-                .init(name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 44), hideSelectionTitle: true)
@@ -131,12 +119,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(name: "Black", type: .color(Colors.primary.black)),
-                .init(name: "Gray", type: .color(.gray)),
-                .init(name: "Red", type: .color(.red)),
-                .init(name: "Green", type: .color(.green)),
-                .init(name: "Blue", type: .color(.blue)),
-                .init(name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(
@@ -150,12 +138,12 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(name: "Black", type: .color(Colors.primary.black)),
-                .init(name: "Gray", type: .color(.gray)),
-                .init(name: "Red", type: .color(.red)),
-                .init(name: "Green", type: .color(.green)),
-                .init(name: "Blue", type: .color(.blue)),
-                .init(name: "Yellow", type: .color(.yellow)),
+                .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+                .init(id: "2", name: "Gray", type: .color(.gray)),
+                .init(id: "3", name: "Red", type: .color(.red)),
+                .init(id: "4", name: "Green", type: .color(.green)),
+                .init(id: "5", name: "Blue", type: .color(.blue)),
+                .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))
