@@ -35,6 +35,7 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case grid = "square.grid.2x2"
     case hamburguerMenu = "line.3.horizontal"
     case heart
+    case heartFill = "heart.fill"
     case help = "questionmark.circle"
     case history = "clock.arrow.circlepath"
     case home = "house"

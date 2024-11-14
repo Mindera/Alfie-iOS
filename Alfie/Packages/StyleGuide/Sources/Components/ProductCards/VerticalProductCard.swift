@@ -94,6 +94,7 @@ public struct VerticalProductCard: View {
     private let priceType: PriceType
     private let onUserAction: ProductUserActionHandler
     @Binding public private(set) var isSkeleton: Bool
+    @Binding private var isFavorite: Bool
 
     public init(
         configuration: VerticalProductCardConfiguration,
@@ -103,7 +104,8 @@ public struct VerticalProductCard: View {
         name: String,
         priceType: PriceType,
         onUserAction: @escaping ProductUserActionHandler,
-        isSkeleton: Binding<Bool> = .constant(false)
+        isSkeleton: Binding<Bool> = .constant(false),
+        isFavorite: Binding<Bool> = .constant(false)
     ) {
         self.configuration = configuration
         self.productId = productId
@@ -113,13 +115,15 @@ public struct VerticalProductCard: View {
         self.priceType = priceType
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
+        self._isFavorite = isFavorite
     }
 
     public init(
         configuration: VerticalProductCardConfiguration,
         product: Product,
         onUserAction: @escaping ProductUserActionHandler,
-        isSkeleton: Binding<Bool> = .constant(false)
+        isSkeleton: Binding<Bool> = .constant(false),
+        isFavorite: Binding<Bool> = .constant(false)
     ) {
         self.configuration = configuration
         self.productId = product.id
@@ -129,6 +133,7 @@ public struct VerticalProductCard: View {
         self.priceType = product.priceType
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
+        self._isFavorite = isFavorite
     }
 
     public var body: some View {
@@ -223,9 +228,12 @@ public struct VerticalProductCard: View {
             let iconSize = configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
-                onUserAction(productId, .wishlist(isFavorite: true))
+                isFavorite.toggle()
+                onUserAction(productId, .wishlist(isFavorite: isFavorite))
             }, label: {
-                Icon.heart.image
+                let image = isFavorite ? Icon.heartFill.image : Icon.heart.image
+
+                image
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
