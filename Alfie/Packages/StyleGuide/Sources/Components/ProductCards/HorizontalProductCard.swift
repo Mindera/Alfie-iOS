@@ -72,7 +72,6 @@ public struct HorizontalProductCard: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.productCard)
-        Spacer()
     }
 
     @ViewBuilder private var productImageView: some View {

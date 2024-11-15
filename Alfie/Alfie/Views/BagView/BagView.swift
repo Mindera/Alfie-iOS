@@ -18,19 +18,24 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
     var body: some View {
     #if DEBUG
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.space200) {
-                ForEach(mockContent.bagProducts) { product in
-                    HorizontalProductCard(
-                        product: product,
-                        colorTitle: LocalizableProductDetails.$color + ":",
-                        sizeTitle: LocalizableProductDetails.$size + ":",
-                        oneSizeTitle: LocalizableProductDetails.$oneSize
-                    )
-                }
+        List {
+            ForEach(mockContent.bagProducts) { product in
+                HorizontalProductCard(
+                    product: product,
+                    colorTitle: LocalizableProductDetails.$color + ":",
+                    sizeTitle: LocalizableProductDetails.$size + ":",
+                    oneSizeTitle: LocalizableProductDetails.$oneSize
+                )
+                .listRowInsets(EdgeInsets())
             }
+            .onDelete { offsets in
+                mockContent.bagProducts.remove(atOffsets: offsets)
+            }
+            .listRowSeparator(.hidden)
             .padding(.horizontal, Spacing.space200)
         }
+        .listStyle(.plain)
+        .listRowSpacing(Spacing.space200)
         .padding(.vertical, Spacing.space200)
         .withToolbar(for: .tab(.bag))
     #else
