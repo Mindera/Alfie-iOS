@@ -15,7 +15,12 @@ struct WishListView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.space200) {
                 ForEach(mockContent.wishlistProducts) { product in
-                    HorizontalProductCard(product: product, colorTitle: "Color:", sizeTitle: "Size:")
+                    HorizontalProductCard(
+                        product: product,
+                        colorTitle: LocalizableProductDetails.$color + ":",
+                        sizeTitle: LocalizableProductDetails.$size + ":",
+                        oneSizeTitle: LocalizableProductDetails.$oneSize
+                    )
                 }
             }
             .padding(.horizontal, Spacing.space200)

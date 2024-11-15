@@ -296,9 +296,12 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         let sizes = buildVariantSizes(product: product, selectedVariant: selectedVariant)
         return sizes.map { size in
             let isAvailable = product.variants.contains { $0.size?.id == size.id && $0.stock > 0 }
-
+            var sizeName = size.value
+            if let scale = size.scale {
+                sizeName += " \(scale)"
+            }
             // TODO: Handle unavailable state if needed
-            return SizingSwatch(id: size.id, name: size.value, state: isAvailable ? .available : .outOfStock)
+            return SizingSwatch(id: size.id, name: sizeName, state: isAvailable ? .available : .outOfStock)
         }
     }
 
