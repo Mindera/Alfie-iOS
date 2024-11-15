@@ -13,14 +13,18 @@ struct WishListView: View {
     var body: some View {
     #if DEBUG
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.space200) {
+            LazyVGrid(
+                columns: Array(
+                    repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
+                    count: 2
+                ),
+                spacing: Spacing.space200
+            ) {
                 ForEach(mockContent.wishlistProducts) { product in
-                    HorizontalProductCard(
-                        product: product,
-                        colorTitle: LocalizableProductDetails.$color + ":",
-                        sizeTitle: LocalizableProductDetails.$size + ":",
-                        oneSizeTitle: LocalizableProductDetails.$oneSize
-                    )
+                    VerticalProductCard(
+                        configuration: .init(size: .medium, hideAction: true),
+                        product: product
+                    ) { _, _ in }
                 }
             }
             .padding(.horizontal, Spacing.space200)
