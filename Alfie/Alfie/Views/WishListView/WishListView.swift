@@ -26,10 +26,30 @@ struct WishListView: View {
                         product: product,
                         colorTitle: LocalizableGeneral.$color + ":",
                         sizeTitle: LocalizableGeneral.$size + ":",
-                        oneSizeTitle: LocalizableGeneral.$oneSize
+                        oneSizeTitle: LocalizableGeneral.$oneSize,
+                        addToBagTitle: LocalizableGeneral.$addToBag,
+                        outOfStockTitle: LocalizableGeneral.$outOfStock,
+                        isAddToBagDisabled: product.defaultVariant.stock == .zero
                     ) { productId, type in
-                        guard case .remove = type else { return }
-                        mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != productId }
+                        switch type {
+                        case .remove:
+                            mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != productId }
+
+                        case .addToBag:
+                            guard !mockContent.bagProducts.contains(
+                                where: {
+                                    $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
+                                    $0.defaultVariant.size?.id == product.defaultVariant.size?.id
+                                }
+                            )
+                            else {
+                                return
+                            }
+                            mockContent.bagProducts.append(product)
+
+                        case .wishlist:
+                            return
+                        }
                     }
                 }
             }

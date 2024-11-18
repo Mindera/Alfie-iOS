@@ -110,6 +110,7 @@ public struct VerticalProductCard: View {
     public enum ProductUserActionType {
         case wishlist(isFavorite: Bool)
         case remove
+        case addToBag
     }
 
     private let configuration: VerticalProductCardConfiguration
@@ -122,6 +123,9 @@ public struct VerticalProductCard: View {
     private let sizeTitle: String
     private let size: String
     private let priceType: PriceType
+    private let addToBagTitle: String
+    private let outOfStockTitle: String
+    private let isAddToBagDisabled: Bool
     private let onUserAction: ProductUserActionHandler
     @Binding public private(set) var isSkeleton: Bool
     @Binding private var isFavorite: Bool
@@ -137,6 +141,9 @@ public struct VerticalProductCard: View {
         sizeTitle: String = "",
         size: String = "",
         priceType: PriceType,
+        addToBagTitle: String = "",
+        outOfStockTitle: String = "",
+        isAddToBagDisabled: Bool = false,
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
         isFavorite: Binding<Bool> = .constant(false)
@@ -151,6 +158,9 @@ public struct VerticalProductCard: View {
         self.sizeTitle = sizeTitle
         self.size = size
         self.priceType = priceType
+        self.addToBagTitle = addToBagTitle
+        self.outOfStockTitle = outOfStockTitle
+        self.isAddToBagDisabled = isAddToBagDisabled
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
         self._isFavorite = isFavorite
@@ -162,6 +172,9 @@ public struct VerticalProductCard: View {
         colorTitle: String = "",
         sizeTitle: String = "",
         oneSizeTitle: String = "",
+        addToBagTitle: String = "",
+        outOfStockTitle: String = "",
+        isAddToBagDisabled: Bool = false,
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
         isFavorite: Binding<Bool> = .constant(false)
@@ -176,6 +189,9 @@ public struct VerticalProductCard: View {
         self.sizeTitle = sizeTitle
         self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
+        self.addToBagTitle = addToBagTitle
+        self.outOfStockTitle = outOfStockTitle
+        self.isAddToBagDisabled = isAddToBagDisabled
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
         self._isFavorite = isFavorite
@@ -200,11 +216,13 @@ public struct VerticalProductCard: View {
                 if configuration.size == .large && !configuration.hidePrice {
                     Spacer()
                     productPriceView
+                    addToBagView
                 }
             }
 
             if configuration.size != .large && !configuration.hidePrice {
                 productPriceView
+                addToBagView
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -293,6 +311,23 @@ public struct VerticalProductCard: View {
             .shimmering(while: $isSkeleton)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityId.productPrice)
+    }
+
+    @ViewBuilder private var addToBagView: some View {
+        if !configuration.hideDetails {
+            ThemedButton(
+                text: isAddToBagDisabled ? outOfStockTitle : addToBagTitle,
+                type: .small,
+                style: .secondary,
+                isDisabled: .init(
+                    get: { isAddToBagDisabled },
+                    set: { _ in }
+                ),
+                isFullWidth: true
+            ) {
+                onUserAction(productId, .addToBag)
+            }
+        }
     }
 
     @ViewBuilder private var actionView: some View {

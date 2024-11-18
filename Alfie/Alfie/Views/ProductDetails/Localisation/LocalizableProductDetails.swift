@@ -5,8 +5,6 @@ struct LocalizableProductDetails: LocalizableProtocol {
     @LocalizableResource<Self>(.complementaryInfoPayment) static var complementaryInfoPayment
     @LocalizableResource<Self>(.complementaryInfoReturns) static var complementaryInfoReturns
     @LocalizableResource<Self>(.productDescription) static var productDescription
-    @LocalizableResource<Self>(.addToBag) static var addToBag
-    @LocalizableResource<Self>(.outOfStock) static var outOfStock
     @LocalizableResource<Self>(.shareTitleFrom) static var shareTitleFrom
     @LocalizableResource<Self>(.errorTitle) static var errorTitle
     @LocalizableResource<Self>(.errorNotFoundMessage) static var errorNotFoundMessage
@@ -19,8 +17,6 @@ struct LocalizableProductDetails: LocalizableProtocol {
         case complementaryInfoPayment = "KeyComplementaryInfoPayment"
         case complementaryInfoReturns = "KeyComplementaryInfoReturns"
         case productDescription = "KeyProductDescription"
-        case addToBag = "KeyAddToBag"
-        case outOfStock = "KeyOutOfStock"
         case shareTitleFrom = "KeyShareTitleFrom"
         case errorTitle = "KeyErrorTitle"
         case errorNotFoundMessage = "KeyErrorNotFoundMessage"

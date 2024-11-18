@@ -486,8 +486,8 @@ extension ProductDetailsView {
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
             VStack(spacing: Spacing.space0) {
-                let addToBagText = LocalizableProductDetails.$addToBag
-                let outOfStockText = LocalizableProductDetails.$outOfStock
+                let addToBagText = LocalizableGeneral.$addToBag
+                let outOfStockText = LocalizableGeneral.$outOfStock
 
                 ThemedButton(
                     text: viewModel.productHasStock ? addToBagText : outOfStockText,
