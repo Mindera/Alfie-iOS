@@ -21,6 +21,7 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case chevronUp = "chevron.up"
     case clock
     case close = "xmark"
+    case closeCircleFill = "xmark.circle.fill"
     case copy = "doc.on.doc"
     case download = "square.and.arrow.down"
     case edit = "pencil"

@@ -11,6 +11,11 @@ public struct VerticalProductCardConfiguration {
         case large
     }
 
+    public enum ActionType {
+        case wishlist
+        case remove
+    }
+
     enum CardIntrinsicSize {
         case fixed(size: CGFloat)
         case flexible
@@ -26,11 +31,13 @@ public struct VerticalProductCardConfiguration {
     let size: Size
     let hidePrice: Bool
     let hideAction: Bool
+    let actionType: ActionType
 
-    public init(size: Size, hidePrice: Bool = false, hideAction: Bool = false) {
+    public init(size: Size, hidePrice: Bool = false, hideAction: Bool = false, actionType: ActionType = .wishlist) {
         self.size = size
         self.hidePrice = hidePrice
         self.hideAction = hideAction
+        self.actionType = actionType
     }
 
     // swiftlint:disable vertical_whitespace_between_cases
@@ -84,6 +91,7 @@ public struct VerticalProductCard: View {
     public typealias ProductUserActionHandler = (_ product: String, _ type: ProductUserActionType) -> Void
     public enum ProductUserActionType {
         case wishlist(isFavorite: Bool)
+        case remove
     }
 
     private let configuration: VerticalProductCardConfiguration
@@ -160,7 +168,7 @@ public struct VerticalProductCard: View {
         }
         .overlay(alignment: .topTrailing) {
             if !isSkeleton && !configuration.hideAction {
-                wishlistView
+                actionView
             }
         }
         .frame(width: configuration.cardSize.value)
@@ -218,7 +226,7 @@ public struct VerticalProductCard: View {
             .accessibilityIdentifier(AccessibilityId.productPrice)
     }
 
-    @ViewBuilder private var wishlistView: some View {
+    @ViewBuilder private var actionView: some View {
         switch configuration.size {
         case .small:
             EmptyView()
@@ -228,19 +236,36 @@ public struct VerticalProductCard: View {
             let iconSize = configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
-                isFavorite.toggle()
-                onUserAction(productId, .wishlist(isFavorite: isFavorite))
-            }, label: {
-                let image = isFavorite ? Icon.heartFill.image : Icon.heart.image
+                switch configuration.actionType {
+                case .wishlist:
+                    isFavorite.toggle()
+                    onUserAction(productId, .wishlist(isFavorite: isFavorite))
 
-                image
+                case .remove:
+                    onUserAction(productId, .remove)
+                }
+            }, label: {
+                actionImage
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Colors.primary.black, Colors.primary.white)
             })
             .padding([.top, .trailing], topTrailingEdgePadding)
             .accessibilityIdentifier(AccessibilityId.productWishlistButton)
+        }
+    }
+}
+
+// MARK: - Private Properties
+
+private extension VerticalProductCard {
+    var actionImage: Image {
+        switch configuration.actionType {
+        case .wishlist:
+            isFavorite ? Icon.heartFill.image : Icon.heart.image
+        case .remove:
+            Icon.closeCircleFill.image
         }
     }
 }
@@ -257,8 +282,8 @@ private enum AccessibilityId {
 private enum Constants {
     static let productDesignerLineLimit: Int = 1
     static let productNameLineLimit: Int = 2
-    static let iconSmallSize: CGFloat = 16
-    static let iconLargeSize: CGFloat = 24
+    static let iconSmallSize: CGFloat = 24
+    static let iconLargeSize: CGFloat = 32
     static let imageAspectRatio: CGFloat = 0.75
 }
 

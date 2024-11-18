@@ -22,9 +22,12 @@ struct WishListView: View {
             ) {
                 ForEach(mockContent.wishlistProducts) { product in
                     VerticalProductCard(
-                        configuration: .init(size: .medium, hideAction: true),
+                        configuration: .init(size: .medium, actionType: .remove),
                         product: product
-                    ) { _, _ in }
+                    ) { productId, type in
+                        guard case .remove = type else { return }
+                        mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != productId }
+                    }
                 }
             }
             .padding(.horizontal, Spacing.space200)
