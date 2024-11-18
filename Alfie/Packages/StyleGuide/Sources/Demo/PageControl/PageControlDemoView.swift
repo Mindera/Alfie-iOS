@@ -27,29 +27,32 @@ struct PageControlDemoView: View {
                         ThemedPageControl(
                             data: [0, 1, 2],
                             selectedIndex: $selectedIndex,
-                            configuration: .init(size: 8, spacing: 5))
+                            configuration: .init(size: 8, spacing: 5)
+                        )
                         .frame(height: 30, alignment: .leading)
                         ThemedPageControl(
                             data: [0, 1, 2],
                             selectedIndex: $selectedIndex,
-                            configuration: .init(size: 12, spacing: 5))
+                            configuration: .init(size: 12, spacing: 5)
+                        )
                         .frame(height: 30, alignment: .leading)
                         ThemedPageControl(
                             data: [0, 1, 2],
                             selectedIndex: $selectedIndex,
-                            configuration: .init(size: 16, spacing: 5))
+                            configuration: .init(size: 16, spacing: 5)
+                        )
                         .frame(height: 30, alignment: .leading)
                         ThemedPageControl(
                             data: [0, 1, 2],
                             selectedIndex: $selectedIndex,
-                            configuration: .init(size: 16, spacing: 5), customControl: { _, isSelected in
-                                let configuration = ThemedPageControlConfiguration(size: 16)
-                                Rectangle()
-                                    .fill(isSelected ? configuration.selectedColor : configuration.color)
-                                    .frame(width: configuration.size, height: configuration.size)
-                                    .animation(.linear(duration: configuration.animationDuration),
-                                               value: isSelected)
-                            })
+                            configuration: .init(size: 16, spacing: 5)
+                        ) { _, isSelected in
+                            let configuration = ThemedPageControlConfiguration(size: 16)
+                            Rectangle()
+                                .fill(isSelected ? configuration.selectedColor : configuration.color)
+                                .frame(width: configuration.size, height: configuration.size)
+                                .animation(.linear(duration: configuration.animationDuration), value: isSelected)
+                        }
                         .frame(height: 30, alignment: .leading)
                     }
                 }
@@ -67,9 +70,7 @@ struct PageControlDemoView: View {
     }
 
     private func selectionButton(title: String, selectedIndex: Int) -> some View {
-        ThemedButton(text: title, action: {
-            self.selectedIndex = selectedIndex
-        })
+        ThemedButton(text: title) { self.selectedIndex = selectedIndex }
     }
 }
 

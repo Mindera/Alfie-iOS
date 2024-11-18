@@ -7,7 +7,10 @@ struct CheckboxesDemoView: View {
         VStack(alignment: .leading, spacing: Spacing.space250) {
             DemoHelper.demoSectionHeader(title: "Checkbox")
                 .padding(.bottom, Spacing.space400)
-            Checkbox(state: $enabledCheckboxState, text: .constant(enabledCheckboxState == .selected ? "Selected" : "Unselected"))
+            Checkbox(
+                state: $enabledCheckboxState,
+                text: .constant(enabledCheckboxState == .selected ? "Selected" : "Unselected")
+            )
             Checkbox(state: .constant(.disabled), text: "Disabled")
             Spacer()
         }

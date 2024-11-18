@@ -14,7 +14,7 @@ struct SkeletonDemoView: View {
                 bodyType {
                     Image("DemoProductImage", bundle: .module)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .scaledToFit()
                         .shimmering(while: $isImageLoading)
                 } second: {
                     VStack(alignment: .leading, spacing: Spacing.space100) {
@@ -24,9 +24,11 @@ struct SkeletonDemoView: View {
                         Text.build(theme.font.paragraph.normal("TH CITY TOTE"))
                             .shimmering(while: $isContentLoading)
 
-                        Text.build(theme.font.small.normal(
+                        Text.build(
+                            theme.font.small.normal(
                             """
-                            For busy days on the move, choose this timeless tote featuring a handy removable coin purse to store your on-the-go cash.
+                            For busy days on the move, choose this timeless tote \
+                            featuring a handy removable coin purse to store your on-the-go cash.
 
                             Highlights
                             - Smooth finish
@@ -46,7 +48,8 @@ struct SkeletonDemoView: View {
                             - 100% polyurethane
 
                             """
-                        ))
+                            )
+                        )
                         .shimmeringMultiline(while: $isContentLoading, lines: 14, font: theme.font.small.normal)
                         .padding(.top, Spacing.space100)
                     }
@@ -57,17 +60,11 @@ struct SkeletonDemoView: View {
 
             ThemedDivider.horizontalThick
             HStack(spacing: Spacing.space200) {
-                ThemedButton(text: "Add To Bag", type: .big,
-                             style: .primary,
-                             trailingAsset: Icon.bag,
-                             action: {})
-                .shimmering(while: $isContentLoading)
-                
-                ThemedButton(text: "Find in Store", type: .big,
-                             style: .secondary,
-                             trailingAsset: Icon.store,
-                             action: {})
-                .shimmering(while: $isContentLoading)
+                ThemedButton(text: "Add To Bag", type: .big, style: .primary, trailingAsset: Icon.bag) {}
+                    .shimmering(while: $isContentLoading)
+
+                ThemedButton(text: "Find in Store", type: .big, style: .secondary, trailingAsset: Icon.store) {}
+                    .shimmering(while: $isContentLoading)
             }
             .padding(Spacing.space100)
         }
@@ -86,19 +83,19 @@ struct SkeletonDemoView: View {
     @ViewBuilder
     private func bodyType(first: @escaping () -> some View, second: @escaping () -> some View) -> some View {
         switch horizontalSizeClass {
-            case .regular:
-                HStack(alignment: .top) {
-                    first()
-                    second()
-                    Spacer()
-                }
-            case .compact,
-                 .none,
-                 .some:
-                VStack {
-                    first()
-                    second()
-                }
+        case .regular:
+            HStack(alignment: .top) {
+                first()
+                second()
+                Spacer()
+            }
+        case .compact,
+             .none, // swiftlint:disable:this indentation_width
+             .some:
+            VStack {
+                first()
+                second()
+            }
         }
     }
 }

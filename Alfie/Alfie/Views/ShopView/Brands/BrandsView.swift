@@ -1,7 +1,7 @@
 import Models
+import OrderedCollections
 import StyleGuide
 import SwiftUI
-import OrderedCollections
 #if DEBUG
 import Mocks
 #endif
@@ -43,16 +43,18 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
         .scrollDisabled(true)
     }
 
-    @ViewBuilder
-    private var searchBar: some View {
+    @ViewBuilder private var searchBar: some View {
         if viewModel.state.isSuccess {
-            ThemedSearchBarView(searchText: $viewModel.searchText,
-                                placeholder: LocalizableBrands.$searchBarPlaceholder,
-                                theme: .soft,
-                                dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
-                                onFocusChange: { isFocused in
-                viewModel.searchFocusDidChange(isFocused: isFocused)
-            })
+            // swiftlint:disable:next trailing_closure
+            ThemedSearchBarView(
+                searchText: $viewModel.searchText,
+                placeholder: LocalizableBrands.$searchBarPlaceholder,
+                theme: .soft,
+                dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
+                onFocusChange: { isFocused in
+                    viewModel.searchFocusDidChange(isFocused: isFocused)
+                }
+            )
         }
     }
 
@@ -67,11 +69,11 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
                 brandsList
             }
         }
-        .onReceive(viewModel.indexVisibilityPublisher.receive(on: DispatchQueue.main), perform: { isVisible in
+        .onReceive(viewModel.indexVisibilityPublisher.receive(on: DispatchQueue.main)) { isVisible in
             withAnimation(.standardAccelerate) {
                 showIndex = isVisible
             }
-        })
+        }
     }
 
     private var brandsList: some View {
@@ -79,10 +81,11 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             ScrollViewReader { scrollProxy in
                 ZStack {
                     List(viewModel.sectionTitles, id: \.self) { section in
-                        Section(header: HeaderView(title: section)
-                            .anchorPreference(key: VisiblePreferenceKey.self, value: .bounds) {
-                                [.init(item: section, anchor: $0)]
-                            }
+                        Section(
+                            header: HeaderView(title: section)
+                                .anchorPreference(key: VisiblePreferenceKey.self, value: .bounds) {
+                                    [.init(item: section, anchor: $0)]
+                                }
                         ) {
                             VStack(spacing: Spacing.space0) {
                                 ForEach(viewModel.brands(for: section)) { brand in
@@ -121,29 +124,37 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     }
 
     private func brandItemView(_ brand: Brand) -> some View {
-        BrandItemView(brand: brand,
-                      foregroundColor: { Colors.primary.mono800 },
-                      isLoading: .constant(false))
-        .modifier(TapHighlightableModifier(action: {
-            coordinator.openProductListing(configuration: .init(category: brand.slug,
-                                                                searchText: nil,
-                                                                urlQueryParameters: nil,
-                                                                mode: .listing))
-        }))
+        BrandItemView(
+            brand: brand,
+            foregroundColor: { Colors.primary.mono800 },
+            isLoading: .constant(false)
+        )
+        .modifier(
+            TapHighlightableModifier {
+                coordinator.openProductListing(
+                    configuration: .init(
+                        category: brand.slug,
+                        searchText: nil,
+                        urlQueryParameters: nil,
+                        mode: .listing
+                    )
+                )
+            }
+        )
     }
 
     private func placeholderItemView(_ placeholder: Brand) -> some View {
-        BrandItemView(brand: placeholder,
-                      foregroundColor: { Colors.primary.mono300 },
-                      isLoading: .constant(true))
+        BrandItemView(brand: placeholder, foregroundColor: { Colors.primary.mono300 }, isLoading: .constant(true))
     }
 
     private func sectionIndexTitles(proxy: ScrollViewProxy) -> some View {
         VStack(spacing: Spacing.space0) {
             if showIndex {
-                SectionIndexTitles(scrollProxy: proxy,
-                                   titles: viewModel.sectionTitles,
-                                   selectedIndexTitle: $selectedIndexTitle)
+                SectionIndexTitles(
+                    scrollProxy: proxy,
+                    titles: viewModel.sectionTitles,
+                    selectedIndexTitle: $selectedIndexTitle
+                )
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
@@ -187,8 +198,8 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             .renderingMode(.template)
             .resizable()
             .foregroundStyle(Colors.primary.black)
+            .scaledToFit()
             .frame(width: Constants.iconSize, height: Constants.iconSize)
-            .aspectRatio(contentMode: .fit)
     }
 }
 
@@ -220,9 +231,7 @@ extension BrandsView {
         private let foregroundColor: () -> Color
         @Binding private var isLoading: Bool
 
-        init(brand: Brand,
-             foregroundColor: @escaping () -> Color,
-             isLoading: Binding<Bool>) {
+        init(brand: Brand, foregroundColor: @escaping () -> Color, isLoading: Binding<Bool>) {
             self.brand = brand
             self.foregroundColor = foregroundColor
             self._isLoading = isLoading
@@ -256,9 +265,7 @@ extension BrandsView {
         @Binding private var selectedIndexTitle: String
         @GestureState private var dragLocation: CGPoint = .zero
 
-        init(scrollProxy: ScrollViewProxy,
-             titles: OrderedSet<String>,
-             selectedIndexTitle: Binding<String>) {
+        init(scrollProxy: ScrollViewProxy, titles: OrderedSet<String>, selectedIndexTitle: Binding<String>) {
             self.scrollProxy = scrollProxy
             self.titles = titles
             _selectedIndexTitle = selectedIndexTitle
@@ -290,9 +297,7 @@ extension BrandsView {
         private func dragObserver(geometry: GeometryProxy, title: String) -> some View {
             let emptyView = Rectangle().fill(Color.clear)
 
-            guard title != selectedIndexTitle else {
-                return emptyView
-            }
+            guard title != selectedIndexTitle else { return emptyView }
 
             if geometry.frame(in: .global).contains(dragLocation) {
                 DispatchQueue.main.async {
@@ -320,7 +325,7 @@ extension BrandsView {
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
                     RoundedRectangle(cornerRadius: CornerRadius.xxs)
-                        .foregroundColor(isSelected ? Colors.primary.mono900 : Color.clear)
+                        .foregroundStyle(isSelected ? Colors.primary.mono900 : Color.clear)
                 }
         }
     }
@@ -360,9 +365,18 @@ private enum Constants {
             Brand(name: "\(letter) brand \(instance)", slug: "")
         }
     }
-    return BrandsView(viewModel: MockBrandsViewModel(
-        state: .success(OrderedDictionary(grouping: brands, by: { String($0.name.first!) })),
-        sectionTitles: OrderedSet(sections)))
+
+    return BrandsView(
+        viewModel: MockBrandsViewModel(
+            state: .success(
+                OrderedDictionary(grouping: brands) {
+                    guard let firstCharacter = $0.name.first else { return "" }
+                    return String(firstCharacter)
+                }
+            ),
+            sectionTitles: OrderedSet(sections)
+        )
+    )
     .environmentObject(Coordinator())
 }
 

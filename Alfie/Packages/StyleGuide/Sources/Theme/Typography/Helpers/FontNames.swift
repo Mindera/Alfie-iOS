@@ -10,8 +10,8 @@ public enum FontNames: String, CaseIterable {
 
     public var fileName: String {
         switch self {
-            case .sfProMedium:
-                return "SF-Pro-Display-Medium"
+        case .sfProMedium:
+            return "SF-Pro-Display-Medium"
         }
     }
 
@@ -36,6 +36,7 @@ public enum FontManager {
     private static func registerFont(named name: String) throws {
         guard
             let asset = NSDataAsset(name: "\(name)", bundle: Bundle.module),
+            // swiftlint:disable:next legacy_objc_type
             let provider = CGDataProvider(data: asset.data as NSData),
             let font = CGFont(provider)
         else {
@@ -54,6 +55,7 @@ public enum FontError: Swift.Error {
 }
 
 extension UIFont {
+    // swiftlint:disable:next strict_fileprivate
     fileprivate static func register(from url: URL) {
         guard let fontDataProvider = CGDataProvider(url: url as CFURL) else {
             logError("could not get reference to font data provider")

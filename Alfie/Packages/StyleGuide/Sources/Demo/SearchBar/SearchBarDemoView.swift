@@ -14,6 +14,7 @@ struct SearchBarDemoView: View {
             DemoHelper.demoSectionHeader(title: "Search Bar")
                 .padding(.horizontal, Spacing.space200)
 
+            // swiftlint:disable:next trailing_closure
             ScrollViewWithOffsetReader(offset: $scrollOffset) {
                 LazyVGrid(columns: [
                     GridItem(.flexible(minimum: 200)),
@@ -23,14 +24,14 @@ struct SearchBarDemoView: View {
                         VStack {
                             Image("DemoProductImage", bundle: .module)
                                 .resizable()
-                                .aspectRatio(contentMode: .fit)
+                                .scaledToFit()
                                 .cornerRadius(8)
                             Text("Product \(index)")
                                 .font(.headline)
                                 .padding(.top, 5)
                             Text("Description \(index)")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundStyle(.gray)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 10)
                         }
@@ -81,10 +82,10 @@ struct SearchBarDemoView: View {
 private extension ThemedSearchBarView.Theme {
     var name: String {
         switch self {
-            case .softLarge:
-                "Soft Large"
-            default:
-                "\(self)".capitalized
+        case .softLarge:
+            "Soft Large"
+        default:
+            "\(self)".capitalized
         }
     }
 }

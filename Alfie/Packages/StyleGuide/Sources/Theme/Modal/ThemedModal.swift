@@ -54,9 +54,13 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                 onDismiss()
                                             } label: {
                                                 Icon.close.image
-                                                    .resizable()
                                                     .renderingMode(.template)
-                                                    .frame(width: Constants.iconCloseSize, height: Constants.iconCloseSize)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(
+                                                        width: Constants.iconCloseSize,
+                                                        height: Constants.iconCloseSize
+                                                    )
                                                     .tint(Colors.primary.black)
                                             }
                                         }
@@ -70,10 +74,15 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                             offset = .zero
                                                         }
                                                 )
-                                                .background(GeometryReader {
-                                                    ZStack {}.preference(key: ViewHeightKey.self,
-                                                                         value: $0.frame(in: .local).size.height)
-                                                })
+                                                .background(
+                                                    GeometryReader {
+                                                        ZStack {}
+                                                            .preference(
+                                                                key: ViewHeightKey.self,
+                                                                value: $0.frame(in: .local).size.height
+                                                            )
+                                                    }
+                                                )
                                                 .padding(.bottom, Spacing.space400)
                                                 .padding(.horizontal, Spacing.space200)
                                                 .onPreferenceChange(ViewHeightKey.self) {
@@ -93,13 +102,19 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                             }
                                         }
                                     }
-                                    .padding(.horizontal, horizontalSizeClass == .regular ? Spacing.space1000 : Spacing.space0)
+                                    .padding(
+                                        .horizontal,
+                                        horizontalSizeClass == .regular ? Spacing.space1000 : Spacing.space0
+                                    )
                                     .edgesIgnoringSafeArea(.bottom)
                                     .background {
                                         RoundedRectangle(cornerRadius: CornerRadius.m)
                                             .fill(Colors.primary.white)
                                             .edgesIgnoringSafeArea(.bottom)
-                                            .padding(.horizontal, horizontalSizeClass == .regular ? Spacing.space1000 : Spacing.space0)
+                                            .padding(
+                                                .horizontal,
+                                                horizontalSizeClass == .regular ? Spacing.space1000 : Spacing.space0
+                                            )
                                     }
                                     .offset(y: offset.height)
                                     .transition(.move(edge: .bottom))
@@ -137,9 +152,9 @@ struct ThemedModal<Modal: View>: ViewModifier {
                         self.showModal = true
                     }
                 }
-                .transaction({ transaction in
+                .transaction { transaction in
                     transaction.disablesAnimations = true
-                })
+                }
                 .background(ClearBackground())
             }
     }
@@ -195,6 +210,7 @@ struct ClearBackground: UIViewRepresentable {
 }
 
 extension UIDevice {
+    // swiftlint:disable:next strict_fileprivate
     fileprivate var topMargin: CGFloat {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene
@@ -203,6 +219,7 @@ extension UIDevice {
         return window.safeAreaInsets.top
     }
 
+    // swiftlint:disable:next strict_fileprivate
     fileprivate var hasNotch: Bool {
         let scenes = UIApplication.shared.connectedScenes
         let windowScene = scenes.first as? UIWindowScene

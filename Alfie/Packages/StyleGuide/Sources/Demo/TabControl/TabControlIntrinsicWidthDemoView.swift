@@ -15,10 +15,14 @@ struct TabControlIntrinsicWidthDemoView: View {
 
     var body: some View {
         VStack {
-            TabControl(theme: theme,
-                       configuration: .intrisicSize(itemSpacing: spacing),
-                       options: currentOptions.map { TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil) },
-                       currentIndex: $currentIndex)
+            TabControl(
+                theme: theme,
+                configuration: .intrisicSize(itemSpacing: spacing),
+                options: currentOptions.map {
+                    TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil)
+                },
+                currentIndex: $currentIndex
+            )
             .animation(.emphasizedDecelerate, value: spacing)
 
             TabView(selection: $currentIndex) {
@@ -27,7 +31,7 @@ struct TabControlIntrinsicWidthDemoView: View {
                         .fill(Colors.primary.mono300)
                         .overlay {
                             Text.build(theme.font.paragraph.bold(value))
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                         }
                         .frame(width: 300, height: 350)
                 }

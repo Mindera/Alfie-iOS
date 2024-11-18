@@ -11,7 +11,8 @@ extension XCTestCase {
                 return
             }
             exp.fulfill()
-        }.store(in: &subscriptions)
+        }
+        .store(in: &subscriptions)
 
         asyncOperation?()
 
@@ -29,7 +30,7 @@ extension XCTestCase {
         var cancellable: AnyCancellable?
         cancellable = propertyPublisher
             .dropFirst()
-            .first(where: { $0 == expectedValue })
+            .first { $0 == expectedValue }
             .sink { value in
                 XCTAssertEqual(value, expectedValue, file: file, line: line)
                 cancellable?.cancel()
@@ -49,7 +50,8 @@ extension XCTestCase {
             .sink { publisherValue in
                 value = publisherValue
                 exp.fulfill()
-            }.store(in: &subscriptions)
+            }
+            .store(in: &subscriptions)
 
         eventTriggered.send()
         eventTrigger()
@@ -68,7 +70,8 @@ extension XCTestCase {
             .drop(untilOutputFrom: eventTriggered)
             .sink { _ in
                 exp.fulfill()
-            }.store(in: &subscriptions)
+            }
+            .store(in: &subscriptions)
 
         eventTriggered.send()
         eventTrigger()
@@ -85,16 +88,19 @@ extension XCTestCase {
         publisher
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in
                 exp.fulfill()
-            }).store(in: &subscriptions)
+            })
+            .store(in: &subscriptions)
 
         let result = XCTWaiter().wait(for: [exp], timeout: timeout)
         return result == .completed
     }
 
-    public func captureLastEvent<T>(fromPublisher publisher: AnyPublisher<T, Never>,
-                                    filteringValues: @escaping (T) -> Bool = { _ in true },
-                                    eventTrigger: () -> Void,
-                                    timeout: TimeInterval = 2.0) -> T? {
+    public func captureLastEvent<T>(
+        fromPublisher publisher: AnyPublisher<T, Never>,
+        filteringValues: @escaping (T) -> Bool = { _ in true },
+        eventTrigger: () -> Void,
+        timeout: TimeInterval = 2.0
+    ) -> T? {
         var subscriptions: Set<AnyCancellable> = []
         var value: T?
         let exp = expectation(description: "capture first event")
@@ -105,7 +111,8 @@ extension XCTestCase {
             .sink { publisherValue in
                 value = publisherValue
                 exp.fulfill()
-            }.store(in: &subscriptions)
+            }
+            .store(in: &subscriptions)
 
         eventTrigger()
 
@@ -120,7 +127,8 @@ extension XCTestCase {
 
         publisher.sink { value in
             values.append(value)
-        }.store(in: &subscriptions)
+        }
+        .store(in: &subscriptions)
 
         sleep(UInt32(duration))
         return values
@@ -134,12 +142,14 @@ extension XCTestCase {
             .first()
             .sink(
                 receiveCompletion: { completion in
+                    // swiftlint:disable vertical_whitespace_between_cases
                     switch completion {
-                        case .failure(let error):
-                            result = .failure(error)
-                        case .finished:
-                            break
+                    case .failure(let error):
+                        result = .failure(error)
+                    case .finished:
+                        break
                     }
+                    // swiftlint:enable vertical_whitespace_between_cases
                     exp.fulfill()
                 },
                 receiveValue: { value in
@@ -161,12 +171,14 @@ extension XCTestCase {
         _ = publisher
             .sink(receiveCompletion: { completion in
                 isCompletionCalled = true
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch completion {
-                    case .finished:
-                        break
-                    case .failure(let failure):
-                        error = failure
+                case .finished:
+                    break
+                case .failure(let failure):
+                    error = failure
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
                 expectation.fulfill()
             }, receiveValue: { _ in
                 // do nothing
@@ -185,16 +197,19 @@ extension XCTestCase {
 
         publisher
             .sink(receiveCompletion: { completion in
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch completion {
-                    case .finished:
-                        break
-                    case .failure(let failure):
-                        error = failure
+                case .finished:
+                    break
+                case .failure(let failure):
+                    error = failure
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
                 expectation.fulfill()
             }, receiveValue: { _ in
                 // do nothing
-            }).store(in: &subscriptions)
+            })
+            .store(in: &subscriptions)
 
         waitForExpectations(timeout: 3)
 
@@ -211,15 +226,18 @@ extension XCTestCase {
 
         publisher
             .sink(receiveCompletion: { completion in
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch completion {
-                    case .finished:
-                        break
-                    case .failure:
-                        expectation.fulfill()
+                case .finished:
+                    break
+                case .failure:
+                    expectation.fulfill()
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
             }, receiveValue: { _ in
                 XCTFail("Failure")
-            }).store(in: &subscriptions)
+            })
+            .store(in: &subscriptions)
 
         waitForExpectations(timeout: 3)
     }

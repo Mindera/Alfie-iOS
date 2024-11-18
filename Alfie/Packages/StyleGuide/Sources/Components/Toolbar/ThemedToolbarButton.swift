@@ -29,15 +29,17 @@ public struct ThemedToolbarButton: View {
     @Binding private var badgeValue: Int?
     private let action: () -> Void
 
-    public init(icon: Icon?,
-                text: String? = nil,
-                tint: Color = Colors.primary.mono900,
-                isDisabled: Binding<Bool> = .constant(false),
-                isLoading: Binding<Bool> = .constant(false),
-                badgeValue: Binding<Int?> = .constant(nil),
-                accessibilityId: String = "",
-                toolBarButtonSize: ToolBarButtonSize = .normal,
-                action: @escaping () -> Void) {
+    public init(
+        icon: Icon?,
+        text: String? = nil,
+        tint: Color = Colors.primary.mono900,
+        isDisabled: Binding<Bool> = .constant(false),
+        isLoading: Binding<Bool> = .constant(false),
+        badgeValue: Binding<Int?> = .constant(nil),
+        accessibilityId: String = "",
+        toolBarButtonSize: ToolBarButtonSize = .normal,
+        action: @escaping () -> Void
+    ) {
         self.icon = icon
         self.text = text
         self.tint = tint
@@ -59,9 +61,9 @@ public struct ThemedToolbarButton: View {
                 LoaderView(circleDiameter: .defaultSmall, labelHidden: true)
             } else if let icon {
                 icon.image
-                    .resizable()
                     .renderingMode(.template)
-                    .aspectRatio(contentMode: .fit)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(tint)
                     .badgeView(badgeValue: $badgeValue)
@@ -88,33 +90,12 @@ public struct ThemedToolbarButton: View {
 
 #Preview {
     VStack(spacing: 40) {
-        ThemedToolbarButton(icon: .bell,
-                            action: {})
-
-        ThemedToolbarButton(icon: nil,
-                            text: "Help",
-                            action: {})
-
-        ThemedToolbarButton(icon: .bell,
-                            badgeValue: .constant(1),
-                            action: {})
-
-        ThemedToolbarButton(icon: nil,
-                            text: "Help",
-                            badgeValue: .constant(1),
-                            action: {})
-
-        ThemedToolbarButton(icon: .bell,
-                            isDisabled: .constant(true),
-                            action: {})
-
-        ThemedToolbarButton(icon: nil,
-                            text: "Help",
-                            isDisabled: .constant(true),
-                            action: {})
-
-        ThemedToolbarButton(icon: .bell,
-                            isLoading: .constant(true),
-                            action: {})
+        ThemedToolbarButton(icon: .bell) {}
+        ThemedToolbarButton(icon: nil, text: "Help") {}
+        ThemedToolbarButton(icon: .bell, badgeValue: .constant(1)) {}
+        ThemedToolbarButton(icon: nil, text: "Help", badgeValue: .constant(1)) {}
+        ThemedToolbarButton(icon: .bell, isDisabled: .constant(true)) {}
+        ThemedToolbarButton(icon: nil, text: "Help", isDisabled: .constant(true)) {}
+        ThemedToolbarButton(icon: .bell, isLoading: .constant(true)) {}
     }
 }

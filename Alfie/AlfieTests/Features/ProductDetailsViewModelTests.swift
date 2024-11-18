@@ -33,14 +33,19 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertTrue(sut.productName.isEmpty)
         XCTAssertTrue(sut.productTitle.isEmpty)
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
+        let sizingSelectionConfiguration = sut.sizingSelectionConfiguration
         XCTAssertTrue(colorSelectionConfiguration.items.isEmpty)
+        XCTAssertTrue(sizingSelectionConfiguration.items.isEmpty)
     }
 
     func test_placeholder_information_is_available_when_a_base_product_is_passed_on_init() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
-                                      variants: [.fixture(colour: color)])
+                                      defaultVariant: variant,
+                                      variants: [variant])
         initViewModel(product: product)
         XCTAssertEqual(sut.productName, product.name)
         XCTAssertEqual(sut.productTitle, product.brand.name)
@@ -48,6 +53,21 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
         XCTAssertEqual(colorSelectionConfiguration.items.first?.id, color.id)
         XCTAssertEqual(colorSelectionConfiguration.items.first?.name, color.name)
+        let sizingSelectionConfiguration = sut.sizingSelectionConfiguration
+        XCTAssertEqual(sizingSelectionConfiguration.items.count, 1)
+        XCTAssertEqual(sizingSelectionConfiguration.items.first?.id, size.id)
+        XCTAssertEqual(sizingSelectionConfiguration.items.first?.name, size.value)
+    }
+    
+    func test_sizing_selection_configuration_is_unavailable_when_there_is_no_selected_variant_on_init() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(name: "Product Name",
+                                      brand: .fixture(name: "Product Brand"),
+                                      variants: [variant])
+        initViewModel(product: product)
+        XCTAssertEqual(sut.sizingSelectionConfiguration.items.count, 0)
     }
 
     // MARK: - Properties
@@ -141,6 +161,41 @@ final class ProductDetailsViewModelTests: XCTestCase {
         })
 
         XCTAssertEqual(sut.productDescription, product.longDescription)
+    }
+    
+    func test_price_type_is_nil_when_no_product_is_missing() {
+        initViewModel()
+        XCTAssertNil(sut.priceType)
+    }
+    
+    func test_price_type_is_not_nil_with_sale_product() {
+        initViewModel(product: Product.blazer)
+        guard case .sale(let fullPrice, let finalPrice) = sut.priceType else {
+            XCTFail("Unexpected price type")
+            return
+        }
+        XCTAssertEqual(fullPrice, "$495.00")
+        XCTAssertEqual(finalPrice, "$299.00")
+    }
+    
+    func test_price_type_is_not_nil_with_range_price_product() {
+        initViewModel(product: Product.hat)
+        guard case .range(let lowerBound, let upperBound, let separator) = sut.priceType else {
+            XCTFail("Unexpected price type")
+            return
+        }
+        XCTAssertEqual(lowerBound, "$750.00")
+        XCTAssertEqual(upperBound, "$850.00")
+        XCTAssertEqual(separator, "-")
+    }
+    
+    func test_price_type_is_not_nil_with_default_price_product() {
+        initViewModel(product: Product.necklace)
+        guard case .default(let price) = sut.priceType else {
+            XCTFail("Unexpected price type")
+            return
+        }
+        XCTAssertEqual(price, "$279.00")
     }
 
     // MARK: - Product fetch
@@ -243,8 +298,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
         let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
-        let variant1 = Product.Variant.fixture(colour: color1, stock: 1)
-        let variant2 = Product.Variant.fixture(colour: color2, stock: 2)
+        let size1 = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let size2 = Product.ProductSize.fixture(id: "13", value: "UK 8")
+        let variant1 = Product.Variant.fixture(size: size1, colour: color1, stock: 1)
+        let variant2 = Product.Variant.fixture(size: size2, colour: color2, stock: 2)
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
                                       defaultVariant: variant1,
@@ -261,6 +318,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertNotNil(selectedVariant)
         XCTAssertEqual(selectedVariant?.colour?.id, variant1.colour?.id)
         XCTAssertEqual(selectedVariant?.colour?.name, variant1.colour?.name)
+        XCTAssertEqual(selectedVariant?.size?.id, variant1.size?.id)
+        XCTAssertEqual(selectedVariant?.size?.value, variant1.size?.value)
         XCTAssertEqual(selectedVariant?.stock, variant1.stock)
     }
 
@@ -330,6 +389,28 @@ final class ProductDetailsViewModelTests: XCTestCase {
         })
 
         let result = sut.shouldShowLoading(for: .colorSelector)
+        XCTAssertFalse(result)
+    }
+    
+    func test_reports_size_section_loading_when_loading() {
+        initViewModel()
+
+        let result = sut.shouldShowLoading(for: .sizeSelector)
+        XCTAssertTrue(result)
+    }
+    
+    func test_does_not_report_size_section_loading_when_not_loading() {
+        initViewModel()
+
+        mockProductService.onGetProductCalled = { _ in
+            .fixture()
+        }
+
+        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+            sut.viewDidAppear()
+        })
+
+        let result = sut.shouldShowLoading(for: .sizeSelector)
         XCTAssertFalse(result)
     }
 
@@ -591,6 +672,12 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
 
         XCTAssertTrue(sut.shouldShow(section: .colorSelector))
+    }
+    
+    func test_reports_sizing_selection_section_as_visible() {
+        initViewModel()
+
+        XCTAssertTrue(sut.shouldShow(section: .sizeSelector))
     }
 
     func test_reports_complementary_info_section_as_visible() {

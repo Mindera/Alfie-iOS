@@ -26,8 +26,8 @@ public struct PickerMenu<Content: View>: View {
                         Icon.chevronDown.image
                             .renderingMode(.template)
                             .resizable()
+                            .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
-                            .aspectRatio(contentMode: .fit)
                             .tint(Colors.primary.mono900)
                     }
                     .padding(.horizontal, Spacing.space200)
@@ -39,6 +39,5 @@ public struct PickerMenu<Content: View>: View {
 }
 
 #Preview {
-    PickerMenu(isModalPresented: .constant(false),
-               selectedOptionView: { Text("Selected Option") })
+    PickerMenu(isModalPresented: .constant(false)) { Text("Selected Option") }
 }

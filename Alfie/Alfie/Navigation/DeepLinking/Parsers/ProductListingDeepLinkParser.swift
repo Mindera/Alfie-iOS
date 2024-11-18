@@ -33,11 +33,15 @@ final class ProductListingDeepLinkParser: DeepLinkParserProtocol {
         let components = url.cleanPathComponents
 
         // Special "Brand" case, check if it is /Brand/<something>, in that case it's a PLP link, otherwise let the default parser handle it
-        if let firstComponent = components.first?.lowercased(),
-           firstComponent == brandComponent,
-           components.count == 2,
-           let _ = components.last?.lowercased() {
-            return .init(type: .productList(category: url.cleanPath, query: nil, urlParameters: url.queryParameters), fullUrl: normalisedWebUrl)
+        if
+            let firstComponent = components.first?.lowercased(),
+            firstComponent == brandComponent,
+            components.count == 2,
+            components.last?.lowercased() != nil {
+            return .init(
+                type: .productList(category: url.cleanPath, query: nil, urlParameters: url.queryParameters),
+                fullUrl: normalisedWebUrl
+            )
         }
 
         guard
@@ -47,6 +51,9 @@ final class ProductListingDeepLinkParser: DeepLinkParserProtocol {
             return nil
         }
 
-        return .init(type: .productList(category: url.cleanPath, query: nil, urlParameters: url.queryParameters), fullUrl: normalisedWebUrl)
+        return .init(
+            type: .productList(category: url.cleanPath, query: nil, urlParameters: url.queryParameters),
+            fullUrl: normalisedWebUrl
+        )
     }
 }

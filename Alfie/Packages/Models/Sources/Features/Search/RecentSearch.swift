@@ -6,9 +6,9 @@ public enum RecentSearch {
 public extension RecentSearch {
     var value: String {
         switch self {
-            case .text(let value),
-                 .reccomendation(let value, _):
-                return value
+        case .text(let value),
+             .reccomendation(let value, _): // swiftlint:disable:this indentation_width
+            return value
         }
     }
 }

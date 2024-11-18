@@ -31,6 +31,6 @@ public struct Log: Identifiable {
 
 public extension Collection where Element == Log {
     var sortedByMostRecent: [Log] {
-        sorted(by: { $0.date > $1.date })
+        sorted { $0.date > $1.date }
     }
 }

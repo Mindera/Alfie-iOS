@@ -20,25 +20,11 @@ struct SnackbarDemoView: View {
                 VStack(spacing: Spacing.space250) {
                     DemoHelper.demoSectionHeader(title: "Snackbars")
 
-                    ThemedToggleView(isOn: $showIcon, label: {
-                        Text.build(theme.font.small.bold("Show icon"))
-                    })
-
-                    ThemedToggleView(isOn: $showAction, label: {
-                        Text.build(theme.font.small.bold("Show action button"))
-                    })
-
-                    ThemedToggleView(isOn: $showClose, label: {
-                        Text.build(theme.font.small.bold("Show close button"))
-                    })
-
-                    ThemedToggleView(isOn: $autoDismiss, label: {
-                        Text.build(theme.font.small.bold("Auto dismiss"))
-                    })
-
-                    ThemedToggleView(isOn: $showFromTop, label: {
-                        Text.build(theme.font.small.bold("Show on top"))
-                    })
+                    ThemedToggleView(isOn: $showIcon) { Text.build(theme.font.small.bold("Show icon")) }
+                    ThemedToggleView(isOn: $showAction) { Text.build(theme.font.small.bold("Show action button")) }
+                    ThemedToggleView(isOn: $showClose) { Text.build(theme.font.small.bold("Show close button")) }
+                    ThemedToggleView(isOn: $autoDismiss) { Text.build(theme.font.small.bold("Auto dismiss")) }
+                    ThemedToggleView(isOn: $showFromTop) { Text.build(theme.font.small.bold("Show on top")) }
 
                     Button(action: {
                         buildConfig(type: .info, text: "Text messsage")
@@ -72,7 +58,7 @@ struct SnackbarDemoView: View {
         .snackbarView(configuration: $snackbarConfig)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                ThemedToolbarButton(icon: .arrowLeft, action: { dismiss() })
+                ThemedToolbarButton(icon: .arrowLeft) { dismiss() }
             }
             ToolbarItem(placement: .principal) {
                 ThemedToolbarTitle(style: .logo)
@@ -88,7 +74,7 @@ struct SnackbarDemoView: View {
                 .fill(.black)
             Text.build(theme.font.paragraph.bold(label))
                 .padding()
-                .foregroundColor(Colors.primary.white)
+                .foregroundStyle(Colors.primary.white)
         }
         .frame(width: 180, height: 36)
     }
@@ -96,15 +82,17 @@ struct SnackbarDemoView: View {
     private func buildConfig(type: SnackbarViewConfiguration.SnackbarViewType, text: String) {
         let delay = snackbarConfig == nil ? 0.0 : 2.5
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            snackbarConfig = SnackbarViewConfiguration(type: type,
-                                                       text: text,
-                                                       showCloseButton: showClose,
-                                                       icon: showIcon ? Icon.checkmark.image : nil,
-                                                       actionButtonLabel: showAction ? "Action" : nil,
-                                                       showFromTop: showFromTop,
-                                                       autoDismissTime: autoDismiss ? 2 : nil,
-                                                       onActionTap: { },
-                                                       onDismiss: { snackbarConfig = nil })
+            snackbarConfig = SnackbarViewConfiguration(
+                type: type,
+                text: text,
+                showCloseButton: showClose,
+                icon: showIcon ? Icon.checkmark.image : nil,
+                actionButtonLabel: showAction ? "Action" : nil,
+                showFromTop: showFromTop,
+                autoDismissTime: autoDismiss ? 2 : nil,
+                onActionTap: { },
+                onDismiss: { snackbarConfig = nil }
+            )
         }
     }
 }

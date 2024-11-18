@@ -17,9 +17,6 @@ final class AuthorizationInterceptor: ApolloInterceptor {
         // then check if the user is authenticated, if the token is expired, renew tokens, etc and add them to the request
         // with (for example): request.addHeader(name: "Authorization", value: "Bearer \(token)")
 
-        chain.proceedAsync(request: request,
-                           response: response,
-                           interceptor: self,
-                           completion: completion)
+        chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
     }
 }

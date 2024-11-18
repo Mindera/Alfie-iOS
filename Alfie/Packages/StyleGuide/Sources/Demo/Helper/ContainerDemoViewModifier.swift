@@ -6,8 +6,7 @@ public struct ContainerDemoViewModifier: ViewModifier {
     private let headerTitle: String
     private let embedInScrollView: Bool
 
-    public init(headerTitle: String = "Catalogue App",
-                embedInScrollView: Bool = true) {
+    public init(headerTitle: String = "Catalogue App", embedInScrollView: Bool = true) {
         self.headerTitle = headerTitle
         self.embedInScrollView = embedInScrollView
     }
@@ -27,7 +26,7 @@ public struct ContainerDemoViewModifier: ViewModifier {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                ThemedToolbarButton(icon: .arrowLeft, action: { dismiss() })
+                ThemedToolbarButton(icon: .arrowLeft) { dismiss() }
             }
             ToolbarItem(placement: .principal) {
                 ThemedToolbarTitle(style: .logo)

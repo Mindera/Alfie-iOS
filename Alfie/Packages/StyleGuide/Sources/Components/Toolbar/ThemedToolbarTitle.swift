@@ -26,32 +26,35 @@ public struct ThemedToolbarTitle: View {
 
     public var body: some View {
         switch style {
-            case .logo:
-                Image("Logo")
-                    .resizable()
-                    .renderingMode(.template)
-                    .frame(maxWidth: Constants.logoWidth, maxHeight: Constants.logoHeight)
-                    .foregroundColor(tint)
-                    .accessibilityIdentifier(accessibilityId)
-            case .leftText(let text, let subtitle):
-                VStack(alignment: .leading) {
-                    Text(text)
-                        .font(Font(theme.font.header.h2))
-                        .foregroundStyle(tint)
-                        .accessibilityIdentifier(accessibilityId)
+        case .logo:
+            Image("Logo")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: Constants.logoWidth, maxHeight: Constants.logoHeight)
+                .foregroundStyle(tint)
+                .accessibilityIdentifier(accessibilityId)
 
-                    if let subtitle {
-                        Text.build(theme.font.tiny.normal(subtitle))
-                            .foregroundColor(Colors.primary.mono500)
-                    }
-                }
-                .padding(.vertical, Spacing.space200)
-            case .text(let text):
+        case .leftText(let text, let subtitle):
+            VStack(alignment: .leading) {
                 Text(text)
-                    .font(Font(theme.font.paragraph.normal.withSize(18)))
+                    .font(Font(theme.font.header.h2))
                     .foregroundStyle(tint)
                     .accessibilityIdentifier(accessibilityId)
-                    .padding(.vertical, Spacing.space200)
+
+                if let subtitle {
+                    Text.build(theme.font.tiny.normal(subtitle))
+                        .foregroundStyle(Colors.primary.mono500)
+                }
+            }
+            .padding(.vertical, Spacing.space200)
+
+        case .text(let text):
+            Text(text)
+                .font(Font(theme.font.paragraph.normal.withSize(18)))
+                .foregroundStyle(tint)
+                .accessibilityIdentifier(accessibilityId)
+                .padding(.vertical, Spacing.space200)
         }
     }
 }

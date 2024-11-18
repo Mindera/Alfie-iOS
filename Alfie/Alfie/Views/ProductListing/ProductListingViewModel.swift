@@ -35,13 +35,15 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         !(state.isLoadingFirstPage || mode == .searchResults)
     }
 
-    init(productListingService: ProductListingServiceProtocol,
-         plpStyleListProvider: ProductListingStyleProviderProtocol,
-         category: String? = nil,
-         searchText: String? = nil,
-         urlQueryParameters: [String: String]? = nil,
-         mode: ProductListingViewMode = .listing,
-         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize) {
+    init(
+        productListingService: ProductListingServiceProtocol,
+        plpStyleListProvider: ProductListingStyleProviderProtocol,
+        category: String? = nil,
+        searchText: String? = nil,
+        urlQueryParameters: [String: String]? = nil,
+        mode: ProductListingViewMode = .listing,
+        skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize
+    ) {
         self.productListingService = productListingService
         self.plpStyleListProvider = plpStyleListProvider
         style = plpStyleListProvider.style
@@ -95,8 +97,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
             return
         }
 
-        state = .success(.init(title: productListing.title,
-                               products: productListing.products))
+        state = .success(.init(title: productListing.title, products: productListing.products))
     }
 
     @MainActor
@@ -105,8 +106,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
             return
         }
 
-        state = .loadingNextPage(.init(title: title,
-                                       products: products))
+        state = .loadingNextPage(.init(title: title, products: products))
         let productListing: ProductListing?
 
         do {
@@ -122,37 +122,39 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
             return
         }
 
-        state = .success(.init(title: title,
-                               products: model.products + productListing.products))
+        state = .success(.init(title: title, products: model.products + productListing.products))
     }
 }
 
 // MARK: - Skeleton
 
 extension Collection where Element == Product {
+    // swiftlint:disable:next strict_fileprivate
     fileprivate static func skeleton(itemsSize: Int) -> [Element] {
         Array(repeating: (), count: itemsSize).map { Element.empty }
     }
 }
 
 extension Product {
+    // swiftlint:disable:next strict_fileprivate
     fileprivate static var empty: Product {
-        let variant = Product.Variant(sku: "",
-                                      size: nil,
-                                      colour: nil,
-                                      attributes: nil,
-                                      stock: 0,
-                                      price: .init(amount: .init(currencyCode: "AUD",
-                                                                 amount: 0,
-                                                                 amountFormatted: "$000,00"),
-                                                   was: nil))
-        return Product(styleNumber: "",
-                       name: "",
-                       brand: Brand(id: "", name: "", slug: ""),
-                       shortDescription: "",
-                       slug: "",
-                       defaultVariant: variant,
-                       variants: [variant],
-                       colours: nil)
+        let variant = Product.Variant(
+            sku: "",
+            size: nil,
+            colour: nil,
+            attributes: nil,
+            stock: 0,
+            price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
+        )
+        return Product(
+            styleNumber: "",
+            name: "",
+            brand: Brand(id: "", name: "", slug: ""),
+            shortDescription: "",
+            slug: "",
+            defaultVariant: variant,
+            variants: [variant],
+            colours: nil
+        )
     }
 }

@@ -20,12 +20,14 @@ public struct DeepLink {
 
         public func configurationKey() -> ConfigurationKey? {
             // In case a link type depends on a specific feature toggle to be enabled, return the key here
+            // swiftlint:disable vertical_whitespace_between_cases
             switch self {
-                case .wishlist:
-                    return .wishlist
-                default:
-                    return nil
+            case .wishlist:
+                return .wishlist
+            default:
+                return nil
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
@@ -34,10 +36,7 @@ public struct DeepLink {
     let language: String?
     let country: String?
 
-    public init(type: LinkType,
-                fullUrl: URL,
-                language: String? = nil,
-                country: String? = nil) {
+    public init(type: LinkType, fullUrl: URL, language: String? = nil, country: String? = nil) {
         self.type = type
         self.fullUrl = fullUrl
         self.language = language
@@ -47,17 +46,19 @@ public struct DeepLink {
 
 extension DeepLink.LinkType {
     public var isWebView: Bool {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .productList,
-                 .productDetail,
-                 .bag,
-                 .shop,
-                 .home,
-                 .wishlist,
-                 .account:
-                return false
-            default:
-                return true
+        case .productList,
+             .productDetail, // swiftlint:disable:this indentation_width
+             .bag,
+             .shop,
+             .home,
+             .wishlist,
+             .account:
+            return false
+        default:
+            return true
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

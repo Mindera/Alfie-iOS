@@ -6,7 +6,7 @@ import WebKit
 // So we call this one on app startup and it seems to help speedup the actual WebView usage later
 // https://stackoverflow.com/questions/74301868/wkwebview-ios-slow-on-first-launch
 
-struct WebViewPreload {
+enum WebViewPreload {
     static func preloadWebView() {
         Task.detached {
             let webView = await WKWebView()

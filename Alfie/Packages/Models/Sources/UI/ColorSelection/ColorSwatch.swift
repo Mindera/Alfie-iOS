@@ -8,31 +8,30 @@ public enum SwatchType: Equatable {
     case url(URL)
 
     public static func == (lhs: SwatchType, rhs: SwatchType) -> Bool {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch (lhs, rhs) {
-            case (.image(let imagel), .image(let imager)):
-                return imagel == imager
-            case (.color(let colorl), .color(let colorr)):
-                return colorl == colorr
-            case (.url(let urll), .url(let urlr)):
-                return urll == urlr
-            default:
-                return false
+        case (.image(let imagel), .image(let imager)):
+            return imagel == imager
+        case (.color(let colorl), .color(let colorr)):
+            return colorl == colorr
+        case (.url(let urll), .url(let urlr)):
+            return urll == urlr
+        default:
+            return false
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
 // MARK: - ColorSwatch
 
-public struct ColorSwatch: Equatable, Identifiable {
+public struct ColorSwatch: ColorAndSizingSwatchProtocol {
     public let id: String
     public let name: String
     public let type: SwatchType
     public let isDisabled: Bool
 
-    public init(id: String = UUID().uuidString,
-                name: String,
-                type: SwatchType,
-                isDisabled: Bool = false) {
+    public init(id: String, name: String, type: SwatchType, isDisabled: Bool = false) {
         self.id = id
         self.name = name
         self.type = type

@@ -34,7 +34,6 @@ let package = Package(
                 .copy("Theme/Components/Loader/spin.gif"),
                 .process("Theme/Typography/Resources/Fonts.xcassets"),
                 .process("Theme/Color/Colors.xcassets"),
-                .process("Theme/Icons/Icons.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
                 .process("Theme/Toggle/ToggleColor.xcassets")
             ]

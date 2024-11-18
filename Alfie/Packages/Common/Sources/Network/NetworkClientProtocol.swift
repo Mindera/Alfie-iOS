@@ -15,12 +15,14 @@ enum NetworkError: Error {
             return .notFound
         }
 
+        // swiftlint:disable vertical_whitespace_between_cases
         switch response.statusCode {
-            case 400 ..< 500:
-                return .genericClient
-            default:
-                return nil
+        case 400 ..< 500:
+            return .genericClient
+        default:
+            return nil
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 

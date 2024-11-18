@@ -14,23 +14,21 @@ public final class RecentsService: RecentsServiceProtocol {
         recentSearchesSubject.value
     }
 
-    public init(autoSaveEnabled: Bool,
-                storageService: StorageServiceProtocol?,
-                storageKey: String) {
+    public init(autoSaveEnabled: Bool, storageService: StorageServiceProtocol?, storageKey: String) {
         self.autoSaveEnabled = autoSaveEnabled
         self.hasPendingChanges = false
         self.storageKey = storageKey
         self.storageService = storageService
-        self.recentSearchesSubject = .init((try? storageService?.load(
-            for: storageKey,
-            as: [RecentSearch].self,
-            expiry: .never)) ?? [])
+        self.recentSearchesSubject = .init(
+            (try? storageService?.load(for: storageKey, as: [RecentSearch].self, expiry: .never)) ?? []
+        )
         self.recentSearchesPublisher = recentSearchesSubject.eraseToAnyPublisher()
     }
 
     public func add(_ recentSearch: RecentSearch) {
-        guard !recentSearches.contains(recentSearch),
-              !recentSearch.value.isEmpty
+        guard
+            !recentSearches.contains(recentSearch),
+            !recentSearch.value.isEmpty
         else {
             return
         }

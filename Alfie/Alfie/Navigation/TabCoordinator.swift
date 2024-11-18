@@ -35,9 +35,7 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
     // Specific view updates
     let shopViewTabUpdatePublisher: AnyPublisher<ShopViewTab?, Never>
 
-    init(tabs: [Tab],
-         activeTab: Tab,
-         serviceProvider: ServiceProviderProtocol) {
+    init(tabs: [Tab], activeTab: Tab, serviceProvider: ServiceProviderProtocol) {
         self.tabs = tabs
         self.activeTab = activeTab
         self.shopViewTabUpdatePublisher = shopViewTabUpdateSubject.eraseToAnyPublisher()
@@ -81,33 +79,43 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
         }
         coordinator.closeDebugMenu()
         switch screen {
-            case .tab(let tab):
-                updateActiveTab(tab)
-            case .webView(let url, let title):
-                coordinator.open(url: url, title: title)
-            case .webFeature(let feature):
-                coordinator.open(webFeature: feature)
-            case .forceAppUpdate:
-                coordinator.openForceAppUpdate()
-            case .account:
-                coordinator.openAccount()
-            case .wishlist:
-                coordinator.openWishlist()
-            case .productListing(let configuration):
-                coordinator.openProductListing(configuration: configuration)
-            case .search,
-                 .recentSearches,
-                 .debugMenu:
-                break
-            case .productDetails(let type):
-                switch type {
-                    case .id(let id):
-                        coordinator.openDetails(for: id)
-                    case .product(let product):
-                        coordinator.openDetails(for: product)
-                }
-            case .categoryList(let categories, let title):
-                coordinator.openCategories(categories, title: title)
+        case .tab(let tab):
+            updateActiveTab(tab)
+
+        case .webView(let url, let title):
+            coordinator.open(url: url, title: title)
+
+        case .webFeature(let feature):
+            coordinator.open(webFeature: feature)
+
+        case .forceAppUpdate:
+            coordinator.openForceAppUpdate()
+
+        case .account:
+            coordinator.openAccount()
+
+        case .wishlist:
+            coordinator.openWishlist()
+
+        case .productListing(let configuration):
+            coordinator.openProductListing(configuration: configuration)
+
+        case .search,
+             .recentSearches, // swiftlint:disable:this indentation_width
+             .debugMenu:
+            break
+
+        case .productDetails(let type):
+            switch type {
+            case .id(let id):
+                coordinator.openDetails(for: id)
+
+            case .product(let product):
+                coordinator.openDetails(for: product)
+            }
+
+        case .categoryList(let categories, let title):
+            coordinator.openCategories(categories, title: title)
         }
     }
 
@@ -137,54 +145,59 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
 
     private func updateActiveTab(_ tab: Tab) {
         switch tab {
-            case .shop(let shopTab):
-                activeTab = .shop()
-                if let shopTab {
-                    shopViewTabUpdateSubject.send(shopTab)
-                }
-            default:
-                activeTab = tab
+        case .shop(let shopTab):
+            activeTab = .shop()
+            if let shopTab {
+                shopViewTabUpdateSubject.send(shopTab)
+            }
+
+        default:
+            activeTab = tab
         }
     }
 }
 
 extension TabScreen {
     var title: LocalizedStringResource {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .home:
-                LocalizableGeneral.home
-            case .shop:
-                LocalizableGeneral.shop
-            case .wishlist:
-                LocalizableGeneral.wishlist
-            case .bag:
-                LocalizableGeneral.bag
+        case .home:
+            LocalizableGeneral.home
+        case .shop:
+            LocalizableGeneral.shop
+        case .wishlist:
+            LocalizableGeneral.wishlist
+        case .bag:
+            LocalizableGeneral.bag
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     var icon: Icon {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-            case .home:
-                .home
-            case .shop:
-                .store
-            case .bag:
-                .bag
-            case .wishlist:
-                .heart
+        case .home:
+            .home
+        case .shop:
+            .store
+        case .bag:
+            .bag
+        case .wishlist:
+            .heart
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     var accessibilityId: String {
         switch self {
-            case .home:
-                "home-tab"
-            case .shop:
-                "shop-tab"
-            case .bag:
-                "bag-tab"
-            case .wishlist:
-                "wishlist-tab"
+        case .home:
+            "home-tab"
+        case .shop:
+            "shop-tab"
+        case .bag:
+            "bag-tab"
+        case .wishlist:
+            "wishlist-tab"
         }
     }
 }

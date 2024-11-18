@@ -11,13 +11,15 @@ public struct AppUpdateInfo {
     public let cancelActionText: String?
     public let url: URL?
 
-    public init(minimumAppVersion: Version,
-                title: String,
-                message: String,
-                backgroundImage: URL?,
-                confirmActionText: String,
-                cancelActionText: String?,
-                url: URL?) {
+    public init(
+        minimumAppVersion: Version,
+        title: String,
+        message: String,
+        backgroundImage: URL?,
+        confirmActionText: String,
+        cancelActionText: String?,
+        url: URL?
+    ) {
         self.minimumAppVersion = minimumAppVersion
         self.title = title
         self.message = message
@@ -77,12 +79,14 @@ public struct ConfigurationAppUpdateInfo: Codable {
         case cancelActionText = "cancel_action_text"
     }
 
-    public init(minimumAppVersion: Version,
-                title: String,
-                message: String,
-                backgroundImage: URL?,
-                confirmActionText: String,
-                cancelActionText: String?) {
+    public init(
+        minimumAppVersion: Version,
+        title: String,
+        message: String,
+        backgroundImage: URL?,
+        confirmActionText: String,
+        cancelActionText: String?
+    ) {
         self.minimumAppVersion = minimumAppVersion
         self.title = title
         self.message = message

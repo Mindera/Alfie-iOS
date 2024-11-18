@@ -8,14 +8,14 @@ public enum ApiEndpointOption: CaseIterable, Hashable, RawRepresentable {
 
     public var label: String {
         switch self {
-            case .dev:
-                "Development"
-            case .preProd:
-                "Pre-production"
-            case .prod:
-                "Production"
-            case .custom:
-                "Custom"
+        case .dev:
+            "Development"
+        case .preProd:
+            "Pre-production"
+        case .prod:
+            "Production"
+        case .custom:
+            "Custom"
         }
     }
 

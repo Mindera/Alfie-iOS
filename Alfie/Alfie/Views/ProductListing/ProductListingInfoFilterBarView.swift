@@ -28,13 +28,13 @@ struct ProductListingFilterBarView: View {
             Spacer()
             listTypeView
         }
-        .onChange(of: isLoading(), perform: { newValue in
+        .onChange(of: isLoading()) { newValue in
             if !newValue {
                 withAnimation {
                     opacity = Constants.fullOpacityResults
                 }
             }
-        })
+        }
         .padding(.horizontal, Spacing.space200)
         .frame(minHeight: Constants.barMinHeight)
     }
@@ -45,8 +45,9 @@ struct ProductListingFilterBarView: View {
         } label: {
             HStack(spacing: Spacing.space100) {
                 Icon.filter.image
-                    .resizable()
                     .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
                     .frame(size: Constants.filterIcon)
                     .tint(Colors.primary.mono900)
                 Text.build(theme.font.paragraph.normal(LocalizableProductListing.filters))
@@ -69,9 +70,9 @@ struct ProductListingFilterBarView: View {
                 styleSelected = .grid
             } label: {
                 Icon.grid.image
-                    .resizable()
                     .renderingMode(.template)
-                    .aspectRatio(contentMode: .fit)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: Constants.filterIcon, height: Constants.filterIcon)
                     .foregroundStyle(styleSelected == .grid ? Colors.primary.mono900 : Colors.primary.mono200)
             }
@@ -81,9 +82,9 @@ struct ProductListingFilterBarView: View {
                 styleSelected = .list
             } label: {
                 Icon.listplp.image
-                    .resizable()
                     .renderingMode(.template)
-                    .aspectRatio(contentMode: .fit)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: Constants.filterIcon, height: Constants.filterIcon)
                     .foregroundStyle(styleSelected == .list ? Colors.primary.mono900 : Colors.primary.mono200)
             }

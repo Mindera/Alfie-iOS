@@ -10,20 +10,22 @@ struct MotionDemoView: View {
         case emphasizedDecelerate = "Emphasized Decelerate"
 
         var correspondingAnimation: Animation {
+            // swiftlint:disable vertical_whitespace_between_cases
             switch self {
-                case .standard:
-                    return .standard
-                case .standardAccelerate:
-                    return .standardAccelerate
-                case .standardDecelerate:
-                    return .standardDecelerate
-                case .emphasized:
-                    return .emphasized
-                case .emphasizedAccelerate:
-                    return .emphasizedAccelerate
-                case .emphasizedDecelerate:
-                    return .emphasizedDecelerate
+            case .standard:
+                return .standard
+            case .standardAccelerate:
+                return .standardAccelerate
+            case .standardDecelerate:
+                return .standardDecelerate
+            case .emphasized:
+                return .emphasized
+            case .emphasizedAccelerate:
+                return .emphasizedAccelerate
+            case .emphasizedDecelerate:
+                return .emphasizedDecelerate
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
@@ -51,11 +53,11 @@ struct MotionDemoView: View {
                 }
             }
 
-            ThemedButton(text: "Preview", action: {
+            ThemedButton(text: "Preview") {
                 withAnimation(motionType.correspondingAnimation) {
                     showRectangle.toggle()
                 }
-            })
+            }
 
             if showRectangle {
                 Spacer()
@@ -66,22 +68,21 @@ struct MotionDemoView: View {
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .leading))
-                        .foregroundColor(Colors.secondary.blue300)
+                        .foregroundStyle(Colors.secondary.blue300)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .bottom))
-                        .foregroundColor(Colors.secondary.blue500)
+                        .foregroundStyle(Colors.secondary.blue500)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .trailing))
-                        .foregroundColor(Colors.secondary.blue700)
+                        .foregroundStyle(Colors.secondary.blue700)
                 }
             }
             .padding(Spacing.space200)
-            .frame(maxWidth: showRectangle ? .infinity : 0,
-                   maxHeight: showRectangle ? 300 : 0)
+            .frame(maxWidth: showRectangle ? .infinity : 0, maxHeight: showRectangle ? 300 : 0)
             Spacer()
         }
         .padding(.horizontal, Spacing.space200)

@@ -1,6 +1,6 @@
 import Foundation
-import UIKit
 import SwiftUI
+import UIKit
 
 protocol ZoomableViewConfigurationProtocol {
     var isPresented: Binding<Bool> { get }
@@ -32,9 +32,12 @@ final class ZoomableUIView<Content: View>: UIScrollView, UIScrollViewDelegate, U
         frame.height * dismissHeightMultiplier
     }
 
-    init(childView: Content, index: Int,
-         dismissHeightMultiplier: CGFloat,
-         configuration: ZoomableViewConfigurationProtocol) {
+    init(
+        childView: Content,
+        index: Int,
+        dismissHeightMultiplier: CGFloat,
+        configuration: ZoomableViewConfigurationProtocol
+    ) {
         self.hostingController = UIHostingController(rootView: childView)
         self.dismissHeightMultiplier = dismissHeightMultiplier
         self.configuration = configuration
@@ -96,10 +99,8 @@ final class ZoomableUIView<Content: View>: UIScrollView, UIScrollViewDelegate, U
         let pointInView = sender.location(in: uiView)
 
         let newZoomScale = zoomScale == minimumZoomScale ? configuration.doubleTapZoomScale : minimumZoomScale
-        let zoomSize = CGSize(width: bounds.size.width / newZoomScale,
-                              height: bounds.size.height / newZoomScale)
-        let zoomOrigin = CGPoint(x: pointInView.x - zoomSize.width / 2,
-                                 y: pointInView.y - zoomSize.height / 2)
+        let zoomSize = CGSize(width: bounds.size.width / newZoomScale, height: bounds.size.height / newZoomScale)
+        let zoomOrigin = CGPoint(x: pointInView.x - zoomSize.width / 2, y: pointInView.y - zoomSize.height / 2)
         let zoomRect = CGRect(origin: zoomOrigin, size: zoomSize)
 
         zoom(to: zoomRect, animated: true)
@@ -152,7 +153,8 @@ final class ZoomableUIView<Content: View>: UIScrollView, UIScrollViewDelegate, U
         let deltaTranslation = sender.translation(in: self)
         let velocity = sender.velocity(in: self)
         let isVerticalGesture = abs(velocity.y) > abs(velocity.x)
-        let isGestureValid = isVerticalGesture || abs(dismissPanGestureYTranslation) > 0 // if it's not vertical we interrupt, unless it's already ongoing. sender.state == .changed won't work here
+        // if it's not vertical we interrupt, unless it's already ongoing. sender.state == .changed won't work here
+        let isGestureValid = isVerticalGesture || abs(dismissPanGestureYTranslation) > 0
 
         guard !isZoomed && !isTracking && isGestureValid else {
             sender.state = .cancelled
@@ -169,22 +171,27 @@ final class ZoomableUIView<Content: View>: UIScrollView, UIScrollViewDelegate, U
         }
 
         switch sender.state {
-            case .began:
-                dismissPanGestureYTranslation = 0
-            case .changed:
-                dismissPanGestureYTranslation += deltaTranslation.y
-                uiView.transform = .identity.translatedBy(x: 0, y: dismissPanGestureYTranslation)
-                sender.setTranslation(.zero, in: self)
-            case .ended, .cancelled, .failed:
-                if sender.state != .failed && normalizedDismissalPercentage > 1 {
-                    configuration.isPresented.wrappedValue = false
-                } else {
-                    resetUIViewTransform()
-                }
+        case .began:
+            dismissPanGestureYTranslation = 0
 
-                dismissPanGestureYTranslation = 0
-            default:
-                break
+        case .changed:
+            dismissPanGestureYTranslation += deltaTranslation.y
+            uiView.transform = .identity.translatedBy(x: 0, y: dismissPanGestureYTranslation)
+            sender.setTranslation(.zero, in: self)
+
+        case .ended,
+             .cancelled, // swiftlint:disable:this indentation_width
+             .failed:
+            if sender.state != .failed && normalizedDismissalPercentage > 1 {
+                configuration.isPresented.wrappedValue = false
+            } else {
+                resetUIViewTransform()
+            }
+
+            dismissPanGestureYTranslation = 0
+
+        default:
+            break
         }
     }
 

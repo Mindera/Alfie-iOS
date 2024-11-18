@@ -14,7 +14,7 @@ struct LazyImageView<Content: View>: RemoteImageProvider {
     }
 
     var body: some View {
-        LazyImage(url: url, transaction: transaction, content: { imageState in
+        LazyImage(url: url, transaction: transaction) { imageState in
             if let image = imageState.image {
                 content(.success(image))
             } else if let error = imageState.error {
@@ -22,6 +22,6 @@ struct LazyImageView<Content: View>: RemoteImageProvider {
             } else {
                 content(.empty)
             }
-        })
+        }
     }
 }

@@ -12,10 +12,12 @@ struct AsyncImageView<Content: View>: RemoteImageProvider {
         self.init(urlRequest: urlRequest, transaction: transaction, content: content)
     }
 
-    init(urlRequest: URLRequest?,
-         urlCache: URLCache = .shared,
-         transaction: Transaction = Transaction(),
-         @ViewBuilder content: @escaping (RemoteImageState) -> Content) {
+    init(
+        urlRequest: URLRequest?,
+        urlCache: URLCache = .shared,
+        transaction: Transaction = Transaction(),
+        @ViewBuilder content: @escaping (RemoteImageState) -> Content
+    ) {
         let configuration = URLSessionConfiguration.default
         configuration.urlCache = urlCache
         self.urlRequest = urlRequest
@@ -26,16 +28,18 @@ struct AsyncImageView<Content: View>: RemoteImageProvider {
 
     var body: some View {
         AsyncImage(url: urlRequest?.url, transaction: transaction) { phase in
+            // swiftlint:disable vertical_whitespace_between_cases
             switch phase {
-                case .empty:
-                    content(.empty)
-                case .success(let image):
-                    content(.success(image))
-                case .failure(let error):
-                    content(.failure(error))
-                @unknown default:
-                    content(.empty)
+            case .empty:
+                content(.empty)
+            case .success(let image):
+                content(.success(image))
+            case .failure(let error):
+                content(.failure(error))
+            @unknown default:
+                content(.empty)
             }
+            // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 }

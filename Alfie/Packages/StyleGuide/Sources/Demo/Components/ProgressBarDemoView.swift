@@ -9,17 +9,17 @@ struct ProgressBarDemoView: View {
 
             ProgressableHorizontalScrollView(
                 scrollViewConfiguration: .init(horizontalPadding: Spacing.space200),
-                progressBarConfiguration: .init(horizontalPadding: Spacing.space800),
-                content: {
-                    HStack {
-                        ForEach(0..<40) { _ in
-                            Rectangle()
-                                .foregroundColor(Colors.primary.mono300)
-                                .cornerRadius(CornerRadius.m)
-                                .frame(width: 120, height: 120)
-                        }
+                progressBarConfiguration: .init(horizontalPadding: Spacing.space800)
+            ) {
+                HStack {
+                    ForEach(0..<40) { _ in
+                        Rectangle()
+                            .foregroundStyle(Colors.primary.mono300)
+                            .cornerRadius(CornerRadius.m)
+                            .frame(width: 120, height: 120)
                     }
-                })
+                }
+            }
 
             Spacer()
         }

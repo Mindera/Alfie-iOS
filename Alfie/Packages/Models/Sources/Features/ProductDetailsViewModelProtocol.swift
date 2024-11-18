@@ -26,6 +26,7 @@ public enum ProductDetailsViewErrorType: Error, CaseIterable {
 public enum ProductDetailsSection {
     case titleHeader
     case colorSelector
+    case sizeSelector
     case mediaCarousel
     case complementaryInfo
     case productDescription
@@ -40,6 +41,14 @@ public enum ProductDetailsComplementaryInfoType {
     case returns
 }
 
+// MARK: - PriceType
+
+public enum PriceType {
+    case `default`(price: String)
+    case sale(fullPrice: String, finalPrice: String)
+    case range(lowerBound: String, upperBound: String, separator: String)
+}
+
 // MARK: - ProductDetailsViewModelProtocol
 
 public protocol ProductDetailsViewModelProtocol: ObservableObject {
@@ -51,11 +60,13 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productHasStock: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
-    var colorSelectionConfiguration: ColorSelectorConfiguration { get }
+    var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> { get }
+    var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> { get }
     var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] { get }
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
     var hasSingleImage: Bool { get }
+    var priceType: PriceType? { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool

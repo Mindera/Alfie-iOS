@@ -15,17 +15,19 @@ struct MultilineShimmerEffectModifier: ViewModifier {
     private let disabledWhileShimmering: Bool
     private let animateOnStateTransition: Bool
 
-    init(isLoading: Binding<Bool>,
-         cornerRadius: CGFloat = 0,
-         blurRadius: CGFloat = 0,
-         customLighterShimmerColor: Color? = nil,
-         customDarkerShimmerColor: Color? = nil,
-         lines: Int,
-         font: UIFont,
-         lineMaxRandomPadding: CGFloat,
-         lineSpacing: CGFloat,
-         disabledWhileShimmering: Bool,
-         animateOnStateTransition: Bool = true) {
+    init(
+        isLoading: Binding<Bool>,
+        cornerRadius: CGFloat = 0,
+        blurRadius: CGFloat = 0,
+        customLighterShimmerColor: Color? = nil,
+        customDarkerShimmerColor: Color? = nil,
+        lines: Int,
+        font: UIFont,
+        lineMaxRandomPadding: CGFloat,
+        lineSpacing: CGFloat,
+        disabledWhileShimmering: Bool,
+        animateOnStateTransition: Bool = true
+    ) {
         self._isLoading = isLoading
         self.shouldShowShimmer = isLoading.wrappedValue
         self.cornerRadius = cornerRadius
@@ -35,11 +37,13 @@ struct MultilineShimmerEffectModifier: ViewModifier {
         self.lines = lines > 0 ? Array(0..<lines) : []
         self.font = font
         self.lineSpacing = lineSpacing
-        self.linesPadding = lineMaxRandomPadding > 0 ? self.lines.map { _ in CGFloat.random(in: 0..<lineMaxRandomPadding) } : []
+        self.linesPadding = lineMaxRandomPadding > 0 ? self.lines.map { _ in
+            CGFloat.random(in: 0..<lineMaxRandomPadding)
+        } : []
         self.lineMaxRandomPadding = lineMaxRandomPadding
         self.disabledWhileShimmering = disabledWhileShimmering
         self.animateOnStateTransition = animateOnStateTransition
-     }
+    }
 
     func body(content: Content) -> some View {
         if shouldShowShimmer {
@@ -71,7 +75,9 @@ struct MultilineShimmerEffectModifier: ViewModifier {
 }
 
 #Preview(body: {
-    Text.build(ThemeProvider.shared.font.small.bold(Array(repeating: "Hello, world!", count: 24).joined(separator: " ")))
-        .shimmeringMultiline(while: .constant(true), lines: 8, font: ThemeProvider.shared.font.small.bold)
-        .padding(.horizontal, Spacing.space300)
+    Text.build(
+        ThemeProvider.shared.font.small.bold(Array(repeating: "Hello, world!", count: 24).joined(separator: " "))
+    )
+    .shimmeringMultiline(while: .constant(true), lines: 8, font: ThemeProvider.shared.font.small.bold)
+    .padding(.horizontal, Spacing.space300)
 })

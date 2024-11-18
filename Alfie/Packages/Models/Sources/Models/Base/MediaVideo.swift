@@ -10,10 +10,7 @@ public struct MediaVideo {
     /// The sources for the video.
     public let sources: [VideoSource]
 
-    public init(alt: String?,
-                mediaContentType: MediaContentType,
-                previewImage: MediaImage?,
-                sources: [VideoSource]) {
+    public init(alt: String?, mediaContentType: MediaContentType, previewImage: MediaImage?, sources: [VideoSource]) {
         self.alt = alt
         self.mediaContentType = mediaContentType
         self.previewImage = previewImage
@@ -35,9 +32,7 @@ public struct VideoSource {
     /// The URL of the video."
     public let url: URL
 
-    public init(format: VideoFormat,
-                mimeType: String,
-                url: URL) {
+    public init(format: VideoFormat, mimeType: String, url: URL) {
         self.format = format
         self.mimeType = mimeType
         self.url = url

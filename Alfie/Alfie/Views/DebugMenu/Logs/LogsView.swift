@@ -1,6 +1,6 @@
-import SwiftUI
-import StyleGuide
 import Common
+import StyleGuide
+import SwiftUI
 
 struct LogsView: View {
     @State private var logLevelFilter: LogLevel?
@@ -44,11 +44,11 @@ struct LogsView: View {
                     icon(for: log.level)
                         .resizable()
                         .frame(width: 25, height: 25)
-                        .foregroundColor(color(for: log.level))
+                        .foregroundStyle(color(for: log.level))
                     VStack(alignment: .leading) {
                         HStack {
                             Text.build(theme.font.paragraph.bold(log.level.rawValue))
-                                .foregroundColor(color(for: log.level))
+                                .foregroundStyle(color(for: log.level))
                             Text.build(theme.font.small.normal("(\(log.date.formatted(date: .omitted, time: .standard)))"))
                         }
 
@@ -61,29 +61,35 @@ struct LogsView: View {
     }
 
     private func color(for logLevel: LogLevel) -> Color {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch logLevel {
-            case .debug, .info:
-                return Colors.primary.black
-            case .warning:
-                return Colors.secondary.yellow400
-            case .error:
-                return Colors.secondary.red500
-            case .critical:
-                return Colors.secondary.red700
+        case .debug,
+             .info: // swiftlint:disable:this indentation_width
+            return Colors.primary.black
+        case .warning:
+            return Colors.secondary.yellow400
+        case .error:
+            return Colors.secondary.red500
+        case .critical:
+            return Colors.secondary.red700
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private func icon(for logLevel: LogLevel) -> Image {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch logLevel {
-            case .debug, .info:
-                return Image(systemName: "info.circle")
-            case .warning:
-                return Image(systemName: "exclamationmark.triangle")
-            case .error:
-                return Image(systemName: "exclamationmark.circle")
-            case .critical:
-                return Image(systemName: "exclamationmark.3")
+        case .debug,
+             .info: // swiftlint:disable:this indentation_width
+            return Image(systemName: "info.circle")
+        case .warning:
+            return Image(systemName: "exclamationmark.triangle")
+        case .error:
+            return Image(systemName: "exclamationmark.circle")
+        case .critical:
+            return Image(systemName: "exclamationmark.3")
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 

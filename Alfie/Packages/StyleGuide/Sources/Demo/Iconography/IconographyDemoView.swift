@@ -11,19 +11,19 @@ struct IconographyDemoView: View {
                 columns: Array(repeating: GridItem(.flexible(), alignment: .top), count: 4),
                 spacing: Spacing.space400
             ) {
-                ForEach(Icon.allCases, id: \.rawValue, content: { icon in
+                ForEach(Icon.allCases, id: \.rawValue) { icon in
                     VStack {
                         icon.image
-                            .resizable()
                             .renderingMode(.template)
-                            .aspectRatio(contentMode: .fit)
+                            .resizable()
+                            .scaledToFit()
                             .foregroundStyle(Colors.primary.mono900)
                             .frame(width: 40, height: 40)
                         Text.build(theme.font.tiny.normal(icon.literalName))
                             .foregroundStyle(Colors.primary.mono900)
                             .font(.caption2)
                     }
-                })
+                }
             }
             .padding(.horizontal, Spacing.space200)
 

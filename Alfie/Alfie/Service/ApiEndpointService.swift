@@ -1,7 +1,7 @@
 import Common
 import Core
-import Models
 import Foundation
+import Models
 
 final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     private let apiUrlUserDefaultsKey: String
@@ -11,10 +11,12 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
 
     private(set) var currentApiEndpoint: ApiEndpointOption
 
-    init(appDelegate: AppDelegateProtocol,
-         userDefaults: UserDefaultsProtocol,
-         userDefaultsKey: String = "com.alfie.config.api.endpoint",
-         rebootDelay: TimeInterval = 5) {
+    init(
+        appDelegate: AppDelegateProtocol,
+        userDefaults: UserDefaultsProtocol,
+        userDefaultsKey: String = "com.alfie.config.api.endpoint",
+        rebootDelay: TimeInterval = 5
+    ) {
         self.appDelegate = appDelegate
         self.userDefaults = userDefaults
         self.apiUrlUserDefaultsKey = userDefaultsKey
@@ -44,31 +46,34 @@ enum ApiEndpointUrl: String {
     case custom = "https://api-preview-000.mock-server-rose.vercel.app/"
 
     static func url(for option: ApiEndpointOption) -> String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch option {
-            case .dev:
-                ApiEndpointUrl.dev.rawValue
-            case .preProd:
-                ApiEndpointUrl.preProd.rawValue
-            case .prod:
-                ApiEndpointUrl.prod.rawValue
-            case .custom:
-                ApiEndpointUrl.custom.rawValue
+        case .dev:
+            ApiEndpointUrl.dev.rawValue
+        case .preProd:
+            ApiEndpointUrl.preProd.rawValue
+        case .prod:
+            ApiEndpointUrl.prod.rawValue
+        case .custom:
+            ApiEndpointUrl.custom.rawValue
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
 private extension ApiEndpointOption {
     var url: URL {
         let url: URL? = switch self {
-                            case let .custom(customUrl):
-                                if customUrl != nil {
-                                    customUrl
-                                } else {
-                                    URL(string: ApiEndpointUrl.custom.rawValue)
-                                }
-                            default:
-                                URL(string: ApiEndpointUrl.url(for: self))
-                        }
+        case .custom(let customUrl):
+            if customUrl != nil {
+                customUrl
+            } else {
+                URL(string: ApiEndpointUrl.custom.rawValue)
+            }
+
+        default:
+            URL(string: ApiEndpointUrl.url(for: self))
+        }
 
         guard let url else {
             let message = "Cannot build API endpoint URL for option \(self.label)"
@@ -87,7 +92,9 @@ private extension ApiEndpointOption {
             return Self.defaultOption
         }
 
-        return ApiEndpointOption.allCases.first(where: { $0.url.absoluteString == url && $0 != .custom(url: nil) }) ?? .custom(url: URL(string: url))
+        return ApiEndpointOption
+            .allCases
+            .first { $0.url.absoluteString == url && $0 != .custom(url: nil) } ?? .custom(url: URL(string: url))
     }
 
     static var defaultOption: ApiEndpointOption {
