@@ -220,7 +220,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         colorSelectionConfiguration = .init(
-            selectedTitle: LocalizableProductDetails.$color + ":",
+            selectedTitle: LocalizableGeneral.$color + ":",
             items: colorSwatches,
             selectedItem: selectedSwatch
         )
@@ -277,7 +277,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         sizingSelectionConfiguration = .init(
-            selectedTitle: LocalizableProductDetails.$size + ":",
+            selectedTitle: LocalizableGeneral.$size + ":",
             items: sizingSwatches,
             selectedItem: selectedSwatch
         )

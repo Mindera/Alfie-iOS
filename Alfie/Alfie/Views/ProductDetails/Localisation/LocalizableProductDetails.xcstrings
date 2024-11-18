@@ -12,28 +12,6 @@
         }
       }
     },
-    "KeyAddToWishlist" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add to Wish List"
-          }
-        }
-      }
-    },
-    "KeyColor" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Colour"
-          }
-        }
-      }
-    },
     "KeyComplementaryInfoDelivery" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -111,17 +89,6 @@
         }
       }
     },
-    "KeyOneSize" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One Size"
-          }
-        }
-      }
-    },
     "KeyOutOfStock" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -162,17 +129,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "from Alfie"
-          }
-        }
-      }
-    },
-    "KeySize" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Size"
           }
         }
       }

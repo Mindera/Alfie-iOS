@@ -448,9 +448,9 @@ extension ProductDetailsView {
     @ViewBuilder private var singleSizeView: some View {
         let sizeText: String = isOneSize
             ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
-            : LocalizableProductDetails.$oneSize
+            : LocalizableGeneral.$oneSize
         HStack {
-            Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
+            Text.build(theme.font.small.bold(LocalizableGeneral.$size + ":"))
                 .foregroundStyle(Colors.primary.mono900)
             Text.build(theme.font.small.normal(sizeText))
                 .foregroundStyle(Colors.primary.mono900)
@@ -535,7 +535,7 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .addToWishlist) {
             VStack(spacing: Spacing.space0) {
                 ThemedButton(
-                    text: LocalizableProductDetails.$addToWishlist,
+                    text: LocalizableGeneral.$addToWishlist,
                     style: .secondary,
                     isFullWidth: true
                 ) {

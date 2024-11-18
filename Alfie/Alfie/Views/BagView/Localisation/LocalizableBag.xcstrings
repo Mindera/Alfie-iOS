@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "KeyAddToWishlist" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add to wishlist"
-          }
-        }
-      }
-    },
     "KeyBag" : {
       "extractionState" : "manual",
       "localizations" : {

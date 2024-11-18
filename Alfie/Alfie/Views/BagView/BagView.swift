@@ -22,9 +22,9 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             ForEach(mockContent.bagProducts) { product in
                 HorizontalProductCard(
                     product: product,
-                    colorTitle: LocalizableProductDetails.$color + ":",
-                    sizeTitle: LocalizableProductDetails.$size + ":",
-                    oneSizeTitle: LocalizableProductDetails.$oneSize
+                    colorTitle: LocalizableGeneral.$color + ":",
+                    sizeTitle: LocalizableGeneral.$size + ":",
+                    oneSizeTitle: LocalizableGeneral.$oneSize
                 )
                 .listRowInsets(EdgeInsets())
             }
