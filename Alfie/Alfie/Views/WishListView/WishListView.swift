@@ -22,8 +22,11 @@ struct WishListView: View {
             ) {
                 ForEach(mockContent.wishlistProducts) { product in
                     VerticalProductCard(
-                        configuration: .init(size: .medium, actionType: .remove),
-                        product: product
+                        configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
+                        product: product,
+                        colorTitle: LocalizableProductDetails.$color + ":",
+                        sizeTitle: LocalizableProductDetails.$size + ":",
+                        oneSizeTitle: LocalizableProductDetails.$oneSize
                     ) { productId, type in
                         guard case .remove = type else { return }
                         mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != productId }

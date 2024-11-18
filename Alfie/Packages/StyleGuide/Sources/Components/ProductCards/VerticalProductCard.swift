@@ -31,12 +31,20 @@ public struct VerticalProductCardConfiguration {
     let size: Size
     let hidePrice: Bool
     let hideAction: Bool
+    let hideDetails: Bool
     let actionType: ActionType
 
-    public init(size: Size, hidePrice: Bool = false, hideAction: Bool = false, actionType: ActionType = .wishlist) {
+    public init(
+        size: Size,
+        hidePrice: Bool = false,
+        hideAction: Bool = false,
+        hideDetails: Bool = true,
+        actionType: ActionType = .wishlist
+    ) {
         self.size = size
         self.hidePrice = hidePrice
         self.hideAction = hideAction
+        self.hideDetails = hideDetails
         self.actionType = actionType
     }
 
@@ -82,6 +90,16 @@ public struct VerticalProductCardConfiguration {
             ThemeProvider.shared.font.paragraph.normal
         }
     }
+
+    var smallTextFont: UIFont {
+        switch size {
+        case .small,
+             .medium: // swiftlint:disable:this indentation_width
+            ThemeProvider.shared.font.tiny.normal
+        case .large:
+            ThemeProvider.shared.font.small.normal
+        }
+    }
     // swiftlint:enable vertical_whitespace_between_cases
 }
 
@@ -99,6 +117,10 @@ public struct VerticalProductCard: View {
     private let image: URL?
     private let designer: String
     private let name: String
+    private let colorTitle: String
+    private let color: String
+    private let sizeTitle: String
+    private let size: String
     private let priceType: PriceType
     private let onUserAction: ProductUserActionHandler
     @Binding public private(set) var isSkeleton: Bool
@@ -110,6 +132,10 @@ public struct VerticalProductCard: View {
         image: URL?,
         designer: String,
         name: String,
+        colorTitle: String = "",
+        color: String = "",
+        sizeTitle: String = "",
+        size: String = "",
         priceType: PriceType,
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
@@ -120,6 +146,10 @@ public struct VerticalProductCard: View {
         self.image = image
         self.designer = designer
         self.name = name
+        self.colorTitle = colorTitle
+        self.color = color
+        self.sizeTitle = sizeTitle
+        self.size = size
         self.priceType = priceType
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
@@ -129,6 +159,9 @@ public struct VerticalProductCard: View {
     public init(
         configuration: VerticalProductCardConfiguration,
         product: Product,
+        colorTitle: String = "",
+        sizeTitle: String = "",
+        oneSizeTitle: String = "",
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
         isFavorite: Binding<Bool> = .constant(false)
@@ -138,6 +171,10 @@ public struct VerticalProductCard: View {
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name
+        self.colorTitle = colorTitle
+        self.color = product.defaultVariant.colour?.name ?? ""
+        self.sizeTitle = sizeTitle
+        self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
@@ -154,6 +191,10 @@ public struct VerticalProductCard: View {
                 VStack(alignment: .leading, spacing: Spacing.space050) {
                     productDesignerView
                     productNameView
+                    if !configuration.hideDetails {
+                        productColorView
+                        productSizeView
+                    }
                 }
 
                 if configuration.size == .large && !configuration.hidePrice {
@@ -219,6 +260,34 @@ public struct VerticalProductCard: View {
             .accessibilityIdentifier(AccessibilityId.productName)
     }
 
+    private var productColorView: some View {
+        HStack(spacing: Spacing.space100) {
+            Text(colorTitle)
+                .font(Font(configuration.smallTextFont))
+                .foregroundStyle(Colors.primary.mono500)
+            Text(color)
+                .font(Font(configuration.smallTextFont))
+                .foregroundStyle(Colors.primary.mono700)
+        }
+        .lineLimit(Constants.productColorLineLimit)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(AccessibilityId.productColor)
+    }
+
+    private var productSizeView: some View {
+        HStack(spacing: Spacing.space100) {
+            Text(sizeTitle)
+                .font(Font(configuration.smallTextFont))
+                .foregroundStyle(Colors.primary.mono500)
+            Text(size)
+                .font(Font(configuration.smallTextFont))
+                .foregroundStyle(Colors.primary.mono700)
+        }
+        .lineLimit(Constants.productSizeLineLimit)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(AccessibilityId.productSize)
+    }
+
     private var productPriceView: some View {
         PriceComponentView(type: priceType, configuration: configuration.priceConfiguration)
             .shimmering(while: $isSkeleton)
@@ -252,7 +321,7 @@ public struct VerticalProductCard: View {
                     .foregroundStyle(Colors.primary.black, Colors.primary.white)
             })
             .padding([.top, .trailing], topTrailingEdgePadding)
-            .accessibilityIdentifier(AccessibilityId.productWishlistButton)
+            .accessibilityIdentifier(actionViewAccessibilityIdentifier)
         }
     }
 }
@@ -261,12 +330,25 @@ public struct VerticalProductCard: View {
 
 private extension VerticalProductCard {
     var actionImage: Image {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch configuration.actionType {
         case .wishlist:
             isFavorite ? Icon.heartFill.image : Icon.heart.image
         case .remove:
             Icon.closeCircleFill.image
         }
+        // swiftlint:enable vertical_whitespace_between_cases
+    }
+
+    var actionViewAccessibilityIdentifier: String {
+        // swiftlint:disable vertical_whitespace_between_cases
+        switch configuration.actionType {
+        case .wishlist:
+            AccessibilityId.productWishlistButton
+        case .remove:
+            AccessibilityId.productRemoveFromWishlistButton
+        }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
@@ -275,13 +357,18 @@ private enum AccessibilityId {
     static let productImage = "product-image"
     static let productDesigner = "product-designer"
     static let productName = "product-name"
+    static let productColor = "product-color"
+    static let productSize = "product-size"
     static let productPrice = "product-price-component"
     static let productWishlistButton = "product-add-wishlist-btn"
+    static let productRemoveFromWishlistButton = "product-remove-from-wishlist-btn"
 }
 
 private enum Constants {
     static let productDesignerLineLimit: Int = 1
     static let productNameLineLimit: Int = 2
+    static let productColorLineLimit: Int = 1
+    static let productSizeLineLimit: Int = 1
     static let iconSmallSize: CGFloat = 24
     static let iconLargeSize: CGFloat = 32
     static let imageAspectRatio: CGFloat = 0.75
@@ -320,4 +407,4 @@ private enum Constants {
         name: "Rouge Pur Couture",
         priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
     ) { _, _ in }
-}
+} // swiftlint:disable:this file_length

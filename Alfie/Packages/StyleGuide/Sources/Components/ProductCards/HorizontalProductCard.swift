@@ -33,20 +33,11 @@ public struct HorizontalProductCard: View {
     }
 
     public init(product: Product, colorTitle: String = "", sizeTitle: String = "", oneSizeTitle: String = "") {
-        var sizeValue: String
-        if let size = product.defaultVariant.size {
-            sizeValue = size.value
-            if let scale = size.scale {
-                sizeValue += " \(scale)"
-            }
-        } else {
-            sizeValue = oneSizeTitle
-        }
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name
         self.color = product.defaultVariant.colour?.name ?? ""
-        self.size = sizeValue
+        self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
         self.colorTitle = colorTitle
         self.sizeTitle = sizeTitle
