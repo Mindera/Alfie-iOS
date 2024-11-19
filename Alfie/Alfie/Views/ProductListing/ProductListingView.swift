@@ -75,30 +75,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                     configuration: .init(size: viewModel.style == .list ? .large : .medium),
                     product: product,
                     onUserAction: { _, type in
-                        guard case .wishlist(let isFavorite) = type else { return }
-                        #if DEBUG
-                        if !isFavorite {
-                            let product = Product(
-                                styleNumber: product.styleNumber,
-                                name: product.name,
-                                brand: product.brand,
-                                shortDescription: product.shortDescription,
-                                longDescription: product.longDescription,
-                                slug: product.slug,
-                                priceRange: product.priceRange,
-                                attributes: product.attributes,
-                                defaultVariant: product.defaultVariant,
-                                variants: product.variants,
-                                colours: product.colours
-                            )
-                            mockContent.wishlistProducts.append(product)
-                        } else {
-                            mockContent.wishlistProducts.removeAll {
-                                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
-                            }
-                        }
-                        #endif
+                        handleUserAction(forProduct: product, actionType: type)
                     },
                     isSkeleton: .init(
                         get: { viewModel.state.isLoadingFirstPage },
@@ -188,6 +165,37 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
             Text.build(theme.font.small.normal(LocalizableProductListing.errorMessage))
                 .foregroundStyle(Colors.primary.black)
         }
+    }
+}
+
+// MARK: - Private Methods
+
+private extension ProductListingView {
+    func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
+        #if DEBUG
+        guard case .wishlist(let isFavorite) = actionType else { return }
+        if !isFavorite {
+            let product = Product(
+                styleNumber: product.styleNumber,
+                name: product.name,
+                brand: product.brand,
+                shortDescription: product.shortDescription,
+                longDescription: product.longDescription,
+                slug: product.slug,
+                priceRange: product.priceRange,
+                attributes: product.attributes,
+                defaultVariant: product.defaultVariant,
+                variants: product.variants,
+                colours: product.colours
+            )
+            mockContent.wishlistProducts.append(product)
+        } else {
+            mockContent.wishlistProducts.removeAll {
+                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
+                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
+            }
+        }
+        #endif
     }
 }
 

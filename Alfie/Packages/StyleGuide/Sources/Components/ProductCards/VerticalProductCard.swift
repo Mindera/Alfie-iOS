@@ -136,15 +136,15 @@ public struct VerticalProductCard: View {
         image: URL?,
         designer: String,
         name: String,
+        priceType: PriceType,
+        onUserAction: @escaping ProductUserActionHandler,
         colorTitle: String = "",
         color: String = "",
         sizeTitle: String = "",
         size: String = "",
-        priceType: PriceType,
         addToBagTitle: String = "",
         outOfStockTitle: String = "",
         isAddToBagDisabled: Bool = false,
-        onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
         isFavorite: Binding<Bool> = .constant(false)
     ) {
@@ -169,13 +169,13 @@ public struct VerticalProductCard: View {
     public init(
         configuration: VerticalProductCardConfiguration,
         product: Product,
+        onUserAction: @escaping ProductUserActionHandler,
         colorTitle: String = "",
         sizeTitle: String = "",
         oneSizeTitle: String = "",
         addToBagTitle: String = "",
         outOfStockTitle: String = "",
         isAddToBagDisabled: Bool = false,
-        onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
         isFavorite: Binding<Bool> = .constant(false)
     ) {

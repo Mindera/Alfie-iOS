@@ -24,33 +24,16 @@ struct WishListView: View {
                     VerticalProductCard(
                         configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
                         product: product,
+                        onUserAction: { _, type in
+                            handleUserAction(forProduct: product, actionType: type)
+                        },
                         colorTitle: LocalizableGeneral.$color + ":",
                         sizeTitle: LocalizableGeneral.$size + ":",
                         oneSizeTitle: LocalizableGeneral.$oneSize,
                         addToBagTitle: LocalizableGeneral.$addToBag,
                         outOfStockTitle: LocalizableGeneral.$outOfStock,
                         isAddToBagDisabled: product.defaultVariant.stock == .zero
-                    ) { productId, type in
-                        switch type {
-                        case .remove:
-                            mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != productId }
-
-                        case .addToBag:
-                            guard !mockContent.bagProducts.contains(
-                                where: {
-                                    $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                                    $0.defaultVariant.size?.id == product.defaultVariant.size?.id
-                                }
-                            )
-                            else {
-                                return
-                            }
-                            mockContent.bagProducts.append(product)
-
-                        case .wishlist:
-                            return
-                        }
-                    }
+                    )
                 }
             }
             .padding(.horizontal, Spacing.space200)
@@ -68,6 +51,32 @@ struct WishListView: View {
         .padding(.horizontal, Spacing.space200)
         .withToolbar(for: .wishlist)
     #endif
+    }
+}
+
+// MARK: - Private Methods
+
+private extension WishListView {
+    func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
+        switch actionType {
+        case .remove:
+            mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != product.id }
+
+        case .addToBag:
+            guard !mockContent.bagProducts.contains(
+                where: {
+                    $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
+                    $0.defaultVariant.size?.id == product.defaultVariant.size?.id
+                }
+            )
+            else {
+                return
+            }
+            mockContent.bagProducts.append(product)
+
+        case .wishlist:
+            return
+        }
     }
 }
 
