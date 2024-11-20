@@ -145,6 +145,7 @@
 		DAC900762B87D04100F9819C /* LocalizableGeneral.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DAC900752B87D04100F9819C /* LocalizableGeneral.xcstrings */; };
 		DAE910222B8CAD81008DC191 /* ForceAppUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE910212B8CAD81008DC191 /* ForceAppUpdateView.swift */; };
 		DAEDF87F2B7AD606000C3604 /* LocalizableHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEDF87E2B7AD606000C3604 /* LocalizableHome.swift */; };
+		FCE40D292CEC6C5E00B73944 /* ci.yml in Resources */ = {isa = PBXBuildFile; fileRef = FCE40D282CEC6C5E00B73944 /* ci.yml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -313,6 +314,7 @@
 		DAC900752B87D04100F9819C /* LocalizableGeneral.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = LocalizableGeneral.xcstrings; sourceTree = "<group>"; };
 		DAE910212B8CAD81008DC191 /* ForceAppUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceAppUpdateView.swift; sourceTree = "<group>"; };
 		DAEDF87E2B7AD606000C3604 /* LocalizableHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizableHome.swift; sourceTree = "<group>"; };
+		FCE40D282CEC6C5E00B73944 /* ci.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = ci.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -721,6 +723,7 @@
 		BE8B021B2B616976007AE489 = {
 			isa = PBXGroup;
 			children = (
+				FCE40D242CEC69D100B73944 /* .github */,
 				BEA12B7C2B62665B00DA7608 /* Packages */,
 				BE8B02262B616976007AE489 /* Alfie */,
 				BE8B02372B616979007AE489 /* AlfieTests */,
@@ -1015,6 +1018,22 @@
 			path = DeepLinking;
 			sourceTree = "<group>";
 		};
+		FCE40D242CEC69D100B73944 /* .github */ = {
+			isa = PBXGroup;
+			children = (
+				FCE40D252CEC69EB00B73944 /* Workflows */,
+			);
+			path = .github;
+			sourceTree = "<group>";
+		};
+		FCE40D252CEC69EB00B73944 /* Workflows */ = {
+			isa = PBXGroup;
+			children = (
+				FCE40D282CEC6C5E00B73944 /* ci.yml */,
+			);
+			path = Workflows;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1157,6 +1176,7 @@
 				BEB3C3562BD2C7C600AFDDC1 /* LocalizableSortBy.xcstrings in Resources */,
 				DAC900572B87B83C00F9819C /* LocalizableHome.xcstrings in Resources */,
 				DAC900672B87CCB600F9819C /* LocalizableAccount.xcstrings in Resources */,
+				FCE40D292CEC6C5E00B73944 /* ci.yml in Resources */,
 				BE8B022C2B616979007AE489 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
