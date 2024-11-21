@@ -5,7 +5,8 @@ on:
   push:
     branches:
       - main
-      - 'ALFMOB-33_Implemented_CI_CD'
+      - release/**
+      - ALFMOB-33_Implemented_CI_CD
   workflow_dispatch:
   schedule:
     - cron: '0 23 * * 0' # Every Sunday at 23:00 GMT
