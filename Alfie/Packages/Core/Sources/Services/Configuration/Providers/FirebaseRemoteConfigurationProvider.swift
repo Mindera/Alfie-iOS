@@ -71,4 +71,24 @@ public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderPro
         }
         return configValue.stringValue
     }
+
+	public func set(_ value: Bool, for key: Models.ConfigurationKey) {
+		// Updating remote configurations not available yet
+	}
+
+	public func set(_ value: Data, for key: Models.ConfigurationKey) {
+		// Updating remote configurations not available yet
+	}
+
+	public func set(_ value: Double, for key: Models.ConfigurationKey) {
+		// Updating remote configurations not available yet
+	}
+
+	public func set(_ value: Int, for key: Models.ConfigurationKey) {
+		// Updating remote configurations not available yet
+	}
+
+	public func set(_ value: String, for key: Models.ConfigurationKey) {
+		// Updating remote configurations not available yet
+	}
 }

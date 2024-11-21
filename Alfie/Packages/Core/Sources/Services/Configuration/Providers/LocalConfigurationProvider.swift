@@ -3,10 +3,15 @@ import Foundation
 import Models
 
 public final class LocalConfigurationProvider: ConfigurationProviderProtocol {
-    private var localConfig: [String: Any]?
+	private static let userDefaultsKey = "featureToggles"
+
+	private var localConfig: [String: Data] = [:]
     private let isReadySubject: CurrentValueSubject<Bool, Never> = .init(false)
     public var isReady: Bool { isReadySubject.value }
     public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+
+	private lazy var decoder = JSONDecoder()
+	private lazy var encoder = JSONEncoder()
 
     public init() {
         loadConfig()
@@ -15,56 +20,112 @@ public final class LocalConfigurationProvider: ConfigurationProviderProtocol {
     // MARK: - ConfigurationProviderProtocol
 
     public func bool(for key: ConfigurationKey) -> Bool? {
-        guard let localConfig, localConfig.has(key: key.rawValue) else {
+        guard
+			localConfig.has(key: key.rawValue),
+			let data = localConfig[key.rawValue]
+		else {
             return nil
         }
-        return localConfig[key.rawValue] as? Bool
+
+		return try? decoder.decode(Bool.self, from: data)
     }
 
     public func data(for key: ConfigurationKey) -> Data? {
-        guard
-            let localConfig, localConfig.has(key: key.rawValue),
-            let value = localConfig[key.rawValue] as? [String: [Any]]
-        else {
-            return nil
-        }
+		guard
+			localConfig.has(key: key.rawValue),
+			let data = localConfig[key.rawValue]
+		else {
+			return nil
+		}
 
-        return try? JSONSerialization.data(withJSONObject: value)
+		return data
     }
 
     public func double(for key: ConfigurationKey) -> Double? {
-        guard let localConfig, localConfig.has(key: key.rawValue) else {
-            return nil
-        }
-        return localConfig[key.rawValue] as? Double
+		guard
+			localConfig.has(key: key.rawValue),
+			let data = localConfig[key.rawValue]
+		else {
+			return nil
+		}
+
+		return try? decoder.decode(Double.self, from: data)
     }
 
     public func int(for key: ConfigurationKey) -> Int? {
-        guard let localConfig, localConfig.has(key: key.rawValue) else {
-            return nil
-        }
-        return localConfig[key.rawValue] as? Int
+		guard
+			localConfig.has(key: key.rawValue),
+			let data = localConfig[key.rawValue]
+		else {
+			return nil
+		}
+
+		return try? decoder.decode(Int.self, from: data)
     }
 
     public func string(for key: ConfigurationKey) -> String? {
-        guard let localConfig, localConfig.has(key: key.rawValue) else {
-            return nil
-        }
-        return localConfig[key.rawValue] as? String
+		guard
+			localConfig.has(key: key.rawValue),
+			let data = localConfig[key.rawValue]
+		else {
+			return nil
+		}
+
+		return try? decoder.decode(String.self, from: data)
     }
+
+	public func set(_ value: Bool, for key: ConfigurationKey) {
+		setValue(value, for: key)
+	}
+
+	public func set(_ value: Data, for key: ConfigurationKey) {
+		setValue(value, for: key)
+	}
+
+	public func set(_ value: Double, for key: ConfigurationKey) {
+		setValue(value, for: key)
+	}
+
+	public func set(_ value: Int, for key: ConfigurationKey) {
+		setValue(value, for: key)
+	}
+
+	public func set(_ value: String, for key: ConfigurationKey) {
+		setValue(value, for: key)
+	}
 
     // MARK: - Private
 
     private func loadConfig() {
-        guard
-            let path = Bundle.main.path(forResource: "local_config", ofType: "json"),
-            let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-            let object = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any]
-        else {
-            return
-        }
+		guard
+			let data = UserDefaults.standard.data(forKey: Self.userDefaultsKey),
+			let config = try? decoder.decode([String: Data].self, from: data)
+		else {
+			return
+		}
 
-        localConfig = object
-        isReadySubject.value = true
+		isReadySubject.value = true
+		self.localConfig = config
     }
+
+	private func syncLocalConfig() {
+		guard
+			let data = try? encoder.encode(localConfig)
+		else {
+			return
+		}
+
+		UserDefaults.standard.set(data, forKey: Self.userDefaultsKey)
+	}
+
+	private func setValue<T: Encodable>(_ value: T, for key: ConfigurationKey) {
+		guard
+			let data = try? encoder.encode(value)
+		else {
+			return
+		}
+
+		localConfig[key.rawValue] = data
+		syncLocalConfig()
+	}
 }

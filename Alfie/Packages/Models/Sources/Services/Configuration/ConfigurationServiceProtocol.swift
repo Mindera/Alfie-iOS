@@ -10,4 +10,5 @@ public protocol ConfigurationServiceProtocol {
     var softAppUpdateInfo: AppUpdateInfo? { get }
 
     func isFeatureEnabled(_ key: ConfigurationKey) -> Bool
+	func updateFeature(_ key: ConfigurationKey, isEnabled: Bool)
 }

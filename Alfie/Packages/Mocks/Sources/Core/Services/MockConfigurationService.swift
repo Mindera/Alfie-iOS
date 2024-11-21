@@ -27,4 +27,9 @@ public class MockConfigurationService: ConfigurationServiceProtocol {
     public func isFeatureEnabled(_ key: ConfigurationKey) -> Bool {
         onIsFeatureEnabledCalled?(key) ?? false
     }
+
+	public var onUpdateFeatureCalled: ((Bool) -> Void)?
+	public func updateFeature(_ key: Models.ConfigurationKey, isEnabled: Bool) {
+		onUpdateFeatureCalled?(isEnabled)
+	}
 }

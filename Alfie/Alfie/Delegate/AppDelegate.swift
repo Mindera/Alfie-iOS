@@ -54,7 +54,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 serviceProvider.notificationsService.start()
             }
         }
-        tabCoordinator = TabCoordinator(tabs: TabScreen.allCases, activeTab: .home(), serviceProvider: serviceProvider)
+
+		var tabs: [TabScreen] = TabScreen.allCases
+
+		// TODO: Review feature toggle flow
+		if !serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
+			tabs.removeAll { $0 == .wishlist }
+		}
+
+        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
     }
 
     // MARK: - Notifications

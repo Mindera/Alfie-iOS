@@ -32,5 +32,30 @@ public class MockConfigurationProvider: ConfigurationProviderProtocol {
         onStringCalled?(key)
     }
 
+	public var onSetBoolCalled: ((Bool, ConfigurationKey) -> Void)?
+	public func set(_ value: Bool, for key: ConfigurationKey) {
+		onSetBoolCalled?(value, key)
+	}
+
+	public var onSetDataCalled: ((Data, ConfigurationKey) -> Void)?
+	public func set(_ value: Data, for key: ConfigurationKey) {
+		onSetDataCalled?(value, key)
+	}
+
+	public var onSetDoubleCalled: ((Double, ConfigurationKey) -> Void)?
+	public func set(_ value: Double, for key: ConfigurationKey) {
+		onSetDoubleCalled?(value, key)
+	}
+
+	public var onSetIntCalled: ((Int, ConfigurationKey) -> Void)?
+	public func set(_ value: Int, for key: Models.ConfigurationKey) {
+		onSetIntCalled?(value, key)
+	}
+
+	public var onSetStringCalled: ((String, ConfigurationKey) -> Void)?
+	public func set(_ value: String, for key: ConfigurationKey) {
+		onSetStringCalled?(value, key)
+	}
+
     public init() { }
 }

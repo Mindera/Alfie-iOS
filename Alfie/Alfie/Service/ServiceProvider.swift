@@ -39,8 +39,15 @@ final class ServiceProvider: ServiceProviderProtocol {
             minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800
         )
         let localProvider = LocalConfigurationProvider()
+
+		#if DEBUG
+		let providers: [ConfigurationProviderProtocol] = [localProvider]
+		#else
+		let providers: [ConfigurationProviderProtocol] = [firebaseProvider, localProvider] // Order matters!
+		#endif
+
         configurationService = ConfigurationService(
-            providers: [firebaseProvider, localProvider], // Order matters!
+			providers: providers,
             authenticationService: authenticationService,
             country: defaultInitializationCountry
         )
