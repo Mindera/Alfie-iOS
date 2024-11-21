@@ -49,6 +49,7 @@ final class ViewFactory: ViewFactoryProtocol {
                 BagView(
                     viewModel: BagViewModel(
                         dependencies: BagDependencyContainer(
+                            bagService: serviceProvider.bagService,
                             deepLinkService: serviceProvider.deepLinkService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             webViewConfigurationService: serviceProvider.webViewConfigurationService
@@ -129,7 +130,8 @@ final class ViewFactory: ViewFactoryProtocol {
                         product: nil,
                         dependencies: ProductDetailsDependencyContainer(
                             productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider
+                            webUrlProvider: serviceProvider.webUrlProvider,
+                            bagService: serviceProvider.bagService
                         )
                     )
                 )
@@ -141,7 +143,8 @@ final class ViewFactory: ViewFactoryProtocol {
                         product: product,
                         dependencies: ProductDetailsDependencyContainer(
                             productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider
+                            webUrlProvider: serviceProvider.webUrlProvider,
+                            bagService: serviceProvider.bagService
                         )
                     )
                 )

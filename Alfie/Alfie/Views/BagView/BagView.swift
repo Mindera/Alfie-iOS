@@ -19,7 +19,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     var body: some View {
     #if DEBUG
         List {
-            ForEach(mockContent.bagProducts) { product in
+            ForEach(viewModel.products) { product in
                 HorizontalProductCard(
                     product: product,
                     colorTitle: LocalizableGeneral.$color + ":",
@@ -29,7 +29,9 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 .listRowInsets(EdgeInsets())
             }
             .onDelete { offsets in
-                mockContent.bagProducts.remove(atOffsets: offsets)
+                for index in offsets.makeIterator() {
+                    viewModel.didSelectDelete(for: viewModel.products[index].id)
+                }
             }
             .listRowSeparator(.hidden)
             .padding(.horizontal, Spacing.space200)
@@ -38,6 +40,9 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .listRowSpacing(Spacing.space200)
         .padding(.vertical, Spacing.space200)
         .withToolbar(for: .tab(.bag))
+        .onAppear {
+            viewModel.viewDidAppear()
+        }
     #else
         if let webViewModel = viewModel.webViewModel() as? WebViewModel {
             WebView(viewModel: webViewModel)

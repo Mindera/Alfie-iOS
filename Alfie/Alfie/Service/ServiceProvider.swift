@@ -3,6 +3,9 @@ import Core
 import Firebase
 import Foundation
 import Models
+#if DEBUG
+import Mocks
+#endif
 
 final class ServiceProvider: ServiceProviderProtocol {
     let apiEndpointService: ApiEndpointServiceProtocol
@@ -21,6 +24,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     let notificationsService: NotificationsServiceProtocol
     let searchService: SearchServiceProtocol
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
+    let bagService: BagServiceProtocol
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
@@ -76,6 +80,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         brandsService = BrandsService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient)
+        bagService = MockBagService()
     }
 
     public func resetServices() {

@@ -160,8 +160,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         (selectedVariant?.stock ?? 0) > 0
     }
 
-    func didTapAddToBag() {
-        // TODO: implement in a future ticket
+    func didTapAddToBag(for product: Product, selectedVariant: Product.Variant) {
+        dependencies.bagService.addProduct(product, selectedVariant: selectedVariant)
     }
 
     func didTapAddToWishlist() {

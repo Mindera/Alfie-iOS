@@ -64,7 +64,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public var onDidTapAddToBagCalled: (() -> Void)?
-    public func didTapAddToBag() {
+    public func didTapAddToBag(for product: Product, selectedVariant: Product.Variant) {
         onDidTapAddToBagCalled?()
     }
 

@@ -20,24 +20,28 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var notificationsService: NotificationsServiceProtocol
     public var searchService: SearchServiceProtocol
     public var webViewConfigurationService: WebViewConfigurationServiceProtocol
+    public var bagService: BagServiceProtocol
 
-    public init(authenticationService: AuthenticationServiceProtocol = MockAuthenticationService(),
-                configurationService: ConfigurationServiceProtocol = MockConfigurationService(),
-                deepLinkService: DeepLinkServiceProtocol = MockDeepLinkService(),
-                trackingService: TrackingServiceProtocol = MockTrackingService(),
-                apiEndpointService: ApiEndpointServiceProtocol = MockApiEndpointService(),
-                hapticsService: HapticsServiceProtocol = MockHapticsService(),
-                reachabilityService: ReachabilityServiceProtocol = MockReachabilityService(),
-                navigationService: NavigationServiceProtocol = MockNavigationService(),
-                recentsService: RecentsServiceProtocol = MockRecentsService(),
-                storageService: StorageServiceProtocol? = MockStorageService(),
-                userDefaults: UserDefaultsProtocol = MockUserDefaults(),
-                productService: ProductServiceProtocol = MockProductService(),
-                brandsService: BrandsServiceProtocol = MockBrandsService(),
-                webUrlProvider: WebURLProviderProtocol = MockWebUrlProvider(),
-                notificationsService: NotificationsServiceProtocol = MockNotificationsServiceProtocol(),
-                searchService: SearchServiceProtocol = MockSearchService(),
-                webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService()) {
+    public init(
+        authenticationService: AuthenticationServiceProtocol = MockAuthenticationService(),
+        configurationService: ConfigurationServiceProtocol = MockConfigurationService(),
+        deepLinkService: DeepLinkServiceProtocol = MockDeepLinkService(),
+        trackingService: TrackingServiceProtocol = MockTrackingService(),
+        apiEndpointService: ApiEndpointServiceProtocol = MockApiEndpointService(),
+        hapticsService: HapticsServiceProtocol = MockHapticsService(),
+        reachabilityService: ReachabilityServiceProtocol = MockReachabilityService(),
+        navigationService: NavigationServiceProtocol = MockNavigationService(),
+        recentsService: RecentsServiceProtocol = MockRecentsService(),
+        storageService: StorageServiceProtocol? = MockStorageService(),
+        userDefaults: UserDefaultsProtocol = MockUserDefaults(),
+        productService: ProductServiceProtocol = MockProductService(),
+        brandsService: BrandsServiceProtocol = MockBrandsService(),
+        webUrlProvider: WebURLProviderProtocol = MockWebUrlProvider(),
+        notificationsService: NotificationsServiceProtocol = MockNotificationsServiceProtocol(),
+        searchService: SearchServiceProtocol = MockSearchService(),
+        webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService(),
+        bagService: BagServiceProtocol = MockBagService()
+    ) {
         self.authenticationService = authenticationService
         self.configurationService = configurationService
         self.deepLinkService = deepLinkService
@@ -55,6 +59,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         self.notificationsService = notificationsService
         self.searchService = searchService
         self.webViewConfigurationService = webViewConfigurationService
+        self.bagService = bagService
     }
 
     public var onResetServicesCalled: (() -> Void)?

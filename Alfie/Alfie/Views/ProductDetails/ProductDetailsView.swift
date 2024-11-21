@@ -497,35 +497,8 @@ extension ProductDetailsView {
                     ),
                     isFullWidth: true
                 ) {
-                    #if DEBUG
-                        guard
-                            case .success(let model) = viewModel.state,
-                            !mockContent.bagProducts.contains(
-                                where: {
-                                    $0.defaultVariant.colour?.id == model.selectedVariant.colour?.id &&
-                                    $0.defaultVariant.size?.id == model.selectedVariant.size?.id
-                                }
-                            )
-                        else {
-                            return
-                        }
-                        let product = Product(
-                            styleNumber: model.product.styleNumber,
-                            name: model.product.name,
-                            brand: model.product.brand,
-                            shortDescription: model.product.shortDescription,
-                            longDescription: model.product.longDescription,
-                            slug: model.product.slug,
-                            priceRange: model.product.priceRange,
-                            attributes: model.product.attributes,
-                            defaultVariant: model.selectedVariant,
-                            variants: model.product.variants,
-                            colours: model.product.colours
-                        )
-                        mockContent.bagProducts.append(product)
-                    #else
-                        viewModel.didTapAddToBag()
-                    #endif
+                    guard case .success(let model) = viewModel.state else { return }
+                    viewModel.didTapAddToBag(for: model.product, selectedVariant: model.selectedVariant)
                 }
             }
         }
