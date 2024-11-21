@@ -142,17 +142,17 @@
 		FCA0B27B2CEF3EE7000339F6 /* .github */ = {
 			isa = PBXGroup;
 			children = (
-				FCA0B27D2CEF3EFB000339F6 /* Workflows */,
+				FCA0B27D2CEF3EFB000339F6 /* workflows */,
 			);
 			path = .github;
 			sourceTree = "<group>";
 		};
-		FCA0B27D2CEF3EFB000339F6 /* Workflows */ = {
+		FCA0B27D2CEF3EFB000339F6 /* workflows */ = {
 			isa = PBXGroup;
 			children = (
 				FCA0B27E2CEF3F12000339F6 /* ci.yml */,
 			);
-			path = Workflows;
+			path = workflows;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
