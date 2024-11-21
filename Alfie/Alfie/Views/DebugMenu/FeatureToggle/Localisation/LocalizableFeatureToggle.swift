@@ -4,8 +4,10 @@ struct LocalizableFeatureToggle: LocalizableProtocol {
 	@LocalizableResource<Self>(.title) static var title
 
 	static func featureName(for feature: String, locale: Locale = .current) -> LocalizedStringResource {
-		.init(
-			String.LocalizationValue(stringLiteral: "Key\(feature)Feature"),
+		let identifier = feature.capitalized.replacingOccurrences(of: "_", with: "")
+
+		return .init(
+			String.LocalizationValue(stringLiteral: "Key\(identifier)Feature"),
 			table: tableName,
 			locale: locale
 		)

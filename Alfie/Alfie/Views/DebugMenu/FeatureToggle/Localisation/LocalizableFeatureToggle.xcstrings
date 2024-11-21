@@ -12,7 +12,7 @@
         }
       }
     },
-    "KeyiOSAppUpdateFeature" : {
+    "KeyIosAppUpdateFeature" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -23,7 +23,7 @@
         }
       }
     },
-    "KeyWishlistFeature" : {
+    "KeyIosWishlistFeature" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
