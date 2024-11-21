@@ -54,6 +54,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     func viewDidAppear() {
+        wishListContent = dependencies.wishListService.getWishListContent()
         Task {
             await loadProductsIfNeeded()
         }
