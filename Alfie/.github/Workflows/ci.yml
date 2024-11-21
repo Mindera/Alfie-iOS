@@ -1,0 +1,71 @@
+
+name: Alfie CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'ALFMOB-33_Implemented_CI_CD'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 23 * * 0' # Every Sunday at 23:00 GMT
+
+jobs:
+  branch-validation:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v2
+        with:
+          xcode-version: 16
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Run Static Code Analysis
+        run: swiftlint
+
+      - name: Run Unit Tests
+          run: xcodebuild test -scheme Alfie -destination 'platform=iOS Simulator,name=iPhone 14'
+
+  testflight-build:
+    needs: branch-validation
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v2
+        with:
+          xcode-version: 16
+
+      - name: Increment Build Number
+        run: agvtool next-version -all
+
+      - name: Build and Archive
+        run: |
+          xcodebuild clean archive -scheme Alfie -archivePath $PWD/build/App.xcarchive
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
+            -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
+    
+    #config this later when app is setup in appstore connect
+      - name: Deploy to TestFlight
+        uses: appleboy/app-store-action@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          api_key_id: ${{ secrets.API_KEY_ID }}
+          api_issuer: ${{ secrets.API_ISSUER }}
+          ipa_path: ${{ github.workspace }}/build/App.ipa
+
+  debug-build-schedule:
+    needs: branch-validation
+    runs-on: macos-latest
+    steps:
+      - name: Trigger Debug Build
+        run: echo "Scheduled Debug Build for TestFlight"
