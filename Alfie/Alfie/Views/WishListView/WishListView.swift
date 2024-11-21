@@ -5,10 +5,12 @@ import SwiftUI
 import Mocks
 #endif
 
-struct WishListView: View {
-    #if DEBUG
-    @EnvironmentObject var mockContent: MockContent
-    #endif
+struct WishListView<ViewModel: WishListViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
+
+    init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
     #if DEBUG
@@ -20,7 +22,7 @@ struct WishListView: View {
                 ),
                 spacing: Spacing.space200
             ) {
-                ForEach(mockContent.wishlistProducts) { product in
+                ForEach(viewModel.products) { product in
                     VerticalProductCard(
                         configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
                         product: product,
@@ -40,6 +42,9 @@ struct WishListView: View {
         }
         .padding(.vertical, Spacing.space200)
         .withToolbar(for: .wishlist)
+        .onAppear {
+            viewModel.viewDidAppear()
+        }
     #else
         VStack {
             Icon.heart.image
@@ -60,19 +65,10 @@ private extension WishListView {
     func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
         switch actionType {
         case .remove:
-            mockContent.wishlistProducts = mockContent.wishlistProducts.filter { $0.id != product.id }
+            viewModel.didSelectDelete(for: product)
 
         case .addToBag:
-            guard !mockContent.bagProducts.contains(
-                where: {
-                    $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                    $0.defaultVariant.size?.id == product.defaultVariant.size?.id
-                }
-            )
-            else {
-                return
-            }
-            mockContent.bagProducts.append(product)
+            viewModel.didTapAddToBag(for: product)
 
         case .wishlist:
             return
@@ -81,6 +77,6 @@ private extension WishListView {
 }
 
 #Preview {
-    WishListView()
+    WishListView(viewModel: WishListViewModel(dependencies: MockWishListDependencyConainer()))
         .environmentObject(Coordinator())
 }

@@ -13,16 +13,16 @@ final class BagViewModel: BagViewModelProtocol {
 
     // MARK: - BagViewModelProtocol
 
-    public func viewDidAppear() {
+    func viewDidAppear() {
         products = dependencies.bagService.getBagContent()
     }
 
-    public func didSelectDelete(for productId: String) {
+    func didSelectDelete(for productId: String) {
         dependencies.bagService.removeProduct(productId)
         products = dependencies.bagService.getBagContent()
     }
 
-    public func webViewModel() -> any WebViewModelProtocol {
+    func webViewModel() -> any WebViewModelProtocol {
         WebViewModel(
             webFeature: .bag,
             dependencies: WebDependencyContainer(

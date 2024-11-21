@@ -73,7 +73,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func shouldShow(section: ProductDetailsSection) -> Bool
     func shouldShowLoading(for section: ProductDetailsSection) -> Bool
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
-    func didTapAddToBag(for product: Product, selectedVariant: Product.Variant)
+    func didTapAddToBag()
     func didTapAddToWishlist()
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
 }

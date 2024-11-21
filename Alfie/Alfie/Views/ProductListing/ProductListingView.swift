@@ -21,9 +21,6 @@ private enum Constants {
 
 struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    #if DEBUG
-    @EnvironmentObject var mockContent: MockContent
-    #endif
     @EnvironmentObject var coordinator: Coordinator
     @StateObject private var viewModel: ViewModel
     @State private var orientation = UIDeviceOrientation.unknown
@@ -83,14 +80,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                     ),
                     isFavorite: .init(
                         get: {
-                            #if DEBUG
-                            mockContent.wishlistProducts.contains {
+                            viewModel.wishListContent.contains {
                                 $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
                                 $0.defaultVariant.size?.id == product.defaultVariant.size?.id
                             }
-                            #else
-                            false
-                            #endif
                         },
                         set: { _ in }
                     )
@@ -172,30 +165,8 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
 
 private extension ProductListingView {
     func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
-        #if DEBUG
         guard case .wishlist(let isFavorite) = actionType else { return }
-        if !isFavorite {
-            let product = Product(
-                styleNumber: product.styleNumber,
-                name: product.name,
-                brand: product.brand,
-                shortDescription: product.shortDescription,
-                longDescription: product.longDescription,
-                slug: product.slug,
-                priceRange: product.priceRange,
-                attributes: product.attributes,
-                defaultVariant: product.defaultVariant,
-                variants: product.variants,
-                colours: product.colours
-            )
-            mockContent.wishlistProducts.append(product)
-        } else {
-            mockContent.wishlistProducts.removeAll {
-                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
-            }
-        }
-        #endif
+        viewModel.didTapAddToWishList(for: product, isFavorite: isFavorite)
     }
 }
 

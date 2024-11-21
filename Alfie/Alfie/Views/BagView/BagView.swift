@@ -6,10 +6,6 @@ import Mocks
 #endif
 
 struct BagView<ViewModel: BagViewModelProtocol>: View {
-    #if DEBUG
-    @EnvironmentObject var mockContent: MockContent
-    #endif
-
     @StateObject private var viewModel: ViewModel
 
     init(viewModel: ViewModel) {

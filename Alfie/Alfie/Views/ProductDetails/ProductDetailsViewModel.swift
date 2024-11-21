@@ -160,12 +160,14 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         (selectedVariant?.stock ?? 0) > 0
     }
 
-    func didTapAddToBag(for product: Product, selectedVariant: Product.Variant) {
-        dependencies.bagService.addProduct(product, selectedVariant: selectedVariant)
+    func didTapAddToBag() {
+        guard let selectedProduct else { return }
+        dependencies.bagService.addProduct(selectedProduct)
     }
 
     func didTapAddToWishlist() {
-        // TODO: implement in a future ticket
+        guard let selectedProduct else { return }
+        dependencies.wishListService.addProduct(selectedProduct)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
@@ -357,5 +359,28 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         state = .success(.init(product: product, selectedVariant: variant))
+    }
+
+    private var selectedProduct: Product? {
+        guard
+            let product,
+            let selectedVariant
+        else {
+            return nil
+        }
+
+        return Product(
+            styleNumber: product.styleNumber,
+            name: product.name,
+            brand: product.brand,
+            shortDescription: product.shortDescription,
+            longDescription: product.longDescription,
+            slug: product.slug,
+            priceRange: product.priceRange,
+            attributes: product.attributes,
+            defaultVariant: selectedVariant,
+            variants: product.variants,
+            colours: product.colours
+        )
     }
 }

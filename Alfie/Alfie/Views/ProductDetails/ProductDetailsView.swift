@@ -10,9 +10,6 @@ import StyleGuide
 import SwiftUI
 
 struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
-    #if DEBUG
-    @EnvironmentObject private var mockContent: MockContent
-    #endif
     @StateObject private var viewModel: ViewModel
     @EnvironmentObject var coordinator: Coordinator
     @State private var currentMediaIndex = 0
@@ -498,7 +495,7 @@ extension ProductDetailsView {
                     isFullWidth: true
                 ) {
                     guard case .success(let model) = viewModel.state else { return }
-                    viewModel.didTapAddToBag(for: model.product, selectedVariant: model.selectedVariant)
+                    viewModel.didTapAddToBag()
                 }
             }
         }
@@ -512,35 +509,7 @@ extension ProductDetailsView {
                     style: .secondary,
                     isFullWidth: true
                 ) {
-                    #if DEBUG
-                        guard
-                            case .success(let model) = viewModel.state,
-                            !mockContent.wishlistProducts.contains(
-                                where: {
-                                    $0.defaultVariant.colour?.id == model.selectedVariant.colour?.id &&
-                                    $0.defaultVariant.size?.id == model.selectedVariant.size?.id
-                                }
-                            )
-                        else {
-                            return
-                        }
-                        let product = Product(
-                            styleNumber: model.product.styleNumber,
-                            name: model.product.name,
-                            brand: model.product.brand,
-                            shortDescription: model.product.shortDescription,
-                            longDescription: model.product.longDescription,
-                            slug: model.product.slug,
-                            priceRange: model.product.priceRange,
-                            attributes: model.product.attributes,
-                            defaultVariant: model.selectedVariant,
-                            variants: model.product.variants,
-                            colours: model.product.colours
-                        )
-                    mockContent.wishlistProducts.append(product)
-                    #else
-                        viewModel.didTapAddToWishlist()
-                    #endif
+                    viewModel.didTapAddToWishlist()
                 }
             }
         }

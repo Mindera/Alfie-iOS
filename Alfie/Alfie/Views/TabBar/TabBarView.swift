@@ -9,18 +9,7 @@ import Mocks
 
 // MARK: - TabBarView
 
-// TODO: Remove MockContent and related code when API is ready
-#if DEBUG
-class MockContent: ObservableObject {
-    @Published var bagProducts: [Product] = []
-    @Published var wishlistProducts: [Product] = []
-}
-#endif
-
 struct TabBarView: View {
-    #if DEBUG
-    @StateObject private var mockContent = MockContent()
-    #endif
     @EnvironmentObject private var tabCoordinator: TabCoordinator
     private let configurationService: ConfigurationServiceProtocol
     @State private var isShowingAppUpdateAlert = false
@@ -44,9 +33,6 @@ struct TabBarView: View {
                         .toolbar(tabCoordinator.shouldShowTabBar ? .visible : .hidden, for: .tabBar)
                 }
             }
-            #if DEBUG
-            .environmentObject(mockContent)
-            #endif
             .onChange(of: tabCoordinator.activeTab) { _ in
                 hapticsService.trigger(.selectionChanged)
             }
