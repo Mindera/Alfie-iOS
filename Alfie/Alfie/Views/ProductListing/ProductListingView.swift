@@ -69,8 +69,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
         LazyVGrid(columns: gridStruct, spacing: Spacing.space200) {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
-                    configuration: .init(size: viewModel.style == .list ? .large : .medium),
-                    product: product,
+                    viewModel: .init(
+                        configuration: .init(size: viewModel.style == .list ? .large : .medium),
+                        product: product
+                    ),
                     onUserAction: { _, type in
                         handleUserAction(forProduct: product, actionType: type)
                     },

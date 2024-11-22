@@ -48,7 +48,7 @@ public struct ProductCarouselView<Header: View, Content: View, DataType: Identif
             )
         },
         content: { product in
-            VerticalProductCard(configuration: .init(size: .small), product: product) { _, _ in }
+            VerticalProductCard(viewModel: .init(configuration: .init(size: .small), product: product)) { _, _ in }
         }
     )
 }

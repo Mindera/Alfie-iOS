@@ -113,92 +113,25 @@ public struct VerticalProductCard: View {
         case addToBag
     }
 
-    private let configuration: VerticalProductCardConfiguration
-    private let productId: String
-    private let image: URL?
-    private let designer: String
-    private let name: String
-    private let colorTitle: String
-    private let color: String
-    private let sizeTitle: String
-    private let size: String
-    private let priceType: PriceType
-    private let addToBagTitle: String
-    private let outOfStockTitle: String
-    private let isAddToBagDisabled: Bool
+    private let viewModel: VerticalProductCardViewModel
     private let onUserAction: ProductUserActionHandler
     @Binding public private(set) var isSkeleton: Bool
     @Binding private var isFavorite: Bool
 
     public init(
-        configuration: VerticalProductCardConfiguration,
-        productId: String,
-        image: URL?,
-        designer: String,
-        name: String,
-        priceType: PriceType,
+        viewModel: VerticalProductCardViewModel,
         onUserAction: @escaping ProductUserActionHandler,
-        colorTitle: String = "",
-        color: String = "",
-        sizeTitle: String = "",
-        size: String = "",
-        addToBagTitle: String = "",
-        outOfStockTitle: String = "",
-        isAddToBagDisabled: Bool = false,
         isSkeleton: Binding<Bool> = .constant(false),
         isFavorite: Binding<Bool> = .constant(false)
     ) {
-        self.configuration = configuration
-        self.productId = productId
-        self.image = image
-        self.designer = designer
-        self.name = name
-        self.colorTitle = colorTitle
-        self.color = color
-        self.sizeTitle = sizeTitle
-        self.size = size
-        self.priceType = priceType
-        self.addToBagTitle = addToBagTitle
-        self.outOfStockTitle = outOfStockTitle
-        self.isAddToBagDisabled = isAddToBagDisabled
-        self.onUserAction = onUserAction
-        self._isSkeleton = isSkeleton
-        self._isFavorite = isFavorite
-    }
-
-    public init(
-        configuration: VerticalProductCardConfiguration,
-        product: Product,
-        onUserAction: @escaping ProductUserActionHandler,
-        colorTitle: String = "",
-        sizeTitle: String = "",
-        oneSizeTitle: String = "",
-        addToBagTitle: String = "",
-        outOfStockTitle: String = "",
-        isAddToBagDisabled: Bool = false,
-        isSkeleton: Binding<Bool> = .constant(false),
-        isFavorite: Binding<Bool> = .constant(false)
-    ) {
-        self.configuration = configuration
-        self.productId = product.id
-        self.image = product.defaultVariant.media.first?.asImage?.url
-        self.designer = product.brand.name
-        self.name = product.name
-        self.colorTitle = colorTitle
-        self.color = product.defaultVariant.colour?.name ?? ""
-        self.sizeTitle = sizeTitle
-        self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
-        self.priceType = product.priceType
-        self.addToBagTitle = addToBagTitle
-        self.outOfStockTitle = outOfStockTitle
-        self.isAddToBagDisabled = isAddToBagDisabled
+        self.viewModel = viewModel
         self.onUserAction = onUserAction
         self._isSkeleton = isSkeleton
         self._isFavorite = isFavorite
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: configuration.verticalInterSpacing) {
+        VStack(alignment: .leading, spacing: viewModel.configuration.verticalInterSpacing) {
             productImageView
                 .shimmering(while: $isSkeleton)
                 .accessibilityIdentifier(AccessibilityId.productImage)
@@ -207,37 +140,37 @@ public struct VerticalProductCard: View {
                 VStack(alignment: .leading, spacing: Spacing.space050) {
                     productDesignerView
                     productNameView
-                    if !configuration.hideDetails {
+                    if !viewModel.configuration.hideDetails {
                         productColorView
                         productSizeView
                     }
                 }
 
-                if configuration.size == .large && !configuration.hidePrice {
+                if viewModel.configuration.size == .large && !viewModel.configuration.hidePrice {
                     Spacer()
                     productPriceView
                     addToBagView
                 }
             }
 
-            if configuration.size != .large && !configuration.hidePrice {
+            if viewModel.configuration.size != .large && !viewModel.configuration.hidePrice {
                 productPriceView
                 addToBagView
             }
         }
         .overlay(alignment: .topTrailing) {
-            if !isSkeleton && !configuration.hideAction {
+            if !isSkeleton && !viewModel.configuration.hideAction {
                 actionView
             }
         }
-        .frame(width: configuration.cardSize.value)
+        .frame(width: viewModel.configuration.cardSize.value)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.productCard)
     }
 
     @ViewBuilder private var productImageView: some View {
         RemoteImage(
-            url: image,
+            url: viewModel.image,
             success: { image in
                 image
                     .resizable()
@@ -250,41 +183,42 @@ public struct VerticalProductCard: View {
     }
 
     private var productDesignerView: some View {
-        Text(designer)
-            .font(Font(configuration.textFont))
+        Text(viewModel.designer)
+            .font(Font(viewModel.configuration.textFont))
             .foregroundStyle(Colors.primary.mono900)
             .lineLimit(Constants.productDesignerLineLimit)
             .shimmeringMultiline(
                 while: $isSkeleton,
                 lines: Constants.productDesignerLineLimit,
-                font: configuration.textFont
+                font: viewModel.configuration.textFont
             )
             .accessibilityIdentifier(AccessibilityId.productDesigner)
     }
 
     @ViewBuilder private var productNameView: some View {
-        Text(name)
-            .font(Font(configuration.textFont))
+        Text(viewModel.name)
+            .font(Font(viewModel.configuration.textFont))
             .foregroundStyle(Colors.primary.mono500)
             .frame(
-                height: (configuration.textFont.lineHeight * CGFloat(Constants.productNameLineLimit)), alignment: .top
+                height: (viewModel.configuration.textFont.lineHeight * CGFloat(Constants.productNameLineLimit)),
+                alignment: .top
             )
             .lineLimit(Constants.productNameLineLimit)
             .shimmeringMultiline(
                 while: $isSkeleton,
                 lines: Constants.productNameLineLimit,
-                font: configuration.textFont
+                font: viewModel.configuration.textFont
             )
             .accessibilityIdentifier(AccessibilityId.productName)
     }
 
     private var productColorView: some View {
         HStack(spacing: Spacing.space100) {
-            Text(colorTitle)
-                .font(Font(configuration.smallTextFont))
+            Text(viewModel.colorTitle)
+                .font(Font(viewModel.configuration.smallTextFont))
                 .foregroundStyle(Colors.primary.mono500)
-            Text(color)
-                .font(Font(configuration.smallTextFont))
+            Text(viewModel.color)
+                .font(Font(viewModel.configuration.smallTextFont))
                 .foregroundStyle(Colors.primary.mono700)
         }
         .lineLimit(Constants.productColorLineLimit)
@@ -294,11 +228,11 @@ public struct VerticalProductCard: View {
 
     private var productSizeView: some View {
         HStack(spacing: Spacing.space100) {
-            Text(sizeTitle)
-                .font(Font(configuration.smallTextFont))
+            Text(viewModel.sizeTitle)
+                .font(Font(viewModel.configuration.smallTextFont))
                 .foregroundStyle(Colors.primary.mono500)
-            Text(size)
-                .font(Font(configuration.smallTextFont))
+            Text(viewModel.size)
+                .font(Font(viewModel.configuration.smallTextFont))
                 .foregroundStyle(Colors.primary.mono700)
         }
         .lineLimit(Constants.productSizeLineLimit)
@@ -307,46 +241,46 @@ public struct VerticalProductCard: View {
     }
 
     private var productPriceView: some View {
-        PriceComponentView(type: priceType, configuration: configuration.priceConfiguration)
+        PriceComponentView(type: viewModel.priceType, configuration: viewModel.configuration.priceConfiguration)
             .shimmering(while: $isSkeleton)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityId.productPrice)
     }
 
     @ViewBuilder private var addToBagView: some View {
-        if !configuration.hideDetails {
+        if !viewModel.configuration.hideDetails {
             ThemedButton(
-                text: isAddToBagDisabled ? outOfStockTitle : addToBagTitle,
+                text: viewModel.isAddToBagDisabled ? viewModel.outOfStockTitle : viewModel.addToBagTitle,
                 type: .small,
                 style: .secondary,
                 isDisabled: .init(
-                    get: { isAddToBagDisabled },
+                    get: { viewModel.isAddToBagDisabled },
                     set: { _ in }
                 ),
                 isFullWidth: true
             ) {
-                onUserAction(productId, .addToBag)
+                onUserAction(viewModel.productId, .addToBag)
             }
         }
     }
 
     @ViewBuilder private var actionView: some View {
-        switch configuration.size {
+        switch viewModel.configuration.size {
         case .small:
             EmptyView()
         case .medium,
              .large: // swiftlint:disable:this indentation_width
-            let topTrailingEdgePadding = configuration.size == .medium ? Spacing.space050 : Spacing.space100
-            let iconSize = configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
+            let topTrailingEdgePadding = viewModel.configuration.size == .medium ? Spacing.space050 : Spacing.space100
+            let iconSize = viewModel.configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
-                switch configuration.actionType {
+                switch viewModel.configuration.actionType {
                 case .wishlist:
                     isFavorite.toggle()
-                    onUserAction(productId, .wishlist(isFavorite: isFavorite))
+                    onUserAction(viewModel.productId, .wishlist(isFavorite: isFavorite))
 
                 case .remove:
-                    onUserAction(productId, .remove)
+                    onUserAction(viewModel.productId, .remove)
                 }
             }, label: {
                 actionImage
@@ -366,7 +300,7 @@ public struct VerticalProductCard: View {
 private extension VerticalProductCard {
     var actionImage: Image {
         // swiftlint:disable vertical_whitespace_between_cases
-        switch configuration.actionType {
+        switch viewModel.configuration.actionType {
         case .wishlist:
             isFavorite ? Icon.heartFill.image : Icon.heart.image
         case .remove:
@@ -377,7 +311,7 @@ private extension VerticalProductCard {
 
     var actionViewAccessibilityIdentifier: String {
         // swiftlint:disable vertical_whitespace_between_cases
-        switch configuration.actionType {
+        switch viewModel.configuration.actionType {
         case .wishlist:
             AccessibilityId.productWishlistButton
         case .remove:
@@ -411,12 +345,14 @@ private enum Constants {
 
 #Preview("Small") {
     VerticalProductCard(
-        configuration: .init(size: .small),
-        productId: "1",
-        image: URL(string: "https://www.alfieproj.com/productimages/thumb/1/1262024_22313940_13558933.jpg"),
-        designer: "Yves Saint Laurent",
-        name: "Rouge Pur Couture",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD"),
+        viewModel: .init(
+            configuration: .init(size: .small),
+            productId: "1",
+            image: URL(string: "https://www.alfieproj.com/productimages/thumb/1/1262024_22313940_13558933.jpg"),
+            designer: "Yves Saint Laurent",
+            name: "Rouge Pur Couture",
+            priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        ),
         onUserAction: { _, _ in },
         isSkeleton: .constant(false)
     )
@@ -424,22 +360,26 @@ private enum Constants {
 
 #Preview("Medium") {
     VerticalProductCard(
-        configuration: .init(size: .medium),
-        productId: "2",
-        image: URL(string: "https://www.alfieproj.com/productimages/medium/1/1262024_22313940_13558933.jpg"),
-        designer: "Yves Saint Laurent",
-        name: "Rouge Pur Couture",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        viewModel: .init(
+            configuration: .init(size: .medium),
+            productId: "2",
+            image: URL(string: "https://www.alfieproj.com/productimages/medium/1/1262024_22313940_13558933.jpg"),
+            designer: "Yves Saint Laurent",
+            name: "Rouge Pur Couture",
+            priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        )
     ) { _, _ in }
 }
 
 #Preview("Large") {
     VerticalProductCard(
-        configuration: .init(size: .large),
-        productId: "3",
-        image: URL(string: "https://www.alfieproj.com/productimages/medium/1/1262024_22313940_13558933.jpg"),
-        designer: "Yves Saint Laurent",
-        name: "Rouge Pur Couture",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        viewModel: .init(
+            configuration: .init(size: .large),
+            productId: "3",
+            image: URL(string: "https://www.alfieproj.com/productimages/medium/1/1262024_22313940_13558933.jpg"),
+            designer: "Yves Saint Laurent",
+            name: "Rouge Pur Couture",
+            priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        )
     ) { _, _ in }
 } // swiftlint:disable:this file_length

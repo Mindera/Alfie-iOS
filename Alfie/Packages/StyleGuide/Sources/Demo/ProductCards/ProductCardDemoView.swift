@@ -50,7 +50,9 @@ extension ProductCardDemoView {
         ) {
             HStack(alignment: .top, spacing: Spacing.space150) {
                 ForEach(Product.fixtures) { product in
-                    VerticalProductCard(configuration: .init(size: .small), product: product) { _, _ in }
+                    VerticalProductCard(
+                        viewModel: .init(configuration: .init(size: .small), product: product)
+                    ) { _, _ in }
                 }
             }
         }
@@ -73,7 +75,7 @@ extension ProductCardDemoView {
             spacing: Spacing.space200
         ) {
             ForEach(Product.fixtures) { product in
-                VerticalProductCard(configuration: .init(size: .medium), product: product) { _, _ in }
+                VerticalProductCard(viewModel: .init(configuration: .init(size: .medium), product: product)) { _, _ in }
             }
         }
     }
@@ -95,7 +97,7 @@ extension ProductCardDemoView {
             spacing: Spacing.space200
         ) {
             ForEach(Product.fixtures) { product in
-                VerticalProductCard(configuration: .init(size: .large), product: product) { _, _ in }
+                VerticalProductCard(viewModel: .init(configuration: .init(size: .large), product: product)) { _, _ in }
             }
         }
     }

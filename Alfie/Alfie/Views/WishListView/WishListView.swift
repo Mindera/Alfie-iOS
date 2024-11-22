@@ -23,18 +23,19 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
             ) {
                 ForEach(viewModel.products) { product in
                     VerticalProductCard(
-                        configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
-                        product: product,
-                        onUserAction: { _, type in
-                            handleUserAction(forProduct: product, actionType: type)
-                        },
-                        colorTitle: LocalizableGeneral.$color + ":",
-                        sizeTitle: LocalizableGeneral.$size + ":",
-                        oneSizeTitle: LocalizableGeneral.$oneSize,
-                        addToBagTitle: LocalizableGeneral.$addToBag,
-                        outOfStockTitle: LocalizableGeneral.$outOfStock,
-                        isAddToBagDisabled: product.defaultVariant.stock == .zero
-                    )
+                        viewModel: .init(
+                            configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
+                            product: product,
+                            colorTitle: LocalizableGeneral.$color + ":",
+                            sizeTitle: LocalizableGeneral.$size + ":",
+                            oneSizeTitle: LocalizableGeneral.$oneSize,
+                            addToBagTitle: LocalizableGeneral.$addToBag,
+                            outOfStockTitle: LocalizableGeneral.$outOfStock,
+                            isAddToBagDisabled: product.defaultVariant.stock == .zero
+                        )
+                    ) { _, type in
+                        handleUserAction(forProduct: product, actionType: type)
+                    }
                 }
             }
             .padding(.horizontal, Spacing.space200)
