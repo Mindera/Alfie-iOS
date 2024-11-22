@@ -1,4 +1,5 @@
 
+---
 name: Alfie CI/CD Pipeline
 
 on:
@@ -8,6 +9,9 @@ on:
       - release/**
       - ALFMOB-33_Implemented_CI_CD
   workflow_dispatch:
+  schedule:
+    - cron: '0 23 * * 0' # Every Sunday at 23:00 GMT
+
 jobs:
   branch-validation:
     runs-on: macos-latest
@@ -51,9 +55,8 @@ jobs:
       - name: Export IPA
         run: |
           xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
+          -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
 
-      # Config this later when app is set up in App Store Connect
       - name: Deploy to TestFlight
         uses: appleboy/app-store-action@v1
         with:
