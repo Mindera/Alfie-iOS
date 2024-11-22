@@ -43,9 +43,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private func bootstrap(application: UIApplication?) {
         if ProcessInfo.isSwiftUIPreview || ProcessInfo.isRunningTests {
-            #if DEBUG
+        #if DEBUG
             serviceProvider = MockServiceProvider()
-            #endif
+        #endif
         } else {
             CoreBootstrap.bootstrap()
             serviceProvider = ServiceProvider()
@@ -55,12 +55,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-		var tabs: [TabScreen] = TabScreen.allCases
+        var tabs: [TabScreen] = TabScreen.allCases
 
-		// TODO: Review feature toggle flow
-		if !serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
-			tabs.removeAll { $0 == .wishlist }
-		}
+        // TODO: Review feature toggle flow
+        if !serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
+            tabs.removeAll { $0 == .wishlist }
+        }
 
         tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
     }

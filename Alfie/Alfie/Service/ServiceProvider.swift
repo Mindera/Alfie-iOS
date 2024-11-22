@@ -40,14 +40,14 @@ final class ServiceProvider: ServiceProviderProtocol {
         )
         let localProvider = LocalConfigurationProvider()
 
-		#if DEBUG
-		let providers: [ConfigurationProviderProtocol] = [localProvider]
-		#else
-		let providers: [ConfigurationProviderProtocol] = [firebaseProvider, localProvider] // Order matters!
-		#endif
+        var providers: [ConfigurationProviderProtocol] = [firebaseProvider, localProvider] // Order matters!
+
+        #if DEBUG
+        providers.insert(DebugConfigurationProvider.shared, at: 0)
+        #endif
 
         configurationService = ConfigurationService(
-			providers: providers,
+            providers: providers,
             authenticationService: authenticationService,
             country: defaultInitializationCountry
         )

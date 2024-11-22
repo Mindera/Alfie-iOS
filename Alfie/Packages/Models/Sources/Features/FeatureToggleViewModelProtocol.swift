@@ -1,9 +1,11 @@
 import SwiftUI
 
 public protocol FeatureToggleViewModelProtocol: ObservableObject {
-	var features: [String: Bool] { get }
+    var features: [(feature: String, isEnabled: Bool)] { get }
+    var isDebugConfigurationEnabled: Bool { get }
 
 	func viewDidAppear()
 	func didUpdate(feature: String)
-	func description(for feature: String) -> LocalizedStringResource
+	func localizedName(for feature: String) -> LocalizedStringResource
+    func toggleDebugConfiguration()
 }

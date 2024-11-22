@@ -1,39 +1,52 @@
+import Combine
 import FeatureToggles
 import Models
 import SwiftUI
 
 final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
-	@Published private(set) var features: [String: Bool] = [:]
+    @Published private(set) var features: [(feature: String, isEnabled: Bool)] = []
+    @Published var isDebugConfigurationEnabled = false
 
-	private let service: any ConfigurationServiceProtocol
+    private let provider: any DebugConfigurationProviderProtocol
+    private var store: Set<AnyCancellable> = []
 
-	init(service: some ConfigurationServiceProtocol) {
-		self.service = service
-	}
+    init(provider: some DebugConfigurationProviderProtocol) {
+        self.provider = provider
+    }
 
-	func viewDidAppear() {
-		let featuresAsDict = ConfigurationKey.allCases.map { configuration in
-			(configuration.rawValue, service.isFeatureEnabled(configuration))
-		}
+    func viewDidAppear() {
+        self.features = ConfigurationKey.allCases.map { configuration in
+            (configuration.rawValue, provider.bool(for: configuration) ?? true)
+        }
 
-		self.features = Dictionary(uniqueKeysWithValues: featuresAsDict)
-	}
+        provider.isReadyPublisher
+            .sink { isEnabled in
+                self.isDebugConfigurationEnabled = isEnabled
+            }
+            .store(in: &store)
+    }
 
-	func didUpdate(feature: String) {
-		guard
-			let key = ConfigurationKey(rawValue: feature)
-		else {
-			return
-		}
+    func didUpdate(feature: String) {
+        guard let key = ConfigurationKey(rawValue: feature),
+              let index = features.firstIndex(where: { $0.feature == key.rawValue }) else {
+            return
+        }
 
-		let isEnabled = service.isFeatureEnabled(key)
+        let isEnabled = provider.bool(for: key) ?? true
 
-		service.updateFeature(key, isEnabled: !isEnabled)
+        provider.updateFeature(key, isEnabled: !isEnabled)
+        self.features[index] = (key.rawValue, !isEnabled)
+    }
 
-		self.features[feature] = service.isFeatureEnabled(key)
-	}
+    func localizedName(for feature: String) -> LocalizedStringResource {
+        guard let key = ConfigurationKey(rawValue: feature) else {
+            return .init(stringLiteral: "")
+        }
 
-	func description(for feature: String) -> LocalizedStringResource {
-		LocalizableFeatureToggle.featureName(for: feature)
-	}
+        return key.localizedName
+    }
+
+    func toggleDebugConfiguration() {
+        provider.toggleAvailability()
+    }
 }

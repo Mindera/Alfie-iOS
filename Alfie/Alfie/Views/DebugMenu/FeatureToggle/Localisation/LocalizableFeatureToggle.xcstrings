@@ -1,6 +1,28 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "KeyAppUpdateFeature" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Update"
+          }
+        }
+      }
+    },
+    "KeyDebugConfigurationEnabled" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug Configuration Enabled"
+          }
+        }
+      }
+    },
     "KeyFeatureToggle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12,18 +34,7 @@
         }
       }
     },
-    "KeyIosAppUpdateFeature" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Update"
-          }
-        }
-      }
-    },
-    "KeyIosWishlistFeature" : {
+    "KeyWishlistFeature" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

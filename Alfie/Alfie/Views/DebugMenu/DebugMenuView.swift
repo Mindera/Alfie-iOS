@@ -97,7 +97,7 @@ struct DebugMenuView: View {
 		case .featureToggle:
 			FeatureToggleView(
 				viewModel: FeatureToggleViewModel(
-					service: serviceProvider.configurationService
+                    provider: DebugConfigurationProvider.shared
 				)
 			).modifier(
 				ContainerDemoViewModifier(

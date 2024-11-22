@@ -10,10 +10,4 @@ public protocol ConfigurationProviderProtocol {
     func double(for key: ConfigurationKey) -> Double?
     func int(for key: ConfigurationKey) -> Int?
     func string(for key: ConfigurationKey) -> String?
-
-	func set(_ value: Bool, for key: ConfigurationKey)
-	func set(_ value: Data, for key: ConfigurationKey)
-	func set(_ value: Double, for key: ConfigurationKey)
-	func set(_ value: Int, for key: ConfigurationKey)
-	func set(_ value: String, for key: ConfigurationKey)
 }

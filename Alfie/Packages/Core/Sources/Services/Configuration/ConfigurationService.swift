@@ -76,10 +76,6 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
         return value
     }
 
-	public func updateFeature(_ key: ConfigurationKey, isEnabled: Bool) {
-		updateProviderValue(isEnabled, for: key)
-	}
-
     // MARK: - App Update
 
     public var isForceAppUpdateAvailable: Bool {
@@ -119,10 +115,7 @@ extension ConfigurationService {
     }
 
     private func checkFeatureAvailability(key: ConfigurationKey) -> Bool {
-        guard
-			let rawValue = providerValue(for: key),
-			let configValue = ConfigurationValue(rawValue: rawValue)
-		else {
+        guard let rawValue = providerValue(for: key), let configValue = ConfigurationValue(rawValue: rawValue) else {
             return key.defaultAvailabilityValue
         }
 
@@ -139,25 +132,26 @@ extension ConfigurationService {
     }
 
     private func appUpdateInfo(type: AppUpdateType) -> AppUpdateInfo? {
-		guard
-			let rawValue = providerValue(for: .appUpdate),
-			let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
-			let configuration: ConfigurationAppUpdateInfo = switch type {
-			case .immediate:
-				appUpdate.requirements.immediate
-			case .flexible:
-				appUpdate.requirements.flexible
-			}
-		else {
-			return nil
-		}
+        guard
+            let rawValue = providerValue(for: .appUpdate),
+            let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
+            let configuration: ConfigurationAppUpdateInfo = switch type {
+            case .immediate:
+                appUpdate.requirements.immediate
+
+            case .flexible:
+                appUpdate.requirements.flexible
+
+            } else {
+                return nil
+            }
 
         let redirectUrl = URL(string: appUpdate.url)
         return .init(configuration: configuration, url: redirectUrl)
     }
 
     private func providerValue(for key: ConfigurationKey) -> Any? {
-		for provider in providers where provider.isReady {
+        for provider in providers where provider.isReady {
             if let value = provider.data(for: key), !value.isEmpty {
                 return value
             } else if let value = provider.bool(for: key) {
@@ -167,14 +161,6 @@ extension ConfigurationService {
 
         return nil
     }
-
-	private func updateProviderValue(_ value: Bool, for key: ConfigurationKey) {
-		for provider in providers where provider.isReady {
-			provider.set(value, for: key)
-		}
-
-		updateFeatureAvailability()
-	}
 
     private func checkAvailability(using versions: ConfigurationVersions) -> Bool? {
         // Can't continue without an authentication service to check if the user is guest
