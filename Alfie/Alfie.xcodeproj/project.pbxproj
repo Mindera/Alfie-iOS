@@ -313,7 +313,7 @@
 		DAC900752B87D04100F9819C /* LocalizableGeneral.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = LocalizableGeneral.xcstrings; sourceTree = "<group>"; };
 		DAE910212B8CAD81008DC191 /* ForceAppUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceAppUpdateView.swift; sourceTree = "<group>"; };
 		DAEDF87E2B7AD606000C3604 /* LocalizableHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizableHome.swift; sourceTree = "<group>"; };
-		FCA0B27E2CEF3F12000339F6 /* ci.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = ci.yml; sourceTree = "<group>"; };
+		FCA0B27E2CEF3F12000339F6 /* alfie.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = alfie.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1028,7 +1028,7 @@
 		FCA0B27D2CEF3EFB000339F6 /* workflows */ = {
 			isa = PBXGroup;
 			children = (
-				FCA0B27E2CEF3F12000339F6 /* ci.yml */,
+				FCA0B27E2CEF3F12000339F6 /* alfie.yml */,
 			);
 			path = workflows;
 			sourceTree = "<group>";
