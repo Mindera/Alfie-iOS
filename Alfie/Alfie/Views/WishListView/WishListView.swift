@@ -13,7 +13,6 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
     }
 
     var body: some View {
-    #if DEBUG
         ScrollView {
             LazyVGrid(
                 columns: Array(
@@ -45,17 +44,6 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
         .onAppear {
             viewModel.viewDidAppear()
         }
-    #else
-        VStack {
-            Icon.heart.image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 75)
-            Text.build(theme.font.header.h3(LocalizableWishList.title))
-        }
-        .padding(.horizontal, Spacing.space200)
-        .withToolbar(for: .wishlist)
-    #endif
     }
 }
 
@@ -63,16 +51,16 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
 
 private extension WishListView {
     func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
         case .remove:
             viewModel.didSelectDelete(for: product)
-
         case .addToBag:
             viewModel.didTapAddToBag(for: product)
-
         case .wishlist:
             return
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 

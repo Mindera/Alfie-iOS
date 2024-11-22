@@ -13,9 +13,4 @@ public class MockBagViewModel: BagViewModelProtocol {
     }
 
     public func didSelectDelete(for productId: String) {}
-
-    public var onWebViewModelCalled: (() -> any WebViewModelProtocol)?
-    public func webViewModel() -> any WebViewModelProtocol {
-        onWebViewModelCalled?() ?? MockWebViewModel()
-    }
 }

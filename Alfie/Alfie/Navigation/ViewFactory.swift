@@ -43,17 +43,12 @@ final class ViewFactory: ViewFactoryProtocol {
                 )
 
             case .wishlist:
-                wishlistView
+                wishListView
 
             case .bag:
                 BagView(
                     viewModel: BagViewModel(
-                        dependencies: BagDependencyContainer(
-                            bagService: serviceProvider.bagService,
-                            deepLinkService: serviceProvider.deepLinkService,
-                            webUrlProvider: serviceProvider.webUrlProvider,
-                            webViewConfigurationService: serviceProvider.webViewConfigurationService
-                        )
+                        dependencies: BagDependencyContainer(bagService: serviceProvider.bagService)
                     )
                 )
             }
@@ -122,7 +117,7 @@ final class ViewFactory: ViewFactoryProtocol {
             .withToolbar(for: screen)
 
         case .wishlist:
-            wishlistView
+            wishListView
 
         case .productDetails(let type):
             switch type {
@@ -167,7 +162,7 @@ final class ViewFactory: ViewFactoryProtocol {
 }
 
 private extension ViewFactory {
-    var wishlistView: some View {
+    var wishListView: some View {
         WishListView(
             viewModel: WishListViewModel(
                 dependencies: WishListDependencyContainer(

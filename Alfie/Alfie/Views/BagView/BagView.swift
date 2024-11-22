@@ -13,7 +13,6 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     }
 
     var body: some View {
-    #if DEBUG
         List {
             ForEach(viewModel.products) { product in
                 HorizontalProductCard(
@@ -39,12 +38,6 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .onAppear {
             viewModel.viewDidAppear()
         }
-    #else
-        if let webViewModel = viewModel.webViewModel() as? WebViewModel {
-            WebView(viewModel: webViewModel)
-                .withToolbar(for: .tab(.bag))
-        }
-    #endif
     }
 }
 

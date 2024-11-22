@@ -77,6 +77,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         if !isFavorite {
             let selectedProduct = Product(
+                id: UUID().uuidString,
                 styleNumber: product.styleNumber,
                 name: product.name,
                 brand: product.brand,
@@ -169,6 +170,7 @@ extension Product {
             price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
         )
         return Product(
+            id: UUID().uuidString,
             styleNumber: "",
             name: "",
             brand: Brand(id: "", name: "", slug: ""),

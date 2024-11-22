@@ -494,7 +494,6 @@ extension ProductDetailsView {
                     ),
                     isFullWidth: true
                 ) {
-                    guard case .success(let model) = viewModel.state else { return }
                     viewModel.didTapAddToBag()
                 }
             }

@@ -370,6 +370,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         return Product(
+            id: UUID().uuidString,
             styleNumber: product.styleNumber,
             name: product.name,
             brand: product.brand,

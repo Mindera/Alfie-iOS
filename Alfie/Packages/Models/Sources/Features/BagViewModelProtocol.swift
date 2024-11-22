@@ -5,5 +5,4 @@ public protocol BagViewModelProtocol: ObservableObject {
 
     func viewDidAppear()
     func didSelectDelete(for productId: String)
-    func webViewModel() -> any WebViewModelProtocol
 }

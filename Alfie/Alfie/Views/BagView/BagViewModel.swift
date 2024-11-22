@@ -21,15 +21,4 @@ final class BagViewModel: BagViewModelProtocol {
         dependencies.bagService.removeProduct(productId)
         products = dependencies.bagService.getBagContent()
     }
-
-    func webViewModel() -> any WebViewModelProtocol {
-        WebViewModel(
-            webFeature: .bag,
-            dependencies: WebDependencyContainer(
-                deepLinkService: dependencies.deepLinkService,
-                webViewConfigurationService: dependencies.webViewConfigurationService,
-                webUrlProvider: dependencies.webUrlProvider
-            )
-        )
-    }
 }

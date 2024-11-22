@@ -11,7 +11,7 @@ final class WishListViewModel: WishListViewModelProtocol {
         products = dependencies.bagService.getBagContent()
     }
 
-    // MARK: - BagViewModelProtocol
+    // MARK: - WishListViewModelProtocol
 
     func viewDidAppear() {
         products = dependencies.wishListService.getWishListContent()

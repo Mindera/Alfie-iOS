@@ -28,7 +28,7 @@ public struct Product: Identifiable, Equatable, Hashable {
     public let colours: [Colour]?
 
     public init(
-        id: String = UUID().uuidString,
+        id: String,
         styleNumber: String,
         name: String,
         brand: Brand,
