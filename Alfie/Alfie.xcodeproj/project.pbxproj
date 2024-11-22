@@ -41,7 +41,7 @@
 		BE8B02342B616979007AE489 /* AlfieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B023E2B616979007AE489 /* AlfieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5C9C4C92D3571D800D5D70E /* AlfieKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AlfieKit; sourceTree = "<group>"; };
-		FCA0B27E2CEF3F12000339F6 /* ci.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = ci.yml; sourceTree = "<group>"; };
+		FCA0B27E2CEF3F12000339F6 /* alfie.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = alfie.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -150,7 +150,7 @@
 		FCA0B27D2CEF3EFB000339F6 /* workflows */ = {
 			isa = PBXGroup;
 			children = (
-				FCA0B27E2CEF3F12000339F6 /* ci.yml */,
+				FCA0B27E2CEF3F12000339F6 /* alfie.yml */,
 			);
 			path = workflows;
 			sourceTree = "<group>";
