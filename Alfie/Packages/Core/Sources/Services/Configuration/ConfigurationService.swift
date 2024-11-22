@@ -121,7 +121,8 @@ extension ConfigurationService {
     private func checkFeatureAvailability(key: ConfigurationKey) -> Bool {
         guard
 			let rawValue = providerValue(for: key),
-			let configValue = ConfigurationValue(rawValue: rawValue) else {
+			let configValue = ConfigurationValue(rawValue: rawValue)
+		else {
             return key.defaultAvailabilityValue
         }
 
@@ -138,22 +139,18 @@ extension ConfigurationService {
     }
 
     private func appUpdateInfo(type: AppUpdateType) -> AppUpdateInfo? {
-        guard
-            let rawValue = providerValue(for: .appUpdate),
-            let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
-            let configuration: ConfigurationAppUpdateInfo = {
-                // swiftlint:disable vertical_whitespace_between_cases
-                switch type {
-                case .immediate:
-                    return appUpdate.requirements.immediate
-                case .flexible:
-                    return appUpdate.requirements.flexible
-                }
-                // swiftlint:enable vertical_whitespace_between_cases
-            }()
-        else {
-            return nil
-        }
+		guard
+			let rawValue = providerValue(for: .appUpdate),
+			let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
+			let configuration: ConfigurationAppUpdateInfo = switch type {
+			case .immediate:
+				appUpdate.requirements.immediate
+			case .flexible:
+				appUpdate.requirements.flexible
+			}
+		else {
+			return nil
+		}
 
         let redirectUrl = URL(string: appUpdate.url)
         return .init(configuration: configuration, url: redirectUrl)
