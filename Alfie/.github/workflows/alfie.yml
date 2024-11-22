@@ -1,5 +1,5 @@
 ---
-name: Alfie CI/CD Pipeline
+name: Alfie CI/CD
 
 on:
   push:
