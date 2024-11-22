@@ -12,5 +12,8 @@ public class MockBagViewModel: BagViewModelProtocol {
         onViewDidAppearCalled?()
     }
 
-    public func didSelectDelete(for productId: String) {}
+    public var onDidSelectDeleteCalled: ((String) -> Void)?
+    public func didSelectDelete(for productId: String) {
+        onDidSelectDeleteCalled?(productId)
+    }
 }
