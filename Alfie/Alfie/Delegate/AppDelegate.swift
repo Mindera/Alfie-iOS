@@ -43,9 +43,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private func bootstrap(application: UIApplication?) {
         if ProcessInfo.isSwiftUIPreview || ProcessInfo.isRunningTests {
-        #if DEBUG
+            #if DEBUG
             serviceProvider = MockServiceProvider()
-        #endif
+            #endif
         } else {
             CoreBootstrap.bootstrap()
             serviceProvider = ServiceProvider()
