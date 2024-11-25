@@ -6,12 +6,10 @@ extension ConfigurationKey {
         switch self {
         case .appUpdate:
             LocalizableFeatureToggle.appUpdateFeature
-
         case .wishlist:
             LocalizableFeatureToggle.wishlistFeature
-
         default:
-            LocalizedStringResource(stringLiteral: "")
+            fatalError("Missing localisation key for feature")
         }
     }
 }
