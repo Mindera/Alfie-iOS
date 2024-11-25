@@ -36,8 +36,10 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
     }
 
     func binding(for feature: String) -> Binding<Bool> {
-        guard let key = ConfigurationKey(rawValue: feature),
-              let index = features.firstIndex(where: { $0.feature == key.rawValue }) else {
+        guard
+            let key = ConfigurationKey(rawValue: feature),
+            let index = features.firstIndex(where: { $0.feature == key.rawValue })
+        else {
             return .constant(false)
         }
 
@@ -50,17 +52,16 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
 
 extension FeatureToggleViewModel {
     private func updateState(for feature: String) {
-        guard let key = ConfigurationKey(rawValue: feature) else {
+        guard
+            let key = ConfigurationKey(rawValue: feature),
+            let index = features.firstIndex(where: { $0.feature == key.rawValue })
+        else {
             return
         }
 
         let isEnabled = provider.bool(for: key) ?? true
 
         provider.updateFeature(key, isEnabled: !isEnabled)
-
-        if let index = features.firstIndex(where: { $0.feature == key.rawValue }) {
-            features[index] = (key.rawValue, !isEnabled)
-        }
+        features[index] = (key.rawValue, !isEnabled)
     }
-
 }

@@ -23,15 +23,16 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
     // MARK: - ConfigurationProviderProtocol
 
     public func toggleAvailability() {
-        let newState = !isReady
+        isReadySubject.value.toggle()
 
-        UserDefaults.standard.set(newState, for: Self.debugConfigurationKey)
-
-        isReadySubject.value = newState
+        UserDefaults.standard.set(isReady, for: Self.debugConfigurationKey)
     }
 
     public func bool(for key: ConfigurationKey) -> Bool? {
-        guard localConfig.has(key: key.rawValue), let data = localConfig[key.rawValue] else {
+        guard
+            localConfig.has(key: key.rawValue),
+            let data = localConfig[key.rawValue]
+        else {
             return nil
         }
 
@@ -39,7 +40,10 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
     }
 
     public func data(for key: ConfigurationKey) -> Data? {
-        guard localConfig.has(key: key.rawValue), let data = localConfig[key.rawValue] else {
+        guard
+            localConfig.has(key: key.rawValue),
+            let data = localConfig[key.rawValue]
+        else {
             return nil
         }
 
@@ -47,7 +51,10 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
     }
 
     public func double(for key: ConfigurationKey) -> Double? {
-        guard localConfig.has(key: key.rawValue), let data = localConfig[key.rawValue] else {
+        guard
+            localConfig.has(key: key.rawValue),
+            let data = localConfig[key.rawValue]
+        else {
             return nil
         }
 
@@ -55,7 +62,10 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
     }
 
     public func int(for key: ConfigurationKey) -> Int? {
-        guard localConfig.has(key: key.rawValue), let data = localConfig[key.rawValue] else {
+        guard
+            localConfig.has(key: key.rawValue),
+            let data = localConfig[key.rawValue]
+        else {
             return nil
         }
 
@@ -63,7 +73,10 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
     }
 
     public func string(for key: ConfigurationKey) -> String? {
-        guard localConfig.has(key: key.rawValue), let data = localConfig[key.rawValue] else {
+        guard
+            localConfig.has(key: key.rawValue),
+            let data = localConfig[key.rawValue]
+        else {
             return nil
         }
 

@@ -55,7 +55,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        var tabs: [TabScreen] = [.home(nil), .shop(tab: nil), .bag]
+        var tabs: [TabScreen] = [.home(), .shop(), .bag]
 
         if serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
             tabs.insert(.wishlist, at: 2)
