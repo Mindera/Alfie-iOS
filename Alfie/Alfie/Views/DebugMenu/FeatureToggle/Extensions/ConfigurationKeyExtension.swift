@@ -8,8 +8,8 @@ extension ConfigurationKey {
             LocalizableFeatureToggle.appUpdateFeature
         case .wishlist:
             LocalizableFeatureToggle.wishlistFeature
-        default:
-            fatalError("Missing localisation key for feature")
+        case .custom(_):
+            fatalError("Missing localisation key for custom feature")
         }
     }
 }
