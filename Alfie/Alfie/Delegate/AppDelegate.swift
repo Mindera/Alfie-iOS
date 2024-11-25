@@ -55,11 +55,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        var tabs: [TabScreen] = TabScreen.allCases
+        var tabs: [TabScreen] = [.home(nil), .shop(tab: nil), .bag]
 
-        // TODO: Review feature toggle flow
-        if !serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
-            tabs.removeAll { $0 == .wishlist }
+        if serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
+            tabs.insert(.wishlist, at: 2)
         }
 
         tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)

@@ -132,19 +132,18 @@ extension ConfigurationService {
     }
 
     private func appUpdateInfo(type: AppUpdateType) -> AppUpdateInfo? {
-        guard
-            let rawValue = providerValue(for: .appUpdate),
-            let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
-            let configuration: ConfigurationAppUpdateInfo = switch type {
-            case .immediate:
-                appUpdate.requirements.immediate
-
-            case .flexible:
-                appUpdate.requirements.flexible
-
-            } else {
-                return nil
-            }
+        guard let rawValue = providerValue(for: .appUpdate),
+              let appUpdate = ConfigurationValue(rawValue: rawValue)?.appUpdate,
+              let configuration: ConfigurationAppUpdateInfo = switch type {
+                  // swiftlint:disable vertical_whitespace_between_cases
+              case .immediate:
+                  appUpdate.requirements.immediate
+              case .flexible:
+                  appUpdate.requirements.flexible
+                  // swiftlint:enable vertical_whitespace_between_cases
+              } else {
+                  return nil
+              }
 
         let redirectUrl = URL(string: appUpdate.url)
         return .init(configuration: configuration, url: redirectUrl)

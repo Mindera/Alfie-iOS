@@ -7,22 +7,21 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
     @Published var isDebugConfigurationEnabled = false
 
     private let provider: any DebugConfigurationProviderProtocol
-    private var store: Set<AnyCancellable> = []
+    private var providerReadySubscription: AnyCancellable?
 
     init(provider: some DebugConfigurationProviderProtocol) {
         self.provider = provider
     }
 
     func viewDidAppear() {
-        self.features = ConfigurationKey.allCases.map { configuration in
+        features = ConfigurationKey.allCases.map { configuration in
             (configuration.rawValue, provider.bool(for: configuration) ?? true)
         }
 
-        provider.isReadyPublisher
+        providerReadySubscription = provider.isReadyPublisher
             .sink { isEnabled in
                 self.isDebugConfigurationEnabled = isEnabled
             }
-            .store(in: &store)
     }
 
     func didUpdate(feature: String) {
@@ -34,7 +33,7 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
         let isEnabled = provider.bool(for: key) ?? true
 
         provider.updateFeature(key, isEnabled: !isEnabled)
-        self.features[index] = (key.rawValue, !isEnabled)
+        features[index] = (key.rawValue, !isEnabled)
     }
 
     func localizedName(for feature: String) -> LocalizedStringResource {

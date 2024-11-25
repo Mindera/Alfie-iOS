@@ -21,6 +21,7 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
     }
 
     // MARK: - ConfigurationProviderProtocol
+
     public func toggleAvailability() {
         let newState = !isReady
 
@@ -83,8 +84,8 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
             return
         }
 
-        self.isReadySubject.value = UserDefaults.standard.bool(forKey: Self.debugConfigurationKey)
-        self.localConfig = config
+        isReadySubject.value = UserDefaults.standard.bool(forKey: Self.debugConfigurationKey)
+        localConfig = config
     }
 
     private func syncLocalConfig() {
