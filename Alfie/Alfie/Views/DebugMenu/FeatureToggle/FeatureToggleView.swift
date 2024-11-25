@@ -11,12 +11,7 @@ struct FeatureToggleView<ViewModel: FeatureToggleViewModelProtocol>: View {
 
     var body: some View {
         LazyVStack {
-            ThemedToggleView(
-                isOn: Binding(
-                    get: { viewModel.isDebugConfigurationEnabled },
-                    set: { _ in viewModel.toggleDebugConfiguration() }
-                )
-            ) {
+            ThemedToggleView(isOn: $viewModel.isDebugConfigurationEnabled) {
                 Text(LocalizableFeatureToggle.debugConfigurationEnabled)
                     .font(Font(theme.font.paragraph.bold.withSize(20)))
             }
@@ -25,11 +20,8 @@ struct FeatureToggleView<ViewModel: FeatureToggleViewModelProtocol>: View {
             Spacer(minLength: Spacing.space200)
 
             if viewModel.isDebugConfigurationEnabled {
-                ForEach(viewModel.features, id: \.feature) { feature, isEnabled in
-                    ThemedToggleView(isOn: Binding(
-                        get: { isEnabled },
-                        set: { _ in viewModel.didUpdate(feature: feature) }
-                    )) {
+                ForEach(viewModel.features, id: \.feature) { feature, _ in
+                    ThemedToggleView(isOn: viewModel.binding(for: feature)) {
                         Text(theme.font.paragraph.normal(viewModel.localizedName(for: feature)))
                     }
                 }

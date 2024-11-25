@@ -7,9 +7,9 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
     @Published var isDebugConfigurationEnabled = false
 
     private let provider: any DebugConfigurationProviderProtocol
-    private var providerReadySubscription: AnyCancellable?
+    private var isDebugConfigurationEnabledSubcription: AnyCancellable?
 
-    init(provider: some DebugConfigurationProviderProtocol) {
+    init(provider: DebugConfigurationProviderProtocol) {
         self.provider = provider
     }
 
@@ -18,22 +18,13 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
             (configuration.rawValue, provider.bool(for: configuration) ?? true)
         }
 
-        providerReadySubscription = provider.isReadyPublisher
-            .sink { isEnabled in
-                self.isDebugConfigurationEnabled = isEnabled
+        isDebugConfigurationEnabled = provider.isReady
+
+        isDebugConfigurationEnabledSubcription = $isDebugConfigurationEnabled
+            .dropFirst()
+            .sink { _ in
+                self.provider.toggleAvailability()
             }
-    }
-
-    func didUpdate(feature: String) {
-        guard let key = ConfigurationKey(rawValue: feature),
-              let index = features.firstIndex(where: { $0.feature == key.rawValue }) else {
-            return
-        }
-
-        let isEnabled = provider.bool(for: key) ?? true
-
-        provider.updateFeature(key, isEnabled: !isEnabled)
-        features[index] = (key.rawValue, !isEnabled)
     }
 
     func localizedName(for feature: String) -> LocalizedStringResource {
@@ -44,7 +35,32 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
         return key.localizedName
     }
 
-    func toggleDebugConfiguration() {
-        provider.toggleAvailability()
+    func binding(for feature: String) -> Binding<Bool> {
+        guard let key = ConfigurationKey(rawValue: feature),
+              let index = features.firstIndex(where: { $0.feature == key.rawValue }) else {
+            return .constant(false)
+        }
+
+        return Binding(
+            get: { self.features[index].isEnabled },
+            set: { _ in self.updateState(for: feature) }
+        )
     }
+}
+
+extension FeatureToggleViewModel {
+    private func updateState(for feature: String) {
+        guard let key = ConfigurationKey(rawValue: feature) else {
+            return
+        }
+
+        let isEnabled = provider.bool(for: key) ?? true
+
+        provider.updateFeature(key, isEnabled: !isEnabled)
+
+        if let index = features.firstIndex(where: { $0.feature == key.rawValue }) {
+            features[index] = (key.rawValue, !isEnabled)
+        }
+    }
+
 }
