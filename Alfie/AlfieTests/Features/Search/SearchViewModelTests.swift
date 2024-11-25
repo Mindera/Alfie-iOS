@@ -4,7 +4,7 @@ import Models
 @testable import Alfie
 
 final class SearchViewModelTests: XCTestCase {
-    private var mockDependencies: MockSearchDependencyContainer!
+    private var mockDependencies: SearchDependencyContainerProtocol!
     private var mockRecentsService: MockRecentsService!
     private var mockSearchService: MockSearchService!
     private var sut: SearchViewModel!
@@ -13,7 +13,11 @@ final class SearchViewModelTests: XCTestCase {
         try super.setUpWithError()
         mockRecentsService = .init()
         mockSearchService = .init()
-        mockDependencies = .init(recentsService: mockRecentsService, searchService: mockSearchService)
+        mockDependencies = SearchDependencyContainer(
+            executionQueue: DispatchQueue.global(),
+            recentsService: MockRecentsService(),
+            searchService: MockSearchService()
+        )
         sut = .init(dependencies: mockDependencies)
     }
 
