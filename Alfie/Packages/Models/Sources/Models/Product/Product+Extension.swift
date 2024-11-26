@@ -13,4 +13,21 @@ public extension Product {
             )
         }
     }
+
+    var isSingleSizeProduct: Bool {
+        let variantsForSelectedColor = variants.filter { $0.colour?.id == defaultVariant.colour?.id }
+        return !variantsForSelectedColor.contains { $0.size != nil }
+    }
+
+    var sizeText: String {
+        var sizeValue: String = ""
+        if let size = defaultVariant.size {
+            sizeValue = size.value
+            if let scale = size.scale {
+                sizeValue += " \(scale)"
+            }
+        }
+
+        return sizeValue
+    }
 }

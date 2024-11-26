@@ -19,6 +19,7 @@ extension Product {
         } else {
             fixtures.map { fixture in
                 Product(
+                    id: fixture.id,
                     styleNumber: fixture.styleNumber,
                     name: fixture.name,
                     brand: fixture.brand,
@@ -59,6 +60,7 @@ extension Product {
     // MARK: - Necklace -
 
     public static let necklace = Product(
+        id: "1",
         styleNumber: "26427344",
         name: "Sardinia Necklace",
         brand: .init(name: "Amber Sceats", slug: "amber-sceats"),
@@ -95,6 +97,7 @@ extension Product {
     // MARK: - Blazer -
 
     public static let blazer = Product(
+        id: "2",
         styleNumber: "26533700",
         name: "June Double Breasted Blazer",
         brand: .init(name: "Reiss", slug: "reiss"),
@@ -134,6 +137,7 @@ extension Product {
     // MARK: - Dress -
 
     public static let dress = Product(
+        id: "3",
         styleNumber: "26320534",
         name: "Tie front shirt dress",
         brand: .init(name: "Gucci", slug: "gucci"),
@@ -173,6 +177,7 @@ extension Product {
     // MARK: - Hat -
 
     public static let hat = Product(
+        id: "4",
         styleNumber: "26626706",
         name: "Baseball hat with Gucci print | Baseball hat with Gucci print | Baseball hat with Gucci print",
         brand: .init(name: "Gucci", slug: "gucci"),
@@ -214,6 +219,7 @@ extension Product {
     // MARK: - Neck Dress -
 
     public static let neckDress = Product(
+        id: "5",
         styleNumber: "26203353",
         name: "Admiral Crepe Funnel Neck Dress",
         brand: .init(name: "Theory", slug: "theory"),
@@ -253,6 +259,7 @@ extension Product {
     // MARK: - Sandal -
 
     public static let sandal = Product(
+        id: "6",
         styleNumber: "26241404",
         name: "Women's Verona Sandal",
         brand: .init(name: "Alias Mae", slug: "alias-mae"),
@@ -289,6 +296,7 @@ extension Product {
     // MARK: - Jacket -
 
     public static let jacket = Product(
+        id: "7",
         styleNumber: "26630621",
         name: "Maltese Rain Jacket",
         brand: .init(name: "C&M Camilla & Marc | C&M Camilla & Marc", slug: "c-and-m-camilla-and-marc"),

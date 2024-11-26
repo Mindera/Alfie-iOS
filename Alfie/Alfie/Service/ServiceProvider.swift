@@ -3,6 +3,9 @@ import Core
 import Firebase
 import Foundation
 import Models
+#if DEBUG
+import Mocks
+#endif
 
 final class ServiceProvider: ServiceProviderProtocol {
     let apiEndpointService: ApiEndpointServiceProtocol
@@ -21,6 +24,8 @@ final class ServiceProvider: ServiceProviderProtocol {
     let notificationsService: NotificationsServiceProtocol
     let searchService: SearchServiceProtocol
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
+    let bagService: BagServiceProtocol
+    let wishListService: WishListServiceProtocol
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
@@ -39,8 +44,15 @@ final class ServiceProvider: ServiceProviderProtocol {
             minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800
         )
         let localProvider = LocalConfigurationProvider()
+
+        var providers: [ConfigurationProviderProtocol] = [firebaseProvider, localProvider] // Order matters!
+
+        #if DEBUG
+        providers.insert(DebugConfigurationProvider.shared, at: 0)
+        #endif
+
         configurationService = ConfigurationService(
-            providers: [firebaseProvider, localProvider], // Order matters!
+            providers: providers,
             authenticationService: authenticationService,
             country: defaultInitializationCountry
         )
@@ -76,6 +88,8 @@ final class ServiceProvider: ServiceProviderProtocol {
         brandsService = BrandsService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient)
+        bagService = MockBagService()
+        wishListService = MockWishListService()
     }
 
     public func resetServices() {

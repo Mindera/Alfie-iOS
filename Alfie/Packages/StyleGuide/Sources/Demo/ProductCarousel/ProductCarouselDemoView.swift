@@ -55,7 +55,7 @@ struct ProductCarouselDemoView: View {
 
     @ViewBuilder
     private func productCard(_ product: Product) -> some View {
-        VerticalProductCard(configuration: .init(size: .small), product: product) { _, _ in }
+        VerticalProductCard(viewModel: .init(configuration: .init(size: .small), product: product)) { _, _ in }
     }
 }
 

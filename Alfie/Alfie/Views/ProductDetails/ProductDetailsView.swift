@@ -253,7 +253,12 @@ extension ProductDetailsView {
                     .padding([.horizontal, .top], Spacing.space200)
             }
 
-            addToBag
+            VStack {
+                addToBag
+                addToWishlist
+            }
+            .padding(.vertical, Spacing.space100)
+            .padding(.horizontal, Spacing.space200)
         }
         .presentationDetents(Set(bottomSheetDetents), selection: $bottomSheetCurrentDetent)
         .presentationDragIndicator(.hidden)
@@ -440,9 +445,9 @@ extension ProductDetailsView {
     @ViewBuilder private var singleSizeView: some View {
         let sizeText: String = isOneSize
             ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
-            : LocalizableProductDetails.$oneSize
+            : LocalizableGeneral.$oneSize
         HStack {
-            Text.build(theme.font.small.bold(LocalizableProductDetails.$size + ":"))
+            Text.build(theme.font.small.bold(LocalizableGeneral.$size + ":"))
                 .foregroundStyle(Colors.primary.mono900)
             Text.build(theme.font.small.normal(sizeText))
                 .foregroundStyle(Colors.primary.mono900)
@@ -478,8 +483,8 @@ extension ProductDetailsView {
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
             VStack(spacing: Spacing.space0) {
-                let addToBagText = LocalizableProductDetails.$addToBag
-                let outOfStockText = LocalizableProductDetails.$outOfStock
+                let addToBagText = LocalizableGeneral.$addToBag
+                let outOfStockText = LocalizableGeneral.$outOfStock
 
                 ThemedButton(
                     text: viewModel.productHasStock ? addToBagText : outOfStockText,
@@ -488,10 +493,24 @@ extension ProductDetailsView {
                         set: { _ in }
                     ),
                     isFullWidth: true
-                ) { viewModel.didTapAddToBag() }
+                ) {
+                    viewModel.didTapAddToBag()
+                }
             }
-            .padding(.vertical, Spacing.space100)
-            .padding(.horizontal, Spacing.space200)
+        }
+    }
+
+    @ViewBuilder private var addToWishlist: some View {
+        if viewModel.shouldShow(section: .addToWishlist) {
+            VStack(spacing: Spacing.space0) {
+                ThemedButton(
+                    text: LocalizableGeneral.$addToWishlist,
+                    style: .secondary,
+                    isFullWidth: true
+                ) {
+                    viewModel.didTapAddToWishlist()
+                }
+            }
         }
     }
 

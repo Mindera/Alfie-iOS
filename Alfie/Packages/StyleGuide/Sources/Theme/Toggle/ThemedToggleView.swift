@@ -2,18 +2,18 @@ import SwiftUI
 
 // MARK: - ThemedToggleView
 
-struct ThemedToggleView<Content: View>: View {
+public struct ThemedToggleView<Content: View>: View {
     var label: () -> Content
     @Binding var isDisabled: Bool
     @Binding var isOn: Bool
 
-    init(isOn: Binding<Bool>, isDisabled: Binding<Bool> = .constant(false), label: @escaping () -> Content) {
+    public init(isOn: Binding<Bool>, isDisabled: Binding<Bool> = .constant(false), label: @escaping () -> Content) {
         self.label = label
         _isDisabled = isDisabled
         _isOn = isOn
     }
 
-    var body: some View {
+    public var body: some View {
         Toggle(isOn: $isOn) {
             label()
         }

@@ -15,6 +15,8 @@ final class LocalizationTests: XCTestCase {
         testTable(LocalizableBrands.self)
         testTable(LocalizableWebView.self)
         testTable(LocalizableCategories.self)
+        testTable(LocalizableProductDetails.self)
+        testTable(LocalizableWishList.self)
     }
 
     func testLocalizableBagWithArgs() {

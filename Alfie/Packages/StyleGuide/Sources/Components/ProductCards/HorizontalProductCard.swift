@@ -32,16 +32,12 @@ public struct HorizontalProductCard: View {
         self.priceType = priceType
     }
 
-    init(product: Product, colorTitle: String = "", sizeTitle: String = "") {
+    public init(product: Product, colorTitle: String = "", sizeTitle: String = "", oneSizeTitle: String = "") {
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name
         self.color = product.defaultVariant.colour?.name ?? ""
-        self.size = if let size = product.defaultVariant.size {
-            "\(size.value) \((size.scale ?? ""))"
-        } else {
-            ""
-        }
+        self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
         self.colorTitle = colorTitle
         self.sizeTitle = sizeTitle
@@ -67,7 +63,6 @@ public struct HorizontalProductCard: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.productCard)
-        Spacer()
     }
 
     @ViewBuilder private var productImageView: some View {

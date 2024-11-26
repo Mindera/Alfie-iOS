@@ -26,9 +26,9 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
         // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .color:
-            LocalizableProductDetails.$color
+            LocalizableGeneral.$color
         case .size:
-            LocalizableProductDetails.$size
+            LocalizableGeneral.$size
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
