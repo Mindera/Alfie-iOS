@@ -211,8 +211,10 @@ extension SearchView {
 
     private func productCardView(_ product: Product) -> some View {
         VerticalProductCard(
-            configuration: .init(size: .medium, hidePrice: true, hideAction: true),
-            product: product
+            viewModel: .init(
+                configuration: .init(size: .medium, hidePrice: true, hideAction: true),
+                product: product
+            )
         ) { _, _ in }
         .onTapGesture {
             coordinator.openDetails(for: product)

@@ -117,7 +117,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
              .complementaryInfo:
             return state.isLoading
         case .productDescription,
-             .addToBag: // swiftlint:disable:this indentation_width
+             .addToBag, // swiftlint:disable:this indentation_width
+             .addToWishlist:
             return false
         }
     }
@@ -135,7 +136,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag:
+        case .addToBag,
+             .addToWishlist: // swiftlint:disable:this indentation_width
             return state.isSuccess
         }
         // swiftlint:enable vertical_whitespace_between_cases
@@ -159,7 +161,13 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     func didTapAddToBag() {
-        // TODO: implement in a future ticket
+        guard let selectedProduct else { return }
+        dependencies.bagService.addProduct(selectedProduct)
+    }
+
+    func didTapAddToWishlist() {
+        guard let selectedProduct else { return }
+        dependencies.wishListService.addProduct(selectedProduct)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
@@ -214,7 +222,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         colorSelectionConfiguration = .init(
-            selectedTitle: LocalizableProductDetails.$color + ":",
+            selectedTitle: LocalizableGeneral.$color + ":",
             items: colorSwatches,
             selectedItem: selectedSwatch
         )
@@ -271,7 +279,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         sizingSelectionConfiguration = .init(
-            selectedTitle: LocalizableProductDetails.$size + ":",
+            selectedTitle: LocalizableGeneral.$size + ":",
             items: sizingSwatches,
             selectedItem: selectedSwatch
         )
@@ -290,9 +298,12 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         let sizes = buildVariantSizes(product: product, selectedVariant: selectedVariant)
         return sizes.map { size in
             let isAvailable = product.variants.contains { $0.size?.id == size.id && $0.stock > 0 }
-
+            var sizeName = size.value
+            if let scale = size.scale {
+                sizeName += " \(scale)"
+            }
             // TODO: Handle unavailable state if needed
-            return SizingSwatch(id: size.id, name: size.value, state: isAvailable ? .available : .outOfStock)
+            return SizingSwatch(id: size.id, name: sizeName, state: isAvailable ? .available : .outOfStock)
         }
     }
 
@@ -348,5 +359,29 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         state = .success(.init(product: product, selectedVariant: variant))
+    }
+
+    private var selectedProduct: Product? {
+        guard
+            let product,
+            let selectedVariant
+        else {
+            return nil
+        }
+
+        return Product(
+            id: UUID().uuidString,
+            styleNumber: product.styleNumber,
+            name: product.name,
+            brand: product.brand,
+            shortDescription: product.shortDescription,
+            longDescription: product.longDescription,
+            slug: product.slug,
+            priceRange: product.priceRange,
+            attributes: product.attributes,
+            defaultVariant: selectedVariant,
+            variants: product.variants,
+            colours: product.colours
+        )
     }
 }

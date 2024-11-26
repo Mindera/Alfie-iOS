@@ -1,5 +1,8 @@
 import Foundation
 
 public protocol BagViewModelProtocol: ObservableObject {
-    func webViewModel() -> any WebViewModelProtocol
+    var products: [Product] { get }
+
+    func viewDidAppear()
+    func didSelectDelete(for productId: String)
 }

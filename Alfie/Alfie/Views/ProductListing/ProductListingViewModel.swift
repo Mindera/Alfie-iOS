@@ -7,12 +7,12 @@ import Models
 // MARK: - ProductListingViewModel
 
 final class ProductListingViewModel: ProductListingViewModelProtocol {
-    private let productListingService: ProductListingServiceProtocol
-    private let plpStyleListProvider: ProductListingStyleProviderProtocol
+    private let dependencies: ProductListingDependencyContainerProtocol
     private let category: String?
     private let query: String?
     private let mode: ProductListingViewMode
     @Published var style: ProductListingListStyle
+    @Published private(set) var wishListContent: [Product]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
     private enum Constants {
@@ -28,7 +28,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     var totalNumberOfProducts: Int {
-        productListingService.totalOfRecords ?? 0
+        dependencies.productListingService.totalOfRecords ?? 0
     }
 
     var showSearchButton: Bool {
@@ -36,25 +36,25 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     init(
-        productListingService: ProductListingServiceProtocol,
-        plpStyleListProvider: ProductListingStyleProviderProtocol,
+        dependencies: ProductListingDependencyContainerProtocol,
         category: String? = nil,
         searchText: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize
     ) {
-        self.productListingService = productListingService
-        self.plpStyleListProvider = plpStyleListProvider
-        style = plpStyleListProvider.style
+        self.dependencies = dependencies
+        style = self.dependencies.plpStyleListProvider.style
         // TODO: - review filtering later, API not supporting for now
         self.category = category
         self.mode = mode
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
+        wishListContent = dependencies.wishListService.getWishListContent()
     }
 
     func viewDidAppear() {
+        wishListContent = dependencies.wishListService.getWishListContent()
         Task {
             await loadProductsIfNeeded()
         }
@@ -69,10 +69,33 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     func setListStyle(_ style: ProductListingListStyle) {
-        plpStyleListProvider.set(style)
+        dependencies.plpStyleListProvider.set(style)
     }
 
     func didSelect(_: Product) {}
+
+    func didTapAddToWishList(for product: Product, isFavorite: Bool) {
+        if !isFavorite {
+            let selectedProduct = Product(
+                id: UUID().uuidString,
+                styleNumber: product.styleNumber,
+                name: product.name,
+                brand: product.brand,
+                shortDescription: product.shortDescription,
+                longDescription: product.longDescription,
+                slug: product.slug,
+                priceRange: product.priceRange,
+                attributes: product.attributes,
+                defaultVariant: product.defaultVariant,
+                variants: product.variants,
+                colours: product.colours
+            )
+            dependencies.wishListService.addProduct(selectedProduct)
+        } else {
+            dependencies.wishListService.removeProduct(product)
+        }
+        wishListContent = dependencies.wishListService.getWishListContent()
+    }
 
     // MARK: - Private
 
@@ -85,7 +108,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         let productListing: ProductListing?
 
         do {
-            productListing = try await productListingService.paged(categoryId: category, query: query)
+            productListing = try await dependencies.productListingService.paged(categoryId: category, query: query)
         } catch {
             logError("Error fetching product listing (first page): \(error)")
             state = .error(.generic)
@@ -102,7 +125,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     @MainActor
     private func loadMoreProducts() async {
-        guard productListingService.hasNext(), case .success(let model) = state else {
+        guard dependencies.productListingService.hasNext(), case .success(let model) = state else {
             return
         }
 
@@ -110,7 +133,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         let productListing: ProductListing?
 
         do {
-            productListing = try await productListingService.next(categoryId: category, query: query)
+            productListing = try await dependencies.productListingService.next(categoryId: category, query: query)
         } catch {
             logError("Error fetching product listing (following page): \(error)")
             state = .error(.generic)
@@ -147,6 +170,7 @@ extension Product {
             price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
         )
         return Product(
+            id: UUID().uuidString,
             styleNumber: "",
             name: "",
             brand: Brand(id: "", name: "", slug: ""),

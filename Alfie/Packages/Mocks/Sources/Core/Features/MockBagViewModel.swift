@@ -1,10 +1,19 @@
 import Models
 
 public class MockBagViewModel: BagViewModelProtocol {
-    public init() {}
+    public var products: [Product]
 
-    public var onWebViewModelCalled: (() -> any WebViewModelProtocol)?
-    public func webViewModel() -> any WebViewModelProtocol {
-        onWebViewModelCalled?() ?? MockWebViewModel()
+    public init(products: [Product] = []) {
+        self.products = products
+    }
+
+    public var onViewDidAppearCalled: (() -> Void)?
+    public func viewDidAppear() {
+        onViewDidAppearCalled?()
+    }
+
+    public var onDidSelectDeleteCalled: ((String) -> Void)?
+    public func didSelectDelete(for productId: String) {
+        onDidSelectDeleteCalled?(productId)
     }
 }

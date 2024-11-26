@@ -43,16 +43,12 @@ final class ViewFactory: ViewFactoryProtocol {
                 )
 
             case .wishlist:
-                WishListView()
+                wishListView
 
             case .bag:
                 BagView(
                     viewModel: BagViewModel(
-                        dependencies: BagDependencyContainer(
-                            deepLinkService: serviceProvider.deepLinkService,
-                            webUrlProvider: serviceProvider.webUrlProvider,
-                            webViewConfigurationService: serviceProvider.webViewConfigurationService
-                        )
+                        dependencies: BagDependencyContainer(bagService: serviceProvider.bagService)
                     )
                 )
             }
@@ -71,11 +67,14 @@ final class ViewFactory: ViewFactoryProtocol {
         case .productListing(let configuration):
             ProductListingView(
                 viewModel: ProductListingViewModel(
-                    productListingService: ProductListingService(
-                        productService: serviceProvider.productService,
-                        configuration: .init(type: .plp)
+                    dependencies: ProductListingDependencyContainer(
+                        productListingService: ProductListingService(
+                            productService: serviceProvider.productService,
+                            configuration: .init(type: .plp)
+                        ),
+                        plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
+                        wishListService: serviceProvider.wishListService
                     ),
-                    plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
                     category: configuration.category,
                     searchText: configuration.searchText,
                     urlQueryParameters: configuration.urlQueryParameters,
@@ -118,7 +117,7 @@ final class ViewFactory: ViewFactoryProtocol {
             .withToolbar(for: screen)
 
         case .wishlist:
-            WishListView()
+            wishListView
 
         case .productDetails(let type):
             switch type {
@@ -129,7 +128,9 @@ final class ViewFactory: ViewFactoryProtocol {
                         product: nil,
                         dependencies: ProductDetailsDependencyContainer(
                             productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider
+                            webUrlProvider: serviceProvider.webUrlProvider,
+                            bagService: serviceProvider.bagService,
+                            wishListService: serviceProvider.wishListService
                         )
                     )
                 )
@@ -141,7 +142,9 @@ final class ViewFactory: ViewFactoryProtocol {
                         product: product,
                         dependencies: ProductDetailsDependencyContainer(
                             productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider
+                            webUrlProvider: serviceProvider.webUrlProvider,
+                            bagService: serviceProvider.bagService,
+                            wishListService: serviceProvider.wishListService
                         )
                     )
                 )
@@ -155,5 +158,18 @@ final class ViewFactory: ViewFactoryProtocol {
             let viewModel = CategoriesViewModel(categories: categories, title: title, showToolbar: true)
             CategoriesView(viewModel: viewModel)
         }
+    }
+}
+
+private extension ViewFactory {
+    var wishListView: some View {
+        WishListView(
+            viewModel: WishListViewModel(
+                dependencies: WishListDependencyContainer(
+                    wishListService: serviceProvider.wishListService,
+                    bagService: serviceProvider.bagService
+                )
+            )
+        )
     }
 }
