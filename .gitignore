@@ -119,6 +119,5 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 *.xcuserstate
-Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 Alfie/Alfie.xcodeproj/xcuserdata/*
 Alfie/Packages/*/.swiftpm
