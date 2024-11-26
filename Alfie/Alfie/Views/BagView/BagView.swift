@@ -13,9 +13,30 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     }
 
     var body: some View {
-        if let webViewModel = viewModel.webViewModel() as? WebViewModel {
-            WebView(viewModel: webViewModel)
-                .withToolbar(for: .tab(.bag))
+        List {
+            ForEach(viewModel.products) { product in
+                HorizontalProductCard(
+                    product: product,
+                    colorTitle: LocalizableGeneral.$color + ":",
+                    sizeTitle: LocalizableGeneral.$size + ":",
+                    oneSizeTitle: LocalizableGeneral.$oneSize
+                )
+                .listRowInsets(EdgeInsets())
+            }
+            .onDelete { offsets in
+                for index in offsets.makeIterator() {
+                    viewModel.didSelectDelete(for: viewModel.products[index].id)
+                }
+            }
+            .listRowSeparator(.hidden)
+            .padding(.horizontal, Spacing.space200)
+        }
+        .listStyle(.plain)
+        .listRowSpacing(Spacing.space200)
+        .padding(.vertical, Spacing.space200)
+        .withToolbar(for: .tab(.bag))
+        .onAppear {
+            viewModel.viewDidAppear()
         }
     }
 }

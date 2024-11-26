@@ -31,7 +31,19 @@ struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         .withToolbar(for: .account)
     }
 
-    private func navigateToSection(_: AccountSection) {}
+    private func navigateToSection(_ section: AccountSection) {
+        switch section {
+        case .wishlist:
+            coordinator.openWishlist()
+        case .myAddressBook,
+             .myDetails, // swiftlint:disable:this indentation_width
+             .myOrders,
+             .wallet,
+             .signOut:
+            // TODO: Implement in a future ticket
+            break
+        }
+    }
 }
 
 private enum AccessibilityId {

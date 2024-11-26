@@ -2,11 +2,20 @@ import Foundation
 import Models
 
 final class ProductDetailsDependencyContainer: ProductDetailsDependencyContainerProtocol {
-    public let productService: ProductServiceProtocol
-    public let webUrlProvider: WebURLProviderProtocol
+    let productService: ProductServiceProtocol
+    let webUrlProvider: WebURLProviderProtocol
+    let bagService: BagServiceProtocol
+    let wishListService: WishListServiceProtocol
 
-    public init(productService: ProductServiceProtocol, webUrlProvider: WebURLProviderProtocol) {
+    init(
+        productService: ProductServiceProtocol,
+        webUrlProvider: WebURLProviderProtocol,
+        bagService: BagServiceProtocol,
+        wishListService: WishListServiceProtocol
+    ) {
         self.productService = productService
         self.webUrlProvider = webUrlProvider
+        self.bagService = bagService
+        self.wishListService = wishListService
     }
 }
