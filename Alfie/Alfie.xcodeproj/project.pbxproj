@@ -26,6 +26,11 @@
 		84064E2B2CEFA619003CBE2C /* WishListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84064E2A2CEFA619003CBE2C /* WishListViewModel.swift */; };
 		84064E2D2CEFACC2003CBE2C /* WishListDependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84064E2C2CEFACB5003CBE2C /* WishListDependencyContainer.swift */; };
 		84064E2F2CEFBADF003CBE2C /* ProductListingDependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84064E2E2CEFBADE003CBE2C /* ProductListingDependencyContainer.swift */; };
+		615E067F2CEB7E4700065ECF /* FeatureToggleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615E067E2CEB7E4700065ECF /* FeatureToggleView.swift */; };
+		615E06812CEB7E5400065ECF /* FeatureToggleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615E06802CEB7E4F00065ECF /* FeatureToggleViewModel.swift */; };
+		615E06842CEB929400065ECF /* LocalizableFeatureToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615E06832CEB928E00065ECF /* LocalizableFeatureToggle.swift */; };
+		615E06882CEBBA2000065ECF /* LocalizableFeatureToggle.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 615E06872CEBBA1F00065ECF /* LocalizableFeatureToggle.xcstrings */; };
+		615E068B2CF0A8EE00065ECF /* ConfigurationKeyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615E068A2CF0A8E800065ECF /* ConfigurationKeyExtension.swift */; };
 		8451DCCC2C049C60001BD45A /* Alfie.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 8451DCCB2C049C60001BD45A /* Alfie.xctestplan */; };
 		A10132F52B6BB6FC00A4C9C8 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = A10132F42B6BB6FC00A4C9C8 /* Navigation */; };
 		A10971432B973C5E003BE2A3 /* ThemedButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10971422B973C5E003BE2A3 /* ThemedButton+Extension.swift */; };
@@ -186,6 +191,11 @@
 		84064E2A2CEFA619003CBE2C /* WishListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WishListViewModel.swift; sourceTree = "<group>"; };
 		84064E2C2CEFACB5003CBE2C /* WishListDependencyContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WishListDependencyContainer.swift; sourceTree = "<group>"; };
 		84064E2E2CEFBADE003CBE2C /* ProductListingDependencyContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListingDependencyContainer.swift; sourceTree = "<group>"; };
+		615E067E2CEB7E4700065ECF /* FeatureToggleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureToggleView.swift; sourceTree = "<group>"; };
+		615E06802CEB7E4F00065ECF /* FeatureToggleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureToggleViewModel.swift; sourceTree = "<group>"; };
+		615E06832CEB928E00065ECF /* LocalizableFeatureToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizableFeatureToggle.swift; sourceTree = "<group>"; };
+		615E06872CEBBA1F00065ECF /* LocalizableFeatureToggle.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = LocalizableFeatureToggle.xcstrings; sourceTree = "<group>"; };
+		615E068A2CF0A8E800065ECF /* ConfigurationKeyExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationKeyExtension.swift; sourceTree = "<group>"; };
 		8451DCCB2C049C60001BD45A /* Alfie.xctestplan */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Alfie.xctestplan; path = Alfie/Alfie.xctestplan; sourceTree = SOURCE_ROOT; };
 		A10132F62B6BB72500A4C9C8 /* Navigation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Navigation; sourceTree = "<group>"; };
 		A10971422B973C5E003BE2A3 /* ThemedButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThemedButton+Extension.swift"; sourceTree = "<group>"; };
@@ -491,6 +501,34 @@
 				49F5B9402B8CE2A000472A23 /* LogsView.swift */,
 			);
 			path = Logs;
+			sourceTree = "<group>";
+		};
+		615E067D2CEB7E2D00065ECF /* FeatureToggle */ = {
+			isa = PBXGroup;
+			children = (
+				615E06892CF0A8E100065ECF /* Extensions */,
+				615E06822CEB928700065ECF /* Localisation */,
+				615E06802CEB7E4F00065ECF /* FeatureToggleViewModel.swift */,
+				615E067E2CEB7E4700065ECF /* FeatureToggleView.swift */,
+			);
+			path = FeatureToggle;
+			sourceTree = "<group>";
+		};
+		615E06822CEB928700065ECF /* Localisation */ = {
+			isa = PBXGroup;
+			children = (
+				615E06832CEB928E00065ECF /* LocalizableFeatureToggle.swift */,
+				615E06872CEBBA1F00065ECF /* LocalizableFeatureToggle.xcstrings */,
+			);
+			path = Localisation;
+			sourceTree = "<group>";
+		};
+		615E06892CF0A8E100065ECF /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				615E068A2CF0A8E800065ECF /* ConfigurationKeyExtension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		A14AAF482B8E52BA00EFBC98 /* Tracking */ = {
@@ -1005,12 +1043,13 @@
 		DAFD22DA2B84A410009AFACD /* DebugMenu */ = {
 			isa = PBXGroup;
 			children = (
-				BA6988E52B9F25E700DAE352 /* Endpoint */,
-				A14AAF482B8E52BA00EFBC98 /* Tracking */,
-				DAAC67E52B8FA6CE00F6C47C /* Configuration */,
 				BE3C3CAA2B92082600E2CAE6 /* BrazePush */,
-				49F5B93F2B8CE29500472A23 /* Logs */,
+				DAAC67E52B8FA6CE00F6C47C /* Configuration */,
 				DAFD22DD2B84A70B009AFACD /* DeepLinking */,
+				BA6988E52B9F25E700DAE352 /* Endpoint */,
+				615E067D2CEB7E2D00065ECF /* FeatureToggle */,
+				49F5B93F2B8CE29500472A23 /* Logs */,
+				A14AAF482B8E52BA00EFBC98 /* Tracking */,
 				BA2DC30C2B90DC4900DE77DF /* DebugMenuView.swift */,
 			);
 			path = DebugMenu;
@@ -1166,6 +1205,7 @@
 				BEB3C3562BD2C7C600AFDDC1 /* LocalizableSortBy.xcstrings in Resources */,
 				DAC900572B87B83C00F9819C /* LocalizableHome.xcstrings in Resources */,
 				DAC900672B87CCB600F9819C /* LocalizableAccount.xcstrings in Resources */,
+				615E06882CEBBA2000065ECF /* LocalizableFeatureToggle.xcstrings in Resources */,
 				BE8B022C2B616979007AE489 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1223,7 +1263,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Release/GoogleService-Info.plist\nelse \n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Debug/GoogleService-Info.plist\nfi\n\nDESTINATION_CONFIG_PATH=$SRCROOT/Alfie/Configuration/GoogleService-Info.plist\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp $SOURCE_CONFIG_PATH $DESTINATION_CONFIG_PATH\n";
+			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Release/GoogleService-Info.plist\nelse \n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Debug/GoogleService-Info.plist\nfi\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp $SOURCE_CONFIG_PATH $DESTINATION_CONFIG_PATH\n";
 			showEnvVarsInLog = 0;
 		};
 		BAEFC2612B84AE5D00387C00 /* Upload DSYMs to Crashlytics */ = {
@@ -1269,6 +1309,7 @@
 				BAD41CF02BC6C98700F49FEE /* ProductDetailsView.swift in Sources */,
 				DA3946452B751B320016B804 /* LinkConfiguration.swift in Sources */,
 				BA2C3D3E2BE52BA800E72606 /* WebFeature+Extension.swift in Sources */,
+				615E06812CEB7E5400065ECF /* FeatureToggleViewModel.swift in Sources */,
 				A157750C2BBD63A400B21C82 /* SearchViewModel.swift in Sources */,
 				DAAC67E72B8FA78D00F6C47C /* AppUpdateDemoView.swift in Sources */,
 				BA2C3D432BE544F800E72606 /* LocalizableWebView.swift in Sources */,
@@ -1278,11 +1319,13 @@
 				BEEB55F62BA0C6180091D8F8 /* WishListView.swift in Sources */,
 				BEEB55F82BA0C6330091D8F8 /* LocalizableWishList.swift in Sources */,
 				DAC9005B2B87C4AF00F9819C /* LocalizableShop.swift in Sources */,
+				615E068B2CF0A8EE00065ECF /* ConfigurationKeyExtension.swift in Sources */,
 				DAC900742B87CFF300F9819C /* LocalizableGeneral.swift in Sources */,
 				BE504C9C2B8DE0F200B2D4A2 /* AccountSectionView.swift in Sources */,
 				BA01AD812B767BF800E23603 /* ToolbarItemProvider.swift in Sources */,
 				BEB3C3542BD2C73E00AFDDC1 /* LocalizableSortBy.swift in Sources */,
 				BAB7C0AC2B879DAF00010587 /* ViewFactory.swift in Sources */,
+				615E067F2CEB7E4700065ECF /* FeatureToggleView.swift in Sources */,
 				BAB7C0AB2B879DAF00010587 /* Screen.swift in Sources */,
 				49032CE52B694BBE002C86F5 /* AccountView.swift in Sources */,
 				BAD41CF22BC6C99300F49FEE /* ProductDetailsViewModel.swift in Sources */,
@@ -1324,6 +1367,7 @@
 				A1C8EDE42BB58F8500EEF6A2 /* RecentSearchesViewModel.swift in Sources */,
 				84064E2F2CEFBADF003CBE2C /* ProductListingDependencyContainer.swift in Sources */,
 				BE8105842B8F376D00012456 /* AccountSection.swift in Sources */,
+				615E06842CEB929400065ECF /* LocalizableFeatureToggle.swift in Sources */,
 				BAD41CF72BC6C9DA00F49FEE /* LocalizableProductDetails.swift in Sources */,
 				BAB7C0A52B879DAF00010587 /* Coordinator.swift in Sources */,
 				BA730CE62BC9967000BD2716 /* LocalizableProductListing.swift in Sources */,
@@ -1463,6 +1507,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -1519,6 +1564,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

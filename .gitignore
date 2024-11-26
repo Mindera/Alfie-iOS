@@ -120,11 +120,4 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 *.xcuserstate
 Alfie/Alfie.xcodeproj/xcuserdata/*
-StyleGuide/.swiftpm/xcode/xcuserdata/*
-Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-Alfie/Packages/Core/.swiftpm/xcode/xcuserdata/*
-Alfie/Packages/Models/.swiftpm/xcode/xcuserdata/*
-Alfie/Packages/Mocks/.swiftpm/xcode/xcuserdata/*
-Alfie/Packages/Navigation/.swiftpm/xcode/xcuserdata/*
-Alfie/Packages/StyleGuide/Package.resolved
-Alfie/Packages/Common/.swiftpm/xcode/xcuserdata/*
+Alfie/Packages/*/.swiftpm
