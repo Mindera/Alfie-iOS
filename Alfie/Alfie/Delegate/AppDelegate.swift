@@ -54,7 +54,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 serviceProvider.notificationsService.start()
             }
         }
-        tabCoordinator = TabCoordinator(tabs: TabScreen.allCases, activeTab: .home(), serviceProvider: serviceProvider)
+
+        var tabs: [TabScreen] = [.home(), .shop(), .bag]
+
+        if serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
+            tabs.insert(.wishlist, at: 2)
+        }
+
+        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
     }
 
     // MARK: - Notifications

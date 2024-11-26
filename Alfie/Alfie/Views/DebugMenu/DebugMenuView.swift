@@ -29,7 +29,8 @@ struct DebugMenuView: View {
                     link(for: .appUpdate, text: "Force & Soft Update")
                     link(for: .brazeInfo, text: "Braze Push")
                     #if DEBUG
-                        link(for: .logs, text: "Logs")
+                    link(for: .logs, text: "Logs")
+                    link(for: .featureToggle, text: "Feature Toggle")
                     #endif
                     link(for: .endpoint, text: "Environment")
                 }
@@ -92,6 +93,12 @@ struct DebugMenuView: View {
             .modifier(
                 ContainerDemoViewModifier(headerTitle: "Environment", embedInScrollView: false)
             )
+
+        case .featureToggle:
+            FeatureToggleView(viewModel: FeatureToggleViewModel(provider: DebugConfigurationProvider.shared))
+                .modifier(
+                    ContainerDemoViewModifier(headerTitle: LocalizableFeatureToggle.$title, embedInScrollView: true)
+                )
         }
     }
 
@@ -103,6 +110,7 @@ struct DebugMenuView: View {
         case brazeInfo
         case logs
         case endpoint
+        case featureToggle
     }
 }
 
