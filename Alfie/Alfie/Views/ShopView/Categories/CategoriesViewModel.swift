@@ -105,7 +105,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
 
         guard
-            var url = URL(string: "https://mock-server-rose.vercel.app"),
+            var url = URL(string: "https://localhost:4000"),
             let categoryUrl = category.url
         else {
             logError("Error building URL for category from navigation item: \(category)")

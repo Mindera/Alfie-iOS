@@ -7,7 +7,7 @@ struct LinkConfiguration: LinkConfigurationProtocol {
     init(
         schemes: [String] = ["https", "http", "alfie"],
         hosts: [String] = [
-            "mock-server-rose.vercel.app",
+            "localhost:4000",
             "alfie.target",
         ]
     ) {

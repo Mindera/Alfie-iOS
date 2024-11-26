@@ -4,7 +4,7 @@ import SwiftUI
 
 struct DeepLinkDemoView: View {
     @State private var customWebPath: String = "sale"
-    private let baseUrl = URL.fromString("alfie://mock-server-rose.vercel.app/")
+    private let baseUrl = URL.fromString("alfie://localhost:4000/")
     private var webViewUrl: URL {
         baseUrl.appending(path: customWebPath)
     }

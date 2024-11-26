@@ -10,7 +10,7 @@ enum ThemedURL: String, WebURLEndpoint {
 }
 
 extension ThemedURL {
-    static let preferredHost = "mock-server-rose.vercel.app"
+    static let preferredHost = "localhost:4000"
     static let internalScheme = "alfie"
     static let internalHost = "alfie.target"
 
