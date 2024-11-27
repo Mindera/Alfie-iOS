@@ -329,6 +329,7 @@
 		DAC900752B87D04100F9819C /* LocalizableGeneral.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = LocalizableGeneral.xcstrings; sourceTree = "<group>"; };
 		DAE910212B8CAD81008DC191 /* ForceAppUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceAppUpdateView.swift; sourceTree = "<group>"; };
 		DAEDF87E2B7AD606000C3604 /* LocalizableHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizableHome.swift; sourceTree = "<group>"; };
+		FCA0B27E2CEF3F12000339F6 /* alfie.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = alfie.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -766,6 +767,7 @@
 		BE8B021B2B616976007AE489 = {
 			isa = PBXGroup;
 			children = (
+				FCA0B27B2CEF3EE7000339F6 /* .github */,
 				BEA12B7C2B62665B00DA7608 /* Packages */,
 				BE8B02262B616976007AE489 /* Alfie */,
 				BE8B02372B616979007AE489 /* AlfieTests */,
@@ -1061,6 +1063,22 @@
 				BA2DC30E2B90DC5800DE77DF /* DeepLinkDemoView.swift */,
 			);
 			path = DeepLinking;
+			sourceTree = "<group>";
+		};
+		FCA0B27B2CEF3EE7000339F6 /* .github */ = {
+			isa = PBXGroup;
+			children = (
+				FCA0B27D2CEF3EFB000339F6 /* workflows */,
+			);
+			path = .github;
+			sourceTree = "<group>";
+		};
+		FCA0B27D2CEF3EFB000339F6 /* workflows */ = {
+			isa = PBXGroup;
+			children = (
+				FCA0B27E2CEF3F12000339F6 /* alfie.yml */,
+			);
+			path = workflows;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
