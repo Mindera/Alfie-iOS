@@ -173,7 +173,11 @@ private enum Constants {
         brandsViewModel: MockBrandsViewModel(),
         servicesViewModel: WebViewModel(
             url: URL(string: "https://www.alfieproj.com/services/store-services"),
-            dependencies: MockWebDependencyContainer()
+            dependencies: WebDependencyContainer(
+                deepLinkService: MockDeepLinkService(),
+                webViewConfigurationService: MockWebViewConfigurationService(),
+                webUrlProvider: MockWebUrlProvider()
+            )
         )
     )
     .environmentObject(Coordinator())

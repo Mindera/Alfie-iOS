@@ -66,6 +66,13 @@ private extension WishListView {
 }
 
 #Preview {
-    WishListView(viewModel: WishListViewModel(dependencies: MockWishListDependencyConainer()))
+    WishListView(
+        viewModel: WishListViewModel(
+            dependencies: WishListDependencyContainer(
+                wishListService: MockWishListService(),
+                bagService: MockBagService()
+            )
+        )
+    )
         .environmentObject(Coordinator())
 }

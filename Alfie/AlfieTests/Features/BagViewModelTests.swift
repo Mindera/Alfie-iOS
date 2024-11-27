@@ -6,12 +6,12 @@ import XCTest
 final class BagViewModelTests: XCTestCase {
     private var sut: BagViewModel!
     private var mockWebViewConfigurationService: MockWebViewConfigurationService!
-    private var mockDependencies: MockBagDependencyContainer!
+    private var mockDependencies: BagDependencyContainerProtocol!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockWebViewConfigurationService = MockWebViewConfigurationService()
-        mockDependencies = MockBagDependencyContainer(webViewConfigurationService: mockWebViewConfigurationService)
+        mockDependencies = BagDependencyContainer(bagService: MockBagService())
         sut = .init(dependencies: mockDependencies)
     }
 

@@ -8,16 +8,18 @@ final class WebViewModelTests: XCTestCase {
     private var mockDeepLinkService: MockDeepLinkService!
     private var mockWebViewConfigurationService: MockWebViewConfigurationService!
     private var mockWebUrlProvider: MockWebUrlProvider!
-    private var mockDependencies: MockWebDependencyContainer!
+    private var mockDependencies: WebDependencyContainerProtocol!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockDeepLinkService = MockDeepLinkService()
         mockWebViewConfigurationService = MockWebViewConfigurationService()
         mockWebUrlProvider = MockWebUrlProvider()
-        mockDependencies = MockWebDependencyContainer(deepLinkService: mockDeepLinkService,
-                                                      webViewConfigurationService: mockWebViewConfigurationService,
-                                                      webUrlProvider: mockWebUrlProvider)
+        mockDependencies = WebDependencyContainer(
+            deepLinkService: mockDeepLinkService,
+            webViewConfigurationService: mockWebViewConfigurationService,
+            webUrlProvider: mockWebUrlProvider
+        )
         // The view model is initialized in each test individually
     }
 

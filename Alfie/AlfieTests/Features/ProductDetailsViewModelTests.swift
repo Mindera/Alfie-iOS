@@ -8,14 +8,18 @@ final class ProductDetailsViewModelTests: XCTestCase {
     private var sut: ProductDetailsViewModel!
     private var mockProductService: MockProductService!
     private var mockWebUrlProvider: MockWebUrlProvider!
-    private var mockDependencies: MockProductDetailsDependencyContainer!
+    private var mockDependencies: ProductDetailsDependencyContainerProtocol!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockProductService = MockProductService()
         mockWebUrlProvider = MockWebUrlProvider()
-        mockDependencies = MockProductDetailsDependencyContainer(productService: mockProductService,
-                                                                 webUrlProvider: mockWebUrlProvider)
+        mockDependencies = ProductDetailsDependencyContainer(
+            productService: MockProductService(),
+            webUrlProvider: MockWebUrlProvider(),
+            bagService: MockBagService(),
+            wishListService: MockWishListService()
+        )
     }
 
     override func tearDownWithError() throws {
