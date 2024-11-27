@@ -369,19 +369,27 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
+        let colours: [Product.Colour]? = {
+            if let colour = selectedVariant.colour {
+                [colour]
+            } else {
+                nil
+            }
+        }()
+
         return Product(
-            id: UUID().uuidString,
+            id: selectedVariant.sku == "UNKNOWN" ? UUID().uuidString : selectedVariant.sku,
             styleNumber: product.styleNumber,
             name: product.name,
             brand: product.brand,
             shortDescription: product.shortDescription,
             longDescription: product.longDescription,
             slug: product.slug,
-            priceRange: product.priceRange,
-            attributes: product.attributes,
+            priceRange: nil,
+            attributes: nil,
             defaultVariant: selectedVariant,
-            variants: product.variants,
-            colours: product.colours
+            variants: [selectedVariant],
+            colours: colours
         )
     }
 }
