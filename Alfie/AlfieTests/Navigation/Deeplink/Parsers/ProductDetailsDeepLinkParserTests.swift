@@ -7,7 +7,7 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
     private var linkConfig: LinkConfiguration!
 
     private static let httpScheme = "http"
-    private static let host = "localhost:4000"
+    private static let host = ThemedURL.preferredHost
     private static let httpUrl = "\(httpScheme)://\(host)"
 
     override func setUpWithError() throws {

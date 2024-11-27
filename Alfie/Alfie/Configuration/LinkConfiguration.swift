@@ -7,8 +7,8 @@ struct LinkConfiguration: LinkConfigurationProtocol {
     init(
         schemes: [String] = ["https", "http", "alfie"],
         hosts: [String] = [
-            "localhost:4000",
-            "alfie.target",
+            ThemedURL.preferredHost,
+            ThemedURL.internalHost,
         ]
     ) {
         self.schemes = schemes

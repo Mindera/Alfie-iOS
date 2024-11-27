@@ -7,7 +7,7 @@ final class InternalDeepLinkParserTests: XCTestCase {
     private var linkConfig: LinkConfiguration!
 
     private static let appScheme = "alfie"
-    private static let host = "alfie.target"
+    private static let host = ThemedURL.internalHost
     private static let appUrl = "\(appScheme)://\(host)"
 
     override func setUpWithError() throws {
@@ -37,7 +37,7 @@ final class InternalDeepLinkParserTests: XCTestCase {
     }
 
     func test_does_not_parse_links_with_unknown_scheme() throws {
-        let testUrl = try XCTUnwrap(URL(string: "http://alfie.target"))
+        let testUrl = try XCTUnwrap(URL(string: "http://\(ThemedURL.internalHost)"))
         let result = sut.parseUrl(testUrl)
         XCTAssertNil(result)
     }
