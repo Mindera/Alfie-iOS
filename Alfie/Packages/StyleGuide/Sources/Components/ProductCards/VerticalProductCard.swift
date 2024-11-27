@@ -382,4 +382,4 @@ private enum Constants {
             priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
         )
     ) { _, _ in }
-} // swiftlint:disable:this file_length
+}
