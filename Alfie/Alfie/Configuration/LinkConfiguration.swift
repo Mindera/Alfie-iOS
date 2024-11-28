@@ -7,8 +7,8 @@ struct LinkConfiguration: LinkConfigurationProtocol {
     init(
         schemes: [String] = ["https", "http", "alfie"],
         hosts: [String] = [
-            "mock-server-rose.vercel.app",
-            "alfie.target",
+            ThemedURL.preferredHost,
+            ThemedURL.internalHost,
         ]
     ) {
         self.schemes = schemes
