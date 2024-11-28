@@ -370,7 +370,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         return SelectionProduct(
-            id: selectedVariant.sku == "UNKNOWN" ? UUID().uuidString : selectedVariant.sku,
+            id: selectedVariant.sku,
             name: product.name,
             brand: product.brand,
             size: selectedVariant.size,

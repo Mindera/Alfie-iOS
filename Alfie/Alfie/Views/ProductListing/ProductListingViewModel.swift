@@ -90,7 +90,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         if !isFavorite {
             let selectedProduct = SelectionProduct(
-                id: product.defaultVariant.sku == "UNKNOWN" ? UUID().uuidString : product.defaultVariant.sku,
+                id: product.defaultVariant.sku,
                 name: product.name,
                 brand: product.brand,
                 size: product.defaultVariant.size,
@@ -100,10 +100,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
             )
             dependencies.wishListService.addProduct(selectedProduct)
         } else {
-            dependencies.wishListService.removeProductWith(
-                colourId: product.defaultVariant.colour?.id,
-                sizeId: product.defaultVariant.size?.id
-            )
+            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
         }
         wishListContent = dependencies.wishListService.getWishListContent()
     }

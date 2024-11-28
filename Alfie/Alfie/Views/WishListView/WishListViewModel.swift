@@ -18,7 +18,7 @@ final class WishListViewModel: WishListViewModelProtocol {
     }
 
     func didSelectDelete(for product: SelectionProduct) {
-        dependencies.wishListService.removeProductWith(colourId: product.colour?.id, sizeId: product.size?.id)
+        dependencies.wishListService.removeProduct(product.id)
         products = dependencies.wishListService.getWishListContent()
     }
 

@@ -29,7 +29,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             }
             .onDelete { offsets in
                 for index in offsets.makeIterator() {
-                    viewModel.didSelectDelete(for: viewModel.products[index].id)
+                    viewModel.didSelectDelete(for: viewModel.products[index])
                 }
             }
             .listRowSeparator(.hidden)

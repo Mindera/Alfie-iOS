@@ -17,8 +17,8 @@ final class BagViewModel: BagViewModelProtocol {
         products = dependencies.bagService.getBagContent()
     }
 
-    func didSelectDelete(for productId: String) {
-        dependencies.bagService.removeProduct(productId)
+    func didSelectDelete(for product: SelectionProduct) {
+        dependencies.bagService.removeProduct(product)
         products = dependencies.bagService.getBagContent()
     }
 }
