@@ -5,7 +5,7 @@ import Models
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
     public var products: [Product]
-    public var wishListContent: [Product]
+    public var wishListContent: [SelectionProduct]
     public var title: String = "Title"
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
@@ -14,7 +14,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
         products: [Product] = [],
-        wishListContent: [Product] = []
+        wishListContent: [SelectionProduct] = []
     ) {
         self.state = state
         self.products = products

@@ -2,7 +2,7 @@ import Foundation
 import Models
 
 final class BagViewModel: BagViewModelProtocol {
-    @Published private(set) var products: [Product]
+    @Published private(set) var products: [SelectionProduct]
 
     private let dependencies: BagDependencyContainerProtocol
 

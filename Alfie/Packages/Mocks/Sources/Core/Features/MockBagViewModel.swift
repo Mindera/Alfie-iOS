@@ -1,9 +1,9 @@
 import Models
 
 public class MockBagViewModel: BagViewModelProtocol {
-    public var products: [Product]
+    public var products: [SelectionProduct]
 
-    public init(products: [Product] = []) {
+    public init(products: [SelectionProduct] = []) {
         self.products = products
     }
 

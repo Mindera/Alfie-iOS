@@ -16,10 +16,14 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         List {
             ForEach(viewModel.products) { product in
                 HorizontalProductCard(
-                    product: product,
+                    image: product.media.first?.asImage?.url,
+                    designer: product.brand.name,
+                    name: product.name,
                     colorTitle: LocalizableGeneral.$color + ":",
+                    color: product.colour?.name ?? "",
                     sizeTitle: LocalizableGeneral.$size + ":",
-                    oneSizeTitle: LocalizableGeneral.$oneSize
+                    size: product.size == nil ? LocalizableGeneral.$oneSize : product.sizeText,
+                    priceType: product.priceType
                 )
                 .listRowInsets(EdgeInsets())
             }

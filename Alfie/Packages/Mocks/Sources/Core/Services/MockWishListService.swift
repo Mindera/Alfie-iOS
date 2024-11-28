@@ -2,15 +2,15 @@ import Foundation
 import Models
 
 public final class MockWishListService: WishListServiceProtocol {
-    private var products: [Product] = []
+    private var products: [SelectionProduct] = []
 
     public init() { }
 
-    public func addProduct(_ product: Product) {
+    public func addProduct(_ product: SelectionProduct) {
         guard !products.contains(
             where: {
-                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
+                $0.colour?.id == product.colour?.id &&
+                $0.size?.id == product.size?.id
             }
         )
         else {
@@ -20,14 +20,14 @@ public final class MockWishListService: WishListServiceProtocol {
         products.append(product)
     }
 
-    public func removeProduct(_ product: Product) {
+    public func removeProductWith(colourId: String?, sizeId: String?) {
         products.removeAll {
-            $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-            $0.defaultVariant.size?.id == product.defaultVariant.size?.id
+            $0.colour?.id == colourId &&
+            $0.size?.id == sizeId
         }
     }
 
-    public func getWishListContent() -> [Product] {
+    public func getWishListContent() -> [SelectionProduct] {
         products
     }
 }

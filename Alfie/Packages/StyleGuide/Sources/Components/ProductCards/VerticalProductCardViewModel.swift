@@ -15,6 +15,36 @@ public struct VerticalProductCardViewModel {
     var addToBagTitle: String = ""
     var outOfStockTitle: String = ""
     var isAddToBagDisabled = false
+
+    public init(
+        configuration: VerticalProductCardConfiguration,
+        productId: String,
+        image: URL? = nil,
+        designer: String,
+        name: String,
+        priceType: PriceType,
+        colorTitle: String = "",
+        color: String = "",
+        sizeTitle: String = "",
+        size: String = "",
+        addToBagTitle: String = "",
+        outOfStockTitle: String = "",
+        isAddToBagDisabled: Bool = false
+    ) {
+        self.configuration = configuration
+        self.productId = productId
+        self.image = image
+        self.designer = designer
+        self.name = name
+        self.priceType = priceType
+        self.colorTitle = colorTitle
+        self.color = color
+        self.sizeTitle = sizeTitle
+        self.size = size
+        self.addToBagTitle = addToBagTitle
+        self.outOfStockTitle = outOfStockTitle
+        self.isAddToBagDisabled = isAddToBagDisabled
+    }
 }
 
 public extension VerticalProductCardViewModel {

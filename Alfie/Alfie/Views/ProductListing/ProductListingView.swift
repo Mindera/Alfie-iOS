@@ -83,8 +83,8 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                     isFavorite: .init(
                         get: {
                             viewModel.wishListContent.contains {
-                                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
+                                $0.colour?.id == product.defaultVariant.colour?.id &&
+                                $0.size?.id == product.defaultVariant.size?.id
                             }
                         },
                         set: { _ in }

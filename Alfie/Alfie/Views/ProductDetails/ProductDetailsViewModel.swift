@@ -361,7 +361,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         state = .success(.init(product: product, selectedVariant: variant))
     }
 
-    private var selectedProduct: Product? {
+    private var selectedProduct: SelectionProduct? {
         guard
             let product,
             let selectedVariant
@@ -369,27 +369,14 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
-        let colours: [Product.Colour]? = {
-            if let colour = selectedVariant.colour {
-                [colour]
-            } else {
-                nil
-            }
-        }()
-
-        return Product(
+        return SelectionProduct(
             id: selectedVariant.sku == "UNKNOWN" ? UUID().uuidString : selectedVariant.sku,
-            styleNumber: product.styleNumber,
             name: product.name,
             brand: product.brand,
-            shortDescription: product.shortDescription,
-            longDescription: product.longDescription,
-            slug: product.slug,
-            priceRange: nil,
-            attributes: nil,
-            defaultVariant: selectedVariant,
-            variants: [selectedVariant],
-            colours: colours
+            size: selectedVariant.size,
+            colour: selectedVariant.colour,
+            stock: selectedVariant.stock,
+            price: selectedVariant.price
         )
     }
 }

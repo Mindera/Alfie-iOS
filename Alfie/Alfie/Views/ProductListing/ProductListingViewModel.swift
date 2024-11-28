@@ -12,7 +12,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let query: String?
     private let mode: ProductListingViewMode
     @Published var style: ProductListingListStyle
-    @Published private(set) var wishListContent: [Product]
+    @Published private(set) var wishListContent: [SelectionProduct]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
     private enum Constants {
@@ -76,23 +76,21 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         if !isFavorite {
-            let selectedProduct = Product(
-                id: UUID().uuidString,
-                styleNumber: product.styleNumber,
+            let selectedProduct = SelectionProduct(
+                id: product.defaultVariant.sku == "UNKNOWN" ? UUID().uuidString : product.defaultVariant.sku,
                 name: product.name,
                 brand: product.brand,
-                shortDescription: product.shortDescription,
-                longDescription: product.longDescription,
-                slug: product.slug,
-                priceRange: product.priceRange,
-                attributes: product.attributes,
-                defaultVariant: product.defaultVariant,
-                variants: product.variants,
-                colours: product.colours
+                size: product.defaultVariant.size,
+                colour: product.defaultVariant.colour,
+                stock: product.defaultVariant.stock,
+                price: product.defaultVariant.price
             )
             dependencies.wishListService.addProduct(selectedProduct)
         } else {
-            dependencies.wishListService.removeProduct(product)
+            dependencies.wishListService.removeProductWith(
+                colourId: product.defaultVariant.colour?.id,
+                sizeId: product.defaultVariant.size?.id
+            )
         }
         wishListContent = dependencies.wishListService.getWishListContent()
     }

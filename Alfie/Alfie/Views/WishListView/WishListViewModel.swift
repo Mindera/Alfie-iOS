@@ -2,13 +2,13 @@ import Foundation
 import Models
 
 final class WishListViewModel: WishListViewModelProtocol {
-    @Published private(set) var products: [Product]
+    @Published private(set) var products: [SelectionProduct]
 
     private let dependencies: WishListDependencyContainerProtocol
 
     init(dependencies: WishListDependencyContainerProtocol) {
         self.dependencies = dependencies
-        products = dependencies.bagService.getBagContent()
+        products = dependencies.wishListService.getWishListContent()
     }
 
     // MARK: - WishListViewModelProtocol
@@ -17,12 +17,12 @@ final class WishListViewModel: WishListViewModelProtocol {
         products = dependencies.wishListService.getWishListContent()
     }
 
-    func didSelectDelete(for product: Product) {
-        dependencies.wishListService.removeProduct(product)
+    func didSelectDelete(for product: SelectionProduct) {
+        dependencies.wishListService.removeProductWith(colourId: product.colour?.id, sizeId: product.size?.id)
         products = dependencies.wishListService.getWishListContent()
     }
 
-    func didTapAddToBag(for product: Product) {
+    func didTapAddToBag(for product: SelectionProduct) {
         dependencies.bagService.addProduct(product)
     }
 }
