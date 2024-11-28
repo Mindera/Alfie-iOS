@@ -40,10 +40,10 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
 }
 
 enum ApiEndpointUrl: String {
-    case dev = "https://mock-server-rose.vercel.app/"
-    case preProd = "https://api-preprod.mock-server-rose.vercel.app/"
-    case prod = "https://api.mock-server-rose.vercel.app/"
-    case custom = "https://api-preview-000.mock-server-rose.vercel.app/"
+    case dev = "http://localhost:4000/"
+    case preProd = "https://api-preprod.localhost:4000/"
+    case prod = "https://api.localhost:4000/"
+    case custom = "https://api-preview-000.localhost:4000/"
 
     static func url(for option: ApiEndpointOption) -> String {
         // swiftlint:disable vertical_whitespace_between_cases

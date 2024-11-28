@@ -4,6 +4,10 @@ This is a repository for an e-commerce iOS app template.
 
 ---
 
+## Prerequisites
+
+This project uses a mock GraphQL API for fetching data. Mock server can be run locally as decribed in documentation: https://github.com/Mindera/Alfie-Mocks
+
 ## Architecture 
 
 ### Model 
