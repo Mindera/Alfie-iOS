@@ -6,4 +6,5 @@ public protocol WishListViewModelProtocol: ObservableObject {
     func viewDidAppear()
     func didSelectDelete(for product: SelectionProduct)
     func didTapAddToBag(for product: SelectionProduct)
+    func productCardViewModel(for product: SelectionProduct) -> VerticalProductCardViewModel
 }

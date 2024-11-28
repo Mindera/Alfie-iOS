@@ -25,4 +25,22 @@ final class WishListViewModel: WishListViewModelProtocol {
     func didTapAddToBag(for product: SelectionProduct) {
         dependencies.bagService.addProduct(product)
     }
+
+    func productCardViewModel(for product: SelectionProduct) -> VerticalProductCardViewModel {
+        .init(
+            configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
+            productId: product.id,
+            image: product.media.first?.asImage?.url,
+            designer: product.brand.name,
+            name: product.name,
+            priceType: product.priceType,
+            colorTitle: LocalizableGeneral.$color + ":",
+            color: product.colour?.name ?? "",
+            sizeTitle: LocalizableGeneral.$size + ":",
+            size: product.size == nil ? LocalizableGeneral.$oneSize : product.sizeText,
+            addToBagTitle: LocalizableGeneral.$addToBag,
+            outOfStockTitle: LocalizableGeneral.$outOfStock,
+            isAddToBagDisabled: product.stock == .zero
+        )
+    }
 }

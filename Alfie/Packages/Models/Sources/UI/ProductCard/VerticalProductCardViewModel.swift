@@ -1,20 +1,19 @@
 import Foundation
-import Models
 
 public struct VerticalProductCardViewModel {
-    var configuration: VerticalProductCardConfiguration
-    var productId: String
-    var image: URL?
-    var designer: String
-    var name: String
-    var priceType: PriceType
-    var colorTitle: String = ""
-    var color: String = ""
-    var sizeTitle: String = ""
-    var size: String = ""
-    var addToBagTitle: String = ""
-    var outOfStockTitle: String = ""
-    var isAddToBagDisabled = false
+    public var configuration: VerticalProductCardConfiguration
+    public var productId: String
+    public var image: URL?
+    public var designer: String
+    public var name: String
+    public var priceType: PriceType
+    public var colorTitle: String = ""
+    public var color: String = ""
+    public var sizeTitle: String = ""
+    public var size: String = ""
+    public var addToBagTitle: String = ""
+    public var outOfStockTitle: String = ""
+    public var isAddToBagDisabled = false
 
     public init(
         configuration: VerticalProductCardConfiguration,

@@ -3,6 +3,7 @@ import Common
 import Core
 import Foundation
 import Models
+import SwiftUI
 
 // MARK: - ProductListingViewModel
 
@@ -73,6 +74,18 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     func didSelect(_: Product) {}
+
+    func isFavoriteState(for product: Product) -> Binding<Bool> {
+        .init(
+            get: {
+                self.wishListContent.contains {
+                    $0.colour?.id == product.defaultVariant.colour?.id &&
+                    $0.size?.id == product.defaultVariant.size?.id
+                }
+            },
+            set: { _ in }
+        )
+    }
 
     func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         if !isFavorite {

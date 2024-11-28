@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import SwiftUI
 
 public struct ProductListingViewStateModel {
     public let title: String
@@ -34,6 +35,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func viewDidAppear()
     func didDisplay(_ product: Product)
     func didSelect(_ product: Product)
+    func isFavoriteState(for product: Product) -> Binding<Bool>
     func setListStyle(_ style: ProductListingListStyle)
     func didTapAddToWishList(for product: Product, isFavorite: Bool)
 }
