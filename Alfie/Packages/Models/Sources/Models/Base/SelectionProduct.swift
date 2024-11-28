@@ -8,6 +8,7 @@ public struct SelectionProduct: Identifiable {
     public let colour: Product.Colour?
     public let stock: Int
     public let price: Price
+    
     public var media: [Media] {
         colour?.media ?? []
     }
