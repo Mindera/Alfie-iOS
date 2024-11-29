@@ -6,10 +6,11 @@ on:
     branches:
       - main
       - release/**
-      - ALFMOB-33_Implemented_CI_CD
   workflow_dispatch:
-  schedule:
-    - cron: '0 23 * * 0' # Every Sunday at 23:00 GMT
+
+env:
+  IOS_DESTINATION: "platform=iOS Simulator,name=iPhone 14"
+  DEVELOPER_DIR: "/Applications/Xcode_16.app/Contents/Developer"
 
 jobs:
   branch-validation:
@@ -18,32 +19,55 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v2
-        with:
-          xcode-version: 16
-
       - name: Install SwiftLint
         run: brew install swiftlint
 
-      - name: Run Static Code Analysis
+      - name: Run Code Linting
         run: swiftlint
 
+      - name: Run Static Code Analysis
+        run: |
+         xcodebuild analyze \
+           -scheme Alfie \
+           -destination "${{ env.IOS_DESTINATION }}"
+
       - name: Run Unit Tests
-        run: xcodebuild test -scheme Alfie -destination
-          'platform=iOS Simulator,name=iPhone 14'
+        run: |
+         xcodebuild test \
+           -scheme Alfie \
+           -destination "${{ env.IOS_DESTINATION }}"
 
   testflight-build:
     needs: branch-validation
     runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/heads/release/')
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v2
-        with:
-          xcode-version: 16
+      - name: Set up SSH for Bitbucket
+        run: |
+           mkdir -p ~/.ssh
+           echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
+           chmod 600 ~/.ssh/id_rsa
+           ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+
+      - name: Install Fastlane
+        run: |
+          brew install fastlane
+          gem install bundler
+          bundle install --path vendor/bundle
+
+      - name: Run Fastlane Match
+        run: |
+          bundle exec fastlane match appstore
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BRANCH: ${{ secrets.MATCH_GIT_BRANCH }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_API_KEY_FILEPATH: ${{ secrets.API_KEY_PATH }}
 
       - name: Increment Build Number
         run: agvtool next-version -all
@@ -58,18 +82,8 @@ jobs:
         run: |
           xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
           -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
-
+    
       - name: Deploy to TestFlight
-        uses: appleboy/app-store-action@v1
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          api_key_id: ${{ secrets.API_KEY_ID }}
-          api_issuer: ${{ secrets.API_ISSUER }}
-          ipa_path: ${{ github.workspace }}/build/App.ipa
+        run: |
+         fastlane pilot upload -i $PWD/build/App.ipa
 
-  debug-build-schedule:
-    needs: branch-validation
-    runs-on: macos-latest
-    steps:
-      - name: Trigger Debug Build
-        run: echo "Scheduled Debug Build for TestFlight"
