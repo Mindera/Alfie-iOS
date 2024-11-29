@@ -72,6 +72,19 @@ jobs:
       - name: Increment Build Number
         run: agvtool next-version -all
 
+      - name: Configure Git User
+        run: |
+          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+
+      - name: Commit and Push Build Number
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: |
+          git add .
+          git commit -m "Increment build to $(agvtool what-version -terse)"
+          git push origin HEAD
+
       - name: Build and Archive
         run: |
           xcodebuild clean archive \
@@ -82,8 +95,7 @@ jobs:
         run: |
           xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
           -exportOptionsPlist ExportOptions.plist -exportPath $PWD/build
-    
+
       - name: Deploy to TestFlight
         run: |
          fastlane pilot upload -i $PWD/build/App.ipa
-
