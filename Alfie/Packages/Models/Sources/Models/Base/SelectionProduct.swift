@@ -8,26 +8,20 @@ public struct SelectionProduct: Identifiable {
     public let colour: Product.Colour?
     public let stock: Int
     public let price: Price
-    
+
     public var media: [Media] {
         colour?.media ?? []
     }
 
-    public init(
-        id: String,
-        name: String,
-        brand: Brand,
-        size: Product.ProductSize?,
-        colour: Product.Colour?,
-        stock: Int,
-        price: Price
-    ) {
-        self.id = id
-        self.name = name
-        self.brand = brand
-        self.size = size
-        self.colour = colour
-        self.stock = stock
-        self.price = price
+    public init(product: Product, selectedVariant: Product.Variant? = nil) {
+        let selectedVariant = selectedVariant ?? product.defaultVariant
+
+        self.id = selectedVariant.sku
+        self.name = product.name
+        self.brand = product.brand
+        self.size = selectedVariant.size
+        self.colour = selectedVariant.colour
+        self.stock = selectedVariant.stock
+        self.price = selectedVariant.price
     }
 }

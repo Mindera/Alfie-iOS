@@ -5,4 +5,5 @@ public protocol BagViewModelProtocol: ObservableObject {
 
     func viewDidAppear()
     func didSelectDelete(for product: SelectionProduct)
+    func productCardViewModel(for product: SelectionProduct) -> HorizontalProductCardViewModel
 }

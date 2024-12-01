@@ -369,14 +369,6 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
-        return SelectionProduct(
-            id: selectedVariant.sku,
-            name: product.name,
-            brand: product.brand,
-            size: selectedVariant.size,
-            colour: selectedVariant.colour,
-            stock: selectedVariant.stock,
-            price: selectedVariant.price
-        )
+        return SelectionProduct(product: product, selectedVariant: selectedVariant)
     }
 }

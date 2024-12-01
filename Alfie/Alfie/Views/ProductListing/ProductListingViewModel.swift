@@ -83,26 +83,10 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
                     $0.size?.id == product.defaultVariant.size?.id
                 }
             },
-            set: { _ in }
+            set: { isFavorite in
+                self.handleAddToWishList(for: product, isFavorite: isFavorite)
+            }
         )
-    }
-
-    func didTapAddToWishList(for product: Product, isFavorite: Bool) {
-        if !isFavorite {
-            let selectedProduct = SelectionProduct(
-                id: product.defaultVariant.sku,
-                name: product.name,
-                brand: product.brand,
-                size: product.defaultVariant.size,
-                colour: product.defaultVariant.colour,
-                stock: product.defaultVariant.stock,
-                price: product.defaultVariant.price
-            )
-            dependencies.wishListService.addProduct(selectedProduct)
-        } else {
-            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
-        }
-        wishListContent = dependencies.wishListService.getWishListContent()
     }
 
     // MARK: - Private
@@ -154,6 +138,16 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
 
         state = .success(.init(title: title, products: model.products + productListing.products))
+    }
+
+    private func handleAddToWishList(for product: Product, isFavorite: Bool) {
+        if isFavorite {
+            let selectedProduct = SelectionProduct(product: product)
+            dependencies.wishListService.addProduct(selectedProduct)
+        } else {
+            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
+        }
+        wishListContent = dependencies.wishListService.getWishListContent()
     }
 }
 

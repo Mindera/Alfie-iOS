@@ -15,16 +15,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     var body: some View {
         List {
             ForEach(viewModel.products) { product in
-                HorizontalProductCard(
-                    image: product.media.first?.asImage?.url,
-                    designer: product.brand.name,
-                    name: product.name,
-                    colorTitle: LocalizableGeneral.$color + ":",
-                    color: product.colour?.name ?? "",
-                    sizeTitle: LocalizableGeneral.$size + ":",
-                    size: product.size == nil ? LocalizableGeneral.$oneSize : product.sizeText,
-                    priceType: product.priceType
-                )
+                HorizontalProductCard(viewModel: viewModel.productCardViewModel(for: product))
                 .listRowInsets(EdgeInsets())
             }
             .onDelete { offsets in

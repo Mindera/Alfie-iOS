@@ -47,9 +47,4 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public func setListStyle(_ style: ProductListingListStyle) {
         onSetListStyleCalled?(style)
     }
-
-    public var onDidTapAddToWishListCalled: ((Product, Bool) -> Void)?
-    public func didTapAddToWishList(for product: Product, isFavorite: Bool) {
-        onDidTapAddToWishListCalled?(product, isFavorite)
-    }
 }

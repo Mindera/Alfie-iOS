@@ -37,5 +37,4 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didSelect(_ product: Product)
     func isFavoriteState(for product: Product) -> Binding<Bool>
     func setListStyle(_ style: ProductListingListStyle)
-    func didTapAddToWishList(for product: Product, isFavorite: Bool)
 }

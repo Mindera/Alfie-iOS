@@ -7,7 +7,6 @@ import SwiftUI
 public struct VerticalProductCard: View {
     public typealias ProductUserActionHandler = (_ product: String, _ type: ProductUserActionType) -> Void
     public enum ProductUserActionType {
-        case wishlist(isFavorite: Bool)
         case remove
         case addToBag
     }
@@ -173,14 +172,14 @@ public struct VerticalProductCard: View {
             let iconSize = viewModel.configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch viewModel.configuration.actionType {
                 case .wishlist:
                     isFavorite.toggle()
-                    onUserAction(viewModel.productId, .wishlist(isFavorite: isFavorite))
-
                 case .remove:
                     onUserAction(viewModel.productId, .remove)
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
             }, label: {
                 actionImage
                     .resizable()
