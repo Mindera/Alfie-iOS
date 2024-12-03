@@ -17,13 +17,13 @@ public struct SizingSelectorComponentView: View {
             horizontalSwatches(itemSpacing: itemSpacing, scrollable: scrollable)
         case .chips(let horizontalSpacing, let verticalSpacing):
             chipsSwatches(horizontalSpacing: horizontalSpacing, verticalSpacing: verticalSpacing)
-        case .grid(let columns, let columnWidth):
-            gridSwatches(columns: columns, columnWidth: columnWidth)
+        case .grid(let columns, _):
+            gridSwatches(columns: columns)
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
 
-    private func gridSwatches(columns: Int, columnWidth: CGFloat) -> some View {
+    private func gridSwatches(columns: Int) -> some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns)) {
             swatches()
         }
@@ -75,7 +75,7 @@ public struct SizingSelectorComponentView: View {
                 .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
-        layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
+        layoutConfiguration: .init(arrangement: .grid(columns: 4))
     )
 }
 
