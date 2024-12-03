@@ -26,7 +26,7 @@ public struct SwatchLayoutConfiguration {
     public enum Arrangement {
         case horizontal(itemSpacing: CGFloat, scrollable: Bool = true)
         case chips(itemHorizontalSpacing: CGFloat, itemVerticalSpacing: CGFloat)
-        case grid(columns: Int, columnWidth: CGFloat)
+        case grid(columns: Int, columnWidth: CGFloat = .zero)
     }
 
     public init(arrangement: Arrangement, hideSelectionTitle: Bool = false, hideOnSingleColor: Bool = true) {

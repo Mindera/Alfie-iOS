@@ -43,7 +43,7 @@ struct SizingBannerDemoView: View {
                 section(title: "Sizing Swatches - Grid") {
                     SizingSelectorComponentView(
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
-                        layoutConfiguration: .init(arrangement: .grid(columns: 4, columnWidth: 50))
+                        layoutConfiguration: .init(arrangement: .grid(columns: 4))
                     )
                 }
 
