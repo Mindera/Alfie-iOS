@@ -54,7 +54,7 @@ final class ViewFactory: ViewFactoryProtocol {
             }
 
         case .account:
-            AccountView(viewModel: AccountViewModel())
+            AccountView(viewModel: AccountViewModel(configurationService: serviceProvider.configurationService))
 
         case .search(let transition):
             let dependencies = SearchDependencyContainer(
