@@ -4,7 +4,7 @@ import StyleGuide
 
 // MARK: - AccountViewModelProtocol
 
-protocol AccountViewModelProtocol: ObservableObject {
+protocol AccountViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
     var sectionList: [AccountSection] { get }
 }
 
@@ -12,6 +12,10 @@ protocol AccountViewModelProtocol: ObservableObject {
 
 final class AccountViewModel: AccountViewModelProtocol {
     private(set) var sectionList: [AccountSection]
+
+    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        DefaultToolbarModifierViewModel(configurationService: configurationService)
+    }
 
     private let configurationService: ConfigurationServiceProtocol
 

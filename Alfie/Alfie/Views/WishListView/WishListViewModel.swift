@@ -4,6 +4,10 @@ import Models
 final class WishListViewModel: WishListViewModelProtocol {
     @Published private(set) var products: [Product]
 
+    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
+    }
+
     private let dependencies: WishListDependencyContainerProtocol
 
     init(dependencies: WishListDependencyContainerProtocol) {

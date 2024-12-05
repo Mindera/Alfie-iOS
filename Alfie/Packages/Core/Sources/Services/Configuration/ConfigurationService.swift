@@ -46,9 +46,12 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
 
         Publishers.MergeMany(self.providers.map { $0.isReadyPublisher })
             .sink { [weak self] isReady in
-                if let self, isReady {
-                    self.updateFeatureAvailability()
-                    self.providerBecameAvailableSubject.send()
+                guard let self else { return }
+
+                updateFeatureAvailability()
+
+                if isReady {
+                    providerBecameAvailableSubject.send()
                 }
             }
             .store(in: &subscriptions)

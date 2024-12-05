@@ -29,6 +29,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     private let navigationService: NavigationServiceProtocol?
+    private let configurationService: ConfigurationServiceProtocol
     private let openCategorySubject: PassthroughSubject<CategoriesNavigationDestination, Never> = .init()
     private lazy var placeholders: [NavigationItem] = {
         (0..<Constants.placeholderItemCount).map { _ in
@@ -70,15 +71,30 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         return model.title
     }
 
+    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        DefaultToolbarModifierViewModel(configurationService: configurationService)
+    }
+
     private(set) var shouldShowToolbar: Bool
 
-    init(navigationService: NavigationServiceProtocol, showToolbar: Bool = false) {
+    init(
+        navigationService: NavigationServiceProtocol,
+        configurationService: ConfigurationServiceProtocol,
+        showToolbar: Bool = false
+    ) {
         self.navigationService = navigationService
+        self.configurationService = configurationService
         self.shouldShowToolbar = showToolbar
     }
 
-    init(categories: [NavigationItem], title: String, showToolbar: Bool = true) {
+    init(
+        configurationService: ConfigurationServiceProtocol,
+        categories: [NavigationItem],
+        title: String,
+        showToolbar: Bool = true
+    ) {
         self.navigationService = nil
+        self.configurationService = configurationService
         self.state = .success(.init(categories: categories, title: title))
         self.shouldShowToolbar = showToolbar
     }

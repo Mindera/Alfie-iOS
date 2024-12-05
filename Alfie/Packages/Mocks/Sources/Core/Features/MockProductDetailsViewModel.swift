@@ -77,4 +77,9 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
     }
+
+    public var onToolbarModifierViewModelCalled:  (() -> DefaultToolbarModifierViewModelProtocol)?
+    public var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        onToolbarModifierViewModelCalled?() ?? MockDefaultToolbarModifierViewModel(isWishlistEnabled: false)
+    }
 }

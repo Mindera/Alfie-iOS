@@ -1,4 +1,5 @@
 import BrazeKit
+import Combine
 import Common
 import Core
 import Foundation
@@ -18,6 +19,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     var tabCoordinator: TabCoordinator!
     // swiftlint:enable implicitly_unwrapped_optional
     static var braze: Braze?
+
+    private var featureAvailabilitySubscription: AnyCancellable?
+    private var isWishlistEnabled: Bool = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.instance = self
@@ -57,9 +61,17 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         var tabs: [TabScreen] = [.home(), .shop(), .bag]
 
-        if serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
+        isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
+        if isWishlistEnabled {
             tabs.insert(.wishlist, at: 2)
         }
+
+        featureAvailabilitySubscription = serviceProvider.configurationService.featureAvailabilityPublisher
+            .sink { [weak self] featureAvailability in
+                guard let self, isWishlistEnabled != featureAvailability[.wishlist] else { return }
+
+                rebootApp()
+            }
 
         tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
     }

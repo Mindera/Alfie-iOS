@@ -35,6 +35,10 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         !(state.isLoadingFirstPage || mode == .searchResults)
     }
 
+    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
+    }
+
     init(
         dependencies: ProductListingDependencyContainerProtocol,
         category: String? = nil,

@@ -23,12 +23,16 @@ final class ViewFactory: ViewFactoryProtocol {
         case .tab(let tab):
             switch tab {
             case .home:
-                HomeView(viewFactory: self)
+                HomeView(
+                    viewFactory: self,
+                    viewModel: HomeViewModel(configurationService: serviceProvider.configurationService)
+                )
 
             case .shop:
                 ShopView(
                     categoriesViewModel: CategoriesViewModel(
                         navigationService: serviceProvider.navigationService,
+                        configurationService: serviceProvider.configurationService,
                         showToolbar: false
                     ),
                     brandsViewModel: BrandsViewModel(brandsService: serviceProvider.brandsService),
@@ -48,7 +52,10 @@ final class ViewFactory: ViewFactoryProtocol {
             case .bag:
                 BagView(
                     viewModel: BagViewModel(
-                        dependencies: BagDependencyContainer(bagService: serviceProvider.bagService)
+                        dependencies: BagDependencyContainer(
+                            bagService: serviceProvider.bagService,
+                            configurationService: serviceProvider.configurationService
+                        )
                     )
                 )
             }
@@ -73,7 +80,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             configuration: .init(type: .plp)
                         ),
                         plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                        wishListService: serviceProvider.wishListService
+                        wishListService: serviceProvider.wishListService,
+                        configurationService: serviceProvider.configurationService
                     ),
                     category: configuration.category,
                     searchText: configuration.searchText,
@@ -101,7 +109,7 @@ final class ViewFactory: ViewFactoryProtocol {
                     )
                 )
             )
-            .withToolbar(for: screen)
+            .withToolbar(for: screen, viewModel: toolbarModifierViewModel)
 
         case .webFeature(let feature):
             WebView(
@@ -114,7 +122,7 @@ final class ViewFactory: ViewFactoryProtocol {
                     )
                 )
             )
-            .withToolbar(for: screen)
+            .withToolbar(for: screen, viewModel: toolbarModifierViewModel)
 
         case .wishlist:
             wishListView
@@ -130,7 +138,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             productService: serviceProvider.productService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
-                            wishListService: serviceProvider.wishListService
+                            wishListService: serviceProvider.wishListService,
+                            configurationService: serviceProvider.configurationService
                         )
                     )
                 )
@@ -144,7 +153,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             productService: serviceProvider.productService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
-                            wishListService: serviceProvider.wishListService
+                            wishListService: serviceProvider.wishListService,
+                            configurationService: serviceProvider.configurationService
                         )
                     )
                 )
@@ -155,19 +165,29 @@ final class ViewFactory: ViewFactoryProtocol {
             RecentSearchesView(viewModel: viewModel)
 
         case .categoryList(let categories, let title):
-            let viewModel = CategoriesViewModel(categories: categories, title: title, showToolbar: true)
+            let viewModel = CategoriesViewModel(
+                configurationService: serviceProvider.configurationService,
+                categories: categories,
+                title: title,
+                showToolbar: true
+            )
             CategoriesView(viewModel: viewModel)
         }
     }
 }
 
 private extension ViewFactory {
+    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        DefaultToolbarModifierViewModel(configurationService: serviceProvider.configurationService)
+    }
+
     var wishListView: some View {
         WishListView(
             viewModel: WishListViewModel(
                 dependencies: WishListDependencyContainer(
                     wishListService: serviceProvider.wishListService,
-                    bagService: serviceProvider.bagService
+                    bagService: serviceProvider.bagService,
+                    configurationService: serviceProvider.configurationService
                 )
             )
         )

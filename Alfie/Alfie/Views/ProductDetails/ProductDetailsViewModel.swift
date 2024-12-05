@@ -88,6 +88,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
+    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
+    }
+
     init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {
         self.productId = productId
         baseProduct = product
