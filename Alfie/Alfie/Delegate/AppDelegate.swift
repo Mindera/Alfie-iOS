@@ -66,14 +66,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             tabs.insert(.wishlist, at: 2)
         }
 
+        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
+
         featureAvailabilitySubscription = serviceProvider.configurationService.featureAvailabilityPublisher
             .sink { [weak self] featureAvailability in
-                guard let self, isWishlistEnabled != featureAvailability[.wishlist] else { return }
+                guard let self, isWishlistEnabled != (featureAvailability[.wishlist] ?? false) else { return }
 
                 rebootApp()
             }
-
-        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
     }
 
     // MARK: - Notifications
