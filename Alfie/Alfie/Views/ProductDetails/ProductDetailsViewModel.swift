@@ -88,6 +88,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
+    var shouldHideAction: Bool {
+        !dependencies.configurationService.isFeatureEnabled(.wishlist)
+    }
+
     var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
         DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
     }
@@ -140,9 +144,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag,
-             .addToWishlist: // swiftlint:disable:this indentation_width
+        case .addToBag:
             return state.isSuccess
+        case .addToWishlist:
+            return state.isSuccess && dependencies.configurationService.isFeatureEnabled(.wishlist)
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

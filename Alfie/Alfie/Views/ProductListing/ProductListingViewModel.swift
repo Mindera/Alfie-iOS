@@ -35,6 +35,10 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         !(state.isLoadingFirstPage || mode == .searchResults)
     }
 
+    var shouldHideAction: Bool {
+        !dependencies.configurationService.isFeatureEnabled(.wishlist)
+    }
+
     var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
         DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
     }
