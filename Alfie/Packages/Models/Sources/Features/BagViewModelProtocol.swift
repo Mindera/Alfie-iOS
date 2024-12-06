@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol BagViewModelProtocol: ObservableObject {
+public protocol BagViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
     var products: [Product] { get }
 
     func viewDidAppear()

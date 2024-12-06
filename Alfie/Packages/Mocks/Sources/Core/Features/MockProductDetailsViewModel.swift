@@ -18,6 +18,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var shouldShowMediaPaginatedControl = true
     public var hasSingleImage: Bool = false
     public var priceType: PriceType? = nil
+    public var shouldHideAction: Bool = false
 
     public init(state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading,
                 productId: String = "",
@@ -76,5 +77,10 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?
     public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
+    }
+
+    public var onToolbarModifierViewModelCalled:  (() -> DefaultToolbarModifierViewModelProtocol)?
+    public var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        onToolbarModifierViewModelCalled?() ?? MockDefaultToolbarModifierViewModel(isWishlistEnabled: false)
     }
 }

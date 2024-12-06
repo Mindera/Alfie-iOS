@@ -45,7 +45,13 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 errorView
             }
         }
-        .modifier(CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title))
+        .modifier(
+            CategoriesToolbarModifier(
+                showToolbar: viewModel.shouldShowToolbar,
+                title: viewModel.title,
+                toolbarModifierViewModel: viewModel.toolbarModifierViewModel
+            )
+        )
         .onAppear {
             viewModel.viewDidAppear()
         }
@@ -153,17 +159,19 @@ private enum Constants {
 private struct CategoriesToolbarModifier: ViewModifier {
     private var showToolbar: Bool
     private var title: String?
+    private let toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol
 
-    public init(showToolbar: Bool, title: String?) {
+    public init(showToolbar: Bool, title: String?, toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol) {
         self.showToolbar = showToolbar
         self.title = title
+        self.toolbarModifierViewModel = toolbarModifierViewModel
     }
 
     @ViewBuilder
     public func body(content: Content) -> some View {
         if showToolbar, let title {
             content
-                .withToolbar(for: .categoryList([], title: title))
+                .withToolbar(for: .categoryList([], title: title), viewModel: toolbarModifierViewModel)
         } else {
             content
         }

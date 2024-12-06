@@ -51,7 +51,8 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                     urlQueryParameters: nil,
                     mode: .listing
                 )
-            )
+            ),
+            viewModel: viewModel.toolbarModifierViewModel
         )
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -70,7 +71,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
                     viewModel: .init(
-                        configuration: .init(size: viewModel.style == .list ? .large : .medium),
+                        configuration: .init(
+                            size: viewModel.style == .list ? .large : .medium,
+                            hideAction: viewModel.shouldHideAction
+                        ),
                         product: product
                     ),
                     onUserAction: { _, type in

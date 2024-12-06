@@ -1,5 +1,8 @@
 import StyleGuide
 import SwiftUI
+#if DEBUG
+import Mocks
+#endif
 
 struct AccountView<ViewModel: AccountViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
@@ -28,7 +31,7 @@ struct AccountView<ViewModel: AccountViewModelProtocol>: View {
             }
         }
         .padding(.horizontal, Spacing.space200)
-        .withToolbar(for: .account)
+        .withToolbar(for: .account, viewModel: viewModel.toolbarModifierViewModel)
     }
 
     private func navigateToSection(_ section: AccountSection) {
@@ -76,7 +79,9 @@ private extension AccountSection {
     }
 }
 
+#if DEBUG
 #Preview {
-    AccountView(viewModel: AccountViewModel())
+    AccountView(viewModel: AccountViewModel(configurationService: MockConfigurationService()))
         .environmentObject(Coordinator())
 }
+#endif
