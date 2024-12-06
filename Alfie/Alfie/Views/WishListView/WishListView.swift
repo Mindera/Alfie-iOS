@@ -23,16 +23,7 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
             ) {
                 ForEach(viewModel.products) { product in
                     VerticalProductCard(
-                        viewModel: .init(
-                            configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
-                            product: product,
-                            colorTitle: LocalizableGeneral.$color + ":",
-                            sizeTitle: LocalizableGeneral.$size + ":",
-                            oneSizeTitle: LocalizableGeneral.$oneSize,
-                            addToBagTitle: LocalizableGeneral.$addToBag,
-                            outOfStockTitle: LocalizableGeneral.$outOfStock,
-                            isAddToBagDisabled: product.defaultVariant.stock == .zero
-                        )
+                        viewModel: viewModel.productCardViewModel(for: product)
                     ) { _, type in
                         handleUserAction(forProduct: product, actionType: type)
                     }
@@ -51,15 +42,13 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
 // MARK: - Private Methods
 
 private extension WishListView {
-    func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
+    func handleUserAction(forProduct product: SelectionProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
         case .remove:
             viewModel.didSelectDelete(for: product)
         case .addToBag:
             viewModel.didTapAddToBag(for: product)
-        case .wishlist:
-            return
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

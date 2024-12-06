@@ -2,113 +2,11 @@ import Core
 import Models
 import SwiftUI
 
-// MARK: - Configuration
-
-public struct VerticalProductCardConfiguration {
-    public enum Size {
-        case small
-        case medium
-        case large
-    }
-
-    public enum ActionType {
-        case wishlist
-        case remove
-    }
-
-    enum CardIntrinsicSize {
-        case fixed(size: CGFloat)
-        case flexible
-
-        var value: CGFloat? {
-            guard case .fixed(let size) = self else {
-                return nil
-            }
-            return size
-        }
-    }
-
-    let size: Size
-    let hidePrice: Bool
-    let hideAction: Bool
-    let hideDetails: Bool
-    let actionType: ActionType
-
-    public init(
-        size: Size,
-        hidePrice: Bool = false,
-        hideAction: Bool = false,
-        hideDetails: Bool = true,
-        actionType: ActionType = .wishlist
-    ) {
-        self.size = size
-        self.hidePrice = hidePrice
-        self.hideAction = hideAction
-        self.hideDetails = hideDetails
-        self.actionType = actionType
-    }
-
-    // swiftlint:disable vertical_whitespace_between_cases
-    var cardSize: CardIntrinsicSize {
-        switch size {
-        case .small:
-            .fixed(size: 130)
-        case .medium,
-             .large: // swiftlint:disable:this indentation_width
-            .flexible
-        }
-    }
-
-    var verticalInterSpacing: CGFloat {
-        switch size {
-        case .small:
-            Spacing.space100
-        case .medium:
-            Spacing.space150
-        case .large:
-            Spacing.space200
-        }
-    }
-
-    var priceConfiguration: PriceConfiguration {
-        switch size {
-        case .small:
-            .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
-        case .medium:
-            .init(preferredDistribution: .horizontal, size: .large, textAlignment: .leading)
-        case .large:
-            .init(preferredDistribution: .vertical, size: .large, textAlignment: .trailing)
-        }
-    }
-
-    var textFont: UIFont {
-        switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.small.normal
-        case .large:
-            ThemeProvider.shared.font.paragraph.normal
-        }
-    }
-
-    var smallTextFont: UIFont {
-        switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.tiny.normal
-        case .large:
-            ThemeProvider.shared.font.small.normal
-        }
-    }
-    // swiftlint:enable vertical_whitespace_between_cases
-}
-
 // MARK: - Card View
 
 public struct VerticalProductCard: View {
     public typealias ProductUserActionHandler = (_ product: String, _ type: ProductUserActionType) -> Void
     public enum ProductUserActionType {
-        case wishlist(isFavorite: Bool)
         case remove
         case addToBag
     }
@@ -274,14 +172,14 @@ public struct VerticalProductCard: View {
             let iconSize = viewModel.configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch viewModel.configuration.actionType {
                 case .wishlist:
                     isFavorite.toggle()
-                    onUserAction(viewModel.productId, .wishlist(isFavorite: isFavorite))
-
                 case .remove:
                     onUserAction(viewModel.productId, .remove)
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
             }, label: {
                 actionImage
                     .resizable()

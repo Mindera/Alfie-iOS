@@ -3,6 +3,7 @@ import Common
 import Core
 import Foundation
 import Models
+import SwiftUI
 
 // MARK: - ProductListingViewModel
 
@@ -12,7 +13,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let query: String?
     private let mode: ProductListingViewMode
     @Published var style: ProductListingListStyle
-    @Published private(set) var wishListContent: [Product]
+    @Published private(set) var wishListContent: [SelectionProduct]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
     private enum Constants {
@@ -74,27 +75,18 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     func didSelect(_: Product) {}
 
-    func didTapAddToWishList(for product: Product, isFavorite: Bool) {
-        if !isFavorite {
-            let selectedProduct = Product(
-                id: UUID().uuidString,
-                styleNumber: product.styleNumber,
-                name: product.name,
-                brand: product.brand,
-                shortDescription: product.shortDescription,
-                longDescription: product.longDescription,
-                slug: product.slug,
-                priceRange: product.priceRange,
-                attributes: product.attributes,
-                defaultVariant: product.defaultVariant,
-                variants: product.variants,
-                colours: product.colours
-            )
-            dependencies.wishListService.addProduct(selectedProduct)
-        } else {
-            dependencies.wishListService.removeProduct(product)
-        }
-        wishListContent = dependencies.wishListService.getWishListContent()
+    func isFavoriteState(for product: Product) -> Binding<Bool> {
+        .init(
+            get: {
+                self.wishListContent.contains {
+                    $0.colour?.id == product.defaultVariant.colour?.id &&
+                    $0.size?.id == product.defaultVariant.size?.id
+                }
+            },
+            set: { isFavorite in
+                self.handleAddToWishList(for: product, isFavorite: isFavorite)
+            }
+        )
     }
 
     // MARK: - Private
@@ -146,6 +138,16 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
 
         state = .success(.init(title: title, products: model.products + productListing.products))
+    }
+
+    private func handleAddToWishList(for product: Product, isFavorite: Bool) {
+        if isFavorite {
+            let selectedProduct = SelectionProduct(product: product)
+            dependencies.wishListService.addProduct(selectedProduct)
+        } else {
+            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
+        }
+        wishListContent = dependencies.wishListService.getWishListContent()
     }
 }
 
