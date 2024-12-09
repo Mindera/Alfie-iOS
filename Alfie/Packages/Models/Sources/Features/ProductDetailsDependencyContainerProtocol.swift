@@ -6,4 +6,5 @@ public protocol ProductDetailsDependencyContainerProtocol {
     var webUrlProvider: WebURLProviderProtocol { get }
     var bagService: BagServiceProtocol { get }
     var wishListService: WishListServiceProtocol { get }
+    var configurationService: ConfigurationServiceProtocol { get }
 }

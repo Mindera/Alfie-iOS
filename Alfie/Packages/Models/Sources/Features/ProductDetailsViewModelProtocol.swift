@@ -52,7 +52,7 @@ public enum PriceType {
 
 // MARK: - ProductDetailsViewModelProtocol
 
-public protocol ProductDetailsViewModelProtocol: ObservableObject {
+public protocol ProductDetailsViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
     var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> { get }
 
     var productId: String { get }
@@ -68,6 +68,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var shouldShowMediaPaginatedControl: Bool { get }
     var hasSingleImage: Bool { get }
     var priceType: PriceType? { get }
+    var shouldHideAction: Bool { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool

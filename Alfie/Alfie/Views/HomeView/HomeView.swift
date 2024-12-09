@@ -1,22 +1,21 @@
 import Models
 import StyleGuide
 import SwiftUI
+#if DEBUG
+import Mocks
+#endif
 
-struct HomeView: View {
+struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     @EnvironmentObject var coordinador: Coordinator
     private let viewFactory: ViewFactory?
+    private let viewModel: ViewModel
     @State private var showSearchBar = true
     @Namespace private var animation
     @State private var loggedInCheckboxState = CheckboxState.selected
 
-    enum Constants {
-        static let searchBarGeometryID = "SearchBar"
-        static let searchAccessibility = "search-input"
-        static let cancelAccessibilityId = "back-btn"
-    }
-
-    init(viewFactory: ViewFactory? = nil) {
+    init(viewFactory: ViewFactory? = nil, viewModel: ViewModel) {
         self.viewFactory = viewFactory
+        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -53,9 +52,12 @@ struct HomeView: View {
             Checkbox(state: $loggedInCheckboxState, text: "Logged In")
             Spacer()
         }
-        .withToolbar(for: .tab(.home(
-            loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut
-        )))
+        .withToolbar(
+            for: .tab(
+                .home(loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
+            ),
+            viewModel: viewModel.toolbarModifierViewModel
+        )
         .ignoresSafeArea(.keyboard, edges: .bottom)
         // TODO: Remove debug menu for production releases
         .fullScreenCover(isPresented: $coordinador.isPresentingDebugMenu) {
@@ -64,7 +66,15 @@ struct HomeView: View {
     }
 }
 
+private enum Constants {
+    static let searchBarGeometryID = "SearchBar"
+    static let searchAccessibility = "search-input"
+    static let cancelAccessibilityId = "back-btn"
+}
+
+#if DEBUG
 #Preview {
-    HomeView()
+    HomeView(viewModel: MockHomeViewModel())
         .environmentObject(Coordinator())
 }
+#endif

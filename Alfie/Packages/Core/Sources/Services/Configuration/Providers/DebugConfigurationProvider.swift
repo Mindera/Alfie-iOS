@@ -3,15 +3,20 @@ import Foundation
 import Models
 
 public final class DebugConfigurationProvider: DebugConfigurationProviderProtocol {
+    public static var shared: DebugConfigurationProviderProtocol = DebugConfigurationProvider()
+
+    public var isReady: Bool { isReadySubject.value }
+    public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+    public var configurationUpdatedPublisher: AnyPublisher<Void, Never> {
+        configurationUpdatedSubject.eraseToAnyPublisher()
+    }
+
     private static let userDefaultsKey = "featureToggles"
     private static let debugConfigurationKey = "debugConfigurationOverride"
 
-    public static var shared: DebugConfigurationProviderProtocol = DebugConfigurationProvider()
-
     private var localConfig: [String: Data] = [:]
     private let isReadySubject: CurrentValueSubject<Bool, Never> = .init(false)
-    public var isReady: Bool { isReadySubject.value }
-    public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+    private let configurationUpdatedSubject: PassthroughSubject<Void, Never> = .init()
 
     private lazy var decoder = JSONDecoder()
     private lazy var encoder = JSONEncoder()
@@ -85,6 +90,7 @@ public final class DebugConfigurationProvider: DebugConfigurationProviderProtoco
 
     public func updateFeature(_ key: ConfigurationKey, isEnabled: Bool) {
         setValue(isEnabled, for: key)
+        configurationUpdatedSubject.send()
     }
 
     // MARK: - Private

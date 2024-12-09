@@ -22,7 +22,7 @@ public enum ProductListingViewMode {
     case searchResults
 }
 
-public protocol ProductListingViewModelProtocol: ObservableObject {
+public protocol ProductListingViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
     var products: [Product] { get }
     var wishListContent: [Product] { get }
@@ -30,6 +30,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     var title: String { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
+    var shouldHideAction: Bool { get }
 
     func viewDidAppear()
     func didDisplay(_ product: Product)

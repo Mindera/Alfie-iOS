@@ -10,6 +10,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
     public var showSearchButton = false
+    public var shouldHideAction: Bool = false
 
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
@@ -45,5 +46,10 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var onDidTapAddToWishListCalled: ((Product, Bool) -> Void)?
     public func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         onDidTapAddToWishListCalled?(product, isFavorite)
+    }
+
+    public var onToolbarModifierViewModelCalled:  (() -> DefaultToolbarModifierViewModelProtocol)?
+    public var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
+        onToolbarModifierViewModelCalled?() ?? MockDefaultToolbarModifierViewModel(isWishlistEnabled: false)
     }
 }
