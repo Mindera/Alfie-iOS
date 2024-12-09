@@ -112,12 +112,16 @@ public struct VerticalProductCard: View {
 
     private var productColorView: some View {
         HStack(spacing: Spacing.space100) {
-            Text(viewModel.colorTitle)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono500)
-            Text(viewModel.color)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono700)
+            if let colorTitle = viewModel.colorTitle {
+                Text(colorTitle)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let color = viewModel.color {
+                Text(color)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
@@ -126,12 +130,16 @@ public struct VerticalProductCard: View {
 
     private var productSizeView: some View {
         HStack(spacing: Spacing.space100) {
-            Text(viewModel.sizeTitle)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono500)
-            Text(viewModel.size)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono700)
+            if let sizeTitle = viewModel.sizeTitle {
+                Text(sizeTitle)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let size = viewModel.size {
+                Text(size)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productSizeLineLimit)
         .accessibilityElement(children: .contain)
@@ -146,9 +154,12 @@ public struct VerticalProductCard: View {
     }
 
     @ViewBuilder private var addToBagView: some View {
-        if !viewModel.configuration.hideDetails {
+        if
+            !viewModel.configuration.hideDetails,
+            let outOfStockTitle = viewModel.outOfStockTitle,
+            let addToBagTitle = viewModel.addToBagTitle {
             ThemedButton(
-                text: viewModel.isAddToBagDisabled ? viewModel.outOfStockTitle : viewModel.addToBagTitle,
+                text: viewModel.isAddToBagDisabled ? outOfStockTitle : addToBagTitle,
                 type: .small,
                 style: .secondary,
                 isDisabled: .init(

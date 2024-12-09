@@ -62,10 +62,14 @@ public struct HorizontalProductCard: View {
 
     private var productColorView: some View {
         HStack(spacing: Spacing.space100) {
-            Text.build(theme.font.tiny.normal(viewModel.colorTitle))
-                .foregroundStyle(Colors.primary.mono500)
-            Text.build(theme.font.tiny.normal(viewModel.color))
-                .foregroundStyle(Colors.primary.mono700)
+            if let colorTitle = viewModel.colorTitle {
+                Text.build(theme.font.tiny.normal(colorTitle))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let color = viewModel.color {
+                Text.build(theme.font.tiny.normal(color))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
@@ -74,10 +78,14 @@ public struct HorizontalProductCard: View {
 
     private var productSizeView: some View {
         HStack(spacing: Spacing.space100) {
-            Text.build(theme.font.tiny.normal(viewModel.sizeTitle))
-                .foregroundStyle(Colors.primary.mono500)
-            Text.build(theme.font.tiny.normal(viewModel.size))
-                .foregroundStyle(Colors.primary.mono700)
+            if let sizeTitle = viewModel.sizeTitle {
+                Text.build(theme.font.tiny.normal(sizeTitle))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let size = viewModel.size {
+                Text.build(theme.font.tiny.normal(size))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productSizeLineLimit)
         .accessibilityElement(children: .contain)

@@ -19,6 +19,15 @@ public class MockBagViewModel: BagViewModelProtocol {
 
     public var onProductCardViewModelCalled: ((SelectionProduct) -> HorizontalProductCardViewModel)?
     public func productCardViewModel(for product: SelectionProduct) -> HorizontalProductCardViewModel {
-        onProductCardViewModelCalled?(product) ?? .init(image: nil, priceType: .default(price: "50€"))
+        onProductCardViewModelCalled?(product) ?? .init(
+            image: nil,
+            designer: "Yves Saint Laurent",
+            name: "Rouge Pur Couture",
+            colorTitle: "Color:",
+            color: "104",
+            sizeTitle: "Size:",
+            size: "No size",
+            priceType: .default(price: "50€")
+        )
     }
 }

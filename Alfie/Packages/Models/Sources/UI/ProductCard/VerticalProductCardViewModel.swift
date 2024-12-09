@@ -7,12 +7,12 @@ public struct VerticalProductCardViewModel {
     public var designer: String
     public var name: String
     public var priceType: PriceType
-    public var colorTitle: String = ""
-    public var color: String = ""
-    public var sizeTitle: String = ""
-    public var size: String = ""
-    public var addToBagTitle: String = ""
-    public var outOfStockTitle: String = ""
+    public var colorTitle: String?
+    public var color: String?
+    public var sizeTitle: String?
+    public var size: String?
+    public var addToBagTitle: String?
+    public var outOfStockTitle: String?
     public var isAddToBagDisabled = false
 
     public init(
@@ -22,12 +22,12 @@ public struct VerticalProductCardViewModel {
         designer: String,
         name: String,
         priceType: PriceType,
-        colorTitle: String = "",
-        color: String = "",
-        sizeTitle: String = "",
-        size: String = "",
-        addToBagTitle: String = "",
-        outOfStockTitle: String = "",
+        colorTitle: String? = nil,
+        color: String? = nil,
+        sizeTitle: String? = nil,
+        size: String? = nil,
+        addToBagTitle: String? = nil,
+        outOfStockTitle: String? = nil,
         isAddToBagDisabled: Bool = false
     ) {
         self.configuration = configuration
@@ -50,11 +50,11 @@ public extension VerticalProductCardViewModel {
     init(
         configuration: VerticalProductCardConfiguration,
         product: Product,
-        colorTitle: String = "",
-        sizeTitle: String = "",
-        oneSizeTitle: String = "",
-        addToBagTitle: String = "",
-        outOfStockTitle: String = "",
+        colorTitle: String? = nil,
+        sizeTitle: String? = nil,
+        oneSizeTitle: String? = nil,
+        addToBagTitle: String? = nil,
+        outOfStockTitle: String? = nil,
         isAddToBagDisabled: Bool = false
     ) {
         self.configuration = configuration
@@ -63,7 +63,7 @@ public extension VerticalProductCardViewModel {
         self.designer = product.brand.name
         self.name = product.name
         self.colorTitle = colorTitle
-        self.color = product.defaultVariant.colour?.name ?? ""
+        self.color = product.defaultVariant.colour?.name ?? nil
         self.sizeTitle = sizeTitle
         self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
