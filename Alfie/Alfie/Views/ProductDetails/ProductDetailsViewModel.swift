@@ -361,7 +361,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         state = .success(.init(product: product, selectedVariant: variant))
     }
 
-    private var selectedProduct: Product? {
+    private var selectedProduct: SelectionProduct? {
         guard
             let product,
             let selectedVariant
@@ -369,19 +369,6 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
-        return Product(
-            id: UUID().uuidString,
-            styleNumber: product.styleNumber,
-            name: product.name,
-            brand: product.brand,
-            shortDescription: product.shortDescription,
-            longDescription: product.longDescription,
-            slug: product.slug,
-            priceRange: product.priceRange,
-            attributes: product.attributes,
-            defaultVariant: selectedVariant,
-            variants: product.variants,
-            colours: product.colours
-        )
+        return SelectionProduct(product: product, selectedVariant: selectedVariant)
     }
 }

@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import SwiftUI
 
 public struct ProductListingViewStateModel {
     public let title: String
@@ -25,7 +26,7 @@ public enum ProductListingViewMode {
 public protocol ProductListingViewModelProtocol: ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
     var products: [Product] { get }
-    var wishListContent: [Product] { get }
+    var wishListContent: [SelectionProduct] { get }
     var style: ProductListingListStyle { get set }
     var title: String { get }
     var totalNumberOfProducts: Int { get }
@@ -34,6 +35,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func viewDidAppear()
     func didDisplay(_ product: Product)
     func didSelect(_ product: Product)
-    func setListStyle(_ style: ProductListingListStyle)
+    func isFavoriteState(for product: Product) -> Bool
     func didTapAddToWishList(for product: Product, isFavorite: Bool)
+    func setListStyle(_ style: ProductListingListStyle)
 }

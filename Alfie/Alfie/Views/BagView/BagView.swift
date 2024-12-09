@@ -15,17 +15,12 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     var body: some View {
         List {
             ForEach(viewModel.products) { product in
-                HorizontalProductCard(
-                    product: product,
-                    colorTitle: LocalizableGeneral.$color + ":",
-                    sizeTitle: LocalizableGeneral.$size + ":",
-                    oneSizeTitle: LocalizableGeneral.$oneSize
-                )
+                HorizontalProductCard(viewModel: viewModel.productCardViewModel(for: product))
                 .listRowInsets(EdgeInsets())
             }
             .onDelete { offsets in
                 for index in offsets.makeIterator() {
-                    viewModel.didSelectDelete(for: viewModel.products[index].id)
+                    viewModel.didSelectDelete(for: viewModel.products[index])
                 }
             }
             .listRowSeparator(.hidden)

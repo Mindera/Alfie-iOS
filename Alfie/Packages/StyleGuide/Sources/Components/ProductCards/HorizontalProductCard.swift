@@ -3,44 +3,10 @@ import Models
 import SwiftUI
 
 public struct HorizontalProductCard: View {
-    private let image: URL?
-    private let designer: String
-    private let name: String
-    private let colorTitle: String
-    private let color: String
-    private let sizeTitle: String
-    private let size: String
-    private let priceType: PriceType
+    private let viewModel: HorizontalProductCardViewModel
 
-    public init(
-        image: URL?,
-        designer: String = "",
-        name: String = "",
-        colorTitle: String = "",
-        color: String = "",
-        sizeTitle: String = "",
-        size: String = "",
-        priceType: PriceType
-    ) {
-        self.image = image
-        self.designer = designer
-        self.name = name
-        self.colorTitle = colorTitle
-        self.color = color
-        self.sizeTitle = sizeTitle
-        self.size = size
-        self.priceType = priceType
-    }
-
-    public init(product: Product, colorTitle: String = "", sizeTitle: String = "", oneSizeTitle: String = "") {
-        self.image = product.defaultVariant.media.first?.asImage?.url
-        self.designer = product.brand.name
-        self.name = product.name
-        self.color = product.defaultVariant.colour?.name ?? ""
-        self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
-        self.priceType = product.priceType
-        self.colorTitle = colorTitle
-        self.sizeTitle = sizeTitle
+    public init(viewModel: HorizontalProductCardViewModel) {
+        self.viewModel = viewModel
     }
 
     public var body: some View {
@@ -68,7 +34,7 @@ public struct HorizontalProductCard: View {
     @ViewBuilder private var productImageView: some View {
         VStack {
             RemoteImage(
-                url: image,
+                url: viewModel.image,
                 success: { image in
                     image
                         .resizable()
@@ -82,13 +48,13 @@ public struct HorizontalProductCard: View {
     }
 
     private var productDesignerView: some View {
-        Text.build(theme.font.small.normal(designer))
+        Text.build(theme.font.small.normal(viewModel.designer))
             .lineLimit(Constants.productDesignerLineLimit)
             .accessibilityIdentifier(AccessibilityId.productDesigner)
     }
 
     private var productNameView: some View {
-        Text.build(theme.font.small.normal(name))
+        Text.build(theme.font.small.normal(viewModel.name))
             .lineLimit(Constants.productNameLineLimit)
             .foregroundStyle(Colors.primary.mono500)
             .accessibilityIdentifier(AccessibilityId.productName)
@@ -96,10 +62,14 @@ public struct HorizontalProductCard: View {
 
     private var productColorView: some View {
         HStack(spacing: Spacing.space100) {
-            Text.build(theme.font.tiny.normal(colorTitle))
-                .foregroundStyle(Colors.primary.mono500)
-            Text.build(theme.font.tiny.normal(color))
-                .foregroundStyle(Colors.primary.mono700)
+            if let colorTitle = viewModel.colorTitle {
+                Text.build(theme.font.tiny.normal(colorTitle))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let color = viewModel.color {
+                Text.build(theme.font.tiny.normal(color))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
@@ -108,10 +78,14 @@ public struct HorizontalProductCard: View {
 
     private var productSizeView: some View {
         HStack(spacing: Spacing.space100) {
-            Text.build(theme.font.tiny.normal(sizeTitle))
-                .foregroundStyle(Colors.primary.mono500)
-            Text.build(theme.font.tiny.normal(size))
-                .foregroundStyle(Colors.primary.mono700)
+            if let sizeTitle = viewModel.sizeTitle {
+                Text.build(theme.font.tiny.normal(sizeTitle))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let size = viewModel.size {
+                Text.build(theme.font.tiny.normal(size))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productSizeLineLimit)
         .accessibilityElement(children: .contain)
@@ -120,7 +94,7 @@ public struct HorizontalProductCard: View {
 
     private var productPriceView: some View {
         PriceComponentView(
-            type: priceType,
+            type: viewModel.priceType,
             configuration: .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
         )
         .accessibilityElement(children: .contain)
@@ -150,13 +124,15 @@ private enum Constants {
 
 #Preview {
     HorizontalProductCard(
-        image: URL(string: "https://www.alfieproj.com/productimages/thumb/1/1262024_22313940_13558933.jpg"),
-        designer: "Yves Saint Laurent",
-        name: "Rouge Pur Couture",
-        colorTitle: "Color:",
-        color: "104",
-        sizeTitle: "Size:",
-        size: "No size",
-        priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        viewModel: .init(
+            image: URL(string: "https://www.alfieproj.com/productimages/thumb/1/1262024_22313940_13558933.jpg"),
+            designer: "Yves Saint Laurent",
+            name: "Rouge Pur Couture",
+            colorTitle: "Color:",
+            color: "104",
+            sizeTitle: "Size:",
+            size: "No size",
+            priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
+        )
     )
 }

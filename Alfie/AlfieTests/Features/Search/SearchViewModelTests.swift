@@ -15,8 +15,8 @@ final class SearchViewModelTests: XCTestCase {
         mockSearchService = .init()
         mockDependencies = SearchDependencyContainer(
             executionQueue: DispatchQueue.global(),
-            recentsService: MockRecentsService(),
-            searchService: MockSearchService()
+            recentsService: mockRecentsService,
+            searchService: mockSearchService
         )
         sut = .init(dependencies: mockDependencies)
     }
@@ -153,7 +153,7 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_does_not_show_recent_searches_when_view_appears_and_recents_service_is_not_available() {
-        mockDependencies = .init(recentsService: nil, searchService: mockSearchService)
+        mockDependencies = SearchDependencyContainer(recentsService: nil, searchService: mockSearchService)
         sut = .init(dependencies: mockDependencies)
 
         let result = assertNoEvent(from: sut.$state.drop(while: { $0 == .empty }).eraseToAnyPublisher(), afterTrigger: { sut.viewDidAppear() }, timeout: defaultTimeout)

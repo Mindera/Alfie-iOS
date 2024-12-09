@@ -2,107 +2,6 @@ import Core
 import Models
 import SwiftUI
 
-// MARK: - Configuration
-
-public struct VerticalProductCardConfiguration {
-    public enum Size {
-        case small
-        case medium
-        case large
-    }
-
-    public enum ActionType {
-        case wishlist
-        case remove
-    }
-
-    enum CardIntrinsicSize {
-        case fixed(size: CGFloat)
-        case flexible
-
-        var value: CGFloat? {
-            guard case .fixed(let size) = self else {
-                return nil
-            }
-            return size
-        }
-    }
-
-    let size: Size
-    let hidePrice: Bool
-    let hideAction: Bool
-    let hideDetails: Bool
-    let actionType: ActionType
-
-    public init(
-        size: Size,
-        hidePrice: Bool = false,
-        hideAction: Bool = false,
-        hideDetails: Bool = true,
-        actionType: ActionType = .wishlist
-    ) {
-        self.size = size
-        self.hidePrice = hidePrice
-        self.hideAction = hideAction
-        self.hideDetails = hideDetails
-        self.actionType = actionType
-    }
-
-    // swiftlint:disable vertical_whitespace_between_cases
-    var cardSize: CardIntrinsicSize {
-        switch size {
-        case .small:
-            .fixed(size: 130)
-        case .medium,
-             .large: // swiftlint:disable:this indentation_width
-            .flexible
-        }
-    }
-
-    var verticalInterSpacing: CGFloat {
-        switch size {
-        case .small:
-            Spacing.space100
-        case .medium:
-            Spacing.space150
-        case .large:
-            Spacing.space200
-        }
-    }
-
-    var priceConfiguration: PriceConfiguration {
-        switch size {
-        case .small:
-            .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
-        case .medium:
-            .init(preferredDistribution: .horizontal, size: .large, textAlignment: .leading)
-        case .large:
-            .init(preferredDistribution: .vertical, size: .large, textAlignment: .trailing)
-        }
-    }
-
-    var textFont: UIFont {
-        switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.small.normal
-        case .large:
-            ThemeProvider.shared.font.paragraph.normal
-        }
-    }
-
-    var smallTextFont: UIFont {
-        switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.tiny.normal
-        case .large:
-            ThemeProvider.shared.font.small.normal
-        }
-    }
-    // swiftlint:enable vertical_whitespace_between_cases
-}
-
 // MARK: - Card View
 
 public struct VerticalProductCard: View {
@@ -115,19 +14,19 @@ public struct VerticalProductCard: View {
 
     private let viewModel: VerticalProductCardViewModel
     private let onUserAction: ProductUserActionHandler
+    private let isFavorite: Bool
     @Binding public private(set) var isSkeleton: Bool
-    @Binding private var isFavorite: Bool
 
     public init(
         viewModel: VerticalProductCardViewModel,
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
-        isFavorite: Binding<Bool> = .constant(false)
+        isFavorite: Bool = false
     ) {
         self.viewModel = viewModel
         self.onUserAction = onUserAction
+        self.isFavorite = isFavorite
         self._isSkeleton = isSkeleton
-        self._isFavorite = isFavorite
     }
 
     public var body: some View {
@@ -214,12 +113,16 @@ public struct VerticalProductCard: View {
 
     private var productColorView: some View {
         HStack(spacing: Spacing.space100) {
-            Text(viewModel.colorTitle)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono500)
-            Text(viewModel.color)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono700)
+            if let colorTitle = viewModel.colorTitle {
+                Text(colorTitle)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let color = viewModel.color {
+                Text(color)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
@@ -228,12 +131,16 @@ public struct VerticalProductCard: View {
 
     private var productSizeView: some View {
         HStack(spacing: Spacing.space100) {
-            Text(viewModel.sizeTitle)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono500)
-            Text(viewModel.size)
-                .font(Font(viewModel.configuration.smallTextFont))
-                .foregroundStyle(Colors.primary.mono700)
+            if let sizeTitle = viewModel.sizeTitle {
+                Text(sizeTitle)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono500)
+            }
+            if let size = viewModel.size {
+                Text(size)
+                    .font(Font(viewModel.configuration.smallTextFont))
+                    .foregroundStyle(Colors.primary.mono700)
+            }
         }
         .lineLimit(Constants.productSizeLineLimit)
         .accessibilityElement(children: .contain)
@@ -248,9 +155,12 @@ public struct VerticalProductCard: View {
     }
 
     @ViewBuilder private var addToBagView: some View {
-        if !viewModel.configuration.hideDetails {
+        if
+            !viewModel.configuration.hideDetails,
+            let outOfStockTitle = viewModel.outOfStockTitle,
+            let addToBagTitle = viewModel.addToBagTitle {
             ThemedButton(
-                text: viewModel.isAddToBagDisabled ? viewModel.outOfStockTitle : viewModel.addToBagTitle,
+                text: viewModel.isAddToBagDisabled ? outOfStockTitle : addToBagTitle,
                 type: .small,
                 style: .secondary,
                 isDisabled: .init(
@@ -274,14 +184,14 @@ public struct VerticalProductCard: View {
             let iconSize = viewModel.configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
+                // swiftlint:disable vertical_whitespace_between_cases
                 switch viewModel.configuration.actionType {
                 case .wishlist:
-                    isFavorite.toggle()
                     onUserAction(viewModel.productId, .wishlist(isFavorite: isFavorite))
-
                 case .remove:
                     onUserAction(viewModel.productId, .remove)
                 }
+                // swiftlint:enable vertical_whitespace_between_cases
             }, label: {
                 actionImage
                     .resizable()
