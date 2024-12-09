@@ -49,6 +49,8 @@ private extension WishListView {
             viewModel.didSelectDelete(for: product)
         case .addToBag:
             viewModel.didTapAddToBag(for: product)
+        case .wishlist:
+            return
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

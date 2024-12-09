@@ -75,18 +75,18 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     func didSelect(_: Product) {}
 
-    func isFavoriteState(for product: Product) -> Binding<Bool> {
-        .init(
-            get: {
-                self.wishListContent.contains {
-                    $0.colour?.id == product.defaultVariant.colour?.id &&
-                    $0.size?.id == product.defaultVariant.size?.id
-                }
-            },
-            set: { isFavorite in
-                self.handleAddToWishList(for: product, isFavorite: isFavorite)
-            }
-        )
+    func isFavoriteState(for product: Product) -> Bool {
+        wishListContent.contains { $0.id == product.defaultVariant.sku }
+    }
+
+    func didTapAddToWishList(for product: Product, isFavorite: Bool) {
+        if !isFavorite {
+            let selectedProduct = SelectionProduct(product: product)
+            dependencies.wishListService.addProduct(selectedProduct)
+        } else {
+            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
+        }
+        wishListContent = dependencies.wishListService.getWishListContent()
     }
 
     // MARK: - Private
@@ -138,16 +138,6 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
 
         state = .success(.init(title: title, products: model.products + productListing.products))
-    }
-
-    private func handleAddToWishList(for product: Product, isFavorite: Bool) {
-        if isFavorite {
-            let selectedProduct = SelectionProduct(product: product)
-            dependencies.wishListService.addProduct(selectedProduct)
-        } else {
-            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
-        }
-        wishListContent = dependencies.wishListService.getWishListContent()
     }
 }
 

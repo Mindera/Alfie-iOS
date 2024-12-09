@@ -7,25 +7,26 @@ import SwiftUI
 public struct VerticalProductCard: View {
     public typealias ProductUserActionHandler = (_ product: String, _ type: ProductUserActionType) -> Void
     public enum ProductUserActionType {
+        case wishlist(isFavorite: Bool)
         case remove
         case addToBag
     }
 
     private let viewModel: VerticalProductCardViewModel
     private let onUserAction: ProductUserActionHandler
+    private let isFavorite: Bool
     @Binding public private(set) var isSkeleton: Bool
-    @Binding private var isFavorite: Bool
 
     public init(
         viewModel: VerticalProductCardViewModel,
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
-        isFavorite: Binding<Bool> = .constant(false)
+        isFavorite: Bool = false
     ) {
         self.viewModel = viewModel
         self.onUserAction = onUserAction
+        self.isFavorite = isFavorite
         self._isSkeleton = isSkeleton
-        self._isFavorite = isFavorite
     }
 
     public var body: some View {
@@ -186,7 +187,7 @@ public struct VerticalProductCard: View {
                 // swiftlint:disable vertical_whitespace_between_cases
                 switch viewModel.configuration.actionType {
                 case .wishlist:
-                    isFavorite.toggle()
+                    onUserAction(viewModel.productId, .wishlist(isFavorite: isFavorite))
                 case .remove:
                     onUserAction(viewModel.productId, .remove)
                 }

@@ -38,13 +38,18 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
         onDidDisplayCalled?(product)
     }
 
-    public var onIsFavoriteStateCalled: ((Product) -> Binding<Bool>)?
-    public func isFavoriteState(for product: Product) -> Binding<Bool> {
-        onIsFavoriteStateCalled?(product) ?? .init(get: { false }, set: { _ in })
+    public var onIsFavoriteStateCalled: ((Product) -> Bool)?
+    public func isFavoriteState(for product: Product) -> Bool {
+        onIsFavoriteStateCalled?(product) ?? false
     }
 
     public var onSetListStyleCalled: ((ProductListingListStyle) -> Void)?
     public func setListStyle(_ style: ProductListingListStyle) {
         onSetListStyleCalled?(style)
+    }
+
+    public var onDidTapAddToWishListCalled: ((Product, Bool) -> Void)?
+    public func didTapAddToWishList(for product: Product, isFavorite: Bool) {
+        onDidTapAddToWishListCalled?(product, isFavorite)
     }
 }

@@ -73,7 +73,9 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                         configuration: .init(size: viewModel.style == .list ? .large : .medium),
                         product: product
                     ),
-                    onUserAction: { _, _ in },
+                    onUserAction: { _, type in
+                        handleUserAction(forProduct: product, actionType: type)
+                    },
                     isSkeleton: .init(
                         get: { viewModel.state.isLoadingFirstPage },
                         set: { _ in }
@@ -150,6 +152,15 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
             Text.build(theme.font.small.normal(LocalizableProductListing.errorMessage))
                 .foregroundStyle(Colors.primary.black)
         }
+    }
+}
+
+// MARK: - Private Methods
+
+private extension ProductListingView {
+    func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
+        guard case .wishlist(let isFavorite) = actionType else { return }
+        viewModel.didTapAddToWishList(for: product, isFavorite: isFavorite)
     }
 }
 
