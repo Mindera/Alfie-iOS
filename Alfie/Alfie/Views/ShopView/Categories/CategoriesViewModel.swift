@@ -72,19 +72,12 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     private(set) var shouldShowToolbar: Bool
 
-    init(
-        navigationService: NavigationServiceProtocol,
-        showToolbar: Bool = false
-    ) {
+    init(navigationService: NavigationServiceProtocol, showToolbar: Bool = false) {
         self.navigationService = navigationService
         self.shouldShowToolbar = showToolbar
     }
 
-    init(
-        categories: [NavigationItem],
-        title: String,
-        showToolbar: Bool = true
-    ) {
+    init(categories: [NavigationItem], title: String, showToolbar: Bool = true) {
         self.navigationService = nil
         self.state = .success(.init(categories: categories, title: title))
         self.shouldShowToolbar = showToolbar

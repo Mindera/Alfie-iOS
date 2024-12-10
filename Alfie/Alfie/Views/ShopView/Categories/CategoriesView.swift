@@ -45,9 +45,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 errorView
             }
         }
-        .modifier(
-            CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title)
-        )
+        .modifier(CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title))
         .onAppear {
             viewModel.viewDidAppear()
         }

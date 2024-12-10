@@ -1,9 +1,6 @@
 import Models
 import StyleGuide
 import SwiftUI
-#if DEBUG
-import Mocks
-#endif
 
 struct HomeView: View {
     @EnvironmentObject var coordinador: Coordinator
@@ -69,9 +66,7 @@ private enum Constants {
     static let cancelAccessibilityId = "back-btn"
 }
 
-#if DEBUG
 #Preview {
     HomeView()
         .environmentObject(Coordinator())
 }
-#endif
