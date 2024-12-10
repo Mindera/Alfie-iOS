@@ -41,7 +41,7 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
             .padding(.horizontal, Spacing.space200)
         }
         .padding(.vertical, Spacing.space200)
-        .withToolbar(for: .wishlist, viewModel: viewModel.toolbarModifierViewModel)
+        .withToolbar(for: .wishlist)
         .onAppear {
             viewModel.viewDidAppear()
         }
@@ -70,8 +70,7 @@ private extension WishListView {
         viewModel: WishListViewModel(
             dependencies: WishListDependencyContainer(
                 wishListService: MockWishListService(),
-                bagService: MockBagService(),
-                configurationService: MockConfigurationService()
+                bagService: MockBagService()
             )
         )
     )

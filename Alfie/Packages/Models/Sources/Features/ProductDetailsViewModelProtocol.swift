@@ -52,7 +52,7 @@ public enum PriceType {
 
 // MARK: - ProductDetailsViewModelProtocol
 
-public protocol ProductDetailsViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
+public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> { get }
 
     var productId: String { get }

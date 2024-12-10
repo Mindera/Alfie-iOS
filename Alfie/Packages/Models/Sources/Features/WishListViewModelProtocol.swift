@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol WishListViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
+public protocol WishListViewModelProtocol: ObservableObject {
     var products: [Product] { get }
 
     func viewDidAppear()

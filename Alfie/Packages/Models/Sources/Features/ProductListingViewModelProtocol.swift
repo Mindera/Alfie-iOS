@@ -22,7 +22,7 @@ public enum ProductListingViewMode {
     case searchResults
 }
 
-public protocol ProductListingViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
+public protocol ProductListingViewModelProtocol: ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
     var products: [Product] { get }
     var wishListContent: [Product] { get }

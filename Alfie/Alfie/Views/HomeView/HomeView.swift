@@ -5,17 +5,15 @@ import SwiftUI
 import Mocks
 #endif
 
-struct HomeView<ViewModel: HomeViewModelProtocol>: View {
+struct HomeView: View {
     @EnvironmentObject var coordinador: Coordinator
     private let viewFactory: ViewFactory?
-    private let viewModel: ViewModel
     @State private var showSearchBar = true
     @Namespace private var animation
     @State private var loggedInCheckboxState = CheckboxState.selected
 
-    init(viewFactory: ViewFactory? = nil, viewModel: ViewModel) {
+    init(viewFactory: ViewFactory? = nil) {
         self.viewFactory = viewFactory
-        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -55,8 +53,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
         .withToolbar(
             for: .tab(
                 .home(loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
-            ),
-            viewModel: viewModel.toolbarModifierViewModel
+            )
         )
         .ignoresSafeArea(.keyboard, edges: .bottom)
         // TODO: Remove debug menu for production releases
@@ -74,7 +71,7 @@ private enum Constants {
 
 #if DEBUG
 #Preview {
-    HomeView(viewModel: MockHomeViewModel())
+    HomeView()
         .environmentObject(Coordinator())
 }
 #endif

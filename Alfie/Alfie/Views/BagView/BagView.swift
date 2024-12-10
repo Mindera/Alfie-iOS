@@ -34,7 +34,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .listStyle(.plain)
         .listRowSpacing(Spacing.space200)
         .padding(.vertical, Spacing.space200)
-        .withToolbar(for: .tab(.bag), viewModel: viewModel.toolbarModifierViewModel)
+        .withToolbar(for: .tab(.bag))
         .onAppear {
             viewModel.viewDidAppear()
         }
@@ -43,14 +43,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
 #if DEBUG
 #Preview {
-    BagView(
-        viewModel: BagViewModel(
-            dependencies: BagDependencyContainer(
-                bagService: MockBagService(),
-                configurationService: MockConfigurationService()
-            )
-        )
-    )
+    BagView(viewModel: BagViewModel(dependencies: BagDependencyContainer(bagService: MockBagService())))
         .environmentObject(Coordinator())
 }
 #endif

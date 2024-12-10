@@ -51,8 +51,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                     urlQueryParameters: nil,
                     mode: .listing
                 )
-            ),
-            viewModel: viewModel.toolbarModifierViewModel
+            )
         )
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

@@ -76,7 +76,7 @@ struct ShopView<
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .withToolbar(for: .tab(.shop()), viewModel: categoriesViewModel.toolbarModifierViewModel)
+        .withToolbar(for: .tab(.shop()))
         .onReceive(tabCoordinator.shopViewTabUpdatePublisher.receive(on: DispatchQueue.main)) { tab in
             guard let tab else {
                 return

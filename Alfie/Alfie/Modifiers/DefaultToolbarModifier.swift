@@ -4,8 +4,8 @@ import StyleGuide
 import SwiftUI
 
 extension View {
-    func withToolbar(for screen: Screen, viewModel: DefaultToolbarModifierViewModelProtocol) -> some View {
-        modifier(DefaultToolbarModifier(screen: screen, viewModel: viewModel))
+    func withToolbar(for screen: Screen) -> some View {
+        modifier(DefaultToolbarModifier(screen: screen))
     }
 }
 
@@ -14,11 +14,9 @@ extension View {
 struct DefaultToolbarModifier: ViewModifier {
     @EnvironmentObject var coordinator: Coordinator
     private let screen: Screen
-    private let viewModel: DefaultToolbarModifierViewModelProtocol
 
-    public init(screen: Screen, viewModel: DefaultToolbarModifierViewModelProtocol) {
+    public init(screen: Screen) {
         self.screen = screen
-        self.viewModel = viewModel
     }
 
     @ViewBuilder
@@ -30,7 +28,7 @@ struct DefaultToolbarModifier: ViewModifier {
                 ToolbarItemProvider.trailingItems(
                     for: screen,
                     coordinator: coordinator,
-                    isWishlistEnabled: viewModel.isWishlistEnabled,
+                    isWishlistEnabled: coordinator.isWishlistEnabled,
                     isPresentingDebugMenu: $coordinator.isPresentingDebugMenu
                 )
             }

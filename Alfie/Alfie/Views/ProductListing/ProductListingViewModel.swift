@@ -39,10 +39,6 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         !dependencies.configurationService.isFeatureEnabled(.wishlist)
     }
 
-    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
-        DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
-    }
-
     init(
         dependencies: ProductListingDependencyContainerProtocol,
         category: String? = nil,

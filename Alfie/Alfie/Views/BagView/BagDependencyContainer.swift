@@ -3,10 +3,8 @@ import Models
 
 final class BagDependencyContainer: BagDependencyContainerProtocol {
     let bagService: BagServiceProtocol
-    let configurationService: ConfigurationServiceProtocol
 
-    init(bagService: BagServiceProtocol, configurationService: ConfigurationServiceProtocol) {
+    init(bagService: BagServiceProtocol) {
         self.bagService = bagService
-        self.configurationService = configurationService
     }
 }

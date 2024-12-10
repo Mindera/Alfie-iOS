@@ -73,7 +73,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
                     .writingSize(to: $viewSize)
             }
         }
-        .withToolbar(for: .productDetails(.id(viewModel.productId)), viewModel: viewModel.toolbarModifierViewModel)
+        .withToolbar(for: .productDetails(.id(viewModel.productId)))
         .toolbar {
             if !viewModel.state.didFail {
                 ToolbarItem(placement: .principal) {

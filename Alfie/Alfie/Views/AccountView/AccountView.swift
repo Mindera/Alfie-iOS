@@ -31,7 +31,7 @@ struct AccountView<ViewModel: AccountViewModelProtocol>: View {
             }
         }
         .padding(.horizontal, Spacing.space200)
-        .withToolbar(for: .account, viewModel: viewModel.toolbarModifierViewModel)
+        .withToolbar(for: .account)
     }
 
     private func navigateToSection(_ section: AccountSection) {

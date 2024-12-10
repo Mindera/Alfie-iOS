@@ -92,10 +92,6 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         !dependencies.configurationService.isFeatureEnabled(.wishlist)
     }
 
-    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
-        DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
-    }
-
     init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {
         self.productId = productId
         baseProduct = product

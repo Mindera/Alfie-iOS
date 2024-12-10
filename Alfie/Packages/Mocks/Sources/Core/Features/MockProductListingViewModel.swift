@@ -47,9 +47,4 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         onDidTapAddToWishListCalled?(product, isFavorite)
     }
-
-    public var onToolbarModifierViewModelCalled:  (() -> DefaultToolbarModifierViewModelProtocol)?
-    public var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
-        onToolbarModifierViewModelCalled?() ?? MockDefaultToolbarModifierViewModel(isWishlistEnabled: false)
-    }
 }

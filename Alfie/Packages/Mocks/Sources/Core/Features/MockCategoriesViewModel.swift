@@ -25,9 +25,4 @@ public class MockCategoriesViewModel: CategoriesViewModelProtocol {
     public func didSelectCategory(_ category: NavigationItem) {
         onDidSelectCategoryCalled?(category)
     }
-
-    public var onToolbarModifierViewModelCalled:  (() -> DefaultToolbarModifierViewModelProtocol)?
-    public var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
-        onToolbarModifierViewModelCalled?() ?? MockDefaultToolbarModifierViewModel(isWishlistEnabled: false)
-    }
 }

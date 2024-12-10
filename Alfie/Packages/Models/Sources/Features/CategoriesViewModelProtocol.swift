@@ -25,7 +25,7 @@ public enum CategoriesNavigationDestination {
     case subCategories(_ subCategories: [NavigationItem], parentCategory: NavigationItem)
 }
 
-public protocol CategoriesViewModelProtocol: ToolbarModifierContainerViewModelProtocol, ObservableObject {
+public protocol CategoriesViewModelProtocol: ObservableObject {
     var openCategoryPublisher: AnyPublisher<CategoriesNavigationDestination, Never> { get }
     var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> { get }
     var categories: [NavigationItem] { get }

@@ -4,10 +4,6 @@ import Models
 final class BagViewModel: BagViewModelProtocol {
     @Published private(set) var products: [Product]
 
-    var toolbarModifierViewModel: DefaultToolbarModifierViewModelProtocol {
-        DefaultToolbarModifierViewModel(configurationService: dependencies.configurationService)
-    }
-
     private let dependencies: BagDependencyContainerProtocol
 
     init(dependencies: BagDependencyContainerProtocol) {
