@@ -1,11 +1,12 @@
 import Combine
 import Foundation
 import Models
+import SwiftUI
 
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
     public var products: [Product]
-    public var wishListContent: [Product]
+    public var wishListContent: [SelectionProduct]
     public var title: String = "Title"
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
@@ -14,7 +15,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
         products: [Product] = [],
-        wishListContent: [Product] = []
+        wishListContent: [SelectionProduct] = []
     ) {
         self.state = state
         self.products = products
@@ -35,6 +36,11 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var onDidDisplayCalled: ((Product) -> Void)?
     public func didDisplay(_ product: Product) {
         onDidDisplayCalled?(product)
+    }
+
+    public var onIsFavoriteStateCalled: ((Product) -> Bool)?
+    public func isFavoriteState(for product: Product) -> Bool {
+        onIsFavoriteStateCalled?(product) ?? false
     }
 
     public var onSetListStyleCalled: ((ProductListingListStyle) -> Void)?

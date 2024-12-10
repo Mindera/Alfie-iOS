@@ -80,15 +80,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                         get: { viewModel.state.isLoadingFirstPage },
                         set: { _ in }
                     ),
-                    isFavorite: .init(
-                        get: {
-                            viewModel.wishListContent.contains {
-                                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
-                            }
-                        },
-                        set: { _ in }
-                    )
+                    isFavorite: viewModel.isFavoriteState(for: product)
                 )
                 .onTapGesture {
                     coordinator.openDetails(for: product)
