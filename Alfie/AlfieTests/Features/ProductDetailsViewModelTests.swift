@@ -15,8 +15,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         mockProductService = MockProductService()
         mockWebUrlProvider = MockWebUrlProvider()
         mockDependencies = ProductDetailsDependencyContainer(
-            productService: MockProductService(),
-            webUrlProvider: MockWebUrlProvider(),
+            productService: mockProductService,
+            webUrlProvider: mockWebUrlProvider,
             bagService: MockBagService(),
             wishListService: MockWishListService(),
             configurationService: MockConfigurationService()

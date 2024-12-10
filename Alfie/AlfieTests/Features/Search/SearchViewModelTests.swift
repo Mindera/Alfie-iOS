@@ -15,8 +15,8 @@ final class SearchViewModelTests: XCTestCase {
         mockSearchService = .init()
         mockDependencies = SearchDependencyContainer(
             executionQueue: DispatchQueue.global(),
-            recentsService: MockRecentsService(),
-            searchService: MockSearchService()
+            recentsService: mockRecentsService,
+            searchService: mockSearchService
         )
         sut = .init(dependencies: mockDependencies)
     }
