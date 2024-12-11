@@ -73,8 +73,7 @@ final class ViewFactory: ViewFactoryProtocol {
                             configuration: .init(type: .plp)
                         ),
                         plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                        wishListService: serviceProvider.wishListService,
-                        configurationService: serviceProvider.configurationService
+                        wishListService: serviceProvider.wishListService
                     ),
                     category: configuration.category,
                     searchText: configuration.searchText,

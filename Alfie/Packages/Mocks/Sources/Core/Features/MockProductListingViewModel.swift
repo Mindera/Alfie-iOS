@@ -11,7 +11,6 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
     public var showSearchButton = false
-    public var shouldHideAction: Bool = false
 
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,

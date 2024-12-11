@@ -88,10 +88,6 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
-    var shouldHideAction: Bool {
-        !dependencies.configurationService.isFeatureEnabled(.wishlist)
-    }
-
     init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {
         self.productId = productId
         baseProduct = product

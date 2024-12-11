@@ -21,7 +21,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     static var braze: Braze?
 
     private var featureAvailabilitySubscription: AnyCancellable?
-    private var isWishlistEnabled: Bool = false
+    private var isWishlistEnabled = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.instance = self

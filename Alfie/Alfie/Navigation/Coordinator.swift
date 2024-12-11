@@ -5,15 +5,16 @@ import UIKit
 
 final class Coordinator: ObservableObject, CoordinatorProtocol {
     let navigationAdapter: NavigationAdapter<Screen>
-    let isWishlistEnabled = false
+    let isWishlistEnabled: Bool
     @Published var isPresentingDebugMenu = false
 
-    init(navigationAdapter: NavigationAdapter<Screen>) {
+    init(navigationAdapter: NavigationAdapter<Screen>, isWishlistEnabled: Bool) {
         self.navigationAdapter = navigationAdapter
+        self.isWishlistEnabled = isWishlistEnabled
     }
 
     convenience init() {
-        self.init(navigationAdapter: .init())
+        self.init(navigationAdapter: .init(), isWishlistEnabled: false)
     }
 
     // MARK: - Public
