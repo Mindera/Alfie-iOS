@@ -135,7 +135,11 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
     private static func buildTabViews(from tabs: [Tab], with serviceProvider: ServiceProviderProtocol) -> [Tab: CoordinatedTabView] {
         let viewFactory = ViewFactory(serviceProvider: serviceProvider)
         return tabs.reduce(into: [Tab: CoordinatedTabView]()) { dict, tab in
-            dict[tab] = .init(rootScreen: tab.correspondingScreen, viewFactory: viewFactory)
+            dict[tab] = .init(
+                rootScreen: tab.correspondingScreen,
+                viewFactory: viewFactory,
+                isWishlistEnabled: serviceProvider.configurationService.isFeatureEnabled(.wishlist)
+            )
         }
     }
 

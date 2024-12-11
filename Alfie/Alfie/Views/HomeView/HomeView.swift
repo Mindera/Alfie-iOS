@@ -9,12 +9,6 @@ struct HomeView: View {
     @Namespace private var animation
     @State private var loggedInCheckboxState = CheckboxState.selected
 
-    enum Constants {
-        static let searchBarGeometryID = "SearchBar"
-        static let searchAccessibility = "search-input"
-        static let cancelAccessibilityId = "back-btn"
-    }
-
     init(viewFactory: ViewFactory? = nil) {
         self.viewFactory = viewFactory
     }
@@ -53,15 +47,23 @@ struct HomeView: View {
             Checkbox(state: $loggedInCheckboxState, text: "Logged In")
             Spacer()
         }
-        .withToolbar(for: .tab(.home(
-            loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut
-        )))
+        .withToolbar(
+            for: .tab(
+                .home(loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
+            )
+        )
         .ignoresSafeArea(.keyboard, edges: .bottom)
         // TODO: Remove debug menu for production releases
         .fullScreenCover(isPresented: $coordinador.isPresentingDebugMenu) {
             viewFactory?.view(for: .debugMenu)
         }
     }
+}
+
+private enum Constants {
+    static let searchBarGeometryID = "SearchBar"
+    static let searchAccessibility = "search-input"
+    static let cancelAccessibilityId = "back-btn"
 }
 
 #Preview {

@@ -54,7 +54,7 @@ final class ViewFactory: ViewFactoryProtocol {
             }
 
         case .account:
-            AccountView(viewModel: AccountViewModel())
+            AccountView(viewModel: AccountViewModel(configurationService: serviceProvider.configurationService))
 
         case .search(let transition):
             let dependencies = SearchDependencyContainer(
@@ -130,7 +130,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             productService: serviceProvider.productService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
-                            wishListService: serviceProvider.wishListService
+                            wishListService: serviceProvider.wishListService,
+                            configurationService: serviceProvider.configurationService
                         )
                     )
                 )
@@ -144,7 +145,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             productService: serviceProvider.productService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
-                            wishListService: serviceProvider.wishListService
+                            wishListService: serviceProvider.wishListService,
+                            configurationService: serviceProvider.configurationService
                         )
                     )
                 )

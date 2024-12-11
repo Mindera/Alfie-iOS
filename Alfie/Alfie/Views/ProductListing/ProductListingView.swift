@@ -70,7 +70,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
                     viewModel: .init(
-                        configuration: .init(size: viewModel.style == .list ? .large : .medium),
+                        configuration: .init(
+                            size: viewModel.style == .list ? .large : .medium,
+                            hideAction: !coordinator.isWishlistEnabled
+                        ),
                         product: product
                     ),
                     onUserAction: { _, type in

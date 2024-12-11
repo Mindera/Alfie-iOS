@@ -6,16 +6,18 @@ public struct CoordinatedView<
 >: View {
     private let rootScreen: Coordinator.Screen
     private let rootView: ViewFactory.ViewForScreen
+    private var isWishlistEnabled: Bool
 
     public var coordinator: Coordinator {
-        Coordinator(navigationAdapter: navigationAdapter)
+        Coordinator(navigationAdapter: navigationAdapter, isWishlistEnabled: isWishlistEnabled)
     }
 
     @ObservedObject public private(set) var navigationAdapter: NavigationAdapter<Coordinator.Screen> = .init()
     @ObservedObject private var viewFactory: ViewFactory
 
-    public init(rootScreen: Coordinator.Screen, viewFactory: ViewFactory = .init()) {
+    public init(rootScreen: Coordinator.Screen, viewFactory: ViewFactory = .init(), isWishlistEnabled: Bool) {
         self.rootScreen = rootScreen
+        self.isWishlistEnabled = isWishlistEnabled
         _viewFactory = ObservedObject(wrappedValue: viewFactory)
         self.rootView = viewFactory.view(for: rootScreen)
     }

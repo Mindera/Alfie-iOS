@@ -36,7 +36,7 @@ public extension HorizontalProductCardViewModel {
         self.image = product.defaultVariant.media.first?.asImage?.url
         self.designer = product.brand.name
         self.name = product.name
-        self.color = product.defaultVariant.colour?.name ?? nil
+        self.color = product.defaultVariant.colour?.name
         self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
         self.colorTitle = colorTitle
