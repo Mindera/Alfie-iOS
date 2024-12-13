@@ -13,13 +13,41 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
-default_platform(:ios)
-
 platform :ios do
-  desc "Push a new beta build to TestFlight"
+  desc "Validate branch with linting, analysis, and tests"
+  lane :validate_branch do
+    sh("swiftlint") # Runs SwiftLint
+    sh("xcodebuild analyze -scheme Alfie -destination '#{ENV['IOS_DESTINATION']}'")
+    sh("xcodebuild test -scheme Alfie -destination '#{ENV['IOS_DESTINATION']}'")
+  end
+
+  desc "Deploy to TestFlight using Git tags"
   lane :beta do
-    increment_build_number(xcodeproj: "Alfie.xcodeproj")
-    build_app(scheme: "Alfie")
-    upload_to_testflight
+    api_key = app_store_connect_api_key(
+      key_id: ENV['ASC_KEY_ID'],
+      issuer_id: ENV['ASC_ISSUER_ID'],
+      key_filepath: ENV['ASC_API_KEY']
+    )
+
+    match(type: "appstore", readonly: false, api_key: api_key)
+
+    increment_build_number
+
+    version = get_version_number(xcodeproj: "Alfie.xcodeproj")
+    build_number = get_build_number(xcodeproj: "Alfie.xcodeproj")
+    sh("git config user.name '#{ENV['GIT_USER_NAME']}'")
+    sh("git config user.email '#{ENV['GIT_EMAIL']}'")
+    sh("git tag v#{version}-#{build_number}")
+    sh("git push origin --tags")
+
+    build_app(
+      scheme: "Alfie",
+      export_options: { method: "app-store" },
+      api_key: api_key
+    )
+
+    upload_to_testflight(api_key: api_key)
   end
 end
+
+

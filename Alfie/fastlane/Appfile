@@ -1,6 +1,4 @@
 app_identifier("com.mindera.alfie.debug") # The bundle identifier of your app
-apple_id("naveen.katari@mindera.com") # Your Apple Developer Portal username
-
 itc_team_id("116567802") # App Store Connect Team ID
 team_id("74L475LDQT") # Developer Portal Team ID
 
