@@ -163,7 +163,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
 private extension ProductListingView {
     func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
         guard case .wishlist(let isFavorite) = actionType else { return }
-        viewModel.didTapAddToWishList(for: product, isFavorite: isFavorite)
+        viewModel.didTapAddToWishlist(for: product, isFavorite: isFavorite)
     }
 }
 

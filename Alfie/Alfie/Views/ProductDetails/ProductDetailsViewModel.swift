@@ -168,7 +168,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     func didTapAddToWishlist() {
         guard let selectedProduct else { return }
-        dependencies.wishListService.addProduct(selectedProduct)
+        dependencies.wishlistService.addProduct(selectedProduct)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {

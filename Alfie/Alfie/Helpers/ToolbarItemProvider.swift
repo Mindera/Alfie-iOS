@@ -44,7 +44,7 @@ enum ToolbarItemProvider {
 
             case .tab(.wishlist):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableWishList.$title),
+                    style: .leftText(LocalizableWishlist.$title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -80,7 +80,7 @@ enum ToolbarItemProvider {
 
             case .wishlist:
                 ThemedToolbarTitle(
-                    style: .text(LocalizableWishList.$title),
+                    style: .text(LocalizableWishlist.$title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 

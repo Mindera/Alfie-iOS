@@ -43,7 +43,7 @@ final class ViewFactory: ViewFactoryProtocol {
                 )
 
             case .wishlist:
-                wishListView
+                wishlistView
 
             case .bag:
                 BagView(
@@ -73,7 +73,7 @@ final class ViewFactory: ViewFactoryProtocol {
                             configuration: .init(type: .plp)
                         ),
                         plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                        wishListService: serviceProvider.wishListService
+                        wishlistService: serviceProvider.wishlistService
                     ),
                     category: configuration.category,
                     searchText: configuration.searchText,
@@ -117,7 +117,7 @@ final class ViewFactory: ViewFactoryProtocol {
             .withToolbar(for: screen)
 
         case .wishlist:
-            wishListView
+            wishlistView
 
         case .productDetails(let type):
             switch type {
@@ -130,7 +130,7 @@ final class ViewFactory: ViewFactoryProtocol {
                             productService: serviceProvider.productService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
-                            wishListService: serviceProvider.wishListService,
+                            wishlistService: serviceProvider.wishlistService,
                             configurationService: serviceProvider.configurationService
                         )
                     )
@@ -145,7 +145,7 @@ final class ViewFactory: ViewFactoryProtocol {
                             productService: serviceProvider.productService,
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
-                            wishListService: serviceProvider.wishListService,
+                            wishlistService: serviceProvider.wishlistService,
                             configurationService: serviceProvider.configurationService
                         )
                     )
@@ -164,11 +164,11 @@ final class ViewFactory: ViewFactoryProtocol {
 }
 
 private extension ViewFactory {
-    var wishListView: some View {
-        WishListView(
-            viewModel: WishListViewModel(
-                dependencies: WishListDependencyContainer(
-                    wishListService: serviceProvider.wishListService,
+    var wishlistView: some View {
+        WishlistView(
+            viewModel: WishlistViewModel(
+                dependencies: WishlistDependencyContainer(
+                    wishlistService: serviceProvider.wishlistService,
                     bagService: serviceProvider.bagService
                 )
             )

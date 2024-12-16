@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-public final class MockWishListService: WishListServiceProtocol {
+public final class MockWishlistService: WishlistServiceProtocol {
     private var products: [SelectionProduct] = []
 
     public init() { }
@@ -16,7 +16,7 @@ public final class MockWishListService: WishListServiceProtocol {
         products = products.filter { $0.id != productId }
     }
 
-    public func getWishListContent() -> [SelectionProduct] {
+    public func getWishlistContent() -> [SelectionProduct] {
         products
     }
 }

@@ -18,7 +18,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             productService: mockProductService,
             webUrlProvider: mockWebUrlProvider,
             bagService: MockBagService(),
-            wishListService: MockWishListService(),
+            wishlistService: MockWishlistService(),
             configurationService: MockConfigurationService()
         )
     }

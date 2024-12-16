@@ -5,20 +5,20 @@ final class ProductDetailsDependencyContainer: ProductDetailsDependencyContainer
     let productService: ProductServiceProtocol
     let webUrlProvider: WebURLProviderProtocol
     let bagService: BagServiceProtocol
-    let wishListService: WishListServiceProtocol
+    let wishlistService: WishlistServiceProtocol
     let configurationService: ConfigurationServiceProtocol
 
     init(
         productService: ProductServiceProtocol,
         webUrlProvider: WebURLProviderProtocol,
         bagService: BagServiceProtocol,
-        wishListService: WishListServiceProtocol,
+        wishlistService: WishlistServiceProtocol,
         configurationService: ConfigurationServiceProtocol
     ) {
         self.productService = productService
         self.webUrlProvider = webUrlProvider
         self.bagService = bagService
-        self.wishListService = wishListService
+        self.wishlistService = wishlistService
         self.configurationService = configurationService
     }
 }

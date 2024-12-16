@@ -4,15 +4,15 @@ import Models
 final class ProductListingDependencyContainer: ProductListingDependencyContainerProtocol {
     let productListingService: ProductListingServiceProtocol
     let plpStyleListProvider: ProductListingStyleProviderProtocol
-    let wishListService: WishListServiceProtocol
+    let wishlistService: WishlistServiceProtocol
 
     init(
         productListingService: ProductListingServiceProtocol,
         plpStyleListProvider: ProductListingStyleProviderProtocol,
-        wishListService: WishListServiceProtocol
+        wishlistService: WishlistServiceProtocol
     ) {
         self.productListingService = productListingService
         self.plpStyleListProvider = plpStyleListProvider
-        self.wishListService = wishListService
+        self.wishlistService = wishlistService
     }
 }

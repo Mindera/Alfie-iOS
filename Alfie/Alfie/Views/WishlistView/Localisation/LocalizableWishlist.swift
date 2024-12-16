@@ -1,6 +1,6 @@
 import Foundation
 
-struct LocalizableWishList: LocalizableProtocol {
+struct LocalizableWishlist: LocalizableProtocol {
     @LocalizableResource<Self>(.title) static var title
 
     enum Keys: String, LocalizableKeyProtocol {
