@@ -7,15 +7,17 @@ import XCTest
 final class ProductListingViewModelTests: XCTestCase {
     private var sut: ProductListingViewModel!
     private var mockProductListing: MockProductListingService!
+    private var mockWishlistService: MockWishlistService!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockProductListing = MockProductListingService()
+        mockWishlistService = MockWishlistService()
         sut = .init(
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             )
         )
     }
@@ -23,6 +25,7 @@ final class ProductListingViewModelTests: XCTestCase {
     override func tearDownWithError() throws {
         sut = nil
         mockProductListing = nil
+        mockWishlistService = nil
         try super.tearDownWithError()
     }
 
@@ -31,7 +34,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
@@ -48,7 +51,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"]
@@ -79,7 +82,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             searchText: "something"
@@ -124,7 +127,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"]
@@ -185,7 +188,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             searchText: "something",
@@ -213,7 +216,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
@@ -230,7 +233,7 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishListService: MockWishListService()
+                wishlistService: mockWishlistService
             ),
             category: "clothing",
             searchText: "something",

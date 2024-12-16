@@ -63,7 +63,7 @@ public extension VerticalProductCardViewModel {
         self.designer = product.brand.name
         self.name = product.name
         self.colorTitle = colorTitle
-        self.color = product.defaultVariant.colour?.name ?? nil
+        self.color = product.defaultVariant.colour?.name
         self.sizeTitle = sizeTitle
         self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType

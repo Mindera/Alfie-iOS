@@ -1,25 +1,25 @@
 import Foundation
 import Models
 
-final class WishListViewModel: WishListViewModelProtocol {
+final class WishlistViewModel: WishlistViewModelProtocol {
     @Published private(set) var products: [SelectionProduct]
 
-    private let dependencies: WishListDependencyContainerProtocol
+    private let dependencies: WishlistDependencyContainerProtocol
 
-    init(dependencies: WishListDependencyContainerProtocol) {
+    init(dependencies: WishlistDependencyContainerProtocol) {
         self.dependencies = dependencies
-        products = dependencies.wishListService.getWishListContent()
+        products = dependencies.wishlistService.getWishlistContent()
     }
 
     // MARK: - WishListViewModelProtocol
 
     func viewDidAppear() {
-        products = dependencies.wishListService.getWishListContent()
+        products = dependencies.wishlistService.getWishlistContent()
     }
 
     func didSelectDelete(for product: SelectionProduct) {
-        dependencies.wishListService.removeProduct(product.id)
-        products = dependencies.wishListService.getWishListContent()
+        dependencies.wishlistService.removeProduct(product.id)
+        products = dependencies.wishlistService.getWishlistContent()
     }
 
     func didTapAddToBag(for product: SelectionProduct) {

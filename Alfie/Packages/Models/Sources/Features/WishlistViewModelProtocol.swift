@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol WishListViewModelProtocol: ObservableObject {
+public protocol WishlistViewModelProtocol: ObservableObject {
     var products: [SelectionProduct] { get }
 
     func viewDidAppear()

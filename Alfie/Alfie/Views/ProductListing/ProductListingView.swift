@@ -70,7 +70,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
                     viewModel: .init(
-                        configuration: .init(size: viewModel.style == .list ? .large : .medium),
+                        configuration: .init(
+                            size: viewModel.style == .list ? .large : .medium,
+                            hideAction: !coordinator.isWishlistEnabled
+                        ),
                         product: product
                     ),
                     onUserAction: { _, type in
@@ -160,7 +163,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
 private extension ProductListingView {
     func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
         guard case .wishlist(let isFavorite) = actionType else { return }
-        viewModel.didTapAddToWishList(for: product, isFavorite: isFavorite)
+        viewModel.didTapAddToWishlist(for: product, isFavorite: isFavorite)
     }
 }
 

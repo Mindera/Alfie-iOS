@@ -21,7 +21,7 @@ public protocol ServiceProviderProtocol: AnyObject {
     var brandsService: BrandsServiceProtocol { get }
     var searchService: SearchServiceProtocol { get }
     var bagService: BagServiceProtocol { get }
-    var wishListService: WishListServiceProtocol { get }
+    var wishlistService: WishlistServiceProtocol { get }
 
     // Reset services before the app itself is reset, to allow them to cleanup gracefully if necessary
     func resetServices()

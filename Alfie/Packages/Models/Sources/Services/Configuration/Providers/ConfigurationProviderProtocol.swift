@@ -4,6 +4,7 @@ import Foundation
 public protocol ConfigurationProviderProtocol {
     var isReady: Bool { get }
     var isReadyPublisher: AnyPublisher<Bool, Never> { get }
+    var configurationUpdatedPublisher: AnyPublisher<Void, Never> { get }
 
     func bool(for key: ConfigurationKey) -> Bool?
     func data(for key: ConfigurationKey) -> Data?

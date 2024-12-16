@@ -13,7 +13,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let query: String?
     private let mode: ProductListingViewMode
     @Published var style: ProductListingListStyle
-    @Published private(set) var wishListContent: [SelectionProduct]
+    @Published private(set) var wishlistContent: [SelectionProduct]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
     private enum Constants {
@@ -51,11 +51,11 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.mode = mode
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
-        wishListContent = dependencies.wishListService.getWishListContent()
+        wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
     func viewDidAppear() {
-        wishListContent = dependencies.wishListService.getWishListContent()
+        wishlistContent = dependencies.wishlistService.getWishlistContent()
         Task {
             await loadProductsIfNeeded()
         }
@@ -76,17 +76,17 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     func didSelect(_: Product) {}
 
     func isFavoriteState(for product: Product) -> Bool {
-        wishListContent.contains { $0.id == product.defaultVariant.sku }
+        wishlistContent.contains { $0.id == product.defaultVariant.sku }
     }
 
-    func didTapAddToWishList(for product: Product, isFavorite: Bool) {
+    func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
         if !isFavorite {
             let selectedProduct = SelectionProduct(product: product)
-            dependencies.wishListService.addProduct(selectedProduct)
+            dependencies.wishlistService.addProduct(selectedProduct)
         } else {
-            dependencies.wishListService.removeProduct(product.defaultVariant.sku)
+            dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
         }
-        wishListContent = dependencies.wishListService.getWishListContent()
+        wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
     // MARK: - Private

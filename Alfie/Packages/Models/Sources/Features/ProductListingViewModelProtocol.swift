@@ -26,7 +26,7 @@ public enum ProductListingViewMode {
 public protocol ProductListingViewModelProtocol: ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
     var products: [Product] { get }
-    var wishListContent: [SelectionProduct] { get }
+    var wishlistContent: [SelectionProduct] { get }
     var style: ProductListingListStyle { get set }
     var title: String { get }
     var totalNumberOfProducts: Int { get }
@@ -36,6 +36,6 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didDisplay(_ product: Product)
     func didSelect(_ product: Product)
     func isFavoriteState(for product: Product) -> Bool
-    func didTapAddToWishList(for product: Product, isFavorite: Bool)
+    func didTapAddToWishlist(for product: Product, isFavorite: Bool)
     func setListStyle(_ style: ProductListingListStyle)
 }
