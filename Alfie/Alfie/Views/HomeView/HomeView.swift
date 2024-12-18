@@ -6,8 +6,8 @@ struct HomeView: View {
     @EnvironmentObject var coordinador: Coordinator
     private let viewFactory: ViewFactory?
     @State private var showSearchBar = true
+    @State private var isUserLogged = false
     @Namespace private var animation
-    @State private var loggedInCheckboxState = CheckboxState.selected
 
     init(viewFactory: ViewFactory? = nil) {
         self.viewFactory = viewFactory
@@ -51,7 +51,7 @@ struct HomeView: View {
         }
         .withToolbar(
             for: .tab(
-                .home(loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
+                .home(isUserLogged ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
             )
         )
         .ignoresSafeArea(.keyboard, edges: .bottom)
