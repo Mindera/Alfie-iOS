@@ -4,8 +4,8 @@ query GetProduct($productId: ID!) {
     }
 }
 
-query ProductListingQuery($offset: Int!, $limit: Int!, $categoryId: String, $query: String) {
-    productListing(offset: $offset, limit: $limit, categoryId: $categoryId, query: $query) {
+query ProductListingQuery($offset: Int!, $limit: Int!, $categoryId: String, $query: String, $sort: ProductListingSort) {
+    productListing(offset: $offset, limit: $limit, categoryId: $categoryId, query: $query, sort: $sort) {
         title
         pagination {
             ...PaginationFragment

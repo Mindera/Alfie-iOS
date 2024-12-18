@@ -29,7 +29,6 @@ public class GetProductQuery: GraphQLQuery {
     ] }
 
     /// Retrieve a product by its ID.
-    @available(*, deprecated, message: "use productDetails")
     public var product: Product? { __data["product"] }
 
     /// Product
@@ -89,7 +88,7 @@ public class GetProductQuery: GraphQLQuery {
 
         public static var __parentType: ApolloAPI.ParentType { BFFGraphApi.Objects.Brand }
 
-        /// The David Jones ID for the brand
+        /// The ID for the brand
         public var id: BFFGraphApi.ID { __data["id"] }
         /// The display name of the brand
         public var name: String { __data["name"] }

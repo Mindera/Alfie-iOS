@@ -9,7 +9,9 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var title: String = "Title"
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
+    public var sortOption: String?
     public var showSearchButton = false
+    public var showRefine: Bool = false
 
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
@@ -45,5 +47,10 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var onDidTapAddToWishListCalled: ((Product, Bool) -> Void)?
     public func didTapAddToWishList(for product: Product, isFavorite: Bool) {
         onDidTapAddToWishListCalled?(product, isFavorite)
+    }
+
+    public var onDidApplyFiltersCalled: (() -> Void)?
+    public func didApplyFilters() {
+        onDidApplyFiltersCalled?()
     }
 }

@@ -27,6 +27,8 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     var products: [Product] { get }
     var wishListContent: [Product] { get }
     var style: ProductListingListStyle { get set }
+    var showRefine: Bool { get set }
+    var sortOption: String? { get set }
     var title: String { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
@@ -36,4 +38,5 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didSelect(_ product: Product)
     func setListStyle(_ style: ProductListingListStyle)
     func didTapAddToWishList(for product: Product, isFavorite: Bool)
+    func didApplyFilters()
 }
