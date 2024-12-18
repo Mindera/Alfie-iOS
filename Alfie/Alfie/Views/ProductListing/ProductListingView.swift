@@ -70,7 +70,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
                     viewModel: .init(
-                        configuration: .init(size: viewModel.style == .list ? .large : .medium),
+                        configuration: .init(
+                            size: viewModel.style == .list ? .large : .medium,
+                            hideAction: !coordinator.isWishlistEnabled
+                        ),
                         product: product
                     ),
                     onUserAction: { _, type in
@@ -80,15 +83,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                         get: { viewModel.state.isLoadingFirstPage },
                         set: { _ in }
                     ),
-                    isFavorite: .init(
-                        get: {
-                            viewModel.wishListContent.contains {
-                                $0.defaultVariant.colour?.id == product.defaultVariant.colour?.id &&
-                                $0.defaultVariant.size?.id == product.defaultVariant.size?.id
-                            }
-                        },
-                        set: { _ in }
-                    )
+                    isFavorite: viewModel.isFavoriteState(for: product)
                 )
                 .onTapGesture {
                     coordinator.openDetails(for: product)
@@ -175,7 +170,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
 private extension ProductListingView {
     func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
         guard case .wishlist(let isFavorite) = actionType else { return }
-        viewModel.didTapAddToWishList(for: product, isFavorite: isFavorite)
+        viewModel.didTapAddToWishlist(for: product, isFavorite: isFavorite)
     }
 }
 

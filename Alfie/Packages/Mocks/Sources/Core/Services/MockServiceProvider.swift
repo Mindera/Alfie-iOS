@@ -21,7 +21,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var searchService: SearchServiceProtocol
     public var webViewConfigurationService: WebViewConfigurationServiceProtocol
     public var bagService: BagServiceProtocol
-    public var wishListService: WishListServiceProtocol
+    public var wishlistService: WishlistServiceProtocol
 
     public init(
         authenticationService: AuthenticationServiceProtocol = MockAuthenticationService(),
@@ -42,7 +42,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         searchService: SearchServiceProtocol = MockSearchService(),
         webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService(),
         bagService: BagServiceProtocol = MockBagService(),
-        wishListService: WishListServiceProtocol = MockWishListService()
+        wishlistService: WishlistServiceProtocol = MockWishlistService()
     ) {
         self.authenticationService = authenticationService
         self.configurationService = configurationService
@@ -62,7 +62,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         self.searchService = searchService
         self.webViewConfigurationService = webViewConfigurationService
         self.bagService = bagService
-        self.wishListService = wishListService
+        self.wishlistService = wishlistService
     }
 
     public var onResetServicesCalled: (() -> Void)?

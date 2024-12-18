@@ -25,7 +25,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     let searchService: SearchServiceProtocol
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
     let bagService: BagServiceProtocol
-    let wishListService: WishListServiceProtocol
+    let wishlistService: WishlistServiceProtocol
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
@@ -89,7 +89,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient)
         bagService = MockBagService()
-        wishListService = MockWishListService()
+        wishlistService = MockWishlistService()
     }
 
     public func resetServices() {

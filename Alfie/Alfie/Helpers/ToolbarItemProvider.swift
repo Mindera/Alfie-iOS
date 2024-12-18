@@ -44,7 +44,7 @@ enum ToolbarItemProvider {
 
             case .tab(.wishlist):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableWishList.$title),
+                    style: .leftText(LocalizableWishlist.$title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -80,7 +80,7 @@ enum ToolbarItemProvider {
 
             case .wishlist:
                 ThemedToolbarTitle(
-                    style: .text(LocalizableWishList.$title),
+                    style: .text(LocalizableWishlist.$title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -111,6 +111,7 @@ enum ToolbarItemProvider {
     public static func trailingItems(
         for screen: Screen,
         coordinator: Coordinator,
+        isWishlistEnabled: Bool,
         isPresentingDebugMenu: Binding<Bool>? = nil
     ) -> some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
@@ -126,7 +127,9 @@ enum ToolbarItemProvider {
                 case .shop,
                     .wishlist,
                     .bag:
-                    wishlistItem(with: coordinator, size: .big)
+                    if isWishlistEnabled {
+                        wishlistItem(with: coordinator, size: .big)
+                    }
                     accountItem(with: coordinator, size: .big)
                 }
 

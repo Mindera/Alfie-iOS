@@ -136,9 +136,10 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag,
-             .addToWishlist: // swiftlint:disable:this indentation_width
+        case .addToBag:
             return state.isSuccess
+        case .addToWishlist:
+            return state.isSuccess && dependencies.configurationService.isFeatureEnabled(.wishlist)
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -167,7 +168,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     func didTapAddToWishlist() {
         guard let selectedProduct else { return }
-        dependencies.wishListService.addProduct(selectedProduct)
+        dependencies.wishlistService.addProduct(selectedProduct)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
@@ -361,7 +362,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         state = .success(.init(product: product, selectedVariant: variant))
     }
 
-    private var selectedProduct: Product? {
+    private var selectedProduct: SelectionProduct? {
         guard
             let product,
             let selectedVariant
@@ -369,19 +370,6 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
-        return Product(
-            id: UUID().uuidString,
-            styleNumber: product.styleNumber,
-            name: product.name,
-            brand: product.brand,
-            shortDescription: product.shortDescription,
-            longDescription: product.longDescription,
-            slug: product.slug,
-            priceRange: product.priceRange,
-            attributes: product.attributes,
-            defaultVariant: selectedVariant,
-            variants: product.variants,
-            colours: product.colours
-        )
+        return SelectionProduct(product: product, selectedVariant: selectedVariant)
     }
 }

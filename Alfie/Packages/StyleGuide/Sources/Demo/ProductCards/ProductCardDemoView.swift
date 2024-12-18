@@ -38,7 +38,7 @@ extension ProductCardDemoView {
     private var productCardListXS: some View {
         VStack(alignment: .leading, spacing: Spacing.space200) {
             ForEach(Product.fixtures) { product in
-                HorizontalProductCard(product: product, colorTitle: "Color:", sizeTitle: "Size:")
+                HorizontalProductCard(viewModel: .init(product: product, colorTitle: "Color:", sizeTitle: "Size:"))
             }
         }
     }

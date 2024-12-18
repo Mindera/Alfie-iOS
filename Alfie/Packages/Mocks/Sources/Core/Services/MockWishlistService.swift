@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-public final class MockBagService: BagServiceProtocol {
+public final class MockWishlistService: WishlistServiceProtocol {
     private var products: [SelectionProduct] = []
 
     public init() { }
@@ -12,11 +12,11 @@ public final class MockBagService: BagServiceProtocol {
         products.append(product)
     }
 
-    public func removeProduct(_ product: SelectionProduct) {
-        products = products.filter { $0.id != product.id }
+    public func removeProduct(_ productId: String) {
+        products = products.filter { $0.id != productId }
     }
 
-    public func getBagContent() -> [SelectionProduct] {
+    public func getWishlistContent() -> [SelectionProduct] {
         products
     }
 }

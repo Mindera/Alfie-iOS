@@ -6,6 +6,10 @@ public class MockConfigurationProvider: ConfigurationProviderProtocol {
     public let isReadySubject: CurrentValueSubject<Bool, Never> = .init(true)
     public var isReady: Bool { isReadySubject.value }
     public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+    public let configurationUpdatedSubject: PassthroughSubject<Void, Never> = .init()
+    public var configurationUpdatedPublisher: AnyPublisher<Void, Never> {
+        configurationUpdatedSubject.eraseToAnyPublisher()
+    }
 
     public var onBoolCalled: ((ConfigurationKey) -> Bool?)?
     public func bool(for key: ConfigurationKey) -> Bool? {

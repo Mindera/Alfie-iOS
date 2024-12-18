@@ -1,11 +1,12 @@
 import Combine
 import Foundation
 import Models
+import SwiftUI
 
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
     public var products: [Product]
-    public var wishListContent: [Product]
+    public var wishlistContent: [SelectionProduct]
     public var title: String = "Title"
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
@@ -16,11 +17,11 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
         products: [Product] = [],
-        wishListContent: [Product] = []
+        wishlistContent: [SelectionProduct] = []
     ) {
         self.state = state
         self.products = products
-        self.wishListContent = wishListContent
+        self.wishlistContent = wishlistContent
         totalNumberOfProducts = products.count
     }
 
@@ -39,14 +40,19 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
         onDidDisplayCalled?(product)
     }
 
+    public var onIsFavoriteStateCalled: ((Product) -> Bool)?
+    public func isFavoriteState(for product: Product) -> Bool {
+        onIsFavoriteStateCalled?(product) ?? false
+    }
+
     public var onSetListStyleCalled: ((ProductListingListStyle) -> Void)?
     public func setListStyle(_ style: ProductListingListStyle) {
         onSetListStyleCalled?(style)
     }
 
-    public var onDidTapAddToWishListCalled: ((Product, Bool) -> Void)?
-    public func didTapAddToWishList(for product: Product, isFavorite: Bool) {
-        onDidTapAddToWishListCalled?(product, isFavorite)
+    public var onDidTapAddToWishlistCalled: ((Product, Bool) -> Void)?
+    public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
+        onDidTapAddToWishlistCalled?(product, isFavorite)
     }
 
     public var onDidApplyFiltersCalled: (() -> Void)?

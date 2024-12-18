@@ -3,7 +3,7 @@ import Common
 import Core
 import Foundation
 import Models
-import StyleGuide
+import SwiftUI
 
 // MARK: - ProductListingViewModel
 
@@ -15,7 +15,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published var style: ProductListingListStyle
     @Published var showRefine = false
     @Published var sortOption: String?
-    @Published private(set) var wishListContent: [Product]
+    @Published private(set) var wishlistContent: [SelectionProduct]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
     private enum Constants {
@@ -55,11 +55,11 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         sortOption = sort ?? ""
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
-        wishListContent = dependencies.wishListService.getWishListContent()
+        wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
     func viewDidAppear() {
-        wishListContent = dependencies.wishListService.getWishListContent()
+        wishlistContent = dependencies.wishlistService.getWishlistContent()
         Task {
             await loadProductsIfNeeded()
         }
@@ -81,27 +81,18 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     func didSelect(_: Product) {}
 
-    func didTapAddToWishList(for product: Product, isFavorite: Bool) {
+    func isFavoriteState(for product: Product) -> Bool {
+        wishlistContent.contains { $0.id == product.defaultVariant.sku }
+    }
+
+    func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
         if !isFavorite {
-            let selectedProduct = Product(
-                id: UUID().uuidString,
-                styleNumber: product.styleNumber,
-                name: product.name,
-                brand: product.brand,
-                shortDescription: product.shortDescription,
-                longDescription: product.longDescription,
-                slug: product.slug,
-                priceRange: product.priceRange,
-                attributes: product.attributes,
-                defaultVariant: product.defaultVariant,
-                variants: product.variants,
-                colours: product.colours
-            )
-            dependencies.wishListService.addProduct(selectedProduct)
+            let selectedProduct = SelectionProduct(product: product)
+            dependencies.wishlistService.addProduct(selectedProduct)
         } else {
-            dependencies.wishListService.removeProduct(product)
+            dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
         }
-        wishListContent = dependencies.wishListService.getWishListContent()
+        wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
     func didApplyFilters() {

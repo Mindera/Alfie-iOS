@@ -5,7 +5,7 @@ import SwiftUI
 import Mocks
 #endif
 
-struct WishListView<ViewModel: WishListViewModelProtocol>: View {
+struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
 
     init(viewModel: ViewModel) {
@@ -23,16 +23,7 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
             ) {
                 ForEach(viewModel.products) { product in
                     VerticalProductCard(
-                        viewModel: .init(
-                            configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
-                            product: product,
-                            colorTitle: LocalizableGeneral.$color + ":",
-                            sizeTitle: LocalizableGeneral.$size + ":",
-                            oneSizeTitle: LocalizableGeneral.$oneSize,
-                            addToBagTitle: LocalizableGeneral.$addToBag,
-                            outOfStockTitle: LocalizableGeneral.$outOfStock,
-                            isAddToBagDisabled: product.defaultVariant.stock == .zero
-                        )
+                        viewModel: viewModel.productCardViewModel(for: product)
                     ) { _, type in
                         handleUserAction(forProduct: product, actionType: type)
                     }
@@ -50,8 +41,8 @@ struct WishListView<ViewModel: WishListViewModelProtocol>: View {
 
 // MARK: - Private Methods
 
-private extension WishListView {
-    func handleUserAction(forProduct product: Product, actionType: VerticalProductCard.ProductUserActionType) {
+private extension WishlistView {
+    func handleUserAction(forProduct product: SelectionProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
         case .remove:
@@ -66,10 +57,10 @@ private extension WishListView {
 }
 
 #Preview {
-    WishListView(
-        viewModel: WishListViewModel(
-            dependencies: WishListDependencyContainer(
-                wishListService: MockWishListService(),
+    WishlistView(
+        viewModel: WishlistViewModel(
+            dependencies: WishlistDependencyContainer(
+                wishlistService: MockWishlistService(),
                 bagService: MockBagService()
             )
         )

@@ -5,11 +5,16 @@ import Foundation
 import Models
 
 public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderProtocol {
+    public var isReady: Bool { isReadySubject.value }
+    public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+    public var configurationUpdatedPublisher: AnyPublisher<Void, Never> {
+        configurationUpdatedSubject.eraseToAnyPublisher()
+    }
+
     private let remoteConfig: RemoteConfig
     private let remoteConfigSettings: RemoteConfigSettings
     private let isReadySubject: CurrentValueSubject<Bool, Never> = .init(false)
-    public var isReady: Bool { isReadySubject.value }
-    public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+    private let configurationUpdatedSubject: PassthroughSubject<Void, Never> = .init()
 
     public init(
         remoteConfig: RemoteConfig = RemoteConfig.remoteConfig(),

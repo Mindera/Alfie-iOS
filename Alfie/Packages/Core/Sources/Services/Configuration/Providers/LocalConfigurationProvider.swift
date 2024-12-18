@@ -3,10 +3,15 @@ import Foundation
 import Models
 
 public final class LocalConfigurationProvider: ConfigurationProviderProtocol {
-    private var localConfig: [String: Any]?
-    private let isReadySubject: CurrentValueSubject<Bool, Never> = .init(false)
     public var isReady: Bool { isReadySubject.value }
     public var isReadyPublisher: AnyPublisher<Bool, Never> { isReadySubject.eraseToAnyPublisher() }
+    public var configurationUpdatedPublisher: AnyPublisher<Void, Never> {
+        configurationUpdatedSubject.eraseToAnyPublisher()
+    }
+
+    private var localConfig: [String: Any]?
+    private let isReadySubject: CurrentValueSubject<Bool, Never> = .init(false)
+    private let configurationUpdatedSubject: PassthroughSubject<Void, Never> = .init()
 
     public init() {
         loadConfig()

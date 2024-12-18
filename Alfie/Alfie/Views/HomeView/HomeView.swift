@@ -3,18 +3,11 @@ import StyleGuide
 import SwiftUI
 
 struct HomeView: View {
-    enum Constants {
-        static let searchBarGeometryID = "SearchBar"
-        static let searchAccessibility = "search-input"
-        static let cancelAccessibilityId = "back-btn"
-    }
-
     @EnvironmentObject var coordinador: Coordinator
-    @Namespace private var animation
-    @State private var showSearchBar = true
-    @State private var isUserLogged = false
-
     private let viewFactory: ViewFactory?
+    @State private var showSearchBar = true
+    @Namespace private var animation
+    @State private var loggedInCheckboxState = CheckboxState.selected
 
     init(viewFactory: ViewFactory? = nil) {
         self.viewFactory = viewFactory
@@ -56,15 +49,23 @@ struct HomeView: View {
             }
             Spacer()
         }
-        .withToolbar(for: .tab(.home(
-            isUserLogged ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut
-        )))
+        .withToolbar(
+            for: .tab(
+                .home(loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
+            )
+        )
         .ignoresSafeArea(.keyboard, edges: .bottom)
         // TODO: Remove debug menu for production releases
         .fullScreenCover(isPresented: $coordinador.isPresentingDebugMenu) {
             viewFactory?.view(for: .debugMenu)
         }
     }
+}
+
+private enum Constants {
+    static let searchBarGeometryID = "SearchBar"
+    static let searchAccessibility = "search-input"
+    static let cancelAccessibilityId = "back-btn"
 }
 
 #Preview {

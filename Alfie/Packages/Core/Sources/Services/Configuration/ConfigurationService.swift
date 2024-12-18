@@ -25,7 +25,7 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
     public private(set) var featureAvailabilityPublisher: AnyPublisher<[ConfigurationKey: Bool], Never>
     private let providerBecameAvailableSubject: PassthroughSubject<Void, Never> = .init()
     public private(set) var providerBecameAvailablePublisher: AnyPublisher<Void, Never>
-    private var providerReadySubscription: AnyCancellable?
+    private var subscriptions = Set<AnyCancellable>()
 
     public init(
         providers: [ConfigurationProviderProtocol],
@@ -44,13 +44,23 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
 
         updateFeatureAvailability()
 
-        self.providerReadySubscription = Publishers.MergeMany(self.providers.map { $0.isReadyPublisher })
+        Publishers.MergeMany(self.providers.map { $0.isReadyPublisher })
             .sink { [weak self] isReady in
-                if let self, isReady {
-                    self.updateFeatureAvailability()
-                    self.providerBecameAvailableSubject.send()
+                guard let self else { return }
+
+                updateFeatureAvailability()
+
+                if isReady {
+                    providerBecameAvailableSubject.send()
                 }
             }
+            .store(in: &subscriptions)
+
+        Publishers.MergeMany(self.providers.map { $0.configurationUpdatedPublisher })
+            .sink { [weak self] in
+                self?.updateFeatureAvailability()
+            }
+            .store(in: &subscriptions)
     }
 
     func updateDependencies(authenticationService: AuthenticationServiceProtocol?, country: String) {
