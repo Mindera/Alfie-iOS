@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Objects {
-  /// A product for sale at David Jones.
+  /// A product for sale at Alfie.
   static let Product = ApolloAPI.Object(
     typename: "Product",
     implementedInterfaces: []

@@ -28,12 +28,13 @@ public final class ProductListingService: ProductListingServiceProtocol {
 
     /// Fetch the initial page (offset) and update local pagination information
     /// Offset starts at 0
-    public func paged(categoryId: String? = nil, query: String? = nil) async throws -> ProductListing {
+    public func paged(categoryId: String? = nil, query: String? = nil, sort: String?) async throws -> ProductListing {
         let result = try await productService.productListing(
             offset: configuration.initialPage,
             limit: configuration.pageSize,
             categoryId: categoryId,
-            query: query
+            query: query,
+            sort: sort
         )
         pagination = result.pagination
         return result
@@ -45,7 +46,7 @@ public final class ProductListingService: ProductListingServiceProtocol {
     }
 
     /// Fetch following page while there is a next page and update local pagination information
-    public func next(categoryId: String? = nil, query: String? = nil) async throws -> ProductListing {
+    public func next(categoryId: String? = nil, query: String? = nil, sort: String? = nil) async throws -> ProductListing {
         guard let nextPage = pagination?.nextPage else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query)))
         }
@@ -53,7 +54,8 @@ public final class ProductListingService: ProductListingServiceProtocol {
             offset: nextPage,
             limit: configuration.pageSize,
             categoryId: categoryId,
-            query: query
+            query: query,
+            sort: sort
         )
         pagination = result.pagination
         return result

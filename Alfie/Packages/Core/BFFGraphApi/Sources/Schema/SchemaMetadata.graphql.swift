@@ -38,7 +38,6 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
     case "VideoSource": return BFFGraphApi.Objects.VideoSource
     case "ProductListing": return BFFGraphApi.Objects.ProductListing
     case "Pagination": return BFFGraphApi.Objects.Pagination
-    case "NavMenu": return BFFGraphApi.Objects.NavMenu
     case "NavMenuItem": return BFFGraphApi.Objects.NavMenuItem
     case "Suggestion": return BFFGraphApi.Objects.Suggestion
     case "SuggestionBrand": return BFFGraphApi.Objects.SuggestionBrand

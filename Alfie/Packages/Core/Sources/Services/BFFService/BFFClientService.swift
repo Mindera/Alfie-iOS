@@ -46,16 +46,15 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        let items = try await executeFetch(
+        let navigation = try await executeFetch(
             GetHeaderNavQuery(
                 handle: handle.rawValue,
                 fetchMedia: includeMedia,
                 fetchSubItems: includeSubItems
             )
-        ).navigation?.items
+        ).navigation
 
-        guard let items else { throw BFFRequestError(type: .emptyResponse) }
-        return items.convertToNavigationItems()
+        return navigation.convertToNavigationItems()
     }
 
     public func getProduct(id: String) async throws -> Product {
@@ -65,13 +64,20 @@ public final class BFFClientService: BFFClientServiceProtocol {
         return product.convertToProduct()
     }
 
-    public func productListing(offset: Int, limit: Int, categoryId: String?, query: String?) async throws -> ProductListing {
+    public func productListing(
+        offset: Int,
+        limit: Int,
+        categoryId: String?,
+        query: String?,
+        sort: String?
+    ) async throws -> ProductListing {
         guard let productList = try await executeFetch(
             ProductListingQuery(
                 offset: offset,
                 limit: limit,
                 categoryId: categoryId.map { .some($0) } ?? .none,
-                query: query.map { .some($0) } ?? .none
+                query: query.map { .some($0) } ?? .none,
+                sort: sort.map { .some(.case(.init(rawValue: $0) ?? .aZ )) } ?? .none
             )
         ).productListing
         else {

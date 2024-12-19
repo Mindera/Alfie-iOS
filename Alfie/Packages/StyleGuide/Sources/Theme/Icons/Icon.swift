@@ -1,6 +1,7 @@
 import Foundation
 
 public enum Icon: String, IconRepresentable, CaseIterable {
+    case aCircle = "a.circle"
     case arrowDown = "arrow.down"
     case arrowLeft = "arrow.left"
     case arrowRight = "arrow.right"
@@ -12,6 +13,8 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case calendar
     case callCenter = "headphones.circle"
     case camera
+    case chartUpTrend = "chart.line.uptrend.xyaxis"
+    case chartDownTrend = "chart.line.downtrend.xyaxis"
     case chat = "ellipsis.bubble"
     case chat2 = "note.text"
     case checkmark
@@ -71,6 +74,7 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case upload = "square.and.arrow.up.circle.fill"
     case user = "person"
     case warning = "exclamationmark.triangle"
+    case zCircle = "z.circle"
     case zoomIn = "plus.magnifyingglass"
     case zoomOut = "minus.magnifyingglass"
 }

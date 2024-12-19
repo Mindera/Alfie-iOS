@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Objects {
-  /// A brand sold by with David Jones
+  /// A brand sold by Alfie
   static let Brand = ApolloAPI.Object(
     typename: "Brand",
     implementedInterfaces: []

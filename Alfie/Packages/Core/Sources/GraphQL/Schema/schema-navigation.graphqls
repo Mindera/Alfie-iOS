@@ -1,18 +1,8 @@
 extend type Query {
   "Retrieve a navigation menu by its handle."
-  navigation("The nav menu's handle." handle: String!): NavMenu
+  navigation("The nav menu's handle." handle: String!): [NavMenuItem!]!
   "Retrieve a list of the navigation handles."
   navigationHandles: [String!]!
-}
-
-"A Nav menu representing a hierarchy of hyperlinks (items)."
-type NavMenu {
-  "The menu's handle."
-  handle: String!
-  "The menu's child items."
-  items: [NavMenuItem!]!
-  "The menu's attributes, a dynamic list of key-value pairs."
-  attributes: [KeyValuePair]
 }
 
 "A menu item within a parent menu."

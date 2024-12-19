@@ -1,0 +1,13 @@
+fragment NavMenuItemFragment on NavMenuItem {
+    title
+    type
+    url
+    media {
+        ...on Image {
+            ...ImageFragment
+        }
+    }
+    attributes {
+    ...AttributesFragment
+    }
+}
