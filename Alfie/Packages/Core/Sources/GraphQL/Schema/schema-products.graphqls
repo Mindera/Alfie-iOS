@@ -41,7 +41,7 @@ input ProductListingRefineQuery {
 type Product {
   "Unique ID for the product and its variants."
   id: ID!
-  "DJ refer to products (including variants) as style numbers, so this is DJ's unique identifier."
+  "App refers to products (including variants) as style numbers, so this is the product's unique identifier."
   styleNumber: String!
   "The formal name of the product."
   name: String!
@@ -76,7 +76,7 @@ type Product {
 type ProductSummary {
   "Unique ID for the product and its variants."
   id: ID!
-  "DJ refer to products (including variants) as style numbers, so this is DJ's unique identifier."
+  "App refers to products (including variants) as style numbers, so this is the product's unique identifier."
   styleNumber: String!
   "The formal name of the product."
   name: String!
@@ -151,7 +151,7 @@ enum ProductFilterType {
 }
 
 """
-DJ often display a price range or a 'from'.
+App often display a price range or a 'from'.
 If this data is present in the product and no variant is selected, display the range.
 If high is null, display as 'From ${low}', otherwise '${low} to ${high}'
 """
@@ -164,11 +164,11 @@ type PriceRange {
 
 """
 An element in the breadcrumb that leads to the product.
-DJ have terms for each level (class, subclass etc) but
+App has terms for each level (class, subclass etc) but
 these are omitted here for simplicity and flexibility.
 """
 type HierarchyItem {
-  "DJ's ID for the level/category."
+  "ID for the level/category."
   categoryId: ID!
   "The display name - e.g. Menswear."
   name: String!
@@ -184,7 +184,7 @@ We default to one (the 'hero') and have an additional array including all varian
 A variant is a specific item, such as a brown extra-large kettle.
 """
 type Variant {
-  "DJ's unique identifier for the variant."
+  "A unique identifier for the variant."
   sku: ID!
   "Size, if applicable."
   size: Size
@@ -202,7 +202,7 @@ type Variant {
 
 "Summary information included on product listing"
 type VariantSummary {
-  "DJ's unique identifier for the variant."
+  "A unique identifier for the variant."
   sku: ID!
   "Size, if applicable."
   size: Size

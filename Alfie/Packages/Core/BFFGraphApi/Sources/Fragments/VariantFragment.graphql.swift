@@ -22,7 +22,7 @@ public struct VariantFragment: BFFGraphApi.SelectionSet, Fragment {
     .field("price", Price.self),
   ] }
 
-  /// DJ's unique identifier for the variant.
+  /// A unique identifier for the variant.
   public var sku: BFFGraphApi.ID { __data["sku"] }
   /// Size, if applicable.
   public var size: Size? { __data["size"] }

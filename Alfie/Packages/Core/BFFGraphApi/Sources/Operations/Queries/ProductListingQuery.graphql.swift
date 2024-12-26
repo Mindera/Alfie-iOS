@@ -130,7 +130,7 @@ public class ProductListingQuery: GraphQLQuery {
 
         /// Unique ID for the product and its variants.
         public var id: BFFGraphApi.ID { __data["id"] }
-        /// DJ refer to products (including variants) as style numbers, so this is DJ's unique identifier.
+        /// App refers to products (including variants) as style numbers, so this is the product's unique identifier.
         public var styleNumber: String { __data["styleNumber"] }
         /// The formal name of the product.
         public var name: String { __data["name"] }
@@ -288,7 +288,7 @@ public class ProductListingQuery: GraphQLQuery {
 
           public static var __parentType: ApolloAPI.ParentType { BFFGraphApi.Objects.Variant }
 
-          /// DJ's unique identifier for the variant.
+          /// A unique identifier for the variant.
           public var sku: BFFGraphApi.ID { __data["sku"] }
           /// Size, if applicable.
           public var size: Size? { __data["size"] }
@@ -518,7 +518,7 @@ public class ProductListingQuery: GraphQLQuery {
 
           public static var __parentType: ApolloAPI.ParentType { BFFGraphApi.Objects.Variant }
 
-          /// DJ's unique identifier for the variant.
+          /// A unique identifier for the variant.
           public var sku: BFFGraphApi.ID { __data["sku"] }
           /// Size, if applicable.
           public var size: Size? { __data["size"] }
