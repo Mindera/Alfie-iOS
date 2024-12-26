@@ -66,9 +66,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     func didDisplay(_ product: Product) {
-        guard products.last?.id == product.id, !state.isLoadingNextPage else {
-            return
-        }
+        guard products.last?.id == product.id, !state.isLoadingNextPage else { return }
 
         Task {
             await loadMoreProducts()
