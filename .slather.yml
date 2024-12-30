@@ -5,7 +5,7 @@ xcodeproj: ./Alfie/Alfie.xcodeproj
 scheme: Alfie
 source_directory: ./Alfie
 output_directory: ./coverage_report
-binary_basename: DavidJones
+binary_basename: Alfie
 ignore:
   - '../Library/Developer/Xcode/DerivedData/*'
   - '**/DerivedData/*' 
