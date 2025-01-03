@@ -258,7 +258,7 @@ private enum Constants {
         viewModel: .init(
             configuration: .init(size: .small),
             productId: "1",
-            image: URL(string: https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1),
+            image: URL(string: "https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
             designer: "Yves Saint Laurent",
             name: "Rouge Pur Couture",
             priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
@@ -273,7 +273,7 @@ private enum Constants {
         viewModel: .init(
             configuration: .init(size: .medium),
             productId: "2",
-            image: URL(string: https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1),
+            image: URL(string: "https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
             designer: "Yves Saint Laurent",
             name: "Rouge Pur Couture",
             priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")
@@ -286,7 +286,7 @@ private enum Constants {
         viewModel: .init(
             configuration: .init(size: .large),
             productId: "3",
-            image: URL(string: https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1),
+            image: URL(string: "https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
             designer: "Yves Saint Laurent",
             name: "Rouge Pur Couture",
             priceType: .formattedRange(lowerBound: 65, upperBound: 68, currencyCode: "AUD")

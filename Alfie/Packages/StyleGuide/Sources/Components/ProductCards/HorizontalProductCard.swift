@@ -125,7 +125,7 @@ private enum Constants {
 #Preview {
     HorizontalProductCard(
         viewModel: .init(
-            image: URL(string: https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1),
+            image: URL(string: "https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
             designer: "Yves Saint Laurent",
             name: "Rouge Pur Couture",
             colorTitle: "Color:",
