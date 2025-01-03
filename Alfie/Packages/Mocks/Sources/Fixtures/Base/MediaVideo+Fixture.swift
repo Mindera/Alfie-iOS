@@ -14,9 +14,11 @@ extension MediaVideo {
 }
 
 extension VideoSource {
-    public static func fixture(format: VideoFormat = .mp4,
-                               mimeType: String = "video/mp4",
-                               url: URL = URL(string: "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4")!) -> VideoSource {
+    public static func fixture(
+        format: VideoFormat = .mp4,
+        mimeType: String = "video/mp4",
+        url: URL = URL(string: "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4")!
+    ) -> VideoSource {
         .init(format: format,
               mimeType: mimeType,
               url: url)
