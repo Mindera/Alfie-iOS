@@ -56,9 +56,11 @@ final class MediaConverterTests: XCTestCase {
             alt: "Accessibility description",
             previewImage: .mock(),
             sources: [
-                .mock(format: .mp4,
-                      mimeType: "video/mp4",
-                      url: "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4"),
+                .mock(
+                    format: .mp4,
+                    mimeType: "video/mp4",
+                    url: "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4"
+                ),
             ]
         )
         let mockMedia = MediaFragment.from(video)
