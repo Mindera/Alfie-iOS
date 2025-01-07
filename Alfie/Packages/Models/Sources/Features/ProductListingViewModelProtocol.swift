@@ -28,6 +28,8 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     var products: [Product] { get }
     var wishlistContent: [SelectionProduct] { get }
     var style: ProductListingListStyle { get set }
+    var showRefine: Bool { get set }
+    var sortOption: String? { get set }
     var title: String { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
@@ -38,4 +40,5 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func isFavoriteState(for product: Product) -> Bool
     func didTapAddToWishlist(for product: Product, isFavorite: Bool)
     func setListStyle(_ style: ProductListingListStyle)
+    func didApplyFilters()
 }

@@ -7,7 +7,7 @@ public struct SortByView: View {
     private var title: String
     private var options: [SortByItemProtocol]
 
-    init(sortBy: Binding<SortByType>, title: String, options: [SortByItemProtocol]) {
+    public init(sortBy: Binding<SortByType>, title: String, options: [SortByItemProtocol]) {
         _sortBy = sortBy
         self.title = title
         self.options = options
@@ -82,5 +82,5 @@ public struct SortByView: View {
 }
 
 #Preview {
-    SortByView(sortBy: .constant(.mostPopular), title: "Sort By", options: [])
+    SortByView(sortBy: .constant(.alphaDesc), title: "Sort By", options: [])
 }

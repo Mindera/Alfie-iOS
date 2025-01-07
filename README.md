@@ -1,6 +1,8 @@
 # Alfie Native iOS Application 
 
-This is a repository for an e-commerce iOS app template.
+This is a repository for an e-commerce iOS app template. Its current behavior can be seen in the following demonstration:
+
+<video src="Docs/alfie-demo.mp4" alt="Video demonstration of the Alfie app usage"></video>
 
 ---
 

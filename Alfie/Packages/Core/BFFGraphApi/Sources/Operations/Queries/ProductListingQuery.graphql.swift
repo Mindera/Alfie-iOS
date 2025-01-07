@@ -7,7 +7,7 @@ public class ProductListingQuery: GraphQLQuery {
   public static let operationName: String = "ProductListingQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
-      #"query ProductListingQuery($offset: Int!, $limit: Int!, $categoryId: String, $query: String) { productListing( offset: $offset limit: $limit categoryId: $categoryId query: $query ) { __typename title pagination { __typename ...PaginationFragment } products { __typename ...ProductFragment } } }"#,
+      #"query ProductListingQuery($offset: Int!, $limit: Int!, $categoryId: String, $query: String, $sort: ProductListingSort) { productListing( offset: $offset limit: $limit categoryId: $categoryId query: $query sort: $sort ) { __typename title pagination { __typename ...PaginationFragment } products { __typename ...ProductFragment } } }"#,
       fragments: [AttributesFragment.self, BrandFragment.self, ColourFragment.self, ImageFragment.self, MediaFragment.self, MoneyFragment.self, PaginationFragment.self, PriceFragment.self, PriceRangeFragment.self, ProductFragment.self, SizeFragment.self, SizeGuideFragment.self, SizeGuideTreeFragment.self, SizeTreeFragment.self, VariantFragment.self]
     ))
 
@@ -15,24 +15,28 @@ public class ProductListingQuery: GraphQLQuery {
   public var limit: Int
   public var categoryId: GraphQLNullable<String>
   public var query: GraphQLNullable<String>
+  public var sort: GraphQLNullable<GraphQLEnum<ProductListingSort>>
 
   public init(
     offset: Int,
     limit: Int,
     categoryId: GraphQLNullable<String>,
-    query: GraphQLNullable<String>
+    query: GraphQLNullable<String>,
+    sort: GraphQLNullable<GraphQLEnum<ProductListingSort>>
   ) {
     self.offset = offset
     self.limit = limit
     self.categoryId = categoryId
     self.query = query
+    self.sort = sort
   }
 
   public var __variables: Variables? { [
     "offset": offset,
     "limit": limit,
     "categoryId": categoryId,
-    "query": query
+    "query": query,
+    "sort": sort
   ] }
 
   public struct Data: BFFGraphApi.SelectionSet {
@@ -45,12 +49,12 @@ public class ProductListingQuery: GraphQLQuery {
         "offset": .variable("offset"),
         "limit": .variable("limit"),
         "categoryId": .variable("categoryId"),
-        "query": .variable("query")
+        "query": .variable("query"),
+        "sort": .variable("sort")
       ]),
     ] }
 
-    /// Handler for products
-    @available(*, deprecated, message: "use productSummaryListing")
+    /// Retrieve a list of products
     public var productListing: ProductListing? { __data["productListing"] }
 
     /// ProductListing
@@ -126,7 +130,7 @@ public class ProductListingQuery: GraphQLQuery {
 
         /// Unique ID for the product and its variants.
         public var id: BFFGraphApi.ID { __data["id"] }
-        /// DJ refer to products (including variants) as style numbers, so this is DJ's unique identifier.
+        /// App refers to products (including variants) as style numbers, so this is the product's unique identifier.
         public var styleNumber: String { __data["styleNumber"] }
         /// The formal name of the product.
         public var name: String { __data["name"] }
@@ -168,7 +172,7 @@ public class ProductListingQuery: GraphQLQuery {
 
           public static var __parentType: ApolloAPI.ParentType { BFFGraphApi.Objects.Brand }
 
-          /// The David Jones ID for the brand
+          /// The ID for the brand
           public var id: BFFGraphApi.ID { __data["id"] }
           /// The display name of the brand
           public var name: String { __data["name"] }
@@ -284,7 +288,7 @@ public class ProductListingQuery: GraphQLQuery {
 
           public static var __parentType: ApolloAPI.ParentType { BFFGraphApi.Objects.Variant }
 
-          /// DJ's unique identifier for the variant.
+          /// A unique identifier for the variant.
           public var sku: BFFGraphApi.ID { __data["sku"] }
           /// Size, if applicable.
           public var size: Size? { __data["size"] }
@@ -514,7 +518,7 @@ public class ProductListingQuery: GraphQLQuery {
 
           public static var __parentType: ApolloAPI.ParentType { BFFGraphApi.Objects.Variant }
 
-          /// DJ's unique identifier for the variant.
+          /// A unique identifier for the variant.
           public var sku: BFFGraphApi.ID { __data["sku"] }
           /// Size, if applicable.
           public var size: Size? { __data["size"] }

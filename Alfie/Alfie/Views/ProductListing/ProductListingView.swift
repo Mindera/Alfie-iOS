@@ -102,15 +102,22 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
     }
 
     @ViewBuilder private var infoFilterBarView: some View {
-        ProductListingFilterBarView(
-            $viewModel.style,
+        ProductListingFilterBar(
+            style: $viewModel.style,
             total: viewModel.totalNumberOfProducts,
-            isLoading: { viewModel.state.isLoadingFirstPage },
-            filterAction: {
-                /// Open Filters on Another task
-            }
-        )
+            isLoading: viewModel.state.isLoadingFirstPage
+        ) {
+            viewModel.showRefine.toggle()
+        }
         .onChange(of: viewModel.style, perform: viewModel.setListStyle)
+        .sheet(isPresented: $viewModel.showRefine) {
+            ProductListingFilter(
+                isVisible: $viewModel.showRefine,
+                listStyle: $viewModel.style,
+                sortOption: $viewModel.sortOption,
+                onFilter: viewModel.didApplyFilters
+            )
+        }
     }
 
     private var gridStruct: [GridItem] {

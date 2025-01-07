@@ -6,8 +6,8 @@ struct HomeView: View {
     @EnvironmentObject var coordinador: Coordinator
     private let viewFactory: ViewFactory?
     @State private var showSearchBar = true
+    @State private var isUserLogged = false
     @Namespace private var animation
-    @State private var loggedInCheckboxState = CheckboxState.selected
 
     init(viewFactory: ViewFactory? = nil) {
         self.viewFactory = viewFactory
@@ -44,12 +44,14 @@ struct HomeView: View {
                 .scaledToFit()
                 .frame(width: 75)
             Text.build(theme.font.header.h3(LocalizableHome.title))
-            Checkbox(state: $loggedInCheckboxState, text: "Logged In")
+            ThemedButton(text: isUserLogged ? LocalizableHome.$signOut : LocalizableHome.$signIn) {
+                isUserLogged.toggle()
+            }
             Spacer()
         }
         .withToolbar(
             for: .tab(
-                .home(loggedInCheckboxState.isSelected ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
+                .home(isUserLogged ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
             )
         )
         .ignoresSafeArea(.keyboard, edges: .bottom)

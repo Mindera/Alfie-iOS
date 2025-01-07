@@ -1,25 +1,8 @@
 extend type Query {
   "Retrieve a product by its ID."
   product("The product's ID" id: ID!): Product
-    @deprecated(reason: "use productDetails")
-  "Retrieve a product details by its ID."
-  productDetails("The product's ID" id: ID!): ProductDetails
-  "Handler for products"
+  "Retrieve a list of products"
   productListing(
-    "Starting point"
-    offset: Int!
-    "Number of records"
-    limit: Int!
-    """
-    Filter by single category
-    Assumption: We are using a unique category ID
-    """
-    categoryId: String
-    "Filter by custom query"
-    query: String
-  ): ProductListing @deprecated(reason: "use productSummaryListing")
-  "Retrieve a product by its ID."
-  productSummaryListing(
     "Starting point"
     offset: Int!
     "Number of records"
@@ -34,15 +17,12 @@ extend type Query {
     "Additional filters"
     refine: [ProductListingRefineQuery!]
     "Sort order"
-    sort: ProductSummaryListingSort
-  ): ProductSummaryListing
+    sort: ProductListingSort
+  ): ProductListing
 }
 
-"Support sorting orders"
-enum ProductSummaryListingSort {
-  FAVOURITES
-  POPULAR
-  NEW
+"Support sorting products"
+enum ProductListingSort {
   LOW_TO_HIGH
   HIGH_TO_LOW
   A_Z
@@ -82,34 +62,6 @@ type Product {
   attributes: [KeyValuePair!]
   "Specific labels such as 'Bestseller' or 'New in'."
   labels: [String!] @deprecated(reason: "Unavailable from iSAMS, do not use")
-  "The 'default' variant."
-  defaultVariant: Variant!
-  "All variants of the product, including the default one."
-  variants: [Variant!]!
-  "Aggregation of all available sizes from all variants."
-  sizes: [Size!]
-  "Aggregation of all available colours from all variants."
-  colours: [Colour!]
-}
-
-"Detailed information of for a product sale"
-type ProductDetails {
-  "Unique ID for the product and its variants."
-  id: ID!
-  "App refers to products (including variants) as style numbers, so this is the product's unique identifier."
-  styleNumber: String!
-  "The formal name of the product."
-  name: String!
-  "The brand of the product."
-  brand: Brand!
-  "For displaying a high and low price range if it exists."
-  priceRange: PriceRange
-  "One-line description of the product."
-  shortDescription: String!
-  "Detailed description of the product."
-  longDescription: String
-  "For building canonical URL to PDP."
-  slug: String!
   "The 'default' variant."
   defaultVariant: Variant!
   "All variants of the product, including the default one."
@@ -199,7 +151,7 @@ enum ProductFilterType {
 }
 
 """
-App often displays a price range or a 'from'.
+App often display a price range or a 'from'.
 If this data is present in the product and no variant is selected, display the range.
 If high is null, display as 'From ${low}', otherwise '${low} to ${high}'
 """

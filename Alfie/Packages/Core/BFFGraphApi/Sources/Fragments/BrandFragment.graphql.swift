@@ -19,7 +19,7 @@ public struct BrandFragment: BFFGraphApi.SelectionSet, Fragment {
     .field("slug", String.self),
   ] }
 
-  /// The David Jones ID for the brand
+  /// The ID for the brand
   public var id: BFFGraphApi.ID { __data["id"] }
   /// The display name of the brand
   public var name: String { __data["name"] }

@@ -38,7 +38,26 @@ extension Collection where Element == GetHeaderNavQuery.Data.Navigation.Item {
     }
 }
 
-extension GetHeaderNavQuery.Data.Navigation.Item.Item {
+extension GetHeaderNavQuery.Data.Navigation {
+    func convertToNavigationItem() -> NavigationItem {
+        NavigationItem(
+            type: self.type.convertToNavigationItemType(),
+            title: self.title,
+            url: self.url,
+            media: nil,
+            items: items?.convertToNavigationItems(),
+            attributes: self.attributes?.compactMap { $0?.fragments.attributesFragment }.convertToAttributeCollection()
+        )
+    }
+}
+
+extension Collection where Element == GetHeaderNavQuery.Data.Navigation {
+    func convertToNavigationItems() -> [NavigationItem] {
+        compactMap { $0.convertToNavigationItem() }
+    }
+}
+
+extension NavMenuItemFragment {
     func convertToNavigationItem() -> NavigationItem {
         NavigationItem(
             type: self.type.convertToNavigationItemType(),
@@ -53,14 +72,7 @@ extension GetHeaderNavQuery.Data.Navigation.Item.Item {
 
 extension GetHeaderNavQuery.Data.Navigation.Item {
     func convertToNavigationItem() -> NavigationItem {
-        NavigationItem(
-            type: self.type.convertToNavigationItemType(),
-            title: self.title,
-            url: self.url,
-            media: self.media?.convertToMedia(),
-            items: self.items?.compactMap { $0.convertToNavigationItem() },
-            attributes: self.attributes?.compactMap { $0?.fragments.attributesFragment }.convertToAttributeCollection()
-        )
+        fragments.navMenuItemFragment.convertToNavigationItem()
     }
 }
 

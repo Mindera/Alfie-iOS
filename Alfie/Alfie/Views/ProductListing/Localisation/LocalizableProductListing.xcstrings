@@ -23,13 +23,35 @@
         }
       }
     },
-    "KeyFilters" : {
+    "KeyListStyleTitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filters"
+            "value" : "Page Style"
+          }
+        }
+      }
+    },
+    "KeyRefineAndSortTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refine and Sort"
+          }
+        }
+      }
+    },
+    "KeyRefineButtonTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refine"
           }
         }
       }
@@ -53,6 +75,28 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "KeyShowResults" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show results"
+          }
+        }
+      }
+    },
+    "KeySortByTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By"
           }
         }
       }

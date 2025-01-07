@@ -13,6 +13,8 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let query: String?
     private let mode: ProductListingViewMode
     @Published var style: ProductListingListStyle
+    @Published var showRefine = false
+    @Published var sortOption: String?
     @Published private(set) var wishlistContent: [SelectionProduct]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
@@ -40,15 +42,17 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         dependencies: ProductListingDependencyContainerProtocol,
         category: String? = nil,
         searchText: String? = nil,
+        sort: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize
     ) {
         self.dependencies = dependencies
-        style = self.dependencies.plpStyleListProvider.style
+        style = dependencies.plpStyleListProvider.style
         // TODO: - review filtering later, API not supporting for now
         self.category = category
         self.mode = mode
+        sortOption = sort ?? ""
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
         wishlistContent = dependencies.wishlistService.getWishlistContent()
@@ -62,10 +66,10 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     func didDisplay(_ product: Product) {
-        if products.last?.id == product.id, !state.isLoadingNextPage {
-            Task {
-                await loadMoreProducts()
-            }
+        guard products.last?.id == product.id, !state.isLoadingNextPage else { return }
+
+        Task {
+            await loadMoreProducts()
         }
     }
 
@@ -89,6 +93,15 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
+    func didApplyFilters() {
+        showRefine = false
+        state = .loadingFirstPage(.init(title: "", products: []))
+
+        Task {
+            await loadProductsIfNeeded()
+        }
+    }
+
     // MARK: - Private
 
     @MainActor
@@ -100,7 +113,8 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         let productListing: ProductListing?
 
         do {
-            productListing = try await dependencies.productListingService.paged(categoryId: category, query: query)
+            productListing = try await dependencies.productListingService
+                .paged(categoryId: category, query: query, sort: sortOption)
         } catch {
             logError("Error fetching product listing (first page): \(error)")
             state = .error(.generic)
@@ -125,7 +139,8 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         let productListing: ProductListing?
 
         do {
-            productListing = try await dependencies.productListingService.next(categoryId: category, query: query)
+            productListing = try await dependencies.productListingService
+                .next(categoryId: category, query: query, sort: sortOption)
         } catch {
             logError("Error fetching product listing (following page): \(error)")
             state = .error(.generic)
