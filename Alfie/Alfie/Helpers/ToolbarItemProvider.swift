@@ -55,7 +55,11 @@ enum ToolbarItemProvider {
                 .productDetails,
                 .productListing,
                 .categoryList:
-                backButton(with: coordinator)
+                if coordinator.canPop() {
+                    backButton(with: coordinator)
+                } else {
+                    EmptyView()
+                }
 
             default:
                 EmptyView()

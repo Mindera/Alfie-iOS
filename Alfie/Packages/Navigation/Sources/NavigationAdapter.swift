@@ -105,3 +105,13 @@ extension NavigationAdapter {
         }
     }
 }
+
+// MARK: - Auxiliar methods
+
+extension NavigationAdapter {
+    public func canPop() -> Bool {
+        modalPath.count >= 1 ||
+        path.count >= 1 ||
+        isPresentingFullScreenOverlay
+    }
+}

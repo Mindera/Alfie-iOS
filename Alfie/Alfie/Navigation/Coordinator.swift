@@ -29,6 +29,10 @@ final class Coordinator: ObservableObject, CoordinatorProtocol {
         navigationAdapter.popToRoot()
     }
 
+    public func canPop() -> Bool {
+        navigationAdapter.canPop()
+    }
+
     // MARK: Search
 
     public func openSearch() {
