@@ -79,7 +79,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/1/2627014_22646926_13567396.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/6858599/pexels-photo-6858599.jpeg?auto=compress&cs=tinysrgb&w=600")
                 )
             ),
         ]
@@ -116,7 +116,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/1/2641917_22732293_13656033.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/27008317/pexels-photo-27008317/free-photo-of-an-elegant-woman-wearing-brown-heels-and-holding-a-brown-bag.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
                 )
             ),
         ]
@@ -156,7 +156,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/1/2612578_22583503_13491037.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/4428388/pexels-photo-4428388.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
                 )
             ),
         ]
@@ -201,7 +201,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/1/2657108_22804950_13918038.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/9558689/pexels-photo-9558689.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
                 )
             ),
         ]
@@ -238,7 +238,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/2/2584579_22478962_13351997.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/14993680/pexels-photo-14993680/free-photo-of-young-woman-in-a-dress.png?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
                 )
             ),
         ]
@@ -278,7 +278,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/1/2593051_22512791_12951251.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/10283296/pexels-photo-10283296.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
                 )
             ),
         ]
@@ -315,7 +315,7 @@ extension Product {
                 MediaImage(
                     alt: nil,
                     mediaContentType: .image,
-                    url: URL.fromString("https://www.alfieproj.com/productimages/medium/1/2657932_22808834_13869761.jpg")
+                    url: URL.fromString("https://images.pexels.com/photos/1124468/pexels-photo-1124468.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
                 )
             ),
         ]
