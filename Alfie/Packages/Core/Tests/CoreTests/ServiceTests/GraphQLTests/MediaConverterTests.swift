@@ -10,7 +10,7 @@ final class MediaConverterTests: XCTestCase {
     func test_image_valid_image() {
         let image: Mock<Image> = .mock(
             alt: "Accessibility description",
-            url: "https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+            url: "https://www.alfieproj.com/images/assetimages/footer/alfie.png"
         )
         let mockMedia = MediaFragment.from(image)
 
@@ -25,7 +25,7 @@ final class MediaConverterTests: XCTestCase {
         XCTAssertEqual(mediaImage.mediaContentType, .image)
         XCTAssertEqual(
             mediaImage.url,
-            URL(string: "https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
+            URL(string: "https://www.alfieproj.com/images/assetimages/footer/alfie.png")
         )
     }
 
@@ -59,7 +59,7 @@ final class MediaConverterTests: XCTestCase {
                 .mock(
                     format: .mp4,
                     mimeType: "video/mp4",
-                    url: "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4"
+                    url: "https://www.alfieproj.com/images/assetvideos/demo-video.mp4"
                 ),
             ]
         )
@@ -82,7 +82,7 @@ final class MediaConverterTests: XCTestCase {
         XCTAssertEqual(source.mimeType, "video/mp4")
         XCTAssertEqual(
             source.url,
-            URL(string: "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4")
+            URL(string: "https://www.alfieproj.com/images/assetvideos/demo-video.mp4")
         )
     }
 
@@ -104,7 +104,7 @@ final class MediaConverterTests: XCTestCase {
         let source = Mock<VideoSource>(
             format: .unknown("mov"),
             mimeType: "video/mov",
-            url: "https://videos.pexels.com/video-files/6960047/6960047-hd_1920_1080_30fps.mov"
+            url: "https://www.alfieproj.com/images/assetvideos/demo-video.mov"
         )
         let video: Mock<Video> = .mock(alt: "Accessibility description",
                                        previewImage: .mock(),

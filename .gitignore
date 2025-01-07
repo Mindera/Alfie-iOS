@@ -120,4 +120,4 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 *.xcuserstate
 Alfie/Alfie.xcodeproj/xcuserdata/*
-Alfie/Packages/*/.swiftpm
+Alfie/Packages/**/*/.swiftpm
