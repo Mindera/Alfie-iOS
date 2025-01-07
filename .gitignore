@@ -118,6 +118,6 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-*.xcuserstate
-**/*/xcuserdata/
-Alfie/Packages/*/.swiftpm
+**/*/xcuserdata
+Alfie/Packages/**/*/.swiftpm
+Alfie/Packages/*/Package.resolved
