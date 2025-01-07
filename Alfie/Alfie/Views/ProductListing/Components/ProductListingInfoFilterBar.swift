@@ -15,7 +15,8 @@ struct ProductListingFilterBar: View {
         style: Binding<ProductListingListStyle>,
         total: Int,
         isLoading: Bool,
-        filterAction: @escaping () -> Void) {
+        filterAction: @escaping () -> Void
+    ) {
         _selectedStyle = style
         self.total = total
         self.isLoading = isLoading

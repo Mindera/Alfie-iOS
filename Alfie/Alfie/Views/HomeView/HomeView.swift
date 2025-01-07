@@ -44,7 +44,7 @@ struct HomeView: View {
                 .scaledToFit()
                 .frame(width: 75)
             Text.build(theme.font.header.h3(LocalizableHome.title))
-            ThemedButton(text: isUserLogged ? "Sign out" : "Sign in") {
+            ThemedButton(text: isUserLogged ? LocalizableHome.$signOut : LocalizableHome.$signIn) {
                 isUserLogged.toggle()
             }
             Spacer()

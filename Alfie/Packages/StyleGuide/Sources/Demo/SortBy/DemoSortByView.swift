@@ -3,8 +3,8 @@ import SwiftUI
 struct DemoSortByView: View {
     @State private var sortBy: SortByType = .alphaDesc
     private var list: [SortByItem] = [
-        .init(value: .priceHighToLow, title: "Price - High to Low", icon: .saleTag),
-        .init(value: .priceLowToHigh, title: "Price - Low to High", icon: .saleTag),
+        .init(value: .priceDesc, title: "Price - High to Low", icon: .saleTag),
+        .init(value: .priceAsc, title: "Price - Low to High", icon: .saleTag),
         .init(value: .alphaAsc, title: "A-Z"),
         .init(value: .alphaDesc, title: "Z-A"),
     ]
