@@ -5,17 +5,19 @@ final class LocalizationTests: XCTestCase {
     let localizations = Bundle.main.localizations
 
     func testLocalizationTables() {
+        testTable(LocalizableAccount.self)
+        testTable(LocalizableBag.self)
+        testTable(LocalizableBrands.self)
+        testTable(LocalizableCategories.self)
+        testTable(LocalizableFeatureToggle.self)
         testTable(LocalizableGeneral.self)
         testTable(LocalizableHome.self)
-        testTable(LocalizableShop.self)
-        testTable(LocalizableBag.self)
-        testTable(LocalizableAccount.self)
-        testTable(LocalizableSearch.self)
-        testTable(LocalizableSortBy.self)
-        testTable(LocalizableBrands.self)
-        testTable(LocalizableWebView.self)
-        testTable(LocalizableCategories.self)
         testTable(LocalizableProductDetails.self)
+        testTable(LocalizableProductListing.self)
+        testTable(LocalizableSearch.self)
+        testTable(LocalizableShop.self)
+        testTable(LocalizableSortBy.self)
+        testTable(LocalizableWebView.self)
         testTable(LocalizableWishlist.self)
     }
 
