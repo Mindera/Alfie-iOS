@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-final class ProductDetailsDependencyContainer: ProductDetailsDependencyContainerProtocol {
+final class ProductDetailsDependencyContainer {
     let productService: ProductServiceProtocol
     let webUrlProvider: WebURLProviderProtocol
     let bagService: BagServiceProtocol

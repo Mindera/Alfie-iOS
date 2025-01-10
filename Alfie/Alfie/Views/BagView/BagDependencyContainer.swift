@@ -1,7 +1,7 @@
 import Core
 import Models
 
-final class BagDependencyContainer: BagDependencyContainerProtocol {
+final class BagDependencyContainer {
     let bagService: BagServiceProtocol
 
     init(bagService: BagServiceProtocol) {

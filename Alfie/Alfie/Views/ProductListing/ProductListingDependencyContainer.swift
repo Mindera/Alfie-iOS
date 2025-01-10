@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-final class ProductListingDependencyContainer: ProductListingDependencyContainerProtocol {
+final class ProductListingDependencyContainer {
     let productListingService: ProductListingServiceProtocol
     let plpStyleListProvider: ProductListingStyleProviderProtocol
     let wishlistService: WishlistServiceProtocol

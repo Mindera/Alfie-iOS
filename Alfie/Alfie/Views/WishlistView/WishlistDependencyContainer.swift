@@ -1,7 +1,7 @@
 import Core
 import Models
 
-final class WishlistDependencyContainer: WishlistDependencyContainerProtocol {
+final class WishlistDependencyContainer {
     let wishlistService: WishlistServiceProtocol
     let bagService: BagServiceProtocol
 

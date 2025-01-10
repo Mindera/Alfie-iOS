@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-final class SearchDependencyContainer: SearchDependencyContainerProtocol {
+final class SearchDependencyContainer {
     let executionQueue: DispatchQueue
     let recentsService: RecentsServiceProtocol?
     let searchService: SearchServiceProtocol

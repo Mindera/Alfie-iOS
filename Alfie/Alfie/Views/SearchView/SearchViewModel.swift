@@ -7,7 +7,7 @@ final class SearchViewModel: SearchViewModelProtocol {
     // MARK: - Private Properties
 
     private var currentTask: Task<Void, Never>?
-    private let dependencies: SearchDependencyContainerProtocol
+    private let dependencies: SearchDependencyContainer
     private let didUpdateSearchTermPassthrough: PassthroughSubject<String, Never> = .init()
     private var subscriptions: Set<AnyCancellable> = .init()
     private var lastSearchedText: String = ""
@@ -57,7 +57,7 @@ final class SearchViewModel: SearchViewModelProtocol {
 
     // MARK: - Initialiser
 
-    init(dependencies: SearchDependencyContainerProtocol) {
+    init(dependencies: SearchDependencyContainer) {
         self.dependencies = dependencies
         self.searchText = ""
         self.state = canShowRecentSearches ? .recentSearches : .empty

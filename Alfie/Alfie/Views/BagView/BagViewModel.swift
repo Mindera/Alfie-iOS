@@ -4,9 +4,9 @@ import Models
 final class BagViewModel: BagViewModelProtocol {
     @Published private(set) var products: [SelectionProduct]
 
-    private let dependencies: BagDependencyContainerProtocol
+    private let dependencies: BagDependencyContainer
 
-    init(dependencies: BagDependencyContainerProtocol) {
+    init(dependencies: BagDependencyContainer) {
         self.dependencies = dependencies
         products = dependencies.bagService.getBagContent()
     }
