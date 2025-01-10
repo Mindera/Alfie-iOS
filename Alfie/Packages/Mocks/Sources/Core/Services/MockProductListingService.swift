@@ -9,7 +9,7 @@ public final class MockProductListingService: ProductListingServiceProtocol {
     public var onPageCalled: ((String?, String?, String?) throws -> ProductListing)?
     public func paged(categoryId: String?, query: String?, sort: String?) async throws -> Models.ProductListing {
         guard let productListing = try onPageCalled?(categoryId, query, sort) else {
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query)))
+            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
         return productListing
     }
@@ -24,7 +24,7 @@ public final class MockProductListingService: ProductListingServiceProtocol {
     )?
     public func next(categoryId: String?, query: String?, sort: String?) async throws -> ProductListing {
         guard let productListing = try onNextCalled?(categoryId, query, sort) else {
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query)))
+            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
         return productListing
     }
