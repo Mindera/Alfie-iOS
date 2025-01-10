@@ -8,7 +8,7 @@ final class WebViewModelTests: XCTestCase {
     private var mockDeepLinkService: MockDeepLinkService!
     private var mockWebViewConfigurationService: MockWebViewConfigurationService!
     private var mockWebUrlProvider: MockWebUrlProvider!
-    private var mockDependencies: WebDependencyContainerProtocol!
+    private var mockDependencies: WebDependencyContainer!
 
     override func setUpWithError() throws {
         try super.setUpWithError()

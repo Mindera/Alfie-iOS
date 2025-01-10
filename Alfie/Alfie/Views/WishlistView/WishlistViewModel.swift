@@ -4,9 +4,9 @@ import Models
 final class WishlistViewModel: WishlistViewModelProtocol {
     @Published private(set) var products: [SelectionProduct]
 
-    private let dependencies: WishlistDependencyContainerProtocol
+    private let dependencies: WishlistDependencyContainer
 
-    init(dependencies: WishlistDependencyContainerProtocol) {
+    init(dependencies: WishlistDependencyContainer) {
         self.dependencies = dependencies
         products = dependencies.wishlistService.getWishlistContent()
     }

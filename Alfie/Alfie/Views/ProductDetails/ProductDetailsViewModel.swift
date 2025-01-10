@@ -6,7 +6,7 @@ import Models
 import StyleGuide
 
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
-    private let dependencies: ProductDetailsDependencyContainerProtocol
+    private let dependencies: ProductDetailsDependencyContainer
     // In case we already have a full or partial product to show while fetching
     private let baseProduct: Product?
     private var colorSelectionSubscription: AnyCancellable?
@@ -88,7 +88,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
-    init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {
+    init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainer) {
         self.productId = productId
         baseProduct = product
         self.dependencies = dependencies
