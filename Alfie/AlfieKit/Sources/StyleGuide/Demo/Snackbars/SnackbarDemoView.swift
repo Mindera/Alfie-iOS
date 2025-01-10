@@ -57,15 +57,11 @@ struct SnackbarDemoView: View {
         }
         .snackbarView(configuration: $snackbarConfig)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                ThemedToolbarButton(icon: .arrowLeft) { dismiss() }
-            }
             ToolbarItem(placement: .principal) {
                 ThemedToolbarTitle(style: .logo)
             }
         }
         .modifier(ThemedToolbarModifier())
-        .navigationBarBackButtonHidden()
     }
 
     private func button(label: String) -> some View {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ToolbarDemoView: View {
-    private enum ToolbarButtonMode: String, CaseIterable {
+    private enum ToolbarRightButtonMode: String, CaseIterable {
         case singleIcon = "Single Icon"
         case singleText = "Single Text"
         case multiIcon = "Multiple Icon"
@@ -22,14 +22,28 @@ struct ToolbarDemoView: View {
         }
     }
 
+    private enum ToolbarLeftButtonMode: String, CaseIterable {
+        case singleIcon = "Single Icon"
+        case multiIcon = "Multiple Icon"
+        case multiMixed = "Multiple Mixed"
+
+        var isIcon: Bool {
+            [.singleIcon, .multiIcon, .multiMixed].contains(self)
+        }
+
+        var isMulti: Bool {
+            [.multiIcon, .multiMixed].contains(self)
+        }
+    }
+
     // TODO: replace usage of dismiss with a coordinator, here and in other demo views (not possible for now, as we have a crash due to a missing env obj, to be fixed later)
     @Environment(\.dismiss) private var dismiss
     @State private var showLogo = true
     @State private var alwaysShowDivider = true
     @State private var darkMode = false
     @State private var leftAlign = false
-    @State private var rightMode: ToolbarButtonMode? = .multiIcon
-    @State private var leftMode: ToolbarButtonMode? = .singleIcon
+    @State private var rightMode: ToolbarRightButtonMode? = .multiIcon
+    @State private var leftMode: ToolbarLeftButtonMode? = .singleIcon
 
     var body: some View {
         ScrollView {
@@ -55,9 +69,9 @@ struct ToolbarDemoView: View {
                 DemoHelper.demoSectionHeader(title: "Controls (Left / Right)")
                     .padding(.top, Spacing.space250)
 
-                HStack(spacing: Spacing.space0) {
+                HStack(alignment: .top, spacing: Spacing.space0) {
                     RadioButtonList(
-                        values: ToolbarButtonMode.allCases,
+                        values: ToolbarLeftButtonMode.allCases,
                         disabledValues: .constant([]),
                         selectedValue: $leftMode,
                         verticalSpacing: Spacing.space300
@@ -66,7 +80,7 @@ struct ToolbarDemoView: View {
                     Spacer()
 
                     RadioButtonList(
-                        values: ToolbarButtonMode.allCases,
+                        values: ToolbarRightButtonMode.allCases,
                         disabledValues: .constant([]),
                         selectedValue: $rightMode,
                         verticalSpacing: Spacing.space300
@@ -82,6 +96,7 @@ struct ToolbarDemoView: View {
             principalToolbarContent
             trailingToolbarContent
         }
+        .modifier(ThemedToolbarModifier(showDivider: alwaysShowDivider))
         .onChange(of: leftAlign) { newValue in
             if newValue {
                 showLogo = false
@@ -92,10 +107,6 @@ struct ToolbarDemoView: View {
                 leftAlign = false
             }
         }
-        .toolbarBackground(darkMode ? Colors.primary.mono900 : Colors.primary.white)
-        .toolbarBackground(alwaysShowDivider ? .visible : .automatic, for: .navigationBar)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
         .onChange(of: darkMode) { newValue in
             if newValue {
                 alwaysShowDivider = true
@@ -111,20 +122,12 @@ struct ToolbarDemoView: View {
                     tint: !darkMode ? Colors.primary.mono900 : Colors.primary.white
                 )
             } else {
-                if let mode = leftMode, mode != .hidden {
+                if let mode = leftMode, mode.isMulti {
                     ThemedToolbarButton(
-                        icon: mode.isIcon ? .arrowLeft : nil,
-                        text: mode.isText ? "Back" : nil,
+                        icon: mode.isIcon && mode != .multiMixed ? .store : nil,
+                        text: mode == .multiMixed ? "Shop" : nil,
                         tint: darkMode ? Colors.primary.white : Colors.primary.mono900
-                    ) { dismiss() }
-
-                    if mode.isMulti {
-                        ThemedToolbarButton(
-                            icon: mode.isIcon && mode != .multiMixed ? .store : nil,
-                            text: mode.isText || mode == .multiMixed ? "Shop" : nil,
-                            tint: darkMode ? Colors.primary.white : Colors.primary.mono900
-                        ) {}
-                    }
+                    ) {}
                 }
             }
         }
