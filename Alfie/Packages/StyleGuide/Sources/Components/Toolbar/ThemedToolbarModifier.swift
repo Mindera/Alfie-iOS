@@ -11,10 +11,11 @@ public struct ThemedToolbarModifier: ViewModifier {
 
     @ViewBuilder
     public func body(content: Content) -> some View {
+        if showDivider {
+            Divider()
+                .background(Colors.primary.mono200)
+        }
         content
-            .navigationBarBackButtonHidden()
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Colors.primary.white)
-            .toolbarBackground(showDivider ? .visible : .hidden, for: .navigationBar)
     }
 }
