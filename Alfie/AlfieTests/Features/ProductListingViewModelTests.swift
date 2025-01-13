@@ -54,6 +54,7 @@ final class ProductListingViewModelTests: XCTestCase {
                 wishlistService: mockWishlistService
             ),
             category: "clothing",
+            sort: "sort",
             urlQueryParameters: ["category": "women/clothing"]
         )
 
@@ -61,9 +62,10 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.title, "")
 
         mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query in
+        mockProductListing.onPageCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "women/clothing")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
                                           products: Array(Product.fixtures.prefix(5)))
         }
@@ -85,16 +87,18 @@ final class ProductListingViewModelTests: XCTestCase {
                 wishlistService: mockWishlistService
             ),
             category: "clothing",
-            searchText: "something"
+            searchText: "something",
+            sort: "sort"
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
         XCTAssertEqual(sut.title, "")
 
         mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query in
+        mockProductListing.onPageCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
                                           products: Array(Product.fixtures.prefix(5)))
         }
@@ -108,10 +112,9 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.totalNumberOfProducts, 5)
     }
 
-
     func test_fetch_first_page_failure_returns_error() {
-        mockProductListing.onPageCalled = { categoryId, query in
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query)))
+        mockProductListing.onPageCalled = { categoryId, query, sort in
+            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
 
         _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
@@ -130,18 +133,20 @@ final class ProductListingViewModelTests: XCTestCase {
                 wishlistService: mockWishlistService
             ),
             category: "clothing",
+            sort: "sort",
             urlQueryParameters: ["category": "women/clothing"]
         )
 
-        mockProductListing.onPageCalled = { _, _ in
+        mockProductListing.onPageCalled = { _, _, _ in
             ProductListing.fixture(pagination: .fixture(nextPage: 1),
                                    products: Product.fixtures)
         }
 
         mockProductListing.onHasNextCalled = { true }
-        mockProductListing.onNextCalled = { categoryId, query in
+        mockProductListing.onNextCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "women/clothing")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(products: Product.fixtures)
         }
 
@@ -160,7 +165,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
     func test_does_not_fetch_next_page_when_no_next_page() {
         mockProductListing.onHasNextCalled = { false }
-        mockProductListing.onPageCalled = { _, _ in
+        mockProductListing.onPageCalled = { _, _, _ in
             ProductListing.fixture(products: Product.fixtures)
         }
 
@@ -174,7 +179,7 @@ final class ProductListingViewModelTests: XCTestCase {
             return
         }
         mockProductListing.onHasNextCalled = { false }
-        mockProductListing.onPageCalled = { _, _ in
+        mockProductListing.onPageCalled = { _, _, _ in
             ProductListing.fixture(products: Product.fixtures)
         }
 
@@ -192,13 +197,15 @@ final class ProductListingViewModelTests: XCTestCase {
             ),
             category: "clothing",
             searchText: "something",
+            sort: "sort",
             mode: .listing
         )
 
         mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query in
+        mockProductListing.onPageCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
                                           products: Array(Product.fixtures.prefix(5)))
         }
@@ -237,13 +244,15 @@ final class ProductListingViewModelTests: XCTestCase {
             ),
             category: "clothing",
             searchText: "something",
+            sort: "sort",
             mode: .searchResults
         )
 
         mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query in
+        mockProductListing.onPageCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
                                           products: Array(Product.fixtures.prefix(5)))
         }

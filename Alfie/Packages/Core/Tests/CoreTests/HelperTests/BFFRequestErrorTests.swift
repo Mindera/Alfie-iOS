@@ -8,7 +8,7 @@ final class BFFRequestErrorTests: XCTestCase {
     }
 
     func test_bffrequesterror_is_notfound_for_no_products_error() {
-        let sut = BFFRequestError(type: .product(.noProducts(category: nil, query: nil)))
+        let sut = BFFRequestError(type: .product(.noProducts(category: nil, query: nil, sort: nil)))
         XCTAssertTrue(sut.isNotFound)
     }
 
