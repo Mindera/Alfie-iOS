@@ -1,0 +1,5 @@
+fragment SuggestionBrandFragment on SuggestionBrand {
+    value
+    results
+    slug
+}

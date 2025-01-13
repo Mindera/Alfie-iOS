@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "logo-ht-l.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

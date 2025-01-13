@@ -1,0 +1,276 @@
+extend type Query {
+  "Retrieve a product by its ID."
+  product("The product's ID" id: ID!): Product
+  "Retrieve a list of products"
+  productListing(
+    "Starting point"
+    offset: Int!
+    "Number of records"
+    limit: Int!
+    """
+    Filter by single category
+    Assumption: We are using a unique category ID
+    """
+    categoryId: String
+    "Filter by custom query"
+    query: String
+    "Additional filters"
+    refine: [ProductListingRefineQuery!]
+    "Sort order"
+    sort: ProductListingSort
+  ): ProductListing
+}
+
+"Support sorting products"
+enum ProductListingSort {
+  LOW_TO_HIGH
+  HIGH_TO_LOW
+  A_Z
+  Z_A
+}
+
+"Specify an additional filter in the query"
+input ProductListingRefineQuery {
+  "A valid product filter name"
+  name: ProductFilterType!
+  "One or more values (OR-ed) If name is PRICE, submit 2 values: [min, max]"
+  values: [String!]!
+}
+
+"A product for sale at Alfie."
+type Product {
+  "Unique ID for the product and its variants."
+  id: ID!
+  "App refers to products (including variants) as style numbers, so this is the product's unique identifier."
+  styleNumber: String!
+  "The formal name of the product."
+  name: String!
+  "The brand of the product."
+  brand: Brand!
+  "For displaying a high and low price range if it exists."
+  priceRange: PriceRange
+  "One-line description of the product."
+  shortDescription: String!
+  "Detailed description of the product."
+  longDescription: String
+  "For building canonical URL to PDP."
+  slug: String!
+  "Details of category/classification for breadcrumbs."
+  hierarchy: [HierarchyItem!]!
+    @deprecated(reason: "Unavailable from iSAMS, do not use")
+  "Product attributes common to all variants."
+  attributes: [KeyValuePair!]
+  "Specific labels such as 'Bestseller' or 'New in'."
+  labels: [String!] @deprecated(reason: "Unavailable from iSAMS, do not use")
+  "The 'default' variant."
+  defaultVariant: Variant!
+  "All variants of the product, including the default one."
+  variants: [Variant!]!
+  "Aggregation of all available sizes from all variants."
+  sizes: [Size!]
+  "Aggregation of all available colours from all variants."
+  colours: [Colour!]
+}
+
+"Summary information of for a product sale"
+type ProductSummary {
+  "Unique ID for the product and its variants."
+  id: ID!
+  "App refers to products (including variants) as style numbers, so this is the product's unique identifier."
+  styleNumber: String!
+  "The formal name of the product."
+  name: String!
+  "The brand of the product."
+  brand: Brand!
+  "For displaying a high and low price range if it exists."
+  priceRange: PriceRange
+  "One-line description of the product."
+  shortDescription: String!
+  "For building canonical URL to PDP."
+  slug: String!
+  "The 'default' variant."
+  defaultVariant: VariantSummary!
+  "All variants of the product, including the default one."
+  variants: [VariantSummary!]!
+  "Aggregation of all available sizes from all variants."
+  sizes: [Size!]
+  "Aggregation of all available colours from all variants."
+  colours: [Colour!]
+}
+
+"A collection of products with metadata"
+type ProductListing {
+  "Listing title"
+  title: String!
+  "Pagination data"
+  pagination: Pagination!
+  "hierarchy for breadcrums. Only present if a specific  (instead of search)."
+  hierarchy: [HierarchyItem!]
+  "Array of products"
+  products: [Product!]!
+}
+
+"A collection of products with metadata"
+type ProductSummaryListing {
+  "Listing title"
+  title: String
+  "Pagination data"
+  pagination: Pagination!
+  "Applicable filters"
+  filters: [ProductFilter]!
+  "Array of products"
+  products: [ProductSummary!]!
+}
+
+"Filters can be used to refine searches"
+type ProductFilter {
+  "Type of filter"
+  name: ProductFilterType!
+  "Available values"
+  values: [ProductFilterValue]!
+}
+
+"A value available as a filter for a specific type"
+type ProductFilterValue {
+  "The name of the value"
+  name: String!
+  "Slugified form for query use"
+  slug: String!
+  "The amount of current matches"
+  count: Int!
+  "Whether this filter value is part of the current query"
+  selected: Boolean!
+}
+
+"The different types of filter"
+enum ProductFilterType {
+  BRAND
+  COLOUR
+  PRICE
+  SIZE
+}
+
+"""
+App often display a price range or a 'from'.
+If this data is present in the product and no variant is selected, display the range.
+If high is null, display as 'From ${low}', otherwise '${low} to ${high}'
+"""
+type PriceRange {
+  "The lowest price."
+  low: Money!
+  "The highest price if not a 'from' range."
+  high: Money
+}
+
+"""
+An element in the breadcrumb that leads to the product.
+App has terms for each level (class, subclass etc) but
+these are omitted here for simplicity and flexibility.
+"""
+type HierarchyItem {
+  "ID for the level/category."
+  categoryId: ID!
+  "The display name - e.g. Menswear."
+  name: String!
+  "For building a canonical URL."
+  slug: String!
+  "The parent hierarchy item, except for root items."
+  parent: HierarchyItem
+}
+
+"""
+Many products come in variants of colour, size and other attributes.
+We default to one (the 'hero') and have an additional array including all variants.
+A variant is a specific item, such as a brown extra-large kettle.
+"""
+type Variant {
+  "A unique identifier for the variant."
+  sku: ID!
+  "Size, if applicable."
+  size: Size
+  "Colour, if applicable."
+  colour: Colour
+  "Array of images and videos."
+  media: [Media!]!
+  "Attributes that are specific for this variant."
+  attributes: [KeyValuePair!]
+  "How many of this variant in stock?"
+  stock: Int!
+  "How much does it cost?"
+  price: Price!
+}
+
+"Summary information included on product listing"
+type VariantSummary {
+  "A unique identifier for the variant."
+  sku: ID!
+  "Size, if applicable."
+  size: Size
+  "Colour, if applicable."
+  colour: Colour
+  "Array of images and videos."
+  media: [Media!]!
+  "How much does it cost?"
+  price: Price!
+}
+
+"""
+The price of a variant. Includes previous pricing if discounted.
+"""
+type Price {
+  "The current price."
+  amount: Money!
+  "If discounted, the previous price."
+  was: Money
+}
+
+"""
+We are starting with one currency, but expect to handle more in future.
+Each query will only return the currency requested, not all that are available.
+"""
+type Money {
+  "The 3-letter currency code e.g. AUD."
+  currencyCode: String!
+  "The amount in minor units (e.g. for $1.23 this will be 123)."
+  amount: Int!
+  "The amount formatted according to the client locale (e.g. $1.23)."
+  amountFormatted: String!
+}
+
+"The various colour options available for an item."
+type Colour {
+  "Unique ID for the colour."
+  id: ID!
+  "Image resolver for the colour swatch."
+  swatch: Image
+  "The name of the colour."
+  name: String!
+  "The product images for the colour"
+  media: [Media!]
+}
+
+"Sizing information for a product."
+type Size {
+  "Unique size ID."
+  id: ID!
+  "The size value (e.g. XS)."
+  value: String!
+  "The scale of the size (e.g. US)."
+  scale: String
+  "A description of the size (e.g. Extra Small)."
+  description: String
+  "The size guide that includes this size."
+  sizeGuide: SizeGuide
+}
+
+"Information about a size guide."
+type SizeGuide {
+  "Unique size guide ID."
+  id: ID!
+  "The name of the size guide (e.g. Men's shoes size guide)."
+  name: String!
+  "A description for the size guide."
+  description: String
+  "The ordered list of sizes that make up this size guide."
+  sizes: [Size!]!
+}

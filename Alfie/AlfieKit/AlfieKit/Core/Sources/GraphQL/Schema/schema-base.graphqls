@@ -1,0 +1,181 @@
+"The Query root for the schema."
+type Query
+
+"""
+Represents an [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986)-compliant URI string.
+
+For example, `"https://www.google.com"` is a valid URL. It includes a scheme (`https`) and a host
+(`www.google.com`).
+"""
+scalar URL
+
+"An ISO-8601 compliant date string"
+scalar Date
+
+"A key-value pair, where both key and value are strings."
+type KeyValuePair {
+  "The key of the pair."
+  key: String!
+  "The value of the pair."
+  value: String!
+}
+
+"Represents a media resource."
+union Media = Image | Video
+
+"The types of media content."
+enum MediaContentType {
+  "Am image."
+  IMAGE
+  "A video."
+  VIDEO
+}
+
+"Pagination info"
+type Pagination {
+  "Start point"
+  offset: Int!
+  "Records to return"
+  limit: Int!
+  "The total number of results"
+  total: Int!
+  "Based on offset, how many pages are there?"
+  pages: Int!
+  "Which page are we on?"
+  page: Int!
+  "Do we have a next page? (If null, no, else new offset)"
+  nextPage: Int
+  "Do we have a previous page? (If null, no, else new offset)"
+  previousPage: Int
+}
+
+"Represents an image resource."
+type Image {
+  "A description of the contents of the image for accessibility purposes."
+  alt: String
+  "The media content type."
+  mediaContentType: MediaContentType!
+  "The original width of the image in pixels."
+  width: Int @deprecated(reason: "Unavailable from iSAMS, do not use")
+  "The original height of the image in pixels."
+  height: Int @deprecated(reason: "Unavailable from iSAMS, do not use")
+  """
+  The location of the image as a URL.
+
+  If no transform options are specified, then the original image will be preserved.
+
+  All transformation options are considered "best-effort". Any transformation that the original image type doesn't support will be ignored.
+
+  If you need multiple variations of the same image, then you can use [GraphQL aliases](https://graphql.org/learn/queries/#aliases).
+  """
+  url(
+    "A set of options to transform the original image."
+    transform: ImageTransformInput
+  ): URL!
+}
+
+"The available options for transforming an image."
+input ImageTransformInput {
+  """
+  Image width in pixels.
+  """
+  width: Int
+  """
+  Image height in pixels.
+  """
+  height: Int
+  """
+  Control how an image is resized. Default is `contain`.
+  """
+  fit: ImageFit = CONTAIN
+  """
+  Image size multiplier for high-resolution retina displays. Must be within 1..3.
+  """
+  scale: Int = 1
+  """
+  Specify a preferred imaged format, instead of relying on content negotiation.
+  """
+  format: ImageFormat
+  """
+  Specify a preferred quality for lossy formats. Must be within 1..100.
+  """
+  quality: Int = 75
+}
+
+"Represents an image format."
+enum ImageFormat {
+  "An AVIF image."
+  AVIF
+  "A JPG image."
+  JPG
+  "A PNG image."
+  PNG
+  "A WEBP image."
+  WEBP
+  "A GIF image."
+  GIF
+}
+
+"Options for resizing an image."
+enum ImageFit {
+  """
+  Fit within the specified dimensions and maintain the source aspect ratio
+  by resizing the image proportionally (default).
+  """
+  CONTAIN
+  """
+  Fill the specified dimensions without distortion by resizing the image
+  proportionally, then cropping out any excess pixels.
+  """
+  COVER
+  """
+  Fill the specified dimensions exactly. If the target aspect ratio is
+  different than the source aspect ratio, the image is stretched and squished
+  as needed to fill the target dimensions.
+  """
+  FILL
+}
+
+"Represents a video resource."
+type Video {
+  "A description of the contents of the video for accessibility purposes."
+  alt: String
+  "The media content type."
+  mediaContentType: MediaContentType!
+  "A preview image for the video."
+  previewImage: Image
+  "The sources for the video."
+  sources: [VideoSource!]!
+}
+
+"Represents a source for a video resource."
+type VideoSource {
+  "The format of the video source."
+  format: VideoFormat!
+  "The video MIME type."
+  mimeType: String!
+  "The URL of the video."
+  url: URL!
+  "The width of the video."
+  width: Int! @deprecated(reason: "Unavailable from iSAMS, do not use")
+  "The height of the video."
+  height: Int! @deprecated(reason: "Unavailable from iSAMS, do not use")
+}
+
+"Represents a video format."
+enum VideoFormat {
+  "An MP4 video, in H.264 (AVC) or H.265 (HEVC)."
+  MP4
+  "A WebM video."
+  WEBM
+}
+
+"A brand sold by Alfie"
+type Brand {
+  "The ID for the brand"
+  id: ID!
+  "The display name of the brand"
+  name: String!
+  "A slugified name for URL usage"
+  slug: String!
+}

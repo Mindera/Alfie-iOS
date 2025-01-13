@@ -1,0 +1,61 @@
+extend type Query {
+  """Retrieve search suggestion data by custom query"""
+  suggestion(
+    """Search by a custom query"""
+    query: String!
+  ): Suggestion!
+}
+
+"""A collection of information returned for suggestions"""
+type Suggestion {
+  """An array of potential search terms."""
+  keywords: [SuggestionKeyword!]!
+
+  """An array of suggested products."""
+  products: [SuggestionProduct!]!
+
+  """An array of suggested brands."""
+  brands: [SuggestionBrand!]!
+}
+
+"""Full potential search terms"""
+type SuggestionKeyword {
+  """Value of the suggested search term."""
+  value: String!
+
+  """Number of results that match the suggested search term."""
+  results: Int!
+}
+
+"""A product for navigation purposes using the search."""
+type SuggestionProduct {
+  """Unique ID for the product."""
+  id: ID!
+
+  """The formal name of the product."""
+  name: String!
+
+  """The name of the brand for the product."""
+  brandName: String!
+
+  """Array of images and videos."""
+  media: [Media!]!
+
+  """How much does it cost?"""
+  price: Price!
+
+  """For building a navigation link to the product."""
+  slug: String!
+}
+
+"""Suggested Brand for navigation purposes."""
+type SuggestionBrand {
+  """Name of the brand."""
+  value: String!
+
+  """Number of products matching the brand."""
+  results: Int!
+
+  """Slugified name of the brand."""
+  slug: String!
+}

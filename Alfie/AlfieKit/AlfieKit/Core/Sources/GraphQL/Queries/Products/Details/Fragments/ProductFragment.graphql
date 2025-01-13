@@ -1,0 +1,27 @@
+fragment ProductFragment on Product {
+    id
+    styleNumber
+    name
+    brand {
+        ...BrandFragment
+    }
+    priceRange {
+        ...PriceRangeFragment
+    }
+    shortDescription
+    longDescription
+    slug
+    labels
+    attributes {
+        ...AttributesFragment
+    }
+    defaultVariant {
+        ...VariantFragment
+    }
+    variants {
+        ...VariantFragment
+    }
+    colours {
+        ...ColourFragment
+    }
+}

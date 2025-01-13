@@ -1,0 +1,13 @@
+query GetSuggestions($term: String!) {
+  suggestion(query: $term) {
+    brands {
+      ...SuggestionBrandFragment
+    }
+    keywords {
+      ...SuggestionKeywordFragment
+    }
+    products {
+      ...SuggestionProductFragment
+    }
+  }
+}

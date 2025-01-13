@@ -1,0 +1,4 @@
+extend type Query {
+  "List all the available brands"
+  brands: [Brand!]!
+}
