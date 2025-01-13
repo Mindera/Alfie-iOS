@@ -197,6 +197,7 @@ final class ProductListingViewModelTests: XCTestCase {
             ),
             category: "clothing",
             searchText: "something",
+            sort: "sort",
             mode: .listing
         )
 
@@ -204,6 +205,7 @@ final class ProductListingViewModelTests: XCTestCase {
         mockProductListing.onPageCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
                                           products: Array(Product.fixtures.prefix(5)))
         }
@@ -242,6 +244,7 @@ final class ProductListingViewModelTests: XCTestCase {
             ),
             category: "clothing",
             searchText: "something",
+            sort: "sort",
             mode: .searchResults
         )
 
@@ -249,6 +252,7 @@ final class ProductListingViewModelTests: XCTestCase {
         mockProductListing.onPageCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
                                           products: Array(Product.fixtures.prefix(5)))
         }
