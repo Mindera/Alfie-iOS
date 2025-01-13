@@ -38,7 +38,7 @@ let package = Package(
         .library(
             name: "CommonTestUtils",
             targets: ["CommonTestUtils"]
-        ),
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -134,38 +134,37 @@ let package = Package(
             ]
         ),
         
-        
         .target(
             name: "CommonTestUtils",
             path: "AlfieKit/Common/TestUtils"
         ),
-//        .testTarget(
-//            name: "CoreTests",
-//            dependencies: [
-//                "Core",
-//                "Mocks",
-//                "Common",
-//                .product(name: "BFFGraphMocks", package: "BFFGraphApi"),
-//                .product(name: "Apollo", package: "apollo-ios"),
-//                .product(name: "CommonTestUtils", package: "Common"),
-//            ],
-//            path: "AlfieKit/Core/Test"
-//        ),
-//        .testTarget(
-//            name: "NavigationTests",
-//            dependencies: [
-//                "Navigation"
-//            ],
-//            path: "AlfieKit/Navigation/Test"
-//        ),
-//        .testTarget(
-//            name: "StyleGuideTests",
-//            dependencies: [
-//                "StyleGuide",
-//                "Common",
-//                "Core"
-//            ],
-//            path: "AlfieKit/StyleGuide/Test"
-//        )
+        .testTarget(
+            name: "CoreTests",
+            dependencies: [
+                "Core",
+                "Mocks",
+                "Common",
+                "CommonTestUtils",
+                .product(name: "BFFGraphMocks", package: "BFFGraphApi"),
+                .product(name: "Apollo", package: "apollo-ios"),
+            ],
+            path: "AlfieKit/Core/Tests/CoreTests"
+        ),
+        .testTarget(
+            name: "NavigationTests",
+            dependencies: [
+                "Navigation"
+            ],
+            path: "AlfieKit/Navigation/Tests/NavigationTests"
+        ),
+        .testTarget(
+            name: "StyleGuideTests",
+            dependencies: [
+                "StyleGuide",
+                "Common",
+                "Core"
+            ],
+            path: "AlfieKit/StyleGuide/Tests/StyleGuideTests"
+        )
     ]
 )

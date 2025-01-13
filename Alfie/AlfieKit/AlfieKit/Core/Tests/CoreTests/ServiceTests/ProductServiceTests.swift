@@ -73,17 +73,24 @@ final class ProductServiceTests: XCTestCase {
 
     func test_get_productList_calls_bff_service() {
         let expectation = expectation(description: "Wait for service call")
-        mockClientService.onProductListingCalled = { offset, limit, categoryId, query in
+        mockClientService.onProductListingCalled = { offset, limit, categoryId, query, sort in
             XCTAssertEqual(offset, 1)
             XCTAssertEqual(limit, 2)
             XCTAssertEqual(categoryId, "category id")
             XCTAssertEqual(query, "query")
+            XCTAssertEqual(sort, "sort")
             expectation.fulfill()
             return ProductListing.fixture()
         }
 
         Task {
-            _ = try await sut.productListing(offset: 1, limit: 2, categoryId: "category id", query: "query")
+            _ = try await sut.productListing(
+                offset: 1,
+                limit: 2,
+                categoryId: "category id",
+                query: "query",
+                sort: "sort"
+            )
         }
         wait(for: [expectation], timeout: defaultTimeout)
     }
