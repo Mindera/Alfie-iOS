@@ -133,6 +133,7 @@ final class ProductListingViewModelTests: XCTestCase {
                 wishlistService: mockWishlistService
             ),
             category: "clothing",
+            sort: "sort",
             urlQueryParameters: ["category": "women/clothing"]
         )
 
@@ -145,6 +146,7 @@ final class ProductListingViewModelTests: XCTestCase {
         mockProductListing.onNextCalled = { categoryId, query, sort in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "women/clothing")
+            XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(products: Product.fixtures)
         }
 
