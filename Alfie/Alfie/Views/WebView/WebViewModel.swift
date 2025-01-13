@@ -5,7 +5,7 @@ final class WebViewModel: WebViewModelProtocol {
     private let webFeature: WebFeature?
     private let url: URL?
     let title: String
-    private let dependencies: WebDependencyContainerProtocol
+    private let dependencies: WebDependencyContainer
     @Published private(set) var state: WebViewState = .empty
     // Handler should return true if it handled the URL, false to allow the webview to handle it
     private let urlChangeHandler: ((URL) -> Bool)?
@@ -21,7 +21,7 @@ final class WebViewModel: WebViewModelProtocol {
     init(
         url: URL?,
         title: String? = nil,
-        dependencies: WebDependencyContainerProtocol,
+        dependencies: WebDependencyContainer,
         urlChangeHandler: ((URL) -> Bool)? = nil
     ) {
         self.url = url
@@ -34,7 +34,7 @@ final class WebViewModel: WebViewModelProtocol {
     init(
         webFeature: WebFeature,
         title: String? = nil,
-        dependencies: WebDependencyContainerProtocol,
+        dependencies: WebDependencyContainer,
         urlChangeHandler: ((URL) -> Bool)? = nil
     ) {
         self.url = nil

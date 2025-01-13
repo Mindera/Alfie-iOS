@@ -8,7 +8,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     private var sut: ProductDetailsViewModel!
     private var mockProductService: MockProductService!
     private var mockWebUrlProvider: MockWebUrlProvider!
-    private var mockDependencies: ProductDetailsDependencyContainerProtocol!
+    private var mockDependencies: ProductDetailsDependencyContainer!
 
     override func setUpWithError() throws {
         try super.setUpWithError()

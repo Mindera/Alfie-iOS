@@ -1,12 +1,7 @@
 import Common
 import Models
 
-public protocol BFFClientDependencyContainerProtocol {
-    var reachabilityService: ReachabilityServiceProtocol { get }
-    var restNetworkClient: NetworkClientProtocol { get }
-}
-
-public final class BFFClientDependencyContainer: BFFClientDependencyContainerProtocol {
+public final class BFFClientDependencyContainer {
     public var reachabilityService: ReachabilityServiceProtocol
     public var restNetworkClient: NetworkClientProtocol
 

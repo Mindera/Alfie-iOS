@@ -4,7 +4,7 @@ import Models
 @testable import Alfie
 
 final class SearchViewModelTests: XCTestCase {
-    private var mockDependencies: SearchDependencyContainerProtocol!
+    private var mockDependencies: SearchDependencyContainer!
     private var mockRecentsService: MockRecentsService!
     private var mockSearchService: MockSearchService!
     private var sut: SearchViewModel!
