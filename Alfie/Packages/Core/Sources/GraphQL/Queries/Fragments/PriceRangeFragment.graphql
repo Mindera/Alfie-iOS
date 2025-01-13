@@ -1,8 +1,0 @@
-fragment PriceRangeFragment on PriceRange {
-    low {
-        ...MoneyFragment
-    }
-    high {
-        ...MoneyFragment
-    }
-}
