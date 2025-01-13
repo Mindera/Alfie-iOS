@@ -10,7 +10,7 @@ public struct BFFRequestError: Error {
 
     public enum BFFProductRequestErrorType: Equatable {
         case noProduct
-        case noProducts(category: String?, query: String?)
+        case noProducts(category: String?, query: String?, sort: String?)
         case generic
     }
 

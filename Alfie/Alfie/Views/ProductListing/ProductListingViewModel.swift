@@ -52,7 +52,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         // TODO: - review filtering later, API not supporting for now
         self.category = category
         self.mode = mode
-        sortOption = sort ?? ""
+        sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
         wishlistContent = dependencies.wishlistService.getWishlistContent()
