@@ -161,7 +161,6 @@ let package = Package(
                 "Core",
                 "Models"
             ],
-            path: "Sources/StyleGuide",
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
                 .copy("Theme/Components/Loader/spin.gif"),
