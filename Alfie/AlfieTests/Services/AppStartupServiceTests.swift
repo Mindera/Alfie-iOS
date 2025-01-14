@@ -1,4 +1,4 @@
-import CommonTestUtils
+import TestUtils
 import XCTest
 import Mocks
 import Models

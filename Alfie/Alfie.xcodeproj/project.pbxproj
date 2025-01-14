@@ -9,13 +9,13 @@
 /* Begin PBXBuildFile section */
 		49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 49AFF8542B6D0AA600695C66 /* OrderedCollections */; };
 		BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BA04B1A22B977EE700713298 /* SnapshotTesting */; };
-		BA1C21D02B97362C007596F1 /* CommonTestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = BA1C21CF2B97362C007596F1 /* CommonTestUtils */; };
-		C5C9C4CB2D35735000D5D70E /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C5C9C4CA2D35735000D5D70E /* Common */; };
-		C5C9C4CD2D35735000D5D70E /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C5C9C4CC2D35735000D5D70E /* Core */; };
-		C5C9C4CF2D35735000D5D70E /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C5C9C4CE2D35735000D5D70E /* Mocks */; };
-		C5C9C4D12D35735000D5D70E /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C5C9C4D02D35735000D5D70E /* Models */; };
-		C5C9C4D32D35735000D5D70E /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C5C9C4D22D35735000D5D70E /* Navigation */; };
-		C5C9C4D52D35735000D5D70E /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = C5C9C4D42D35735000D5D70E /* StyleGuide */; };
+		C54DA2B52D368A40005142F4 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B42D368A40005142F4 /* Common */; };
+		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
+		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
+		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
+		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
+		C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BE2D368A40005142F4 /* StyleGuide */; };
+		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,13 +77,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C5C9C4D32D35735000D5D70E /* Navigation in Frameworks */,
-				C5C9C4D52D35735000D5D70E /* StyleGuide in Frameworks */,
-				C5C9C4D12D35735000D5D70E /* Models in Frameworks */,
+				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
+				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
+				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
 				49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */,
-				C5C9C4CB2D35735000D5D70E /* Common in Frameworks */,
-				C5C9C4CF2D35735000D5D70E /* Mocks in Frameworks */,
-				C5C9C4CD2D35735000D5D70E /* Core in Frameworks */,
+				C54DA2B52D368A40005142F4 /* Common in Frameworks */,
+				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
+				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,8 +91,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C54DA59D2D369927005142F4 /* TestUtils in Frameworks */,
 				BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */,
-				BA1C21D02B97362C007596F1 /* CommonTestUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,12 +159,12 @@
 			name = Alfie;
 			packageProductDependencies = (
 				49AFF8542B6D0AA600695C66 /* OrderedCollections */,
-				C5C9C4CA2D35735000D5D70E /* Common */,
-				C5C9C4CC2D35735000D5D70E /* Core */,
-				C5C9C4CE2D35735000D5D70E /* Mocks */,
-				C5C9C4D02D35735000D5D70E /* Models */,
-				C5C9C4D22D35735000D5D70E /* Navigation */,
-				C5C9C4D42D35735000D5D70E /* StyleGuide */,
+				C54DA2B42D368A40005142F4 /* Common */,
+				C54DA2B62D368A40005142F4 /* Core */,
+				C54DA2B82D368A40005142F4 /* Mocks */,
+				C54DA2BA2D368A40005142F4 /* Models */,
+				C54DA2BC2D368A40005142F4 /* Navigation */,
+				C54DA2BE2D368A40005142F4 /* StyleGuide */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -189,7 +189,7 @@
 			name = AlfieTests;
 			packageProductDependencies = (
 				BA04B1A22B977EE700713298 /* SnapshotTesting */,
-				BA1C21CF2B97362C007596F1 /* CommonTestUtils */,
+				C54DA59C2D369927005142F4 /* TestUtils */,
 			);
 			productName = AlfieTests;
 			productReference = BE8B02342B616979007AE489 /* AlfieTests.xctest */;
@@ -730,33 +730,33 @@
 			package = BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
 		};
-		BA1C21CF2B97362C007596F1 /* CommonTestUtils */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CommonTestUtils;
-		};
-		C5C9C4CA2D35735000D5D70E /* Common */ = {
+		C54DA2B42D368A40005142F4 /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Common;
 		};
-		C5C9C4CC2D35735000D5D70E /* Core */ = {
+		C54DA2B62D368A40005142F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Core;
 		};
-		C5C9C4CE2D35735000D5D70E /* Mocks */ = {
+		C54DA2B82D368A40005142F4 /* Mocks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Mocks;
 		};
-		C5C9C4D02D35735000D5D70E /* Models */ = {
+		C54DA2BA2D368A40005142F4 /* Models */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Models;
 		};
-		C5C9C4D22D35735000D5D70E /* Navigation */ = {
+		C54DA2BC2D368A40005142F4 /* Navigation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Navigation;
 		};
-		C5C9C4D42D35735000D5D70E /* StyleGuide */ = {
+		C54DA2BE2D368A40005142F4 /* StyleGuide */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = StyleGuide;
+		};
+		C54DA59C2D369927005142F4 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TestUtils;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
