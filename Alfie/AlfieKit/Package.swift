@@ -11,16 +11,16 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Common",
-            targets: ["Common"]
-        ),
-        .library(
             name: "BFFGraphApi",
             targets: ["BFFGraphApi"]
         ),
         .library(
             name: "BFFGraphMocks",
             targets: ["BFFGraphMocks"]
+        ),
+        .library(
+            name: "Common",
+            targets: ["Common"]
         ),
         .library(
             name: "Core",
@@ -78,15 +78,6 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         
-        // - Common -
-        
-        .target(
-            name: "Common",
-            path: "Sources/Common"
-        ),
-        
-        // - BFFGraph -
-        
         .target(
             name: "BFFGraphApi",
             dependencies: [
@@ -103,7 +94,9 @@ let package = Package(
             path: "Sources/BFFGraph/Mocks"
         ),
         
-        // - Core -
+        .target(
+            name: "Common"
+        ),
         
         .target(
             name: "Core",
@@ -136,21 +129,15 @@ let package = Package(
                     name: "BrazeKit",
                     package: "braze-swift-sdk"
                 ),
-            ],
-            path: "Sources/Core"
+            ]
         ),
-        
-        // - Mocks -
         
         .target(
             name: "Mocks",
             dependencies: [
                 "Models"
-            ],
-            path: "Sources/Mocks"
+            ]
         ),
-        
-        // - Models -
         
         .target(
             name: "Models",
@@ -159,19 +146,12 @@ let package = Package(
                     name: "OrderedCollections",
                     package: "swift-collections"
                 ),
-            ],
-            path: "Sources/Models",
-            resources: []
+            ]
         ),
-        
-        // - Navigation -
         
         .target(
-            name: "Navigation",
-            path: "Sources/Navigation"
+            name: "Navigation"
         ),
-        
-        // - StyleGuide -
         
         .target(
             name: "StyleGuide",
@@ -192,14 +172,9 @@ let package = Package(
             ]
         ),
         
-        // - TestUtils -
-        
         .target(
-            name: "TestUtils",
-            path: "Sources/TestUtils"
+            name: "TestUtils"
         ),
-        
-        // - Tests -
         
         .testTarget(
             name: "CoreTests",
