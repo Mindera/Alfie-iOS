@@ -15,6 +15,14 @@ let package = Package(
             targets: ["Common"]
         ),
         .library(
+            name: "BFFGraphApi",
+            targets: ["BFFGraphApi"]
+        ),
+        .library(
+            name: "BFFGraphMocks",
+            targets: ["BFFGraphMocks"]
+        ),
+        .library(
             name: "Core",
             targets: ["Core"]
         ),
@@ -41,7 +49,6 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(path: "Sources/Core/BFFGraphApi"),
         .package(
             url: "https://github.com/firebase/firebase-ios-sdk.git",
             exact: "10.20.0"
@@ -76,6 +83,24 @@ let package = Package(
         .target(
             name: "Common",
             path: "Sources/Common"
+        ),
+        
+        // - BFFGraph -
+        
+        .target(
+            name: "BFFGraphApi",
+            dependencies: [
+                .product(name: "ApolloAPI", package: "apollo-ios"),
+            ],
+            path: "Sources/BFFGraph/Api"
+        ),
+        .target(
+            name: "BFFGraphMocks",
+            dependencies: [
+                "BFFGraphApi",
+                .product(name: "ApolloTestSupport", package: "apollo-ios"),
+            ],
+            path: "Sources/BFFGraph/Mocks"
         ),
         
         // - Core -
@@ -183,10 +208,7 @@ let package = Package(
                 "Mocks",
                 "Common",
                 "TestUtils",
-                .product(
-                    name: "BFFGraphMocks",
-                    package: "BFFGraphApi"
-                ),
+                "BFFGraphMocks",
                 .product(
                     name: "Apollo",
                     package: "apollo-ios"
