@@ -25,14 +25,10 @@ public struct ContainerDemoViewModifier: ViewModifier {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                ThemedToolbarButton(icon: .arrowLeft) { dismiss() }
-            }
             ToolbarItem(placement: .principal) {
                 ThemedToolbarTitle(style: .logo)
             }
         }
         .modifier(ThemedToolbarModifier())
-        .navigationBarBackButtonHidden()
     }
 }
