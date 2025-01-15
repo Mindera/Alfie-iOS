@@ -47,12 +47,13 @@ let package = Package(
         )
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-collections", exact: "1.0.6"),
         .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "1.7.1"),
         .package(url: "https://github.com/braze-inc/braze-swift-sdk", exact: "8.0.1"),
-        .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.20.0"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
-        .package(url: "https://github.com/apple/swift-collections", exact: "1.0.6")
+        .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9")
+        
     ],
     targets: [
         .target(
@@ -121,9 +122,9 @@ let package = Package(
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
                 .copy("Theme/Components/Loader/spin.gif"),
                 .process("Theme/Color/Colors.xcassets"),
-                .process("Theme/Typography/Resources/Fonts.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
-                .process("Theme/Toggle/ToggleColor.xcassets")
+                .process("Theme/Toggle/ToggleColor.xcassets"),
+                .process("Theme/Typography/Resources/Fonts.xcassets")
             ]
         ),
         
