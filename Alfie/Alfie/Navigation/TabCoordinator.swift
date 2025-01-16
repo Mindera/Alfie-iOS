@@ -166,13 +166,13 @@ extension TabScreen {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .home:
-            LocalizableGeneral.home
+            L10n.tabHomeTitle
         case .shop:
-            LocalizableGeneral.shop
+            L10n.tabShopTitle
         case .wishlist:
-            LocalizableGeneral.wishlist
+            L10n.tabWishlistTitle
         case .bag:
-            LocalizableGeneral.bag
+            L10n.tabBagTitle
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

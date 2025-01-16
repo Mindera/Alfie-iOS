@@ -32,7 +32,7 @@ extension RootView {
     private func view(for screen: AppStartupScreen) -> some View {
         switch screen {
         case .loading:
-            ThemedLoaderView(labelHidden: true, labelTitle: LocalizableGeneral.$loading)
+            ThemedLoaderView(labelHidden: true, labelTitle: L10n.$loadingTitle)
                 .transition(.opacity)
 
         case .error:
