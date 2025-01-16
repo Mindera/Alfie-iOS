@@ -16,12 +16,8 @@ enum ToolbarItemProvider {
                 case .loggedIn(let username, let memberSince):
                     ThemedToolbarTitle(
                         style: .leftText(
-                            String(localized: LocalizableHome.loggedInHeaderTitle(username: username)),
-                            subtitle: String(
-                                localized: LocalizableHome.loggedInHeaderSubtitle(
-                                    registrationYear: "\(memberSince)"
-                                )
-                            )
+                            L10n.homeScreenLoggedInTitleWithParameter(username: username),
+                            subtitle: L10n.homeScreenLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)")
                         ),
                         accessibilityId: AccessibilityId.titleHeader
                     )
@@ -32,19 +28,19 @@ enum ToolbarItemProvider {
 
             case .tab(.bag):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableBag.$title),
+                    style: .leftText(L10n.$bagScreenTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.shop):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableShop.$title),
+                    style: .leftText(L10n.$shopScreenTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.wishlist):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableWishlist.$title),
+                    style: .leftText(L10n.$wishlistScreenTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -78,13 +74,13 @@ enum ToolbarItemProvider {
 
             case .account:
                 ThemedToolbarTitle(
-                    style: .text(LocalizableAccount.$title),
+                    style: .text(L10n.$accountScreenTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .wishlist:
                 ThemedToolbarTitle(
-                    style: .text(LocalizableWishlist.$title),
+                    style: .text(L10n.$wishlistScreenTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 

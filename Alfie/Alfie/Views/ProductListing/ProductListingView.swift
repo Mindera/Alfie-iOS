@@ -157,9 +157,9 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                 .foregroundStyle(Colors.primary.black)
                 .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
-            Text.build(theme.font.paragraph.bold(LocalizableProductListing.errorTitle))
+            Text.build(theme.font.paragraph.bold(L10n.plpErrorViewTitle))
                 .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(LocalizableProductListing.errorMessage))
+            Text.build(theme.font.small.normal(L10n.plpErrorViewMessage))
                 .foregroundStyle(Colors.primary.black)
         }
     }

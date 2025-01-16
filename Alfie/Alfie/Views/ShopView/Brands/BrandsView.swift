@@ -48,9 +48,9 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             // swiftlint:disable:next trailing_closure
             ThemedSearchBarView(
                 searchText: $viewModel.searchText,
-                placeholder: LocalizableBrands.$searchBarPlaceholder,
+                placeholder: L10n.$shopBrandsSearchBarPlaceholder,
                 theme: .soft,
-                dismissConfiguration: .init(type: .cancel(title: LocalizableSearch.$cancel)),
+                dismissConfiguration: .init(type: .cancel(title: L10n.$searchBarCancel)),
                 onFocusChange: { isFocused in
                     viewModel.searchFocusDidChange(isFocused: isFocused)
                 }
@@ -168,9 +168,9 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
         VStack(spacing: Spacing.space200) {
             Spacer()
             imageForIcon(Icon.warning)
-            Text.build(theme.font.paragraph.bold(LocalizableBrands.errorTitle))
+            Text.build(theme.font.paragraph.bold(L10n.shopBrandsErrorViewTitle))
                 .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(LocalizableBrands.errorMessage))
+            Text.build(theme.font.small.normal(L10n.shopBrandsErrorViewMessage))
                 .foregroundStyle(Colors.primary.black)
             Spacer()
         }
@@ -184,7 +184,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             Spacer()
             imageForIcon(Icon.search)
             HStack(spacing: Spacing.space050) {
-                Text.build(theme.font.small.normal(LocalizableBrands.searchNoResultsMessage))
+                Text.build(theme.font.small.normal(L10n.shopBrandsSearchBarNoResultsMessage))
                     .foregroundStyle(Colors.primary.black)
                 Text.build(theme.font.small.bold("'\(viewModel.searchText)'"))
                     .foregroundStyle(Colors.primary.black)

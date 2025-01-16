@@ -27,10 +27,10 @@ final class BagViewModel: BagViewModelProtocol {
             image: product.media.first?.asImage?.url,
             designer: product.brand.name,
             name: product.name,
-            colorTitle: LocalizableGeneral.$color + ":",
+            colorTitle: L10n.$productColorTitle + ":",
             color: product.colour?.name ?? "",
-            sizeTitle: LocalizableGeneral.$size + ":",
-            size: product.size == nil ? LocalizableGeneral.$oneSize : product.sizeText,
+            sizeTitle: L10n.$productSizeTitle + ":",
+            size: product.size == nil ? L10n.$productOneSizeTitle : product.sizeText,
             priceType: product.priceType
         )
     }
