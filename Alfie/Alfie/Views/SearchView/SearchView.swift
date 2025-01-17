@@ -29,8 +29,8 @@ struct SearchView<ViewModel: SearchViewModelProtocol>: View {
             viewModel.viewDidDisappear()
         }
         .searchable(
-            placeholder: LocalizableSearch.$searchBarPlaceholder,
-            placeholderOnFocus: LocalizableSearch.$searchBarPlaceholderFocused,
+            placeholder: L10n.$searchBarPlaceholder,
+            placeholderOnFocus: L10n.$searchBarFocusedPlaceholder,
             searchText: $viewModel.searchText,
             pullToSearchConfig: .disabled,
             theme: .softLarge,
@@ -77,9 +77,9 @@ extension SearchView {
         VStack(spacing: Spacing.space200) {
             Spacer()
             imageForIcon(Icon.search)
-            Text.build(theme.font.paragraph.bold(LocalizableSearch.searchEmptyTitle))
+            Text.build(theme.font.paragraph.bold(L10n.searchScreenEmptyViewTitle))
                 .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(LocalizableSearch.searchEmptyMessage))
+            Text.build(theme.font.small.normal(L10n.searchScreenEmptyViewMessage))
                 .foregroundStyle(Colors.primary.black)
             Spacer()
         }
@@ -89,14 +89,18 @@ extension SearchView {
 
     private var noResultsView: some View {
         VStack(alignment: .leading, spacing: Spacing.space400) {
-            Text.build(theme.font.paragraph.normal(LocalizableSearch.searchNoResults(for: viewModel.searchText)))
+            Text.build(
+                theme.font.paragraph.normal(
+                    L10n.searchScreenNoResultsViewTermWithParameter(term: viewModel.searchText)
+                )
+            )
                 .foregroundStyle(Colors.primary.mono900)
-            Text.build(theme.font.paragraph.normal(LocalizableSearch.searchNoResultsHelp))
+            Text.build(theme.font.paragraph.normal(L10n.searchScreenNoResultsViewTitle))
                 .foregroundStyle(Colors.primary.mono900)
             Button(action: {
                 openBrands()
             }, label: {
-                Text.build(theme.font.paragraph.normalUnderline(LocalizableSearch.searchNoResultsLink))
+                Text.build(theme.font.paragraph.normalUnderline(L10n.searchScreenNoResultsViewLink))
                     .foregroundStyle(Colors.primary.mono900)
             })
             .accessibilityIdentifier(AccessibilityId.brandsListLink)
@@ -114,7 +118,7 @@ extension SearchView {
                 suggestionBrands
                 suggestionProducts
 
-                ThemedButton(text: LocalizableSearch.$suggestionsMore, style: .secondary) { onSubmit() }
+                ThemedButton(text: L10n.$searchScreenSuggestionsMoreButtonCTA, style: .secondary) { onSubmit() }
                     .accessibilityIdentifier(AccessibilityId.moreProductsCta)
             }
             .padding(Spacing.space200)
@@ -124,7 +128,7 @@ extension SearchView {
     @ViewBuilder private var suggestionTerms: some View {
         if !viewModel.suggestionTerms.isEmpty {
             LazyVStack(spacing: Spacing.space200) {
-                suggestionHeader(text: LocalizableSearch.$suggestionsTitle)
+                suggestionHeader(text: L10n.$searchScreenSuggestionsTermsHeaderTitle)
                     .accessibilityIdentifier(AccessibilityId.suggestionsTermsTitle)
                 ForEach(viewModel.suggestionTerms, id: \.self) { suggestion in
                     Button(action: {
@@ -141,7 +145,7 @@ extension SearchView {
     @ViewBuilder private var suggestionBrands: some View {
         if !viewModel.suggestionBrands.isEmpty {
             LazyVStack(spacing: Spacing.space200) {
-                suggestionHeader(text: LocalizableSearch.$suggestionsBrands)
+                suggestionHeader(text: L10n.$searchScreenSuggestionsBrandsHeaderTitle)
                     .accessibilityIdentifier(AccessibilityId.suggestionsBrandsTitle)
                 ForEach(viewModel.suggestionBrands, id: \.self) { brand in
                     Button(action: {
@@ -157,7 +161,7 @@ extension SearchView {
     @ViewBuilder private var suggestionProducts: some View {
         if !viewModel.suggestionProducts.isEmpty {
             VStack(spacing: Spacing.space150) {
-                suggestionHeader(text: LocalizableSearch.$suggestionsProducts)
+                suggestionHeader(text: L10n.$searchScreenSuggestionsProductsHeaderTitle)
                     .accessibilityIdentifier(AccessibilityId.suggestionsProductsTitle)
                 LazyVGrid(
                     columns: Array(
