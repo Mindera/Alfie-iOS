@@ -1,6 +1,6 @@
 import Foundation
 
-struct L10n {
+enum L10n {
     // MARK: - Internal Properties
 
     static var tableName: String {
