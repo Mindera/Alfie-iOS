@@ -5,13 +5,13 @@ final class LocalizationTests: XCTestCase {
     let localizations = Bundle.main.localizations
 
     func testLocalizationTables() {
-        testTable(L10n.self)
+        testTable(L10n.self, keys: L10n.Keys.self)
     }
 
     func testLocalizableHomeWithArgs() {
         localizations.forEach { localization in
-            let headerTitle = L10n.homeScreenLoggedInTitleWithParameter(username: "test")
-            let headerSubtitle = L10n.homeScreenLoggedInSubtitleWithParameter(registrationYear: "2024")
+            let headerTitle = L10n.homeLoggedInTitleWithParameter(username: "test")
+            let headerSubtitle = L10n.homeLoggedInSubtitleWithParameter(registrationYear: "2024")
             let resources: [String] = [headerTitle, headerSubtitle]
             XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
         }
@@ -86,8 +86,8 @@ final class LocalizationTests: XCTestCase {
 
     // MARK: - Private Test Helpers
 
-    private func testTable<T: LocalizableProtocol>(_ table: T.Type) {
-        table.Keys.allCases.forEach { key in
+    private func testTable<Keys>(_ table: L10n.Type, keys: Keys.Type) where Keys: RawRepresentable & CaseIterable, Keys.RawValue == String {
+        Keys.allCases.forEach { key in
             localizeResource(key: key.rawValue, table: table.tableName)
         }
     }

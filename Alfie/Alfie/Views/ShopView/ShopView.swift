@@ -136,11 +136,11 @@ extension ShopViewTab {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .categories:
-            L10n.$shopScreenCategoriesSegmentTitle
+            L10n.$shopCategoriesSegmentTitle
         case .brands:
-            L10n.$shopScreenBrandsSegmentTitle
+            L10n.$shopBrandsSegmentTitle
         case .services:
-            L10n.$shopScreenServicesSegmentTitle
+            L10n.$shopServicesSegmentTitle
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

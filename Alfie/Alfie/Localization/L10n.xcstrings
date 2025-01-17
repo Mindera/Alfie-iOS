@@ -1,7 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "account.screen.title" : {
+    "account.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -12,7 +12,7 @@
         }
       }
     },
-    "bag.screen.title" : {
+    "bag.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -45,7 +45,7 @@
         }
       }
     },
-    "feature_toggle.screen.title" : {
+    "feature_toggle.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -67,7 +67,7 @@
         }
       }
     },
-    "home.screen.logged_in.subtitle" : {
+    "home.logged_in.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -78,7 +78,7 @@
         }
       }
     },
-    "home.screen.logged_in.title" : {
+    "home.logged_in.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -89,7 +89,7 @@
         }
       }
     },
-    "home.screen.search_bar.placeholder" : {
+    "home.search_bar.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -100,7 +100,7 @@
         }
       }
     },
-    "home.screen.sign_in.button.cta" : {
+    "home.sign_in.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -111,7 +111,7 @@
         }
       }
     },
-    "home.screen.sign_out.button.cta" : {
+    "home.sign_out.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -122,7 +122,7 @@
         }
       }
     },
-    "home.screen.title" : {
+    "home.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -310,7 +310,7 @@
         }
       }
     },
-    "plp.refine_and_sort.screen.title" : {
+    "plp.refine_and_sort.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -618,6 +618,17 @@
         }
       }
     },
+    "shop.brands.segment.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brands"
+          }
+        }
+      }
+    },
     "shop.categories.error_view.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -640,18 +651,7 @@
         }
       }
     },
-    "shop.screen.brands.segment.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Brands"
-          }
-        }
-      }
-    },
-    "shop.screen.categories.segment.title" : {
+    "shop.categories.segment.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -662,7 +662,7 @@
         }
       }
     },
-    "shop.screen.services.segment.title" : {
+    "shop.services.segment.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -673,7 +673,7 @@
         }
       }
     },
-    "shop.screen.title" : {
+    "shop.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -860,7 +860,7 @@
         }
       }
     },
-    "wishlist.screen.title" : {
+    "wishlist.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

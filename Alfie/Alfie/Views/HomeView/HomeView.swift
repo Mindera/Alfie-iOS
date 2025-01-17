@@ -18,7 +18,7 @@ struct HomeView: View {
             if !coordinador.navigationAdapter.isPresentingFullScreenOverlay {
                 ThemedSearchBarView(
                     searchText: .constant(""),
-                    placeholder: L10n.$homeScreenSearchBarPlaceholder,
+                    placeholder: L10n.$homeSearchBarPlaceholder,
                     theme: .soft,
                     dismissConfiguration: .init(type: .back, accessibilityId: Constants.cancelAccessibilityId),
                     inputAccessibilityId: Constants.searchAccessibility
@@ -43,8 +43,8 @@ struct HomeView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 75)
-            Text.build(theme.font.header.h3(L10n.homeScreenTitle))
-            ThemedButton(text: isUserLogged ? L10n.$homeScreenSignOutButtonCTA : L10n.$homeScreenSignInButtonCTA) {
+            Text.build(theme.font.header.h3(L10n.homeTitle))
+            ThemedButton(text: isUserLogged ? L10n.$homeSignOutButtonCTA : L10n.$homeSignInButtonCTA) {
                 isUserLogged.toggle()
             }
             Spacer()
