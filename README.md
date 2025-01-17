@@ -270,7 +270,7 @@ This project uses [Apple String Catalog](https://developer.apple.com/documentati
 
 It is possible to initialise a localised string or a localised attributed string from a `LocalizedStringResource` beforehand or keep it to localise later when needed. The later approach enables having dynamic localisation on SwiftUI Previews by injecting different environment locales, while initialising a localised string/attributed string beforehand disables the ability to automatic lookup for a localisable resource in a different language.
 
-Part of the localisation infrastructure is a property wrapper `LocalizableResource` which provides a wrapped `LocalizedStringResource` and also a *projectedValue* with a localized String type for interoperability purposes. Use $(dollar sign) before the property name to access it.
+Part of the localisation infrastructure is a property wrapper `L10n.Resource` which provides a wrapped `LocalizedStringResource` and also a *projectedValue* with a localized String type for interoperability purposes. Use $(dollar sign) before the property name to access it.
 
 Some instructions outlined below.
 
@@ -280,7 +280,7 @@ Some instructions outlined below.
 2. **Manually** add the entries in the base language and any other languages. Please use `ReverseDomain` convention along with `SnakeCase` convention for keys naming (ex: `plp.error_view.title`) and give translation keys meaningful names.
 3. *Mark for Review* any entry not officially provided/approved to easily track the translations state (*Mark as Reviewed* when this happens too)
 4. Add the required nested enumeration `Keys` in `L10n+Keys` file with a case for each entry added in the step 2. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
-5. Add the required `@LocalizableResource` variables in `L10n` file for each key added in the step 4. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
+5. Add the required `@Resource` variables in `L10n+Resources` file for each key added in the step 4. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
 6. To handle entries with arguments (*%d*, *%@*) specify a dedicated function for each entry. In an edge case of having very complex text copy to manage this way, not following this approach leads to get the literal string with the wildcards and you can still use String(format:) with variadic parameters as fallback.
 
 **Note:** New tables are discouraged, the goal is to have everything in the `L10n` table.
@@ -288,7 +288,8 @@ Some instructions outlined below.
 **Sample**
 
 ```
-struct L10n: LocalizableProtocol {
+// L10n+Resources.swift
+extension L10n {
 
 	...
 	
@@ -301,8 +302,9 @@ struct L10n: LocalizableProtocol {
 	@LocalizableResource<Self>(.homeScreenTitle) static var homeScreenTitle
 }
 
+// L10n+Keys.swift
 extension L10n {
-	enum Keys: String, LocalizableKeyProtocol {
+	enum Keys: String, RawRepresentable, CaseIterable {
 	
 		...
 		

@@ -16,8 +16,8 @@ enum ToolbarItemProvider {
                 case .loggedIn(let username, let memberSince):
                     ThemedToolbarTitle(
                         style: .leftText(
-                            L10n.homeScreenLoggedInTitleWithParameter(username: username),
-                            subtitle: L10n.homeScreenLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)")
+                            L10n.homeLoggedInTitleWithParameter(username: username),
+                            subtitle: L10n.homeLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)")
                         ),
                         accessibilityId: AccessibilityId.titleHeader
                     )
@@ -28,19 +28,19 @@ enum ToolbarItemProvider {
 
             case .tab(.bag):
                 ThemedToolbarTitle(
-                    style: .leftText(L10n.$bagScreenTitle),
+                    style: .leftText(L10n.$bagTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.shop):
                 ThemedToolbarTitle(
-                    style: .leftText(L10n.$shopScreenTitle),
+                    style: .leftText(L10n.$shopTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.wishlist):
                 ThemedToolbarTitle(
-                    style: .leftText(L10n.$wishlistScreenTitle),
+                    style: .leftText(L10n.$wishlistTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -74,13 +74,13 @@ enum ToolbarItemProvider {
 
             case .account:
                 ThemedToolbarTitle(
-                    style: .text(L10n.$accountScreenTitle),
+                    style: .text(L10n.$accountTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .wishlist:
                 ThemedToolbarTitle(
-                    style: .text(L10n.$wishlistScreenTitle),
+                    style: .text(L10n.$wishlistTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 

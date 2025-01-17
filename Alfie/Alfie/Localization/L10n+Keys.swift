@@ -1,31 +1,30 @@
 import Foundation
 
-// swiftlint:disable identifier_name
 extension L10n {
-    enum Keys: String, LocalizableKeyProtocol {
+    enum Keys: String, RawRepresentable, CaseIterable {
         // MARK: - Account Screen
 
-        case accountScreenTitle = "account.screen.title"
+        case accountTitle = "account.title"
 
         // MARK: - Bag Screen
 
-        case bagScreenTitle = "bag.screen.title"
+        case bagTitle = "bag.title"
 
         // MARK: - Feature Toggle
 
         case featureToggleAppUpdateOptionTitle = "feature_toggle.app_update.option.title"
         case featureToggleDebugConfigurationOptionTitle = "feature_toggle.debug_configuration.option.title"
-        case featureToggleScreenTitle = "feature_toggle.screen.title"
+        case featureToggleTitle = "feature_toggle.title"
         case featureToggleWishlistOptionTitle = "feature_toggle.wishlist.option.title"
 
         // MARK: - Home Screen
 
-        case homeScreenLoggedInSubtitle = "home.screen.logged_in.subtitle"
-        case homeScreenLoggedInTitle = "home.screen.logged_in.title"
-        case homeScreenSearchBarPlaceholder = "home.screen.search_bar.placeholder"
-        case homeScreenSignInButtonCTA = "home.screen.sign_in.button.cta"
-        case homeScreenSignOutButtonCTA = "home.screen.sign_out.button.cta"
-        case homeScreenTitle = "home.screen.title"
+        case homeLoggedInTitle = "home.logged_in.title"
+        case homeLoggedInSubtitle = "home.logged_in.subtitle"
+        case homeSearchBarPlaceholder = "home.search_bar.placeholder"
+        case homeSignInButtonCTA = "home.sign_in.button.cta"
+        case homeSignOutButtonCTA = "home.sign_out.button.cta"
+        case homeTitle = "home.title"
 
         // MARK: - Loading
 
@@ -46,11 +45,11 @@ extension L10n {
 
         // MARK: - Product list page
 
-        case plpErrorViewMessage = "plp.error_view.message"
         case plpErrorViewTitle = "plp.error_view.title"
+        case plpErrorViewMessage = "plp.error_view.message"
         case plpListStyleOptionTitle = "plp.list_style.option.title"
         case plpNumberOfResultsMessage = "plp.number_of_results.message"
-        case plpRefineAndSortScreenTitle = "plp.refine_and_sort.screen.title"
+        case plpRefineAndSortTitle = "plp.refine_and_sort.title"
         case plpRefineButtonCTA = "plp.refine.button.cta"
         case plpShowResultsButtonCTA = "plp.show_results.button.cta"
         case plpSortByOptionTitle = "plp.sort_by.option.title"
@@ -89,10 +88,10 @@ extension L10n {
         case shopBrandsSearchBarPlaceholder = "shop.brands.search_bar.placeholder"
         case shopCategoriesErrorViewMessage = "shop.categories.error_view.message"
         case shopCategoriesErrorViewTitle = "shop.categories.error_view.title"
-        case shopScreenBrandsSegmentTitle = "shop.screen.brands.segment.title"
-        case shopScreenCategoriesSegmentTitle = "shop.screen.categories.segment.title"
-        case shopScreenServicesSegmentTitle = "shop.screen.services.segment.title"
-        case shopScreenTitle = "shop.screen.title"
+        case shopBrandsSegmentTitle = "shop.brands.segment.title"
+        case shopCategoriesSegmentTitle = "shop.categories.segment.title"
+        case shopServicesSegmentTitle = "shop.services.segment.title"
+        case shopTitle = "shop.title"
 
         // MARK: - Sort by
 
@@ -121,7 +120,6 @@ extension L10n {
 
         // MARK: - Wishlist Screen
 
-        case wishlistScreenTitle = "wishlist.screen.title"
+        case wishlistTitle = "wishlist.title"
     }
 }
-// swiftlint:enable identifier_name

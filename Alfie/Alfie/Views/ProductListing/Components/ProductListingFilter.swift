@@ -55,7 +55,7 @@ struct ProductListingFilter: View {
                     .foregroundStyle(Colors.primary.black)
             })
             Spacer()
-            ThemedToolbarTitle(style: .text(L10n.$plpRefineAndSortScreenTitle))
+            ThemedToolbarTitle(style: .text(L10n.$plpRefineAndSortTitle))
             Spacer()
         }
         .padding(.horizontal, Spacing.space300)
