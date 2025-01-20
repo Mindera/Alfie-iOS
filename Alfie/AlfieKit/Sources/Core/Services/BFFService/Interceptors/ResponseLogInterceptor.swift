@@ -1,7 +1,6 @@
 import AlicerceLogging
 import Apollo
 import BFFGraphApi
-import Common
 import Foundation
 
 final class ResponseLogInterceptor: ApolloInterceptor {

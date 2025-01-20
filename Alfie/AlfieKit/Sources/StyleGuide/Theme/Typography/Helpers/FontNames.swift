@@ -2,7 +2,6 @@ import AlicerceLogging
 import Foundation
 import SwiftUI
 import class UIKit.UIFont
-import Common
 
 // MARK: - FontNames
 
