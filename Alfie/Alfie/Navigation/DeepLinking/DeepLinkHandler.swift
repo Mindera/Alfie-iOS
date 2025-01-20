@@ -41,12 +41,12 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
 
     func handleDeepLink(_ deepLink: DeepLink) {
         guard canHandleDeepLink(deepLink) else {
-            logWarning("Cannot handle deeplink \(deepLink), ignoring")
+            log.debug("Cannot handle deeplink \(deepLink), ignoring")
             return
         }
 
         guard isReadyToHandleLinks else {
-            log("App is not yet ready to handle deeplink \(deepLink), adding it to pending list", level: .info)
+            log.info("App is not yet ready to handle deeplink \(deepLink), adding it to pending list")
             pendingLinks.append(deepLink)
             return
         }
@@ -98,7 +98,7 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
         }
 
         if let target {
-            log("Handling deeplink \(deepLink) by navigating to \(target)")
+            log.debug("Handling deeplink \(deepLink) by navigating to \(target)")
             coordinator.navigate(to: target)
         }
     }
@@ -111,7 +111,7 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
         }
 
         let pendingLink = pendingLinks.removeFirst()
-        log("App is ready to handle deeplinks, handle pending deeplink \(pendingLinks)", printToConsole: false)
+        log.debug("App is ready to handle deeplinks, handle pending deeplink \(pendingLinks)")
         handleDeepLink(pendingLink)
 
         if !pendingLinks.isEmpty {

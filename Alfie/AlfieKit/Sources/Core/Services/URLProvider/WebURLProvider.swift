@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Common
 import Foundation
 import Models
@@ -5,15 +6,21 @@ import Models
 public final class WebURLProvider: WebURLProviderProtocol {
     public var host: String
     public var scheme: String
-
-    public init(scheme: String = "https", host: String) {
+    private let log: Logger
+    
+    public init(
+        scheme: String = "https",
+        host: String,
+        log: Logger
+    ) {
         self.scheme = scheme
         self.host = host
+        self.log = log
     }
 
     public func url<E: WebURLEndpoint>(for endpoint: E) -> URL? {
         guard isAbsoluteWebUrl else {
-            logError("URL scheme is invalid for web: \(scheme)")
+            log.error("URL scheme is invalid for web: \(scheme)")
             return nil
         }
 
@@ -28,7 +35,7 @@ public final class WebURLProvider: WebURLProviderProtocol {
         }
 
         guard let url = components.url else {
-            logError("Error building URL for path: \(endpoint.path)")
+            log.error("Error building URL for path: \(endpoint.path)")
             return nil
         }
         return url

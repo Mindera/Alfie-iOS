@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Foundation
 
 public final class NetworkClient: NetworkClientProtocol {
@@ -7,10 +8,16 @@ public final class NetworkClient: NetworkClientProtocol {
 
     private let logRequests: Bool
     private let logResponses: Bool
+    private let log: Logger
 
-    public init(logRequests: Bool = true, logResponses: Bool = true) {
+    public init(
+        logRequests: Bool = true,
+        logResponses: Bool = true,
+        log: Logger
+    ) {
         self.logRequests = logRequests
         self.logResponses = logResponses
+        self.log = log
     }
 
     // MARK: - NetworkClientProtocol
@@ -25,7 +32,7 @@ public final class NetworkClient: NetworkClientProtocol {
         }
 
         if logRequests {
-            log("[REST] Outgoing GET request: \(request)")
+            log.debug("[REST] Outgoing GET request: \(request)")
         }
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -35,12 +42,12 @@ public final class NetworkClient: NetworkClientProtocol {
         }
 
         if logResponses {
-            log("[REST] HTTP Response: \(response)")
+            log.debug("[REST] HTTP Response: \(response)")
 
             if let stringData = String(data: data, encoding: .utf8) {
-                log("[REST] Response Data: \(stringData)")
+                log.debug("[REST] Response Data: \(stringData)")
             } else {
-                logError("[REST] Could not convert response data to string")
+                log.error("[REST] Could not convert response data to string")
             }
         }
 
@@ -58,14 +65,14 @@ public final class NetworkClient: NetworkClientProtocol {
         }
 
         if logRequests {
-            log("[REST] Outgoing POST request: \(request)")
+            log.debug("[REST] Outgoing POST request: \(request)")
         }
 
         let encodedData = try JSONEncoder().encode(data)
         let (_, response) = try await URLSession.shared.upload(for: request, from: encodedData)
 
         if logResponses {
-            log("[REST] HTTP Response: \(response)")
+            log.debug("[REST] HTTP Response: \(response)")
         }
 
         guard let response = response as? HTTPURLResponse, !response.isError else {

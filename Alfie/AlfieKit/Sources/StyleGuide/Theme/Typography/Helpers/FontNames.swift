@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Foundation
 import SwiftUI
 import class UIKit.UIFont
@@ -40,7 +41,7 @@ public enum FontManager {
             let provider = CGDataProvider(data: asset.data as NSData),
             let font = CGFont(provider)
         else {
-            logError("FontManager failed to register font \(name)")
+            log.error("FontManager failed to register font \(name)")
             throw FontError.failedToRegisterFont(name)
         }
 
@@ -58,16 +59,16 @@ extension UIFont {
     // swiftlint:disable:next strict_fileprivate
     fileprivate static func register(from url: URL) {
         guard let fontDataProvider = CGDataProvider(url: url as CFURL) else {
-            logError("could not get reference to font data provider")
+            log.error("could not get reference to font data provider")
             return
         }
         guard let font = CGFont(fontDataProvider) else {
-            logError("could not get font from coregraphics")
+            log.error("could not get font from coregraphics")
             return
         }
         var error: Unmanaged<CFError>?
         guard CTFontManagerRegisterGraphicsFont(font, &error) else {
-            logError("error registering font: \(error.debugDescription)")
+            log.error("error registering font: \(error.debugDescription)")
             return
         }
     }

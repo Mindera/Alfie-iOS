@@ -1,15 +1,18 @@
+import AlicerceLogging
 import BrazeKit
 import Combine
 import Common
 import Core
 import Foundation
 import Models
+import os
 import StyleGuide
 import UIKit
 #if DEBUG
 import Mocks
 #endif
 
+private(set) var log: AlicerceLogging.Logger!
 // MARK: - AppDelegate
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, AppDelegateProtocol {
@@ -46,12 +49,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Private
 
     private func bootstrap(application: UIApplication?) {
+        
         if ProcessInfo.isSwiftUIPreview || ProcessInfo.isRunningTests {
             #if DEBUG
             serviceProvider = MockServiceProvider()
+            Alfie.log = Log.DummyLogger()
             #endif
         } else {
-            CoreBootstrap.bootstrap()
+            Alfie.log = createLogger()
+            CoreBootstrap.bootstrap(log: log)
+            StyleGuideLogger.setStyleGuideLogger(logger: log)
             serviceProvider = ServiceProvider()
             if let application {
                 application.registerForRemoteNotifications()
@@ -101,5 +108,38 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             willPresent: willPresent,
             completionHandler: completionHandler
         )
+    }
+}
+
+private extension AppDelegate {
+    private func createLogger() -> AlicerceLogging.Logger {
+        let log = OSLog(subsystem: "com.mindera.alfie", category: "console")
+        
+        return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
+            destinations: [
+                Log.ConsoleLogDestination(
+                    formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
+                    minLevel: .verbose,
+                    output: { os_log($0.osLogType, log: log, "%{public}s", $1) }
+                ).eraseToAnyMetadataLogDestination(),
+                FirebaseLogDestination()
+                    .eraseToAnyMetadataLogDestination()
+            ]
+        )
+    }
+}
+
+private extension Log.Level {
+    var osLogType: OSLogType {
+        switch self {
+        case .verbose,
+             .debug:
+            return .debug
+        case .info:
+            return .info
+        case .warning,
+             .error:
+            return .error
+        }
     }
 }

@@ -194,11 +194,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         do {
             product = try await dependencies.productService.getProduct(id: productId)
         } catch let error as BFFRequestError where error.isNotFound {
-            logError("Product \(productId) not found.")
+            log.error("Product \(productId) not found.")
             state = .error(.notFound)
             return
         } catch {
-            logError("Error fetching product \(productId): \(error)")
+            log.error("Error fetching product \(productId): \(error)")
             state = .error(.generic)
             return
         }
@@ -330,7 +330,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     private func didSelect(colorSwatch: ColorSwatch) {
         guard let product else {
-            logError("Tried to select color on inexistent product")
+            log.error("Tried to select color on inexistent product")
             return
         }
 
@@ -338,7 +338,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             where: { $0.colour?.id == colorSwatch.id && $0.size?.id == selectedVariant?.size?.id }
         )
         else {
-            log("Unexpected data inconsistency: tried to select color \(colorSwatch.id) on product \(productId) but no variant exists with that color, ignoring selection")
+            log.debug("Unexpected data inconsistency: tried to select color \(colorSwatch.id) on product \(productId) but no variant exists with that color, ignoring selection")
             return
         }
 
@@ -347,7 +347,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     private func didSelect(sizingSwatch: SizingSwatch) {
         guard let product else {
-            logError("Tried to select size on inexistent product")
+            log.error("Tried to select size on inexistent product")
             return
         }
 
@@ -355,7 +355,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             where: { $0.size?.id == sizingSwatch.id && $0.colour?.id == selectedVariant?.colour?.id }
         )
         else {
-            log("Unexpected data inconsistency: tried to select size \(sizingSwatch.id) on product \(productId) but no variant exists with that size, ignoring selection")
+            log.debug("Unexpected data inconsistency: tried to select size \(sizingSwatch.id) on product \(productId) but no variant exists with that size, ignoring selection")
             return
         }
 

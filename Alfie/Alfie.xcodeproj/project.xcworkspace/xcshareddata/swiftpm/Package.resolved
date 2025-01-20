@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "alicerce",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Mindera/Alicerce.git",
+      "state" : {
+        "revision" : "bd9b6bd326ebee7aee956dabba737febffde6895",
+        "version" : "0.18.0"
+      }
+    },
+    {
       "identity" : "apollo-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apollographql/apollo-ios.git",

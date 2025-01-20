@@ -32,7 +32,10 @@ final class ServiceProvider: ServiceProviderProtocol {
     init() {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
-        self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost)
+        self.webUrlProvider = WebURLProvider(
+            host: ThemedURL.preferredHost,
+            log: log
+        )
 
         // Assuming Australia for now, to be revised later
         let defaultInitializationCountry = "AU"
@@ -41,7 +44,8 @@ final class ServiceProvider: ServiceProviderProtocol {
         trackingService = TrackingService(providers: [FirebaseAnalyticsService()])
 
         let firebaseProvider = FirebaseRemoteConfigurationProvider(
-            minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800
+            minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800,
+            log: log
         )
         let localProvider = LocalConfigurationProvider()
 
@@ -68,17 +72,22 @@ final class ServiceProvider: ServiceProviderProtocol {
 
         // BFF API (GraphQL + REST)
         // Pass false if you wish to remove console clutter
-        let restClient = NetworkClient(logRequests: true, logResponses: true)
+        let restClient = NetworkClient(
+            logRequests: true,
+            logResponses: true,
+            log: log
+        )
         let bffDependencies = BFFClientDependencyContainer(
             reachabilityService: reachabilityService,
             restNetworkClient: restClient
         )
         let apiUrl = apiEndpointService.apiEndpoint(for: apiEndpointService.currentApiEndpoint)
-        log("Initializing BFF API with endpoint \(apiUrl.absoluteString)")
+        log.debug("Initializing BFF API with endpoint \(apiUrl.absoluteString)")
         let bffClient = BFFClientService(
             url: apiUrl,
             logRequests: true, // Pass false if you wish to remove console clutter
-            dependencies: bffDependencies
+            dependencies: bffDependencies,
+            log: log
         )
         notificationsService = NotificationsService()
 
@@ -87,7 +96,10 @@ final class ServiceProvider: ServiceProviderProtocol {
         productService = ProductService(bffClient: bffClient)
         brandsService = BrandsService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
-        webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient)
+        webViewConfigurationService = WebViewConfigurationService(
+            bffClient: bffClient,
+            log: log
+        )
         bagService = MockBagService()
         wishlistService = MockWishlistService()
     }

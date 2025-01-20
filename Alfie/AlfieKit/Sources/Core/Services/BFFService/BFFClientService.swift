@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Apollo
 import BFFGraphApi
 import Common
@@ -18,7 +19,8 @@ public final class BFFClientService: BFFClientServiceProtocol {
         url: Foundation.URL,
         sessionConfiguration: URLSessionConfiguration = .default,
         logRequests: Bool = true,
-        dependencies: BFFClientDependencyContainerProtocol
+        dependencies: BFFClientDependencyContainerProtocol,
+        log: Logger
     ) {
         self.dependencies = dependencies
         self.baseUrl = url
@@ -30,7 +32,8 @@ public final class BFFClientService: BFFClientServiceProtocol {
             client: client,
             store: store,
             reachabilityService: dependencies.reachabilityService,
-            logRequests: logRequests
+            logRequests: logRequests,
+            log: log
         )
         let transport = RequestChainNetworkTransport(
             interceptorProvider: provider,

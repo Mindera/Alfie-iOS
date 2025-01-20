@@ -11,7 +11,7 @@ enum WebViewPreload {
         Task.detached {
             let webView = await WKWebView()
             await webView.loadHTMLString("", baseURL: nil)
-            log("Preloaded WebView")
+            log.debug("Preloaded WebView")
         }
     }
 }
