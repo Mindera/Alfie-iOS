@@ -57,8 +57,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             #endif
         } else {
             Alfie.log = createLogger()
-            CoreBootstrap.bootstrap(log: log)
-            StyleGuideLogger.setStyleGuideLogger(logger: log)
+            CoreBootstrap.bootstrapFirebaseApp(log: log)
+            StyleGuideLogger.set(logger: log)
             serviceProvider = ServiceProvider()
             if let application {
                 application.registerForRemoteNotifications()

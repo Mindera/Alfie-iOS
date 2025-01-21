@@ -49,7 +49,11 @@ final class DeepLinkServiceTests: XCTestCase {
             DeepLink(type: .webView(url: self.testUrl), fullUrl: self.testUrl)
         }
 
-        sut = .init(parsers: [parser], configuration: configuration, log: log)
+        sut = .init(
+            parsers: [parser],
+            configuration: configuration,
+            log: log
+        )
         let result = sut.canHandleUrl(testUrl)
         XCTAssertFalse(result)
     }
