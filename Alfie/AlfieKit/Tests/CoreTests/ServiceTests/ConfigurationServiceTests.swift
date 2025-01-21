@@ -1,5 +1,5 @@
 import Combine
-import CommonTestUtils
+import TestUtils
 import XCTest
 @testable import Core
 import Mocks

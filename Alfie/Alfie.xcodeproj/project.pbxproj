@@ -7,15 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		493DECBE2B8E2B4B00907ECD /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 493DECBD2B8E2B4B00907ECD /* Common */; };
 		49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 49AFF8542B6D0AA600695C66 /* OrderedCollections */; };
-		A10132F52B6BB6FC00A4C9C8 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = A10132F42B6BB6FC00A4C9C8 /* Navigation */; };
 		BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BA04B1A22B977EE700713298 /* SnapshotTesting */; };
-		BA076BAA2B70E24B0005E0EE /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = BA076BA92B70E24B0005E0EE /* Mocks */; };
-		BA1C21D02B97362C007596F1 /* CommonTestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = BA1C21CF2B97362C007596F1 /* CommonTestUtils */; };
-		BAB78AF02B6C00B90038C650 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = BAB78AEF2B6C00B90038C650 /* Models */; };
-		BE6402652B9A360600834C4A /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = BE6402642B9A360600834C4A /* Core */; };
-		BE8B02532B6169C7007AE489 /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = BE8B02522B6169C7007AE489 /* StyleGuide */; };
+		C54DA2B52D368A40005142F4 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B42D368A40005142F4 /* Common */; };
+		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
+		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
+		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
+		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
+		C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BE2D368A40005142F4 /* StyleGuide */; };
+		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
+		C5E0B4B52D36ABDF00D759F7 /* BFFGraphApi in Frameworks */ = {isa = PBXBuildFile; productRef = C5E0B4B42D36ABDF00D759F7 /* BFFGraphApi */; };
+		C5E0B4B72D36ABDF00D759F7 /* BFFGraphMocks in Frameworks */ = {isa = PBXBuildFile; productRef = C5E0B4B62D36ABDF00D759F7 /* BFFGraphMocks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +41,7 @@
 		BE8B02242B616976007AE489 /* Alfie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Alfie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B02342B616979007AE489 /* AlfieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B023E2B616979007AE489 /* AlfieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5C9C4C92D3571D800D5D70E /* AlfieKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AlfieKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -66,7 +69,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		615E06922CF633EA00065ECF /* Packages */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Packages; sourceTree = "<group>"; };
 		615E06B92CF633FC00065ECF /* AlfieTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E06D72CF633FC00065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AlfieTests; sourceTree = "<group>"; };
 		615E06DA2CF633FE00065ECF /* AlfieUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AlfieUITests; sourceTree = "<group>"; };
 		615E07D42CF6369900065ECF /* Alfie */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Alfie; sourceTree = "<group>"; };
@@ -77,13 +79,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10132F52B6BB6FC00A4C9C8 /* Navigation in Frameworks */,
+				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
+				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
+				C5E0B4B72D36ABDF00D759F7 /* BFFGraphMocks in Frameworks */,
+				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
 				49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */,
-				BAB78AF02B6C00B90038C650 /* Models in Frameworks */,
-				BE8B02532B6169C7007AE489 /* StyleGuide in Frameworks */,
-				BE6402652B9A360600834C4A /* Core in Frameworks */,
-				493DECBE2B8E2B4B00907ECD /* Common in Frameworks */,
-				BA076BAA2B70E24B0005E0EE /* Mocks in Frameworks */,
+				C54DA2B52D368A40005142F4 /* Common in Frameworks */,
+				C5E0B4B52D36ABDF00D759F7 /* BFFGraphApi in Frameworks */,
+				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
+				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,8 +95,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C54DA59D2D369927005142F4 /* TestUtils in Frameworks */,
 				BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */,
-				BA1C21D02B97362C007596F1 /* CommonTestUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,7 +120,7 @@
 		BE8B021B2B616976007AE489 = {
 			isa = PBXGroup;
 			children = (
-				615E06922CF633EA00065ECF /* Packages */,
+				C5C9C4C92D3571D800D5D70E /* AlfieKit */,
 				615E07D42CF6369900065ECF /* Alfie */,
 				615E06B92CF633FC00065ECF /* AlfieTests */,
 				615E06DA2CF633FE00065ECF /* AlfieUITests */,
@@ -158,14 +162,15 @@
 			);
 			name = Alfie;
 			packageProductDependencies = (
-				BE8B02522B6169C7007AE489 /* StyleGuide */,
-				A10132F42B6BB6FC00A4C9C8 /* Navigation */,
 				49AFF8542B6D0AA600695C66 /* OrderedCollections */,
-				BAB78AEF2B6C00B90038C650 /* Models */,
-				BA076BA92B70E24B0005E0EE /* Mocks */,
-				493DECBD2B8E2B4B00907ECD /* Common */,
-				493DECBD2B8E2B4B00907ECD /* Common */,
-				BE6402642B9A360600834C4A /* Core */,
+				C54DA2B42D368A40005142F4 /* Common */,
+				C54DA2B62D368A40005142F4 /* Core */,
+				C54DA2B82D368A40005142F4 /* Mocks */,
+				C54DA2BA2D368A40005142F4 /* Models */,
+				C54DA2BC2D368A40005142F4 /* Navigation */,
+				C54DA2BE2D368A40005142F4 /* StyleGuide */,
+				C5E0B4B42D36ABDF00D759F7 /* BFFGraphApi */,
+				C5E0B4B62D36ABDF00D759F7 /* BFFGraphMocks */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -190,7 +195,7 @@
 			name = AlfieTests;
 			packageProductDependencies = (
 				BA04B1A22B977EE700713298 /* SnapshotTesting */,
-				BA1C21CF2B97362C007596F1 /* CommonTestUtils */,
+				C54DA59C2D369927005142F4 /* TestUtils */,
 			);
 			productName = AlfieTests;
 			productReference = BE8B02342B616979007AE489 /* AlfieTests.xctest */;
@@ -721,43 +726,51 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		493DECBD2B8E2B4B00907ECD /* Common */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Common;
-		};
 		49AFF8542B6D0AA600695C66 /* OrderedCollections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = OrderedCollections;
-		};
-		A10132F42B6BB6FC00A4C9C8 /* Navigation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Navigation;
 		};
 		BA04B1A22B977EE700713298 /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
 		};
-		BA076BA92B70E24B0005E0EE /* Mocks */ = {
+		C54DA2B42D368A40005142F4 /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Mocks;
+			productName = Common;
 		};
-		BA1C21CF2B97362C007596F1 /* CommonTestUtils */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CommonTestUtils;
-		};
-		BAB78AEF2B6C00B90038C650 /* Models */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Models;
-		};
-		BE6402642B9A360600834C4A /* Core */ = {
+		C54DA2B62D368A40005142F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Core;
 		};
-		BE8B02522B6169C7007AE489 /* StyleGuide */ = {
+		C54DA2B82D368A40005142F4 /* Mocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Mocks;
+		};
+		C54DA2BA2D368A40005142F4 /* Models */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Models;
+		};
+		C54DA2BC2D368A40005142F4 /* Navigation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Navigation;
+		};
+		C54DA2BE2D368A40005142F4 /* StyleGuide */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = StyleGuide;
+		};
+		C54DA59C2D369927005142F4 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TestUtils;
+		};
+		C5E0B4B42D36ABDF00D759F7 /* BFFGraphApi */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BFFGraphApi;
+		};
+		C5E0B4B62D36ABDF00D759F7 /* BFFGraphMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BFFGraphMocks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

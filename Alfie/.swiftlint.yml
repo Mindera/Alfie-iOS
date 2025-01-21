@@ -1,28 +1,15 @@
 included:
   - Alfie
-  - Packages
+  - AlfieKit
 excluded:
   - .build
   - scripts
   - DerivedData
-  - Packages/Mocks
-  - Packages/Common/Package.swift
-  - Packages/Core/.build
-  - Packages/Core/.swiftpm
-  - Packages/Core/BFFGraphApi
-  - Packages/Core/Tests
-  - Packages/Core/Package.swift
-  - Packages/Navigation/Package.swift
-  - Packages/Navigation/Tests
-  - Packages/StyleGuide/.build
-  - Packages/StyleGuide/.swiftpm
-  - Packages/StyleGuide/Tests
-  - Packages/StyleGuide/Package.swift
-  - Packages/StyleGuide/.build
-  - Packages/StyleGuide/.swiftpm
-  - Packages/Models/.build
-  - Packages/Models/.swiftpm
-  - Packages/Models/Package.swift
+  - AlfieKit/.build
+  - AlfieKit/.swiftpm
+  - AlfieKit/Package.swift
+  - AlfieKit/Sources/BFFGraph
+  - AlfieKit/Tests
 analyzer_rules:
   - unused_declaration
   - unused_import

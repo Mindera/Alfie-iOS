@@ -1,4 +1,4 @@
-import CommonTestUtils
+import TestUtils
 import OrderedCollections
 import Mocks
 import Models
