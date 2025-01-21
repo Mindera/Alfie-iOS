@@ -112,22 +112,19 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
 private extension AppDelegate {
     private func createLogger() -> AlicerceLogging.Logger {
-        Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
+        let log = OSLog(subsystem: "com.mindera.alfie", category: "console")
+
+        return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
             destinations: [
-                createOSLogConsoleLogDestination()
-                    .eraseToAnyMetadataLogDestination(),
+                Log.ConsoleLogDestination(
+                    formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
+                    minLevel: .verbose,
+                    output: { os_log($0.osLogType, log: log, "%{public}s", $1) }
+                )
+                .eraseToAnyMetadataLogDestination(),
                 FirebaseLogDestination()
                     .eraseToAnyMetadataLogDestination()
             ]
-        )
-    }
-
-    private func createOSLogConsoleLogDestination() -> Log.ConsoleLogDestination<Log.StringLogItemFormatter, Log.NoMetadataKey> {
-        let log = OSLog(subsystem: "com.mindera.alfie", category: "console")
-        return Log.ConsoleLogDestination(
-            formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
-            minLevel: .verbose,
-            output: { os_log($0.osLogType, log: log, "%{public}s", $1) }
         )
     }
 }
