@@ -8,4 +8,3 @@ public enum SortByType: String, Hashable {
     case alphaAsc = "A_Z"
     case alphaDesc = "Z_A"
 }
-

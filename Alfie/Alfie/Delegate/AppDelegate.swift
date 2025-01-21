@@ -49,7 +49,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Private
 
     private func bootstrap(application: UIApplication?) {
-        
+
         if ProcessInfo.isSwiftUIPreview || ProcessInfo.isRunningTests {
             #if DEBUG
             serviceProvider = MockServiceProvider()
@@ -113,18 +113,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
 private extension AppDelegate {
     private func createLogger() -> AlicerceLogging.Logger {
-        let log = OSLog(subsystem: "com.mindera.alfie", category: "console")
-        
-        return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
+        Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
             destinations: [
-                Log.ConsoleLogDestination(
-                    formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
-                    minLevel: .verbose,
-                    output: { os_log($0.osLogType, log: log, "%{public}s", $1) }
-                ).eraseToAnyMetadataLogDestination(),
+                createOSLogConsoleLogDestination()
+                    .eraseToAnyMetadataLogDestination(),
                 FirebaseLogDestination()
                     .eraseToAnyMetadataLogDestination()
             ]
+        )
+    }
+
+    private func createOSLogConsoleLogDestination() -> Log.ConsoleLogDestination<Log.StringLogItemFormatter, Log.NoMetadataKey> {
+        let log = OSLog(subsystem: "com.mindera.alfie", category: "console")
+        return Log.ConsoleLogDestination(
+            formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
+            minLevel: .verbose,
+            output: { os_log($0.osLogType, log: log, "%{public}s", $1) }
         )
     }
 }
@@ -132,13 +136,11 @@ private extension AppDelegate {
 private extension Log.Level {
     var osLogType: OSLogType {
         switch self {
-        case .verbose,
-             .debug:
+        case .verbose, .debug:
             return .debug
         case .info:
             return .info
-        case .warning,
-             .error:
+        case .warning, .error:
             return .error
         }
     }

@@ -9,6 +9,7 @@ excluded:
   - AlfieKit/.swiftpm
   - AlfieKit/Package.swift
   - AlfieKit/Sources/BFFGraph
+  - AlfieKit/Sources/Mocks
   - AlfieKit/Tests
 analyzer_rules:
   - unused_declaration
