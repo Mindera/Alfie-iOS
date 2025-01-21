@@ -13,7 +13,7 @@ public final class WebViewConfigurationService: WebViewConfigurationServiceProto
     ) {
         self.bffClient = bffClient
         self.log = log
-        
+
         Task {
             await fetchConfiguration()
         }

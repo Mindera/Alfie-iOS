@@ -49,7 +49,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Private
 
     private func bootstrap(application: UIApplication?) {
-
         if ProcessInfo.isSwiftUIPreview || ProcessInfo.isRunningTests {
             #if DEBUG
             serviceProvider = MockServiceProvider()
@@ -138,8 +137,10 @@ private extension Log.Level {
         switch self {
         case .verbose, .debug:
             return .debug
+
         case .info:
             return .info
+
         case .warning, .error:
             return .error
         }

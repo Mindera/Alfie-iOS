@@ -6,7 +6,7 @@ import Foundation
 final class RequestLogInterceptor: ApolloInterceptor {
     var id: String = UUID().uuidString
     private var log: Logger
-    
+
     init(log: Logger) {
         self.log = log
     }

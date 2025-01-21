@@ -10,7 +10,7 @@ final class ResponseLogInterceptor: ApolloInterceptor {
 
     public var id: String = UUID().uuidString
     private let log: Logger
-    
+
     init(log: Logger) {
         self.log = log
     }
