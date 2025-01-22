@@ -12,11 +12,12 @@ import UIKit
 import Mocks
 #endif
 
+// swiftlint:disable implicitly_unwrapped_optional
 private(set) var log: AlicerceLogging.Logger!
+
 // MARK: - AppDelegate
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, AppDelegateProtocol {
-    // swiftlint:disable implicitly_unwrapped_optional
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
     var tabCoordinator: TabCoordinator!
@@ -116,6 +117,7 @@ private extension AppDelegate {
 
         return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
             destinations: [
+                // swiftlint:disable:next trailing_closure
                 Log.ConsoleLogDestination(
                     formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
                     minLevel: .verbose,
@@ -123,7 +125,7 @@ private extension AppDelegate {
                 )
                 .eraseToAnyMetadataLogDestination(),
                 FirebaseLogDestination()
-                    .eraseToAnyMetadataLogDestination()
+                    .eraseToAnyMetadataLogDestination(),
             ]
         )
     }
