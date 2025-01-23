@@ -116,9 +116,9 @@ final class LocalizationTests: XCTestCase {
         // %u: Unsigned integer specifier.
         // %1$@, %2$d, etc.: Positional specifiers.
         let unresolvedPlaceholderPattern = /%(\d+\$)?[@dfsu]/
-        
-        return !strings.contains { value in
-            value.isEmpty || value.contains(unresolvedPlaceholderPattern)
+
+        return strings.allSatisfy { value in
+            !value.isEmpty && !value.contains(unresolvedPlaceholderPattern)
         }
     }
 }
