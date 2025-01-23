@@ -5,7 +5,7 @@ import Common
 import Core
 import Foundation
 import Models
-import os
+import os.log
 import StyleGuide
 import UIKit
 #if DEBUG
@@ -113,7 +113,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
 private extension AppDelegate {
     private func createLogger() -> AlicerceLogging.Logger {
-        let log = OSLog(subsystem: "com.mindera.alfie", category: "console")
+        let logger = Logger(subsystem: "com.mindera.alfie", category: "console")
 
         return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
             destinations: [
@@ -121,11 +121,10 @@ private extension AppDelegate {
                 Log.ConsoleLogDestination(
                     formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
                     minLevel: .verbose,
-                    output: { os_log($0.osLogType, log: log, "%{public}s", $1) }
+                    output: { logger.log(level: $0.osLogType, "\($1, privacy: .public)") }
                 )
                 .eraseToAnyMetadataLogDestination(),
-                FirebaseLogDestination()
-                    .eraseToAnyMetadataLogDestination(),
+                FirebaseLogDestination(minLevel: .verbose).eraseToAnyMetadataLogDestination(),
             ]
         )
     }
@@ -133,15 +132,17 @@ private extension AppDelegate {
 
 private extension Log.Level {
     var osLogType: OSLogType {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-        case .verbose, .debug:
+        case .verbose,
+            .debug:
             return .debug
-
         case .info:
             return .info
-
-        case .warning, .error:
+        case .warning,
+            .error:
             return .error
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

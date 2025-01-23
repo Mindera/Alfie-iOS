@@ -10,11 +10,7 @@ public final class NetworkClient: NetworkClientProtocol {
     private let logResponses: Bool
     private let log: Logger
 
-    public init(
-        logRequests: Bool = true,
-        logResponses: Bool = true,
-        log: Logger
-    ) {
+    public init(logRequests: Bool = true, logResponses: Bool = true, log: Logger) {
         self.logRequests = logRequests
         self.logResponses = logResponses
         self.log = log
@@ -45,7 +41,7 @@ public final class NetworkClient: NetworkClientProtocol {
             log.debug("[REST] HTTP Response: \(response)")
 
             if let stringData = String(data: data, encoding: .utf8) {
-                log.debug("[REST] Response Data: \(stringData)")
+                log.verbose("[REST] Response Data: \(stringData)")
             } else {
                 log.error("[REST] Could not convert response data to string")
             }

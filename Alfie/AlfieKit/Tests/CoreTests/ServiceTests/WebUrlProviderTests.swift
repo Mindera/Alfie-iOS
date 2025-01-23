@@ -32,31 +32,19 @@ final class WebUrlProviderTests: XCTestCase {
     }
 
     func test_secure_web_scheme_builds_url() {
-        sut = WebURLProvider(
-            scheme: "https",
-            host: "www.host.au",
-            log: log
-        )
+        sut = WebURLProvider(scheme: "https", host: "www.host.au", log: log)
         let url = sut.url(for: mockUrl)
         XCTAssertEqual(url?.absoluteString, "https://www.host.au/path")
     }
 
     func test_unsecure_web_scheme_builds_url() {
-        sut = WebURLProvider(
-            scheme: "http",
-            host: "www.host.au",
-            log: log
-        )
+        sut = WebURLProvider(scheme: "http", host: "www.host.au", log: log)
         let url = sut.url(for: mockUrl)
         XCTAssertEqual(url?.absoluteString, "http://www.host.au/path")
     }
 
     func test_invalid_web_scheme_no_url() {
-        sut = WebURLProvider(
-            scheme: "alfie",
-            host: "www.host.au",
-            log: log
-        )
+        sut = WebURLProvider(scheme: "alfie", host: "www.host.au", log: log)
         XCTAssertNil(sut.url(for: mockUrl))
     }
 

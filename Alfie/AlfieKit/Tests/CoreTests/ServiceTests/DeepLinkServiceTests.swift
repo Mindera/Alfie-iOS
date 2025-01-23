@@ -33,12 +33,7 @@ final class DeepLinkServiceTests: XCTestCase {
             true
         }
 
-        sut = .init(
-            parsers: [],
-            handlers: [handler],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [], handlers: [handler], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
         XCTAssertFalse(result)
     }
@@ -49,11 +44,7 @@ final class DeepLinkServiceTests: XCTestCase {
             DeepLink(type: .webView(url: self.testUrl), fullUrl: self.testUrl)
         }
 
-        sut = .init(
-            parsers: [parser],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [parser], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
         XCTAssertFalse(result)
     }
@@ -79,11 +70,7 @@ final class DeepLinkServiceTests: XCTestCase {
             return nil
         }
 
-        sut = .init(
-            parsers: [parser1, parser2, parser3],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [parser1, parser2, parser3], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
         wait(for: [expectation], timeout: defaultTimeout)
         XCTAssertFalse(result)
@@ -105,11 +92,7 @@ final class DeepLinkServiceTests: XCTestCase {
             return DeepLink(type: .home, fullUrl: self.testUrl)
         }
 
-        sut = .init(
-            parsers: [parser1, parser2],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [parser1, parser2], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
         wait(for: [calledExpectation, notCalledExpectation], timeout: defaultTimeout)
         XCTAssertFalse(result) // False because no handlers were added
@@ -126,12 +109,7 @@ final class DeepLinkServiceTests: XCTestCase {
             true
         }
 
-        sut = .init(
-            parsers: [parser],
-            handlers: [handler],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [parser], handlers: [handler], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
         XCTAssertTrue(result)
     }
@@ -153,12 +131,7 @@ final class DeepLinkServiceTests: XCTestCase {
             expectation.fulfill()
         }
 
-        sut = .init(
-            parsers: [parser],
-            handlers: [handler],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [parser], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([])
         wait(for: [expectation], timeout: defaultTimeout)
     }
@@ -178,12 +151,7 @@ final class DeepLinkServiceTests: XCTestCase {
             XCTAssertEqual(url.absoluteString, self.testUrl.absoluteString)
         }
 
-        sut = .init(
-            parsers: [],
-            handlers: [handler],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
         wait(for: [expectation], timeout: defaultTimeout)
     }
@@ -200,12 +168,7 @@ final class DeepLinkServiceTests: XCTestCase {
             expectation.fulfill()
         }
 
-        sut = .init(
-            parsers: [],
-            handlers: [handler],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
         wait(for: [expectation], timeout: defaultTimeout)
     }
@@ -237,12 +200,7 @@ final class DeepLinkServiceTests: XCTestCase {
             handlerCallExpectation.fulfill()
         }
 
-        sut = .init(
-            parsers: [parser1, parser2],
-            handlers: [handler],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [parser1, parser2], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
         wait(for: [calledExpectation, notCalledExpectation, handlerCallExpectation], timeout: defaultTimeout)
     }
@@ -273,12 +231,7 @@ final class DeepLinkServiceTests: XCTestCase {
             notCalledExpectation.fulfill()
         }
 
-        sut = .init(
-            parsers: [],
-            handlers: [handler1, handler2],
-            configuration: configuration,
-            log: log
-        )
+        sut = .init(parsers: [], handlers: [handler1, handler2], configuration: configuration, log: log)
         sut.openUrls([testUrl])
         wait(for: [calledExpectation, notCalledExpectation], timeout: defaultTimeout)
     }

@@ -7,11 +7,7 @@ public final class WebURLProvider: WebURLProviderProtocol {
     public var scheme: String
     private let log: Logger
 
-    public init(
-        scheme: String = "https",
-        host: String,
-        log: Logger
-    ) {
+    public init(scheme: String = "https", host: String, log: Logger) {
         self.scheme = scheme
         self.host = host
         self.log = log

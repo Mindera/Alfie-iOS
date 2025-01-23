@@ -48,6 +48,6 @@ final class ResponseLogInterceptor: ApolloInterceptor {
             return
         }
 
-        log.debug("[GraphQL] Response Data: \(stringData)")
+        log.verbose("[GraphQL] Response Data: \(stringData)")
     }
 }

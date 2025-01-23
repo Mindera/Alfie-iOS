@@ -29,10 +29,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             expectation.fulfill()
             return WebViewConfiguration(configuration: [:])
         }
-        sut = .init(
-            bffClient: mockClientService,
-            log: log
-        )
+        sut = .init( bffClient: mockClientService, log: log)
         wait(for: [expectation], timeout: defaultTimeout)
     }
 
@@ -43,10 +40,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             firstExpectation.fulfill()
             throw BFFRequestError(type: .generic)
         }
-        sut = .init(
-            bffClient: mockClientService,
-            log: log
-        )
+        sut = .init(bffClient: mockClientService, log: log)
         wait(for: [firstExpectation], timeout: defaultTimeout)
 
         // Now prepare the mock to return a valid configuration
@@ -69,10 +63,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             firstExpectation.fulfill()
             return WebViewConfiguration(configuration: [.addresses: url])
         }
-        sut = .init(
-            bffClient: mockClientService,
-            log: log
-        )
+        sut = .init(bffClient: mockClientService, log: log)
         wait(for: [firstExpectation], timeout: defaultTimeout)
 
         let secondExpectation = expectation(description: "Wait for return")
@@ -91,10 +82,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             firstExpectation.fulfill()
             throw BFFRequestError(type: .generic)
         }
-        sut = .init(
-            bffClient: mockClientService,
-            log: log
-        )
+        sut = .init(bffClient: mockClientService, log: log)
 
         let secondExpectation = expectation(description: "Wait for return")
         Task {

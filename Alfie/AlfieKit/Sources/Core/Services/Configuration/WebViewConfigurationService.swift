@@ -7,10 +7,7 @@ public final class WebViewConfigurationService: WebViewConfigurationServiceProto
     private var configuration: WebViewConfiguration?
     private let log: Logger
 
-    public init(
-        bffClient: BFFClientServiceProtocol,
-        log: Logger
-    ) {
+    public init(bffClient: BFFClientServiceProtocol, log: Logger) {
         self.bffClient = bffClient
         self.log = log
 

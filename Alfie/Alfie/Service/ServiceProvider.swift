@@ -32,10 +32,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     init() {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
-        self.webUrlProvider = WebURLProvider(
-            host: ThemedURL.preferredHost,
-            log: log
-        )
+        self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 
         // Assuming Australia for now, to be revised later
         let defaultInitializationCountry = "AU"
@@ -72,11 +69,7 @@ final class ServiceProvider: ServiceProviderProtocol {
 
         // BFF API (GraphQL + REST)
         // Pass false if you wish to remove console clutter
-        let restClient = NetworkClient(
-            logRequests: true,
-            logResponses: true,
-            log: log
-        )
+        let restClient = NetworkClient(logRequests: true, logResponses: true, log: log)
         let bffDependencies = BFFClientDependencyContainer(
             reachabilityService: reachabilityService,
             restNetworkClient: restClient
@@ -96,10 +89,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         productService = ProductService(bffClient: bffClient)
         brandsService = BrandsService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
-        webViewConfigurationService = WebViewConfigurationService(
-            bffClient: bffClient,
-            log: log
-        )
+        webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
         bagService = MockBagService()
         wishlistService = MockWishlistService()
     }
