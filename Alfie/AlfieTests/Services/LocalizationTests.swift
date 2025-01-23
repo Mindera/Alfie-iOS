@@ -107,30 +107,18 @@ final class LocalizationTests: XCTestCase {
     }
 
     private func validateLocalizedStrings(_ strings: [String], for localization: String) -> Bool {
-
-        // The regex pattern #"%(\d+\$)?[@dfsu]"# matches:
+        
+        // The regex /%(\d+\$)?[@dfsu]/ matches:
         // %@: Object specifier.
         // %d: Integer specifier.
         // %f: Floating-point specifier.
         // %s: String specifier.
         // %u: Unsigned integer specifier.
         // %1$@, %2$d, etc.: Positional specifiers.
-        let unresolvedPlaceholderPattern = #"%(\d+\$)?[@dfsu]"#
-        guard let regex = try? NSRegularExpression(pattern: unresolvedPlaceholderPattern) else {
-            XCTFail("Failed to create regular expression!")
-            return false
+        let unresolvedPlaceholderPattern = /%(\d+\$)?[@dfsu]/
+        
+        return !strings.contains { value in
+            value.isEmpty || value.contains(unresolvedPlaceholderPattern)
         }
-
-        var success = true
-
-        strings.forEach { value in
-            let range = NSRange(location: 0, length: value.utf16.count)
-            let matches = regex.matches(in: value, options: [], range: range)
-            if value.isEmpty || !matches.isEmpty {
-                success = false
-            }
-        }
-
-        return success
     }
 }
