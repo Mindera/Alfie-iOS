@@ -270,45 +270,62 @@ This project uses [Apple String Catalog](https://developer.apple.com/documentati
 
 It is possible to initialise a localised string or a localised attributed string from a `LocalizedStringResource` beforehand or keep it to localise later when needed. The later approach enables having dynamic localisation on SwiftUI Previews by injecting different environment locales, while initialising a localised string/attributed string beforehand disables the ability to automatic lookup for a localisable resource in a different language.
 
-Part of the localisation infrastructure is a property wrapper `LocalizableResource` which provides a wrapped `LocalizedStringResource` and also a *projectedValue* with a localized String type for interoperability purposes. Use $(dollar sign) before the property name to access it.
+Part of the localisation infrastructure is a property wrapper `L10n.Resource` which provides a wrapped `LocalizedStringResource` and also a *projectedValue* with a localized String type for interoperability purposes. Use $(dollar sign) before the property name to access it.
 
-Please group translations per features or scopes.
 Some instructions outlined below.
 
 #### How to use
 
-1. Create a new String Catalog table (ex: `LocalizableHome`)
-2. **Manually** add the entries in the base language and any other languages. Please use `CamelCase` convention for keys naming and give translation keys meaningful names.
+1. Open the String Catalog table `L10n`.
+2. **Manually** add the entries in the base language and any other languages. Please use `ReverseDomain` convention along with `SnakeCase` convention for keys naming (ex: `plp.error_view.title`) and give translation keys meaningful names.
 3. *Mark for Review* any entry not officially provided/approved to easily track the translations state (*Mark as Reviewed* when this happens too)
-4. Create a new file and declare a struct with the same name of the file created in the step 1 (ex: `LocalizableHome`) conforming to `LocalizableProtocol`.
-5. Add the required nested enumeration `Keys` with a case for each entry added in the step 2.
-6. To handle entries with arguments (*%d*, *%@*) specify a dedicated function for each entry as it requires supplying the *defaultValue* with a string literal to express the string interpolation (and for when the translation is really missing). In an edge case of having very complex text copy to manage this way, not following this approach leads to get the literal string with the wildcards and you can still use String(format:) with variadic parameters as fallback.
+4. Add the required nested enumeration `Keys` in `L10n+Keys` file with a case for each entry added in the step 2. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
+5. Add the required `@Resource` variables in `L10n+Resources` file for each key added in the step 4. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
+6. To handle entries with arguments (*%d*, *%@*) specify a dedicated function for each entry. In an edge case of having very complex text copy to manage this way, not following this approach leads to get the literal string with the wildcards and you can still use String(format:) with variadic parameters as fallback.
+
+**Note:** New tables are discouraged, the goal is to have everything in the `L10n` table.
 
 **Sample**
-```
-struct LocalizableHome: LocalizableProtocol {
-    @LocalizableResource<Self>(.title) static var title
 
-    static func loggedInHeaderTitle(username: String, locale: Locale = .current) -> LocalizedStringResource {
-        .init("KeyLoggedInHeaderTitle", defaultValue: "\(username)", table: tableName, locale: locale)
-    }
-    
-    enum Keys: String, LocalizableKeyProtocol {
-        case title = "KeyHome"
-    }
+```
+// L10n+Resources.swift
+extension L10n {
+
+	...
+	
+	// MARK: - Home Screen
+
+	static func homeScreenLoggedInSubtitleWithParameter(registrationYear: String) -> String {
+		LocalizableResource<Self>(.homeScreenLoggedInSubtitle, arguments: registrationYear).projectedValue
+	}
+
+	@LocalizableResource<Self>(.homeScreenTitle) static var homeScreenTitle
+}
+
+// L10n+Keys.swift
+extension L10n {
+	enum Keys: String, RawRepresentable, CaseIterable {
+	
+		...
+		
+		// MARK: - Home Screen
+		
+		case homeScreenLoggedInSubtitle = "home.screen.logged_in.subtitle"
+		case homeScreenTitle = "home.screen.title"
+	}
 }
 
 ...SwiftUI...
-Text(LocalizableHome.title)
-Text(LocalizableHome.$title)
-Text(String(localized: LocalizableHome.title))
-```
+Text(L10n.homeScreenTitle)
+Text(L10n.$homeScreenTitle)
+Text(L10n.homeScreenLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)"))
 
+```
 
 #### How to test
 
 **LocalizationTests** contains some tests that already handle the supported languages.
-Any new localization table should be included in *testLocalizationTables* test that will go through all the keys and validate translations are in place for all supported languages.
+If for some specific reason you have created a new table, you should include in *testLocalizationTables* test that will go through all the keys and validate translations are in place for all supported languages.
 Regarding testing localisation with arguments it's recommended to create a test to validate each variation (pluralization, devices, etc.) you may need to customize.
 
 For example for the copy *bagProductDescription* below with pluralization, a test *testLocalizableBagWithArgs* could be designed to lookup for each variation:
@@ -318,13 +335,9 @@ For example for the copy *bagProductDescription* below with pluralization, a tes
 
 ```
     func testLocalizableBagWithArgs() {
-        let locale: Locale = .init(identifier: localization)
-        let resources = [0, 1, 2].map { LocalizableBag.bagProductDescription(numberOfProducts: $0, locale: locale) }
-        resources.forEach { resource in
-            let value = String(localized: resource)
-            if value == resource.key || value.isEmpty {
-                XCTFail("LocalizableBag.bagProductDescription with \(resource.defaultValue) not found for \(locale.identifier)")
-            }
+    	localizations.forEach { localization in
+            let resources = [0, 1, 2].map { L10n.bagProductDescription(numberOfProducts: $0) }
+            XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
         }
     }
 ```

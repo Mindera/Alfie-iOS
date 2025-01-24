@@ -5,7 +5,7 @@ import Models
 import StyleGuide
 
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
-    private let dependencies: ProductDetailsDependencyContainerProtocol
+    private let dependencies: ProductDetailsDependencyContainer
     // In case we already have a full or partial product to show while fetching
     private let baseProduct: Product?
     private var colorSelectionSubscription: AnyCancellable?
@@ -68,7 +68,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
-        let shareSubject = productName + " " + LocalizableProductDetails.$shareTitleFrom
+        let shareSubject = productName + " " + L10n.$pdpShareProductFromSubject
         let selectedVariantAmount = selectedVariant.price.amount.amountFormatted
         let shareMessage = "\n" + productTitle + "\n" + productName + "\n" + selectedVariantAmount + "\n"
 
@@ -87,7 +87,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
-    init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainerProtocol) {
+    init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainer) {
         self.productId = productId
         baseProduct = product
         self.dependencies = dependencies
@@ -222,7 +222,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         colorSelectionConfiguration = .init(
-            selectedTitle: LocalizableGeneral.$color + ":",
+            selectedTitle: L10n.$productColorTitle + ":",
             items: colorSwatches,
             selectedItem: selectedSwatch
         )
@@ -279,7 +279,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         sizingSelectionConfiguration = .init(
-            selectedTitle: LocalizableGeneral.$size + ":",
+            selectedTitle: L10n.$productSizeTitle + ":",
             items: sizingSwatches,
             selectedItem: selectedSwatch
         )

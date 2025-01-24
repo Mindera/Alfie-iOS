@@ -46,6 +46,24 @@ public class ThemeProvider: ThemeProviderProtocol {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = backgroundColor
+
+        let backButtonAppearance = UIBarButtonItemAppearance(style: .plain)
+        backButtonAppearance.focused.titleTextAttributes = [.foregroundColor: UIColor.clear]
+        backButtonAppearance.disabled.titleTextAttributes = [.foregroundColor: UIColor.clear]
+        backButtonAppearance.highlighted.titleTextAttributes = [.foregroundColor: UIColor.clear]
+        backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+
+        backButtonAppearance.focused.titlePositionAdjustment = .init(horizontal: -44, vertical: 0)
+        backButtonAppearance.disabled.titlePositionAdjustment = .init(horizontal: -44, vertical: 0)
+        backButtonAppearance.highlighted.titlePositionAdjustment = .init(horizontal: -44, vertical: 0)
+        backButtonAppearance.normal.titlePositionAdjustment = .init(horizontal: -44, vertical: 0)
+
+        appearance.backButtonAppearance = backButtonAppearance
+        appearance.setBackIndicatorImage(
+            Icon.arrowLeft.uiImage,
+            transitionMaskImage: Icon.arrowLeft.uiImage
+        )
+
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance

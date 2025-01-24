@@ -7,7 +7,7 @@ import SwiftUI
 // MARK: - ProductListingViewModel
 
 final class ProductListingViewModel: ProductListingViewModelProtocol {
-    private let dependencies: ProductListingDependencyContainerProtocol
+    private let dependencies: ProductListingDependencyContainer
     private let category: String?
     private let query: String?
     private let mode: ProductListingViewMode
@@ -38,7 +38,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     init(
-        dependencies: ProductListingDependencyContainerProtocol,
+        dependencies: ProductListingDependencyContainer,
         category: String? = nil,
         searchText: String? = nil,
         sort: String? = nil,

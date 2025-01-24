@@ -5,13 +5,13 @@ extension WebFeature {
     var title: String {
         switch self {
         case .returnOptions:
-            return LocalizableWebView.$returnOptionsFeatureTitle
+            return L10n.$webViewReturnOptionsFeatureTitle
 
         case .paymentOptions:
-            return LocalizableWebView.$paymentOptionsFeatureTitle
+            return L10n.$webViewPaymentOptionsFeatureTitle
 
         case .storeServices:
-            return LocalizableWebView.$storeServicesFeatureTitle
+            return L10n.$webViewStoreServicesFeatureTitle
 
         default:
             assertionFailure("No title string defined for WebFeature \(self)")

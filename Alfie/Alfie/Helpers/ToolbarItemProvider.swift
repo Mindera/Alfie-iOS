@@ -15,12 +15,8 @@ enum ToolbarItemProvider {
                 case .loggedIn(let username, let memberSince):
                     ThemedToolbarTitle(
                         style: .leftText(
-                            String(localized: LocalizableHome.loggedInHeaderTitle(username: username)),
-                            subtitle: String(
-                                localized: LocalizableHome.loggedInHeaderSubtitle(
-                                    registrationYear: "\(memberSince)"
-                                )
-                            )
+                            L10n.homeLoggedInTitleWithParameter(username: username),
+                            subtitle: L10n.homeLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)")
                         ),
                         accessibilityId: AccessibilityId.titleHeader
                     )
@@ -31,19 +27,19 @@ enum ToolbarItemProvider {
 
             case .tab(.bag):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableBag.$title),
+                    style: .leftText(L10n.$bagTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.shop):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableShop.$title),
+                    style: .leftText(L10n.$shopTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.wishlist):
                 ThemedToolbarTitle(
-                    style: .leftText(LocalizableWishlist.$title),
+                    style: .leftText(L10n.$wishlistTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -54,11 +50,7 @@ enum ToolbarItemProvider {
                 .productDetails,
                 .productListing,
                 .categoryList:
-                if coordinator.canPop() {
-                    backButton(with: coordinator)
-                } else {
                     EmptyView()
-                }
 
             default:
                 EmptyView()
@@ -77,13 +69,13 @@ enum ToolbarItemProvider {
 
             case .account:
                 ThemedToolbarTitle(
-                    style: .text(LocalizableAccount.$title),
+                    style: .text(L10n.$accountTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .wishlist:
                 ThemedToolbarTitle(
-                    style: .text(LocalizableWishlist.$title),
+                    style: .text(L10n.$wishlistTitle),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 

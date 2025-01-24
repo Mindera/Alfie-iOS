@@ -4,9 +4,9 @@ import Models
 final class WishlistViewModel: WishlistViewModelProtocol {
     @Published private(set) var products: [SelectionProduct]
 
-    private let dependencies: WishlistDependencyContainerProtocol
+    private let dependencies: WishlistDependencyContainer
 
-    init(dependencies: WishlistDependencyContainerProtocol) {
+    init(dependencies: WishlistDependencyContainer) {
         self.dependencies = dependencies
         products = dependencies.wishlistService.getWishlistContent()
     }
@@ -34,12 +34,12 @@ final class WishlistViewModel: WishlistViewModelProtocol {
             designer: product.brand.name,
             name: product.name,
             priceType: product.priceType,
-            colorTitle: LocalizableGeneral.$color + ":",
+            colorTitle: L10n.$productColorTitle + ":",
             color: product.colour?.name ?? "",
-            sizeTitle: LocalizableGeneral.$size + ":",
-            size: product.size == nil ? LocalizableGeneral.$oneSize : product.sizeText,
-            addToBagTitle: LocalizableGeneral.$addToBag,
-            outOfStockTitle: LocalizableGeneral.$outOfStock,
+            sizeTitle: L10n.$productSizeTitle + ":",
+            size: product.size == nil ? L10n.$productOneSizeTitle : product.sizeText,
+            addToBagTitle: L10n.$productAddToBagButtonCTA,
+            outOfStockTitle: L10n.$productOutOfStockButtonCTA,
             isAddToBagDisabled: product.stock == .zero
         )
     }
