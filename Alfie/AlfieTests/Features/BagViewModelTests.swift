@@ -5,7 +5,7 @@ import XCTest
 
 final class BagViewModelTests: XCTestCase {
     private var sut: BagViewModel!
-    private var mockDependencies: BagDependencyContainerProtocol!
+    private var mockDependencies: BagDependencyContainer!
 
     override func setUpWithError() throws {
         try super.setUpWithError()

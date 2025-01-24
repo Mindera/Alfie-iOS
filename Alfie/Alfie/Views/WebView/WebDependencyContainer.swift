@@ -1,6 +1,6 @@
 import Models
 
-final class WebDependencyContainer: WebDependencyContainerProtocol {
+final class WebDependencyContainer {
     let deepLinkService: DeepLinkServiceProtocol
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
     let webUrlProvider: WebURLProviderProtocol

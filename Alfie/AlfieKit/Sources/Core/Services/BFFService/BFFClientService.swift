@@ -11,14 +11,14 @@ private enum BFFEndpoint: String {
 
 public final class BFFClientService: BFFClientServiceProtocol {
     private let apolloClient: ApolloClient
-    private let dependencies: BFFClientDependencyContainerProtocol
+    private let dependencies: BFFClientDependencyContainer
     private let baseUrl: Foundation.URL
 
     public init(
         url: Foundation.URL,
         sessionConfiguration: URLSessionConfiguration = .default,
         logRequests: Bool = true,
-        dependencies: BFFClientDependencyContainerProtocol
+        dependencies: BFFClientDependencyContainer
     ) {
         self.dependencies = dependencies
         self.baseUrl = url
