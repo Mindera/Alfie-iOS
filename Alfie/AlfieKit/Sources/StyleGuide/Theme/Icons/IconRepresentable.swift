@@ -17,7 +17,7 @@ public extension RawRepresentable where Self: IconRepresentable, RawValue == Str
     }
 
     var uiImage: UIImage {
-        .init(named: rawValue, in: bundle, with: nil) ?? UIImage()
+        .init(systemName: rawValue) ?? UIImage()
     }
 
     var bundle: Bundle {
