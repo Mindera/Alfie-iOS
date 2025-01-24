@@ -18,6 +18,11 @@ private(set) var log: AlicerceLogging.Logger!
 // MARK: - AppDelegate
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, AppDelegateProtocol {
+    private enum Constants {
+        static let defaultBundleID = "com.mindera.alfie"
+        static let consoleLoggerCategory = "console"
+    }
+
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
     var tabCoordinator: TabCoordinator!
@@ -113,7 +118,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
 private extension AppDelegate {
     private func createLogger() -> AlicerceLogging.Logger {
-        let logger = Logger(subsystem: "com.mindera.alfie", category: "console")
+        let bundleID = Bundle.main.bundleIdentifier ?? Constants.defaultBundleID
+        let logger = Logger(subsystem: bundleID, category: Constants.consoleLoggerCategory)
 
         return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
             destinations: [
@@ -135,12 +141,12 @@ private extension Log.Level {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .verbose,
-            .debug:
+             .debug: // swiftlint:disable:this indentation_width
             return .debug
         case .info:
             return .info
         case .warning,
-            .error:
+             .error: // swiftlint:disable:this indentation_width
             return .error
         }
         // swiftlint:enable vertical_whitespace_between_cases

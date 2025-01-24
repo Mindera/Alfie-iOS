@@ -40,7 +40,7 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
 
     func handleDeepLink(_ deepLink: DeepLink) {
         guard canHandleDeepLink(deepLink) else {
-            log.debug("Cannot handle deeplink \(deepLink), ignoring")
+            log.warning("Cannot handle deeplink \(deepLink), ignoring")
             return
         }
 
