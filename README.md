@@ -270,77 +270,87 @@ This project uses [Apple String Catalog](https://developer.apple.com/documentati
 
 It is possible to initialise a localised string or a localised attributed string from a `LocalizedStringResource` beforehand or keep it to localise later when needed. The later approach enables having dynamic localisation on SwiftUI Previews by injecting different environment locales, while initialising a localised string/attributed string beforehand disables the ability to automatic lookup for a localisable resource in a different language.
 
-Part of the localisation infrastructure is a property wrapper `L10n.Resource` which provides a wrapped `LocalizedStringResource` and also a *projectedValue* with a localized String type for interoperability purposes. Use $(dollar sign) before the property name to access it.
-
-Some instructions outlined below.
+In this project is being used [SwiftGen](https://github.com/SwiftGen/SwiftGen) which generates strongly-typed accessors for string catalogues, providing several significant benefits. First and foremost, it eliminates the risk of runtime errors caused by typos or incorrect key usage in localized strings, as all keys are now referenced through a type-safe API. This ensures compile-time validation, meaning that if a string key is removed or changed, the compiler will catch the issue immediately, reducing the likelihood of bugs slipping into production. Additionally, the generated enums provide a clear and organized structure, making it easier for developers to find and use localized strings consistently across the app. This approach also enhances code readability and maintainability, as the usage of localized strings is self-documenting and less prone to human error. Overall, it streamlines the development process, improves localization reliability, and boosts developer confidence.
 
 #### How to use
 
 1. Open the String Catalog table `L10n`.
 2. **Manually** add the entries in the base language and any other languages. Please use `ReverseDomain` convention along with `SnakeCase` convention for keys naming (ex: `plp.error_view.title`) and give translation keys meaningful names.
 3. *Mark for Review* any entry not officially provided/approved to easily track the translations state (*Mark as Reviewed* when this happens too)
-4. Add the required nested enumeration `Keys` in `L10n+Keys` file with a case for each entry added in the step 2. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
-5. Add the required `@Resource` variables in `L10n+Resources` file for each key added in the step 4. Please group it using a `// MARK -` comment per feature or scope and order alphabetically by key name.
-6. To handle entries with arguments (*%d*, *%@*) specify a dedicated function for each entry. In an edge case of having very complex text copy to manage this way, not following this approach leads to get the literal string with the wildcards and you can still use String(format:) with variadic parameters as fallback.
+4. Build de project. Using [SwiftGen](https://github.com/SwiftGen/SwiftGen), will automatically update the `L10n+Generated.swift` file.
 
 **Note:** New tables are discouraged, the goal is to have everything in the `L10n` table.
 
 **Sample**
 
 ```
-// L10n+Resources.swift
-extension L10n {
-
-	...
-	
-	// MARK: - Home Screen
-
-	static func homeScreenLoggedInSubtitleWithParameter(registrationYear: String) -> String {
-		LocalizableResource<Self>(.homeScreenLoggedInSubtitle, arguments: registrationYear).projectedValue
-	}
-
-	@LocalizableResource<Self>(.homeScreenTitle) static var homeScreenTitle
-}
-
-// L10n+Keys.swift
-extension L10n {
-	enum Keys: String, RawRepresentable, CaseIterable {
-	
-		...
-		
-		// MARK: - Home Screen
-		
-		case homeScreenLoggedInSubtitle = "home.screen.logged_in.subtitle"
-		case homeScreenTitle = "home.screen.title"
-	}
+// L10n+Generated.swift
+enum L10n {
+  enum Account {
+    /// Account
+    static let title = L10n.tr("L10n", "account.title")
+  }
+  enum Home {
+    /// Home
+    static let title = L10n.tr("L10n", "home.title")
+    enum LoggedIn {
+      /// Member Since: %@
+      static func subtitle(_ p1: Any) -> String {
+        return L10n.tr("L10n", "home.logged_in.subtitle", String(describing: p1))
+      }
+      /// Hi, %@
+      static func title(_ p1: Any) -> String {
+        return L10n.tr("L10n", "home.logged_in.title", String(describing: p1))
+      }
+    }
+  }    
 }
 
 ...SwiftUI...
-Text(L10n.homeScreenTitle)
-Text(L10n.$homeScreenTitle)
-Text(L10n.homeScreenLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)"))
+Text(L10n.Account.title)
+Text(L10n.Home.LoggedIn.title("Title"))
 
 ```
 
 #### How to test
 
 **LocalizationTests** contains some tests that already handle the supported languages.
-If for some specific reason you have created a new table, you should include in *testLocalizationTables* test that will go through all the keys and validate translations are in place for all supported languages.
+If for some specific reason you have created a new table, you should include in **testLocalizationTables** test that will go through all the keys and validate translations are in place for all supported languages.
 Regarding testing localisation with arguments it's recommended to create a test to validate each variation (pluralization, devices, etc.) you may need to customize.
 
-For example for the copy *bagProductDescription* below with pluralization, a test *testLocalizableBagWithArgs* could be designed to lookup for each variation:
-- *Zero*: Your bag is empty!
-- *One*: Your bag has a single product!
-- *Other*: You've %d products in your bag!
+For example for the key **plp.number_of_results.message** below with pluralization, a test **testLocalizableProductListingResultsWithArgs** could be designed to lookup for each variation:
+
+- **One**: %d result
+- **Other**: %d results
 
 ```
-    func testLocalizableBagWithArgs() {
-    	localizations.forEach { localization in
-            let resources = [0, 1, 2].map { L10n.bagProductDescription(numberOfProducts: $0) }
-            XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
-        }
-    }
+func testLocalizableProductListingResultsWithArgs() {
+  localizations.forEach { localization in
+    let resources = [0, 1, 2].map { L10n.Plp.NumberOfResults.message($0) }
+    XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
+  }
+}
 ```
+
+#### Why SwiftGenPlugin?
+
+This project utilizes [SwiftGenPlugin](https://github.com/SwiftGen/SwiftGenPlugin) to streamline the integration of [SwiftGen](https://github.com/SwiftGen/SwiftGen) into our workflow. By leveraging SwiftGenPlugin, we can manage the SwiftGen dependency directly through Swift Package Manager (SPM), avoiding the need to install the SwiftGen binary locally or rely on Cocoapods for dependency management. This approach ensures a cleaner, more organized setup for integrating SwiftGen, simplifies dependency handling, and makes the project easier to maintain and share across teams.
+
+#### SwiftGen & SwiftGenPlugin notes
+
+Both dependencies currently rely on forks of the original repositories, as the original projects appear to be abandoned. The solution for supporting string catalogues is still pending merge in a long-standing pull request ([PR link](https://github.com/SwiftGen/SwiftGen/pull/1124)).
+
+The SwiftGenPlugin leverages Swift Package Manager (SPM) plugins by providing both a build tool plugin and a command plugin. While both plugins serve the same purpose of generating type-safe files, there are key differences:
+
+The build tool plugin does not have write permissions, restricting the generated `L10n+Generated.swift` file to the `DerivedData` folder.
+The command plugin allows generating the `L10n+Generated.swift` file directly in the desired location, but it must be run manually with the command:
+`swift package --allow-writing-to-package-directory generate-code-for-resources`.
+However, this requires a `Package.swift` file containing the plugin, which is not applicable for this project.
+Given these constraints, we opted for the build tool plugin. It is integrated into a build phase under the `Run Build Tool Plug-ins` section, where it generates a `Strings+Generated.swift` file in the `DerivedData` folder with all content commented out. To address this, a custom build phase script, `SwiftGen - Copy Generated Files from OUTPUT_DIR to Project`, is used to copy the file to the project directory as `L10n+Generated.swift`, with the comments (`/*` and `*/`) removed.
+
+*A copy-and-delete or move operation was not feasible because the file in `DerivedData` is required until the build process completes for the plugin to succeed. Additionally, both files cannot coexist simultaneously, as this would cause compile errors.*
+
+For more information about SPM plugins, see the official [documentation](https://github.com/swiftlang/swift-package-manager/blob/main/Documentation/Plugins.md).
 
 ---
 

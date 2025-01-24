@@ -5,13 +5,13 @@ final class LocalizationTests: XCTestCase {
     let localizations = Bundle.main.localizations
 
     func testLocalizationTables() {
-        testTable(L10n.self, keys: L10n.Keys.self)
+        testTable(tableName: "L10n", keys: L10n.Keys.self)
     }
 
     func testLocalizableHomeWithArgs() {
         localizations.forEach { localization in
-            let headerTitle = L10n.homeLoggedInTitleWithParameter(username: "test")
-            let headerSubtitle = L10n.homeLoggedInSubtitleWithParameter(registrationYear: "2024")
+            let headerTitle = L10n.Home.LoggedIn.title("test")
+            let headerSubtitle = L10n.Home.LoggedIn.subtitle("2024")
             let resources: [String] = [headerTitle, headerSubtitle]
             XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
         }
@@ -19,7 +19,7 @@ final class LocalizationTests: XCTestCase {
 
     func test_localizable_search_with_args() {
         localizations.forEach { localization in
-            let noResults = L10n.searchScreenNoResultsViewTermWithParameter(term: "test")
+            let noResults = L10n.Search.Screen.NoResultsView.term("test")
             let resources: [String] = [noResults]
             XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
         }
@@ -27,7 +27,7 @@ final class LocalizationTests: XCTestCase {
 
     func testLocalizableProductListingResultsWithArgs() {
         localizations.forEach { localization in
-            let resources = [0, 1, 2].map { L10n.plpNumberOfResultsMessageWithParameter($0) }
+            let resources = [0, 1, 2].map { L10n.Plp.NumberOfResults.message($0) }
             XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
         }
     }
@@ -86,9 +86,9 @@ final class LocalizationTests: XCTestCase {
 
     // MARK: - Private Test Helpers
 
-    private func testTable<Keys>(_ table: L10n.Type, keys: Keys.Type) where Keys: RawRepresentable & CaseIterable, Keys.RawValue == String {
+    private func testTable<Keys>(tableName: String, keys: Keys.Type) where Keys: RawRepresentable & CaseIterable, Keys.RawValue == String {
         Keys.allCases.forEach { key in
-            localizeResource(key: key.rawValue, table: table.tableName)
+            localizeResource(key: key.rawValue, table: tableName)
         }
     }
 

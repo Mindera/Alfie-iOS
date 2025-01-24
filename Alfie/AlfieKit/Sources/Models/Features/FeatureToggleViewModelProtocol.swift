@@ -5,6 +5,6 @@ public protocol FeatureToggleViewModelProtocol: ObservableObject {
     var isDebugConfigurationEnabled: Bool { get set }
 
     func viewDidAppear()
-    func localizedName(for feature: String) -> LocalizedStringResource
+    func localizedName(for feature: String) -> String
     func binding(for feature: String) -> Binding<Bool>
 }
