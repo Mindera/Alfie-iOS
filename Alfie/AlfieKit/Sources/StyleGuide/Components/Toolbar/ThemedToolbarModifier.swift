@@ -11,11 +11,13 @@ public struct ThemedToolbarModifier: ViewModifier {
 
     @ViewBuilder
     public func body(content: Content) -> some View {
-        if showDivider {
-            Divider()
-                .background(Colors.primary.mono200)
+        VStack {
+            if showDivider {
+                Divider()
+                    .background(Colors.primary.mono200)
+            }
+            content
+                .navigationBarTitleDisplayMode(.inline)
         }
-        content
-            .navigationBarTitleDisplayMode(.inline)
     }
 }
