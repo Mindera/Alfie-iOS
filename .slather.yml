@@ -9,5 +9,5 @@ binary_basename: Alfie
 ignore:
   - '../Library/Developer/Xcode/DerivedData/*'
   - '**/DerivedData/*' 
-  - '**/Localizable*.swift'
+  - '**/L10n*.swift'
   - '**/Mock*.swift'

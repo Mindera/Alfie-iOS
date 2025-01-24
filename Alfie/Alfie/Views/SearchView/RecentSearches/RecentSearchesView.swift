@@ -27,7 +27,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
 
     private var recentSearchesHeader: some View {
         HStack(alignment: .lastTextBaseline) {
-            Text.build(theme.font.header.h3(LocalizableSearch.recentSearchesHeaderTitle))
+            Text.build(theme.font.header.h3(L10n.searchScreenRecentSearchesHeaderTitle))
                 .accessibilityIdentifier(AccessibilityId.recentSearchHeaderTitle)
             Spacer()
             clearAllButton
@@ -81,7 +81,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 viewModel.didTapClearAll()
             }
         }, label: {
-            Text.build(theme.font.small.boldUnderline(LocalizableSearch.recentSearchesClearAllTitle))
+            Text.build(theme.font.small.boldUnderline(L10n.searchScreenRecentSearchesClearAllButtonCTA))
                 .foregroundStyle(Colors.primary.mono900)
         })
         .accessibilityIdentifier(AccessibilityId.clearRecentSearchesButton)

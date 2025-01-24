@@ -97,7 +97,7 @@ struct DebugMenuView: View {
         case .featureToggle:
             FeatureToggleView(viewModel: FeatureToggleViewModel(provider: DebugConfigurationProvider.shared))
                 .modifier(
-                    ContainerDemoViewModifier(headerTitle: LocalizableFeatureToggle.$title, embedInScrollView: true)
+                    ContainerDemoViewModifier(headerTitle: L10n.$featureToggleTitle, embedInScrollView: true)
                 )
         }
     }
