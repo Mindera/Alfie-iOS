@@ -17,11 +17,7 @@ final class WebUrlProviderTests: XCTestCase {
         try super.setUpWithError()
         mockUrl = .init()
         log = Log.DummyLogger()
-        sut = WebURLProvider(
-            scheme: "https",
-            host: "www.host.au",
-            log: log
-        )
+        sut = WebURLProvider(scheme: "https", host: "www.host.au", log: log)
     }
 
     override func tearDownWithError() throws {
