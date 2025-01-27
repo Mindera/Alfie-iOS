@@ -1,5 +1,4 @@
 import Combine
-import Common
 import Core
 import Foundation
 import Models
@@ -108,7 +107,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
             var url = URL(string: "https://\(ThemedURL.hostWithPortComponent)"),
             let categoryUrl = category.url
         else {
-            logError("Error building URL for category from navigation item: \(category)")
+            log.error("Error building URL for category from navigation item: \(category)")
             state = .error(.generic)
             return
         }
@@ -154,7 +153,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         do {
             navigationItems = try await navigationService.getNavigationItems(for: .shop)
         } catch {
-            logError("Error fetching categories navigation items for Shop screen: \(error)")
+            log.error("Error fetching categories navigation items for Shop screen: \(error)")
             state = .error(.generic)
             return
         }

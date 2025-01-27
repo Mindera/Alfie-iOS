@@ -1,4 +1,4 @@
-import Common
+import AlicerceLogging
 import OrderedCollections
 import SwiftUI
 
@@ -75,7 +75,7 @@ public struct TabbedView<Content>: View where Content: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
             .task {
                 if !lazyLoading {
-                    log("Beware: Lazy Loading on TabbedView cannot be disabled on iOS 16", level: .info)
+                    log.info("Beware: Lazy Loading on TabbedView cannot be disabled on iOS 16")
                 }
             }
         }

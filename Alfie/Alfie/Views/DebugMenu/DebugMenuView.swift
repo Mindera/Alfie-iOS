@@ -29,7 +29,6 @@ struct DebugMenuView: View {
                     link(for: .appUpdate, text: "Force & Soft Update")
                     link(for: .brazeInfo, text: "Braze Push")
                     #if DEBUG
-                    link(for: .logs, text: "Logs")
                     link(for: .featureToggle, text: "Feature Toggle")
                     #endif
                     link(for: .endpoint, text: "Environment")
@@ -80,12 +79,6 @@ struct DebugMenuView: View {
             BrazeDemoView(brazeUserId: BrazeConstants.userID)
                 .modifier(ContainerDemoViewModifier(headerTitle: "Braze Push"))
 
-        case .logs:
-            LogsView()
-                .modifier(
-                    ContainerDemoViewModifier(headerTitle: "Logs", embedInScrollView: false)
-                )
-
         case .endpoint:
             EndpointSelectionView(
                 viewModel: EndpointSelectionViewModel(apiEndpointService: serviceProvider.apiEndpointService)
@@ -108,7 +101,6 @@ struct DebugMenuView: View {
         case tracking
         case appUpdate
         case brazeInfo
-        case logs
         case endpoint
         case featureToggle
     }

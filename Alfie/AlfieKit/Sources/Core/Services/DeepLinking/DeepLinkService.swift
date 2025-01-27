@@ -1,4 +1,4 @@
-import Common
+import AlicerceLogging
 import Foundation
 import Models
 
@@ -6,15 +6,18 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
     private var handlers: [DeepLinkHandlerProtocol]
     private let parsers: [DeepLinkParserProtocol]
     private let linkConfiguration: LinkConfigurationProtocol
+    private let log: Logger
 
     public init(
         parsers: [DeepLinkParserProtocol],
         handlers: [DeepLinkHandlerProtocol] = [],
-        configuration: LinkConfigurationProtocol
+        configuration: LinkConfigurationProtocol,
+        log: Logger
     ) {
         self.parsers = parsers
         self.handlers = handlers
         self.linkConfiguration = configuration
+        self.log = log
     }
 
     // MARK: - DeepLinkServiceProtocol
@@ -46,7 +49,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
         }
 
         guard let deepLink = deepLinkFromUrl(url) else {
-            logWarning("Could not create valid deeplink from URL \(url), creating fallback to open in webview")
+            log.warning("Could not create valid deeplink from URL \(url), creating fallback to open in webview")
             let fallbackLink = DeepLink(type: .webView(url: url), fullUrl: url)
             handleDeepLink(fallbackLink)
             return
@@ -59,7 +62,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
 
     private func handleDeepLink(_ deepLink: DeepLink) {
         guard let handler = handlers.first(where: { $0.canHandleDeepLink(deepLink) }) else {
-            log("No handlers can handle deeplink \(deepLink), ignoring", level: .info)
+            log.info("No handlers can handle deeplink \(deepLink), ignoring")
             return
         }
 
@@ -68,7 +71,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
             return
         }
 
-        log("Handler \(handler) will handle deeplink \(deepLink)", level: .debug, printToConsole: false)
+        log.debug("Handler \(handler) will handle deeplink \(deepLink)")
         handler.handleDeepLink(deepLink)
     }
 

@@ -1,4 +1,3 @@
-import Common
 import Core
 import Foundation
 import Models
@@ -26,7 +25,7 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     }
 
     func updateApiEndpointAndReboot(_ option: ApiEndpointOption) {
-        log("API endpoint changed to \(option.url.absoluteString), will reboot app")
+        log.debug("API endpoint changed to \(option.url.absoluteString), will reboot app")
         userDefaults.set(option.url.absoluteString, for: apiUrlUserDefaultsKey)
         // Make sure user defaults are synced before rebooting the app
         DispatchQueue.main.asyncAfter(deadline: .now() + rebootDelay) { [weak self] in
@@ -77,7 +76,7 @@ private extension ApiEndpointOption {
 
         guard let url else {
             let message = "Cannot build API endpoint URL for option \(self.label)"
-            logError(message)
+            log.error(message)
             return URL(fileURLWithPath: "")
         }
 

@@ -1,13 +1,15 @@
-import Common
+import AlicerceLogging
 import Foundation
 import Models
 
 public final class WebViewConfigurationService: WebViewConfigurationServiceProtocol {
     private let bffClient: BFFClientServiceProtocol
     private var configuration: WebViewConfiguration?
+    private let log: Logger
 
-    public init(bffClient: BFFClientServiceProtocol) {
+    public init(bffClient: BFFClientServiceProtocol, log: Logger) {
         self.bffClient = bffClient
+        self.log = log
 
         Task {
             await fetchConfiguration()
@@ -30,7 +32,7 @@ public final class WebViewConfigurationService: WebViewConfigurationServiceProto
         do {
             configuration = try await bffClient.getWebViewConfig()
         } catch {
-            logError("Error fetching webview configuration: \(error)")
+            log.error("Error fetching webview configuration: \(error)")
         }
     }
 }

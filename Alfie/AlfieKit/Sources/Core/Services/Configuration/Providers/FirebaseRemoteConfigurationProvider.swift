@@ -1,5 +1,5 @@
+import AlicerceLogging
 import Combine
-import Common
 import FirebaseRemoteConfig
 import Foundation
 import Models
@@ -19,7 +19,8 @@ public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderPro
     public init(
         remoteConfig: RemoteConfig = RemoteConfig.remoteConfig(),
         remoteConfigSettings: RemoteConfigSettings = RemoteConfigSettings(),
-        minimumFetchInterval: TimeInterval
+        minimumFetchInterval: TimeInterval,
+        log: Logger
     ) {
         self.remoteConfig = remoteConfig
         self.remoteConfigSettings = remoteConfigSettings
@@ -28,7 +29,7 @@ public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderPro
         remoteConfig.configSettings = remoteConfigSettings
         remoteConfig.fetchAndActivate { [weak self] _, error in
             if let error {
-                logError("Firebase remote configuration fetch and activate failed with error: \(error.localizedDescription)")
+                log.error("Firebase remote configuration fetch and activate failed with error: \(error.localizedDescription)")
             } else {
                 self?.isReadySubject.value = true
             }

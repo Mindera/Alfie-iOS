@@ -1,4 +1,3 @@
-import Common
 import Models
 import Navigation
 import StyleGuide
@@ -185,7 +184,7 @@ enum ToolbarItemProvider {
 
     private static func rewardsItem(with _: Coordinator, size: ToolBarButtonSize = .normal) -> some View {
         ThemedToolbarButton(icon: .rewards, accessibilityId: AccessibilityId.rewardsBtn, toolBarButtonSize: size) {
-            log("REWARDS CARD PRESSED")
+            log.debug("REWARDS CARD PRESSED")
         }
     }
 
@@ -197,7 +196,7 @@ enum ToolbarItemProvider {
 
     private static func listItem(with _: Coordinator, size: ToolBarButtonSize = .normal) -> some View {
         ThemedToolbarButton(icon: .list, accessibilityId: AccessibilityId.listBtn, toolBarButtonSize: size) {
-            log("LIST ICON PRESSED")
+            log.debug("LIST ICON PRESSED")
         }
     }
 

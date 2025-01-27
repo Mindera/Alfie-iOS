@@ -10,6 +10,6 @@ extension DeepLinkService {
             ProductDetailsDeepLinkParser(configuration: configuration),
             DefaultDeepLinkParser(configuration: configuration),
         ] // Order is important!
-        self.init(parsers: parsers, configuration: configuration)
+        self.init(parsers: parsers, configuration: configuration, log: log)
     }
 }

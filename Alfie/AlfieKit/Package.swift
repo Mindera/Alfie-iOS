@@ -51,6 +51,7 @@ let package = Package(
         .package(url: "https://github.com/braze-inc/braze-swift-sdk", exact: "8.0.1"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.20.0"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
+        .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
         .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9")
         
     ],
@@ -72,7 +73,10 @@ let package = Package(
         ),
         
         .target(
-            name: "Common"
+            name: "Common",
+            dependencies: [
+                .product(name: "AlicerceLogging", package: "Alicerce")
+            ]
         ),
         
         .target(
@@ -82,6 +86,7 @@ let package = Package(
                 "Common",
                 "EasyStash",
                 "Models",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
                 .product(name: "FirebaseRemoteConfig",package: "firebase-ios-sdk"),
@@ -94,6 +99,7 @@ let package = Package(
         .target(
             name: "Mocks",
             dependencies: [
+                "Common",
                 "Models"
             ]
         ),
@@ -115,7 +121,8 @@ let package = Package(
                 "Common",
                 "Core",
                 "Models",
-                "Navigation"
+                "Navigation",
+                .product(name: "AlicerceLogging", package: "Alicerce")
             ],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),

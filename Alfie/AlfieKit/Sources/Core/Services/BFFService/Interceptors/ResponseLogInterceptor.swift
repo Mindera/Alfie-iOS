@@ -1,6 +1,6 @@
+import AlicerceLogging
 import Apollo
 import BFFGraphApi
-import Common
 import Foundation
 
 final class ResponseLogInterceptor: ApolloInterceptor {
@@ -9,6 +9,11 @@ final class ResponseLogInterceptor: ApolloInterceptor {
     }
 
     public var id: String = UUID().uuidString
+    private let log: Logger
+
+    init(log: Logger) {
+        self.log = log
+    }
 
     func interceptAsync<Operation: GraphQLOperation>(
         chain: RequestChain,
@@ -36,13 +41,13 @@ final class ResponseLogInterceptor: ApolloInterceptor {
             return
         }
 
-        log("[GraphQL] HTTP Response: \(receivedResponse.httpResponse)")
+        log.debug("[GraphQL] HTTP Response: \(receivedResponse.httpResponse)")
 
         guard let stringData = String(bytes: receivedResponse.rawData, encoding: .utf8) else {
-            logError("[GraphQL] Could not convert response data to string")
+            log.error("[GraphQL] Could not convert response data to string")
             return
         }
 
-        log("[GraphQL] Response Data: \(stringData)")
+        log.verbose("[GraphQL] Response Data: \(stringData)")
     }
 }

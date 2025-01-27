@@ -1,5 +1,4 @@
 import Combine
-import Common
 import Core
 import Foundation
 import Models
@@ -97,7 +96,7 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         do {
             brands = try await brandsService.getBrands()
         } catch {
-            logError("Error fetching brands for Brands screen: \(error)")
+            log.error("Error fetching brands for Brands screen: \(error)")
             state = .error(.generic)
             return
         }

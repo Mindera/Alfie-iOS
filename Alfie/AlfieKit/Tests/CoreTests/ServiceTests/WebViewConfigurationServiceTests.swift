@@ -1,3 +1,4 @@
+import AlicerceLogging
 @testable import Core
 import Mocks
 import Models
@@ -6,16 +7,19 @@ import XCTest
 final class WebViewConfigurationServiceTests: XCTestCase {
     private var sut: WebViewConfigurationService!
     private var mockClientService: MockBFFClientService!
+    private var log: Logger!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockClientService = MockBFFClientService()
+        log = Log.DummyLogger()
         // The service is initialized in each test individually
     }
 
     override func tearDownWithError() throws {
         sut = nil
         mockClientService = nil
+        log = nil
         try super.tearDownWithError()
     }
 
@@ -25,7 +29,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             expectation.fulfill()
             return WebViewConfiguration(configuration: [:])
         }
-        sut = .init(bffClient: mockClientService)
+        sut = .init( bffClient: mockClientService, log: log)
         wait(for: [expectation], timeout: defaultTimeout)
     }
 
@@ -36,7 +40,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             firstExpectation.fulfill()
             throw BFFRequestError(type: .generic)
         }
-        sut = .init(bffClient: mockClientService)
+        sut = .init(bffClient: mockClientService, log: log)
         wait(for: [firstExpectation], timeout: defaultTimeout)
 
         // Now prepare the mock to return a valid configuration
@@ -59,7 +63,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             firstExpectation.fulfill()
             return WebViewConfiguration(configuration: [.addresses: url])
         }
-        sut = .init(bffClient: mockClientService)
+        sut = .init(bffClient: mockClientService, log: log)
         wait(for: [firstExpectation], timeout: defaultTimeout)
 
         let secondExpectation = expectation(description: "Wait for return")
@@ -78,7 +82,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             firstExpectation.fulfill()
             throw BFFRequestError(type: .generic)
         }
-        sut = .init(bffClient: mockClientService)
+        sut = .init(bffClient: mockClientService, log: log)
 
         let secondExpectation = expectation(description: "Wait for return")
         Task {

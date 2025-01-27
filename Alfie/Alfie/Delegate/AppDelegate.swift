@@ -1,19 +1,28 @@
+import AlicerceLogging
 import BrazeKit
 import Combine
 import Common
 import Core
 import Foundation
 import Models
+import os.log
 import StyleGuide
 import UIKit
 #if DEBUG
 import Mocks
 #endif
 
+// swiftlint:disable implicitly_unwrapped_optional
+private(set) var log: AlicerceLogging.Logger!
+
 // MARK: - AppDelegate
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, AppDelegateProtocol {
-    // swiftlint:disable implicitly_unwrapped_optional
+    private enum Constants {
+        static let defaultBundleID = "com.mindera.alfie"
+        static let consoleLoggerCategory = "console"
+    }
+
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
     var tabCoordinator: TabCoordinator!
@@ -49,9 +58,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if ProcessInfo.isSwiftUIPreview || ProcessInfo.isRunningTests {
             #if DEBUG
             serviceProvider = MockServiceProvider()
+            Alfie.log = Log.DummyLogger()
             #endif
         } else {
-            CoreBootstrap.bootstrap()
+            Alfie.log = createLogger()
+            CoreBootstrap.bootstrapFirebaseApp(log: log)
+            StyleGuideLogger.set(logger: log)
             serviceProvider = ServiceProvider()
             if let application {
                 application.registerForRemoteNotifications()
@@ -101,5 +113,42 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             willPresent: willPresent,
             completionHandler: completionHandler
         )
+    }
+}
+
+private extension AppDelegate {
+    private func createLogger() -> AlicerceLogging.Logger {
+        let bundleID = Bundle.main.bundleIdentifier ?? Constants.defaultBundleID
+        let logger = Logger(subsystem: bundleID, category: Constants.consoleLoggerCategory)
+
+        return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
+            destinations: [
+                // swiftlint:disable:next trailing_closure
+                Log.ConsoleLogDestination(
+                    formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
+                    minLevel: .verbose,
+                    output: { logger.log(level: $0.osLogType, "\($1, privacy: .public)") }
+                )
+                .eraseToAnyMetadataLogDestination(),
+                FirebaseLogDestination(minLevel: .verbose).eraseToAnyMetadataLogDestination(),
+            ]
+        )
+    }
+}
+
+private extension Log.Level {
+    var osLogType: OSLogType {
+        // swiftlint:disable vertical_whitespace_between_cases
+        switch self {
+        case .verbose,
+             .debug: // swiftlint:disable:this indentation_width
+            return .debug
+        case .info:
+            return .info
+        case .warning,
+             .error: // swiftlint:disable:this indentation_width
+            return .error
+        }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 }

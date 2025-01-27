@@ -1,5 +1,4 @@
 import Combine
-import Common
 import Core
 import Foundation
 import Models
@@ -116,7 +115,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
             productListing = try await dependencies.productListingService
                 .paged(categoryId: category, query: query, sort: sortOption)
         } catch {
-            logError("Error fetching product listing (first page): \(error)")
+            log.error("Error fetching product listing (first page): \(error)")
             state = .error(.generic)
             return
         }
@@ -142,7 +141,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
             productListing = try await dependencies.productListingService
                 .next(categoryId: category, query: query, sort: sortOption)
         } catch {
-            logError("Error fetching product listing (following page): \(error)")
+            log.error("Error fetching product listing (following page): \(error)")
             state = .error(.generic)
             return
         }

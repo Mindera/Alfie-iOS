@@ -9,15 +9,14 @@
 /* Begin PBXBuildFile section */
 		49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 49AFF8542B6D0AA600695C66 /* OrderedCollections */; };
 		BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BA04B1A22B977EE700713298 /* SnapshotTesting */; };
-		C54DA2B52D368A40005142F4 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B42D368A40005142F4 /* Common */; };
+		C511F4DC2D3EAA2100AB69D6 /* AlicerceLogging in Frameworks */ = {isa = PBXBuildFile; productRef = C511F4DB2D3EAA2100AB69D6 /* AlicerceLogging */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
 		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
 		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
 		C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BE2D368A40005142F4 /* StyleGuide */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
-		C5E0B4B52D36ABDF00D759F7 /* BFFGraphApi in Frameworks */ = {isa = PBXBuildFile; productRef = C5E0B4B42D36ABDF00D759F7 /* BFFGraphApi */; };
-		C5E0B4B72D36ABDF00D759F7 /* BFFGraphMocks in Frameworks */ = {isa = PBXBuildFile; productRef = C5E0B4B62D36ABDF00D759F7 /* BFFGraphMocks */; };
+		C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C5DCD5F32D3EA0B70005AAB0 /* Common */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,11 +80,10 @@
 			files = (
 				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
 				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
-				C5E0B4B72D36ABDF00D759F7 /* BFFGraphMocks in Frameworks */,
 				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
+				C511F4DC2D3EAA2100AB69D6 /* AlicerceLogging in Frameworks */,
 				49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */,
-				C54DA2B52D368A40005142F4 /* Common in Frameworks */,
-				C5E0B4B52D36ABDF00D759F7 /* BFFGraphApi in Frameworks */,
+				C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */,
 				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
 				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
 			);
@@ -163,14 +161,13 @@
 			name = Alfie;
 			packageProductDependencies = (
 				49AFF8542B6D0AA600695C66 /* OrderedCollections */,
-				C54DA2B42D368A40005142F4 /* Common */,
 				C54DA2B62D368A40005142F4 /* Core */,
 				C54DA2B82D368A40005142F4 /* Mocks */,
 				C54DA2BA2D368A40005142F4 /* Models */,
 				C54DA2BC2D368A40005142F4 /* Navigation */,
 				C54DA2BE2D368A40005142F4 /* StyleGuide */,
-				C5E0B4B42D36ABDF00D759F7 /* BFFGraphApi */,
-				C5E0B4B62D36ABDF00D759F7 /* BFFGraphMocks */,
+				C5DCD5F32D3EA0B70005AAB0 /* Common */,
+				C511F4DB2D3EAA2100AB69D6 /* AlicerceLogging */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -257,6 +254,7 @@
 			packageReferences = (
 				49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */,
 			);
 			productRefGroup = BE8B02252B616976007AE489 /* Products */;
 			projectDirPath = "";
@@ -723,6 +721,14 @@
 				minimumVersion = 1.15.4;
 			};
 		};
+		C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Mindera/Alicerce.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.18.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -736,9 +742,10 @@
 			package = BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
 		};
-		C54DA2B42D368A40005142F4 /* Common */ = {
+		C511F4DB2D3EAA2100AB69D6 /* AlicerceLogging */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Common;
+			package = C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */;
+			productName = AlicerceLogging;
 		};
 		C54DA2B62D368A40005142F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -764,13 +771,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = TestUtils;
 		};
-		C5E0B4B42D36ABDF00D759F7 /* BFFGraphApi */ = {
+		C5DCD5F32D3EA0B70005AAB0 /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = BFFGraphApi;
-		};
-		C5E0B4B62D36ABDF00D759F7 /* BFFGraphMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = BFFGraphMocks;
+			productName = Common;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
