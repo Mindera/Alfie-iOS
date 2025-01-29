@@ -16,17 +16,21 @@
 platform :ios do
   desc "Validate branch with linting, analysis, and tests"
   lane :validate_branch do
-    sh("swiftlint") # Runs SwiftLint
 
-    ENV['SCAN_DESTINATION'] = ENV['IOS_DESTINATION']
+    sh("brew bundle install --file=../Brewfile")
+
+    swiftlint(
+      mode: :lint,
+      config_file: ".swiftlint.yml"
+    )
 
     xcodebuild(
-      scheme: "Alfie",
+      scheme: ENV['SCHEME'],
       analyze: true
     )
 
     run_tests(
-      scheme: "Alfie"
+      scheme: ENV['SCHEME']
     )
   end
 
