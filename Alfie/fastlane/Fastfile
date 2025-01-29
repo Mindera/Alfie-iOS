@@ -17,8 +17,17 @@ platform :ios do
   desc "Validate branch with linting, analysis, and tests"
   lane :validate_branch do
     sh("swiftlint") # Runs SwiftLint
-    sh("xcodebuild analyze -scheme Alfie -destination '#{ENV['IOS_DESTINATION']}'")
-    sh("xcodebuild test -scheme Alfie -destination '#{ENV['IOS_DESTINATION']}'")
+
+    ENV['SCAN_DESTINATION'] = ENV['IOS_DESTINATION']
+
+    xcodebuild(
+      scheme: "Alfie",
+      analyze: true
+    )
+
+    run_tests(
+      scheme: "Alfie"
+    )
   end
 
   desc "Deploy to TestFlight using Git tags"
