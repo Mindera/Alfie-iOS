@@ -107,9 +107,9 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 .foregroundStyle(Colors.primary.black)
                 .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
-            Text.build(theme.font.paragraph.bold(L10n.shopCategoriesErrorViewTitle))
+            Text.build(theme.font.paragraph.bold(L10n.Shop.Categories.ErrorView.title))
                 .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(L10n.shopCategoriesErrorViewMessage))
+            Text.build(theme.font.small.normal(L10n.Shop.Categories.ErrorView.message))
                 .foregroundStyle(Colors.primary.black)
             Spacer()
         }

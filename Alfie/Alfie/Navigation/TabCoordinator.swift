@@ -162,17 +162,17 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
 }
 
 extension TabScreen {
-    var title: LocalizedStringResource {
+    var title: String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .home:
-            L10n.tabHomeTitle
+            L10n.Tab.Home.title
         case .shop:
-            L10n.tabShopTitle
+            L10n.Tab.Shop.title
         case .wishlist:
-            L10n.tabWishlistTitle
+            L10n.Tab.Wishlist.title
         case .bag:
-            L10n.tabBagTitle
+            L10n.Tab.Bag.title
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

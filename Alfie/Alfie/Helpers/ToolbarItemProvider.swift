@@ -15,8 +15,8 @@ enum ToolbarItemProvider {
                 case .loggedIn(let username, let memberSince):
                     ThemedToolbarTitle(
                         style: .leftText(
-                            L10n.homeLoggedInTitleWithParameter(username: username),
-                            subtitle: L10n.homeLoggedInSubtitleWithParameter(registrationYear: "\(memberSince)")
+                            L10n.Home.LoggedIn.title(username),
+                            subtitle: L10n.Home.LoggedIn.subtitle("\(memberSince)")
                         ),
                         accessibilityId: AccessibilityId.titleHeader
                     )
@@ -27,19 +27,19 @@ enum ToolbarItemProvider {
 
             case .tab(.bag):
                 ThemedToolbarTitle(
-                    style: .leftText(L10n.$bagTitle),
+                    style: .leftText(L10n.Bag.title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.shop):
                 ThemedToolbarTitle(
-                    style: .leftText(L10n.$shopTitle),
+                    style: .leftText(L10n.Shop.title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .tab(.wishlist):
                 ThemedToolbarTitle(
-                    style: .leftText(L10n.$wishlistTitle),
+                    style: .leftText(L10n.Wishlist.title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
@@ -69,13 +69,13 @@ enum ToolbarItemProvider {
 
             case .account:
                 ThemedToolbarTitle(
-                    style: .text(L10n.$accountTitle),
+                    style: .text(L10n.Account.title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 
             case .wishlist:
                 ThemedToolbarTitle(
-                    style: .text(L10n.$wishlistTitle),
+                    style: .text(L10n.Wishlist.title),
                     accessibilityId: AccessibilityId.titleHeader
                 )
 

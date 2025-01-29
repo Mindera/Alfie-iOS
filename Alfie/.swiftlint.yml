@@ -3,8 +3,7 @@ included:
   - AlfieKit
 excluded:
   - .build
-  - Alfie/Localization/L10n+Keys.swift
-  - Alfie/Localization/L10n+Resources.swift
+  - Alfie/Localization/L10n+Generated.swift
   - scripts
   - DerivedData
   - AlfieKit/.build

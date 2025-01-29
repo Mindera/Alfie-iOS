@@ -27,7 +27,7 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
             }
     }
 
-    func localizedName(for feature: String) -> LocalizedStringResource {
+    func localizedName(for feature: String) -> String {
         guard let key = ConfigurationKey(rawValue: feature) else {
             return .init(stringLiteral: "")
         }

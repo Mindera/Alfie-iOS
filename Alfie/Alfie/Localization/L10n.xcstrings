@@ -717,17 +717,6 @@
         }
       }
     },
-    "sort_by.new_in.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New-in"
-          }
-        }
-      }
-    },
     "sort_by.price_high_to_low.title" : {
       "extractionState" : "manual",
       "localizations" : {

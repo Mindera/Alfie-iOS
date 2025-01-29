@@ -12,7 +12,7 @@ struct FeatureToggleView<ViewModel: FeatureToggleViewModelProtocol>: View {
     var body: some View {
         LazyVStack {
             ThemedToggleView(isOn: $viewModel.isDebugConfigurationEnabled) {
-                Text(L10n.featureToggleDebugConfigurationOptionTitle)
+                Text(L10n.FeatureToggle.DebugConfiguration.Option.title)
                     .font(Font(theme.font.paragraph.bold.withSize(20)))
             }
 

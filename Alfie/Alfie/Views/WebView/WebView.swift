@@ -48,11 +48,11 @@ struct WebView<ViewModel: WebViewModelProtocol>: View {
             Circle()
                 .fill(Colors.primary.mono200)
                 .frame(width: Constants.errorViewCircleSize, height: Constants.errorViewCircleSize)
-            Text.build(theme.font.header.h2(L10n.webViewErrorViewTitle))
+            Text.build(theme.font.header.h2(L10n.WebView.ErrorView.title))
                 .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.paragraph.normal(L10n.webViewErrorViewGenericMessage))
+            Text.build(theme.font.paragraph.normal(L10n.WebView.ErrorView.Generic.message))
                 .foregroundStyle(Colors.primary.mono600)
-            ThemedButton(text: L10n.$webViewErrorViewButtonCTA, isFullWidth: true) {
+            ThemedButton(text: L10n.WebView.ErrorView.Button.cta, isFullWidth: true) {
                 viewModel.tryAgain()
             }
         }

@@ -38,7 +38,7 @@ struct ProductListingFilter: View {
                 sortView
             }.padding(.vertical, Spacing.space200)
             Spacer()
-            ThemedButton(text: L10n.$plpShowResultsButtonCTA) {
+            ThemedButton(text: L10n.Plp.ShowResults.Button.cta) {
                 onFilter()
             }
         }.onChange(of: sort) { sort in
@@ -55,7 +55,7 @@ struct ProductListingFilter: View {
                     .foregroundStyle(Colors.primary.black)
             })
             Spacer()
-            ThemedToolbarTitle(style: .text(L10n.$plpRefineAndSortTitle))
+            ThemedToolbarTitle(style: .text(L10n.Plp.RefineAndSort.title))
             Spacer()
         }
         .padding(.horizontal, Spacing.space300)
@@ -64,14 +64,14 @@ struct ProductListingFilter: View {
     var sortView: some View {
         SortByView(
             sortBy: $sort,
-            title: L10n.$plpSortByOptionTitle,
+            title: L10n.Plp.SortBy.Option.title,
             options: SortByHelper.options
         )
     }
 
     var listStyleView: some View {
         HStack {
-            Text(L10n.$plpListStyleOptionTitle)
+            Text(L10n.Plp.ListStyle.Option.title)
                 .font(Constants.listStyleFont)
                 .foregroundStyle(Colors.primary.mono900)
             Spacer()

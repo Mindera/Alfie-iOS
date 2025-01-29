@@ -216,11 +216,11 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .delivery:
-            return L10n.$pdpComplementaryInfoDeliveryTitle
+            return L10n.Pdp.ComplementaryInfo.Delivery.title
         case .paymentOptions:
-            return L10n.$pdpComplementaryInfoPaymentTitle
+            return L10n.Pdp.ComplementaryInfo.Payment.title
         case .returns:
-            return L10n.$pdpComplementaryInfoReturnsTitle
+            return L10n.Pdp.ComplementaryInfo.Returns.title
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -234,9 +234,9 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         switch failure {
         case .generic,
              .noInternet: // swiftlint:disable:this indentation_width
-            return L10n.$pdpErrorViewGenericMessage
+            return L10n.Pdp.ErrorView.Generic.message
         case .notFound:
-            return L10n.$pdpErrorViewNotFoundMessage
+            return L10n.Pdp.ErrorView.NotFound.message
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -445,9 +445,9 @@ extension ProductDetailsView {
     @ViewBuilder private var singleSizeView: some View {
         let sizeText: String = isOneSize
             ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
-            : L10n.$productOneSizeTitle
+            : L10n.Product.OneSize.title
         HStack {
-            Text.build(theme.font.small.bold(L10n.$productSizeTitle + ":"))
+            Text.build(theme.font.small.bold(L10n.Product.Size.title + ":"))
                 .foregroundStyle(Colors.primary.mono900)
             Text.build(theme.font.small.normal(sizeText))
                 .foregroundStyle(Colors.primary.mono900)
@@ -470,7 +470,7 @@ extension ProductDetailsView {
                 TabControl(
                     theme: .dark,
                     configuration: .fixedSize(horizontalMargins: Spacing.space200),
-                    options: [TabControl.TabOption(title: L10n.$pdpTabControlDescriptionOptionTitle)],
+                    options: [TabControl.TabOption(title: L10n.Pdp.TabControl.DescriptionOption.title)],
                     currentIndex: $currentDescriptionTabIndex
                 )
 
@@ -483,8 +483,8 @@ extension ProductDetailsView {
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
             VStack(spacing: Spacing.space0) {
-                let addToBagText = L10n.$productAddToBagButtonCTA
-                let outOfStockText = L10n.$productOutOfStockButtonCTA
+                let addToBagText = L10n.Product.AddToBag.Button.cta
+                let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
                 ThemedButton(
                     text: viewModel.productHasStock ? addToBagText : outOfStockText,
@@ -504,7 +504,7 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .addToWishlist) {
             VStack(spacing: Spacing.space0) {
                 ThemedButton(
-                    text: L10n.$productAddToWishlistButtonCTA,
+                    text: L10n.Product.AddToWishlist.Button.cta,
                     style: .secondary,
                     isFullWidth: true
                 ) {
@@ -520,11 +520,11 @@ extension ProductDetailsView {
             Circle()
                 .fill(Colors.primary.mono200)
                 .frame(width: Constants.errorViewCircleSize, height: Constants.errorViewCircleSize)
-            Text.build(theme.font.header.h2(L10n.pdpErrorViewTitle))
+            Text.build(theme.font.header.h2(L10n.Pdp.ErrorView.title))
                 .foregroundStyle(Colors.primary.black)
             Text.build(theme.font.paragraph.normal(errorMessage))
                 .foregroundStyle(Colors.primary.mono600)
-            ThemedButton(text: L10n.$pdpErrorViewGoBackButtonCTA, isFullWidth: true) {
+            ThemedButton(text: L10n.Pdp.ErrorView.GoBack.Button.cta, isFullWidth: true) {
                 coordinator.didTapBackButton()
             }
         }
