@@ -277,7 +277,7 @@ In this project is being used [SwiftGen](https://github.com/SwiftGen/SwiftGen) w
 1. Open the String Catalog table `L10n`.
 2. **Manually** add the entries in the base language and any other languages. Please use `ReverseDomain` convention along with `SnakeCase` convention for keys naming (ex: `plp.error_view.title`) and give translation keys meaningful names.
 3. *Mark for Review* any entry not officially provided/approved to easily track the translations state (*Mark as Reviewed* when this happens too)
-4. Build de project. Using [SwiftGen](https://github.com/SwiftGen/SwiftGen), will automatically update the `L10n+Generated.swift` file.
+4. Build the project. Using [SwiftGen](https://github.com/SwiftGen/SwiftGen), will automatically update the `L10n+Generated.swift` file.
 
 **Note:** New tables are discouraged, the goal is to have everything in the `L10n` table.
 
