@@ -9,7 +9,6 @@ on:
   workflow_dispatch:
 
 env:
-  IOS_DESTINATION: "platform=iOS Simulator,name=iPhone 14"
   DEVELOPER_DIR: "/Applications/Xcode_16.app/Contents/Developer"
 
 jobs:

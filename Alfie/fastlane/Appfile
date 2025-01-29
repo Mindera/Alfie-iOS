@@ -1,6 +1,0 @@
-app_identifier("com.mindera.alfie.debug") # The bundle identifier of your app
-itc_team_id("116567802") # App Store Connect Team ID
-team_id("74L475LDQT") # Developer Portal Team ID
-
-# For more information about the Appfile, see:
-#     https://docs.fastlane.tools/advanced/#appfile
