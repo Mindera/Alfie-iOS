@@ -4,13 +4,15 @@ name: Alfie CI/CD
 on:
   push:
     branches:
-      - main
-      - release/**
+      - 'main'
+      - 'release/**'
+      - 'ALFMOB-33_Implemented_CI_CD'
   
   pull_request:
     branches:
-      - main
-      - release/**
+      - 'main'
+      - 'release/**'
+      - 'ALFMOB-33_Implemented_CI_CD'
 
   workflow_dispatch:
 
