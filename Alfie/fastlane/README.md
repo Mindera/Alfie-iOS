@@ -15,13 +15,13 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios validate_branch
+### ios validate_tests
 
 ```sh
-[bundle exec] fastlane ios validate_branch
+[bundle exec] fastlane ios validate_tests
 ```
 
-Validate branch with linting, analysis, and tests
+Validate Tests
 
 ### ios beta
 
