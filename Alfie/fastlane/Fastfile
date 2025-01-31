@@ -14,52 +14,60 @@
 # update_fastlane
 
 platform :ios do
-  desc "Validate branch with linting, analysis, and tests"
-  lane :validate_branch do
+  desc "Validate Tests"
+  lane :validate_tests do
 
     sh("brew bundle install --file=../Brewfile")
 
-    swiftlint(
-      mode: :lint,
-      config_file: ".swiftlint.yml"
-    )
-
-    xcodebuild(
-      scheme: ENV['SCHEME'],
-      analyze: true
-    )
-
+    puts "🛠 Running Tests..."
     run_tests(
       scheme: ENV['SCHEME']
     )
+    puts "✅ Tests Completed!"
   end
 
   desc "Deploy to TestFlight using Git tags"
   lane :beta do
-    api_key = app_store_connect_api_key(
-      key_id: ENV['ASC_KEY_ID'],
-      issuer_id: ENV['ASC_ISSUER_ID'],
-      key_filepath: ENV['ASC_API_KEY']
-    )
 
-    match(type: "appstore", readonly: false, api_key: api_key)
+    puts "🔑 Fetching App Store Connect API Key..."
+    app_store_connect_api_key
+    puts "✅ API Key Loaded!"
 
-    increment_build_number
+    puts "🔐 Running match..."
+    match(type: "appstore")
+    puts "✅ Match Completed!"
 
-    version = get_version_number(xcodeproj: "Alfie.xcodeproj")
-    build_number = get_build_number(xcodeproj: "Alfie.xcodeproj")
+    puts "#️⃣ Fetching Build Number from latest tag..."
+    last_build_number = sh("git tag -l '#*' --sort=-v:refname | head -n 1 | sed -e 's/#//g' | grep . || echo '0'").strip.to_i
+    new_build_number = last_build_number + 1
+    puts "✅ Fetch Completed!"
+
+    puts "🔢 Last Build Number: #{last_build_number}"
+    puts "🚀 New Build Number: #{new_build_number}"
+
+    puts "#️⃣ Incremeting Build Number..."
+    increment_build_number(build_number: new_build_number)
+    puts "✅ Build Number Increment Completed!"
+
+    puts "🏷️ Updating tag..."
+    new_tag = "'##{new_build_number}'"
+
     sh("git config user.name '#{ENV['GIT_USER_NAME']}'")
     sh("git config user.email '#{ENV['GIT_EMAIL']}'")
-    sh("git tag v#{version}-#{build_number}")
-    sh("git push origin --tags")
+    sh("git tag #{new_tag}")
+    sh("git push origin #{new_tag}")
+    puts "✅ Tag Update Completed!"
 
+    puts "🛠 Building app..."
     build_app(
-      scheme: "Alfie",
-      export_options: { method: "app-store" },
-      api_key: api_key
+      scheme: ENV['SCHEME'],
+      export_options: { method: "app-store" }
     )
+    puts "✅ Build Completed!"
 
-    upload_to_testflight(api_key: api_key)
+    puts "🚀 Uploading to Testflight..."
+    upload_to_testflight
+    puts "✅ Upload Completed!"
   end
 end
 

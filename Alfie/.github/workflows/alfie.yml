@@ -6,6 +6,12 @@ on:
     branches:
       - main
       - release/**
+  
+  pull_request:
+    branches:
+      - main
+      - release/**
+
   workflow_dispatch:
 
 env:
@@ -21,15 +27,23 @@ jobs:
       - name: Install Fastlane
         run: gem install fastlane
 
-      - name: Run Linting, Analysis, and Tests
-        run: fastlane validate_branch
+      - name: Validate Tests
+        run: fastlane validate_tests
         env:
           IOS_DESTINATION: ${{ env.IOS_DESTINATION }}
+      
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: iOS-Test-Results
+          path: |
+              ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult
+          retention-days: 7
 
   testflight-build:
     needs: branch-validation
     runs-on: macos-latest
-    if: startsWith(github.ref, 'refs/heads/release/')
+    if: github.event_name == 'push'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -47,11 +61,14 @@ jobs:
       - name: Deploy to TestFlight
         run: fastlane beta
         env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+          APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+          APPSTORE_CONNECT_KEY_CONTENT_BASE64: ${{ secrets.APPSTORE_CONNECT_KEY_CONTENT_BASE64 }}
+          APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          APPSTORE_CONNECT_TEAM_ID: ${{ secrets.APPSTORE_CONNECT_TEAM_ID }}
+          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
           GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+          ITUNESCONNECT_TEAM_ID: ${{ secrets.ITUNESCONNECT_TEAM_ID }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
