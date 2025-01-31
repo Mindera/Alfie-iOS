@@ -1,0 +1,74 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+platform :ios do
+  desc "Validate Tests"
+  lane :validate_tests do
+
+    sh("brew bundle install --file=../Brewfile")
+
+    puts "🛠 Running Tests..."
+    run_tests(
+      scheme: ENV['SCHEME']
+    )
+    puts "✅ Tests Completed!"
+  end
+
+  desc "Deploy to TestFlight using Git tags"
+  lane :beta do
+
+    puts "🔑 Fetching App Store Connect API Key..."
+    app_store_connect_api_key
+    puts "✅ API Key Loaded!"
+
+    puts "🔐 Running match..."
+    match(type: "appstore")
+    puts "✅ Match Completed!"
+
+    puts "#️⃣ Fetching Build Number from latest tag..."
+    last_build_number = sh("git tag -l '#*' --sort=-v:refname | head -n 1 | sed -e 's/#//g' | grep . || echo '0'").strip.to_i
+    new_build_number = last_build_number + 1
+    puts "✅ Fetch Completed!"
+
+    puts "🔢 Last Build Number: #{last_build_number}"
+    puts "🚀 New Build Number: #{new_build_number}"
+
+    puts "#️⃣ Incremeting Build Number..."
+    increment_build_number(build_number: new_build_number)
+    puts "✅ Build Number Increment Completed!"
+
+    puts "🏷️ Updating tag..."
+    new_tag = "'##{new_build_number}'"
+
+    sh("git config user.name '#{ENV['GIT_USER_NAME']}'")
+    sh("git config user.email '#{ENV['GIT_EMAIL']}'")
+    sh("git tag #{new_tag}")
+    sh("git push origin #{new_tag}")
+    puts "✅ Tag Update Completed!"
+
+    puts "🛠 Building app..."
+    build_app(
+      scheme: ENV['SCHEME'],
+      export_options: { method: "app-store" }
+    )
+    puts "✅ Build Completed!"
+
+    puts "🚀 Uploading to Testflight..."
+    upload_to_testflight
+    puts "✅ Upload Completed!"
+  end
+end
+
+
