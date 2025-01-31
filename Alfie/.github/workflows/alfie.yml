@@ -3,16 +3,10 @@ name: Alfie CI/CD
 
 on:
   push:
-    branches:
-      - 'main'
-      - 'release/**'
-      - 'ALFMOB-33_Implemented_CI_CD'
+    branches: ['main', 'release/**', 'ALFMOB-33_Implemented_CI_CD']
   
   pull_request:
-    branches:
-      - 'main'
-      - 'release/**'
-      - 'ALFMOB-33_Implemented_CI_CD'
+    branches: ['main', 'release/**', 'ALFMOB-33_Implemented_CI_CD']
 
   workflow_dispatch:
 
