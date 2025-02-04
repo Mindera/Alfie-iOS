@@ -107,6 +107,7 @@ let package = Package(
         .target(
             name: "Models",
             dependencies: [
+                .product(name: "AlicerceAnalytics", package: "Alicerce"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
