@@ -1,10 +1,10 @@
 import Foundation
 
 public protocol ServiceProviderProtocol: AnyObject {
+    var analytics: AlfieAnalyticsTracker { get }
     var authenticationService: AuthenticationServiceProtocol { get }
     var configurationService: ConfigurationServiceProtocol { get }
     var deepLinkService: DeepLinkServiceProtocol { get }
-    var trackingService: TrackingServiceProtocol { get }
     var apiEndpointService: ApiEndpointServiceProtocol { get }
     var hapticsService: HapticsServiceProtocol { get }
     var recentsService: RecentsServiceProtocol? { get }

@@ -1,12 +1,13 @@
+import AlicerceAnalytics
 import Common
 import Foundation
 import Models
 
 public final class MockServiceProvider: ServiceProviderProtocol {
+    public var analytics: AlfieAnalyticsTracker
     public var authenticationService: AuthenticationServiceProtocol
     public var configurationService: ConfigurationServiceProtocol
     public var deepLinkService: DeepLinkServiceProtocol
-    public var trackingService: TrackingServiceProtocol
     public var hapticsService: HapticsServiceProtocol
     public var apiEndpointService: ApiEndpointServiceProtocol
     public var reachabilityService: ReachabilityServiceProtocol
@@ -24,10 +25,10 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var wishlistService: WishlistServiceProtocol
 
     public init(
+        analytics: AlfieAnalyticsTracker = AlfieAnalyticsTracker(DummyAnalyticsTracker()),
         authenticationService: AuthenticationServiceProtocol = MockAuthenticationService(),
         configurationService: ConfigurationServiceProtocol = MockConfigurationService(),
         deepLinkService: DeepLinkServiceProtocol = MockDeepLinkService(),
-        trackingService: TrackingServiceProtocol = MockTrackingService(),
         apiEndpointService: ApiEndpointServiceProtocol = MockApiEndpointService(),
         hapticsService: HapticsServiceProtocol = MockHapticsService(),
         reachabilityService: ReachabilityServiceProtocol = MockReachabilityService(),
@@ -44,10 +45,10 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         bagService: BagServiceProtocol = MockBagService(),
         wishlistService: WishlistServiceProtocol = MockWishlistService()
     ) {
+        self.analytics = analytics
         self.authenticationService = authenticationService
         self.configurationService = configurationService
         self.deepLinkService = deepLinkService
-        self.trackingService = trackingService
         self.apiEndpointService = apiEndpointService
         self.hapticsService = hapticsService
         self.reachabilityService = reachabilityService
