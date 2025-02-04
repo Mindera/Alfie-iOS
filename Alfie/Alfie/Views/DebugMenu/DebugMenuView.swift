@@ -25,7 +25,6 @@ struct DebugMenuView: View {
                 List {
                     link(for: .catalogue, text: "Catalogue App")
                     link(for: .deeplinking, text: "Deep Linking")
-                    link(for: .tracking, text: "Analytics")
                     link(for: .appUpdate, text: "Force & Soft Update")
                     link(for: .brazeInfo, text: "Braze Push")
                     #if DEBUG
@@ -67,10 +66,6 @@ struct DebugMenuView: View {
             DeepLinkDemoView()
                 .modifier(ContainerDemoViewModifier(headerTitle: "Deep Linking"))
 
-        case .tracking:
-            TrackingDemoView(trackedEvents: serviceProvider.trackingService.trackedEvents)
-                .modifier(ContainerDemoViewModifier(headerTitle: "Analytics"))
-
         case .appUpdate:
             AppUpdateDemoView(configurationService: serviceProvider.configurationService)
                 .modifier(ContainerDemoViewModifier(headerTitle: "Force & Soft Update"))
@@ -98,7 +93,6 @@ struct DebugMenuView: View {
     private enum DebugNavigation: Hashable {
         case catalogue
         case deeplinking
-        case tracking
         case appUpdate
         case brazeInfo
         case endpoint

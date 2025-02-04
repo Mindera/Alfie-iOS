@@ -23,7 +23,10 @@ final class ViewFactory: ViewFactoryProtocol {
         case .tab(let tab):
             switch tab {
             case .home:
-                HomeView(viewFactory: self)
+                HomeView(
+                    viewFactory: self,
+                    analytics: serviceProvider.analytics
+                )
 
             case .shop:
                 ShopView(
@@ -48,7 +51,10 @@ final class ViewFactory: ViewFactoryProtocol {
             case .bag:
                 BagView(
                     viewModel: BagViewModel(
-                        dependencies: BagDependencyContainer(bagService: serviceProvider.bagService)
+                        dependencies: BagDependencyContainer(
+                            bagService: serviceProvider.bagService,
+                            analytics: serviceProvider.analytics
+                        )
                     )
                 )
             }
@@ -59,7 +65,8 @@ final class ViewFactory: ViewFactoryProtocol {
         case .search(let transition):
             let dependencies = SearchDependencyContainer(
                 recentsService: serviceProvider.recentsService,
-                searchService: serviceProvider.searchService
+                searchService: serviceProvider.searchService,
+                analytics: serviceProvider.analytics
             )
             let viewModel = SearchViewModel(dependencies: dependencies)
             SearchView(viewModel: viewModel, transition: transition)
@@ -73,7 +80,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             configuration: .init(type: .plp)
                         ),
                         plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                        wishlistService: serviceProvider.wishlistService
+                        wishlistService: serviceProvider.wishlistService,
+                        analytics: serviceProvider.analytics
                     ),
                     category: configuration.category,
                     searchText: configuration.searchText,
@@ -131,7 +139,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
                             wishlistService: serviceProvider.wishlistService,
-                            configurationService: serviceProvider.configurationService
+                            configurationService: serviceProvider.configurationService,
+                            analytics: serviceProvider.analytics
                         )
                     )
                 )
@@ -146,7 +155,8 @@ final class ViewFactory: ViewFactoryProtocol {
                             webUrlProvider: serviceProvider.webUrlProvider,
                             bagService: serviceProvider.bagService,
                             wishlistService: serviceProvider.wishlistService,
-                            configurationService: serviceProvider.configurationService
+                            configurationService: serviceProvider.configurationService,
+                            analytics: serviceProvider.analytics
                         )
                     )
                 )
@@ -169,7 +179,8 @@ private extension ViewFactory {
             viewModel: WishlistViewModel(
                 dependencies: WishlistDependencyContainer(
                     wishlistService: serviceProvider.wishlistService,
-                    bagService: serviceProvider.bagService
+                    bagService: serviceProvider.bagService,
+                    analytics: serviceProvider.analytics
                 )
             )
         )

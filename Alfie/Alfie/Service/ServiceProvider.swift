@@ -8,6 +8,7 @@ import Mocks
 #endif
 
 final class ServiceProvider: ServiceProviderProtocol {
+    let analytics: AlfieAnalyticsTracker
     let apiEndpointService: ApiEndpointServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let deepLinkService: DeepLinkServiceProtocol
@@ -16,7 +17,6 @@ final class ServiceProvider: ServiceProviderProtocol {
     let recentsService: RecentsServiceProtocol?
     let reachabilityService: ReachabilityServiceProtocol
     let storageService: StorageServiceProtocol?
-    let trackingService: TrackingServiceProtocol
     let userDefaults: UserDefaultsProtocol
     let productService: ProductServiceProtocol
     let brandsService: BrandsServiceProtocol
@@ -38,7 +38,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         let defaultInitializationCountry = "AU"
 
         authenticationService = AuthenticationService()
-        trackingService = TrackingService(providers: [FirebaseAnalyticsService()])
+        analytics = AlfieAnalyticsTracker(FirebaseAnalyticsTracker())
 
         let firebaseProvider = FirebaseRemoteConfigurationProvider(
             minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800,
