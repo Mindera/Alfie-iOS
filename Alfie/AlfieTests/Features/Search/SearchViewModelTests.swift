@@ -8,6 +8,7 @@ final class SearchViewModelTests: XCTestCase {
     private var mockRecentsService: MockRecentsService!
     private var mockSearchService: MockSearchService!
     private var sut: SearchViewModel!
+    private let serviceProvider = MockServiceProvider()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -16,7 +17,8 @@ final class SearchViewModelTests: XCTestCase {
         mockDependencies = SearchDependencyContainer(
             executionQueue: DispatchQueue.global(),
             recentsService: mockRecentsService,
-            searchService: mockSearchService
+            searchService: mockSearchService,
+            analytics: serviceProvider.analytics
         )
         sut = .init(dependencies: mockDependencies)
     }
@@ -153,7 +155,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_does_not_show_recent_searches_when_view_appears_and_recents_service_is_not_available() {
-        mockDependencies = SearchDependencyContainer(recentsService: nil, searchService: mockSearchService)
+        mockDependencies = SearchDependencyContainer(
+            recentsService: nil,
+            searchService: mockSearchService,
+            analytics: serviceProvider.analytics
+        )
         sut = .init(dependencies: mockDependencies)
 
         let result = assertNoEvent(from: sut.$state.drop(while: { $0 == .empty }).eraseToAnyPublisher(), afterTrigger: { sut.viewDidAppear() }, timeout: defaultTimeout)

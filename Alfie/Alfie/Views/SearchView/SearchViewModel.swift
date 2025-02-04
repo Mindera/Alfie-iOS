@@ -98,6 +98,7 @@ extension SearchViewModel {
             return
         }
         dependencies.recentsService?.add(.text(value: searchText))
+        dependencies.analytics.track(.action(.search, [.searchTerm: searchText]))
     }
 
     func onTapSearchSuggestion(_ suggestion: SearchSuggestionKeyword) {

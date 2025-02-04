@@ -1,6 +1,10 @@
+import Core
 import Models
 import StyleGuide
 import SwiftUI
+#if DEBUG
+import Mocks
+#endif
 
 struct HomeView: View {
     @EnvironmentObject var coordinador: Coordinator
@@ -8,9 +12,14 @@ struct HomeView: View {
     @State private var showSearchBar = true
     @State private var isUserLogged = false
     @Namespace private var animation
+    private let analytics: AlfieAnalyticsTracker
 
-    init(viewFactory: ViewFactory? = nil) {
+    init(
+        viewFactory: ViewFactory? = nil,
+        analytics: AlfieAnalyticsTracker
+    ) {
         self.viewFactory = viewFactory
+        self.analytics = analytics
     }
 
     var body: some View {
@@ -46,6 +55,7 @@ struct HomeView: View {
             Text.build(theme.font.header.h3(L10n.Home.title))
             ThemedButton(text: isUserLogged ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta) {
                 isUserLogged.toggle()
+                analytics.track(.state(isUserLogged ? .userLogin : .userLogout, nil))
             }
             Spacer()
         }
@@ -69,6 +79,7 @@ private enum Constants {
 }
 
 #Preview {
-    HomeView()
+    let serviceProvider = MockServiceProvider()
+    HomeView(analytics: serviceProvider.analytics)
         .environmentObject(Coordinator())
 }

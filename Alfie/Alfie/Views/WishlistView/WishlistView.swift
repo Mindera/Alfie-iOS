@@ -58,11 +58,13 @@ private extension WishlistView {
 
 #if DEBUG
 #Preview {
+    let serviceProvider = MockServiceProvider()
     WishlistView(
         viewModel: WishlistViewModel(
             dependencies: WishlistDependencyContainer(
-                wishlistService: MockWishlistService(),
-                bagService: MockBagService()
+                wishlistService: serviceProvider.wishlistService,
+                bagService: serviceProvider.bagService,
+                analytics: serviceProvider.analytics
             )
         )
     )
