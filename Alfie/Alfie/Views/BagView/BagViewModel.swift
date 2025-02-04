@@ -20,6 +20,15 @@ final class BagViewModel: BagViewModelProtocol {
     func didSelectDelete(for product: SelectionProduct) {
         dependencies.bagService.removeProduct(product)
         products = dependencies.bagService.getBagContent()
+        dependencies.analytics.track(
+            .action(
+                .removeFromBag,
+                [
+                    .screenName: AnalyticsScreenName.bag.rawValue,
+                    .productID: product.id,
+                ]
+            )
+        )
     }
 
     func productCardViewModel(for product: SelectionProduct) -> HorizontalProductCardViewModel {

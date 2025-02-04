@@ -38,7 +38,15 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
 #if DEBUG
 #Preview {
-    BagView(viewModel: BagViewModel(dependencies: BagDependencyContainer(bagService: MockBagService())))
-        .environmentObject(Coordinator())
+    let serviceProvider = MockServiceProvider()
+    BagView(
+        viewModel: BagViewModel(
+            dependencies: BagDependencyContainer(
+                bagService: serviceProvider.bagService,
+                analytics: serviceProvider.analytics
+            )
+        )
+    )
+    .environmentObject(Coordinator())
 }
 #endif
