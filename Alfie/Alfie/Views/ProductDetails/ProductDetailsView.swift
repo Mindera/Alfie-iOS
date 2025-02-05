@@ -30,6 +30,15 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @State private var hasSpaceForSizeSelector = true
     @State private var colorSheetSearchText = ""
 
+    // TODO: #1 Rename and check the ones to be deleted
+    @State private var scrollOffset: CGPoint = .zero
+    @State private var isScrollEnabled = true
+    @State private var bottomButtonsSize: CGSize = .zero
+    @State private var dragOffset: CGFloat = 0
+    @State private var lastDragOffset: CGFloat = 0
+    @State private var isDetailsViewExpanded = false
+    // TODO: End of #1
+
     // There are multiple types of color pickers, but they all depend on the same conditions
     private var canShowColorPickers: Bool {
         viewModel.colorSelectionConfiguration.items.count > 1
@@ -138,38 +147,157 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @available(iOS 16.4, *)
     // swiftlint:disable:next attributes
     private var iPhonePDPView: some View {
-        VStack {
-            mediaCarousel
-            Spacer()
-        }
-        .padding(.horizontal, horizontalPadding)
-        .task {
-            showDetailsSheet = true
-        }
-        .onAppear {
-            if let bottomSheetDetentBeforeNavigation {
-                bottomSheetCurrentDetent = bottomSheetDetentBeforeNavigation
-                showDetailsSheet = true
-            }
-        }
-        .onChange(of: viewSize) { newValue in
-            if newValue != .zero {
-                setupDetents(with: newValue)
-            }
-        }
-        .sheet(isPresented: $showDetailsSheet) {
-            popupView
-                .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
-                    colorSheet
-                        .presentationBackgroundInteraction(.enabled)
-                })
-                .sheet(isPresented: $showSizeSheet) {
-                    sizeSheet
-                        .presentationBackgroundInteraction(.enabled)
+        GeometryReader { geometry in
+            // TODO: #2 Rename and check the ones to be deleted
+            let screenHeight = geometry.size.height
+            let minHeight = screenHeight - carouselSize.height
+            let maxHeight = screenHeight
+            let minVelocity: CGFloat = 800
+            let shouldHavePinnedButtons = minHeight > 100
+            let isScrolledToTop = scrollOffset.y == 0
+            // TODO: End of #2
+
+            ZStack(alignment: .top) {
+                VStack {
+                    mediaCarousel
+                    Spacer()
                 }
-                .fullScreenCover(isPresented: $isMediaFullScreen) {
-                    fullscreenMediaCarousel
+                .padding(.horizontal, horizontalPadding)
+
+                VStack {
+                    Capsule()
+                        .frame(width: 40, height: 6)
+                        .foregroundColor(.gray)
+                        .padding(.top, 8)
+
+                    ScrollViewWithOffsetReader(offset: $scrollOffset) {
+                        complementaryViews
+                            .padding([.horizontal, .top], 16)
+                            .padding(.bottom, shouldHavePinnedButtons ? bottomButtonsSize.height : 0)
+
+                        if !shouldHavePinnedButtons {
+                            VStack {
+                                addToBag
+                                addToWishlist
+                            }
+                            .padding(.vertical, Spacing.space100)
+                            .padding(.horizontal, Spacing.space200)
+                            .background(Colors.primary.white)
+                            .writingSize(to: $bottomButtonsSize)
+                            .frame(maxHeight: .infinity, alignment: .bottom)
+                        }
+                    }
+                    .scrollBounceBehavior(.basedOnSize)
+                    .scrollIndicators(.hidden)
+                    .scrollDisabled(!isScrollEnabled)
                 }
+                .frame(height: maxHeight, alignment: .top)
+                .background(Colors.primary.white)
+                .cornerRadius(10)
+                .shadow(.softFloat5)
+                .offset(y: carouselSize.height + dragOffset)
+                .simultaneousGesture(
+                    DragGesture()
+                        .onChanged { value in
+                            let newOffset = lastDragOffset + value.translation.height
+
+                            if isDetailsViewExpanded {
+                                // Only allow dragging if at the top of the scroll view
+                                if newOffset > lastDragOffset && isScrolledToTop {
+                                    isScrollEnabled = false
+                                    dragOffset = max(min(newOffset, 0), minHeight - maxHeight)
+                                } else {
+                                    isScrollEnabled = true
+                                }
+                            } else {
+                                // Always allow dragging when collapsed
+                                isScrollEnabled = false
+                                dragOffset = max(min(newOffset, 0), minHeight - maxHeight)
+                            }
+                        }
+                        .onEnded { value in
+                            let velocity = value.velocity.height
+                            let midPoint = (minHeight - maxHeight) / 2
+
+                            withAnimation(.spring()) {
+                                if velocity < -minVelocity {
+                                    // Case 1: Fast swipe up → Expand the sheet
+                                    dragOffset = minHeight - maxHeight
+                                    isDetailsViewExpanded = true
+                                    isScrollEnabled = true
+                                } else if velocity > minVelocity && isScrolledToTop {
+                                    // Case 2: Fast swipe down → Collapse the sheet
+                                    dragOffset = 0
+                                    isDetailsViewExpanded = false
+                                    isScrollEnabled = false
+                                } else if dragOffset < midPoint {
+                                    // Case 3: Slow or no swipe, but sheet is past the midpoint → Expand
+                                    dragOffset = minHeight - maxHeight
+                                    isDetailsViewExpanded = true
+                                    isScrollEnabled = true
+                                } else {
+                                    // Case 4: Slow or no swipe, but sheet is before the midpoint → Collapse
+                                    dragOffset = 0
+                                    isDetailsViewExpanded = false
+                                    isScrollEnabled = false
+                                }
+                            }
+                            lastDragOffset = dragOffset
+                        }
+                )
+
+                if shouldHavePinnedButtons {
+                    VStack {
+                        addToBag
+                        addToWishlist
+                    }
+                    .padding(.vertical, Spacing.space100)
+                    .padding(.horizontal, Spacing.space200)
+                    .background(Colors.primary.white)
+                    .writingSize(to: $bottomButtonsSize)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                }
+            }
+            .sheet(
+                isPresented: $showColorSheet,
+                onDismiss: { colorSheetSearchText = "" },
+                content: { colorSheet.presentationBackgroundInteraction(.enabled) }
+            )
+            .sheet(isPresented: $showSizeSheet) {
+                sizeSheet.presentationBackgroundInteraction(.enabled)
+            }
+            .fullScreenCover(isPresented: $isMediaFullScreen) {
+                fullscreenMediaCarousel
+            }
+            .onAppear {
+                dragOffset = isDetailsViewExpanded ? (minHeight - maxHeight) : 0
+            }
+            .onChange(of: showColorSheet) { showSizeSheet in
+                withAnimation(.spring()) {
+                    if showSizeSheet {
+                        dragOffset = 0
+                        isDetailsViewExpanded = false
+                        isScrollEnabled = false
+                    } else {
+                        dragOffset = minHeight - maxHeight
+                        isDetailsViewExpanded = true
+                        isScrollEnabled = true
+                    }
+                }
+            }
+            .onChange(of: showSizeSheet) { showSizeSheet in
+                withAnimation(.spring()) {
+                    if showSizeSheet {
+                        dragOffset = 0
+                        isDetailsViewExpanded = false
+                        isScrollEnabled = false
+                    } else {
+                        dragOffset = minHeight - maxHeight
+                        isDetailsViewExpanded = true
+                        isScrollEnabled = true
+                    }
+                }
+            }
         }
     }
 
