@@ -1,7 +1,7 @@
 import Combine
+import Common
 import Core
 #if DEBUG
-import Common
 import Mocks
 #endif
 import Models
@@ -16,19 +16,17 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
     @State private var showSizeSheet = false
-    @State private var showDetailsSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var carouselSize: CGSize = .zero
     @State private var viewSize: CGSize = .zero
     @State private var colorSelectorSize: CGSize = .zero
-    @State private var bottomSheetCurrentDetent = PresentationDetent.height(0)
-    // store the detents before navigation to restore afterwards
-    @State private var bottomSheetDetentBeforeNavigation: PresentationDetent?
-    @State private var bottomSheetDetents: OrderedSet<PresentationDetent> = [PresentationDetent.height(0)]
     @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
     @State private var hasSpaceForSizeSelector = true
     @State private var colorSheetSearchText = ""
+    @State private var bottomButtonsSize: CGSize = .zero
+    @State private var complementaryViewSize: CGSize = .zero
+    @State private var shouldCollapseDraggableBottomSheet = false
 
     // There are multiple types of color pickers, but they all depend on the same conditions
     private var canShowColorPickers: Bool {
@@ -98,7 +96,6 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
             if newValue {
                 // give the sheet time to dismiss in case we catch it in the middle of the presentation
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    showDetailsSheet = false
                     showFailureState = true
                 }
             } else {
@@ -108,6 +105,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     }
 
     @ViewBuilder private var pdpView: some View {
+        // TODO: Check why iPad uses a different view
         if isIpad {
             legacyPDPView
         } else {
@@ -135,44 +133,68 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         }
     }
 
+    // TODO: Check if we can have the same view for all versions, even if we only drop small features instead of having a completly different view
     @available(iOS 16.4, *)
     // swiftlint:disable:next attributes
     private var iPhonePDPView: some View {
-        VStack {
-            mediaCarousel
-            Spacer()
-        }
-        .padding(.horizontal, horizontalPadding)
-        .task {
-            showDetailsSheet = true
-        }
-        .onAppear {
-            if let bottomSheetDetentBeforeNavigation {
-                bottomSheetCurrentDetent = bottomSheetDetentBeforeNavigation
-                showDetailsSheet = true
-            }
-        }
-        .onChange(of: viewSize) { newValue in
-            if newValue != .zero {
-                setupDetents(with: newValue)
-            }
-        }
-        .sheet(isPresented: $showDetailsSheet) {
-            popupView
-                .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
-                    colorSheet
-                        .presentationBackgroundInteraction(.enabled)
-                })
-                .sheet(isPresented: $showSizeSheet) {
-                    sizeSheet
-                        .presentationBackgroundInteraction(.enabled)
+        GeometryReader { geometry in
+            let screenHeight = geometry.size.height
+            let collapsedHeight = screenHeight - carouselSize.height
+            let shouldHavePinnedButtons = collapsedHeight > 100
+            // TODO: Check if margins should be included in calculations
+            let expandedHeight = shouldHavePinnedButtons ?
+                min(complementaryViewSize.height + 0 + Spacing.space100, screenHeight) :
+                min(complementaryViewSize.height + 0 + bottomButtonsSize.height + Spacing.space100 + 0 + 0, screenHeight)
+
+            ZStack(alignment: .top) {
+                VStack {
+                    mediaCarousel
+                    Spacer()
                 }
-                .fullScreenCover(isPresented: $isMediaFullScreen) {
-                    fullscreenMediaCarousel
+                .padding(.horizontal, horizontalPadding)
+
+                DraggableBottomSheet(
+                    showCapsule: true,
+                    expandedHeight: expandedHeight,
+                    collapsedHeight: collapsedHeight,
+                    dragStartOffset: carouselSize.height, // TODO: Check if we can delete this
+                    expansionSignal: $shouldCollapseDraggableBottomSheet.negate
+                ) {
+                    complementaryViews
+                        .padding([.horizontal, .top], 16)
+                        .padding(.bottom, shouldHavePinnedButtons ? bottomButtonsSize.height : 0)
+                        .writingSize(to: $complementaryViewSize)
+
+                    if !shouldHavePinnedButtons {
+                        bottomButtons
+                    }
                 }
+
+                if shouldHavePinnedButtons {
+                    bottomButtons
+                }
+            }
+            .sheet(
+                isPresented: $showColorSheet,
+                onDismiss: { colorSheetSearchText = "" },
+                content: { colorSheet.presentationBackgroundInteraction(.enabled) }
+            )
+            .sheet(isPresented: $showSizeSheet) {
+                sizeSheet.presentationBackgroundInteraction(.enabled)
+            }
+            .fullScreenCover(isPresented: $isMediaFullScreen) {
+                fullscreenMediaCarousel
+            }
+            .onChange(of: showColorSheet) { showColorSheet in
+                shouldCollapseDraggableBottomSheet = showColorSheet || showSizeSheet
+            }
+            .onChange(of: showSizeSheet) { showSizeSheet in
+                shouldCollapseDraggableBottomSheet = showSizeSheet || showColorSheet
+            }
         }
     }
 
+    // TODO: Check if can be dropped
     private var legacyPDPView: some View {
         VStack {
             ScrollView {
@@ -191,18 +213,6 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     }
 
     // MARK: - Helpers
-
-    private func setupDetents(with viewSize: CGSize) {
-        let collapsedDetent = PresentationDetent.height(viewSize.height + TabBarView.size.height - carouselSize.height)
-        let expandedDetent = PresentationDetent.height(viewSize.height + TabBarView.size.height)
-
-        bottomSheetDetents = [
-            collapsedDetent,
-            expandedDetent,
-        ]
-
-        bottomSheetCurrentDetent = collapsedDetent
-    }
 
     private func shimmeringBinding(for section: ProductDetailsSection) -> Binding<Bool> {
         .init(get: { viewModel.shouldShowLoading(for: section) }, set: { _ in })
@@ -244,30 +254,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
 
 // MARK: - Sections
 extension ProductDetailsView {
-    @available(iOS 16.4, *)
-    // swiftlint:disable:next attributes
-    private var popupView: some View {
-        VStack {
-            ScrollView(showsIndicators: false) {
-                complementaryViews
-                    .padding([.horizontal, .top], Spacing.space200)
-            }
-
-            VStack {
-                addToBag
-                addToWishlist
-            }
-            .padding(.vertical, Spacing.space100)
-            .padding(.horizontal, Spacing.space200)
-        }
-        .presentationDetents(Set(bottomSheetDetents), selection: $bottomSheetCurrentDetent)
-        .presentationDragIndicator(.hidden)
-        .presentationBackgroundInteraction(.enabled)
-        .interactiveDismissDisabled()
-        .persistentSystemOverlays(.hidden)
-    }
-
-    /// contains every view except the media carousel
+    /// contains every view except the media carousel and bottom buttons
     private var complementaryViews: some View {
         VStack(alignment: .leading, spacing: Spacing.space100) {
             titleHeader
@@ -319,6 +306,18 @@ extension ProductDetailsView {
                 .padding(.bottom, Spacing.space200)
         }
         .writingSize(to: $carouselSize)
+    }
+
+    var bottomButtons: some View {
+        VStack {
+            addToBag
+            addToWishlist
+        }
+        .padding(.vertical, Spacing.space100)
+        .padding(.horizontal, Spacing.space200)
+        .background(Colors.primary.white)
+        .writingSize(to: $bottomButtonsSize)
+        .frame(maxHeight: .infinity, alignment: .bottom)
     }
 
     private var fullscreenMediaCarousel: some View {
@@ -556,8 +555,6 @@ extension ProductDetailsView {
             .modifier(
                 TapHighlightableModifier {
                     guard let feature = viewModel.complementaryInfoWebFeature(for: type) else { return }
-                    showDetailsSheet = false
-                    bottomSheetDetentBeforeNavigation = bottomSheetCurrentDetent
                     coordinator.open(webFeature: feature)
                 }
             )
@@ -572,10 +569,8 @@ private enum Constants {
     static let minTitleHeight = 20.0
     static let minColorSelectorHeight = 26.0
     static let chevronSize: CGFloat = 16
-    static let sheetCloseIconSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewCircleSize: CGFloat = 210
-    static let colorChevronSize: CGFloat = 16
 }
 
 #if DEBUG
