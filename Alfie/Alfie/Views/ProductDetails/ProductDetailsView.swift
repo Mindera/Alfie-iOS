@@ -141,10 +141,9 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
             let screenHeight = geometry.size.height
             let collapsedHeight = screenHeight - carouselSize.height
             let shouldHavePinnedButtons = collapsedHeight > 100
-            // TODO: Check if margins should be included in calculations
             let expandedHeight = shouldHavePinnedButtons ?
-                min(complementaryViewSize.height + 0 + Spacing.space100, screenHeight) :
-                min(complementaryViewSize.height + 0 + bottomButtonsSize.height + Spacing.space100 + 0 + 0, screenHeight)
+                min(complementaryViewSize.height + Spacing.space100, screenHeight) :
+                min(complementaryViewSize.height + bottomButtonsSize.height + Spacing.space100, screenHeight)
 
             ZStack(alignment: .top) {
                 VStack {
@@ -157,7 +156,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
                     showCapsule: true,
                     expandedHeight: expandedHeight,
                     collapsedHeight: collapsedHeight,
-                    dragStartOffset: carouselSize.height, // TODO: Check if we can delete this
+                    dragStartOffset: carouselSize.height,
                     expansionSignal: $shouldCollapseDraggableBottomSheet.negate
                 ) {
                     complementaryViews
@@ -206,6 +205,9 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
         }
         .fullScreenCover(isPresented: $isMediaFullScreen) {
             fullscreenMediaCarousel
+        }
+        .sheet(isPresented: $showSizeSheet) {
+            sizeSheet
         }
         .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
             colorSheet
