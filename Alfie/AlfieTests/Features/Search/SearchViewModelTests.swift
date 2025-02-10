@@ -138,7 +138,7 @@ final class SearchViewModelTests: XCTestCase {
     func test_show_recent_searches_when_view_appears_and_recents_are_available() {
         mockRecentsService.recentSearches = [.text(value: "something")]
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -167,13 +167,13 @@ final class SearchViewModelTests: XCTestCase {
             return .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0 != .noResults }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0 != .noResults }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "Something"
         })
 
         XCTAssertEqual(sut.state, .noResults)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "Somethin"
         })
 
@@ -200,7 +200,7 @@ final class SearchViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0 != .noResults }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0 != .noResults }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -212,7 +212,7 @@ final class SearchViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0 != .noResults }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0 != .noResults }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -224,7 +224,7 @@ final class SearchViewModelTests: XCTestCase {
             .fixture(brands: [.fixture()])
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -243,7 +243,7 @@ final class SearchViewModelTests: XCTestCase {
             ])
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -257,7 +257,7 @@ final class SearchViewModelTests: XCTestCase {
             .fixture(keywords: Array(repeating: SearchSuggestionKeyword.fixture(), count: 100))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -276,7 +276,7 @@ final class SearchViewModelTests: XCTestCase {
             ])
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -292,7 +292,7 @@ final class SearchViewModelTests: XCTestCase {
             .fixture(brands: Array(repeating: SearchSuggestionBrand.fixture(), count: 100))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -311,7 +311,7 @@ final class SearchViewModelTests: XCTestCase {
             ])
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -325,7 +325,7 @@ final class SearchViewModelTests: XCTestCase {
             .fixture(products: Array(repeating: SearchSuggestionProduct.fixture(), count: 100))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -362,7 +362,7 @@ final class SearchViewModelTests: XCTestCase {
             ])
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -379,7 +379,7 @@ final class SearchViewModelTests: XCTestCase {
             ])
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isSuccess }).eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 
@@ -387,7 +387,7 @@ final class SearchViewModelTests: XCTestCase {
 
         sut.viewDidAppear()
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.searchText = "something"
         })
 

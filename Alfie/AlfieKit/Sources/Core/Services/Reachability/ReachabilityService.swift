@@ -1,20 +1,35 @@
 import Combine
+import Foundation
 import Models
+import Network
 
 public final class ReachabilityService: ReachabilityServiceProtocol {
-    @Published var isAvailable = false
+    @Published private var isAvailable = false
     public var networkAvailability: AnyPublisher<Bool, Never> { $isAvailable.eraseToAnyPublisher() }
     public var isNetworkAvailable: Bool { isAvailable }
 
-    private var monitor: ReachabilityMonitorProtocol
+    private let monitor = NWPathMonitor()
+    private let utilityQueue = DispatchQueue(label: "com.mindera.alfiekit", qos: .utility)
 
     deinit {
-        monitor.stopMonitoring()
+        stopMonitoring()
     }
 
-    public init(monitor: ReachabilityMonitorProtocol) {
-        self.monitor = monitor
-        monitor.networkAvailability.assign(to: &$isAvailable)
-        monitor.startMonitoring()
+    public init() {
+        startMonitoring()
+    }
+
+    private func startMonitoring() {
+        monitor.pathUpdateHandler = { [weak self] path in
+            let newStatus = path.status == .satisfied
+            guard self?.isAvailable != newStatus else { return }
+            self?.isAvailable = newStatus
+        }
+        monitor.start(queue: utilityQueue)
+    }
+
+    private func stopMonitoring() {
+        monitor.pathUpdateHandler = nil
+        monitor.cancel()
     }
 }

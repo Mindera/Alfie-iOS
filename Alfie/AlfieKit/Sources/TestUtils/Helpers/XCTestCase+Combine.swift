@@ -39,6 +39,7 @@ extension XCTestCase {
         wait(for: [expectation], timeout: timeout)
     }
 
+    @discardableResult
     public func captureEvent<P: Publisher>(fromPublisher publisher: P, afterTrigger eventTrigger: () -> Void, timeout: TimeInterval = 2.0) -> P.Output? where P.Failure == Never {
         var value: P.Output?
         let eventTriggered: PassthroughSubject<Void, Never> = .init()

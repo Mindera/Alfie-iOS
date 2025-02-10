@@ -95,7 +95,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(brand: .fixture(name: "Product Brand"))
         initViewModel(product: product)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -111,7 +111,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name")
         initViewModel(product: product)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -134,7 +134,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       variants: [variant])
         initViewModel(product: product)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -161,7 +161,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(longDescription: "Product Description")
         initViewModel(product: product)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -261,7 +261,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -275,7 +275,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -290,7 +290,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .emptyResponse)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -315,7 +315,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -367,7 +367,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -389,7 +389,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -411,7 +411,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -433,7 +433,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -455,7 +455,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -477,7 +477,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -499,7 +499,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -526,7 +526,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -549,12 +549,12 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1]
         })
 
@@ -580,7 +580,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -604,7 +604,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -633,12 +633,12 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1]
         })
 
@@ -711,7 +711,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -729,7 +729,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -744,7 +744,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -759,7 +759,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -774,7 +774,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -788,7 +788,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -816,7 +816,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -843,7 +843,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             return URL(string: urlString)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 

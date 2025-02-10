@@ -30,7 +30,7 @@ final class CategoriesViewModelTests: XCTestCase {
             []
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -40,7 +40,7 @@ final class CategoriesViewModelTests: XCTestCase {
             NavigationItem.fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -52,7 +52,7 @@ final class CategoriesViewModelTests: XCTestCase {
             NavigationItem.fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -65,7 +65,7 @@ final class CategoriesViewModelTests: XCTestCase {
             NavigationItem.fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -77,7 +77,7 @@ final class CategoriesViewModelTests: XCTestCase {
             []
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -90,7 +90,7 @@ final class CategoriesViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -172,7 +172,7 @@ final class CategoriesViewModelTests: XCTestCase {
             return fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -184,7 +184,7 @@ final class CategoriesViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -246,7 +246,7 @@ final class CategoriesViewModelTests: XCTestCase {
     func test_sets_error_state_when_category_with_invalid_url_is_selected() {
         let fixture = NavigationItem.fixture(url: nil)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.didSelectCategory(fixture)
         })
 

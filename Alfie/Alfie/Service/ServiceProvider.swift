@@ -59,7 +59,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         )
         deepLinkService = DeepLinkService(configuration: LinkConfiguration())
         hapticsService = HapticsService.instance
-        reachabilityService = ReachabilityService(monitor: ReachabilityMonitor())
+        reachabilityService = ReachabilityService()
         storageService = StorageService()
         recentsService = RecentsService(
             autoSaveEnabled: false,
