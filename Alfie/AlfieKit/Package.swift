@@ -49,7 +49,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-collections", exact: "1.0.6"),
         .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "1.7.1"),
         .package(url: "https://github.com/braze-inc/braze-swift-sdk", exact: "8.0.1"),
-        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.20.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.22.1"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
         .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
         .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9")
