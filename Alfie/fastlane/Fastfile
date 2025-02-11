@@ -19,11 +19,9 @@ platform :ios do
 
     sh("brew bundle install --file=../Brewfile")
 
-    puts "🛠 Running Tests..."
     run_tests(
       scheme: ENV['SCHEME']
     )
-    puts "✅ Tests Completed!"
   end
 
   desc "Deploy to TestFlight using Git tags"
