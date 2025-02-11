@@ -29,46 +29,74 @@ platform :ios do
   desc "Deploy to TestFlight using Git tags"
   lane :beta do
 
-    puts "🔑 Fetching App Store Connect API Key..."
-    app_store_connect_api_key
-    puts "✅ API Key Loaded!"
-
-    puts "🔐 Running match..."
     match(type: "appstore")
-    puts "✅ Match Completed!"
 
-    puts "#️⃣ Fetching Build Number from latest tag..."
+    update_code_signing_settings(
+      build_configurations: [ENV['GYM_CONFIGURATION']],
+      code_sign_identity: signing_identity(type: "appstore"),
+      profile_name: provisioning_profile_name(type: "appstore")
+    )
+
+    UI.message("#️⃣ Fetching Build Number from latest tag...")
     last_build_number = sh("git tag -l '#*' --sort=-v:refname | head -n 1 | sed -e 's/#//g' | grep . || echo '0'").strip.to_i
     new_build_number = last_build_number + 1
-    puts "✅ Fetch Completed!"
 
-    puts "🔢 Last Build Number: #{last_build_number}"
-    puts "🚀 New Build Number: #{new_build_number}"
+    UI.message("🔢 Last Build Number: #{last_build_number}")
+    UI.message("🚀 New Build Number: #{new_build_number}")
 
-    puts "#️⃣ Incremeting Build Number..."
     increment_build_number(build_number: new_build_number)
-    puts "✅ Build Number Increment Completed!"
 
-    puts "🏷️ Updating tag..."
     new_tag = "'##{new_build_number}'"
 
     sh("git config user.name '#{ENV['GIT_USER_NAME']}'")
     sh("git config user.email '#{ENV['GIT_EMAIL']}'")
     sh("git tag #{new_tag}")
     sh("git push origin #{new_tag}")
-    puts "✅ Tag Update Completed!"
 
-    puts "🛠 Building app..."
     build_app(
       scheme: ENV['SCHEME'],
-      export_options: { method: "app-store" }
+      export_options: { method: "app-store" },
+      configuration: ENV['BUILD_CONFIGURATION']
     )
-    puts "✅ Build Completed!"
 
-    puts "🚀 Uploading to Testflight..."
+    app_store_connect_api_key
+
     upload_to_testflight
-    puts "✅ Upload Completed!"
   end
+
+  # Helper lane to renew Code Signing certificates/provisioning profiles
+  # Uses `app_store_connect_api_key` to sign in to Dev Portal insted of personal Apple ID. 
+  # Not for CI!
+  
+  # Usage:
+  #  - uncomment lane
+  #    + optional: comment `resolve_spm_dependencies` in `before_all`
+  #  - fill parameters (e.g. `type`, app_identifier`, `git_branch`)
+  #  - set required env vars, via `export FOO=BAR`, or `source ./some-script.sh`
+  #  - run lane: `bundle exec fastlane ios renew_code_signing --env default`
+  
+  # desc "Renew Code Signing"
+  # lane :renew_code_signing do
+  #   app_store_connect_api_key
+  #   match(
+  #     type: "", # adhoc, appstore, development
+  #     readonly: false,
+  #     generate_apple_certs: true, # generate "Apple Development / Apple Distribution" certificates
+  #     app_identifier: "", # "com.mindera.alfie", "com.mindera.alfie.debug"
+  #     git_branch: "alfie", # be necessary to uncomment if static/defined in `.env.default`
+  #     force_for_new_devices: true # only affects `adhoc` type
+  #   )
+  # end
 end
 
+def provisioning_profile_name(app_identifier: nil, type:)
+  ENV["sigh_#{app_identifier || ENV['APP_IDENTIFIER']}_#{type}_profile-name"]
+end
 
+def provisioning_profile_path(app_identifier: nil, type:)
+  ENV["sigh_#{app_identifier || ENV['APP_IDENTIFIER']}_#{type}_profile-path"]
+end
+
+def signing_identity(app_identifier: nil, type:)
+  ENV["sigh_#{app_identifier || ENV['APP_IDENTIFIER']}_#{type}_certificate-name"]
+end
