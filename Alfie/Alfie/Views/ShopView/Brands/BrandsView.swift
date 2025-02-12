@@ -164,42 +164,18 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     // MARK: Error View
 
     private var errorView: some View {
-        // TODO: Remove this after implementing reusable error views
-        VStack(spacing: Spacing.space200) {
-            Spacer()
-            imageForIcon(Icon.warning)
-            Text.build(theme.font.paragraph.bold(L10n.Shop.Brands.ErrorView.title))
-                .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(L10n.Shop.Brands.ErrorView.message))
-                .foregroundStyle(Colors.primary.black)
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-        .contentShape(Rectangle())
+        ErrorView(
+            title: L10n.Shop.Brands.ErrorView.title,
+            message: L10n.Shop.Brands.ErrorView.message
+        )
     }
 
     private var emptySearchResults: some View {
-        // TODO: Remove this after implementing reusable error views
-        VStack(spacing: Spacing.space200) {
-            Spacer()
-            imageForIcon(Icon.search)
-            HStack(spacing: Spacing.space050) {
-                Text.build(theme.font.small.normal(L10n.Shop.Brands.SearchBar.noResultsMessage))
-                    .foregroundStyle(Colors.primary.black)
-                Text.build(theme.font.small.bold("'\(viewModel.searchText)'"))
-                    .foregroundStyle(Colors.primary.black)
-            }
-            Spacer()
-        }
-    }
-
-    private func imageForIcon(_ icon: Icon) -> some View {
-        icon.image
-            .renderingMode(.template)
-            .resizable()
-            .foregroundStyle(Colors.primary.black)
-            .scaledToFit()
-            .frame(width: Constants.iconSize, height: Constants.iconSize)
+        ErrorView(
+            icon: Icon.search.image,
+            message: theme.font.small.normal(L10n.Shop.Brands.SearchBar.noResultsMessage) +
+                theme.font.small.bold(" '\(viewModel.searchText)'")
+        )
     }
 }
 
@@ -349,7 +325,6 @@ private struct VisiblePreferenceKey: PreferenceKey {
 // MARK: - Constants
 
 private enum Constants {
-    static let iconSize: CGFloat = 48
     static let headerViewHeight: CGFloat = 40
     static let brandViewHeight: CGFloat = 56
     static let sectionIndexSize: CGFloat = 16

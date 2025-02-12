@@ -44,23 +44,23 @@ struct WebView<ViewModel: WebViewModelProtocol>: View {
     }
 
     private var errorView: some View {
-        VStack(spacing: Spacing.space500) {
-            Circle()
-                .fill(Colors.primary.mono200)
-                .frame(width: Constants.errorViewCircleSize, height: Constants.errorViewCircleSize)
-            Text.build(theme.font.header.h2(L10n.WebView.ErrorView.title))
-                .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.paragraph.normal(L10n.WebView.ErrorView.Generic.message))
-                .foregroundStyle(Colors.primary.mono600)
-            ThemedButton(text: L10n.WebView.ErrorView.Button.cta, isFullWidth: true) {
-                viewModel.tryAgain()
-            }
-        }
+        ErrorView(
+            spacing: Spacing.space500,
+            iconSize: Constants.errorViewIconSize,
+            title: theme.font.header.h2(L10n.WebView.ErrorView.title),
+            message: theme.font.paragraph.normal(L10n.WebView.ErrorView.Generic.message),
+            messageColor: Colors.primary.mono600,
+            buttons: [
+                ThemedButton(text: L10n.WebView.ErrorView.Button.cta, isFullWidth: true) {
+                    viewModel.tryAgain()
+                },
+            ]
+        )
     }
 }
 
 private enum Constants {
-    static let errorViewCircleSize: CGFloat = 210
+    static let errorViewIconSize: CGFloat = 210
 }
 
 class CustomWebViewNoAccessory: WKWebView {
