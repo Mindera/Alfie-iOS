@@ -26,9 +26,9 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
         // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .color:
-            L10n.$productColorTitle
+            L10n.Product.Color.title
         case .size:
-            L10n.$productSizeTitle
+            L10n.Product.Size.title
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -116,11 +116,11 @@ private extension ProductDetailsColorAndSizeSheet {
             .padding(.vertical, Spacing.space100)
         }
         .searchable(
-            placeholder: L10n.$pdpSearchColorsPlaceholder,
-            placeholderOnFocus: L10n.$pdpSearchColorsPlaceholder,
+            placeholder: L10n.Pdp.SearchColors.placeholder,
+            placeholderOnFocus: L10n.Pdp.SearchColors.placeholder,
             searchText: $searchText,
             theme: .soft,
-            dismissConfiguration: .init(type: .cancel(title: L10n.$searchBarCancel)),
+            dismissConfiguration: .init(type: .cancel(title: L10n.SearchBar.cancel)),
             verticalSpacing: Spacing.space200
         )
     }

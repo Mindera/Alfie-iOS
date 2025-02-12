@@ -4,7 +4,7 @@ import Foundation
 
 public protocol SortByItemProtocol {
     var value: SortByType { get }
-    var title: LocalizedStringResource { get }
+    var title: String { get }
     var icon: Icon? { get }
 }
 
@@ -12,10 +12,10 @@ public protocol SortByItemProtocol {
 
 public struct SortByItem: SortByItemProtocol {
     public var value: SortByType
-    public var title: LocalizedStringResource
+    public var title: String
     public var icon: Icon?
 
-    public init(value: SortByType, title: LocalizedStringResource, icon: Icon? = nil) {
+    public init(value: SortByType, title: String, icon: Icon? = nil) {
         self.value = value
         self.title = title
         self.icon = icon

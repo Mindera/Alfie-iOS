@@ -68,7 +68,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return nil
         }
 
-        let shareSubject = productName + " " + L10n.$pdpShareProductFromSubject
+        let shareSubject = productName + " " + L10n.Pdp.ShareProduct.From.subject
         let selectedVariantAmount = selectedVariant.price.amount.amountFormatted
         let shareMessage = "\n" + productTitle + "\n" + productName + "\n" + selectedVariantAmount + "\n"
 
@@ -222,7 +222,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         colorSelectionConfiguration = .init(
-            selectedTitle: L10n.$productColorTitle + ":",
+            selectedTitle: L10n.Product.Color.title + ":",
             items: colorSwatches,
             selectedItem: selectedSwatch
         )
@@ -279,7 +279,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         sizingSelectionConfiguration = .init(
-            selectedTitle: L10n.$productSizeTitle + ":",
+            selectedTitle: L10n.Product.Size.title + ":",
             items: sizingSwatches,
             selectedItem: selectedSwatch
         )

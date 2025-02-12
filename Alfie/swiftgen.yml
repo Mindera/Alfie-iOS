@@ -1,0 +1,14 @@
+# The code generation is triggered by a SPM plugin using build tools, which doesn't have
+# write permissions in project folder, so we define the Derived Data folder as the
+# destination folder, then using the build phase script
+# 'SwiftGen - Copy generated files from OUTPUT_DIR to Project' we copy the file, rename it
+# and uncomment the generated file so we can have a better control of what's changing.
+
+output_dir: ${DERIVED_SOURCES_DIR}
+
+strings:
+  inputs:
+    - Alfie/Localization/L10n.xcstrings
+  outputs:
+    - templatePath: codegen-strings-structured.stencil
+      output: Strings+Generated.swift

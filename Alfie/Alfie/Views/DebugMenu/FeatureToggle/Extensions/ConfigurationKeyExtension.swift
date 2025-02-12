@@ -2,13 +2,13 @@ import Models
 import SwiftUI
 
 extension ConfigurationKey {
-    var localizedName: LocalizedStringResource {
+    var localizedName: String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .appUpdate:
-            L10n.featureToggleAppUpdateOptionTitle
+            L10n.FeatureToggle.AppUpdate.Option.title
         case .wishlist:
-            L10n.featureToggleWishlistOptionTitle
+            L10n.FeatureToggle.Wishlist.Option.title
         case .custom:
             fatalError("Missing localisation key for custom feature")
         }

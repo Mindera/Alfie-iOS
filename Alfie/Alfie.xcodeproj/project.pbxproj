@@ -145,6 +145,7 @@
 			buildConfigurationList = BE8B02482B616979007AE489 /* Build configuration list for PBXNativeTarget "Alfie" */;
 			buildPhases = (
 				BA63F6C52B73917F00089233 /* SwiftLint */,
+				99FEDCE32D4250BA003B195A /* SwiftGen - Copy generated files from OUTPUT_DIR to Project */,
 				BAEFC2602B84AA5600387C00 /* Copy GoogleService-Info.plist */,
 				BE8B02202B616976007AE489 /* Sources */,
 				BE8B02212B616976007AE489 /* Frameworks */,
@@ -154,6 +155,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				99AB92DA2D492FB800FD005D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				615E07D42CF6369900065ECF /* Alfie */,
@@ -255,6 +257,7 @@
 				49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */,
+				99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */,
 			);
 			productRefGroup = BE8B02252B616976007AE489 /* Products */;
 			projectDirPath = "";
@@ -292,6 +295,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		99FEDCE32D4250BA003B195A /* SwiftGen - Copy generated files from OUTPUT_DIR to Project */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Alfie/Localization/L10n.xcstrings",
+				"$(SRCROOT)/codegen-strings-structured.stencil",
+				"$(SRCROOT)/swiftgen.yml",
+			);
+			name = "SwiftGen - Copy generated files from OUTPUT_DIR to Project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Alfie/Localization/L10n+Generated.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\n\n# Due to limitations in SwiftGenPlugin, we opted for an approach where the `Strings+Generated.swift`  \n# file is generated in the `DerivedData` folder with all content commented out. \n# This script copies and renames the file to `L10n+Generated.swift` in the project directory, \n# while also removing unnecessary comment markers (`/*` and `*/`).\n\n# Define destination directory\nDESTINATION_DIR=\"${SRCROOT}/Alfie/Localization\"\n\n# Dynamically resolve DerivedData path using BUILD_DIR\nDERIVED_DATA_PATH=\"${BUILD_DIR%Build/*}\"\n\n# Define the SwiftGen output directory relative to DerivedData\nSWIFTGEN_OUTPUT_DIR=\"${DERIVED_DATA_PATH}/SourcePackages/plugins/Alfie.output/Alfie/SwiftGenPlugin\"\n\necho \"Derived Data Path: ${DERIVED_DATA_PATH}\"\necho \"SwiftGen Output Dir: ${SWIFTGEN_OUTPUT_DIR}\"\n\n# Define the original file name\nORIGINAL_FILE_NAME=\"Strings+Generated.swift\"\n\n# Define the new file name\nNEW_FILE_NAME=\"L10n+Generated.swift\"\n\n# Check if the source file exists\nif [ -f \"${SWIFTGEN_OUTPUT_DIR}/${ORIGINAL_FILE_NAME}\" ]; then\n    echo \"Copying ${ORIGINAL_FILE_NAME} to ${DESTINATION_DIR}/${NEW_FILE_NAME}\"\n\n    # Copy the file to the destination with the new name\n    cp \"${SWIFTGEN_OUTPUT_DIR}/${ORIGINAL_FILE_NAME}\" \"${DESTINATION_DIR}/${NEW_FILE_NAME}\"\n    \n    # Uncomment the new file by removing /* and */ markers\n    echo \"Uncommenting the new file: ${DESTINATION_DIR}/${NEW_FILE_NAME}\"\n    sed -i '' 's/\\/\\*//g' \"${DESTINATION_DIR}/${NEW_FILE_NAME}\"  # Remove /* markers\n    sed -i '' 's/\\*\\///g' \"${DESTINATION_DIR}/${NEW_FILE_NAME}\"  # Remove */ markers\nelse\n    echo \"Error: Generated file not found in ${SWIFTGEN_OUTPUT_DIR}\"\n    exit 1\nfi\n";
+		};
 		BA63F6C52B73917F00089233 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -381,6 +406,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		99AB92DA2D492FB800FD005D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 99AB92D92D492FB800FD005D /* SwiftGenPlugin */;
+		};
 		BE8B02362B616979007AE489 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BE8B02232B616976007AE489 /* Alfie */;
@@ -713,6 +742,14 @@
 				minimumVersion = 1.0.6;
 			};
 		};
+		99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Mindera/SwiftGenPlugin";
+			requirement = {
+				kind = exactVersion;
+				version = "6.6.4-mindera";
+			};
+		};
 		BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
@@ -736,6 +773,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = OrderedCollections;
+		};
+		99AB92D92D492FB800FD005D /* SwiftGenPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */;
+			productName = "plugin:SwiftGenPlugin";
 		};
 		BA04B1A22B977EE700713298 /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
