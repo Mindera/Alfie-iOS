@@ -23,6 +23,6 @@ public extension AnalyticsEvent {
 
 private extension Dictionary {
     func mapKeys<NewKey: Hashable>(_ transform: (Key) -> NewKey) -> [NewKey: Value] {
-        [NewKey: Value](uniqueKeysWithValues: map { (transform($0.key), $0.value) })
+        .init(map { (transform($0.key), $0.value) }, uniquingKeysWith: { first, _ in first })
     }
 }

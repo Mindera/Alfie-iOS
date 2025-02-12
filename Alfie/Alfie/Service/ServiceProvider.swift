@@ -39,7 +39,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         let defaultInitializationCountry = "AU"
 
         authenticationService = AuthenticationService()
-        analytics = AlfieAnalyticsTracker(FirebaseAnalyticsTracker())
+        analytics = FirebaseAnalyticsTracker().eraseToAnyAnalyticsTracker()
 
         let firebaseProvider = FirebaseRemoteConfigurationProvider(
             minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800,

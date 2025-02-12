@@ -14,10 +14,7 @@ struct HomeView: View {
     @Namespace private var animation
     private let analytics: AlfieAnalyticsTracker
 
-    init(
-        viewFactory: ViewFactory? = nil,
-        analytics: AlfieAnalyticsTracker
-    ) {
+    init(viewFactory: ViewFactory? = nil, analytics: AlfieAnalyticsTracker) {
         self.viewFactory = viewFactory
         self.analytics = analytics
     }
@@ -79,7 +76,6 @@ private enum Constants {
 }
 
 #Preview {
-    let serviceProvider = MockServiceProvider()
-    HomeView(analytics: serviceProvider.analytics)
+    HomeView(analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker())
         .environmentObject(Coordinator())
 }

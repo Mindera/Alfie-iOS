@@ -62,9 +62,9 @@ private extension WishlistView {
     WishlistView(
         viewModel: WishlistViewModel(
             dependencies: WishlistDependencyContainer(
-                wishlistService: serviceProvider.wishlistService,
-                bagService: serviceProvider.bagService,
-                analytics: serviceProvider.analytics
+                wishlistService: MockWishlistService(),
+                bagService: MockBagService(),
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             )
         )
     )

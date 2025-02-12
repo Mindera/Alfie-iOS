@@ -38,12 +38,11 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
 #if DEBUG
 #Preview {
-    let serviceProvider = MockServiceProvider()
     BagView(
         viewModel: BagViewModel(
             dependencies: BagDependencyContainer(
-                bagService: serviceProvider.bagService,
-                analytics: serviceProvider.analytics
+                bagService: MockBagService(),
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             )
         )
     )

@@ -8,7 +8,7 @@ final class SearchViewModelTests: XCTestCase {
     private var mockRecentsService: MockRecentsService!
     private var mockSearchService: MockSearchService!
     private var sut: SearchViewModel!
-    private let serviceProvider = MockServiceProvider()
+    private let mockAnalytics = MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -18,7 +18,7 @@ final class SearchViewModelTests: XCTestCase {
             executionQueue: DispatchQueue.global(),
             recentsService: mockRecentsService,
             searchService: mockSearchService,
-            analytics: serviceProvider.analytics
+            analytics: mockAnalytics
         )
         sut = .init(dependencies: mockDependencies)
     }
@@ -158,7 +158,7 @@ final class SearchViewModelTests: XCTestCase {
         mockDependencies = SearchDependencyContainer(
             recentsService: nil,
             searchService: mockSearchService,
-            analytics: serviceProvider.analytics
+            analytics: mockAnalytics
         )
         sut = .init(dependencies: mockDependencies)
 

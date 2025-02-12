@@ -23,10 +23,7 @@ final class ViewFactory: ViewFactoryProtocol {
         case .tab(let tab):
             switch tab {
             case .home:
-                HomeView(
-                    viewFactory: self,
-                    analytics: serviceProvider.analytics
-                )
+                HomeView(viewFactory: self, analytics: serviceProvider.analytics)
 
             case .shop:
                 ShopView(

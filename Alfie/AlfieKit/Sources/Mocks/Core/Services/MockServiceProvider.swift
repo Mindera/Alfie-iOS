@@ -25,7 +25,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var wishlistService: WishlistServiceProtocol
 
     public init(
-        analytics: AlfieAnalyticsTracker = AlfieAnalyticsTracker(DummyAnalyticsTracker()),
+        analytics: AlfieAnalyticsTracker = MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
         authenticationService: AuthenticationServiceProtocol = MockAuthenticationService(),
         configurationService: ConfigurationServiceProtocol = MockConfigurationService(),
         deepLinkService: DeepLinkServiceProtocol = MockDeepLinkService(),

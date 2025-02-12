@@ -6,9 +6,6 @@ public class FirebaseAnalyticsTracker: AnalyticsTracker {
     public init() {}
 
     public func track(_ event: AnalyticsEvent) {
-        FirebaseAnalytics.Analytics.logEvent(
-            event.name,
-            parameters: event.parameters
-        )
+        FirebaseAnalytics.Analytics.logEvent(event.name, parameters: event.parameters)
     }
 }
