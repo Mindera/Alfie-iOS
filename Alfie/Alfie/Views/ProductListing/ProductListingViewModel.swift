@@ -86,26 +86,10 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         if !isFavorite {
             let selectedProduct = SelectionProduct(product: product)
             dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.track(
-                .action(
-                    .addToWishlist,
-                    [
-                        .screenName: AnalyticsScreenName.plp.rawValue,
-                        .productID: selectedProduct.id,
-                    ]
-                )
-            )
+            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
         } else {
             dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
-            dependencies.analytics.track(
-                .action(
-                    .removeFromWishlist,
-                    [
-                        .screenName: AnalyticsScreenName.plp.rawValue,
-                        .productID: product.id,
-                    ]
-                )
-            )
+            dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
         }
         wishlistContent = dependencies.wishlistService.getWishlistContent()
     }

@@ -19,29 +19,13 @@ final class WishlistViewModel: WishlistViewModelProtocol {
 
     func didSelectDelete(for product: SelectionProduct) {
         dependencies.wishlistService.removeProduct(product.id)
-        dependencies.analytics.track(
-            .action(
-                .removeFromWishlist,
-                [
-                    .screenName: AnalyticsScreenName.wishlist.rawValue,
-                    .productID: product.id,
-                ]
-            )
-        )
+        dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
         products = dependencies.wishlistService.getWishlistContent()
     }
 
     func didTapAddToBag(for product: SelectionProduct) {
         dependencies.bagService.addProduct(product)
-        dependencies.analytics.track(
-            .action(
-                .addToBag,
-                [
-                    .screenName: AnalyticsScreenName.wishlist.rawValue,
-                    .productID: product.id,
-                ]
-            )
-        )
+        dependencies.analytics.trackAddToBag(productID: product.id)
     }
 
     func productCardViewModel(for product: SelectionProduct) -> VerticalProductCardViewModel {

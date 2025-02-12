@@ -163,29 +163,13 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     func didTapAddToBag() {
         guard let selectedProduct else { return }
         dependencies.bagService.addProduct(selectedProduct)
-        dependencies.analytics.track(
-            .action(
-                .addToBag,
-                [
-                    .screenName: AnalyticsScreenName.pdp.rawValue,
-                    .productID: selectedProduct.id,
-                ]
-            )
-        )
+        dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
     }
 
     func didTapAddToWishlist() {
         guard let selectedProduct else { return }
         dependencies.wishlistService.addProduct(selectedProduct)
-        dependencies.analytics.track(
-            .action(
-                .addToWishlist,
-                [
-                    .screenName: AnalyticsScreenName.pdp.rawValue,
-                    .productID: selectedProduct.id,
-                ]
-            )
-        )
+        dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {

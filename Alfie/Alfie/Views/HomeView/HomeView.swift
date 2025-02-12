@@ -52,7 +52,7 @@ struct HomeView: View {
             Text.build(theme.font.header.h3(L10n.Home.title))
             ThemedButton(text: isUserLogged ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta) {
                 isUserLogged.toggle()
-                analytics.track(.state(isUserLogged ? .userLogin : .userLogout, nil))
+                analytics.trackUserLogged(isLogged: isUserLogged)
             }
             Spacer()
         }
