@@ -168,7 +168,6 @@
 				BE8B02202B616976007AE489 /* Sources */,
 				BE8B02212B616976007AE489 /* Frameworks */,
 				BE8B02222B616976007AE489 /* Resources */,
-				BAEFC2612B84AE5D00387C00 /* Upload DSYMs to Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -373,29 +372,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Release/GoogleService-Info.plist\nelse \n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Debug/GoogleService-Info.plist\nfi\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp $SOURCE_CONFIG_PATH $DESTINATION_CONFIG_PATH\n";
 			showEnvVarsInLog = 0;
-		};
-		BAEFC2612B84AE5D00387C00 /* Upload DSYMs to Crashlytics */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
-			);
-			name = "Upload DSYMs to Crashlytics";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

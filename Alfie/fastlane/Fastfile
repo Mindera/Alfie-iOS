@@ -36,10 +36,9 @@ platform :ios do
     sh("git tag #{new_tag}; git push origin #{new_tag}")
 
     gym
-
     app_store_connect_api_key
-
     upload_to_testflight
+    upload_symbols_to_crashlytics
   end
 
   # Helper lane to renew Code Signing certificates/provisioning profiles
