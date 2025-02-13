@@ -3,16 +3,8 @@ import Models
 import Network
 
 extension NWPathMonitor: NetworkPathMonitorProtocol {
-    public var networkAvailability: AnyPublisher<Bool, Never> {
-        let subject = CurrentValueSubject<Bool, Never>(currentPath.status == .satisfied)
-
-        pathUpdateHandler = { path in
-            let newStatus = path.status == .satisfied
-            guard subject.value != newStatus else { return }
-            subject.send(newStatus)
-        }
-
-        return subject.eraseToAnyPublisher()
+    public var isAvailable: Bool {
+        currentPath.status == .satisfied
     }
 
     public func startMonitoring(on queue: DispatchQueue) {
@@ -20,6 +12,13 @@ extension NWPathMonitor: NetworkPathMonitorProtocol {
     }
 
     public func stopMonitoring() {
+        pathUpdateHandler = nil
         cancel()
+    }
+
+    public func setUpdateHandler(_ handler: @escaping (Bool) -> Void) {
+        pathUpdateHandler = { path in
+            handler(path.status == .satisfied)
+        }
     }
 }

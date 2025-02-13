@@ -3,8 +3,12 @@ import Foundation
 import Models
 
 public final class MockNetworkPathMonitor: NetworkPathMonitorProtocol {
-    @Published private var isAvailable = false
-    public var networkAvailability: AnyPublisher<Bool, Never> { $isAvailable.eraseToAnyPublisher() }
+    public var isAvailable: Bool = false {
+        didSet {
+            updateHandler?(isAvailable)
+        }
+    }
+    private var updateHandler: ((Bool) -> Void)?
 
     public init() {}
 
@@ -18,9 +22,7 @@ public final class MockNetworkPathMonitor: NetworkPathMonitorProtocol {
         onStopMonitoringCalled?()
     }
 
-    // MARK: - Helpers
-    
-    public func simulateNetworkAvailability(available: Bool) {
-        isAvailable = available
+    public func setUpdateHandler(_ handler: @escaping (Bool) -> Void) {
+        updateHandler = handler
     }
 }

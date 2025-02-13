@@ -5,14 +5,15 @@ import Models
 
 public final class ReachabilityService: ReachabilityServiceProtocol {
     private let monitor: NetworkPathMonitorProtocol
-    @Published private var isAvailable = false
+    private let monitorQueue: DispatchQueue
+    @Published private var isAvailable: Bool
     private var subscriptions = Set<AnyCancellable>()
 
     public var networkAvailability: AnyPublisher<Bool, Never> { $isAvailable.eraseToAnyPublisher() }
     public var isNetworkAvailable: Bool { isAvailable }
 
     deinit {
-        monitor.stopMonitoring()
+        stopMonitoring()
     }
 
     public init(
@@ -20,11 +21,20 @@ public final class ReachabilityService: ReachabilityServiceProtocol {
         monitorQueue: DispatchQueue = DispatchQueue(label: "com.mindera.alfiekit.reachability", qos: .utility)
     ) {
         self.monitor = monitor
+        self.monitorQueue = monitorQueue
+        self.isAvailable = monitor.isAvailable
+        startMonitoring()
+    }
 
-        monitor.networkAvailability
-            .assignWeakly(to: \.isAvailable, on: self)
-            .store(in: &subscriptions)
-
+    private func startMonitoring() {
+        monitor.setUpdateHandler { [weak self] newStatus in
+            guard let self, isAvailable != newStatus else { return }
+            isAvailable = newStatus
+        }
         monitor.startMonitoring(on: monitorQueue)
+    }
+
+    private func stopMonitoring() {
+        monitor.stopMonitoring()
     }
 }

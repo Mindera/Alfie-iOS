@@ -50,7 +50,7 @@ final class ReachabilityServiceTests: XCTestCase {
         let expectation = expectation(description: "Wait for queue verification")
 
         mockMonitor.onStartMonitoringCalled = { queue in
-            XCTAssertEqual(queue.label, self.testQueue.label, "Monitor should use the injected queue")
+            XCTAssertTrue(queue === self.testQueue, "Monitor should use the injected queue")
             expectation.fulfill()
         }
 
@@ -59,32 +59,38 @@ final class ReachabilityServiceTests: XCTestCase {
     }
 
     func test_reachabilityService_publishesNetworkAvailabilityUpdates() {
+        // Initialize `isAvailable` to `true` to ensure the event triggers, as repeated events are filtered out.
+        mockMonitor.isAvailable = true
+
         let resultUnavailable = captureEvent(
             fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
-            afterTrigger: { mockMonitor.simulateNetworkAvailability(available: false) }
+            afterTrigger: { mockMonitor.isAvailable = false }
         )
 
         XCTAssertEqual(resultUnavailable, false)
 
         let resultAvailable = captureEvent(
             fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
-            afterTrigger: { mockMonitor.simulateNetworkAvailability(available: true) }
+            afterTrigger: { mockMonitor.isAvailable = true }
         )
 
         XCTAssertEqual(resultAvailable, true)
     }
 
     func test_reachabilityService_storesCurrentNetworkAvailability() {
+        // Initialize `isAvailable` to `true` to ensure the event triggers, as repeated events are filtered out.
+        mockMonitor.isAvailable = true
+
        captureEvent(
             fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
-            afterTrigger: { mockMonitor.simulateNetworkAvailability(available: false) }
+            afterTrigger: { mockMonitor.isAvailable = false }
         )
 
         XCTAssertFalse(sut.isNetworkAvailable)
 
         captureEvent(
             fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
-            afterTrigger: { mockMonitor.simulateNetworkAvailability(available: true) }
+            afterTrigger: { mockMonitor.isAvailable = true }
         )
 
         XCTAssertTrue(sut.isNetworkAvailable)
