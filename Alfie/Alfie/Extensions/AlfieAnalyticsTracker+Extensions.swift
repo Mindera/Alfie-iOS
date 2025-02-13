@@ -26,7 +26,7 @@ extension AlfieAnalyticsTracker {
 
     // MARK: - State Events
 
-    func trackUserLogged(isLogged: Bool) {
-        track(.state(.isUserLoggedIn(isLogged), nil))
+    func trackUser(isLoggedIn: Bool) {
+        track(.state(.isUserLoggedIn(isLoggedIn), nil))
     }
 }
