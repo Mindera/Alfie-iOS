@@ -12,34 +12,34 @@ on:
   workflow_dispatch:
 
 env:
-  DEVELOPER_DIR: "/Applications/Xcode_16.app/Contents/Developer"
+  DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
+  ARTIFACTS_PATH: "~/Library/Developer/Xcode/DerivedData/Logs/Test"
+  DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" 
 
 jobs:
-  branch-validation:
-    runs-on: macos-latest
+  run-tests:
+    runs-on: macos-14
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Fastlane
-        run: gem install fastlane
-
-      - name: Validate Tests
-        run: fastlane validate_tests
+      - name: Run Tests
+        run: fastlane test
         env:
-          IOS_DESTINATION: ${{ env.IOS_DESTINATION }}
+          BUILD_CONFIGURATION: "Debug"
       
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: iOS-Test-Results
+          name: Test artifacts
           path: |
-              ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult
+              ${{ env.ARTIFACTS_PATH }}/*.xcresult
+              ${{ env.ARTIFACTS_PATH }}/*.junit
           retention-days: 7
 
-  testflight-build:
-    needs: branch-validation
-    runs-on: macos-latest
+  release:
+    needs: run-tests
+    runs-on: macos-14
     if: github.event_name == 'push'
     steps:
       - name: Checkout Code
@@ -52,12 +52,10 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
 
-      - name: Install Fastlane
-        run: gem install fastlane
-
-      - name: Deploy to TestFlight
-        run: fastlane beta
+      - name: Build and deploy release to TestFlight
+        run: fastlane release
         env:
+          BUILD_CONFIGURATION: "Release"
           APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
           APPSTORE_CONNECT_KEY_CONTENT_BASE64: ${{ secrets.APPSTORE_CONNECT_KEY_CONTENT_BASE64 }}
           APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
