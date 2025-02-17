@@ -122,3 +122,5 @@ fastlane/test_output
 **/*/xcuserdata
 Alfie/Packages/**/*/.swiftpm
 Alfie/Packages/*/Package.resolved
+Alfie/Alfie/Configuration/Debug/GoogleService-Info.plist
+Alfie/Alfie/Configuration/Release/GoogleService-Info.plist
