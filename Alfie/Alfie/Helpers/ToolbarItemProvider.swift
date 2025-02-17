@@ -120,11 +120,13 @@ enum ToolbarItemProvider {
                     accountItem(with: coordinator, size: .big)
 
                 case .shop,
-                    .wishlist,
                     .bag:
                     if isWishlistEnabled {
                         wishlistItem(with: coordinator, size: .big)
                     }
+                    accountItem(with: coordinator, size: .big)
+
+                case .wishlist:
                     accountItem(with: coordinator, size: .big)
                 }
 
