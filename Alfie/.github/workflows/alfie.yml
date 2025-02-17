@@ -13,8 +13,9 @@ on:
 
 env:
   DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
-  ARTIFACTS_PATH: "~/Library/Developer/Xcode/DerivedData/Logs/Test"
+  ARTIFACTS_PATH: "/tmp/alfie-artifacts"
   DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" 
+  SPM_CLONED_DEPENDENCIES_PATH: "tmp/SourcePackages"
 
 jobs:
   run-tests:
