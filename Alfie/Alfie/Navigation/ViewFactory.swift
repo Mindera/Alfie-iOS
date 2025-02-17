@@ -44,6 +44,7 @@ final class ViewFactory: ViewFactoryProtocol {
 
             case .wishlist:
                 wishlistView
+                    .withToolbar(for: .tab(.wishlist))
 
             case .bag:
                 BagView(
@@ -123,6 +124,7 @@ final class ViewFactory: ViewFactoryProtocol {
 
         case .wishlist:
             wishlistView
+                .withToolbar(for: .wishlist)
 
         case .productDetails(let type):
             switch type {
