@@ -17,7 +17,6 @@
 
 # deliver temporary files
 **/fastlane/Preview.html
-**/tmp/
 
 # snapshot generated screenshots
 **/fastlane/screenshots

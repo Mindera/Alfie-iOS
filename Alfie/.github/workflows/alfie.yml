@@ -15,12 +15,22 @@ env:
   DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
   ARTIFACTS_PATH: "/tmp/alfie-artifacts"
   DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" 
-  SPM_CLONED_DEPENDENCIES_PATH: "tmp/SourcePackages"
+  SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
 
 jobs:
   run-tests:
     runs-on: macos-14
     steps:
+      - name: Install Homebrew formulas
+        run: |
+            brew update
+            brew bundle install
+      
+      - name: bundle install
+        run: |
+            gem install bundler --no-document
+            bundle install --jobs 4 --retry 3
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -43,6 +53,16 @@ jobs:
     runs-on: macos-14
     if: github.event_name == 'push'
     steps:
+      - name: Install Homebrew formulas
+        run: |
+            brew update
+            brew bundle install
+      
+      - name: bundle install
+        run: |
+            gem install bundler --no-document
+            bundle install --jobs 4 --retry 3
+
       - name: Checkout Code
         uses: actions/checkout@v3
 

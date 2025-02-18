@@ -6,7 +6,6 @@ platform :ios do
   desc "Run Tests"
   lane :test do
 
-    sh("brew bundle install --file=../Brewfile")
     scan
 
   end
