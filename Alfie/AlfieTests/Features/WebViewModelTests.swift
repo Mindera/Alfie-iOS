@@ -44,7 +44,7 @@ final class WebViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.url)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -60,7 +60,7 @@ final class WebViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.url)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -71,7 +71,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")
         sut = .init(url: url, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.webViewStarted()
         })
 
@@ -82,7 +82,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")
         sut = .init(url: url, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.webViewFailed()
         })
 
@@ -93,7 +93,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")
         sut = .init(url: url, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.webViewFinished()
         })
 
@@ -106,7 +106,7 @@ final class WebViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.url)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.tryAgain()
         })
 
@@ -117,7 +117,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")!
         sut = .init(url: url, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -129,7 +129,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -147,7 +147,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -165,7 +165,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -183,7 +183,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -239,7 +239,7 @@ final class WebViewModelTests: XCTestCase {
             return true
         })
      
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.webViewUrlChanged(baseUrl)
         })
 
@@ -255,7 +255,7 @@ final class WebViewModelTests: XCTestCase {
 
         sut = .init(url: baseUrl, dependencies: mockDependencies, urlChangeHandler: nil)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.webViewUrlChanged(testUrl)
         })
 
@@ -281,7 +281,7 @@ final class WebViewModelTests: XCTestCase {
     func test_state_is_no_url_error_after_update_if_no_url_or_feature_is_supplied_on_init() {
         sut = .init(url: nil, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -291,7 +291,7 @@ final class WebViewModelTests: XCTestCase {
     func test_state_is_loading_when_updating_url_for_feature() {
         sut = .init(webFeature: .addresses, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -304,7 +304,7 @@ final class WebViewModelTests: XCTestCase {
         }
         sut = .init(webFeature: .addresses, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.didFail }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.didFail }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -318,7 +318,7 @@ final class WebViewModelTests: XCTestCase {
         }
         sut = .init(webFeature: .addresses, dependencies: mockDependencies)
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 

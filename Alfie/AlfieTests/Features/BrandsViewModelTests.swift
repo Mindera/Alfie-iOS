@@ -32,7 +32,7 @@ final class BrandsViewModelTests: XCTestCase {
             []
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -42,7 +42,7 @@ final class BrandsViewModelTests: XCTestCase {
             [.fixture(name: "Brand 1")]
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -54,7 +54,7 @@ final class BrandsViewModelTests: XCTestCase {
             [.fixture(name: "Brand 1")]
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -67,7 +67,7 @@ final class BrandsViewModelTests: XCTestCase {
             [Brand.fixture(name: "brand")]
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -79,7 +79,7 @@ final class BrandsViewModelTests: XCTestCase {
             []
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -92,7 +92,7 @@ final class BrandsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -151,7 +151,7 @@ final class BrandsViewModelTests: XCTestCase {
             fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -165,7 +165,7 @@ final class BrandsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -179,7 +179,7 @@ final class BrandsViewModelTests: XCTestCase {
             fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -199,7 +199,7 @@ final class BrandsViewModelTests: XCTestCase {
             fixtures
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -216,7 +216,7 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -234,7 +234,7 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -250,7 +250,7 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -266,7 +266,7 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -281,7 +281,7 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -296,7 +296,7 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 

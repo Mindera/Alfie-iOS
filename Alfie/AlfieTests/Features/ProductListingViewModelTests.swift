@@ -70,7 +70,7 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -103,7 +103,7 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -117,7 +117,7 @@ final class ProductListingViewModelTests: XCTestCase {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -150,13 +150,13 @@ final class ProductListingViewModelTests: XCTestCase {
             return ProductListing.fixture(products: Product.fixtures)
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
         XCTAssertTrue(sut.state.isSuccess)
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.didDisplay(Product.fixtures.last!)
         })
 
@@ -210,7 +210,7 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 
@@ -257,7 +257,7 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-        _ = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
+       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
             sut.viewDidAppear()
         })
 

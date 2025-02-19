@@ -6,6 +6,7 @@ import Models
 #if DEBUG
 import Mocks
 #endif
+import Network
 
 final class ServiceProvider: ServiceProviderProtocol {
     let apiEndpointService: ApiEndpointServiceProtocol
@@ -59,7 +60,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         )
         deepLinkService = DeepLinkService(configuration: LinkConfiguration())
         hapticsService = HapticsService.instance
-        reachabilityService = ReachabilityService(monitor: ReachabilityMonitor())
+        reachabilityService = ReachabilityService(monitor: NWPathMonitor())
         storageService = StorageService()
         recentsService = RecentsService(
             autoSaveEnabled: false,
