@@ -56,6 +56,7 @@ private extension WishlistView {
     }
 }
 
+#if DEBUG
 #Preview {
     WishlistView(
         viewModel: WishlistViewModel(
@@ -67,3 +68,4 @@ private extension WishlistView {
     )
         .environmentObject(Coordinator())
 }
+#endif

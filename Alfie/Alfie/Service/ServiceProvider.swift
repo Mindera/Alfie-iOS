@@ -90,8 +90,8 @@ final class ServiceProvider: ServiceProviderProtocol {
         brandsService = BrandsService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
-        bagService = MockBagService()
-        wishlistService = MockWishlistService()
+        bagService = BagService()
+        wishlistService = WishlistService()
     }
 
     public func resetServices() {

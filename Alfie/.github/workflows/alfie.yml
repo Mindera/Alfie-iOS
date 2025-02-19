@@ -1,0 +1,90 @@
+name: Alfie CI/CD
+
+on:
+  push:
+    branches:
+      - 'main'
+  
+  pull_request:
+    branches:
+      - 'main'
+
+  workflow_dispatch:
+
+env:
+  DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
+  ARTIFACTS_PATH: "/tmp/alfie-artifacts"
+  DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" 
+  SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
+
+jobs:
+  run-tests:
+    runs-on: macos-14
+    steps:
+      - name: Install Homebrew formulas
+        run: |
+            brew update
+            brew bundle install
+      
+      - name: bundle install
+        run: |
+            gem install bundler --no-document
+            bundle install --jobs 4 --retry 3
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Tests
+        run: bundle exec fastlane ios test --env default
+        env:
+          BUILD_CONFIGURATION: "Debug"
+      
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test artifacts
+          path: |
+              ${{ env.ARTIFACTS_PATH }}/*.xcresult
+              ${{ env.ARTIFACTS_PATH }}/*.junit
+          retention-days: 7
+
+  release:
+    needs: run-tests
+    runs-on: macos-14
+    if: github.event_name == 'push'
+    steps:
+      - name: Install Homebrew formulas
+        run: |
+            brew update
+            brew bundle install
+      
+      - name: bundle install
+        run: |
+            gem install bundler --no-document
+            bundle install --jobs 4 --retry 3
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH for Bitbucket
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+
+      - name: Build and deploy release to TestFlight
+        run: bundle exec fastlane ios release --env default
+        env:
+          BUILD_CONFIGURATION: "Release"
+          APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+          APPSTORE_CONNECT_KEY_CONTENT_BASE64: ${{ secrets.APPSTORE_CONNECT_KEY_CONTENT_BASE64 }}
+          APPSTORE_CONNECT_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          APPSTORE_CONNECT_TEAM_ID: ${{ secrets.APPSTORE_CONNECT_TEAM_ID }}
+          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
+          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+          ITUNESCONNECT_TEAM_ID: ${{ secrets.ITUNESCONNECT_TEAM_ID }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

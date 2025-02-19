@@ -41,6 +41,7 @@
 		BE8B02342B616979007AE489 /* AlfieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B023E2B616979007AE489 /* AlfieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5C9C4C92D3571D800D5D70E /* AlfieKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AlfieKit; sourceTree = "<group>"; };
+		FCA0B27E2CEF3F12000339F6 /* alfie.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = alfie.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -118,6 +119,7 @@
 		BE8B021B2B616976007AE489 = {
 			isa = PBXGroup;
 			children = (
+				FCA0B27B2CEF3EE7000339F6 /* .github */,
 				C5C9C4C92D3571D800D5D70E /* AlfieKit */,
 				615E07D42CF6369900065ECF /* Alfie */,
 				615E06B92CF633FC00065ECF /* AlfieTests */,
@@ -137,6 +139,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		FCA0B27B2CEF3EE7000339F6 /* .github */ = {
+			isa = PBXGroup;
+			children = (
+				FCA0B27D2CEF3EFB000339F6 /* workflows */,
+			);
+			path = .github;
+			sourceTree = "<group>";
+		};
+		FCA0B27D2CEF3EFB000339F6 /* workflows */ = {
+			isa = PBXGroup;
+			children = (
+				FCA0B27E2CEF3F12000339F6 /* alfie.yml */,
+			);
+			path = workflows;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -150,7 +168,6 @@
 				BE8B02202B616976007AE489 /* Sources */,
 				BE8B02212B616976007AE489 /* Frameworks */,
 				BE8B02222B616976007AE489 /* Resources */,
-				BAEFC2612B84AE5D00387C00 /* Upload DSYMs to Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -356,29 +373,6 @@
 			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Release/GoogleService-Info.plist\nelse \n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Debug/GoogleService-Info.plist\nfi\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp $SOURCE_CONFIG_PATH $DESTINATION_CONFIG_PATH\n";
 			showEnvVarsInLog = 0;
 		};
-		BAEFC2612B84AE5D00387C00 /* Upload DSYMs to Crashlytics */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
-			);
-			name = "Upload DSYMs to Crashlytics";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -552,10 +546,9 @@
 				CODE_SIGN_ENTITLEMENTS = Alfie/Alfie.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"Alfie/Preview Content\"";
-				DEVELOPMENT_TEAM = 74L475LDQT;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -570,10 +563,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie.debug;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -590,11 +582,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Alfie/Alfie.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_ASSET_PATHS = "\"Alfie/Preview Content\"";
-				DEVELOPMENT_TEAM = 74L475LDQT;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = "Mocks*";
@@ -610,10 +600,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -629,7 +618,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MARKETING_VERSION = 0.8.0;
@@ -646,8 +635,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MARKETING_VERSION = 0.8.0;
@@ -664,7 +652,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.AlfieUITests;
@@ -679,8 +667,7 @@
 		BE8B02502B616979007AE489 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 0;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.AlfieUITests;
@@ -738,8 +725,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-collections.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.6;
+				kind = exactVersion;
+				version = 1.0.6;
 			};
 		};
 		99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */ = {
@@ -754,16 +741,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.15.4;
+				kind = exactVersion;
+				version = 1.15.4;
 			};
 		};
 		C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Mindera/Alicerce.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.18.0;
+				kind = exactVersion;
+				version = 0.18.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
