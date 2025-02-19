@@ -37,11 +37,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		99EB3B502D65EF4D00CE24EB /* alfie.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = alfie.yml; sourceTree = "<group>"; };
 		BE8B02242B616976007AE489 /* Alfie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Alfie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B02342B616979007AE489 /* AlfieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B023E2B616979007AE489 /* AlfieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5C9C4C92D3571D800D5D70E /* AlfieKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AlfieKit; sourceTree = "<group>"; };
-		FCA0B27E2CEF3F12000339F6 /* alfie.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = alfie.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -109,6 +109,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		99EB3B512D65EF4D00CE24EB /* workflows */ = {
+			isa = PBXGroup;
+			children = (
+				99EB3B502D65EF4D00CE24EB /* alfie.yml */,
+			);
+			path = workflows;
+			sourceTree = "<group>";
+		};
+		99EB3B522D65EF4D00CE24EB /* .github */ = {
+			isa = PBXGroup;
+			children = (
+				99EB3B512D65EF4D00CE24EB /* workflows */,
+			);
+			name = .github;
+			path = ../.github;
+			sourceTree = SOURCE_ROOT;
+		};
 		BAB78AEE2B6C00B90038C650 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,7 +136,7 @@
 		BE8B021B2B616976007AE489 = {
 			isa = PBXGroup;
 			children = (
-				FCA0B27B2CEF3EE7000339F6 /* .github */,
+				99EB3B522D65EF4D00CE24EB /* .github */,
 				C5C9C4C92D3571D800D5D70E /* AlfieKit */,
 				615E07D42CF6369900065ECF /* Alfie */,
 				615E06B92CF633FC00065ECF /* AlfieTests */,
@@ -137,22 +154,6 @@
 				BE8B023E2B616979007AE489 /* AlfieUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		FCA0B27B2CEF3EE7000339F6 /* .github */ = {
-			isa = PBXGroup;
-			children = (
-				FCA0B27D2CEF3EFB000339F6 /* workflows */,
-			);
-			path = .github;
-			sourceTree = "<group>";
-		};
-		FCA0B27D2CEF3EFB000339F6 /* workflows */ = {
-			isa = PBXGroup;
-			children = (
-				FCA0B27E2CEF3F12000339F6 /* alfie.yml */,
-			);
-			path = workflows;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
