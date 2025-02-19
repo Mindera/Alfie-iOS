@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Tests
-        run: fastlane test
+        run: bundle exec fastlane ios test --env default
         env:
           BUILD_CONFIGURATION: "Debug"
       
@@ -74,7 +74,7 @@ jobs:
           ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
 
       - name: Build and deploy release to TestFlight
-        run: fastlane release
+        run: bundle exec fastlane ios release --env default
         env:
           BUILD_CONFIGURATION: "Release"
           APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
