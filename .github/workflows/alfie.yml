@@ -14,13 +14,16 @@ on:
 env:
   DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
   ARTIFACTS_PATH: "/tmp/alfie-artifacts"
-  DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" 
+  DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro"
   SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
 
 jobs:
   run-tests:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Install Homebrew formulas
         run: |
             brew update
@@ -30,9 +33,6 @@ jobs:
         run: |
             gem install bundler --no-document
             bundle install --jobs 4 --retry 3
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
 
       - name: Run Tests
         run: bundle exec fastlane ios test --env default
@@ -50,9 +50,12 @@ jobs:
 
   release:
     needs: run-tests
-    runs-on: macos-14
+    runs-on: macos-15
     if: github.event_name == 'push'
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Install Homebrew formulas
         run: |
             brew update
@@ -62,9 +65,6 @@ jobs:
         run: |
             gem install bundler --no-document
             bundle install --jobs 4 --retry 3
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
 
       - name: Set up SSH for Bitbucket
         run: |
