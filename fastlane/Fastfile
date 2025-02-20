@@ -13,6 +13,7 @@ platform :ios do
   desc "Build and deploy app release to TestFlight"
   lane :release do
 
+    setup_ci
     match(type: "appstore")
 
     update_code_signing_settings(
@@ -22,6 +23,7 @@ platform :ios do
     )
 
     UI.message("#️⃣ Fetching Build Number from latest tag...")
+    sh("git fetch --tags")
     last_build_number = sh("git tag -l '#*' --sort=-v:refname | head -n 1 | sed -e 's/#//g' | grep . || echo '0'").strip.to_i
     new_build_number = last_build_number + 1
 
