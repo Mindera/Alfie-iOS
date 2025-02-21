@@ -521,8 +521,8 @@ extension ProductDetailsView {
             title: theme.font.header.h2(L10n.Pdp.ErrorView.title),
             message: theme.font.paragraph.normal(errorMessage),
             messageColor: Colors.primary.mono600,
-            buttons: [
-                ThemedButton(text: L10n.Pdp.ErrorView.GoBack.Button.cta, isFullWidth: true) {
+            buttonsConfiguration: [
+                .init(text: L10n.Pdp.ErrorView.GoBack.Button.cta) {
                     coordinator.didTapBackButton()
                 },
             ]

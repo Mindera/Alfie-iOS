@@ -20,7 +20,7 @@ struct ErrorView: View {
     private let titleColor: Color
     private let message: AttributedString?
     private let messageColor: Color
-    private let buttons: [ThemedButton]
+    private let buttonsConfiguration: [ErrorButtonConfiguration]
 
     // MARK: Lifecycle
 
@@ -33,7 +33,7 @@ struct ErrorView: View {
         titleColor: Color = Colors.primary.black,
         message: AttributedString? = nil,
         messageColor: Color = Colors.primary.black,
-        buttons: [ThemedButton] = []
+        buttonsConfiguration: [ErrorButtonConfiguration] = []
     ) {
         self.spacing = spacing
         self.icon = icon
@@ -43,7 +43,7 @@ struct ErrorView: View {
         self.titleColor = titleColor
         self.message = message
         self.messageColor = messageColor
-        self.buttons = buttons
+        self.buttonsConfiguration = buttonsConfiguration
     }
 
     init(
@@ -55,7 +55,7 @@ struct ErrorView: View {
         titleColor: Color = Colors.primary.black,
         message: String? = nil,
         messageColor: Color = Colors.primary.black,
-        buttons: [ThemedButton] = []
+        buttonsConfiguration: [ErrorButtonConfiguration] = []
     ) {
         self.init(
             spacing: spacing,
@@ -66,7 +66,7 @@ struct ErrorView: View {
             titleColor: titleColor,
             message: message.flatMap(ThemeProvider.shared.font.small.normal),
             messageColor: messageColor,
-            buttons: buttons
+            buttonsConfiguration: buttonsConfiguration
         )
     }
 
@@ -94,8 +94,12 @@ struct ErrorView: View {
             }
 
             VStack(spacing: Spacing.space100) {
-                ForEach(buttons.indices, id: \.self) { index in
-                    buttons[index]
+                ForEach(buttonsConfiguration) { configuration in
+                    ThemedButton(
+                        text: configuration.text,
+                        isFullWidth: true,
+                        action: configuration.action
+                    )
                 }
             }
 
