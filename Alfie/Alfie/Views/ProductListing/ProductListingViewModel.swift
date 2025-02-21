@@ -86,8 +86,10 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         if !isFavorite {
             let selectedProduct = SelectionProduct(product: product)
             dependencies.wishlistService.addProduct(selectedProduct)
+            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
         } else {
             dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
+            dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
         }
         wishlistContent = dependencies.wishlistService.getWishlistContent()
     }

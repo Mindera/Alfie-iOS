@@ -19,7 +19,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
             webUrlProvider: mockWebUrlProvider,
             bagService: MockBagService(),
             wishlistService: MockWishlistService(),
-            configurationService: MockConfigurationService()
+            configurationService: MockConfigurationService(),
+            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
         )
     }
 

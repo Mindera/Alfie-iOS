@@ -163,11 +163,13 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     func didTapAddToBag() {
         guard let selectedProduct else { return }
         dependencies.bagService.addProduct(selectedProduct)
+        dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
     }
 
     func didTapAddToWishlist() {
         guard let selectedProduct else { return }
         dependencies.wishlistService.addProduct(selectedProduct)
+        dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
