@@ -51,6 +51,7 @@ jobs:
   release:
     needs: run-tests
     runs-on: macos-15
+    if: github.event_name == 'push'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3

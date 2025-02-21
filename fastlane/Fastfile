@@ -33,12 +33,12 @@ platform :ios do
 
     new_tag = "'##{new_build_number}'"
 
-    #sh("git config user.name '#{ENV['GIT_USER_NAME']}'; git config user.email '#{ENV['GIT_EMAIL']}'")
-    #sh("git tag #{new_tag}; git push origin #{new_tag}")
+    sh("git config user.name '#{ENV['GIT_USER_NAME']}'; git config user.email '#{ENV['GIT_EMAIL']}'")
+    sh("git tag #{new_tag}; git push origin #{new_tag}")
 
     gym
     app_store_connect_api_key
-    #upload_to_testflight
+    upload_to_testflight
     upload_symbols_to_crashlytics
   end
 
