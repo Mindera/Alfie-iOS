@@ -35,7 +35,7 @@ public struct ScrollViewWithOffsetReader<Content: View>: View {
         }
         .coordinateSpace(name: coordinateSpace)
         .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
-            Task.detached {
+            Task { @MainActor in
                 scrollOffset = .init(x: -value.x, y: -value.y)
             }
         }
