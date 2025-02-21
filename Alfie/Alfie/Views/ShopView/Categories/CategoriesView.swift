@@ -98,21 +98,10 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private var errorView: some View {
-        // TODO: Remove this after implementing reusable error views
-        VStack(spacing: Spacing.space200) {
-            Spacer()
-            Icon.warning.image
-                .renderingMode(.template)
-                .resizable()
-                .foregroundStyle(Colors.primary.black)
-                .scaledToFit()
-                .frame(width: Constants.iconSize, height: Constants.iconSize)
-            Text.build(theme.font.paragraph.bold(L10n.Shop.Categories.ErrorView.title))
-                .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(L10n.Shop.Categories.ErrorView.message))
-                .foregroundStyle(Colors.primary.black)
-            Spacer()
-        }
+        ErrorView(
+            title: L10n.Shop.Categories.ErrorView.title,
+            message: L10n.Shop.Categories.ErrorView.message
+        )
     }
 
     private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color) -> some View {
@@ -144,7 +133,6 @@ private enum AccessibilityId {
 private enum Constants {
     static let segmentedControlHeight: CGFloat = 46
     static let chevronSize: CGFloat = 16
-    static let iconSize: CGFloat = 48
     static let categoryViewHeight: CGFloat = 56
 }
 
