@@ -17,7 +17,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             )
         )
     }
@@ -34,7 +35,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
@@ -51,7 +53,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             sort: "sort",
@@ -84,7 +87,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             searchText: "something",
@@ -130,7 +134,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             sort: "sort",
@@ -193,7 +198,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             searchText: "something",
@@ -223,7 +229,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
@@ -240,7 +247,8 @@ final class ProductListingViewModelTests: XCTestCase {
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             ),
             category: "clothing",
             searchText: "something",
