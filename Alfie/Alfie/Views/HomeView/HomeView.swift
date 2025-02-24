@@ -75,7 +75,9 @@ private enum Constants {
     static let cancelAccessibilityId = "back-btn"
 }
 
+#if DEBUG
 #Preview {
     HomeView(analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker())
         .environmentObject(Coordinator())
 }
+#endif
