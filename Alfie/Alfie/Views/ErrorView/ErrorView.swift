@@ -10,6 +10,17 @@ private enum Constants {
 // MARK: - ErrorView
 
 struct ErrorView: View {
+    // MARK: Inner types
+
+    struct ButtonConfiguration: Identifiable {
+        let cta: String
+        let action: () -> Void
+
+        var id: String {
+            cta
+        }
+    }
+
     // MARK: Properties
 
     private let spacing: CGFloat
@@ -20,7 +31,7 @@ struct ErrorView: View {
     private let titleColor: Color
     private let message: AttributedString?
     private let messageColor: Color
-    private let buttonsConfiguration: [ErrorButtonConfiguration]
+    private let buttons: [ButtonConfiguration]
 
     // MARK: Lifecycle
 
@@ -33,7 +44,7 @@ struct ErrorView: View {
         titleColor: Color = Colors.primary.black,
         message: AttributedString? = nil,
         messageColor: Color = Colors.primary.black,
-        buttonsConfiguration: [ErrorButtonConfiguration] = []
+        buttons: [ButtonConfiguration] = []
     ) {
         self.spacing = spacing
         self.icon = icon
@@ -43,7 +54,7 @@ struct ErrorView: View {
         self.titleColor = titleColor
         self.message = message
         self.messageColor = messageColor
-        self.buttonsConfiguration = buttonsConfiguration
+        self.buttons = buttons
     }
 
     init(
@@ -55,7 +66,7 @@ struct ErrorView: View {
         titleColor: Color = Colors.primary.black,
         message: String? = nil,
         messageColor: Color = Colors.primary.black,
-        buttonsConfiguration: [ErrorButtonConfiguration] = []
+        buttons: [ButtonConfiguration] = []
     ) {
         self.init(
             spacing: spacing,
@@ -66,7 +77,7 @@ struct ErrorView: View {
             titleColor: titleColor,
             message: message.flatMap(ThemeProvider.shared.font.small.normal),
             messageColor: messageColor,
-            buttonsConfiguration: buttonsConfiguration
+            buttons: buttons
         )
     }
 
@@ -94,12 +105,8 @@ struct ErrorView: View {
             }
 
             VStack(spacing: Spacing.space100) {
-                ForEach(buttonsConfiguration) { configuration in
-                    ThemedButton(
-                        text: configuration.text,
-                        isFullWidth: true,
-                        action: configuration.action
-                    )
+                ForEach(buttons) {
+                    ThemedButton(text: $0.cta, isFullWidth: true, action: $0.action)
                 }
             }
 

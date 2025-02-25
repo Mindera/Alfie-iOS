@@ -50,8 +50,8 @@ struct WebView<ViewModel: WebViewModelProtocol>: View {
             title: theme.font.header.h2(L10n.WebView.ErrorView.title),
             message: theme.font.paragraph.normal(L10n.WebView.ErrorView.Generic.message),
             messageColor: Colors.primary.mono600,
-            buttonsConfiguration: [
-                .init(text: L10n.WebView.ErrorView.Button.cta) {
+            buttons: [
+                .init(cta: L10n.WebView.ErrorView.Button.cta) {
                     viewModel.tryAgain()
                 },
             ]
