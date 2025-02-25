@@ -2,7 +2,7 @@
 
 This is a repository for an e-commerce iOS app template. Its current behavior can be seen in the following demonstration:
 
-<video src="Docs/alfie-demo.mp4" alt="Video demonstration of the Alfie app usage"></video>
+https://github.com/user-attachments/assets/864d30fa-7172-4900-94d0-ee928192b793
 
 ---
 
