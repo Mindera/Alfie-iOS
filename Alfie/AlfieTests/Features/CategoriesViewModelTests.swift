@@ -30,9 +30,10 @@ final class CategoriesViewModelTests: XCTestCase {
             []
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
 
@@ -40,9 +41,10 @@ final class CategoriesViewModelTests: XCTestCase {
             NavigationItem.fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isLoading)
     }
@@ -52,9 +54,10 @@ final class CategoriesViewModelTests: XCTestCase {
             NavigationItem.fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertFalse(sut.state.isLoading)
         XCTAssertTrue(sut.state.isSuccess)
@@ -65,9 +68,10 @@ final class CategoriesViewModelTests: XCTestCase {
             NavigationItem.fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
     }
@@ -77,9 +81,10 @@ final class CategoriesViewModelTests: XCTestCase {
             []
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .noResults)
@@ -90,9 +95,10 @@ final class CategoriesViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .generic)
@@ -109,7 +115,7 @@ final class CategoriesViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: `default`)
     }
 
     func test_ignores_load_items_when_view_appears_but_items_were_loaded_before() {
@@ -129,7 +135,7 @@ final class CategoriesViewModelTests: XCTestCase {
             }
 
         sut.viewDidAppear()
-        wait(for: [firstExpectation, secondExpectation], timeout: defaultTimeout)
+        wait(for: [firstExpectation, secondExpectation], timeout: `default`)
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true
@@ -140,7 +146,7 @@ final class CategoriesViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [thirdExpectation], timeout: defaultTimeout)
+        wait(for: [thirdExpectation], timeout: inverted)
         cancellable.cancel()
     }
 
@@ -155,7 +161,7 @@ final class CategoriesViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: inverted)
     }
 
     // MARK: - Categories
@@ -172,9 +178,10 @@ final class CategoriesViewModelTests: XCTestCase {
             return fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.categories.count, fixtures.count)
     }
@@ -184,9 +191,10 @@ final class CategoriesViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.categories.isEmpty)
     }
@@ -197,9 +205,10 @@ final class CategoriesViewModelTests: XCTestCase {
         let path = "/something"
         let fixture = NavigationItem.fixture(type: .page, url: path)
 
-        let destination = captureEvent(fromPublisher: sut.openCategoryPublisher, afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         guard let destination, case .web(let url, _) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
@@ -214,9 +223,10 @@ final class CategoriesViewModelTests: XCTestCase {
         let itemTitle = "Something"
         let fixture = NavigationItem.fixture(type: .page, title: itemTitle, url: path)
 
-        let destination = captureEvent(fromPublisher: sut.openCategoryPublisher, afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         guard let destination, case .web(let url, let title) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
@@ -231,9 +241,10 @@ final class CategoriesViewModelTests: XCTestCase {
         let path = "/clothing"
         let fixture = NavigationItem.fixture(type: .listing, url: path)
 
-        let destination = captureEvent(fromPublisher: sut.openCategoryPublisher, afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         guard let destination, case .plp(let category) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
@@ -246,9 +257,10 @@ final class CategoriesViewModelTests: XCTestCase {
     func test_sets_error_state_when_category_with_invalid_url_is_selected() {
         let fixture = NavigationItem.fixture(url: nil)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .generic)
@@ -260,9 +272,10 @@ final class CategoriesViewModelTests: XCTestCase {
         let subFixtures = NavigationItem.fixtures
         let fixture = NavigationItem.fixture(title: parentTitle, items: subFixtures)
 
-        let destination = captureEvent(fromPublisher: sut.openCategoryPublisher, afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         guard let destination, case .subCategories(let subCategories, let parentCategory) = destination else {
             XCTFail("Unexpected destination type: \(String(describing: destination))")
@@ -274,12 +287,12 @@ final class CategoriesViewModelTests: XCTestCase {
     }
 
     func test_triggers_navigation_when_special_services_category_is_selected() {
-        let fixture = NavigationItem.fixture(type: .page,
-                                             url: "/store-services")
+        let fixture = NavigationItem.fixture(type: .page, url: "/store-services")
 
-        let destination = captureEvent(fromPublisher: sut.openCategoryPublisher, afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         guard let destination else {
             XCTFail("Unexpected nil destination")
@@ -296,12 +309,12 @@ final class CategoriesViewModelTests: XCTestCase {
     }
 
     func test_triggers_navigation_when_special_brands_category_is_selected() {
-        let fixture = NavigationItem.fixture(type: .page,
-                                             url: "/brands")
+        let fixture = NavigationItem.fixture(type: .page, url: "/brands")
 
-        let destination = captureEvent(fromPublisher: sut.openCategoryPublisher, afterTrigger: {
-            sut.didSelectCategory(fixture)
-        })
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { sut.didSelectCategory(fixture) }
+        )
 
         guard let destination else {
             XCTFail("Unexpected nil destination")

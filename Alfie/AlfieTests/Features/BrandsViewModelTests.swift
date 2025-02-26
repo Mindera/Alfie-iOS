@@ -32,9 +32,10 @@ final class BrandsViewModelTests: XCTestCase {
             []
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
 
@@ -42,9 +43,10 @@ final class BrandsViewModelTests: XCTestCase {
             [.fixture(name: "Brand 1")]
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isLoading)
     }
@@ -54,9 +56,10 @@ final class BrandsViewModelTests: XCTestCase {
             [.fixture(name: "Brand 1")]
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertFalse(sut.state.isLoading)
         XCTAssertTrue(sut.state.isSuccess)
@@ -67,9 +70,10 @@ final class BrandsViewModelTests: XCTestCase {
             [Brand.fixture(name: "brand")]
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
     }
@@ -79,9 +83,10 @@ final class BrandsViewModelTests: XCTestCase {
             []
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .noResults)
@@ -92,9 +97,10 @@ final class BrandsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .generic)
@@ -110,7 +116,7 @@ final class BrandsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: `default`)
     }
 
     func test_ignores_load_brands_when_view_appears_but_brands_were_loaded_before() {
@@ -129,7 +135,7 @@ final class BrandsViewModelTests: XCTestCase {
             }
 
         sut.viewDidAppear()
-        wait(for: [firstExpectation, secondExpectation], timeout: defaultTimeout)
+        wait(for: [firstExpectation, secondExpectation], timeout: `default`)
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true
@@ -139,7 +145,7 @@ final class BrandsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [thirdExpectation], timeout: defaultTimeout)
+        wait(for: [thirdExpectation], timeout: inverted)
         cancellable.cancel()
     }
 
@@ -151,9 +157,10 @@ final class BrandsViewModelTests: XCTestCase {
             fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.sectionTitles.count, 2)
         XCTAssertEqual(sut.state.value?.keys.count, sut.sectionTitles.count)
@@ -165,9 +172,10 @@ final class BrandsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.sectionTitles.isEmpty)
         XCTAssertTrue(sut.state.didFail)
@@ -179,9 +187,10 @@ final class BrandsViewModelTests: XCTestCase {
             fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let expectedSections = OrderedSet(arrayLiteral: "A", "B", "C")
         XCTAssertEqual(sut.sectionTitles.count, 3)
@@ -199,9 +208,10 @@ final class BrandsViewModelTests: XCTestCase {
             fixtures
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.brands(for: "A").count, 2)
         XCTAssertEqual(sut.brands(for: "B").count, 1)
@@ -216,9 +226,10 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.sectionTitles, OrderedSet(arrayLiteral: "A", "B", "C"))
 
@@ -234,9 +245,10 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.sectionTitles, OrderedSet(arrayLiteral: "A", "B", "C"))
 
@@ -250,9 +262,10 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         sut.searchText = "Alfie "
         XCTAssertEqual(sut.sectionTitles, OrderedSet(arrayLiteral: "A"))
@@ -266,14 +279,20 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
-        sut.searchText = ""
-        waitUntil(publisher: sut.indexVisibilityPublisher.eraseToAnyPublisher(), emitsValue: true, asyncOperation: {
-            self.sut.searchFocusDidChange(isFocused: false)
-        }, timeout: defaultTimeout)
+        let indexVisibilityPublisher = XCTAssertEmitsValue(
+            from: sut.indexVisibilityPublisher,
+            afterTrigger: {
+                sut.searchText = ""
+                sut.searchFocusDidChange(isFocused: false)
+            }
+        )
+
+        XCTAssertEqual(indexVisibilityPublisher, true)
     }
 
     func test_brands_index_hidden_with_focused_search_and_no_query() {
@@ -281,14 +300,20 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
-        sut.searchText = ""
-        waitUntil(publisher: sut.indexVisibilityPublisher.eraseToAnyPublisher(), emitsValue: false, asyncOperation: {
-            self.sut.searchFocusDidChange(isFocused: true)
-        }, timeout: defaultTimeout)
+        let indexVisibilityPublisher = XCTAssertEmitsValue(
+            from: sut.indexVisibilityPublisher,
+            afterTrigger: {
+                sut.searchText = ""
+                sut.searchFocusDidChange(isFocused: true)
+            }
+        )
+
+        XCTAssertEqual(indexVisibilityPublisher, false)
     }
 
     func test_brands_index_hidden_with_unfocused_search_but_with_query() {
@@ -296,14 +321,20 @@ final class BrandsViewModelTests: XCTestCase {
             .mockBrands
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
-        sut.searchText = "query"
-        waitUntil(publisher: sut.indexVisibilityPublisher.eraseToAnyPublisher(), emitsValue: false, asyncOperation: {
-            self.sut.searchFocusDidChange(isFocused: false)
-        }, timeout: defaultTimeout)
+        let indexVisibilityPublisher = XCTAssertEmitsValue(
+            from: sut.indexVisibilityPublisher,
+            afterTrigger: {
+                sut.searchText = "query"
+                sut.searchFocusDidChange(isFocused: false)
+            }
+        )
+
+        XCTAssertEqual(indexVisibilityPublisher, false)
     }
 
     // MARK: - Placeholders

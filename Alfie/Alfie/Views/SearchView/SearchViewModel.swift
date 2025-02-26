@@ -76,7 +76,7 @@ extension SearchViewModel {
                     self?.state = .loading
                 }
             })
-            .debounce(for: .seconds(Constants.searchDebounceIntervalInSeconds), scheduler: dependencies.executionQueue)
+            .debounce(for: dependencies.searchService.suggestionsDebounceInterval, scheduler: dependencies.scheduler)
             .sink { [weak self] searchText in
                 self?.handleChange(on: searchText)
             }

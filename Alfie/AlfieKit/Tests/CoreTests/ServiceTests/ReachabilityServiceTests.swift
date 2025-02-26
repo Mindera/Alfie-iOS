@@ -62,15 +62,15 @@ final class ReachabilityServiceTests: XCTestCase {
         // Initialize `isAvailable` to `true` to ensure the event triggers, as repeated events are filtered out.
         mockMonitor.isAvailable = true
 
-        let resultUnavailable = captureEvent(
-            fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
+        let resultUnavailable = XCTAssertEmitsValue(
+            from: sut.networkAvailability,
             afterTrigger: { mockMonitor.isAvailable = false }
         )
 
         XCTAssertEqual(resultUnavailable, false)
 
-        let resultAvailable = captureEvent(
-            fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
+        let resultAvailable = XCTAssertEmitsValue(
+            from: sut.networkAvailability,
             afterTrigger: { mockMonitor.isAvailable = true }
         )
 
@@ -81,15 +81,15 @@ final class ReachabilityServiceTests: XCTestCase {
         // Initialize `isAvailable` to `true` to ensure the event triggers, as repeated events are filtered out.
         mockMonitor.isAvailable = true
 
-       captureEvent(
-            fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
+        XCTAssertEmitsValue(
+            from: sut.networkAvailability,
             afterTrigger: { mockMonitor.isAvailable = false }
         )
 
         XCTAssertFalse(sut.isNetworkAvailable)
 
-        captureEvent(
-            fromPublisher: sut.networkAvailability.eraseToAnyPublisher(),
+        XCTAssertEmitsValue(
+            from: sut.networkAvailability,
             afterTrigger: { mockMonitor.isAvailable = true }
         )
 

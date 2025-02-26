@@ -73,9 +73,10 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.title, "Women's Clothing")
@@ -107,9 +108,10 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.title, "Women's Clothing")
@@ -121,9 +123,10 @@ final class ProductListingViewModelTests: XCTestCase {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .generic)
@@ -155,15 +158,17 @@ final class ProductListingViewModelTests: XCTestCase {
             return ProductListing.fixture(products: Product.fixtures)
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.didDisplay(Product.fixtures.last!)
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.didDisplay(Product.fixtures.last!) }
+        )
 
         XCTAssertTrue(sut.state.isLoadingNextPage)
     }
@@ -174,9 +179,11 @@ final class ProductListingViewModelTests: XCTestCase {
             ProductListing.fixture(products: Product.fixtures)
         }
 
-        _ = assertNoEvent(from: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.didDisplay(Product.fixtures.last!)
-        })
+        XCTAssertNoEmit(
+            from: sut.$state,
+            afterTrigger: { sut.didDisplay(Product.fixtures.last!) },
+            timeout: inverted
+        )
     }
 
     func test_does_not_fetch_next_page_while_displaying_products() {
@@ -188,9 +195,11 @@ final class ProductListingViewModelTests: XCTestCase {
             ProductListing.fixture(products: Product.fixtures)
         }
 
-        _ = assertNoEvent(from: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.didDisplay(penultimateProduct)
-        })
+        XCTAssertNoEmit(
+            from: sut.$state,
+            afterTrigger: { sut.didDisplay(penultimateProduct) },
+            timeout: inverted
+        )
     }
 
     func test_allows_showing_search_if_not_loading_and_not_showing_search_results() {
@@ -216,9 +225,10 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertTrue(sut.showSearchButton)
@@ -265,9 +275,10 @@ final class ProductListingViewModelTests: XCTestCase {
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertFalse(sut.showSearchButton)

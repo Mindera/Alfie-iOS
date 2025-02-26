@@ -39,7 +39,7 @@ final class AppStartupService: AppStartupServiceProtocol {
         self.configurationService = configurationService
         setupSubscriptions()
         WebViewPreload.preloadWebView()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + configurationService.startupCompletionDelay) {
             self.isLoading.send(false)
         }
     }

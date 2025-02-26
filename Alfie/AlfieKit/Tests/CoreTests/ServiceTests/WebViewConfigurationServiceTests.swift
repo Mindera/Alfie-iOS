@@ -29,8 +29,8 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             expectation.fulfill()
             return WebViewConfiguration(configuration: [:])
         }
-        sut = .init( bffClient: mockClientService, log: log)
-        wait(for: [expectation], timeout: defaultTimeout)
+        sut = .init(bffClient: mockClientService, log: log)
+        wait(for: [expectation], timeout: `default`)
     }
 
     func test_configuration_is_fetched_if_unavailable_when_url_is_requested() {
@@ -41,7 +41,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
         sut = .init(bffClient: mockClientService, log: log)
-        wait(for: [firstExpectation], timeout: defaultTimeout)
+        wait(for: [firstExpectation], timeout: `default`)
 
         // Now prepare the mock to return a valid configuration
         let secondExpectation = expectation(description: "Wait for service call")
@@ -53,7 +53,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
         Task {
             _ = await sut.url(for: .addresses)
         }
-        wait(for: [secondExpectation], timeout: defaultTimeout)
+        wait(for: [secondExpectation], timeout: `default`)
     }
 
     func test_feature_url_is_returned_when_configuration_is_available() {
@@ -64,7 +64,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             return WebViewConfiguration(configuration: [.addresses: url])
         }
         sut = .init(bffClient: mockClientService, log: log)
-        wait(for: [firstExpectation], timeout: defaultTimeout)
+        wait(for: [firstExpectation], timeout: `default`)
 
         let secondExpectation = expectation(description: "Wait for return")
         Task {
@@ -72,7 +72,7 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             XCTAssertEqual(result?.absoluteString, url.absoluteString)
             secondExpectation.fulfill()
         }
-        wait(for: [secondExpectation], timeout: defaultTimeout)
+        wait(for: [secondExpectation], timeout: `default`)
     }
 
     func test_feature_url_is_nil_when_configuration_is_not_available() {
@@ -90,6 +90,6 @@ final class WebViewConfigurationServiceTests: XCTestCase {
             XCTAssertNil(result)
             secondExpectation.fulfill()
         }
-        wait(for: [firstExpectation, secondExpectation], timeout: defaultTimeout)
+        wait(for: [firstExpectation, secondExpectation], timeout: `default`)
     }
 }

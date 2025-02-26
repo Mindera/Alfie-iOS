@@ -37,7 +37,7 @@ final class RecentSearchesViewModelTests: XCTestCase {
             expectation.fulfill()
         }
         sut.didTapRemove(on: .recentSearch2)
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: `default`)
     }
 
     func test_DidTapClearAll_InRecentsService_CallsRemoveAll() {
@@ -46,7 +46,7 @@ final class RecentSearchesViewModelTests: XCTestCase {
             expectation.fulfill()
         }
         sut.didTapClearAll()
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: `default`)
     }
 
     func test_OnViewDidDisappear_InRecentsService_CallsSave() {
@@ -55,6 +55,6 @@ final class RecentSearchesViewModelTests: XCTestCase {
             expectation.fulfill()
         }
         sut.viewDidDisappear()
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: `default`)
     }
 }

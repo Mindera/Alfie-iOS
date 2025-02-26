@@ -15,6 +15,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         mockProductService = MockProductService()
         mockWebUrlProvider = MockWebUrlProvider()
         mockDependencies = ProductDetailsDependencyContainer(
+            scheduler: .immediate,
             productService: mockProductService,
             webUrlProvider: mockWebUrlProvider,
             bagService: MockBagService(),
@@ -96,9 +97,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(brand: .fixture(name: "Product Brand"))
         initViewModel(product: product)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.productTitle, product.brand.name)
     }
@@ -112,9 +114,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name")
         initViewModel(product: product)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.productName, product.name)
     }
@@ -130,14 +133,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .image(.fixture(url: URL(string: "http://some.media.url.2")!)),
         ])
         let variant = Product.Variant.fixture(colour: color)
-        let product = Product.fixture(name: "Product Name",
-                                      defaultVariant: variant,
-                                      variants: [variant])
+        let product = Product.fixture(name: "Product Name", defaultVariant: variant, variants: [variant])
         initViewModel(product: product)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.productImageUrls.count, variant.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant.media[0].asImage?.url.absoluteString)
@@ -162,9 +164,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(longDescription: "Product Description")
         initViewModel(product: product)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(sut.productDescription, product.longDescription)
     }
@@ -218,7 +221,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: `default`)
     }
 
     func test_product_is_not_fetched_when_view_appears_if_already_fetched() {
@@ -241,7 +244,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             }
 
         sut.viewDidAppear()
-        wait(for: [firstExpectation, secondExpectation], timeout: defaultTimeout)
+        wait(for: [firstExpectation, secondExpectation], timeout: `default`)
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true
@@ -251,7 +254,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [thirdExpectation], timeout: defaultTimeout)
+        wait(for: [thirdExpectation], timeout: inverted)
         cancellable.cancel()
     }
 
@@ -262,9 +265,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.isSuccess)
     }
@@ -276,9 +280,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .generic)
@@ -291,9 +296,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .emptyResponse)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .notFound)
@@ -316,9 +322,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let selectedVariant = sut.state.value?.selectedVariant
         XCTAssertNotNil(selectedVariant)
@@ -339,9 +346,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_state_is_loading_when_fetching_product() {
         initViewModel()
 
-        let state = captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        let state = XCTAssertEmitsValue(
+            from: sut.$state,
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertEqual(state?.isLoading, true)
     }
@@ -368,9 +376,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let result = sut.shouldShowLoading(for: .titleHeader)
         XCTAssertFalse(result)
@@ -390,9 +399,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let result = sut.shouldShowLoading(for: .colorSelector)
         XCTAssertFalse(result)
@@ -412,9 +422,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let result = sut.shouldShowLoading(for: .sizeSelector)
         XCTAssertFalse(result)
@@ -434,9 +445,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let result = sut.shouldShowLoading(for: .mediaCarousel)
         XCTAssertFalse(result)
@@ -456,9 +468,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let result = sut.shouldShowLoading(for: .complementaryInfo)
         XCTAssertFalse(result)
@@ -478,9 +491,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let result = sut.shouldShowLoading(for: .productDescription)
         XCTAssertFalse(result)
@@ -500,9 +514,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
         XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
@@ -527,9 +542,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
         XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(.black))
@@ -550,14 +566,16 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1]
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
+        )
 
         let selectedVariant = sut.state.value?.selectedVariant
         XCTAssertNotNil(selectedVariant)
@@ -581,12 +599,17 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        let result = assertNoEvent(from: sut.$state.eraseToAnyPublisher(), afterTrigger: { colorSelectionConfiguration.selectedItem = nil }, timeout: defaultTimeout)
+        let result = XCTAssertNoEmit(
+            from: sut.$state,
+            afterTrigger: { colorSelectionConfiguration.selectedItem = nil },
+            timeout: inverted
+        )
         XCTAssertTrue(result)
     }
 
@@ -605,12 +628,17 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        let result = assertNoEvent(from: sut.$state.eraseToAnyPublisher(), afterTrigger: { colorSelectionConfiguration.selectedItem = ColorSwatch(id: "3", name: "Color 3", type: .color(.black)) }, timeout: defaultTimeout)
+        let result = XCTAssertNoEmit(
+            from: sut.$state,
+            afterTrigger: { colorSelectionConfiguration.selectedItem = ColorSwatch(id: "3", name: "Color 3", type: .color(.black)) },
+            timeout: inverted
+        )
         XCTAssertTrue(result)
     }
 
@@ -634,14 +662,16 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1]
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
+        )
 
         XCTAssertEqual(sut.productImageUrls.count, variant2.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant2.media[0].asImage?.url.absoluteString)
@@ -712,9 +742,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.shouldShow(section: .mediaCarousel))
     }
@@ -730,9 +761,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertFalse(sut.shouldShow(section: .mediaCarousel))
     }
@@ -745,9 +777,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.shouldShow(section: .productDescription))
     }
@@ -760,9 +793,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertFalse(sut.shouldShow(section: .productDescription))
     }
@@ -775,9 +809,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertTrue(sut.shouldShow(section: .addToBag))
     }
@@ -789,9 +824,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertFalse(sut.shouldShow(section: .addToBag))
     }
@@ -817,9 +853,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         XCTAssertNil(sut.shareConfiguration)
     }
@@ -844,9 +881,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             return URL(string: urlString)
         }
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { $0.isLoading }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: { $0.isLoading }),
+            afterTrigger: { sut.viewDidAppear() }
+        )
 
         let shareConfiguration = sut.shareConfiguration
         XCTAssertNotNil(shareConfiguration)
@@ -864,7 +902,6 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       variants: (expectedMatchedColors + expectedNonMatchedColors).map { Product.Variant.fixture(colour: $0) })
 
         initViewModel(product: product)
-        let allSwatches = sut.colorSelectionConfiguration.items
         let swatchesSearchResult = sut.colorSwatches(filteredBy: "Col")
         XCTAssertTrue(swatchesSearchResult.map(\.name).contains(expectedMatchedColors.map(\.name)))
         XCTAssertFalse(swatchesSearchResult.map(\.name).contains(expectedNonMatchedColors.map(\.name)))

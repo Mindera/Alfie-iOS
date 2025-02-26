@@ -34,6 +34,6 @@ final class NavigationServiceTests: XCTestCase {
         Task {
             _ = try await sut.getNavigationItems(for: .shop)
         }
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: `default`)
     }
 }
