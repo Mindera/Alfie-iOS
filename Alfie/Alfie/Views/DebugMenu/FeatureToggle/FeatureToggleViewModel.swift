@@ -15,7 +15,7 @@ final class FeatureToggleViewModel: FeatureToggleViewModelProtocol {
 
     func viewDidAppear() {
         features = ConfigurationKey.allCases.map { configuration in
-            (configuration.rawValue, provider.bool(for: configuration) ?? true)
+            (configuration.rawValue, provider.bool(for: configuration) ?? configuration.defaultAvailabilityValue)
         }
 
         isDebugConfigurationEnabled = provider.isReady
@@ -59,7 +59,7 @@ extension FeatureToggleViewModel {
             return
         }
 
-        let isEnabled = provider.bool(for: key) ?? true
+        let isEnabled = provider.bool(for: key) ?? key.defaultAvailabilityValue
 
         provider.updateFeature(key, isEnabled: !isEnabled)
         features[index] = (key.rawValue, !isEnabled)

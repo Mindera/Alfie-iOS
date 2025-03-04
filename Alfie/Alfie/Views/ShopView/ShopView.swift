@@ -22,12 +22,17 @@ struct ShopView<
 >: View {
     @ViewBuilder private let categoriesView: CategoriesView<CategoriesViewModel>
     @ViewBuilder private let brandsView: BrandsView<BrandsViewModel>
-    @ViewBuilder private let servicesView: WebView<ServicesViewModel>
+    @ViewBuilder private let servicesView: WebView<ServicesViewModel>?
     private let categoriesViewModel: CategoriesViewModel
     @EnvironmentObject var coordinator: Coordinator
     @EnvironmentObject var tabCoordinator: TabCoordinator
 
-    private let segments: [Segment]
+    private var segments: [Segment] {
+        availableTabs.map { tab in
+            Segment(id: tab.rawValue, title: tab.title, tab)
+        }
+    }
+
     @State private var selectedSegment: Segment
     @State private var activeTab: ShopViewTab
     @State private var isVisible = false
@@ -35,7 +40,7 @@ struct ShopView<
     init(
         categoriesViewModel: CategoriesViewModel,
         brandsViewModel: BrandsViewModel,
-        servicesViewModel: ServicesViewModel,
+        servicesViewModel: ServicesViewModel?,
         initialTab tab: ShopViewTab = .categories
     ) {
         self.categoriesViewModel = categoriesViewModel
@@ -43,12 +48,9 @@ struct ShopView<
         // as those will be handled by this view directly
         self.categoriesView = CategoriesView(viewModel: categoriesViewModel, ignoreLocalNavigation: true)
         self.brandsView = BrandsView(viewModel: brandsViewModel)
-        self.servicesView = WebView(viewModel: servicesViewModel)
+        self.servicesView = servicesViewModel.flatMap { WebView(viewModel: $0) }
         _selectedSegment = State(initialValue: Segment(id: tab.rawValue, title: tab.title, tab))
         _activeTab = State(initialValue: tab)
-        segments = ShopViewTab.allCases.map { tab in
-            Segment(id: tab.rawValue, title: tab.title, tab)
-        }
     }
 
     var body: some View {
@@ -69,10 +71,12 @@ struct ShopView<
                     .tag(ShopViewTab.brands)
                     .accessibilityIdentifier(AccessibilityId.brandsPage)
 
-                servicesView
-                    .gesture(DragGesture())
-                    .tag(ShopViewTab.services)
-                    .accessibilityIdentifier(AccessibilityId.servicesPage)
+                if let servicesView {
+                    servicesView
+                        .gesture(DragGesture())
+                        .tag(ShopViewTab.services)
+                        .accessibilityIdentifier(AccessibilityId.servicesPage)
+                }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
@@ -123,6 +127,25 @@ struct ShopView<
             runWithoutAnimation {
                 coordinator.popToRoot()
                 selectedSegment = segments[index]
+            }
+        }
+    }
+}
+
+// MARK: ShopViewTab Helper
+
+extension ShopView {
+    var availableTabs: [ShopViewTab] {
+        ShopViewTab.allCases.compactMap { tab in
+            switch tab {
+            case .services:
+                return servicesView != nil ? tab : nil
+
+            case .categories:
+                return tab
+
+            case .brands:
+                return tab
             }
         }
     }
