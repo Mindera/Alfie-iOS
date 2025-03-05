@@ -19,5 +19,6 @@ public struct ThemedToolbarModifier: ViewModifier {
             content
                 .navigationBarTitleDisplayMode(.inline)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
