@@ -168,6 +168,23 @@ final class ViewFactory: ViewFactoryProtocol {
                         )
                     )
                 )
+
+            case .selectedProduct(let selectedProduct):
+                ProductDetailsView(
+                    viewModel: ProductDetailsViewModel(
+                        productId: selectedProduct.product.id,
+                        product: selectedProduct.product,
+                        selectedProduct: selectedProduct,
+                        dependencies: ProductDetailsDependencyContainer(
+                            productService: serviceProvider.productService,
+                            webUrlProvider: serviceProvider.webUrlProvider,
+                            bagService: serviceProvider.bagService,
+                            wishlistService: serviceProvider.wishlistService,
+                            configurationService: serviceProvider.configurationService,
+                            analytics: serviceProvider.analytics
+                        )
+                    )
+                )
             }
 
         case .recentSearches:

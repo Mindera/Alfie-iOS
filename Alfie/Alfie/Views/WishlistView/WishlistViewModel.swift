@@ -3,7 +3,7 @@ import Models
 import SharedUI
 
 final class WishlistViewModel: WishlistViewModelProtocol {
-    @Published private(set) var products: [SelectionProduct]
+    @Published private(set) var products: [SelectedProduct]
 
     private let dependencies: WishlistDependencyContainer
 
@@ -18,32 +18,32 @@ final class WishlistViewModel: WishlistViewModelProtocol {
         products = dependencies.wishlistService.getWishlistContent()
     }
 
-    func didSelectDelete(for product: SelectionProduct) {
-        dependencies.wishlistService.removeProduct(product.id)
-        dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+    func didSelectDelete(for selectedProduct: SelectedProduct) {
+        dependencies.wishlistService.removeProduct(selectedProduct)
+        dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
         products = dependencies.wishlistService.getWishlistContent()
     }
 
-    func didTapAddToBag(for product: SelectionProduct) {
-        dependencies.bagService.addProduct(product)
-        dependencies.analytics.trackAddToBag(productID: product.id)
+    func didTapAddToBag(for selectedProduct: SelectedProduct) {
+        dependencies.bagService.addProduct(selectedProduct)
+        dependencies.analytics.trackAddToBag(productID: selectedProduct.product.id)
     }
 
-    func productCardViewModel(for product: SelectionProduct) -> VerticalProductCardViewModel {
+    func productCardViewModel(for selectedProduct: SelectedProduct) -> VerticalProductCardViewModel {
         .init(
             configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
-            productId: product.id,
-            image: product.media.first?.asImage?.url,
-            designer: product.brand.name,
-            name: product.name,
-            priceType: product.priceType,
+            productId: selectedProduct.id,
+            image: selectedProduct.media.first?.asImage?.url,
+            designer: selectedProduct.brand.name,
+            name: selectedProduct.name,
+            priceType: selectedProduct.priceType,
             colorTitle: L10n.Product.Color.title + ":",
-            color: product.colour?.name ?? "",
+            color: selectedProduct.colour?.name ?? "",
             sizeTitle: L10n.Product.Size.title + ":",
-            size: product.size == nil ? L10n.Product.OneSize.title : product.sizeText,
+            size: selectedProduct.size == nil ? L10n.Product.OneSize.title : selectedProduct.sizeText,
             addToBagTitle: L10n.Product.AddToBag.Button.cta,
             outOfStockTitle: L10n.Product.OutOfStock.Button.cta,
-            isAddToBagDisabled: product.stock == .zero
+            isAddToBagDisabled: selectedProduct.stock == .zero
         )
     }
 }

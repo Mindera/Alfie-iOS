@@ -3,7 +3,7 @@ import Models
 import SharedUI
 
 final class BagViewModel: BagViewModelProtocol {
-    @Published private(set) var products: [SelectionProduct]
+    @Published private(set) var products: [SelectedProduct]
 
     private let dependencies: BagDependencyContainer
 
@@ -18,22 +18,22 @@ final class BagViewModel: BagViewModelProtocol {
         products = dependencies.bagService.getBagContent()
     }
 
-    func didSelectDelete(for product: SelectionProduct) {
-        dependencies.bagService.removeProduct(product)
+    func didSelectDelete(for selectedProduct: SelectedProduct) {
+        dependencies.bagService.removeProduct(selectedProduct)
         products = dependencies.bagService.getBagContent()
-        dependencies.analytics.trackRemoveFromBag(productID: product.id)
+        dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
     }
 
-    func productCardViewModel(for product: SelectionProduct) -> HorizontalProductCardViewModel {
+    func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
         .init(
-            image: product.media.first?.asImage?.url,
-            designer: product.brand.name,
-            name: product.name,
+            image: selectedProduct.media.first?.asImage?.url,
+            designer: selectedProduct.brand.name,
+            name: selectedProduct.name,
             colorTitle: L10n.Product.Color.title + ":",
-            color: product.colour?.name ?? "",
+            color: selectedProduct.colour?.name ?? "",
             sizeTitle: L10n.Product.Size.title + ":",
-            size: product.size == nil ? L10n.Product.OneSize.title : product.sizeText,
-            priceType: product.priceType
+            size: selectedProduct.size == nil ? L10n.Product.OneSize.title : selectedProduct.sizeText,
+            priceType: selectedProduct.priceType
         )
     }
 }

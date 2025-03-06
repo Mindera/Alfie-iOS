@@ -113,6 +113,9 @@ final class TabCoordinator: TabCoordinatorProtocol, ObservableObject {
 
             case .product(let product):
                 coordinator.openDetails(for: product)
+
+            case .selectedProduct(let selectedProduct):
+                coordinator.openDetails(for: selectedProduct)
             }
 
         case .categoryList(let categories, let title):
