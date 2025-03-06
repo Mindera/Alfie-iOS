@@ -26,16 +26,16 @@ final class ViewFactory: ViewFactoryProtocol {
                 HomeView(viewFactory: self, analytics: serviceProvider.analytics)
 
             case .shop:
-                let servicesViewModel = serviceProvider.configurationService.isFeatureEnabled(.storeServices) ?
-                    WebViewModel(
+                let servicesViewModel = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
+                    ? WebViewModel(
                         webFeature: .storeServices,
                         dependencies: WebDependencyContainer(
                             deepLinkService: serviceProvider.deepLinkService,
                             webViewConfigurationService: serviceProvider.webViewConfigurationService,
                             webUrlProvider: serviceProvider.webUrlProvider
                         )
-                    ) :
-                    nil
+                    )
+                    : nil
 
                 ShopView(
                     categoriesViewModel: CategoriesViewModel(

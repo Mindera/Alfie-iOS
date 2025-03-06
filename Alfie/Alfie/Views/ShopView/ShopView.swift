@@ -27,12 +27,7 @@ struct ShopView<
     @EnvironmentObject var coordinator: Coordinator
     @EnvironmentObject var tabCoordinator: TabCoordinator
 
-    private var segments: [Segment] {
-        availableTabs.map { tab in
-            Segment(id: tab.rawValue, title: tab.title, tab)
-        }
-    }
-
+    private var segments: [Segment] = []
     @State private var selectedSegment: Segment
     @State private var activeTab: ShopViewTab
     @State private var isVisible = false
@@ -51,6 +46,10 @@ struct ShopView<
         self.servicesView = servicesViewModel.flatMap { WebView(viewModel: $0) }
         _selectedSegment = State(initialValue: Segment(id: tab.rawValue, title: tab.title, tab))
         _activeTab = State(initialValue: tab)
+
+        segments = availableTabs.map { tab in
+            Segment(id: tab.rawValue, title: tab.title, tab)
+        }
     }
 
     var body: some View {
