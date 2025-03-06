@@ -45,6 +45,17 @@
         }
       }
     },
+    "feature_toggle.store_services.option.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Store Services"
+          }
+        }
+      }
+    },
     "feature_toggle.title" : {
       "extractionState" : "manual",
       "localizations" : {

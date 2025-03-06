@@ -31,6 +31,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private var featureAvailabilitySubscription: AnyCancellable?
     private var isWishlistEnabled = false
+    private var isStoreServicesEnabled = false
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.instance = self
@@ -74,6 +75,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         var tabs: [TabScreen] = [.home(), .shop(), .bag]
 
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
+        isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
+
         if isWishlistEnabled {
             tabs.insert(.wishlist, at: 2)
         }
@@ -82,7 +85,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         featureAvailabilitySubscription = serviceProvider.configurationService.featureAvailabilityPublisher
             .sink { [weak self] featureAvailability in
-                guard let self, isWishlistEnabled != (featureAvailability[.wishlist] ?? false) else { return }
+                guard let self else { return }
+
+                guard
+                    isWishlistEnabled != (featureAvailability[.wishlist] ?? false) ||
+                    isStoreServicesEnabled != (featureAvailability[.storeServices] ?? false)
+                else {
+                    return
+                }
 
                 rebootApp()
             }
