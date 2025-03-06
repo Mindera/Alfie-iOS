@@ -2,21 +2,21 @@ import Foundation
 import Models
 
 public final class MockWishlistService: WishlistServiceProtocol {
-    private var products: [SelectionProduct] = []
+    private var products: [SelectedProduct] = []
 
     public init() { }
 
-    public func addProduct(_ product: SelectionProduct) {
+    public func addProduct(_ product: SelectedProduct) {
         guard !products.contains(where: { $0.id == product.id }) else { return }
 
         products.append(product)
     }
 
-    public func removeProduct(_ productId: String) {
-        products = products.filter { $0.id != productId }
+    public func removeProduct(_ product: SelectedProduct) {
+        products = products.filter { $0.id != product.id }
     }
 
-    public func getWishlistContent() -> [SelectionProduct] {
+    public func getWishlistContent() -> [SelectedProduct] {
         products
     }
 }
