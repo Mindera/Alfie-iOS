@@ -166,7 +166,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         sut = .init(apiEndpointService: mockEndpointService)
         sut.selectedEndpointOption = .preProd
         sut.didTapSave()
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: `default`)
     }
 
     func test_saves_selected_custom_option_with_url_on_service() {
@@ -182,6 +182,6 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = urlString
         sut.didTapSave()
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: `default`)
     }
 }

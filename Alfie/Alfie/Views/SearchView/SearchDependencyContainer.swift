@@ -1,20 +1,21 @@
+import CombineSchedulers
 import Core
 import Foundation
 import Models
 
 final class SearchDependencyContainer {
-    let executionQueue: DispatchQueue
+    let scheduler: AnySchedulerOf<DispatchQueue>
     let recentsService: RecentsServiceProtocol?
     let searchService: SearchServiceProtocol
     let analytics: AlfieAnalyticsTracker
 
     init(
-        executionQueue: DispatchQueue = DispatchQueue.main,
+        scheduler: AnySchedulerOf<DispatchQueue> = .main,
         recentsService: RecentsServiceProtocol?,
         searchService: SearchServiceProtocol,
         analytics: AlfieAnalyticsTracker
     ) {
-        self.executionQueue = executionQueue
+        self.scheduler = scheduler
         self.recentsService = recentsService
         self.searchService = searchService
         self.analytics = analytics
