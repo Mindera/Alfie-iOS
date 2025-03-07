@@ -14,7 +14,7 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published var style: ProductListingListStyle
     @Published var showRefine = false
     @Published var sortOption: String?
-    @Published private(set) var wishlistContent: [SelectionProduct]
+    @Published private(set) var wishlistContent: [SelectedProduct]
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
     private enum Constants {
@@ -79,16 +79,17 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     func didSelect(_: Product) {}
 
     func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.contains { $0.id == product.defaultVariant.sku }
+        wishlistContent.contains { $0.product.defaultVariant.sku == product.defaultVariant.sku }
     }
 
     func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
         if !isFavorite {
-            let selectedProduct = SelectionProduct(product: product)
+            let selectedProduct = SelectedProduct(product: product)
             dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            dependencies.analytics.trackAddToWishlist(productID: product.id)
         } else {
-            dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
+            let selectedProduct = SelectedProduct(product: product)
+            dependencies.wishlistService.removeProduct(selectedProduct)
             dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
         }
         wishlistContent = dependencies.wishlistService.getWishlistContent()
