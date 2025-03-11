@@ -25,22 +25,25 @@ public struct VerticalProductCardConfiguration {
     }
 
     public let size: Size
+    public let hideColor: Bool
+    public let hideSize: Bool
     public let hidePrice: Bool
     public let hideAction: Bool
-    public let hideDetails: Bool
     public let actionType: ActionType
 
     public init(
         size: Size,
+        hideColor: Bool = false,
+        hideSize: Bool = false,
         hidePrice: Bool = false,
         hideAction: Bool = false,
-        hideDetails: Bool = true,
         actionType: ActionType = .wishlist
     ) {
         self.size = size
+        self.hideColor = hideColor
+        self.hideSize = hideSize
         self.hidePrice = hidePrice
         self.hideAction = hideAction
-        self.hideDetails = hideDetails
         self.actionType = actionType
     }
 }

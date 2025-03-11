@@ -39,8 +39,10 @@ public struct VerticalProductCard: View {
                 VStack(alignment: .leading, spacing: Spacing.space050) {
                     productDesignerView
                     productNameView
-                    if !viewModel.configuration.hideDetails {
+                    if !viewModel.configuration.hideColor {
                         productColorView
+                    }
+                    if !viewModel.configuration.hideSize {
                         productSizeView
                     }
                 }
@@ -156,7 +158,6 @@ public struct VerticalProductCard: View {
 
     @ViewBuilder private var addToBagView: some View {
         if
-            !viewModel.configuration.hideDetails,
             let outOfStockTitle = viewModel.outOfStockTitle,
             let addToBagTitle = viewModel.addToBagTitle {
             ThemedButton(

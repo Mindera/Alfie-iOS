@@ -49,13 +49,13 @@ struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
 // MARK: - Private Methods
 
 private extension WishlistView {
-    func handleUserAction(forProduct product: SelectedProduct, actionType: VerticalProductCard.ProductUserActionType) {
+    func handleUserAction(forProduct product: WishlistProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
         case .remove:
             viewModel.didSelectDelete(for: product)
         case .addToBag:
-            viewModel.didTapAddToBag(for: product)
+            coordinador.openDetails(for: product)
         case .wishlist:
             return
         }

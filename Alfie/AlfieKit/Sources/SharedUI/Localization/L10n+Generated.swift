@@ -196,7 +196,11 @@ public enum L10n {
     }
     public enum Size {
       /// Size
-      public static let title = L10n.tr("L10n", "product.size.title")
+      static let title = L10n.tr("L10n", "product.size.title")
+      enum NoSelection {
+        /// Select a size
+        static let title = L10n.tr("L10n", "product.size.no_selection.title")
+      }
     }
   }
   public enum Search {
@@ -467,6 +471,7 @@ public extension L10n {
       case productOneSizeTitle = "product.one_size.title"
       case productOutOfStockButtonCta = "product.out_of_stock.button.cta"
       case productSizeTitle = "product.size.title"
+      case productSizeNoSelectionTitle = "product.size.no_selection.title"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"
