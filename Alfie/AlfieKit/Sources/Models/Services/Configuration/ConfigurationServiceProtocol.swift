@@ -8,6 +8,7 @@ public protocol ConfigurationServiceProtocol {
     var forceAppUpdateInfo: AppUpdateInfo? { get }
     var isSoftAppUpdateAvailable: Bool { get }
     var softAppUpdateInfo: AppUpdateInfo? { get }
+    var startupCompletionDelay: CGFloat { get }
 
     func isFeatureEnabled(_ key: ConfigurationKey) -> Bool
 }

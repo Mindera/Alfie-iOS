@@ -1,4 +1,5 @@
 import Combine
+import Foundation
 import Models
 
 public class MockConfigurationService: ConfigurationServiceProtocol {
@@ -12,6 +13,8 @@ public class MockConfigurationService: ConfigurationServiceProtocol {
 
     public var forcedProviderBecameAvailableSubject: PassthroughSubject<Void, Never> = .init()
     public private(set) var providerBecameAvailablePublisher: AnyPublisher<Void, Never>
+
+    public var startupCompletionDelay: CGFloat { 0 }
 
     public init(forceAppUpdateInfo: AppUpdateInfo? = nil,
                 softAppUpdateInfo: AppUpdateInfo? = nil) {
