@@ -1,8 +1,12 @@
 import Foundation
 
-public struct SelectedProduct {
+public class SelectedProduct: Identifiable, Hashable {
     public let product: Product
     public let selectedVariant: Product.Variant
+
+    public var id: String {
+        "\(product.id)-\(selectedVariant.sku)"
+    }
 
     public var name: String {
         product.name
@@ -36,10 +40,14 @@ public struct SelectedProduct {
         self.product = product
         self.selectedVariant = selectedVariant ?? product.defaultVariant
     }
-}
 
-extension SelectedProduct: Identifiable, Hashable {
-    public var id: String {
-        "\(product.id)-\(selectedVariant.sku)"
+    public static func == (lhs: SelectedProduct, rhs: SelectedProduct) -> Bool {
+        lhs.product == rhs.product
+        && lhs.selectedVariant == rhs.selectedVariant
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(product)
+        hasher.combine(selectedVariant)
     }
 }

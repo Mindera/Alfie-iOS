@@ -72,6 +72,7 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
                     viewModel: .init(
                         configuration: .init(
                             size: viewModel.style == .list ? .large : .medium,
+                            hideSize: true,
                             hideAction: !coordinator.isWishlistEnabled
                         ),
                         product: product

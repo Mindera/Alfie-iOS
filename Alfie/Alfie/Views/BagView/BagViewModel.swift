@@ -2,7 +2,7 @@ import Foundation
 import Models
 
 final class BagViewModel: BagViewModelProtocol {
-    @Published private(set) var products: [SelectedProduct]
+    @Published private(set) var products: [BagProduct]
 
     private let dependencies: BagDependencyContainer
 
@@ -17,13 +17,13 @@ final class BagViewModel: BagViewModelProtocol {
         products = dependencies.bagService.getBagContent()
     }
 
-    func didSelectDelete(for selectedProduct: SelectedProduct) {
+    func didSelectDelete(for selectedProduct: BagProduct) {
         dependencies.bagService.removeProduct(selectedProduct)
         products = dependencies.bagService.getBagContent()
         dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
     }
 
-    func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
+    func productCardViewModel(for selectedProduct: BagProduct) -> HorizontalProductCardViewModel {
         .init(
             image: selectedProduct.media.first?.asImage?.url,
             designer: selectedProduct.brand.name,
