@@ -515,19 +515,18 @@ extension ProductDetailsView {
     }
 
     @ViewBuilder private var errorView: some View {
-        // TODO: properly implement the error views in a future ticket (with the refresh CTA and proper labels)
-        VStack(spacing: Spacing.space500) {
-            Circle()
-                .fill(Colors.primary.mono200)
-                .frame(width: Constants.errorViewCircleSize, height: Constants.errorViewCircleSize)
-            Text.build(theme.font.header.h2(L10n.Pdp.ErrorView.title))
-                .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.paragraph.normal(errorMessage))
-                .foregroundStyle(Colors.primary.mono600)
-            ThemedButton(text: L10n.Pdp.ErrorView.GoBack.Button.cta, isFullWidth: true) {
-                coordinator.didTapBackButton()
-            }
-        }
+        ErrorView(
+            spacing: Spacing.space500,
+            iconSize: Constants.errorViewIconSize,
+            title: theme.font.header.h2(L10n.Pdp.ErrorView.title),
+            message: theme.font.paragraph.normal(errorMessage),
+            messageColor: Colors.primary.mono600,
+            buttons: [
+                .init(cta: L10n.Pdp.ErrorView.GoBack.Button.cta) {
+                    coordinator.didTapBackButton()
+                },
+            ]
+        )
     }
 
     private func complementaryInfoCell(type: ProductDetailsComplementaryInfoType, showTopDivider: Bool) -> some View {
@@ -574,7 +573,7 @@ private enum Constants {
     static let chevronSize: CGFloat = 16
     static let sheetCloseIconSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
-    static let errorViewCircleSize: CGFloat = 210
+    static let errorViewIconSize: CGFloat = 210
     static let colorChevronSize: CGFloat = 16
 }
 

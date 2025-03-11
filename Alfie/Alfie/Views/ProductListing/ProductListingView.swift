@@ -9,7 +9,6 @@ import Mocks
 // MARK: - Constants
 
 private enum Constants {
-    static let iconSize: CGFloat = 48
     /// Layout Grid Struct Items Per Row
     static let iPhoneGridRows = 2
     static let iPhoneListRows = 1
@@ -149,19 +148,10 @@ struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: View {
     }
 
     private var errorView: some View {
-        // TODO: Remove this after implementing reusable error views
-        VStack(spacing: Spacing.space200) {
-            Icon.warning.image
-                .renderingMode(.template)
-                .resizable()
-                .foregroundStyle(Colors.primary.black)
-                .scaledToFit()
-                .frame(width: Constants.iconSize, height: Constants.iconSize)
-            Text.build(theme.font.paragraph.bold(L10n.Plp.ErrorView.title))
-                .foregroundStyle(Colors.primary.black)
-            Text.build(theme.font.small.normal(L10n.Plp.ErrorView.message))
-                .foregroundStyle(Colors.primary.black)
-        }
+        ErrorView(
+            title: L10n.Plp.ErrorView.title,
+            message: L10n.Plp.ErrorView.message
+        )
     }
 }
 
