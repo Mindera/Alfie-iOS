@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol BagServiceProtocol {
-    func addProduct(_ product: SelectedProduct)
-    func removeProduct(_ product: SelectedProduct)
-    func getBagContent() -> [SelectedProduct]
+    func addProduct(_ bagProduct: BagProduct)
+    func removeProduct(_ bagProduct: BagProduct)
+    func getBagContent() -> [BagProduct]
 }

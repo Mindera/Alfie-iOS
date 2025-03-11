@@ -489,7 +489,7 @@ extension ProductDetailsView {
                 ThemedButton(
                     text: viewModel.productHasStock ? addToBagText : outOfStockText,
                     isDisabled: .init(
-                        get: { !viewModel.productHasStock },
+                        get: { !viewModel.isAddToBagEnabled },
                         set: { _ in }
                     ),
                     isFullWidth: true
