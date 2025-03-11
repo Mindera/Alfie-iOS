@@ -27,8 +27,7 @@ struct DefaultToolbarModifier: ViewModifier {
                 ToolbarItemProvider.trailingItems(
                     for: screen,
                     coordinator: coordinator,
-                    isWishlistEnabled: coordinator.isWishlistEnabled,
-                    isPresentingDebugMenu: $coordinator.isPresentingDebugMenu
+                    isWishlistEnabled: coordinator.isWishlistEnabled
                 )
             }
             .modifier(ThemedToolbarModifier(showDivider: hasDivider))

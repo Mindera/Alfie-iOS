@@ -106,17 +106,15 @@ enum ToolbarItemProvider {
     public static func trailingItems(
         for screen: Screen,
         coordinator: Coordinator,
-        isWishlistEnabled: Bool,
-        isPresentingDebugMenu: Binding<Bool>? = nil
+        isWishlistEnabled: Bool
     ) -> some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
             switch screen {
             case .tab(let tab):
                 switch tab {
                 case .home:
-                    if let isPresentingDebugMenu {
-                        debugMenuItem(isPresentingDebugMenu, size: .big)
-                    }
+                    // TODO: Remove debug menu for production releases
+                    debugMenuItem(with: coordinator, size: .big)
                     accountItem(with: coordinator, size: .big)
 
                 case .shop,
@@ -207,11 +205,11 @@ enum ToolbarItemProvider {
     }
 
     private static func debugMenuItem(
-        _ isPresentingDebugMenu: Binding<Bool>,
+        with coordinator: Coordinator,
         size: ToolBarButtonSize = .normal
     ) -> some View {
         ThemedToolbarButton(icon: .settings, accessibilityId: AccessibilityId.settingsBtn, toolBarButtonSize: size) {
-            isPresentingDebugMenu.wrappedValue = true
+            coordinator.openDebugMenu()
         }
     }
 

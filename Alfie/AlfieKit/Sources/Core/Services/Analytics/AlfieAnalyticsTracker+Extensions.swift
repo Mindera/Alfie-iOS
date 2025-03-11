@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-extension AlfieAnalyticsTracker {
+public extension AlfieAnalyticsTracker {
     // MARK: - Action Events
 
     func trackAddToBag(productID: String) {

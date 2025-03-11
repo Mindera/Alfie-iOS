@@ -23,7 +23,7 @@ final class ViewFactory: ViewFactoryProtocol {
         case .tab(let tab):
             switch tab {
             case .home:
-                HomeView(viewFactory: self, analytics: serviceProvider.analytics)
+                HomeView(viewModel: HomeViewModel(sessionService: serviceProvider.sessionService))
 
             case .shop:
                 ShopView(
@@ -57,7 +57,12 @@ final class ViewFactory: ViewFactoryProtocol {
             }
 
         case .account:
-            AccountView(viewModel: AccountViewModel(configurationService: serviceProvider.configurationService))
+            AccountView(
+                viewModel: AccountViewModel(
+                    configurationService: serviceProvider.configurationService,
+                    sessionService: serviceProvider.sessionService
+                )
+            )
 
         case .search(let transition):
             let dependencies = SearchDependencyContainer(
