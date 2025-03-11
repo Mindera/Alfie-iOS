@@ -3,6 +3,7 @@ import Foundation
 public enum ConfigurationKey: RawRepresentable, Hashable, CaseIterable {
     private enum Keys: String, CaseIterable {
         case appUpdate = "ios_app_update"
+        case storeServices = "ios_store_services"
         case wishlist = "ios_wishlist"
     }
 
@@ -14,6 +15,7 @@ public enum ConfigurationKey: RawRepresentable, Hashable, CaseIterable {
     case appUpdate
 
     // MARK: - Keys for features
+    case storeServices
     // Define the wishlist as a "sample" key, enabled by default, so that unit tests have something to test properly
     case wishlist
     // More to be added as necessary...
@@ -31,6 +33,8 @@ public enum ConfigurationKey: RawRepresentable, Hashable, CaseIterable {
         switch key {
         case .appUpdate:
             self = .appUpdate
+        case .storeServices:
+            self = .storeServices
         case .wishlist:
             self = .wishlist
         }
@@ -41,10 +45,12 @@ public enum ConfigurationKey: RawRepresentable, Hashable, CaseIterable {
     // swiftlint:disable vertical_whitespace_between_cases
     public var defaultAvailabilityValue: Bool {
         switch self {
-        case .wishlist:
-            return true
         case .appUpdate:
             return false
+        case .storeServices:
+            return false
+        case .wishlist:
+            return true
         default:
             // For now since we don't have any other actual configurable features yet, all default to "not available"
             // in the future we may want some to default to "available", so we must update this method accordingly
@@ -56,6 +62,8 @@ public enum ConfigurationKey: RawRepresentable, Hashable, CaseIterable {
         switch self {
         case .appUpdate:
             return Keys.appUpdate.rawValue
+        case .storeServices:
+            return Keys.storeServices.rawValue
         case .wishlist:
             return Keys.wishlist.rawValue
         case .custom(let key):

@@ -7,6 +7,8 @@ extension ConfigurationKey {
         switch self {
         case .appUpdate:
             L10n.FeatureToggle.AppUpdate.Option.title
+        case .storeServices:
+            L10n.FeatureToggle.StoreServices.Option.title
         case .wishlist:
             L10n.FeatureToggle.Wishlist.Option.title
         case .custom:

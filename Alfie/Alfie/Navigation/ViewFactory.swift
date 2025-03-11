@@ -26,13 +26,8 @@ final class ViewFactory: ViewFactoryProtocol {
                 HomeView(viewFactory: self, analytics: serviceProvider.analytics)
 
             case .shop:
-                ShopView(
-                    categoriesViewModel: CategoriesViewModel(
-                        navigationService: serviceProvider.navigationService,
-                        showToolbar: false
-                    ),
-                    brandsViewModel: BrandsViewModel(brandsService: serviceProvider.brandsService),
-                    servicesViewModel: WebViewModel(
+                let servicesViewModel = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
+                    ? WebViewModel(
                         webFeature: .storeServices,
                         dependencies: WebDependencyContainer(
                             deepLinkService: serviceProvider.deepLinkService,
@@ -40,6 +35,15 @@ final class ViewFactory: ViewFactoryProtocol {
                             webUrlProvider: serviceProvider.webUrlProvider
                         )
                     )
+                    : nil
+
+                ShopView(
+                    categoriesViewModel: CategoriesViewModel(
+                        navigationService: serviceProvider.navigationService,
+                        showToolbar: false
+                    ),
+                    brandsViewModel: BrandsViewModel(brandsService: serviceProvider.brandsService),
+                    servicesViewModel: servicesViewModel
                 )
 
             case .wishlist:
