@@ -15,6 +15,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: [])
     private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: [])
     public let productId: String
+    private let initialSelectedProduct: SelectedProduct?
 
     private var product: Product? {
         guard case .success(let model) = state else {
@@ -26,7 +27,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     private var selectedVariant: Product.Variant? {
         guard case .success(let model) = state else {
-            return baseProduct?.defaultVariant
+            return initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariantWithoutSize
         }
 
         return model.selectedVariant
@@ -87,16 +88,46 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
-    init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainer) {
+    var isAddToBagEnabled: Bool {
+        productHasStock
+        && hasColorSelected
+        && hasSizeSelected
+    }
+
+    private var hasColorSelected: Bool {
+        colorSelectionConfiguration.items.count > 1 ? selectedVariant?.colour != nil : true
+    }
+
+    private var hasSizeSelected: Bool {
+        sizingSelectionConfiguration.items.count > 1 ? selectedVariant?.size != nil : true
+    }
+
+    init(
+        productId: String,
+        product: Product?,
+        selectedProduct: SelectedProduct? = nil,
+        dependencies: ProductDetailsDependencyContainer
+    ) {
         self.productId = productId
+        self.initialSelectedProduct = selectedProduct
         baseProduct = product
         self.dependencies = dependencies
 
-        if let baseProduct {
+        switch (product, selectedProduct) {
+        case (.some(let product), .none):
             buildColorAndSizingSelectionConfigurations(
-                product: baseProduct,
-                selectedVariant: baseProduct.defaultVariant
+                product: product,
+                selectedVariant: product.defaultVariantWithoutSize
             )
+
+        case (_, .some(let selectedProduct)):
+            buildColorAndSizingSelectionConfigurations(
+                product: selectedProduct.product,
+                selectedVariant: selectedProduct.selectedVariant
+            )
+
+        default:
+            break
         }
     }
 
@@ -162,14 +193,16 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     func didTapAddToBag() {
         guard let selectedProduct else { return }
-        dependencies.bagService.addProduct(selectedProduct)
-        dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
+        let bagProduct = BagProduct(selectedProduct: selectedProduct)
+        dependencies.bagService.addProduct(bagProduct)
+        dependencies.analytics.trackAddToBag(productID: bagProduct.id)
     }
 
     func didTapAddToWishlist() {
         guard let selectedProduct else { return }
-        dependencies.wishlistService.addProduct(selectedProduct)
-        dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+        let wishlistProduct = WishlistProduct(selectedProduct: selectedProduct)
+        dependencies.wishlistService.addProduct(wishlistProduct)
+        dependencies.analytics.trackAddToWishlist(productID: wishlistProduct.id)
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
@@ -204,13 +237,14 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: product.defaultVariant)
-        state = .success(.init(product: product, selectedVariant: product.defaultVariant))
+        let selectedVariant = initialSelectedProduct?.selectedVariant ?? product.defaultVariantWithoutSize
+        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: selectedVariant)
+        state = .success(.init(product: product, selectedVariant: selectedVariant))
     }
 
-    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant?) {
-        buildColorSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
-        buildSizingSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
+    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {
+        buildColorSelectionConfiguration(product: product, selectedVariant: selectedVariant)
+        buildSizingSelectionConfiguration(product: product, selectedVariant: selectedVariant)
     }
 
     private func buildColorSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
@@ -283,7 +317,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         sizingSelectionConfiguration = .init(
             selectedTitle: L10n.Product.Size.title + ":",
             items: sizingSwatches,
-            selectedItem: selectedSwatch
+            selectedItem: selectedSwatch,
+            noItemSelectedTitle: L10n.Product.Size.NoSelection.title
         )
         sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
             .receive(on: DispatchQueue.main)
@@ -336,14 +371,26 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         guard let variant = product.variants.first(
-            where: { $0.colour?.id == colorSwatch.id && $0.size?.id == selectedVariant?.size?.id }
+            where: {
+                $0.colour?.id == colorSwatch.id
+                && (selectedVariant?.size?.id == nil || $0.size?.id == selectedVariant?.size?.id)
+            }
         )
         else {
             log.debug("Unexpected data inconsistency: tried to select color \(colorSwatch.id) on product \(productId) but no variant exists with that color, ignoring selection")
             return
         }
 
-        state = .success(.init(product: product, selectedVariant: variant))
+        let updatedVariant = Product.Variant(
+            sku: variant.sku,
+            size: selectedVariant?.size, // Making sure if no size selected, it will not auto select
+            colour: variant.colour,
+            attributes: variant.attributes,
+            stock: variant.stock,
+            price: variant.price
+        )
+
+        state = .success(.init(product: product, selectedVariant: updatedVariant))
     }
 
     private func didSelect(sizingSwatch: SizingSwatch) {
@@ -353,24 +400,36 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
 
         guard let variant = product.variants.first(
-            where: { $0.size?.id == sizingSwatch.id && $0.colour?.id == selectedVariant?.colour?.id }
+            where: {
+                $0.size?.id == sizingSwatch.id
+                && (selectedVariant?.colour?.id == nil || $0.colour?.id == selectedVariant?.colour?.id)
+            }
         )
         else {
             log.debug("Unexpected data inconsistency: tried to select size \(sizingSwatch.id) on product \(productId) but no variant exists with that size, ignoring selection")
             return
         }
 
-        state = .success(.init(product: product, selectedVariant: variant))
+        let updatedVariant = Product.Variant(
+            sku: variant.sku,
+            size: variant.size,
+            colour: selectedVariant?.colour, // Making sure if no color selected, it will not auto select
+            attributes: variant.attributes,
+            stock: variant.stock,
+            price: variant.price
+        )
+
+        state = .success(.init(product: product, selectedVariant: updatedVariant))
     }
 
-    private var selectedProduct: SelectionProduct? {
+    private var selectedProduct: SelectedProduct? {
         guard
             let product,
             let selectedVariant
         else {
-            return nil
+            return initialSelectedProduct
         }
 
-        return SelectionProduct(product: product, selectedVariant: selectedVariant)
+        return SelectedProduct(product: product, selectedVariant: selectedVariant)
     }
-}
+} // swiftlint:disable:this file_length
