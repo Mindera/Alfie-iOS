@@ -38,9 +38,6 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .listRowSpacing(Spacing.space200)
         .padding(.vertical, Spacing.space200)
         .withToolbar(for: .tab(.bag))
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
     }
 }
 
