@@ -1,22 +1,27 @@
+import Combine
 import Foundation
 import Models
 
 public final class MockBagService: BagServiceProtocol {
-    private var products: [SelectionProduct] = []
+    @Published private var products: [BagProduct] = []
+
+    public var productsPublisher: AnyPublisher<[BagProduct], Never> {
+        $products.eraseToAnyPublisher()
+    }
 
     public init() { }
 
-    public func addProduct(_ product: SelectionProduct) {
-        guard !products.contains(where: { $0.id == product.id }) else { return }
+    public func addProduct(_ bagProduct: BagProduct) {
+        guard !products.contains(where: { $0.id == bagProduct.id }) else { return }
 
-        products.append(product)
+        products.append(bagProduct)
     }
 
-    public func removeProduct(_ product: SelectionProduct) {
-        products = products.filter { $0.id != product.id }
+    public func removeProduct(_ bagProduct: BagProduct) {
+        products = products.filter { $0.id != bagProduct.id }
     }
 
-    public func getBagContent() -> [SelectionProduct] {
-        products
+    public func containsProduct(_ bagProduct: BagProduct) -> Bool {
+        products.contains { $0.id == bagProduct.id }
     }
 }

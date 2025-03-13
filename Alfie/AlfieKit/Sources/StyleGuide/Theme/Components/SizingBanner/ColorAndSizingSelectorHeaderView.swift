@@ -26,8 +26,10 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                     HStack(spacing: Spacing.space050) {
                         Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
                             .foregroundStyle(Colors.primary.mono400)
-                        Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                            .foregroundStyle(Colors.primary.mono900)
+                        Text.build(theme.font.paragraph.normal(
+                            configuration.selectedItem?.name ?? configuration.noItemSelectedTitle
+                        ))
+                        .foregroundStyle(Colors.primary.mono900)
 
                         if isExpandable {
                             Icon.chevronDown.image

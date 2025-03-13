@@ -14,8 +14,9 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published var style: ProductListingListStyle
     @Published var showRefine = false
     @Published var sortOption: String?
-    @Published private(set) var wishlistContent: [SelectionProduct]
+    @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
+    private var subscriptions = Set<AnyCancellable>()
 
     private enum Constants {
         static let defaultSkeletonItemsSize = 12
@@ -54,11 +55,20 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
-        wishlistContent = dependencies.wishlistService.getWishlistContent()
+
+        setupBindings()
+    }
+
+    private func setupBindings() {
+        dependencies.wishlistService.productsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] wishListProducts in
+                self?.wishlistContent = wishListProducts
+            }
+            .store(in: &subscriptions)
     }
 
     func viewDidAppear() {
-        wishlistContent = dependencies.wishlistService.getWishlistContent()
         Task {
             await loadProductsIfNeeded()
         }
@@ -79,19 +89,20 @@ final class ProductListingViewModel: ProductListingViewModelProtocol {
     func didSelect(_: Product) {}
 
     func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.contains { $0.id == product.defaultVariant.sku }
+        let wishlistProduct = WishlistProduct(product: product)
+        return dependencies.wishlistService.containsProduct(wishlistProduct)
     }
 
     func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
         if !isFavorite {
-            let selectedProduct = SelectionProduct(product: product)
-            dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            let wishlistProduct = WishlistProduct(product: product)
+            dependencies.wishlistService.addProduct(wishlistProduct)
+            dependencies.analytics.trackAddToWishlist(productID: wishlistProduct.id)
         } else {
-            dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
-            dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+            let wishlistProduct = WishlistProduct(product: product)
+            dependencies.wishlistService.removeProductVariants(wishlistProduct)
+            dependencies.analytics.trackRemoveFromWishlist(productID: wishlistProduct.id)
         }
-        wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
     func didApplyFilters() {
