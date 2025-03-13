@@ -1,25 +1,31 @@
+import Combine
 import Foundation
 import Models
 
 final class BagViewModel: BagViewModelProtocol {
-    @Published private(set) var products: [BagProduct]
-
+    @Published private(set) var products: [BagProduct] = []
+    private var subscriptions = Set<AnyCancellable>()
     private let dependencies: BagDependencyContainer
 
     init(dependencies: BagDependencyContainer) {
         self.dependencies = dependencies
-        products = dependencies.bagService.getBagContent()
+
+        setupBindigs()
+    }
+
+    private func setupBindigs() {
+        dependencies.bagService.productsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] bagProducts in
+                self?.products = bagProducts
+            }
+            .store(in: &subscriptions)
     }
 
     // MARK: - BagViewModelProtocol
 
-    func viewDidAppear() {
-        products = dependencies.bagService.getBagContent()
-    }
-
     func didSelectDelete(for selectedProduct: BagProduct) {
         dependencies.bagService.removeProduct(selectedProduct)
-        products = dependencies.bagService.getBagContent()
         dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
     }
 

@@ -1,9 +1,14 @@
+import Combine
 import Foundation
 import Models
 
 // TODO: Update with an actual implementation with storage
 public final class BagService: BagServiceProtocol {
-    private var products: [BagProduct] = []
+    @Published private var products: [BagProduct] = []
+
+    public var productsPublisher: AnyPublisher<[BagProduct], Never> {
+        $products.eraseToAnyPublisher()
+    }
 
     public init() { }
 
@@ -17,7 +22,7 @@ public final class BagService: BagServiceProtocol {
         products = products.filter { $0.id != bagProduct.id }
     }
 
-    public func getBagContent() -> [BagProduct] {
-        products
+    public func containsProduct(_ bagProduct: BagProduct) -> Bool {
+        products.contains { $0.id == bagProduct.id }
     }
 }

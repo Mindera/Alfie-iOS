@@ -16,6 +16,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: [])
     public let productId: String
     private let initialSelectedProduct: SelectedProduct?
+    private var subscriptions = Set<AnyCancellable>()
 
     private var product: Product? {
         guard case .success(let model) = state else {
@@ -102,6 +103,9 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         sizingSelectionConfiguration.items.count > 1 ? selectedVariant?.size != nil : true
     }
 
+    @Published var bagButtonTitle: String = ""
+    @Published var wishlistButtonTitle: String = ""
+
     init(
         productId: String,
         product: Product?,
@@ -129,6 +133,59 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         default:
             break
         }
+
+        setupBindings()
+    }
+
+    private func setupBindings() {
+        Publishers.CombineLatest(
+            $state,
+            dependencies.bagService.productsPublisher
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+            self?.updateBagButtonTitle()
+        }
+        .store(in: &subscriptions)
+
+        Publishers.CombineLatest(
+            $state,
+            dependencies.wishlistService.productsPublisher
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+            self?.updateWishlistButtonTitle()
+        }
+        .store(in: &subscriptions)
+    }
+
+    private func updateBagButtonTitle() {
+        guard productHasStock else {
+            bagButtonTitle = L10n.Product.OutOfStock.Button.cta
+            return
+        }
+
+        guard let selectedProduct else {
+            bagButtonTitle = L10n.Product.AddToBag.Button.cta
+            return
+        }
+
+        let bagProduct = BagProduct(selectedProduct: selectedProduct)
+        bagButtonTitle = dependencies.bagService.containsProduct(bagProduct)
+            ? L10n.Product.RemoveFromBag.Button.cta
+            : L10n.Product.AddToBag.Button.cta
+    }
+
+    private func updateWishlistButtonTitle() {
+        guard let selectedProduct else {
+            wishlistButtonTitle = L10n.Product.AddToWishlist.Button.cta
+            return
+        }
+
+        let wishlistProduct = WishlistProduct(selectedProduct: selectedProduct)
+        wishlistButtonTitle = dependencies.wishlistService.containsProduct(wishlistProduct)
+            ? L10n.Product.RemoveFromWishlist.Button.cta
+            : L10n.Product.AddToWishlist.Button.cta
     }
 
     func viewDidAppear() {
@@ -147,8 +204,8 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
              .complementaryInfo:
             return state.isLoading
         case .productDescription,
-             .addToBag, // swiftlint:disable:this indentation_width
-             .addToWishlist:
+             .bagButton, // swiftlint:disable:this indentation_width
+             .wishlistButton:
             return false
         }
     }
@@ -166,9 +223,9 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag:
+        case .bagButton:
             return state.isSuccess
-        case .addToWishlist:
+        case .wishlistButton:
             return state.isSuccess && dependencies.configurationService.isFeatureEnabled(.wishlist)
         }
         // swiftlint:enable vertical_whitespace_between_cases
@@ -194,15 +251,27 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     func didTapAddToBag() {
         guard let selectedProduct else { return }
         let bagProduct = BagProduct(selectedProduct: selectedProduct)
-        dependencies.bagService.addProduct(bagProduct)
-        dependencies.analytics.trackAddToBag(productID: bagProduct.id)
+
+        if dependencies.bagService.containsProduct(bagProduct) {
+            dependencies.bagService.removeProduct(bagProduct)
+            dependencies.analytics.trackRemoveFromBag(productID: bagProduct.id)
+        } else {
+            dependencies.bagService.addProduct(bagProduct)
+            dependencies.analytics.trackAddToBag(productID: bagProduct.id)
+        }
     }
 
     func didTapAddToWishlist() {
         guard let selectedProduct else { return }
         let wishlistProduct = WishlistProduct(selectedProduct: selectedProduct)
-        dependencies.wishlistService.addProduct(wishlistProduct)
-        dependencies.analytics.trackAddToWishlist(productID: wishlistProduct.id)
+
+        if dependencies.wishlistService.containsProduct(wishlistProduct) {
+            dependencies.wishlistService.removeProduct(wishlistProduct)
+            dependencies.analytics.trackRemoveFromWishlist(productID: wishlistProduct.id)
+        } else {
+            dependencies.wishlistService.addProduct(wishlistProduct)
+            dependencies.analytics.trackAddToWishlist(productID: wishlistProduct.id)
+        }
     }
 
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
