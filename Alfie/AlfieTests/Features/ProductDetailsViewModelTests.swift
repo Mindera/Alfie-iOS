@@ -732,7 +732,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertTrue(sut.shouldShow(section: .addToBag))
+        XCTAssertTrue(sut.shouldShow(section: .bagButton))
     }
 
     func test_reports_add_to_bag_section_as_not_visible_if_state_is_failure() {
@@ -744,13 +744,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertFalse(sut.shouldShow(section: .addToBag))
+        XCTAssertFalse(sut.shouldShow(section: .bagButton))
     }
 
     func test_reports_add_to_bag_section_as_not_visible_if_state_is_loading() {
         initViewModel()
 
-        XCTAssertFalse(sut.shouldShow(section: .addToBag))
+        XCTAssertFalse(sut.shouldShow(section: .bagButton))
     }
 
     // MARK: - Share

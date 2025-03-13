@@ -30,8 +30,8 @@ public enum ProductDetailsSection {
     case mediaCarousel
     case complementaryInfo
     case productDescription
-    case addToBag
-    case addToWishlist
+    case bagButton
+    case wishlistButton
 }
 
 // MARK: - ProductDetailsComplementaryInfoType
@@ -69,6 +69,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var hasSingleImage: Bool { get }
     var priceType: PriceType? { get }
     var isAddToBagEnabled: Bool { get }
+    var bagButtonTitle: String { get }
+    var wishlistButtonTitle: String { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool

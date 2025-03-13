@@ -194,6 +194,18 @@ public enum L10n {
         public static let cta = L10n.tr("L10n", "product.out_of_stock.button.cta")
       }
     }
+    public enum RemoveFromBag {
+      public enum Button {
+        /// Remove from bag
+        public static let cta = L10n.tr("L10n", "product.remove_from_bag.button.cta")
+      }
+    }
+    public enum RemoveFromWishlist {
+      public enum Button {
+        /// Remove from wishlist
+        public static let cta = L10n.tr("L10n", "product.remove_from_wishlist.button.cta")
+      }
+    }
     public enum Size {
       /// Size
       public static let title = L10n.tr("L10n", "product.size.title")
@@ -470,6 +482,8 @@ public extension L10n {
       case productColorTitle = "product.color.title"
       case productOneSizeTitle = "product.one_size.title"
       case productOutOfStockButtonCta = "product.out_of_stock.button.cta"
+      case productRemoveFromBagButtonCta = "product.remove_from_bag.button.cta"
+      case productRemoveFromWishlistButtonCta = "product.remove_from_wishlist.button.cta"
       case productSizeTitle = "product.size.title"
       case productSizeNoSelectionTitle = "product.size.no_selection.title"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"

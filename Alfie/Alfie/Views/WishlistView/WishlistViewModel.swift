@@ -1,27 +1,33 @@
+import Combine
 import Foundation
 import Models
 import SharedUI
 
 final class WishlistViewModel: WishlistViewModelProtocol {
-    @Published private(set) var products: [WishlistProduct]
-
+    @Published private(set) var products: [WishlistProduct] = []
+    private var subscriptions = Set<AnyCancellable>()
     private let dependencies: WishlistDependencyContainer
 
     init(dependencies: WishlistDependencyContainer) {
         self.dependencies = dependencies
-        products = dependencies.wishlistService.getWishlistContent()
+
+        setupBindigs()
+    }
+
+    private func setupBindigs() {
+        dependencies.wishlistService.productsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] wishListProducts in
+                self?.products = wishListProducts
+            }
+            .store(in: &subscriptions)
     }
 
     // MARK: - WishListViewModelProtocol
 
-    func viewDidAppear() {
-        products = dependencies.wishlistService.getWishlistContent()
-    }
-
     func didSelectDelete(for wishlistProduct: WishlistProduct) {
         dependencies.wishlistService.removeProduct(wishlistProduct)
         dependencies.analytics.trackRemoveFromWishlist(productID: wishlistProduct.product.id)
-        products = dependencies.wishlistService.getWishlistContent()
     }
 
     func productCardViewModel(for wishlistProduct: WishlistProduct) -> VerticalProductCardViewModel {
