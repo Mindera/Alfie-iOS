@@ -18,6 +18,9 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var shouldShowMediaPaginatedControl = true
     public var hasSingleImage: Bool = false
     public var priceType: PriceType? = nil
+    public var isAddToBagEnabled: Bool = true
+    public var bagButtonTitle: String = ""
+    public var wishlistButtonTitle: String = ""
 
     public init(state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading,
                 productId: String = "",

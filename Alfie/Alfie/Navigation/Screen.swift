@@ -43,6 +43,7 @@ enum HomeTabConfig: Equatable, Hashable {
 enum ThemedProductDetailsScreen: Equatable, Hashable {
     case id(_ id: String)
     case product(_ product: Product)
+    case selectedProduct(_ selectedProduct: SelectedProduct)
 }
 
 struct ProductListingScreenConfiguration: Equatable, Hashable {
