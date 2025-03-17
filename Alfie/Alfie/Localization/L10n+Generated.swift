@@ -29,6 +29,12 @@ enum L10n {
         static let title = L10n.tr("L10n", "feature_toggle.debug_configuration.option.title")
       }
     }
+    enum StoreServices {
+      enum Option {
+        /// Store Services
+        static let title = L10n.tr("L10n", "feature_toggle.store_services.option.title")
+      }
+    }
     enum Wishlist {
       enum Option {
         /// Wishlist
@@ -439,6 +445,7 @@ extension L10n {
       case featureToggleTitle = "feature_toggle.title"
       case featureToggleAppUpdateOptionTitle = "feature_toggle.app_update.option.title"
       case featureToggleDebugConfigurationOptionTitle = "feature_toggle.debug_configuration.option.title"
+      case featureToggleStoreServicesOptionTitle = "feature_toggle.store_services.option.title"
       case featureToggleWishlistOptionTitle = "feature_toggle.wishlist.option.title"
       case homeTitle = "home.title"
       case homeLoggedInSubtitle = "home.logged_in.subtitle"
