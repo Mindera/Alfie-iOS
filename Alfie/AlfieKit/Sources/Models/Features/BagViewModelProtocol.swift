@@ -1,9 +1,9 @@
 import Foundation
 
 public protocol BagViewModelProtocol: ObservableObject {
-    var products: [SelectionProduct] { get }
+    var products: [BagProduct] { get }
 
     func viewDidAppear()
-    func didSelectDelete(for product: SelectionProduct)
-    func productCardViewModel(for product: SelectionProduct) -> HorizontalProductCardViewModel
+    func didSelectDelete(for selectedProduct: BagProduct)
+    func productCardViewModel(for selectedProduct: BagProduct) -> HorizontalProductCardViewModel
 }
