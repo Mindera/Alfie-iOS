@@ -4,21 +4,9 @@ import Models
 
 // TODO: Update with an actual implementation with network APIs
 public final class SessionService: SessionServiceProtocol {
-    // MARK: SessionServiceProtocol
-
     public var isUserLoggedPublisher: AnyPublisher<Bool, Never> {
         $isUserLogged.eraseToAnyPublisher()
     }
-
-    public func loginUser() {
-        isUserLogged = true
-    }
-
-    public func logoutUser() {
-        isUserLogged = false
-    }
-
-    // MARK: Lifecycle
 
     @Published private var isUserLogged: Bool
     private let analytics: AlfieAnalyticsTracker
@@ -40,5 +28,13 @@ public final class SessionService: SessionServiceProtocol {
                 analytics.trackUser(isLoggedIn: isUserLogged)
             }
             .store(in: &subscriptions)
+    }
+
+    public func loginUser() {
+        isUserLogged = true
+    }
+
+    public func logoutUser() {
+        isUserLogged = false
     }
 }

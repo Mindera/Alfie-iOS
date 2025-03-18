@@ -15,13 +15,10 @@ protocol AccountViewModelProtocol: ObservableObject {
 // MARK: - AccountViewModel
 
 final class AccountViewModel: AccountViewModelProtocol {
-    // MARK: Properties
-
     private let configurationService: ConfigurationServiceProtocol
     private let sessionService: SessionServiceProtocol
     private var subscriptions: Set<AnyCancellable> = []
-
-    // MARK: Lifecycle
+    @Published private(set) var sectionList: [AccountSection] = []
 
     init(configurationService: ConfigurationServiceProtocol, sessionService: SessionServiceProtocol) {
         self.configurationService = configurationService
@@ -49,10 +46,6 @@ final class AccountViewModel: AccountViewModelProtocol {
         }
         .store(in: &subscriptions)
     }
-
-    // MARK: AccountViewModelProtocol
-
-    @Published private(set) var sectionList: [AccountSection] = []
 
     func didTapSignIn() {
         sessionService.loginUser()

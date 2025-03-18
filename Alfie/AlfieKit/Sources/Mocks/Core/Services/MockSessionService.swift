@@ -3,10 +3,14 @@ import Foundation
 import Models
 
 public final class MockSessionService: SessionServiceProtocol {
-    // MARK: SessionServiceProtocol
-
     public var isUserLoggedPublisher: AnyPublisher<Bool, Never> {
         $isUserLogged.eraseToAnyPublisher()
+    }
+
+    @Published private var isUserLogged: Bool
+
+    public init() {
+        self.isUserLogged = false
     }
 
     public func loginUser() {
@@ -15,14 +19,5 @@ public final class MockSessionService: SessionServiceProtocol {
 
     public func logoutUser() {
         isUserLogged = false
-    }
-
-    // MARK: Lifecycle
-
-    @Published
-    private var isUserLogged: Bool
-
-    public init() {
-        self.isUserLogged = false
     }
 }

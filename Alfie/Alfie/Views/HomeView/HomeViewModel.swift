@@ -3,27 +3,9 @@ import Models
 import SwiftUI
 
 public class HomeViewModel: HomeViewModelProtocol {
-    // MARK: Properties
-
     private let sessionService: SessionServiceProtocol
     @Published private var isUserLogged = false
     private var subscriptions: Set<AnyCancellable> = []
-
-    // MARK: Lifecycle
-
-    init(sessionService: SessionServiceProtocol) {
-        self.sessionService = sessionService
-
-        setupBindings()
-    }
-
-    private func setupBindings() {
-        sessionService.isUserLoggedPublisher
-            .assignWeakly(to: \.isUserLogged, on: self)
-            .store(in: &subscriptions)
-    }
-
-    // MARK: HomeViewModelProtocol
 
     public var homeTitle: String {
         L10n.Home.title
@@ -39,6 +21,18 @@ public class HomeViewModel: HomeViewModelProtocol {
 
     public var memberSince: Int? {
         isUserLogged ? 2024 : nil
+    }
+
+    init(sessionService: SessionServiceProtocol) {
+        self.sessionService = sessionService
+
+        setupBindings()
+    }
+
+    private func setupBindings() {
+        sessionService.isUserLoggedPublisher
+            .assignWeakly(to: \.isUserLogged, on: self)
+            .store(in: &subscriptions)
     }
 
     public func didTapSignInButton() {

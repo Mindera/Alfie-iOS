@@ -60,17 +60,9 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
 private extension View {
     func toolbarView(username: String?, memberSince: Int?) -> some View {
         if let username, let memberSince {
-            withToolbar(
-                for: .tab(
-                    .home(.loggedIn(username: username, memberSince: memberSince))
-                )
-            )
+            withToolbar(for: .tab(.home(.loggedIn(username: username, memberSince: memberSince))))
         } else {
-            withToolbar(
-                for: .tab(
-                    .home(.loggedOut)
-                )
-            )
+            withToolbar(for: .tab(.home(.loggedOut)))
         }
     }
 }
