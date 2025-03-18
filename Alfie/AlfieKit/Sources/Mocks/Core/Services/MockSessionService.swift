@@ -3,21 +3,21 @@ import Foundation
 import Models
 
 public final class MockSessionService: SessionServiceProtocol {
-    public var isUserLoggedPublisher: AnyPublisher<Bool, Never> {
-        $isUserLogged.eraseToAnyPublisher()
+    public var isUserSignInPublisher: AnyPublisher<Bool, Never> {
+        $isUserSignIn.eraseToAnyPublisher()
     }
 
-    @Published private var isUserLogged: Bool
+    @Published private var isUserSignIn: Bool
 
     public init() {
-        self.isUserLogged = false
+        self.isUserSignIn = false
     }
 
     public func loginUser() {
-        isUserLogged = true
+        isUserSignIn = true
     }
 
     public func logoutUser() {
-        isUserLogged = false
+        isUserSignIn = false
     }
 }

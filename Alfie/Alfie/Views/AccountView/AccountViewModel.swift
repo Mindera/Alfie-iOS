@@ -30,9 +30,9 @@ final class AccountViewModel: AccountViewModelProtocol {
     private func setupBindings() {
         Publishers.CombineLatest(
             configurationService.featureAvailabilityPublisher,
-            sessionService.isUserLoggedPublisher
+            sessionService.isUserSignInPublisher
         )
-        .sink { [weak self] _, isUserLogged in
+        .sink { [weak self] _, isUserSignIn in
             guard let self else { return }
             sectionList = [
                 .myDetails,
@@ -40,7 +40,7 @@ final class AccountViewModel: AccountViewModelProtocol {
                 .wallet,
                 .myAddressBook,
                 configurationService.isFeatureEnabled(.wishlist) ? .wishlist : nil,
-                isUserLogged ? .signOut : .signIn,
+                isUserSignIn ? .signOut : .signIn,
             ]
             .compactMap { $0 }
         }

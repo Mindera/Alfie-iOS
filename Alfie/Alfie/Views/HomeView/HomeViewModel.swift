@@ -4,7 +4,7 @@ import SwiftUI
 
 public class HomeViewModel: HomeViewModelProtocol {
     private let sessionService: SessionServiceProtocol
-    @Published private var isUserLogged = false
+    @Published private var isUserSignIn = false
     private var subscriptions: Set<AnyCancellable> = []
 
     public var homeTitle: String {
@@ -12,15 +12,15 @@ public class HomeViewModel: HomeViewModelProtocol {
     }
 
     public var signInButtonText: String {
-        isUserLogged ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta
+        isUserSignIn ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta
     }
 
     public var username: String? {
-        isUserLogged ? "Alfie" : nil
+        isUserSignIn ? "Alfie" : nil
     }
 
     public var memberSince: Int? {
-        isUserLogged ? 2024 : nil
+        isUserSignIn ? 2024 : nil
     }
 
     init(sessionService: SessionServiceProtocol) {
@@ -30,13 +30,13 @@ public class HomeViewModel: HomeViewModelProtocol {
     }
 
     private func setupBindings() {
-        sessionService.isUserLoggedPublisher
-            .assignWeakly(to: \.isUserLogged, on: self)
+        sessionService.isUserSignInPublisher
+            .assignWeakly(to: \.isUserSignIn, on: self)
             .store(in: &subscriptions)
     }
 
     public func didTapSignInButton() {
-        if isUserLogged {
+        if isUserSignIn {
             sessionService.logoutUser()
         } else {
             sessionService.loginUser()

@@ -4,7 +4,7 @@ import Models
 
 // TODO: Update with an actual implementation with network APIs
 public final class SessionService: SessionServiceProtocol {
-    public var isUserLoggedPublisher: AnyPublisher<Bool, Never> {
+    public var isUserSignInPublisher: AnyPublisher<Bool, Never> {
         $isUserLogged.eraseToAnyPublisher()
     }
 
@@ -21,11 +21,11 @@ public final class SessionService: SessionServiceProtocol {
 
     private func setupBindings() {
         // TODO: Analytics shouldn't be part of Services, this should have a more generic handle like an AppViewModel
-        isUserLoggedPublisher
+        isUserSignInPublisher
             .dropFirst()
-            .sink { [weak self] isUserLogged in
+            .sink { [weak self] isUserSignIn in
                 guard let self else { return }
-                analytics.trackUser(isLoggedIn: isUserLogged)
+                analytics.trackUser(isSignIn: isUserSignIn)
             }
             .store(in: &subscriptions)
     }
