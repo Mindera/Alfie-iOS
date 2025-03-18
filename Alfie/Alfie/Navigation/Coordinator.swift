@@ -6,7 +6,6 @@ import UIKit
 final class Coordinator: ObservableObject, CoordinatorProtocol {
     let navigationAdapter: NavigationAdapter<Screen>
     let isWishlistEnabled: Bool
-    @Published var isPresentingDebugMenu = false
 
     init(navigationAdapter: NavigationAdapter<Screen>, isWishlistEnabled: Bool) {
         self.navigationAdapter = navigationAdapter

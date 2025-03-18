@@ -6,17 +6,14 @@ import SwiftUI
 import Mocks
 #endif
 
-struct HomeView: View {
+struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     @EnvironmentObject var coordinador: Coordinator
-    private let viewFactory: ViewFactory?
+    @StateObject private var viewModel: ViewModel
     @State private var showSearchBar = true
-    @State private var isUserLogged = false
     @Namespace private var animation
-    private let analytics: AlfieAnalyticsTracker
 
-    init(viewFactory: ViewFactory? = nil, analytics: AlfieAnalyticsTracker) {
-        self.viewFactory = viewFactory
-        self.analytics = analytics
+    init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
@@ -49,22 +46,23 @@ struct HomeView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 75)
-            Text.build(theme.font.header.h3(L10n.Home.title))
-            ThemedButton(text: isUserLogged ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta) {
-                isUserLogged.toggle()
-                analytics.trackUser(isLoggedIn: isUserLogged)
+            Text.build(theme.font.header.h3(viewModel.homeTitle))
+            ThemedButton(text: viewModel.signInButtonText) {
+                viewModel.didTapSignInButton()
             }
             Spacer()
         }
-        .withToolbar(
-            for: .tab(
-                .home(isUserLogged ? .loggedIn(username: "Alfie", memberSince: 2024) : .loggedOut)
-            )
-        )
+        .toolbarView(username: viewModel.username, memberSince: viewModel.memberSince)
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        // TODO: Remove debug menu for production releases
-        .fullScreenCover(isPresented: $coordinador.isPresentingDebugMenu) {
-            viewFactory?.view(for: .debugMenu)
+    }
+}
+
+private extension View {
+    func toolbarView(username: String?, memberSince: Int?) -> some View {
+        if let username, let memberSince {
+            withToolbar(for: .tab(.home(.loggedIn(username: username, memberSince: memberSince))))
+        } else {
+            withToolbar(for: .tab(.home(.loggedOut)))
         }
     }
 }
@@ -77,7 +75,7 @@ private enum Constants {
 
 #if DEBUG
 #Preview {
-    HomeView(analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker())
+    HomeView(viewModel: MockHomeViewModel())
         .environmentObject(Coordinator())
 }
 #endif

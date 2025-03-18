@@ -38,11 +38,17 @@ struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         switch section {
         case .wishlist:
             coordinator.openWishlist()
+
+        case .signIn:
+            viewModel.didTapSignIn()
+
+        case .signOut:
+            viewModel.didTapSignOut()
+
         case .myAddressBook,
              .myDetails, // swiftlint:disable:this indentation_width
              .myOrders,
-             .wallet,
-             .signOut:
+             .wallet:
             // TODO: Implement in a future ticket
             break
         }
@@ -50,30 +56,33 @@ struct AccountView<ViewModel: AccountViewModelProtocol>: View {
 }
 
 private enum AccessibilityId {
+    static let addressBookSection = "address-book-section"
     static let myDetailsSection = "my-details-section"
     static let myOrdersSection = "my-orders-section"
-    static let walletSection = "wallet-section"
-    static let addressBookSection = "address-book-section"
-    static let wishlistSection = "wishlist-section"
+    static let signInSection = "sign-in-section"
     static let signOutSection = "sign-out-section"
+    static let walletSection = "wallet-section"
+    static let wishlistSection = "wishlist-section"
 }
 
 private extension AccountSection {
     var accessibilityId: String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
+        case .myAddressBook:
+            AccessibilityId.addressBookSection
         case .myDetails:
             AccessibilityId.myDetailsSection
         case .myOrders:
             AccessibilityId.myOrdersSection
-        case .wallet:
-            AccessibilityId.walletSection
-        case .myAddressBook:
-            AccessibilityId.addressBookSection
-        case .wishlist:
-            AccessibilityId.wishlistSection
+        case .signIn:
+            AccessibilityId.signInSection
         case .signOut:
             AccessibilityId.signOutSection
+        case .wallet:
+            AccessibilityId.walletSection
+        case .wishlist:
+            AccessibilityId.wishlistSection
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -81,7 +90,12 @@ private extension AccountSection {
 
 #if DEBUG
 #Preview {
-    AccountView(viewModel: AccountViewModel(configurationService: MockConfigurationService()))
-        .environmentObject(Coordinator())
+    AccountView(
+        viewModel: AccountViewModel(
+            configurationService: MockConfigurationService(),
+            sessionService: MockSessionService()
+        )
+    )
+    .environmentObject(Coordinator())
 }
 #endif
