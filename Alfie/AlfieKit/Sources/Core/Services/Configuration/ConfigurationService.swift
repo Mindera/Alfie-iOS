@@ -72,6 +72,8 @@ public final class ConfigurationService: ConfigurationServiceProtocol {
 
     // MARK: - ConfigurationServiceProtocol
 
+    public var startupCompletionDelay: CGFloat { 2 }
+
     public func isFeatureEnabled(_ key: ConfigurationKey) -> Bool {
         // Custom keys must always be read in real time, others are fetched from the publisher
         if case .custom = key {

@@ -34,9 +34,6 @@
       }
     },
     {
-      "skippedTests" : [
-        "AppStartupServiceTests\/test_currentScreen_is_eventually_landing()"
-      ],
       "target" : {
         "containerPath" : "container:Alfie.xcodeproj",
         "identifier" : "BE8B02332B616979007AE489",

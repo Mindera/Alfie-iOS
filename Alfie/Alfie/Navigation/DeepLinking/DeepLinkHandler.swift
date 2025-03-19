@@ -1,4 +1,5 @@
 import Combine
+import CombineSchedulers
 import Foundation
 import Models
 import Navigation
@@ -10,12 +11,16 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
     private var subscriptions = Set<AnyCancellable>()
     private var isReadyToHandleLinks = false
 
-    init(configurationService: ConfigurationServiceProtocol, coordinator: TabCoordinatorProtocol) {
+    init(
+        configurationService: ConfigurationServiceProtocol,
+        coordinator: TabCoordinatorProtocol,
+        scheduler: AnySchedulerOf<DispatchQueue> = .main
+    ) {
         self.configurationService = configurationService
         self.coordinator = coordinator
 
         self.coordinator.navigationAvailability
-            .receive(on: DispatchQueue.main)
+            .receive(on: scheduler)
             .sink { [weak self] isReadyToHandleLinks in
                 self?.isReadyToHandleLinks = isReadyToHandleLinks
                 if isReadyToHandleLinks {
