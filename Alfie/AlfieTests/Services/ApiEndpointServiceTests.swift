@@ -88,7 +88,7 @@ final class ApiEndpointServiceTests: XCTestCase {
 
         createSut()
         sut.updateApiEndpointAndReboot(.dev)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     // MARK: - Private
@@ -98,7 +98,7 @@ final class ApiEndpointServiceTests: XCTestCase {
             appDelegate: mockAppDelegate,
             userDefaults: userDefaults,
             userDefaultsKey: Self.userDefaultsKey,
-            rebootDelay: inverted
+            rebootDelay: .inverted
         )
     }
 }

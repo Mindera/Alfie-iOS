@@ -42,7 +42,7 @@ final class ConfigurationServiceTests: XCTestCase {
             })
             .store(in: &subscriptions)
 
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_publishes_updated_feature_availability_after_dependency_updates() {
@@ -71,7 +71,7 @@ final class ConfigurationServiceTests: XCTestCase {
             })
             .store(in: &subscriptions)
 
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_publishes_updated_feature_availability_when_providers_become_ready() {
@@ -104,7 +104,7 @@ final class ConfigurationServiceTests: XCTestCase {
             })
             .store(in: &subscriptions)
 
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     // MARK: - Test provider interaction
@@ -143,7 +143,7 @@ final class ConfigurationServiceTests: XCTestCase {
 
         createService(providers: [provider])
         _ = sut.isFeatureEnabled(customKey)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_gets_provider_data_value_when_checking_app_update() {
@@ -167,7 +167,7 @@ final class ConfigurationServiceTests: XCTestCase {
             })
             .store(in: &subscriptions)
 
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_gets_provider_bool_value_when_checking_custom_key() {
@@ -182,7 +182,7 @@ final class ConfigurationServiceTests: XCTestCase {
 
         createService(providers: [provider])
         _ = sut.isFeatureEnabled(customKey)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_calls_all_available_providers_when_checking_custom_key() {
@@ -205,7 +205,7 @@ final class ConfigurationServiceTests: XCTestCase {
 
         createService(providers: [provider1, provider2])
         _ = sut.isFeatureEnabled(customKey)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_uses_first_valid_provider_value_when_checking_custom_key() {
@@ -230,7 +230,7 @@ final class ConfigurationServiceTests: XCTestCase {
 
         createService(providers: [provider1, provider2])
         let result = sut.isFeatureEnabled(customKey)
-        wait(for: [expectation1, expectation2], timeout: inverted)
+        wait(for: [expectation1, expectation2], timeout: .inverted)
         XCTAssertTrue(result)
     }
 
@@ -343,7 +343,7 @@ final class ConfigurationServiceTests: XCTestCase {
 
         provider.isReadySubject.value = true
 
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
 
         // force and soft update available
         XCTAssertNotNil(sut.softAppUpdateInfo)
@@ -366,7 +366,7 @@ final class ConfigurationServiceTests: XCTestCase {
 
         createService(providers: [provider])
         let result = sut.isFeatureEnabled(customKey)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
         XCTAssertFalse(result)
     }
 

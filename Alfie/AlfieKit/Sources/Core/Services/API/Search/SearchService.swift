@@ -7,9 +7,12 @@ public final class SearchService: SearchServiceProtocol {
 
     // MARK: - Public
 
-    public init(bffClient: BFFClientServiceProtocol) {
+    public init(
+        bffClient: BFFClientServiceProtocol,
+        suggestionsDebounceInterval: DispatchQueue.SchedulerTimeType.Stride = .seconds(0.5)
+    ) {
         self.bffClient = bffClient
-        self.suggestionsDebounceInterval = .seconds(0.5)
+        self.suggestionsDebounceInterval = suggestionsDebounceInterval
     }
 
     public func getSuggestion(term: String) async throws -> SearchSuggestion {

@@ -31,6 +31,6 @@ final class SearchServiceTests: XCTestCase {
         Task {
             _ = try await sut.getSuggestion(term: searchTerm)
         }
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 }

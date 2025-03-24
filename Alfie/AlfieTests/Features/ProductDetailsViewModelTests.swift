@@ -97,10 +97,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(brand: .fixture(name: "Product Brand"))
         initViewModel(product: product)
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.productTitle, product.brand.name)
     }
@@ -114,10 +111,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name")
         initViewModel(product: product)
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.productName, product.name)
     }
@@ -136,10 +130,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name", defaultVariant: variant, variants: [variant])
         initViewModel(product: product)
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.productImageUrls.count, variant.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant.media[0].asImage?.url.absoluteString)
@@ -164,10 +155,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(longDescription: "Product Description")
         initViewModel(product: product)
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.productDescription, product.longDescription)
     }
@@ -221,7 +209,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_product_is_not_fetched_when_view_appears_if_already_fetched() {
@@ -244,7 +232,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             }
 
         sut.viewDidAppear()
-        wait(for: [firstExpectation, secondExpectation], timeout: `default`)
+        wait(for: [firstExpectation, secondExpectation])
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true
@@ -254,7 +242,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [thirdExpectation], timeout: inverted)
+        wait(for: [thirdExpectation], timeout: .inverted)
         cancellable.cancel()
     }
 
@@ -265,10 +253,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.state.isSuccess)
     }
@@ -280,10 +265,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .generic)
@@ -296,10 +278,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .emptyResponse)
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .notFound)
@@ -322,10 +301,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let selectedVariant = sut.state.value?.selectedVariant
         XCTAssertNotNil(selectedVariant)
@@ -346,10 +322,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_state_is_loading_when_fetching_product() {
         initViewModel()
 
-        let state = XCTAssertEmitsValue(
-            from: sut.$state,
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(state?.isLoading, true)
     }
@@ -376,10 +349,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.shouldShowLoading(for: .titleHeader)
         XCTAssertFalse(result)
@@ -399,10 +369,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.shouldShowLoading(for: .colorSelector)
         XCTAssertFalse(result)
@@ -422,10 +389,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.shouldShowLoading(for: .sizeSelector)
         XCTAssertFalse(result)
@@ -445,10 +409,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.shouldShowLoading(for: .mediaCarousel)
         XCTAssertFalse(result)
@@ -468,10 +429,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.shouldShowLoading(for: .complementaryInfo)
         XCTAssertFalse(result)
@@ -491,10 +449,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .fixture()
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.shouldShowLoading(for: .productDescription)
         XCTAssertFalse(result)
@@ -514,10 +469,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
         XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
@@ -542,10 +494,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
         XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(.black))
@@ -566,14 +515,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
         XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
+            from: sut.$state.drop(while: \.isLoading),
             afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
         )
 
@@ -599,18 +545,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        let result = XCTAssertNoEmit(
-            from: sut.$state,
-            afterTrigger: { colorSelectionConfiguration.selectedItem = nil },
-            timeout: inverted
-        )
-        XCTAssertTrue(result)
+        XCTAssertNoEmit(from: sut.$state, afterTrigger: { colorSelectionConfiguration.selectedItem = nil })
     }
 
     func test_state_is_not_updated_if_unknown_color_is_selected() {
@@ -628,18 +566,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        let result = XCTAssertNoEmit(
+        XCTAssertNoEmit(
             from: sut.$state,
-            afterTrigger: { colorSelectionConfiguration.selectedItem = ColorSwatch(id: "3", name: "Color 3", type: .color(.black)) },
-            timeout: inverted
+            afterTrigger: { colorSelectionConfiguration.selectedItem = ColorSwatch(id: "3", name: "Color 3", type: .color(.black)) }
         )
-        XCTAssertTrue(result)
     }
 
     func test_product_images_are_updated_when_color_is_selected() {
@@ -662,14 +595,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
         XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
+            from: sut.$state.drop(while: \.isLoading),
             afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
         )
 
@@ -742,10 +672,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.shouldShow(section: .mediaCarousel))
     }
@@ -761,10 +688,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertFalse(sut.shouldShow(section: .mediaCarousel))
     }
@@ -777,10 +701,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.shouldShow(section: .productDescription))
     }
@@ -793,10 +714,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertFalse(sut.shouldShow(section: .productDescription))
     }
@@ -809,10 +727,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             product
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.shouldShow(section: .addToBag))
     }
@@ -824,10 +739,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertFalse(sut.shouldShow(section: .addToBag))
     }
@@ -853,10 +765,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             throw BFFRequestError(type: .generic)
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertNil(sut.shareConfiguration)
     }
@@ -881,10 +790,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             return URL(string: urlString)
         }
 
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: { $0.isLoading }),
-            afterTrigger: { sut.viewDidAppear() }
-        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let shareConfiguration = sut.shareConfiguration
         XCTAssertNotNil(shareConfiguration)

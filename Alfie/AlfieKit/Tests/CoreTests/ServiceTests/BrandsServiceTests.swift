@@ -29,6 +29,6 @@ final class BrandsServiceTests: XCTestCase {
             _ = try await sut.getBrands()
         }
 
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 }

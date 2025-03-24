@@ -3,21 +3,50 @@ import CombineSchedulers
 import XCTest
 
 extension XCTestCase {
+//    @discardableResult
+//    public func XCTAssertEmitsValue<P: Publisher>(
+//        from publisher: P,
+//        where predicate: @escaping (P.Output) -> Bool = { _ in true },
+//        afterTrigger eventTrigger: @escaping () -> Void = {},
+//        timeout: TimeInterval = .default
+//    ) -> P.Output? where P.Failure == Never {
+//        var value: P.Output?
+//        let eventTriggered: PassthroughSubject<Void, Never> = .init()
+//        let expectation = expectation(description: #function)
+//        var cancellable: AnyCancellable?
+//
+//        cancellable = publisher
+//            .drop(untilOutputFrom: eventTriggered)
+//            .first(where: predicate)
+//            .sink { capturedValue in
+//                value = capturedValue
+//                expectation.fulfill()
+//            }
+//
+//        eventTriggered.send()
+//        eventTrigger()
+//
+//        wait(for: [expectation], timeout: timeout)
+//        cancellable?.cancel()
+//
+//        return value
+//    }
+
     @discardableResult
-    public func XCTAssertEmitsValue<T, P: Publisher>(
+    private func assertEmitsValue<P: Publisher>(
         from publisher: P,
-        filteringValues: @escaping (T) -> Bool = { _ in true },
-        afterTrigger eventTrigger: () -> Void = {},
-        timeout: TimeInterval = 2.0
-    ) -> T? where P.Output == T, P.Failure == Never {
-        var value: T?
+        predicate: @escaping (P.Output) -> Bool,
+        afterTrigger eventTrigger: @escaping () -> Void = {},
+        timeout: TimeInterval = .default
+    ) -> P.Output? where P.Failure == Never {
+        var value: P.Output?
         let eventTriggered: PassthroughSubject<Void, Never> = .init()
         let expectation = expectation(description: #function)
         var cancellable: AnyCancellable?
 
         cancellable = publisher
             .drop(untilOutputFrom: eventTriggered)
-            .first(where: filteringValues)
+            .first(where: predicate)
             .sink { capturedValue in
                 value = capturedValue
                 expectation.fulfill()
@@ -33,11 +62,53 @@ extension XCTestCase {
     }
 
     @discardableResult
-    public func XCTAssertNoEmit<T, P: Publisher>(
+    public func XCTAssertEmitsValue<P: Publisher>(
         from publisher: P,
-        afterTrigger eventTrigger: (() -> Void) = {},
-        timeout: TimeInterval
-    ) -> Bool where P.Output == T, P.Failure == Never {
+        where predicate: @escaping (P.Output) -> Bool = { _ in true },
+        afterTrigger eventTrigger: @escaping () -> Void = {},
+        timeout: TimeInterval = .default
+    ) -> P.Output? where P.Failure == Never {
+        assertEmitsValue(
+            from: publisher,
+            predicate: predicate,
+            afterTrigger: eventTrigger,
+            timeout: timeout
+        )
+    }
+
+    public func XCTAssertEmitsValueEqualTo<P: Publisher>(
+        from publisher: P,
+        expectedValue: P.Output,
+        afterTrigger eventTrigger: @escaping () -> Void = {},
+        timeout: TimeInterval = .default
+    ) where P.Failure == Never, P.Output: Equatable {
+        assertEmitsValue(
+            from: publisher,
+            predicate: { $0 == expectedValue },
+            afterTrigger: eventTrigger,
+            timeout: timeout
+        )
+    }
+
+    public func XCTAssertEmitsValueNotEqualTo<P: Publisher>(
+        from publisher: P,
+        unexpectedValue: P.Output,
+        afterTrigger eventTrigger: @escaping () -> Void = {},
+        timeout: TimeInterval = .default
+    ) where P.Failure == Never, P.Output: Equatable {
+        assertEmitsValue(
+            from: publisher,
+            predicate: { $0 != unexpectedValue },
+            afterTrigger: eventTrigger,
+            timeout: timeout
+        )
+    }
+
+    public func XCTAssertNoEmit<P: Publisher>(
+        from publisher: P,
+        afterTrigger eventTrigger: @escaping (() -> Void) = {},
+        timeout: TimeInterval = .inverted
+    ) where P.Failure == Never {
         let eventTriggered: PassthroughSubject<Void, Never> = .init()
         let expectation = expectation(description: #function)
         expectation.isInverted = true
@@ -50,16 +121,15 @@ extension XCTestCase {
         eventTriggered.send()
         eventTrigger()
 
-        let result = XCTWaiter().wait(for: [expectation], timeout: timeout)
+        wait(for: [expectation], timeout: timeout)
         cancellable?.cancel()
-        return result == .completed
     }
 
-    public func XCTAssertResult<T, P: Publisher>(
+    public func XCTAssertResult<P: Publisher>(
         from publisher: P,
-        timeout: TimeInterval = 2.0
-    ) throws -> T where P.Output == T {
-        var result: Result<T, Error>?
+        timeout: TimeInterval = .default
+    ) throws -> P.Output {
+        var result: Result<P.Output, Error>?
         let expectation = expectation(description: #function)
         var cancellable: AnyCancellable?
 
@@ -84,12 +154,12 @@ extension XCTestCase {
         return try unwrappedResult.get()
     }
 
-    public func XCTAssertNoFailure<T, U: Equatable, P: Publisher>(
+    public func XCTAssertNoFailure<P: Publisher>(
         from publisher: P,
-        timeout: TimeInterval = 2.0
-    ) where P.Output == T, P.Failure == U {
+        timeout: TimeInterval = .default
+    ) {
         let expectation = expectation(description: #function)
-        var receivedError: U?
+        var receivedError: P.Failure?
         var cancellable: AnyCancellable?
 
         cancellable = publisher
@@ -109,13 +179,13 @@ extension XCTestCase {
         XCTAssertNil(receivedError)
     }
 
-    public func XCTAssertEmitsFailure<T, U: Equatable, P: Publisher>(
+    public func XCTAssertEmitsFailure<P: Publisher>(
         from publisher: P,
-        expectedError: U? = nil,
-        timeout: TimeInterval = 2.0
-    ) where P.Output == T, P.Failure == U {
+        errorHandler: @escaping (_ error: P.Failure) -> Void,
+        timeout: TimeInterval = .default
+    ) {
         let expectation = expectation(description: #function)
-        var receivedError: U?
+        var receivedError: P.Failure?
         var cancellable: AnyCancellable?
 
         cancellable = publisher
@@ -123,9 +193,7 @@ extension XCTestCase {
                 receiveCompletion: { completion in
                     switch completion {
                     case .finished:
-                        if expectedError != nil {
-                            XCTFail("Expected failure but received completion")
-                        }
+                        XCTFail("Expected failure but received completion")
 
                     case .failure(let error):
                         receivedError = error
@@ -138,10 +206,10 @@ extension XCTestCase {
         wait(for: [expectation], timeout: timeout)
         cancellable?.cancel()
 
-        if let expectedError {
-            XCTAssertEqual(expectedError, receivedError)
+        if let receivedError {
+            errorHandler(receivedError)
         } else {
-            XCTAssertNotNil(receivedError)
+            XCTFail("Expected error but didn't receive any error")
         }
     }
 }

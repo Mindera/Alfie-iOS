@@ -54,18 +54,18 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
         XCTAssertEmitsValue(
             from: sut.$state,
             afterTrigger: {
-                sut.searchText = ""
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = ""
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -81,19 +81,19 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                mockRecentsService.recentSearches = [.text(value: "something")]
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.mockRecentsService.recentSearches = [.text(value: "something")]
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
         XCTAssertEmitsValue(
             from: sut.$state,
             afterTrigger: {
-                sut.searchText = ""
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = ""
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -106,8 +106,8 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEmitsValue(
             from: sut.$state,
             afterTrigger: {
-                sut.searchText = "aaaa"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "aaaa"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -133,20 +133,20 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                mockRecentsService.recentSearches = [.text(value: "something")]
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.mockRecentsService.recentSearches = [.text(value: "something")]
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0 == .recentSearches },
+            where: { $0 == .recentSearches },
             afterTrigger: {
-                sut.searchText = ""
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = ""
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
     }
@@ -160,20 +160,20 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                mockRecentsService.recentSearches = [.text(value: "something")]
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.mockRecentsService.recentSearches = [.text(value: "something")]
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
         XCTAssertEmitsValue(
             from: sut.$state.drop(while: { $0 == .loading }),
             afterTrigger: {
-                sut.searchText = ""
-                mockRecentsService.recentSearches = []
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = ""
+                self.mockRecentsService.recentSearches = []
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -191,7 +191,7 @@ final class SearchViewModelTests: XCTestCase {
         }
         sut.searchText = expectedRecentTerm
         sut.onSubmitSearch()
-        waitForExpectations(timeout: `default`)
+        waitForExpectations(timeout: .default)
     }
 
     func test_onSubmitTerm_emptySearch_addsToRecentsService() {
@@ -202,7 +202,7 @@ final class SearchViewModelTests: XCTestCase {
         }
         sut.searchText = ""
         sut.onSubmitSearch()
-        waitForExpectations(timeout: inverted)
+        waitForExpectations(timeout: .inverted)
     }
 
     func test_onViewDidDisappear_savesInRecentsService() {
@@ -211,7 +211,7 @@ final class SearchViewModelTests: XCTestCase {
             expectation.fulfill()
         }
         sut.viewDidDisappear()
-        waitForExpectations(timeout: `default`)
+        waitForExpectations(timeout: .default)
     }
 
     func test_show_recent_searches_when_view_appears_and_recents_are_available() {
@@ -219,7 +219,7 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            afterTrigger: { sut.viewDidAppear() }
+            afterTrigger: { self.sut.viewDidAppear() }
         )
 
         XCTAssertEqual(sut.state, .recentSearches)
@@ -229,15 +229,13 @@ final class SearchViewModelTests: XCTestCase {
         sut = .init(dependencies: testSchedulerMockDependencies)
         mockRecentsService.recentSearches = []
 
-        let result = XCTAssertNoEmit(
+        XCTAssertNoEmit(
             from: sut.$state.drop(while: { $0 == .empty }),
             afterTrigger: {
-                sut.viewDidAppear()
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
-            },
-            timeout: inverted
+                self.sut.viewDidAppear()
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
+            }
         )
-        XCTAssertTrue(result)
     }
 
     func test_does_not_show_recent_searches_when_view_appears_and_recents_service_is_not_available() {
@@ -249,15 +247,13 @@ final class SearchViewModelTests: XCTestCase {
         )
         sut = .init(dependencies: mockDependencies)
 
-        let result = XCTAssertNoEmit(
+        XCTAssertNoEmit(
             from: sut.$state.drop(while: { $0 == .empty }),
             afterTrigger: {
-                sut.viewDidAppear()
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
-            },
-            timeout: inverted
+                self.sut.viewDidAppear()
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
+            }
         )
-        XCTAssertTrue(result)
     }
 
     // MARK: - Special cases
@@ -271,10 +267,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0 == .noResults },
+            where: { $0 == .noResults },
             afterTrigger: {
-                sut.searchText = "Something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "Something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -283,8 +279,8 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEmitsValue(
             from: sut.$state,
             afterTrigger: {
-                sut.searchText = "Somethin"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "Somethin"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -306,7 +302,7 @@ final class SearchViewModelTests: XCTestCase {
 
         sut.searchText = searchText
         testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_sets_no_results_state_when_service_fails_to_get_suggestions() {
@@ -318,10 +314,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0 == .noResults },
+            where: { $0 == .noResults },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -337,10 +333,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0 == .noResults },
+            where: { $0 == .noResults },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -356,10 +352,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -382,10 +378,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -403,10 +399,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -429,10 +425,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -452,10 +448,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -478,10 +474,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -499,10 +495,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -518,7 +514,7 @@ final class SearchViewModelTests: XCTestCase {
             expectation.fulfill()
         }
         sut.onTapSearchSuggestion(suggestionTerm)
-        waitForExpectations(timeout: `default`)
+        waitForExpectations(timeout: .default)
     }
 
     func test_selecting_an_empty_suggested_term_does_not_add_to_recents_service() {
@@ -529,7 +525,7 @@ final class SearchViewModelTests: XCTestCase {
             expectation.fulfill()
         }
         sut.onTapSearchSuggestion(suggestionTerm)
-        waitForExpectations(timeout: inverted)
+        waitForExpectations(timeout: .inverted)
     }
 
     func test_suggestions_are_not_fetched_if_search_term_is_the_same_as_before() {
@@ -543,24 +539,22 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
         XCTAssertEqual(sut.state.isSuccess, true)
 
-        let result = XCTAssertNoEmit(
+        XCTAssertNoEmit(
             from: sut.$state,
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
-            },
-            timeout: inverted
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
+            }
         )
-        XCTAssertTrue(result)
     }
 
     func test_suggestions_are_fetched_if_search_term_is_the_same_as_before_but_view_reappeared_in_between() {
@@ -574,10 +568,10 @@ final class SearchViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            filteringValues: { $0.isSuccess },
+            where: { $0.isSuccess },
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 
@@ -588,8 +582,8 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEmitsValue(
             from: sut.$state,
             afterTrigger: {
-                sut.searchText = "something"
-                testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
+                self.sut.searchText = "something"
+                self.testScheduler.advance(by: self.mockSearchService.suggestionsDebounceInterval)
             }
         )
 

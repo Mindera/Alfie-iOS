@@ -72,7 +72,7 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [parser1, parser2, parser3], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
         XCTAssertFalse(result)
     }
 
@@ -96,7 +96,7 @@ final class DeepLinkServiceTests: XCTestCase {
         sut = .init(parsers: [parser1, parser2], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
 
-        wait(for: [calledExpectation, notCalledExpectation], timeout: inverted)
+        wait(for: [calledExpectation, notCalledExpectation], timeout: .inverted)
         XCTAssertFalse(result, "Expected canHandleUrl to return false because no handlers were added.")
     }
 
@@ -135,7 +135,7 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [parser], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([])
-        wait(for: [expectation], timeout: inverted)
+        wait(for: [expectation], timeout: .inverted)
     }
 
     func test_uses_fallback_link_when_opening_url_if_no_parsers_are_available() {
@@ -155,7 +155,7 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
-        wait(for: [expectation], timeout: `default`)
+        wait(for: [expectation])
     }
 
     func test_does_nothing_when_opening_url_if_no_capable_handlers_are_available() {
@@ -173,7 +173,7 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
-        wait(for: [expectation], timeout: inverted)
+        wait(for: [expectation], timeout: .inverted)
     }
 
     func test_uses_first_valid_parser_result_when_opening_url() {
@@ -210,7 +210,7 @@ final class DeepLinkServiceTests: XCTestCase {
         sut = .init(parsers: [parser1, parser2], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
 
-        wait(for: [calledExpectation, notCalledExpectation, handlerCallExpectation], timeout: inverted)
+        wait(for: [calledExpectation, notCalledExpectation, handlerCallExpectation], timeout: .inverted)
     }
 
     func test_uses_first_capable_handler_when_opening_url() {
@@ -242,6 +242,6 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [], handlers: [handler1, handler2], configuration: configuration, log: log)
         sut.openUrls([testUrl])
-        wait(for: [calledExpectation, notCalledExpectation], timeout: inverted)
+        wait(for: [calledExpectation, notCalledExpectation], timeout: .inverted)
     }
 }

@@ -62,36 +62,28 @@ final class ReachabilityServiceTests: XCTestCase {
         // Initialize `isAvailable` to `true` to ensure the event triggers, as repeated events are filtered out.
         mockMonitor.isAvailable = true
 
-        let resultUnavailable = XCTAssertEmitsValue(
+        XCTAssertEmitsValueEqualTo(
             from: sut.networkAvailability,
-            afterTrigger: { mockMonitor.isAvailable = false }
+            expectedValue: false,
+            afterTrigger: { self.mockMonitor.isAvailable = false }
         )
 
-        XCTAssertEqual(resultUnavailable, false)
-
-        let resultAvailable = XCTAssertEmitsValue(
+        XCTAssertEmitsValueEqualTo(
             from: sut.networkAvailability,
-            afterTrigger: { mockMonitor.isAvailable = true }
+            expectedValue: true,
+            afterTrigger: { self.mockMonitor.isAvailable = true }
         )
-
-        XCTAssertEqual(resultAvailable, true)
     }
 
     func test_reachabilityService_storesCurrentNetworkAvailability() {
         // Initialize `isAvailable` to `true` to ensure the event triggers, as repeated events are filtered out.
         mockMonitor.isAvailable = true
 
-        XCTAssertEmitsValue(
-            from: sut.networkAvailability,
-            afterTrigger: { mockMonitor.isAvailable = false }
-        )
+        XCTAssertEmitsValue(from: sut.networkAvailability, afterTrigger: { self.mockMonitor.isAvailable = false })
 
         XCTAssertFalse(sut.isNetworkAvailable)
 
-        XCTAssertEmitsValue(
-            from: sut.networkAvailability,
-            afterTrigger: { mockMonitor.isAvailable = true }
-        )
+        XCTAssertEmitsValue(from: sut.networkAvailability, afterTrigger: { self.mockMonitor.isAvailable = true })
 
         XCTAssertTrue(sut.isNetworkAvailable)
     }

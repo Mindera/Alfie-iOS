@@ -89,11 +89,11 @@ let package = Package(
                 .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
-                .product(name: "FirebaseRemoteConfig",package: "firebase-ios-sdk"),
-                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
-                .product(name: "NukeUI", package: "nuke"),
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
+                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseRemoteConfig",package: "firebase-ios-sdk"),
+                .product(name: "NukeUI", package: "nuke"),
             ]
         ),
         
