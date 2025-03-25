@@ -4,16 +4,16 @@ import Models
 
 // TODO: Update with an actual implementation with network APIs
 public final class SessionService: SessionServiceProtocol {
-    public var isUserSignInPublisher: AnyPublisher<Bool, Never> {
-        $isUserLogged.eraseToAnyPublisher()
+    public var isUserSignedInPublisher: AnyPublisher<Bool, Never> {
+        $isUserSignedIn.eraseToAnyPublisher()
     }
 
-    @Published private var isUserLogged: Bool
+    @Published private var isUserSignedIn: Bool
     private let analytics: AlfieAnalyticsTracker
     private var subscriptions: Set<AnyCancellable> = []
 
     public init(analytics: AlfieAnalyticsTracker) {
-        self.isUserLogged = false
+        self.isUserSignedIn = false
         self.analytics = analytics
 
         setupBindings()
@@ -21,20 +21,20 @@ public final class SessionService: SessionServiceProtocol {
 
     private func setupBindings() {
         // TODO: Analytics shouldn't be part of Services, this should have a more generic handle like an AppViewModel
-        isUserSignInPublisher
+        isUserSignedInPublisher
             .dropFirst()
-            .sink { [weak self] isUserSignIn in
+            .sink { [weak self] isUserSignedIn in
                 guard let self else { return }
-                analytics.trackUser(isSignIn: isUserSignIn)
+                analytics.trackUser(isSignedIn: isUserSignedIn)
             }
             .store(in: &subscriptions)
     }
 
-    public func loginUser() {
-        isUserLogged = true
+    public func signInUser() {
+        isUserSignedIn = true
     }
 
-    public func logoutUser() {
-        isUserLogged = false
+    public func signOutUser() {
+        isUserSignedIn = false
     }
 }

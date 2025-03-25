@@ -2,8 +2,8 @@ import Combine
 import Foundation
 
 public protocol SessionServiceProtocol {
-    var isUserSignInPublisher: AnyPublisher<Bool, Never> { get }
+    var isUserSignedInPublisher: AnyPublisher<Bool, Never> { get }
 
-    func loginUser()
-    func logoutUser()
+    func signInUser()
+    func signOutUser()
 }

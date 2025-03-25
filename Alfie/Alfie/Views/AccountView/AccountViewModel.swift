@@ -30,17 +30,17 @@ final class AccountViewModel: AccountViewModelProtocol {
     private func setupBindings() {
         Publishers.CombineLatest(
             configurationService.featureAvailabilityPublisher,
-            sessionService.isUserSignInPublisher
+            sessionService.isUserSignedInPublisher
         )
-        .sink { [weak self] _, isUserSignIn in
+        .sink { [weak self] featureAvailability, isUserSignedIn in
             guard let self else { return }
             sectionList = [
                 .myDetails,
                 .myOrders,
                 .wallet,
                 .myAddressBook,
-                configurationService.isFeatureEnabled(.wishlist) ? .wishlist : nil,
-                isUserSignIn ? .signOut : .signIn,
+                featureAvailability[.wishlist] != nil ? .wishlist : nil,
+                isUserSignedIn ? .signOut : .signIn,
             ]
             .compactMap { $0 }
         }
@@ -48,10 +48,10 @@ final class AccountViewModel: AccountViewModelProtocol {
     }
 
     func didTapSignIn() {
-        sessionService.loginUser()
+        sessionService.signInUser()
     }
 
     func didTapSignOut() {
-        sessionService.logoutUser()
+        sessionService.signOutUser()
     }
 }

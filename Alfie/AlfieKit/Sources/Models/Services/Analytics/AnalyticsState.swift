@@ -1,19 +1,19 @@
 public enum AnalyticsState {
-    case isUserSignIn(Bool)
+    case isUserSignedIn(Bool)
 }
 
 public extension AnalyticsState {
     var eventName: String {
         switch self {
-        case .isUserSignIn:
-            return "user_sign_in"
+        case .isUserSignedIn:
+            return "user_signed_in"
         }
     }
 
     var eventValue: String {
         switch self {
-        case .isUserSignIn(let isSignIn):
-            return isSignIn.description
+        case .isUserSignedIn(let isSignedIn):
+            return isSignedIn.description
         }
     }
 }
