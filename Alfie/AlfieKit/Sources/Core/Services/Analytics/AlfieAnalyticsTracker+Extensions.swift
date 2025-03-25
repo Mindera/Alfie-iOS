@@ -1,7 +1,7 @@
 import Foundation
 import Models
 
-extension AlfieAnalyticsTracker {
+public extension AlfieAnalyticsTracker {
     // MARK: - Action Events
 
     func trackAddToBag(productID: String) {
@@ -26,7 +26,7 @@ extension AlfieAnalyticsTracker {
 
     // MARK: - State Events
 
-    func trackUser(isLoggedIn: Bool) {
-        track(.state(.isUserLoggedIn(isLoggedIn), nil))
+    func trackUser(isSignedIn: Bool) {
+        track(.state(.isUserSignedIn(isSignedIn), nil))
     }
 }

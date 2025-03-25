@@ -27,6 +27,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
     let bagService: BagServiceProtocol
     let wishlistService: WishlistServiceProtocol
+    let sessionService: SessionServiceProtocol
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
@@ -93,6 +94,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
         bagService = BagService()
         wishlistService = WishlistService()
+        sessionService = SessionService(analytics: analytics)
     }
 
     public func resetServices() {

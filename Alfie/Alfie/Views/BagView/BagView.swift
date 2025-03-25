@@ -39,11 +39,10 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 #if DEBUG
 #Preview {
     BagView(
-        viewModel: BagViewModel(
-            dependencies: BagDependencyContainer(
-                bagService: MockBagService(),
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
-            )
+        viewModel: MockBagViewModel(
+            products: [
+                .init(product: Product.fixture())
+            ]
         )
     )
     .environmentObject(Coordinator())
