@@ -229,7 +229,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             selectedItem: selectedSwatch
         )
         colorSelectionSubscription = colorSelectionConfiguration.$selectedItem
-            .receive(on: DispatchQueue.main)
+            .receive(on: dependencies.scheduler)
             .dropFirst()
             .sink { [weak self] colorSwatch in
                 guard let self, let colorSwatch else {
@@ -286,7 +286,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             selectedItem: selectedSwatch
         )
         sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
-            .receive(on: DispatchQueue.main)
+            .receive(on: dependencies.scheduler)
             .dropFirst()
             .sink { [weak self] sizingSwatch in
                 guard let self, let sizingSwatch else {

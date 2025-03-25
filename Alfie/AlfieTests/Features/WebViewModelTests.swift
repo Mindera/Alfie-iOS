@@ -44,9 +44,7 @@ final class WebViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.url)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.url?.absoluteString, url?.absoluteString)
     }
@@ -60,9 +58,7 @@ final class WebViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.url)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.url?.absoluteString, url?.absoluteString)
     }
@@ -71,9 +67,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")
         sut = .init(url: url, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.webViewStarted()
-        })
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.webViewStarted() })
 
         XCTAssertEqual(sut.state.isLoading, true)
     }
@@ -82,9 +76,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")
         sut = .init(url: url, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.webViewFailed()
-        })
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.webViewFailed() })
 
         XCTAssertEqual(sut.state.failure, .generic)
     }
@@ -93,9 +85,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")
         sut = .init(url: url, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.webViewFinished()
-        })
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.webViewFinished() })
 
         XCTAssertEqual(sut.state.isLoaded, true)
     }
@@ -106,9 +96,7 @@ final class WebViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.url)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.tryAgain()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.tryAgain() })
 
         XCTAssertEqual(sut.state.url?.absoluteString, url?.absoluteString)
     }
@@ -117,9 +105,7 @@ final class WebViewModelTests: XCTestCase {
         let url = URL(string: "http://some.url")!
         sut = .init(url: url, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         let result = sut.canOpenUrl(url)
         XCTAssertFalse(result)
@@ -129,9 +115,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         let testUrl = URL(string: "http://other.url")!
         mockDeepLinkService.onDeepLinkTypeCalled = { url in
@@ -147,9 +131,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         let testUrl = URL(string: "http://other.url")!
         mockDeepLinkService.onDeepLinkTypeCalled = { url in
@@ -165,9 +147,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         let testUrl = URL(string: "http://other.url")!
         mockDeepLinkService.onDeepLinkTypeCalled = { url in
@@ -183,9 +163,7 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")
         sut = .init(url: baseUrl, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         let testUrl = URL(string: "http://other.url")!
         mockDeepLinkService.onDeepLinkTypeCalled = { url in
@@ -209,7 +187,7 @@ final class WebViewModelTests: XCTestCase {
 
         sut = .init(url: url, dependencies: mockDependencies)
         sut.handleLink(withUrl: url)
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_forwards_links_to_deeplink_handler_on_url_change() {
@@ -229,7 +207,7 @@ final class WebViewModelTests: XCTestCase {
 
         sut = .init(url: baseUrl, dependencies: mockDependencies)
         sut.webViewUrlChanged(testUrl)
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_navigates_back_if_url_change_is_handled_by_external_handler() {
@@ -238,10 +216,8 @@ final class WebViewModelTests: XCTestCase {
             XCTAssertEqual(url.absoluteString, baseUrl.absoluteString)
             return true
         })
-     
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.webViewUrlChanged(baseUrl)
-        })
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.webViewUrlChanged(baseUrl) })
 
         XCTAssertEqual(sut.shouldNavigateBack, true)
     }
@@ -255,9 +231,7 @@ final class WebViewModelTests: XCTestCase {
 
         sut = .init(url: baseUrl, dependencies: mockDependencies, urlChangeHandler: nil)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.webViewUrlChanged(testUrl)
-        })
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.webViewUrlChanged(testUrl) })
 
         XCTAssertEqual(sut.shouldNavigateBack, true)
     }
@@ -266,10 +240,8 @@ final class WebViewModelTests: XCTestCase {
         let baseUrl = URL(string: "http://some.url")!
         sut = .init(url: baseUrl, dependencies: mockDependencies, urlChangeHandler: nil)
 
-        let result = assertNoEvent(from: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.webViewUrlChanged(baseUrl)
-        })
-        XCTAssertTrue(result)
+        XCTAssertNoEmit(from: sut.$state, afterTrigger: { self.sut.webViewUrlChanged(baseUrl) })
+        XCTAssertTrue(sut.state.isEmpty)
     }
 
     func test_does_not_report_should_navigate_back_withou_valid_navigation_operation() {
@@ -281,9 +253,7 @@ final class WebViewModelTests: XCTestCase {
     func test_state_is_no_url_error_after_update_if_no_url_or_feature_is_supplied_on_init() {
         sut = .init(url: nil, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.failure, .noUrl)
     }
@@ -291,9 +261,7 @@ final class WebViewModelTests: XCTestCase {
     func test_state_is_loading_when_updating_url_for_feature() {
         sut = .init(webFeature: .addresses, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.isLoading, true)
     }
@@ -304,9 +272,7 @@ final class WebViewModelTests: XCTestCase {
         }
         sut = .init(webFeature: .addresses, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.didFail }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.failure, .noUrl)
     }
@@ -318,9 +284,7 @@ final class WebViewModelTests: XCTestCase {
         }
         sut = .init(webFeature: .addresses, dependencies: mockDependencies)
 
-       captureEvent(fromPublisher: sut.$state.drop(while: { !$0.isReady }).eraseToAnyPublisher(), afterTrigger: {
-            sut.viewDidAppear()
-        })
+        XCTAssertEmitsValue(from: sut.$state, where: \.isReady, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.isReady, true)
     }

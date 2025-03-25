@@ -32,25 +32,20 @@ final class RecentsServiceTests: XCTestCase {
     }
 
     func test_AddRecentSearchPublisher_ReturnsCorrectRecentSearches() {
-        waitUntil(
-            publisher: sut.recentSearchesPublisher,
-            emitsValue: [.recentSearch2, .recentSearch1],
-            asyncOperation: {
-                self.sut.add(.recentSearch1)
-                self.sut.add(.recentSearch2)
-            },
-            timeout: defaultTimeout)
+        sut.add(.recentSearch1)
+
+        let recents = XCTAssertEmitsValue(
+            from: sut.recentSearchesPublisher,
+            afterTrigger: { self.sut.add(.recentSearch2) }
+        )
+
+        XCTAssertEqual(recents, [.recentSearch2, .recentSearch1])
     }
 
     func test_AddRecentSearchPublisher_Repeated_DoesNOTAddToRecentSearches() {
-        waitUntil(
-            publisher: sut.recentSearchesPublisher,
-            emitsValue: [.recentSearch1],
-            asyncOperation: {
-                self.sut.add(.recentSearch1)
-                self.sut.add(.recentSearch1)
-            },
-            timeout: defaultTimeout)
+        sut.add(.recentSearch1)
+
+        XCTAssertNoEmit(from: sut.recentSearchesPublisher, afterTrigger: { self.sut.add(.recentSearch1) })
     }
 
     func test_AddRecentSearch_WithMaxItems_RemovesLastItem() {
@@ -82,7 +77,7 @@ final class RecentsServiceTests: XCTestCase {
 
         sut.add(.recentSearch1)
 
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: .default)
     }
 
     func test_RemoveRecentSearch_WhenEmptyRecentSearches_ReturnsEmptySearches() {
@@ -110,7 +105,7 @@ final class RecentsServiceTests: XCTestCase {
         sut.add(.recentSearch1)
         sut.remove(.recentSearch1)
 
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: .default)
     }
 
     func test_RemoveAll_ReturnsEmptySearches() {
@@ -134,7 +129,7 @@ final class RecentsServiceTests: XCTestCase {
         sut.add(.recentSearch2)
         sut.removeAll()
 
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: .default)
     }
 
     func test_Save_AddRecentSearch_SavesInStorage() {
@@ -148,7 +143,7 @@ final class RecentsServiceTests: XCTestCase {
                                  storageKey: "")
         sut.add(.recentSearch1)
         sut.save()
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: .default)
     }
 
     func test_Save_RemoveRecentSearch_SavesInStorage() {
@@ -163,7 +158,7 @@ final class RecentsServiceTests: XCTestCase {
         sut.add(.recentSearch1)
         sut.remove(.recentSearch1)
         sut.save()
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: .default)
     }
 
     func test_Save_WithOutOperation_DoesNOTSaveInStorage() {
@@ -177,6 +172,6 @@ final class RecentsServiceTests: XCTestCase {
                                  storageService: mockStorageService,
                                  storageKey: "")
         sut.save()
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: .inverted)
     }
 }

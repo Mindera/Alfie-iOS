@@ -11,7 +11,7 @@ final class AppStartupServiceTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockConfigurationService = .init()
-        sut = .init(AppStartupService(configurationService: mockConfigurationService))
+        sut = .init(AppStartupService(configurationService: mockConfigurationService, startupCompletionDelay: 0))
     }
 
     override func tearDownWithError() throws {
@@ -25,19 +25,23 @@ final class AppStartupServiceTests: XCTestCase {
     }
 
     func test_forceAppUpdateAvailable_currentScreen_appUpdateScreen() {
-        waitUntil(publisher: sut.$currentScreen.eraseToAnyPublisher(), emitsValue: .forceUpdate, asyncOperation: {
-            self.mockConfigurationService.isForceAppUpdateAvailable = true
-        }, timeout: defaultTimeout)
+        XCTAssertEmitsValueEqualTo(
+            from: sut.$currentScreen,
+            expectedValue: .forceUpdate,
+            afterTrigger: { self.mockConfigurationService.isForceAppUpdateAvailable = true }
+        )
     }
 
     func test_softAppUpdateAvailable_redirects_to_landing() {
-        waitUntil(publisher: sut.$currentScreen.eraseToAnyPublisher(), emitsValue: .landing, asyncOperation: {
-            self.mockConfigurationService.isSoftAppUpdateAvailable = true
-        }, timeout: defaultTimeout)
+        XCTAssertEmitsValueEqualTo(
+            from: sut.$currentScreen,
+            expectedValue: .landing,
+            afterTrigger: { self.mockConfigurationService.isSoftAppUpdateAvailable = true }
+        )
     }
 
     func test_currentScreen_is_eventually_landing() throws {
         //TODO: for now landing is set with a timer, this should be updated when we have actual loading of resources
-        waitUntil(publisher: sut.$currentScreen.eraseToAnyPublisher(), emitsValue: .landing, timeout: 3)
+        XCTAssertEmitsValueEqualTo(from: sut.$currentScreen.drop(while: { $0 == .loading }), expectedValue: .landing)
     }
 }

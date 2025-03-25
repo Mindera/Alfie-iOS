@@ -35,11 +35,11 @@ final class AppStartupService: AppStartupServiceProtocol {
         appStartupScreenCondition.first { $0.value }?.key ?? .error
     }
 
-    init(configurationService: ConfigurationServiceProtocol) {
+    init(configurationService: ConfigurationServiceProtocol, startupCompletionDelay: CGFloat = 2) {
         self.configurationService = configurationService
         setupSubscriptions()
         WebViewPreload.preloadWebView()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)
         }
     }

@@ -88,15 +88,17 @@ final class ApiEndpointServiceTests: XCTestCase {
 
         createSut()
         sut.updateApiEndpointAndReboot(.dev)
-        wait(for: [expectation], timeout: defaultTimeout)
+        wait(for: [expectation], timeout: .default)
     }
 
     // MARK: - Private
 
     private func createSut() {
-        sut = .init(appDelegate: mockAppDelegate,
-                    userDefaults: userDefaults,
-                    userDefaultsKey: Self.userDefaultsKey,
-                    rebootDelay: 0.5)
+        sut = .init(
+            appDelegate: mockAppDelegate,
+            userDefaults: userDefaults,
+            userDefaultsKey: Self.userDefaultsKey,
+            rebootDelay: .inverted
+        )
     }
 }

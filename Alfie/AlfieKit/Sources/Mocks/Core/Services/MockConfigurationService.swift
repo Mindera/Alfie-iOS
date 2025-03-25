@@ -1,4 +1,5 @@
 import Combine
+import Foundation
 import Models
 
 public class MockConfigurationService: ConfigurationServiceProtocol {

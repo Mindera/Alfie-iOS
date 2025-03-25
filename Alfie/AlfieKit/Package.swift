@@ -52,8 +52,8 @@ let package = Package(
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.22.1"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
         .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
-        .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9")
-        
+        .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9"),
+        .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.0.3"),
     ],
     targets: [
         .target(
@@ -89,10 +89,11 @@ let package = Package(
                 .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
-                .product(name: "FirebaseRemoteConfig",package: "firebase-ios-sdk"),
-                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
-                .product(name: "NukeUI", package: "nuke")
+                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseRemoteConfig",package: "firebase-ios-sdk"),
+                .product(name: "NukeUI", package: "nuke"),
             ]
         ),
         
@@ -136,7 +137,10 @@ let package = Package(
         ),
         
         .target(
-            name: "TestUtils"
+            name: "TestUtils",
+            dependencies: [
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
+            ]
         ),
         
         .testTarget(

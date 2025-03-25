@@ -1,7 +1,9 @@
+import CombineSchedulers
 import Foundation
 import Models
 
 final class ProductDetailsDependencyContainer {
+    let scheduler: AnySchedulerOf<DispatchQueue>
     let productService: ProductServiceProtocol
     let webUrlProvider: WebURLProviderProtocol
     let bagService: BagServiceProtocol
@@ -10,6 +12,7 @@ final class ProductDetailsDependencyContainer {
     let analytics: AlfieAnalyticsTracker
 
     init(
+        scheduler: AnySchedulerOf<DispatchQueue> = .main,
         productService: ProductServiceProtocol,
         webUrlProvider: WebURLProviderProtocol,
         bagService: BagServiceProtocol,
@@ -17,6 +20,7 @@ final class ProductDetailsDependencyContainer {
         configurationService: ConfigurationServiceProtocol,
         analytics: AlfieAnalyticsTracker
     ) {
+        self.scheduler = scheduler
         self.productService = productService
         self.webUrlProvider = webUrlProvider
         self.bagService = bagService
