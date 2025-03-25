@@ -97,7 +97,7 @@ final class CategoriesViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_ignores_load_items_when_view_appears_but_items_were_loaded_before() {
@@ -117,7 +117,7 @@ final class CategoriesViewModelTests: XCTestCase {
             }
 
         sut.viewDidAppear()
-        wait(for: [firstExpectation, secondExpectation])
+        wait(for: [firstExpectation, secondExpectation], timeout: .default)
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true

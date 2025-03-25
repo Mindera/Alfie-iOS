@@ -302,7 +302,7 @@ final class SearchViewModelTests: XCTestCase {
 
         sut.searchText = searchText
         testScheduler.advance(by: mockSearchService.suggestionsDebounceInterval)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_sets_no_results_state_when_service_fails_to_get_suggestions() {

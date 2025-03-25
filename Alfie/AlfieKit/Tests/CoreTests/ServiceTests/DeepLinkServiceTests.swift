@@ -72,7 +72,7 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [parser1, parser2, parser3], configuration: configuration, log: log)
         let result = sut.canHandleUrl(testUrl)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
         XCTAssertFalse(result)
     }
 
@@ -155,7 +155,7 @@ final class DeepLinkServiceTests: XCTestCase {
 
         sut = .init(parsers: [], handlers: [handler], configuration: configuration, log: log)
         sut.openUrls([testUrl])
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_does_nothing_when_opening_url_if_no_capable_handlers_are_available() {

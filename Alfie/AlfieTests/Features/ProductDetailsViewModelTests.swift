@@ -209,7 +209,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_product_is_not_fetched_when_view_appears_if_already_fetched() {
@@ -232,7 +232,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             }
 
         sut.viewDidAppear()
-        wait(for: [firstExpectation, secondExpectation])
+        wait(for: [firstExpectation, secondExpectation], timeout: .default)
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true

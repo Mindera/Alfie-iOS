@@ -32,7 +32,7 @@ final class ProductServiceTests: XCTestCase {
         Task {
             _ = try await sut.getProduct(id: "id")
         }
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_get_product_throws_no_product_error_when_not_found() {
@@ -49,7 +49,7 @@ final class ProductServiceTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_get_product_throws_generic_error_when_bff_service_fails() {
@@ -66,7 +66,7 @@ final class ProductServiceTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     // MARK: - Get Product List
@@ -92,6 +92,6 @@ final class ProductServiceTests: XCTestCase {
                 sort: "sort"
             )
         }
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 }

@@ -113,7 +113,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_web_links_when_ready() {
@@ -127,7 +127,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_shop_links_without_route() {
@@ -141,7 +141,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_shop_links_with_shop_route() {
@@ -155,7 +155,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_shop_links_with_brands_route() {
@@ -169,7 +169,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_shop_links_with_services_route() {
@@ -183,7 +183,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_product_listing_links() {
@@ -208,7 +208,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_product_details_links() {
@@ -223,7 +223,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_bag_links() {
@@ -237,7 +237,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_wishlist_links() {
@@ -251,7 +251,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_account_links() {
@@ -265,7 +265,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         sut.handleDeepLink(deepLink)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_handles_but_ignores_unknown_links() {
@@ -306,7 +306,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         mockCoordinator.isReadyForNavigation = true
-        wait(for: [calledExpectation])
+        wait(for: [calledExpectation], timeout: .default)
     }
 
     func test_postpones_handling_web_links_until_it_becomes_ready() {
@@ -332,7 +332,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         mockCoordinator.isReadyForNavigation = true
-        wait(for: [calledExpectation])
+        wait(for: [calledExpectation], timeout: .default)
     }
 
     func test_can_handle_multiple_pending_links() {
@@ -358,7 +358,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
 
         mockCoordinator.isReadyForNavigation = true
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     // MARK: - Private

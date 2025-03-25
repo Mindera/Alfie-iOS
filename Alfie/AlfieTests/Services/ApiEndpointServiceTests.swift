@@ -88,7 +88,7 @@ final class ApiEndpointServiceTests: XCTestCase {
 
         createSut()
         sut.updateApiEndpointAndReboot(.dev)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     // MARK: - Private

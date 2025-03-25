@@ -187,7 +187,7 @@ final class WebViewModelTests: XCTestCase {
 
         sut = .init(url: url, dependencies: mockDependencies)
         sut.handleLink(withUrl: url)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_forwards_links_to_deeplink_handler_on_url_change() {
@@ -207,7 +207,7 @@ final class WebViewModelTests: XCTestCase {
 
         sut = .init(url: baseUrl, dependencies: mockDependencies)
         sut.webViewUrlChanged(testUrl)
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_navigates_back_if_url_change_is_handled_by_external_handler() {

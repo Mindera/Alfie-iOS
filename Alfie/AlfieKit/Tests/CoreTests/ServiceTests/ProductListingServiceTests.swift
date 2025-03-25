@@ -42,7 +42,7 @@ final class ProductListingServiceTests: XCTestCase {
             _ = try await sut.paged(categoryId: "category id", query: "query", sort: "sort")
         }
 
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
     }
 
     func test_pagination_info_provides_next_page() {
@@ -56,7 +56,7 @@ final class ProductListingServiceTests: XCTestCase {
             _ = try await sut.paged()
         }
 
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
         XCTAssertTrue(sut.hasNext())
     }
 
@@ -71,7 +71,7 @@ final class ProductListingServiceTests: XCTestCase {
             _ = try await sut.paged()
         }
 
-        wait(for: [expectation])
+        wait(for: [expectation], timeout: .default)
         XCTAssertEqual(sut.totalOfRecords, 101)
     }
 
@@ -86,7 +86,7 @@ final class ProductListingServiceTests: XCTestCase {
             _ = try await sut.paged()
         }
 
-        wait(for: [calledExpectation])
+        wait(for: [calledExpectation], timeout: .default)
 
         XCTAssertFalse(sut.hasNext())
 
@@ -134,6 +134,6 @@ final class ProductListingServiceTests: XCTestCase {
             XCTAssertEqual(sort, "sort 3")
         }
 
-        await fulfillment(of: [expectation])
+        await fulfillment(of: [expectation], timeout: .default)
     }
 }
