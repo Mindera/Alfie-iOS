@@ -36,11 +36,11 @@ jobs:
       
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
-          git secret reveal -p "$GPG_PASSPHRASE"
+          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Run Tests
         run: bundle exec fastlane ios test --env default
@@ -83,11 +83,11 @@ jobs:
       
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
-          git secret reveal -p "$GPG_PASSPHRASE"
+          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Build and deploy release to TestFlight
         run: bundle exec fastlane ios release --env default

@@ -121,6 +121,8 @@ fastlane/test_output
 **/*/xcuserdata
 Alfie/Packages/**/*/.swiftpm
 Alfie/Packages/*/Package.resolved
+
+# Secret management
 .gitsecret/keys/random_seed
 !*.secret
 Alfie/Alfie/Configuration/Debug/GoogleService-Info.plist

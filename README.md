@@ -275,12 +275,21 @@ If a file containing sensitive data must be stored in the repository, it should 
 
 A **GPG key pair** was created for the team, along with a separate pair for CI/CD. To decrypt secrets, you need to:
 
-1. Install `gnupg` (if not already installed).
+1. Install project dependencies (`git-secret`and `gnupg` which is a `git-secret` dependency, if not already installed).
 2. Import both the **public and private keys** locally.
 
 **Steps**
 
 ```
+# Install project dependencies
+brew bundle install
+
+# Check if `git-secret` is installed
+git-secret --version
+
+# If it's not installed, install it
+brew install git-secret
+
 # Check if `gnupg` is installed
 gpg --version
 
