@@ -6,6 +6,7 @@ import Mocks
 #endif
 
 struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
+    @EnvironmentObject var coordinador: Coordinator
     @StateObject private var viewModel: ViewModel
 
     init(viewModel: ViewModel) {
@@ -22,11 +23,18 @@ struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                 spacing: Spacing.space200
             ) {
                 ForEach(viewModel.products) { product in
-                    VerticalProductCard(
-                        viewModel: viewModel.productCardViewModel(for: product)
-                    ) { _, type in
-                        handleUserAction(forProduct: product, actionType: type)
-                    }
+                    Button(
+                        action: { coordinador.openDetails(for: product) },
+                        label: {
+                            VerticalProductCard(
+                                viewModel: viewModel.productCardViewModel(for: product)
+                            ) { _, type in
+                                handleUserAction(forProduct: product, actionType: type)
+                            }
+                        }
+                    )
+                    .buttonStyle(.plain)
+                    .listRowInsets(EdgeInsets())
                 }
             }
             .padding(.horizontal, Spacing.space200)
@@ -41,13 +49,13 @@ struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
 // MARK: - Private Methods
 
 private extension WishlistView {
-    func handleUserAction(forProduct product: SelectionProduct, actionType: VerticalProductCard.ProductUserActionType) {
+    func handleUserAction(forProduct product: WishlistProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
         case .remove:
             viewModel.didSelectDelete(for: product)
         case .addToBag:
-            viewModel.didTapAddToBag(for: product)
+            coordinador.openDetails(for: product)
         case .wishlist:
             return
         }

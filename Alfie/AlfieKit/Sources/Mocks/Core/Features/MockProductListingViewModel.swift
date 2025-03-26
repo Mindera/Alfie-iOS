@@ -6,7 +6,7 @@ import SwiftUI
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
     public var products: [Product]
-    public var wishlistContent: [SelectionProduct]
+    public var wishlistContent: [SelectedProduct]
     public var title: String = "Title"
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
@@ -17,7 +17,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
         products: [Product] = [],
-        wishlistContent: [SelectionProduct] = []
+        wishlistContent: [SelectedProduct] = []
     ) {
         self.state = state
         self.products = products
