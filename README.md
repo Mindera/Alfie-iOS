@@ -8,7 +8,8 @@ https://github.com/user-attachments/assets/864d30fa-7172-4900-94d0-ee928192b793
 
 ## Prerequisites
 
-This project uses a mock GraphQL API for fetching data. Mock server can be run locally as decribed in documentation: https://github.com/Mindera/Alfie-Mocks
+1. This project contains sensitive files encrypted using `git-secret`. Before starting, you must decrypt them locally to build the project. To do this, request the **public and private GPG keys** from the team. See [this section](#sensitive-files) for details.
+2. This project uses a mock GraphQL API for fetching data. Mock server can be run locally as described in documentation: https://github.com/Mindera/Alfie-Mocks
 
 ## Architecture 
 
@@ -261,6 +262,79 @@ enum Screen: ScreenProtocol {
 
 - Theme default values and rules should be defined in the `StyleGuide` package, including *colors*, *spacings*, *shapes*, *fonts*, *icons*, *animation types* etc.
 - Reusable components such as *buttons*, *loaders*, among others, should also be implemented in this package.
+
+---
+
+## Sensitive files 
+
+When working in a shared repository, security measures are essential—especially if the repository is public.
+
+If a file containing sensitive data must be stored in the repository, it should be **encrypted**. For this, we use `git-secret`, specification can be found [here](https://sobolevn.me/git-secret/#using-gpg).
+
+### Setting Up the Project
+
+A **GPG key pair** was created for the team, along with a separate pair for CI/CD. To decrypt secrets, you need to:
+
+1. Install project dependencies (`git-secret`and `gnupg` which is a `git-secret` dependency, if not already installed).
+2. Import both the **public and private keys** locally.
+
+**Steps**
+
+```
+# Install project dependencies
+brew bundle install
+
+# Check if `git-secret` is installed
+git-secret --version
+
+# If it's not installed, install it
+brew install git-secret
+
+# Check if `gnupg` is installed
+gpg --version
+
+# If it's not installed, install it
+brew install gnupg
+
+# Import the public key (needed to encrypt secrets)
+gpg --import public-key-path.gpg
+
+# Import the private key (needed to decrypt secrets)
+gpg --import private-key-path.gpg
+
+# Reveal the decrypted files
+git secret reveal
+```
+
+After running `git secret reveal`, it may seem like nothing happened. However, the decrypted files are **automatically ignored** by Git via `.gitignore`, preventing accidental commits.
+
+To verify which files were revealed, check `.gitsecret/paths/mapping.cfg`. This file maintains a list of all encrypted files.
+
+### Adding a New Sensitive File
+
+To encrypt a new file:
+
+1. Add it **only locally** (do not commit it yet).
+2. Register it as a secret.
+3. Encrypt it.
+
+```
+# Ensure the file is only local and not tracked by Git
+git rm --cached path-to-the-sensitive-file
+
+# Add it to the secrets list
+git secret add path-to-the-sensitive-file
+
+# Encrypt the sensitive file
+git secret hide
+```
+
+Before committing, confirm that:
+
+1. The **unencrypted file is not committed**.
+2. Only the `.secret` version of the file is included in the commit.
+
+By default, `git-secret` adds the sensitive file to `.gitignore`, but **double-check** to ensure it's excluded from commits.
 
 ---
 

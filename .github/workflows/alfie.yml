@@ -33,6 +33,14 @@ jobs:
         run: |
             gem install bundler --no-document
             bundle install --jobs 4 --retry 3
+      
+      - name: Import GPG Private Key and Decrypt sensitive files
+        env:
+          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+        run: |
+          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Run Tests
         run: bundle exec fastlane ios test --env default
@@ -72,6 +80,14 @@ jobs:
           echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+      
+      - name: Import GPG Private Key and Decrypt sensitive files
+        env:
+          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+        run: |
+          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Build and deploy release to TestFlight
         run: bundle exec fastlane ios release --env default

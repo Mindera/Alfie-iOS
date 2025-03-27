@@ -61,7 +61,10 @@
 		615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Configuration/Debug/GoogleService-Info.plist",
+				"Configuration/Debug/GoogleService-Info.plist.secret",
 				"Configuration/Release/GoogleService-Info.plist",
+				"Configuration/Release/GoogleService-Info.plist.secret",
 				Info.plist,
 			);
 			target = BE8B02232B616976007AE489 /* Alfie */;
