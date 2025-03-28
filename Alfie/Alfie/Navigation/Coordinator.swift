@@ -142,6 +142,10 @@ final class Coordinator: ObservableObject, CoordinatorProtocol {
         navigationAdapter.push(.productDetails(.product(product)))
     }
 
+    public func openDetails(for selectedProduct: SelectedProduct) {
+        navigationAdapter.push(.productDetails(.selectedProduct(selectedProduct)))
+    }
+
     // MARK: - Brands
 
     public func openBrands() {
