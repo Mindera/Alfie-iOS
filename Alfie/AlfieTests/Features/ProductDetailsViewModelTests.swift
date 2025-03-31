@@ -816,8 +816,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
     // MARK: - Helper methods
 
     private func initViewModel(productId: String = "", product: Product? = nil) {
-        sut = .init(productId: productId,
-                    product: product,
-                    dependencies: mockDependencies)
+        let productKind: ThemedProductDetailsScreen
+        if let product = product {
+            productKind = .product(product)
+        } else {
+            productKind = .id(productId)
+        }
+
+        sut = .init(productKind: productKind, dependencies: mockDependencies)
     }
 }
