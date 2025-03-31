@@ -90,31 +90,36 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     init(
-        productId: String,
-        product: Product?,
-        selectedProduct: SelectedProduct? = nil,
+        productKind: ThemedProductDetailsScreen,
         dependencies: ProductDetailsDependencyContainer
     ) {
-        self.productId = productId
-        self.initialSelectedProduct = selectedProduct
-        baseProduct = product
         self.dependencies = dependencies
 
-        switch (product, selectedProduct) {
-        case (.some(let product), .none):
+        switch productKind {
+        case .id(let productId):
+            self.productId = productId
+            self.initialSelectedProduct = nil
+            self.baseProduct = nil
+
+        case .product(let product):
+            self.productId = product.id
+            self.initialSelectedProduct = nil
+            self.baseProduct = product
+
             buildColorAndSizingSelectionConfigurations(
                 product: product,
                 selectedVariant: product.defaultVariant
             )
 
-        case (_, .some(let selectedProduct)):
+        case .selectedProduct(let selectedProduct):
+            self.productId = selectedProduct.product.id
+            self.initialSelectedProduct = selectedProduct
+            baseProduct = selectedProduct.product
+
             buildColorAndSizingSelectionConfigurations(
                 product: selectedProduct.product,
                 selectedVariant: selectedProduct.selectedVariant
             )
-
-        default:
-            break
         }
     }
 

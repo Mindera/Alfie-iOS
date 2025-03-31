@@ -136,56 +136,19 @@ final class ViewFactory: ViewFactoryProtocol {
                 .withToolbar(for: .wishlist)
 
         case .productDetails(let type):
-            switch type {
-            case .id(let id):
-                ProductDetailsView(
-                    viewModel: ProductDetailsViewModel(
-                        productId: id,
-                        product: nil,
-                        dependencies: ProductDetailsDependencyContainer(
-                            productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider,
-                            bagService: serviceProvider.bagService,
-                            wishlistService: serviceProvider.wishlistService,
-                            configurationService: serviceProvider.configurationService,
-                            analytics: serviceProvider.analytics
-                        )
+            ProductDetailsView(
+                viewModel: ProductDetailsViewModel(
+                    productKind: type,
+                    dependencies: ProductDetailsDependencyContainer(
+                        productService: serviceProvider.productService,
+                        webUrlProvider: serviceProvider.webUrlProvider,
+                        bagService: serviceProvider.bagService,
+                        wishlistService: serviceProvider.wishlistService,
+                        configurationService: serviceProvider.configurationService,
+                        analytics: serviceProvider.analytics
                     )
                 )
-
-            case .product(let product):
-                ProductDetailsView(
-                    viewModel: ProductDetailsViewModel(
-                        productId: product.id,
-                        product: product,
-                        dependencies: ProductDetailsDependencyContainer(
-                            productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider,
-                            bagService: serviceProvider.bagService,
-                            wishlistService: serviceProvider.wishlistService,
-                            configurationService: serviceProvider.configurationService,
-                            analytics: serviceProvider.analytics
-                        )
-                    )
-                )
-
-            case .selectedProduct(let selectedProduct):
-                ProductDetailsView(
-                    viewModel: ProductDetailsViewModel(
-                        productId: selectedProduct.product.id,
-                        product: selectedProduct.product,
-                        selectedProduct: selectedProduct,
-                        dependencies: ProductDetailsDependencyContainer(
-                            productService: serviceProvider.productService,
-                            webUrlProvider: serviceProvider.webUrlProvider,
-                            bagService: serviceProvider.bagService,
-                            wishlistService: serviceProvider.wishlistService,
-                            configurationService: serviceProvider.configurationService,
-                            analytics: serviceProvider.analytics
-                        )
-                    )
-                )
-            }
+            )
 
         case .recentSearches:
             let viewModel = RecentSearchesViewModel(recentsService: serviceProvider.recentsService)
