@@ -15,6 +15,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: [])
     private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: [])
     public let productId: String
+    private let initialSelectedProduct: SelectedProduct?
 
     private var product: Product? {
         guard case .success(let model) = state else {
@@ -26,7 +27,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     private var selectedVariant: Product.Variant? {
         guard case .success(let model) = state else {
-            return baseProduct?.defaultVariant
+            return initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariant
         }
 
         return model.selectedVariant
@@ -87,15 +88,36 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
-    init(productId: String, product: Product?, dependencies: ProductDetailsDependencyContainer) {
-        self.productId = productId
-        baseProduct = product
+    init(
+        productKind: ThemedProductDetailsScreen,
+        dependencies: ProductDetailsDependencyContainer
+    ) {
         self.dependencies = dependencies
 
-        if let baseProduct {
+        switch productKind {
+        case .id(let productId):
+            self.productId = productId
+            self.initialSelectedProduct = nil
+            self.baseProduct = nil
+
+        case .product(let product):
+            self.productId = product.id
+            self.initialSelectedProduct = nil
+            self.baseProduct = product
+
             buildColorAndSizingSelectionConfigurations(
-                product: baseProduct,
-                selectedVariant: baseProduct.defaultVariant
+                product: product,
+                selectedVariant: product.defaultVariant
+            )
+
+        case .selectedProduct(let selectedProduct):
+            self.productId = selectedProduct.product.id
+            self.initialSelectedProduct = selectedProduct
+            baseProduct = selectedProduct.product
+
+            buildColorAndSizingSelectionConfigurations(
+                product: selectedProduct.product,
+                selectedVariant: selectedProduct.selectedVariant
             )
         }
     }
@@ -204,13 +226,14 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: product.defaultVariant)
-        state = .success(.init(product: product, selectedVariant: product.defaultVariant))
+        let selectedVariant = initialSelectedProduct?.selectedVariant ?? product.defaultVariant
+        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: selectedVariant)
+        state = .success(.init(product: product, selectedVariant: selectedVariant))
     }
 
-    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant?) {
-        buildColorSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
-        buildSizingSelectionConfiguration(product: product, selectedVariant: product.defaultVariant)
+    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {
+        buildColorSelectionConfiguration(product: product, selectedVariant: selectedVariant)
+        buildSizingSelectionConfiguration(product: product, selectedVariant: selectedVariant)
     }
 
     private func buildColorSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
@@ -363,14 +386,14 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         state = .success(.init(product: product, selectedVariant: variant))
     }
 
-    private var selectedProduct: SelectionProduct? {
+    private var selectedProduct: SelectedProduct? {
         guard
             let product,
             let selectedVariant
         else {
-            return nil
+            return initialSelectedProduct
         }
 
-        return SelectionProduct(product: product, selectedVariant: selectedVariant)
+        return SelectedProduct(product: product, selectedVariant: selectedVariant)
     }
 }
