@@ -44,10 +44,12 @@ extension SelectedProduct: Identifiable, Equatable, Hashable {
     }
 
     public static func == (lhs: SelectedProduct, rhs: SelectedProduct) -> Bool {
-        lhs.id == rhs.id
+        lhs.product == rhs.product
+        && lhs.selectedVariant == rhs.selectedVariant
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(product)
+        hasher.combine(selectedVariant)
     }
 }
