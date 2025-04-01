@@ -218,7 +218,7 @@ final class DeepLinkHandlerTests: XCTestCase {
 
         let expectation = expectation(description: "wait for coordinator call")
         mockCoordinator.onNavigateToScreenCalled = { screen in
-            XCTAssertEqual(screen, .productDetails(.id(productId)))
+            XCTAssertEqual(screen, .productDetails(configuration: .id(productId)))
             expectation.fulfill()
         }
 

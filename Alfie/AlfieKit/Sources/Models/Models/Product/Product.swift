@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Product: Identifiable, Equatable, Hashable {
+public struct Product: Identifiable, Hashable {
     /// Unique ID for the product and its variants.
     public let id: String
     /// App refers to products (including variants) as style numbers, so this is the product's unique identifier.
@@ -54,20 +54,12 @@ public struct Product: Identifiable, Equatable, Hashable {
         self.variants = variants
         self.colours = colours
     }
-
-    public static func == (lhs: Product, rhs: Product) -> Bool {
-        lhs.styleNumber == rhs.styleNumber
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(styleNumber)
-    }
 }
 
 // MARK: - Product Properties Type
 
 extension Product {
-    public struct Variant: Equatable, Hashable {
+    public struct Variant: Hashable {
         /// A unique identifier for the variant.
         public let sku: String
         /// Size, if applicable.
@@ -101,27 +93,9 @@ extension Product {
             self.stock = stock
             self.price = price
         }
-
-        public static func == (lhs: Product.Variant, rhs: Product.Variant) -> Bool {
-            lhs.sku == rhs.sku
-            && lhs.size == rhs.size
-            && lhs.colour == rhs.colour
-            && lhs.attributes == rhs.attributes
-            && lhs.stock == rhs.stock
-            && lhs.price == rhs.price
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(sku)
-            hasher.combine(size)
-            hasher.combine(colour)
-            hasher.combine(attributes)
-            hasher.combine(stock)
-            hasher.combine(price)
-        }
     }
 
-    public struct Colour: Equatable, Hashable {
+    public struct Colour: Hashable {
         /// Unique ID for the colour.
         public let id: String
         /// Image resolver for the colour swatch.
@@ -137,23 +111,9 @@ extension Product {
             self.name = name
             self.media = media
         }
-
-        public static func == (lhs: Colour, rhs: Colour) -> Bool {
-            lhs.id == rhs.id
-            && lhs.swatch == rhs.swatch
-            && lhs.name == rhs.name
-            && lhs.media == rhs.media
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(swatch)
-            hasher.combine(name)
-            hasher.combine(media)
-        }
     }
 
-    public struct ProductSize: Equatable, Hashable {
+    public struct ProductSize: Hashable {
         /// Unique size ID.
         public let id: String
         /// The size value (e.g. XS).
@@ -178,25 +138,9 @@ extension Product {
             self.description = description
             self.sizeGuide = sizeGuide
         }
-
-        public static func == (lhs: ProductSize, rhs: ProductSize) -> Bool {
-            lhs.id == rhs.id
-            && lhs.value == rhs.value
-            && lhs.scale == rhs.scale
-            && lhs.description == rhs.description
-            && lhs.sizeGuide == rhs.sizeGuide
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(value)
-            hasher.combine(scale)
-            hasher.combine(description)
-            hasher.combine(sizeGuide)
-        }
     }
 
-    public struct SizeGuide: Equatable, Hashable {
+    public struct SizeGuide: Hashable {
         /// Unique size guide ID.
         public let id: String
         /// The name of the size guide (e.g. Men's shoes size guide).
@@ -211,20 +155,6 @@ extension Product {
             self.name = name
             self.description = description
             self.sizes = sizes
-        }
-
-        public static func == (lhs: SizeGuide, rhs: SizeGuide) -> Bool {
-            lhs.id == rhs.id
-            && lhs.name == rhs.name
-            && lhs.description == rhs.description
-            && lhs.sizes == rhs.sizes
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-            hasher.combine(name)
-            hasher.combine(description)
-            hasher.combine(sizes)
         }
     }
 }

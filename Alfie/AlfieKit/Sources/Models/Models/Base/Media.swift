@@ -1,6 +1,6 @@
 import Foundation
 
-public enum Media: Equatable, Hashable {
+public enum Media: Hashable {
     case image(MediaImage)
     case video(MediaVideo)
 

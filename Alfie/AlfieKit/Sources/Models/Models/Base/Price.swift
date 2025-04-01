@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Price: Equatable, Hashable {
+public struct Price: Hashable {
     /// The current price.
     public let amount: Money
     /// If discounted, the previous price.
@@ -10,19 +10,9 @@ public struct Price: Equatable, Hashable {
         self.amount = amount
         self.was = was
     }
-
-    public static func == (lhs: Price, rhs: Price) -> Bool {
-        lhs.amount == rhs.amount
-        && lhs.was == rhs.was
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(amount)
-        hasher.combine(was)
-    }
 }
 
-public struct PriceRange {
+public struct PriceRange: Hashable {
     /// The lowest price.
     public let low: Money
     /// The highest price if not a 'from' range.
@@ -34,7 +24,7 @@ public struct PriceRange {
     }
 }
 
-public struct Money: Equatable, Hashable {
+public struct Money: Hashable {
     /// The 3-letter currency code  e.g. AUD.
     public let currencyCode: String
     /// The amount in minor units (e.g. for $1.23 this will be 123).
@@ -46,17 +36,5 @@ public struct Money: Equatable, Hashable {
         self.currencyCode = currencyCode
         self.amount = amount
         self.amountFormatted = amountFormatted
-    }
-
-    public static func == (lhs: Money, rhs: Money) -> Bool {
-        lhs.currencyCode == rhs.currencyCode
-        && lhs.amount == rhs.amount
-        && lhs.amountFormatted == rhs.amountFormatted
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(currencyCode)
-        hasher.combine(amount)
-        hasher.combine(amountFormatted)
     }
 }

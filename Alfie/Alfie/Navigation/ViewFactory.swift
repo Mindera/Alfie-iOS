@@ -124,10 +124,10 @@ final class ViewFactory: ViewFactoryProtocol {
         case .wishlist:
             wishlistView
 
-        case .productDetails(let type):
+        case .productDetails(let configuration):
             ProductDetailsView(
                 viewModel: ProductDetailsViewModel(
-                    productKind: type,
+                    productDetailsConfiguration: configuration,
                     dependencies: ProductDetailsDependencyContainer(
                         productService: serviceProvider.productService,
                         webUrlProvider: serviceProvider.webUrlProvider,
