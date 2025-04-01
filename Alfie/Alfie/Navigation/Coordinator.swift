@@ -135,15 +135,15 @@ final class Coordinator: ObservableObject, CoordinatorProtocol {
     // MARK: - Product Details
 
     public func openDetails(for productId: String) {
-        navigationAdapter.push(.productDetails(.id(productId)))
+        navigationAdapter.push(.productDetails(configuration: .id(productId)))
     }
 
     public func openDetails(for product: Product) {
-        navigationAdapter.push(.productDetails(.product(product)))
+        navigationAdapter.push(.productDetails(configuration: .product(product)))
     }
 
     public func openDetails(for selectedProduct: SelectedProduct) {
-        navigationAdapter.push(.productDetails(.selectedProduct(selectedProduct)))
+        navigationAdapter.push(.productDetails(configuration: .selectedProduct(selectedProduct)))
     }
 
     // MARK: - Brands

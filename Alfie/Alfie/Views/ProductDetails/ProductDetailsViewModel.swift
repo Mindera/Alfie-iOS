@@ -90,12 +90,12 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     init(
-        productKind: ThemedProductDetailsScreen,
+        productDetailsConfiguration: ProductDetailsConfiguration,
         dependencies: ProductDetailsDependencyContainer
     ) {
         self.dependencies = dependencies
 
-        switch productKind {
+        switch productDetailsConfiguration {
         case .id(let productId):
             self.productId = productId
             self.initialSelectedProduct = nil

@@ -135,10 +135,10 @@ final class ViewFactory: ViewFactoryProtocol {
             wishlistView
                 .withToolbar(for: .wishlist)
 
-        case .productDetails(let type):
+        case .productDetails(let configuration):
             ProductDetailsView(
                 viewModel: ProductDetailsViewModel(
-                    productKind: type,
+                    productDetailsConfiguration: configuration,
                     dependencies: ProductDetailsDependencyContainer(
                         productService: serviceProvider.productService,
                         webUrlProvider: serviceProvider.webUrlProvider,

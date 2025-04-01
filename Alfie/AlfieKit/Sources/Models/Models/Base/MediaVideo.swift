@@ -1,6 +1,6 @@
 import Foundation
 
-public struct MediaVideo: Equatable, Hashable {
+public struct MediaVideo: Hashable {
     /// A description of the contents of the video for accessibility purposes.
     public let alt: String?
     /// The media content type.
@@ -16,23 +16,9 @@ public struct MediaVideo: Equatable, Hashable {
         self.previewImage = previewImage
         self.sources = sources
     }
-
-    public static func == (lhs: MediaVideo, rhs: MediaVideo) -> Bool {
-        lhs.alt == rhs.alt
-        && lhs.mediaContentType == rhs.mediaContentType
-        && lhs.previewImage == rhs.previewImage
-        && lhs.sources == rhs.sources
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(alt)
-        hasher.combine(mediaContentType)
-        hasher.combine(previewImage)
-        hasher.combine(sources)
-    }
 }
 
-public struct VideoSource: Equatable, Hashable {
+public struct VideoSource: Hashable {
     public enum VideoFormat: String {
         case mp4 = "MP4"
         case webm = "WEBM"
@@ -50,17 +36,5 @@ public struct VideoSource: Equatable, Hashable {
         self.format = format
         self.mimeType = mimeType
         self.url = url
-    }
-
-    public static func == (lhs: VideoSource, rhs: VideoSource) -> Bool {
-        lhs.format == rhs.format
-        && lhs.mimeType == rhs.mimeType
-        && lhs.url == rhs.url
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(format)
-        hasher.combine(mimeType)
-        hasher.combine(url)
     }
 }

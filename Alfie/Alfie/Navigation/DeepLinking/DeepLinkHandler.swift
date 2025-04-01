@@ -92,7 +92,7 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
 
         case .productDetail(let productId, _, _, _):
             // TODO: currently the API does not support fetching a product by the StyleNumber (that is parsed from the URL), just by ProductID, so all requests will return "not found"
-            target = Screen.productDetails(.id(productId))
+            target = Screen.productDetails(configuration: .id(productId))
 
         case .webView(let url):
             target = Screen.webView(url: url, title: "")
