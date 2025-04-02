@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BA04B1A22B977EE700713298 /* SnapshotTesting */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
 		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
@@ -94,7 +93,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C54DA59D2D369927005142F4 /* TestUtils in Frameworks */,
-				BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,7 +206,6 @@
 			);
 			name = AlfieTests;
 			packageProductDependencies = (
-				BA04B1A22B977EE700713298 /* SnapshotTesting */,
 				C54DA59C2D369927005142F4 /* TestUtils */,
 			);
 			productName = AlfieTests;
@@ -269,7 +266,6 @@
 			);
 			mainGroup = BE8B021B2B616976007AE489;
 			packageReferences = (
-				BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */,
 			);
 			productRefGroup = BE8B02252B616976007AE489 /* Products */;
@@ -725,14 +721,6 @@
 				version = "6.6.4-mindera";
 			};
 		};
-		BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
-			requirement = {
-				kind = exactVersion;
-				version = 1.15.4;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -740,11 +728,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */;
 			productName = "plugin:SwiftGenPlugin";
-		};
-		BA04B1A22B977EE700713298 /* SnapshotTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
-			productName = SnapshotTesting;
 		};
 		C54DA2B62D368A40005142F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
