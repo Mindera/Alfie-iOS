@@ -1,5 +1,6 @@
+@testable import Core
+import SharedUI
 import XCTest
-@testable import Alfie
 
 final class LocalizationTests: XCTestCase {
     let localizations = Bundle.main.localizations
@@ -100,8 +101,16 @@ final class LocalizationTests: XCTestCase {
     }
 
     private func assertResource(key: String, table: String, locale: Locale) {
-        let resource = LocalizedStringResource(String.LocalizationValue(stringLiteral: key), table: table, locale: locale)
-        if String(localized: resource) == key {
+        guard
+            let path = Bundle.sharedUI.path(forResource: locale.identifier, ofType: "lproj"),
+            let bundle = Bundle(path: path)
+        else {
+            XCTFail("Missing bundle for locale: \(locale.identifier)")
+            return
+        }
+
+        let resource = bundle.localizedString(forKey: key, value: nil, table: table)
+        if resource == key {
             XCTFail("\(table).\(key) not found for \(locale.identifier)")
         }
     }

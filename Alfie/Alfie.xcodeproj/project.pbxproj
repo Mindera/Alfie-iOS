@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 49AFF8542B6D0AA600695C66 /* OrderedCollections */; };
-		BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BA04B1A22B977EE700713298 /* SnapshotTesting */; };
-		C511F4DC2D3EAA2100AB69D6 /* AlicerceLogging in Frameworks */ = {isa = PBXBuildFile; productRef = C511F4DB2D3EAA2100AB69D6 /* AlicerceLogging */; };
+		99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */ = {isa = PBXBuildFile; productRef = 99DCD9262D9FD27400A3CA25 /* SharedUI */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
 		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
@@ -61,6 +59,7 @@
 		615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Alfie.xctestplan,
 				"Configuration/Debug/GoogleService-Info.plist",
 				"Configuration/Debug/GoogleService-Info.plist.secret",
 				"Configuration/Release/GoogleService-Info.plist",
@@ -85,8 +84,7 @@
 				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
 				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
 				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
-				C511F4DC2D3EAA2100AB69D6 /* AlicerceLogging in Frameworks */,
-				49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */,
+				99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */,
 				C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */,
 				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
 				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
@@ -98,7 +96,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C54DA59D2D369927005142F4 /* TestUtils in Frameworks */,
-				BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,7 +164,7 @@
 			buildConfigurationList = BE8B02482B616979007AE489 /* Build configuration list for PBXNativeTarget "Alfie" */;
 			buildPhases = (
 				BA63F6C52B73917F00089233 /* SwiftLint */,
-				99FEDCE32D4250BA003B195A /* SwiftGen - Copy generated files from OUTPUT_DIR to Project */,
+				99DCD9282D9FD72600A3CA25 /* Run SwiftGen */,
 				BAEFC2602B84AA5600387C00 /* Copy GoogleService-Info.plist */,
 				BE8B02202B616976007AE489 /* Sources */,
 				BE8B02212B616976007AE489 /* Frameworks */,
@@ -176,21 +173,19 @@
 			buildRules = (
 			);
 			dependencies = (
-				99AB92DA2D492FB800FD005D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				615E07D42CF6369900065ECF /* Alfie */,
 			);
 			name = Alfie;
 			packageProductDependencies = (
-				49AFF8542B6D0AA600695C66 /* OrderedCollections */,
 				C54DA2B62D368A40005142F4 /* Core */,
 				C54DA2B82D368A40005142F4 /* Mocks */,
 				C54DA2BA2D368A40005142F4 /* Models */,
 				C54DA2BC2D368A40005142F4 /* Navigation */,
 				C54DA2BE2D368A40005142F4 /* StyleGuide */,
 				C5DCD5F32D3EA0B70005AAB0 /* Common */,
-				C511F4DB2D3EAA2100AB69D6 /* AlicerceLogging */,
+				99DCD9262D9FD27400A3CA25 /* SharedUI */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -214,7 +209,6 @@
 			);
 			name = AlfieTests;
 			packageProductDependencies = (
-				BA04B1A22B977EE700713298 /* SnapshotTesting */,
 				C54DA59C2D369927005142F4 /* TestUtils */,
 			);
 			productName = AlfieTests;
@@ -275,10 +269,6 @@
 			);
 			mainGroup = BE8B021B2B616976007AE489;
 			packageReferences = (
-				49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */,
-				BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */,
-				99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */,
 			);
 			productRefGroup = BE8B02252B616976007AE489 /* Products */;
 			projectDirPath = "";
@@ -316,7 +306,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		99FEDCE32D4250BA003B195A /* SwiftGen - Copy generated files from OUTPUT_DIR to Project */ = {
+		99DCD9282D9FD72600A3CA25 /* Run SwiftGen */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -324,19 +314,19 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Alfie/Localization/L10n.xcstrings",
-				"$(SRCROOT)/codegen-strings-structured.stencil",
-				"$(SRCROOT)/swiftgen.yml",
+				"$(SRCROOT)/AlfieKit/Sources/SharedUI/Resources/Localization/L10n.xcstrings",
+				"$(SRCROOT)/AlfieKit/Sources/SharedUI/Resources/Templates/codegen-strings-structured.stencil",
+				"$(SRCROOT)/AlfieKit/Sources/SharedUI/swiftgen.yml",
 			);
-			name = "SwiftGen - Copy generated files from OUTPUT_DIR to Project";
+			name = "Run SwiftGen";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Alfie/Localization/L10n+Generated.swift",
+				"$(SRCROOT)/Checksums/swiftgen_checksum.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\n# Due to limitations in SwiftGenPlugin, we opted for an approach where the `Strings+Generated.swift`  \n# file is generated in the `DerivedData` folder with all content commented out. \n# This script copies and renames the file to `L10n+Generated.swift` in the project directory, \n# while also removing unnecessary comment markers (`/*` and `*/`).\n\n# Define destination directory\nDESTINATION_DIR=\"${SRCROOT}/Alfie/Localization\"\n\n# Check if running in CI/CD (GitHub Actions + Fastlane in Release mode)\nif [ \"$CI\" == \"true\" ] && [ -n \"$SPM_CLONED_DEPENDENCIES_PATH\" ] && [ \"$CONFIGURATION\" == \"Release\" ]; then\n    # If running in CI/CD, use the SPM_CLONED_DEPENDENCIES_PATH\n    SWIFTGEN_OUTPUT_DIR=\"${SPM_CLONED_DEPENDENCIES_PATH}/plugins/Alfie.output/Alfie/SwiftGenPlugin\"\nelse\n    # Otherwise, use DerivedData path\n    DERIVED_DATA_PATH=\"${BUILD_DIR%Build/*}\"\n    SWIFTGEN_OUTPUT_DIR=\"${DERIVED_DATA_PATH}/SourcePackages/plugins/Alfie.output/Alfie/SwiftGenPlugin\"\nfi\n\necho \"Derived Data Path: ${DERIVED_DATA_PATH}\"\necho \"SwiftGen Output Dir: ${SWIFTGEN_OUTPUT_DIR}\"\n\n# Define the original file name\nORIGINAL_FILE_NAME=\"Strings+Generated.swift\"\n\n# Define the new file name\nNEW_FILE_NAME=\"L10n+Generated.swift\"\n\n# Check if the source file exists\nif [ -f \"${SWIFTGEN_OUTPUT_DIR}/${ORIGINAL_FILE_NAME}\" ]; then\n    echo \"Copying ${ORIGINAL_FILE_NAME} to ${DESTINATION_DIR}/${NEW_FILE_NAME}\"\n\n    # Copy the file to the destination with the new name\n    cp \"${SWIFTGEN_OUTPUT_DIR}/${ORIGINAL_FILE_NAME}\" \"${DESTINATION_DIR}/${NEW_FILE_NAME}\"\n    \n    # Uncomment the new file by removing /* and */ markers\n    echo \"Uncommenting the new file: ${DESTINATION_DIR}/${NEW_FILE_NAME}\"\n    sed -i '' 's/\\/\\*//g' \"${DESTINATION_DIR}/${NEW_FILE_NAME}\"  # Remove /* markers\n    sed -i '' 's/\\*\\///g' \"${DESTINATION_DIR}/${NEW_FILE_NAME}\"  # Remove */ markers\nelse\n    echo \"Error: Generated file not found in ${SWIFTGEN_OUTPUT_DIR}\"\n    exit 1\nfi\n";
+			shellScript = "set -euo pipefail\n\nCOMBINED_CONTENT=\"\"\nfor (( i=0; i<SCRIPT_INPUT_FILE_COUNT; i++ )); do\n  FILE_VAR=\"SCRIPT_INPUT_FILE_$i\"\n  FILE=\"$(eval echo \\$$FILE_VAR)\"\n  if [[ -f \"$FILE\" ]]; then\n    echo \"📄 Adding $FILE to checksum input...\"\n    COMBINED_CONTENT+=$(cat \"$FILE\")\n  else\n    echo \"❌ Missing input file: $FILE\"\n    exit 1\n  fi\ndone\n\nCHECKSUM=$(printf \"%s\" \"$COMBINED_CONTENT\" | shasum | cut -d ' ' -f 1)\nCHECKSUM_FILE=\"${SCRIPT_OUTPUT_FILE_0}\"\necho \"$CHECKSUM\" > \"$CHECKSUM_FILE\"\n\ncd \"${SRCROOT}/AlfieKit\"\nexport SDKROOT=$(xcrun --sdk macosx --show-sdk-path)\nexport DEVELOPER_DIR=$(xcode-select -p)\nswift package --allow-writing-to-package-directory generate-code-for-resources --config \"Sources/SharedUI/swiftgen.yml\"\n";
 		};
 		BA63F6C52B73917F00089233 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -404,10 +394,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		99AB92DA2D492FB800FD005D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 99AB92D92D492FB800FD005D /* SwiftGenPlugin */;
-		};
 		BE8B02362B616979007AE489 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BE8B02232B616976007AE489 /* Alfie */;
@@ -724,61 +710,10 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.0.6;
-			};
-		};
-		99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Mindera/SwiftGenPlugin";
-			requirement = {
-				kind = exactVersion;
-				version = "6.6.4-mindera";
-			};
-		};
-		BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
-			requirement = {
-				kind = exactVersion;
-				version = 1.15.4;
-			};
-		};
-		C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Mindera/Alicerce.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.18.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		49AFF8542B6D0AA600695C66 /* OrderedCollections */ = {
+		99DCD9262D9FD27400A3CA25 /* SharedUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = OrderedCollections;
-		};
-		99AB92D92D492FB800FD005D /* SwiftGenPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */;
-			productName = "plugin:SwiftGenPlugin";
-		};
-		BA04B1A22B977EE700713298 /* SnapshotTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
-			productName = SnapshotTesting;
-		};
-		C511F4DB2D3EAA2100AB69D6 /* AlicerceLogging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C511F4DA2D3EAA2100AB69D6 /* XCRemoteSwiftPackageReference "Alicerce" */;
-			productName = AlicerceLogging;
+			productName = SharedUI;
 		};
 		C54DA2B62D368A40005142F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;

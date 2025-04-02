@@ -1,5 +1,6 @@
 import Foundation
 import Models
+import SharedUI
 
 final class WishlistViewModel: WishlistViewModelProtocol {
     @Published private(set) var products: [SelectionProduct]

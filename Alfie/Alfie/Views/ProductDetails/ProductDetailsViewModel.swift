@@ -2,6 +2,7 @@ import Combine
 import Core
 import Foundation
 import Models
+import SharedUI
 import StyleGuide
 
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
