@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 49AFF8542B6D0AA600695C66 /* OrderedCollections */; };
 		BA04B1A32B977EE700713298 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BA04B1A22B977EE700713298 /* SnapshotTesting */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
@@ -84,7 +83,6 @@
 				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
 				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
 				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
-				49AFF8552B6D0AA600695C66 /* OrderedCollections in Frameworks */,
 				C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */,
 				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
 				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
@@ -181,7 +179,6 @@
 			);
 			name = Alfie;
 			packageProductDependencies = (
-				49AFF8542B6D0AA600695C66 /* OrderedCollections */,
 				C54DA2B62D368A40005142F4 /* Core */,
 				C54DA2B82D368A40005142F4 /* Mocks */,
 				C54DA2BA2D368A40005142F4 /* Models */,
@@ -272,7 +269,6 @@
 			);
 			mainGroup = BE8B021B2B616976007AE489;
 			packageReferences = (
-				49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				BA04B1A12B977EE700713298 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */,
 			);
@@ -721,14 +717,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.0.6;
-			};
-		};
 		99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Mindera/SwiftGenPlugin";
@@ -748,11 +736,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		49AFF8542B6D0AA600695C66 /* OrderedCollections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 49AFF8532B6D0AA600695C66 /* XCRemoteSwiftPackageReference "swift-collections" */;
-			productName = OrderedCollections;
-		};
 		99AB92D92D492FB800FD005D /* SwiftGenPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 99AB92D82D492FA800FD005D /* XCRemoteSwiftPackageReference "SwiftGenPlugin" */;
