@@ -5,6 +5,7 @@ import Models
 import SharedUI
 import StyleGuide
 
+// swiftlint:disable file_length
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let dependencies: ProductDetailsDependencyContainer
     // In case we already have a full or partial product to show while fetching
@@ -94,11 +95,11 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     private var hasColorSelected: Bool {
-        colorSelectionConfiguration.items.count > 1 ? selectedVariant?.colour != nil : true
+        !colorSelectionConfiguration.items.isEmpty ? selectedVariant?.colour != nil : true
     }
 
     private var hasSizeSelected: Bool {
-        sizingSelectionConfiguration.items.count > 1 ? selectedVariant?.size != nil : true
+        !sizingSelectionConfiguration.items.isEmpty ? selectedVariant?.size != nil : true
     }
 
     init(
@@ -436,4 +437,4 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         return SelectedProduct(product: product, selectedVariant: selectedVariant)
     }
-} // swiftlint:disable:this file_length
+}
