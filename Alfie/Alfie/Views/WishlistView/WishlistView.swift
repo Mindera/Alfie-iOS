@@ -41,9 +41,6 @@ struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
         }
         .padding(.vertical, Spacing.space200)
         .withToolbar(for: .wishlist)
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
     }
 }
 

@@ -1,9 +1,14 @@
+import Combine
 import Foundation
 import Models
 
 // TODO: Update with an actual implementation with storage
 public final class WishlistService: WishlistServiceProtocol {
-    private var products: [WishlistProduct] = []
+    @Published private var products: [WishlistProduct] = []
+
+    public var productsPublisher: AnyPublisher<[WishlistProduct], Never> {
+        $products.eraseToAnyPublisher()
+    }
 
     public init() { }
 
@@ -21,7 +26,7 @@ public final class WishlistService: WishlistServiceProtocol {
         products = products.filter { $0.product.id != wishlistProduct.product.id }
     }
 
-    public func getWishlistContent() -> [WishlistProduct] {
-        products
+    public func containsProduct(_ wishlistProduct: WishlistProduct) -> Bool {
+        products.contains { $0.id == wishlistProduct.id }
     }
 }
