@@ -1,7 +1,8 @@
 import Foundation
 
 public protocol WishlistServiceProtocol {
-    func addProduct(_ product: SelectedProduct)
-    func removeProduct(_ product: SelectedProduct)
-    func getWishlistContent() -> [SelectedProduct]
+    func addProduct(_ wishlistProduct: WishlistProduct)
+    func removeProduct(_ wishlistProduct: WishlistProduct)
+    func removeProductVariants(_ wishlistProduct: WishlistProduct)
+    func getWishlistContent() -> [WishlistProduct]
 }
