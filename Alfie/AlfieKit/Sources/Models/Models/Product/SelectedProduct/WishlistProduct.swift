@@ -1,10 +1,7 @@
 import Foundation
 
 public class WishlistProduct: SelectedProduct {
-    override
-    public var id: String {
-        "\(product.id)-\(colour?.id ?? "no colour")"
-    }
+    override public var id: String { "\(product.id)-\(colour?.id ?? "no colour")" }
 
     public init(selectedProduct: SelectedProduct) {
         let updatedVariant = Product.Variant(
