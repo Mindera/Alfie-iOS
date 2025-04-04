@@ -37,6 +37,10 @@ let package = Package(
             targets: ["Navigation"]
         ),
         .library(
+            name: "SharedUI",
+            targets: ["SharedUI"]
+        ),
+        .library(
             name: "StyleGuide",
             targets: ["StyleGuide"]
         ),
@@ -47,11 +51,13 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-collections", exact: "1.0.6"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.15.4"),
         .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "1.7.1"),
         .package(url: "https://github.com/braze-inc/braze-swift-sdk", exact: "8.0.1"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.22.1"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
         .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
+        .package(url: "https://github.com/Mindera/SwiftGenPlugin", exact: "6.6.4-mindera"),
         .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9"),
         .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.0.3"),
     ],
@@ -116,7 +122,15 @@ let package = Package(
         .target(
             name: "Navigation"
         ),
-        
+
+        .target(
+            name: "SharedUI",
+            plugins: [
+                .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
+            ]
+            // Missing resources
+        ),
+
         .target(
             name: "StyleGuide",
             dependencies: [
@@ -140,6 +154,7 @@ let package = Package(
             name: "TestUtils",
             dependencies: [
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
+                .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
             ]
         ),
         
