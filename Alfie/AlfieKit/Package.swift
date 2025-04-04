@@ -37,6 +37,10 @@ let package = Package(
             targets: ["Navigation"]
         ),
         .library(
+            name: "SharedUI",
+            targets: ["SharedUI"]
+        ),
+        .library(
             name: "StyleGuide",
             targets: ["StyleGuide"]
         ),
@@ -53,6 +57,7 @@ let package = Package(
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.22.1"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
         .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
+        .package(url: "https://github.com/Mindera/SwiftGenPlugin", exact: "6.6.4-mindera"),
         .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9"),
         .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.0.3"),
     ],
@@ -117,7 +122,15 @@ let package = Package(
         .target(
             name: "Navigation"
         ),
-        
+
+        .target(
+            name: "SharedUI",
+            plugins: [
+                .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin")
+            ]
+            // Missing resources
+        ),
+
         .target(
             name: "StyleGuide",
             dependencies: [

@@ -8,7 +8,10 @@ output_dir: ${DERIVED_SOURCES_DIR}
 
 strings:
   inputs:
-    - Alfie/Localization/L10n.xcstrings
+    - Resources/Localization/L10n.xcstrings
   outputs:
-    - templatePath: codegen-strings-structured.stencil
+    - templatePath: Resources/Templates/codegen-strings-structured.stencil
       output: Strings+Generated.swift
+      params:
+        enumName: L10n
+        publicAccess: true
