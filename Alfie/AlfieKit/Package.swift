@@ -50,12 +50,12 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-collections", exact: "1.0.6"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.15.4"),
-        .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "1.7.1"),
-        .package(url: "https://github.com/braze-inc/braze-swift-sdk", exact: "8.0.1"),
-        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "10.22.1"),
-        .package(url: "https://github.com/kean/Nuke.git", exact: "12.4.0"),
+        .package(url: "https://github.com/apple/swift-collections", exact: "1.1.4"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.18.3"),
+        .package(url: "https://github.com/apollographql/apollo-ios.git", exact: "1.19.0"),
+        .package(url: "https://github.com/braze-inc/braze-swift-sdk", exact: "11.9.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.11.0"),
+        .package(url: "https://github.com/kean/Nuke.git", exact: "12.8.0"),
         .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
         .package(url: "https://github.com/Mindera/SwiftGenPlugin", exact: "6.6.4-mindera"),
         .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9"),
