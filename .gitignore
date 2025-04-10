@@ -122,9 +122,6 @@ fastlane/test_output
 Alfie/Packages/**/*/.swiftpm
 Alfie/Packages/*/Package.resolved
 
-# Checksums
-Alfie/Checksums/swiftgen_checksum.txt
-
 # Secret management
 .gitsecret/keys/random_seed
 !*.secret
