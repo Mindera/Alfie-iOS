@@ -121,8 +121,6 @@ fastlane/test_output
 **/*/xcuserdata
 Alfie/Packages/**/*/.swiftpm
 Alfie/Packages/*/Package.resolved
-Alfie/AlfieKit/.swiftpm
-Alfie/AlfieKit/Package.resolved
 
 # Checksums
 Alfie/Checksums/swiftgen_checksum.txt
