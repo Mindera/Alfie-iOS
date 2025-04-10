@@ -364,7 +364,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Release/GoogleService-Info.plist\nelse \n    SOURCE_CONFIG_PATH=$SRCROOT/Alfie/Configuration/Debug/GoogleService-Info.plist\nfi\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp $SOURCE_CONFIG_PATH $DESTINATION_CONFIG_PATH\n";
+			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=\"${SRCROOT}/Alfie/Configuration/Release/GoogleService-Info.plist\"\nelse \n    SOURCE_CONFIG_PATH=\"${SRCROOT}/Alfie/Configuration/Debug/GoogleService-Info.plist\"\nfi\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp \"${SOURCE_CONFIG_PATH}\" \"${DESTINATION_CONFIG_PATH}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
