@@ -1,6 +1,6 @@
 import Core
 import Foundation
-import Models
+import Model
 
 extension DeepLinkService {
     convenience init(configuration: LinkConfigurationProtocol) {

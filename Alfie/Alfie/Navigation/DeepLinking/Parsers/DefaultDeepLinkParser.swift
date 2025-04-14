@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 final class DefaultDeepLinkParser: DeepLinkParserProtocol {
     private enum PathComponents: String {

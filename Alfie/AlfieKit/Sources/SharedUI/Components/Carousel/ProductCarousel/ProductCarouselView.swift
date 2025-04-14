@@ -1,4 +1,4 @@
-import Models
+import Model
 import SwiftUI
 
 public struct ProductCarouselView<Header: View, Content: View, DataType: Identifiable>: View {

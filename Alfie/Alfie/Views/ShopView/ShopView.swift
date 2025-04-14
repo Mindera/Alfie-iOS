@@ -1,6 +1,6 @@
 import Combine
 import Core
-import Models
+import Model
 import SharedUI
 import SharedUI
 import SwiftUI

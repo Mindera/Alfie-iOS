@@ -1,5 +1,5 @@
 import Combine
-import Models
+import Model
 
 final class RecentSearchesViewModel: RecentSearchesViewModelProtocol {
     private let recentsService: RecentsServiceProtocol?

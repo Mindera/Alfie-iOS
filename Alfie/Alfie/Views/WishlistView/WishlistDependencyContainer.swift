@@ -1,5 +1,5 @@
 import Core
-import Models
+import Model
 
 final class WishlistDependencyContainer {
     let wishlistService: WishlistServiceProtocol

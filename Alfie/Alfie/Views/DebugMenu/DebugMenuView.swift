@@ -1,5 +1,5 @@
 import Core
-import Models
+import Model
 #if DEBUG
 import Mocks
 #endif

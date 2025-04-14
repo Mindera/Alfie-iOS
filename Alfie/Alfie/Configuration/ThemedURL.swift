@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 enum ThemedURL: String, WebURLEndpoint {
     case shop

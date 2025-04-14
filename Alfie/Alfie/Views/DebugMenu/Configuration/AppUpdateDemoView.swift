@@ -1,4 +1,4 @@
-import Models
+import Model
 import SharedUI
 import SwiftUI
 #if DEBUG

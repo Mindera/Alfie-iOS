@@ -1,4 +1,4 @@
-import Models
+import Model
 
 public class MockBagViewModel: BagViewModelProtocol {
     public var products: [SelectedProduct]

@@ -1,5 +1,5 @@
 import XCTest
-import Models
+import Model
 
 final class BFFRequestErrorTests: XCTestCase {
     func test_bffrequesterror_is_not_found_for_no_product_error() {

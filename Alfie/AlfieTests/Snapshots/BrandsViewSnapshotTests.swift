@@ -1,5 +1,5 @@
 import Mocks
-import Models
+import Model
 import OrderedCollections
 import SnapshotTesting
 import SwiftUI

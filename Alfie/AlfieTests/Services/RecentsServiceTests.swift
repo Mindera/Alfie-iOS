@@ -1,7 +1,7 @@
 import XCTest
 import Combine
 import Core
-import Models
+import Model
 import Mocks
 @testable import Alfie
 

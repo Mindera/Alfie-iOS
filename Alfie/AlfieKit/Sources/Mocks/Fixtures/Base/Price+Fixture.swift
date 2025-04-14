@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension Price {
     public static func fixture(amount: Money = .fixture(),

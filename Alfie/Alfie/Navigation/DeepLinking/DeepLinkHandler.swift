@@ -1,7 +1,7 @@
 import Combine
 import CombineSchedulers
 import Foundation
-import Models
+import Model
 import Navigation
 
 final class DeepLinkHandler: DeepLinkHandlerProtocol {

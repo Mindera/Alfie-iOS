@@ -1,4 +1,4 @@
-import Models
+import Model
 
 final class WebDependencyContainer {
     let deepLinkService: DeepLinkServiceProtocol

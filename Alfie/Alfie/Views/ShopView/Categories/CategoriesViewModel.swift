@@ -1,7 +1,7 @@
 import Combine
 import Core
 import Foundation
-import Models
+import Model
 
 final class CategoriesViewModel: CategoriesViewModelProtocol {
     private enum Constants {

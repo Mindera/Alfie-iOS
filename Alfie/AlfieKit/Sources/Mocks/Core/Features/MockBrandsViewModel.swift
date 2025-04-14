@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 import OrderedCollections
-import Models
+import Model
 
 public class MockBrandsViewModel: BrandsViewModelProtocol {
     public var state: ViewState<OrderedDictionary<String, [Brand]>, BrandsViewErrorType>

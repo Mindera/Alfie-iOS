@@ -1,4 +1,4 @@
-import Models
+import Model
 import SwiftUI
 
 public struct RemoteImage<Success: View, Failure: View, Placeholder: View>: View {

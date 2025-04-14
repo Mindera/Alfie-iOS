@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 final class SearchViewModel: SearchViewModelProtocol {
     // MARK: - Private Properties

@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public class MockDeepLinkParser: DeepLinkParserProtocol {
     public var configuration: LinkConfigurationProtocol
