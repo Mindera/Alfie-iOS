@@ -1,6 +1,6 @@
 import AlicerceAnalytics
 import FirebaseAnalytics
-import Models
+import Model
 
 public class FirebaseAnalyticsTracker: AnalyticsTracker {
     public init() {}

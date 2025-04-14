@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		994C3E692DAD4FFD00C77271 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 994C3E682DAD4FFD00C77271 /* Model */; };
 		99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */ = {isa = PBXBuildFile; productRef = 99DCD9262D9FD27400A3CA25 /* SharedUI */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
-		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
 		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
 		C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C5DCD5F32D3EA0B70005AAB0 /* Common */; };
@@ -80,8 +80,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				994C3E692DAD4FFD00C77271 /* Model in Frameworks */,
 				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
-				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
 				99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */,
 				C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */,
 				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
@@ -184,6 +184,7 @@
 				C54DA2BE2D368A40005142F4 /* StyleGuide */,
 				C5DCD5F32D3EA0B70005AAB0 /* Common */,
 				99DCD9262D9FD27400A3CA25 /* SharedUI */,
+				994C3E682DAD4FFD00C77271 /* Model */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -709,6 +710,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		994C3E682DAD4FFD00C77271 /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Model;
+		};
 		99DCD9262D9FD27400A3CA25 /* SharedUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedUI;

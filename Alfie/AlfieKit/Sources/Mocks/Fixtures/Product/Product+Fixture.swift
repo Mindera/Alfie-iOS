@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension Product {
     public static func fixture(id: String = UUID().uuidString,

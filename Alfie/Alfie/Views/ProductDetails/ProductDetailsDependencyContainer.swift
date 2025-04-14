@@ -1,6 +1,6 @@
 import CombineSchedulers
 import Foundation
-import Models
+import Model
 
 final class ProductDetailsDependencyContainer {
     let scheduler: AnySchedulerOf<DispatchQueue>

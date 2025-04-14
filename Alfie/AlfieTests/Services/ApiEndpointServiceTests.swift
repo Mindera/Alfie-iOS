@@ -1,7 +1,7 @@
 import TestUtils
 import XCTest
 import Mocks
-import Models
+import Model
 @testable import Alfie
 
 final class ApiEndpointServiceTests: XCTestCase {

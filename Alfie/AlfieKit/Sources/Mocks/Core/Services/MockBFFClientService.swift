@@ -1,4 +1,4 @@
-import Models
+import Model
 
 public class MockBFFClientService: BFFClientServiceProtocol {
     public init() { }

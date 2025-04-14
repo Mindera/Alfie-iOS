@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension NavigationItem {
     public static let fixtures: [NavigationItem] = [

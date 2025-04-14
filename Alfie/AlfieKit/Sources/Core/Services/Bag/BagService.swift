@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 // TODO: Update with an actual implementation with storage
 public final class BagService: BagServiceProtocol {

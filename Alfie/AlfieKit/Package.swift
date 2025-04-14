@@ -29,8 +29,8 @@ let package = Package(
             targets: ["Mocks"]
         ),
         .library(
-            name: "Models",
-            targets: ["Models"]
+            name: "Model",
+            targets: ["Model"]
         ),
         .library(
             name: "Navigation",
@@ -88,7 +88,7 @@ let package = Package(
                 "BFFGraphAPI",
                 "Common",
                 "EasyStash",
-                "Models",
+                "Model",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
@@ -103,12 +103,12 @@ let package = Package(
             name: "Mocks",
             dependencies: [
                 "Common",
-                "Models"
+                "Model"
             ]
         ),
         
         .target(
-            name: "Models",
+            name: "Model",
             dependencies: [
                 .product(name: "AlicerceAnalytics", package: "Alicerce"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
@@ -124,7 +124,7 @@ let package = Package(
             dependencies: [
                 "Common",
                 "Core",
-                "Models",
+                "Model",
                 "Navigation",
                 .product(name: "AlicerceLogging", package: "Alicerce")
             ],

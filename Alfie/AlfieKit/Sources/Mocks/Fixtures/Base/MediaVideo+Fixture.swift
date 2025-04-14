@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension MediaVideo {
     public static func fixture(alt: String? = nil,

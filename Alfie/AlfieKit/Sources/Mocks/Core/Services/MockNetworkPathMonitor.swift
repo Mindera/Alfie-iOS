@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public final class MockNetworkPathMonitor: NetworkPathMonitorProtocol {
     public var isAvailable: Bool = false {

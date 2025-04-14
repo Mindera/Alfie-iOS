@@ -1,4 +1,4 @@
-import Models
+import Model
 import SwiftUI
 #if DEBUG
 import Mocks

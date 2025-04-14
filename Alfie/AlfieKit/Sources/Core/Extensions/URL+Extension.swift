@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension URL {
     public func httpSecureUrl(using configuration: LinkConfigurationProtocol) -> URL {

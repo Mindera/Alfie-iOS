@@ -2,7 +2,7 @@ import AlicerceLogging
 import Apollo
 import BFFGraphAPI
 import Foundation
-import Models
+import Model
 
 private enum BFFEndpoint: String {
     case graphQL = "graphql"

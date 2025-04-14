@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 import RegexBuilder
 
 final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {

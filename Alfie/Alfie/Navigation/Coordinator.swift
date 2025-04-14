@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 import Navigation
 import UIKit
 
