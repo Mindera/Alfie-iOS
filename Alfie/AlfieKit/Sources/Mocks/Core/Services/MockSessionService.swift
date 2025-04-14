@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public final class MockSessionService: SessionServiceProtocol {
     public var isUserSignedInPublisher: AnyPublisher<Bool, Never> {

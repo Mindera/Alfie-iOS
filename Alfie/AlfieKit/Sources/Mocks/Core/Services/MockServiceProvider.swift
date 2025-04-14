@@ -1,7 +1,7 @@
 import AlicerceAnalytics
 import Common
 import Foundation
-import Models
+import Model
 
 public final class MockServiceProvider: ServiceProviderProtocol {
     public var analytics: AlfieAnalyticsTracker

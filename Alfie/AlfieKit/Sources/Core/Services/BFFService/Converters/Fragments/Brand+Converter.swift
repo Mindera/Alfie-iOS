@@ -1,7 +1,7 @@
-import BFFGraphAPI
-import Models
+import BFFGraphApi
+import Model
 
-extension BFFGraphAPI.BrandFragment {
+extension BFFGraphApi.BrandFragment {
     func convertToBrand() -> Brand {
         Brand(id: id, name: name, slug: slug)
     }

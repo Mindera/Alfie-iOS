@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 // TODO: Update with an actual implementation with network APIs
 public final class SessionService: SessionServiceProtocol {

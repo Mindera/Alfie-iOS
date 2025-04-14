@@ -1,7 +1,7 @@
-import BFFGraphAPI
-import Models
+import BFFGraphApi
+import Model
 
-extension BFFGraphAPI.VariantFragment {
+extension BFFGraphApi.VariantFragment {
     /// Transforms a `VariantFragment` into a local model `Product.Variant`
     /// - Parameters:
     ///   - colours: the aggregation of all available colours from all variants.

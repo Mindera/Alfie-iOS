@@ -1,5 +1,5 @@
 import Combine
-import Models
+import Model
 import Mocks
 import XCTest
 @testable import Alfie

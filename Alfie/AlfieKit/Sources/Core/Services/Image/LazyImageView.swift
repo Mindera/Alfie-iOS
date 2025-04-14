@@ -1,4 +1,4 @@
-import Models
+import Model
 import NukeUI
 import SwiftUI
 

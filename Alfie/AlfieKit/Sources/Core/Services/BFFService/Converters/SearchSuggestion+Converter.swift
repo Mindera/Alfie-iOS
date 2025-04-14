@@ -1,6 +1,6 @@
 import BFFGraphAPI
 import Foundation
-import Models
+import Model
 
 extension BFFGraphAPI.GetSuggestionsQuery.Data.Suggestion {
     public func convertToSearchSuggestion() -> SearchSuggestion {

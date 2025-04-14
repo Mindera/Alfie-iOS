@@ -1,6 +1,6 @@
 import BFFGraphAPI
 import Foundation
-import Models
+import Model
 
 public extension BFFGraphAPI.PriceRangeFragment {
     func convertToPriceRange() -> PriceRange {

@@ -1,4 +1,4 @@
-import Models
+import Model
 
 public struct MockLinkConfiguration: LinkConfigurationProtocol {
     public let schemes: [String]

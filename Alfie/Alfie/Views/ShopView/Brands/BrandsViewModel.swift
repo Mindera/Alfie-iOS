@@ -1,7 +1,7 @@
 import Combine
 import Core
 import Foundation
-import Models
+import Model
 import OrderedCollections
 
 final class BrandsViewModel: BrandsViewModelProtocol {

@@ -1,4 +1,4 @@
-import Models
+import Model
 
 struct LinkConfiguration: LinkConfigurationProtocol {
     let schemes: [String]

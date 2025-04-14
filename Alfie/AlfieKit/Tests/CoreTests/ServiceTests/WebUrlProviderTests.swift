@@ -1,6 +1,6 @@
 import AlicerceLogging
 @testable import Core
-import Models
+import Model
 import XCTest
 
 final class WebUrlProviderTests: XCTestCase {

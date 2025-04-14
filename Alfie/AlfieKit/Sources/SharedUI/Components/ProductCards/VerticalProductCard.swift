@@ -1,5 +1,5 @@
 import Core
-import Models
+import Model
 import SwiftUI
 
 // MARK: - Card View

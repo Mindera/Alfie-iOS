@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 final class ProductListingDeepLinkParser: DeepLinkParserProtocol {
     private enum PathComponents: String, CaseIterable {

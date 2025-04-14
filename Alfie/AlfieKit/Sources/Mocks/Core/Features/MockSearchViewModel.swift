@@ -1,4 +1,4 @@
-import Models
+import Model
 
 public final class MockSearchViewModel: SearchViewModelProtocol {
     public var searchText: String = ""

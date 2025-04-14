@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public final class LocalConfigurationProvider: ConfigurationProviderProtocol {
     public var isReady: Bool { isReadySubject.value }

@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading

@@ -1,6 +1,6 @@
 import OrderedCollections
 import Mocks
-import Models
+import Model
 import SnapshotTesting
 import SwiftUI
 import XCTest

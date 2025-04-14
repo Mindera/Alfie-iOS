@@ -4,7 +4,7 @@ import Combine
 import Common
 import Core
 import Foundation
-import Models
+import Model
 import os.log
 import SharedUI
 import UIKit

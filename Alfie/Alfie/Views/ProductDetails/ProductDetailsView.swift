@@ -4,7 +4,7 @@ import Core
 import Common
 import Mocks
 #endif
-import Models
+import Model
 import OrderedCollections
 import SharedUI
 import SharedUI

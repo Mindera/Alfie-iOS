@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 /// Product pagination service
 /// - internally manages the following pages to fetch based on the pagination information provided by the BFF API

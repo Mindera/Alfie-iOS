@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public class MockApiEndpointService: ApiEndpointServiceProtocol {
     public var currentApiEndpoint: ApiEndpointOption = .dev

@@ -1,7 +1,7 @@
 import CombineSchedulers
 import Core
 import Foundation
-import Models
+import Model
 
 final class SearchDependencyContainer {
     let scheduler: AnySchedulerOf<DispatchQueue>

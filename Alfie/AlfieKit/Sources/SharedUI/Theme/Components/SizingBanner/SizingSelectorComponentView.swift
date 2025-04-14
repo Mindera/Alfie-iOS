@@ -1,4 +1,4 @@
-import Models
+import Model
 import SwiftUI
 
 public struct SizingSelectorComponentView: View {

@@ -1,5 +1,5 @@
 import EasyStash
-import Models
+import Model
 
 public final class StorageService: StorageServiceProtocol {
     private let storage: StorageProtocol

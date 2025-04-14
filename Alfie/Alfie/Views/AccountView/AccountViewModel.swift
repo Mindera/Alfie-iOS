@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 import SharedUI
 
 // MARK: - AccountViewModelProtocol

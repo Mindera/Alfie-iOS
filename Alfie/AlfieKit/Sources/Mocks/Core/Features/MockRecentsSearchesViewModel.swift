@@ -1,4 +1,4 @@
-import Models
+import Model
 
 public final class MockRecentSearchesViewModel: RecentSearchesViewModelProtocol {
     public var recentSearches: [RecentSearch] = []
