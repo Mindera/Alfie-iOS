@@ -1,6 +1,6 @@
 import Models
 import SharedUI
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 // MARK: - ProductListingFilterBar

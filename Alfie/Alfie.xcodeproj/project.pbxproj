@@ -12,7 +12,6 @@
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
 		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
 		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
-		C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BE2D368A40005142F4 /* StyleGuide */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
 		C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C5DCD5F32D3EA0B70005AAB0 /* Common */; };
 /* End PBXBuildFile section */
@@ -82,7 +81,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
-				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
 				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
 				99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */,
 				C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */,

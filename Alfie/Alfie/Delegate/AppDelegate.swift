@@ -6,7 +6,7 @@ import Core
 import Foundation
 import Models
 import os.log
-import StyleGuide
+import SharedUI
 import UIKit
 #if DEBUG
 import Mocks
