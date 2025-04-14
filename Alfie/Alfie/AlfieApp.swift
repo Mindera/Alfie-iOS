@@ -1,7 +1,7 @@
 import Common
 import Core
 import Models
-import StyleGuide
+import SharedUI
 import SwiftUI
 import UIKit
 

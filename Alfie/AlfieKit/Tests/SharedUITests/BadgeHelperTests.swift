@@ -1,6 +1,6 @@
 import SwiftUI
 import XCTest
-@testable import StyleGuide
+@testable import SharedUI
 
 final class BadgeHelperTests: XCTestCase {
     private var sut: BadgeHelper!

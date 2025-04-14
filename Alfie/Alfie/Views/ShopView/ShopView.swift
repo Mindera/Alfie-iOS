@@ -2,7 +2,7 @@ import Combine
 import Core
 import Models
 import SharedUI
-import StyleGuide
+import SharedUI
 import SwiftUI
 #if DEBUG
 import Mocks

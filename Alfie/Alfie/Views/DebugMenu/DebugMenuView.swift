@@ -4,7 +4,7 @@ import Models
 import Mocks
 #endif
 import SharedUI
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 // MARK: - DebugMenuView

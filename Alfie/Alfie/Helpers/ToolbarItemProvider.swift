@@ -1,7 +1,7 @@
 import Models
 import Navigation
 import SharedUI
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 // MARK: - ToolbarItemProvider

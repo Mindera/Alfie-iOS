@@ -39,13 +39,6 @@
         "identifier" : "BE8B02332B616979007AE489",
         "name" : "AlfieTests"
       }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "StyleGuideTests",
-        "name" : "StyleGuideTests"
-      }
     }
   ],
   "version" : 1

@@ -1,6 +1,6 @@
 import Models
 import SharedUI
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 // swiftlint:disable:next generic_type_name

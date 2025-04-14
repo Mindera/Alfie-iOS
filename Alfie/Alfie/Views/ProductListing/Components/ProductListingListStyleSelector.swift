@@ -1,5 +1,5 @@
 import Models
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 struct ProductListingListStyleSelector: View {

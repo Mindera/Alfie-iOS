@@ -1,7 +1,7 @@
 import Combine
 import Models
 import SharedUI
-import StyleGuide
+import SharedUI
 import SwiftUI
 import WebKit
 #if DEBUG

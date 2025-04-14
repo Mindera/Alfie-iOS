@@ -1,7 +1,7 @@
 import Foundation
 import Models
 import Navigation
-import StyleGuide
+import SharedUI
 
 enum Screen: ScreenProtocol {
     case tab(_ tab: TabScreen)

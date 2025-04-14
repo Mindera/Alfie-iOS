@@ -4,7 +4,7 @@ import Models
 import SnapshotTesting
 import SwiftUI
 import XCTest
-import StyleGuide
+import SharedUI
 @testable import Alfie
 
 // TODO: Re-add Target Memebership once Snapshot tests are checked for working properly

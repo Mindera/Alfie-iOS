@@ -1,5 +1,5 @@
 import XCTest
-@testable import StyleGuide
+@testable import SharedUI
 
 final class StyleGuideTests: XCTestCase {
     func testExample() throws {
