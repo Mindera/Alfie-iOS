@@ -164,20 +164,29 @@ let package = Package(
                 "Common",
                 "Core",
                 "Mocks",
-                "SharedUI",
                 "TestUtils",
                 .product(name: "Apollo", package: "apollo-ios"),
-            ],
-            swiftSettings: [
-                .unsafeFlags(["-enable-bare-slash-regex"])
             ]
         ),
+
         .testTarget(
             name: "NavigationTests",
             dependencies: [
                 "Navigation"
             ]
         ),
+
+        .testTarget(
+            name: "SharedUITests",
+            dependencies: [
+                "Core",
+                "SharedUI"
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-enable-bare-slash-regex"])
+            ]
+        ),
+        
         .testTarget(
             name: "StyleGuideTests",
             dependencies: [

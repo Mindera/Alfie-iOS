@@ -391,7 +391,7 @@ extension L10n {
             localized: key,
             defaultValue: defaultValue(key, args),
             table: table,
-            bundle: Bundle.sharedUI,
+            bundle: BundleToken.bundle,
             locale: Locale.current
         )
     }

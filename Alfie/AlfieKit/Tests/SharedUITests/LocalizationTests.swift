@@ -1,5 +1,5 @@
-@testable import Core
-import SharedUI
+import Core
+@testable import SharedUI
 import XCTest
 
 final class LocalizationTests: XCTestCase {
@@ -102,7 +102,7 @@ final class LocalizationTests: XCTestCase {
 
     private func assertResource(key: String, table: String, locale: Locale) {
         guard
-            let path = Bundle.sharedUI.path(forResource: locale.identifier, ofType: "lproj"),
+            let path = BundleToken.bundle.path(forResource: locale.identifier, ofType: "lproj"),
             let bundle = Bundle(path: path)
         else {
             XCTFail("Missing bundle for locale: \(locale.identifier)")

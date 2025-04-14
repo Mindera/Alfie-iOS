@@ -2,12 +2,12 @@ import Foundation
 
 final class BundleToken {}
 
-public extension Bundle {
-    static var sharedUI: Bundle {
+extension BundleToken {
+    public static let bundle: Bundle = {
         #if SWIFT_PACKAGE
         return Bundle.module
         #else
         return Bundle(for: BundleToken.self)
         #endif
-    }
+    }()
 }
