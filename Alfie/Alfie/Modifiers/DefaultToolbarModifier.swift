@@ -1,5 +1,5 @@
 import Navigation
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 extension View {

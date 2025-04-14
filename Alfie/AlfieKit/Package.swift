@@ -41,10 +41,6 @@ let package = Package(
             targets: ["SharedUI"]
         ),
         .library(
-            name: "StyleGuide",
-            targets: ["StyleGuide"]
-        ),
-        .library(
             name: "TestUtils",
             targets: ["TestUtils"]
         )
@@ -125,13 +121,6 @@ let package = Package(
 
         .target(
             name: "SharedUI",
-            resources: [
-                .process("Resources/Localization/L10n.xcstrings")
-            ]
-        ),
-
-        .target(
-            name: "StyleGuide",
             dependencies: [
                 "Common",
                 "Core",
@@ -145,7 +134,8 @@ let package = Package(
                 .process("Theme/Color/Colors.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
                 .process("Theme/Toggle/ToggleColor.xcassets"),
-                .process("Theme/Typography/Resources/Fonts.xcassets")
+                .process("Theme/Typography/Resources/Fonts.xcassets"),
+                .process("Resources/Localization/L10n.xcstrings")
             ]
         ),
         
@@ -179,6 +169,7 @@ let package = Package(
         .testTarget(
             name: "SharedUITests",
             dependencies: [
+                "Common",
                 "Core",
                 "SharedUI"
             ],
@@ -186,14 +177,5 @@ let package = Package(
                 .unsafeFlags(["-enable-bare-slash-regex"])
             ]
         ),
-        
-        .testTarget(
-            name: "StyleGuideTests",
-            dependencies: [
-                "Common",
-                "Core",
-                "StyleGuide"
-            ]
-        )
     ]
 )

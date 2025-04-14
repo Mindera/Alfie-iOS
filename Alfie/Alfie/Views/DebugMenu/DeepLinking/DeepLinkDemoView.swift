@@ -1,5 +1,5 @@
 import Common
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 struct DeepLinkDemoView: View {

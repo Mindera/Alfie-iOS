@@ -3,7 +3,7 @@ import Core
 import Foundation
 import Models
 import SharedUI
-import StyleGuide
+import SharedUI
 
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let dependencies: ProductDetailsDependencyContainer
