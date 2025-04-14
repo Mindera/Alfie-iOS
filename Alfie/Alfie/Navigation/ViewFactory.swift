@@ -138,7 +138,7 @@ final class ViewFactory: ViewFactoryProtocol {
         case .productDetails(let configuration):
             ProductDetailsView(
                 viewModel: ProductDetailsViewModel(
-                    productDetailsConfiguration: configuration,
+                    configuration: configuration,
                     dependencies: ProductDetailsDependencyContainer(
                         productService: serviceProvider.productService,
                         webUrlProvider: serviceProvider.webUrlProvider,
