@@ -433,15 +433,15 @@ This project uses GraphQL for fetching data from the BFF API. Data is fetched us
 
 If a new feature being developed requires us to add a new query to fetch data from the BFF API, we need to:
 
-1. Create a new folder in `Packages/Core/Sources/GraphQL/Queries/<Feature>`
+1. Create a new folder in `Packages/Sources/BFFGraph/CodeGen/Queries/<Feature>`
 2. Add a `Queries.graphql` file in that folder and add the query or queries you need (use existing queries as examples if necessary)
 3. It is recommended to use fragments to describe the returned models, so if possible define them and add them to a `Fragments` folder as `<Model>Fragment.graphql` files
-4. Update the schema by adding a `schema-<feature>.graphqls` file to `Packages/Core/Sources/GraphQL/Schema`
+4. Update the schema by adding a `schema-<feature>.graphqls` file to `Packages/Sources/BFFGraph/CodeGen/Schema`
 5. The schema file you add should extend the `Query` type with the new query or queries and also add all the new types necessary for the feature
-6. Open the terminal app, cd to `Packages/Core` and run `./apollo-ios-cli generate` 
+6. Open the terminal app, cd to `Alfie/scripts` and run `./run-apollo-codegen.sh` 
 7. Confirm that new query objects, new models and respective mocks were added to the repository
 8. Create the local models that the app will use for the feature in the `Models` package, mapping the BFF models as required
-9. In `Packages/Core/Sources/Services/BFFService/Converters` add the necessary converter extensions to convert BFF models into the newly created local models
+9. In `Packages/Sources/Core/Services/BFFService/Converters` add the necessary converter extensions to convert BFF models into the newly created local models
 10. Add the fetch method for the new query in the `BFFClientService` instance, including the conversion to the internal models;
 
 #### How to update a query

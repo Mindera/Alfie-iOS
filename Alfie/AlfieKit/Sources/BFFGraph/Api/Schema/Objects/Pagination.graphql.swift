@@ -3,10 +3,11 @@
 
 import ApolloAPI
 
-public extension Objects {
+public extension BFFGraphApi.Objects {
   /// Pagination info
   static let Pagination = ApolloAPI.Object(
     typename: "Pagination",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

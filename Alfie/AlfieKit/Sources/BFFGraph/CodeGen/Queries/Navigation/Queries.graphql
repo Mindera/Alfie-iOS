@@ -1,0 +1,18 @@
+query GetHeaderNav($handle: String!, $fetchMedia: Boolean!, $fetchSubItems: Boolean!) {
+    navigation(handle: $handle) {
+        title
+        type
+        url
+        media @include(if: $fetchMedia) {
+            ...on Image {
+                ...ImageFragment
+            }
+        }
+        items @include(if: $fetchSubItems) {
+            ...NavMenuItemFragment
+        }
+        attributes {
+        ...AttributesFragment
+        }
+    }
+}

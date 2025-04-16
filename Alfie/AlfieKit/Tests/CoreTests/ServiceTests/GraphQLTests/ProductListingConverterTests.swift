@@ -17,7 +17,7 @@ final class ProductListingConverterTests: XCTestCase {
                                                       products: [.mock()],
                                                       title: "Product Listing Title")
 
-        let response = ProductListingQuery.Data.ProductListing.from(mockProductListing)
+        let response = BFFGraphApi.ProductListingQuery.Data.ProductListing.from(mockProductListing)
         let productListing = response.convertToProductListing()
 
         XCTAssertEqual(productListing.products.count, 1)

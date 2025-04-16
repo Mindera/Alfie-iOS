@@ -23,7 +23,7 @@ public extension Mock where O == NavMenuItem {
   convenience init(
     attributes: [Mock<KeyValuePair>?]? = nil,
     items: [Mock<NavMenuItem>]? = nil,
-    media: AnyMock? = nil,
+    media: (any AnyMock)? = nil,
     title: String? = nil,
     type: GraphQLEnum<BFFGraphApi.NavMenuItemType>? = nil,
     url: String? = nil

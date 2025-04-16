@@ -3,10 +3,11 @@
 
 import ApolloAPI
 
-public extension Objects {
+public extension BFFGraphApi.Objects {
   /// A key-value pair, where both key and value are strings.
   static let KeyValuePair = ApolloAPI.Object(
     typename: "KeyValuePair",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

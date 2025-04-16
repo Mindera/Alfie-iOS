@@ -3,10 +3,11 @@
 
 import ApolloAPI
 
-public extension Objects {
+public extension BFFGraphApi.Objects {
   /// The various colour options available for an item.
   static let Colour = ApolloAPI.Object(
     typename: "Colour",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

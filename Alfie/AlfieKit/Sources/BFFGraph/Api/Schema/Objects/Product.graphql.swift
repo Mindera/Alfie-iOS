@@ -3,10 +3,11 @@
 
 import ApolloAPI
 
-public extension Objects {
+public extension BFFGraphApi.Objects {
   /// A product for sale at Alfie.
   static let Product = ApolloAPI.Object(
     typename: "Product",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

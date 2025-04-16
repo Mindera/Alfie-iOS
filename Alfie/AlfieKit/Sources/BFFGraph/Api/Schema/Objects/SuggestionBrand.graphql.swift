@@ -3,10 +3,11 @@
 
 import ApolloAPI
 
-public extension Objects {
+public extension BFFGraphApi.Objects {
   /// Suggested Brand for navigation purposes.
   static let SuggestionBrand = ApolloAPI.Object(
     typename: "SuggestionBrand",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

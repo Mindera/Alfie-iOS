@@ -3,7 +3,7 @@ import BFFGraphApi
 import Foundation
 import Models
 
-extension GraphQLEnum where T == NavMenuItemType {
+extension GraphQLEnum where T == BFFGraphApi.NavMenuItemType {
     func convertToNavigationItemType() -> NavigationItemType {
         guard let type = self.value else {
             return .listing // Assumed default
@@ -32,13 +32,13 @@ extension GraphQLEnum where T == NavMenuItemType {
     }
 }
 
-extension Collection where Element == GetHeaderNavQuery.Data.Navigation.Item {
+extension Collection where Element == BFFGraphApi.GetHeaderNavQuery.Data.Navigation.Item {
     func convertToNavigationItems() -> [NavigationItem] {
         compactMap { $0.convertToNavigationItem() }
     }
 }
 
-extension GetHeaderNavQuery.Data.Navigation {
+extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation {
     func convertToNavigationItem() -> NavigationItem {
         NavigationItem(
             type: self.type.convertToNavigationItemType(),
@@ -51,13 +51,13 @@ extension GetHeaderNavQuery.Data.Navigation {
     }
 }
 
-extension Collection where Element == GetHeaderNavQuery.Data.Navigation {
+extension Collection where Element == BFFGraphApi.GetHeaderNavQuery.Data.Navigation {
     func convertToNavigationItems() -> [NavigationItem] {
         compactMap { $0.convertToNavigationItem() }
     }
 }
 
-extension NavMenuItemFragment {
+extension BFFGraphApi.NavMenuItemFragment {
     func convertToNavigationItem() -> NavigationItem {
         NavigationItem(
             type: self.type.convertToNavigationItemType(),
@@ -70,13 +70,13 @@ extension NavMenuItemFragment {
     }
 }
 
-extension GetHeaderNavQuery.Data.Navigation.Item {
+extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation.Item {
     func convertToNavigationItem() -> NavigationItem {
         fragments.navMenuItemFragment.convertToNavigationItem()
     }
 }
 
-extension GetHeaderNavQuery.Data.Navigation.Item.Media {
+extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation.Item.Media {
     func convertToMedia() -> Media? {
         guard let mediaImage = self.asImage?.fragments.imageFragment.convertToImage() else {
             return nil

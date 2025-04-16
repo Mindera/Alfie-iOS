@@ -3,7 +3,7 @@ import Common
 import Foundation
 import Models
 
-extension ProductListingQuery.Data.ProductListing {
+extension BFFGraphApi.ProductListingQuery.Data.ProductListing {
     public func convertToProductListing() -> ProductListing {
         ProductListing(
             title: title,
@@ -13,7 +13,7 @@ extension ProductListingQuery.Data.ProductListing {
     }
 }
 
-extension PaginationFragment {
+extension BFFGraphApi.PaginationFragment {
     func convertToPagination() -> ProductListing.Pagination {
         ProductListing.Pagination(
             offset: offset,

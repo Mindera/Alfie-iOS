@@ -17,7 +17,7 @@ final class BrandConverterTests: XCTestCase {
             ]
         )
 
-        let response = BrandsQuery.Data.from(mockQuery)
+        let response = BFFGraphApi.BrandsQuery.Data.from(mockQuery)
         let brands = response.brands.convertToBrands()
 
         XCTAssertEqual(brands.count, 2)

@@ -49,7 +49,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
         let navigation = try await executeFetch(
-            GetHeaderNavQuery(
+            BFFGraphApi.GetHeaderNavQuery(
                 handle: handle.rawValue,
                 fetchMedia: includeMedia,
                 fetchSubItems: includeSubItems
@@ -60,7 +60,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
     }
 
     public func getProduct(id: String) async throws -> Product {
-        guard let product = try await executeFetch(GetProductQuery(productId: id)).product else {
+        guard let product = try await executeFetch(BFFGraphApi.GetProductQuery(productId: id)).product else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return product.convertToProduct()
@@ -74,7 +74,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         sort: String?
     ) async throws -> ProductListing {
         guard let productList = try await executeFetch(
-            ProductListingQuery(
+            BFFGraphApi.ProductListingQuery(
                 offset: offset,
                 limit: limit,
                 categoryId: categoryId.map { .some($0) } ?? .none,
@@ -89,12 +89,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
     }
 
     public func getBrands() async throws -> [Brand] {
-        let brands = try await executeFetch(BrandsQuery()).brands
+        let brands = try await executeFetch(BFFGraphApi.BrandsQuery()).brands
         return brands.convertToBrands()
     }
 
     public func getSearchSuggestion(term: String) async throws -> SearchSuggestion {
-        try await executeFetch(GetSuggestionsQuery(term: term)).suggestion.convertToSearchSuggestion()
+        try await executeFetch(BFFGraphApi.GetSuggestionsQuery(term: term)).suggestion.convertToSearchSuggestion()
     }
 
     public func getWebViewConfig() async throws -> WebViewConfiguration {

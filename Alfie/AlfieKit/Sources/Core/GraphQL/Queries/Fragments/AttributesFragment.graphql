@@ -1,4 +1,0 @@
-fragment AttributesFragment on KeyValuePair {
-    key
-    value
-}

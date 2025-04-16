@@ -3,10 +3,11 @@
 
 import ApolloAPI
 
-public extension Objects {
+public extension BFFGraphApi.Objects {
   /// Full potential search terms
   static let SuggestionKeyword = ApolloAPI.Object(
     typename: "SuggestionKeyword",
-    implementedInterfaces: []
+    implementedInterfaces: [],
+    keyFields: nil
   )
 }

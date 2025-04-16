@@ -3,13 +3,13 @@
 
 import ApolloAPI
 
-public extension Unions {
+public extension BFFGraphApi.Unions {
   /// Represents a media resource.
   static let Media = Union(
     name: "Media",
     possibleTypes: [
-      Objects.Image.self,
-      Objects.Video.self
+      BFFGraphApi.Objects.Image.self,
+      BFFGraphApi.Objects.Video.self
     ]
   )
 }

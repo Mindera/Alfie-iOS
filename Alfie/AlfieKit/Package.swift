@@ -65,6 +65,7 @@ let package = Package(
         .target(
             name: "BFFGraphApi",
             dependencies: [
+                .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "ApolloAPI", package: "apollo-ios"),
             ],
             path: "Sources/BFFGraph/Api"
@@ -93,7 +94,6 @@ let package = Package(
                 "EasyStash",
                 "Models",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
-                .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),

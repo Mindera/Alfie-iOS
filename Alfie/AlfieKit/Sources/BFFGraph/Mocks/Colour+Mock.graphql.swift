@@ -20,7 +20,7 @@ public class Colour: MockObject {
 public extension Mock where O == Colour {
   convenience init(
     id: BFFGraphApi.ID? = nil,
-    media: [AnyMock]? = nil,
+    media: [(any AnyMock)]? = nil,
     name: String? = nil,
     swatch: Mock<Image>? = nil
   ) {

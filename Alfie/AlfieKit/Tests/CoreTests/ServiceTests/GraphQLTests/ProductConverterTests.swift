@@ -53,7 +53,7 @@ final class ProductConverterTests: XCTestCase {
                                                variants: [variant],
                                                colours: [color])
 
-        let response = GetProductQuery.Data.Product.from(mockProduct)
+        let response = BFFGraphApi.GetProductQuery.Data.Product.from(mockProduct)
         let product = response.convertToProduct()
 
         XCTAssertEqual(product.id, "id")

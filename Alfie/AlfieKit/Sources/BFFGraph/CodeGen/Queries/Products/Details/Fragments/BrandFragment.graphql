@@ -1,0 +1,5 @@
+fragment BrandFragment on Brand {
+    id
+    name
+    slug
+}

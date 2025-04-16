@@ -1,0 +1,17 @@
+query GetProduct($productId: ID!) {
+    product(id: $productId) {
+        ...ProductFragment
+    }
+}
+
+query ProductListingQuery($offset: Int!, $limit: Int!, $categoryId: String, $query: String, $sort: ProductListingSort) {
+    productListing(offset: $offset, limit: $limit, categoryId: $categoryId, query: $query, sort: $sort) {
+        title
+        pagination {
+            ...PaginationFragment
+        }
+        products {
+            ...ProductFragment
+        }
+    }
+}

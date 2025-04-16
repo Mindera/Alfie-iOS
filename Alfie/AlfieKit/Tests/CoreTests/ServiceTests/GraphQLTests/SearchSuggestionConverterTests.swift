@@ -30,7 +30,7 @@ final class SearchSuggestionConverterTests: XCTestCase {
                                                            keywords: [mockKeyword1, mockKeyword2],
                                                            products: [mockProduct])
 
-        let response = GetSuggestionsQuery.Data.Suggestion.from(mockSearchSuggestion)
+        let response = BFFGraphApi.GetSuggestionsQuery.Data.Suggestion.from(mockSearchSuggestion)
         let searchSuggestion = response.convertToSearchSuggestion()
 
         XCTAssertEqual(searchSuggestion.brands.count, 2)

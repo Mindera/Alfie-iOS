@@ -23,7 +23,7 @@ public extension Mock where O == SuggestionProduct {
   convenience init(
     brandName: String? = nil,
     id: BFFGraphApi.ID? = nil,
-    media: [AnyMock]? = nil,
+    media: [(any AnyMock)]? = nil,
     name: String? = nil,
     price: Mock<Price>? = nil,
     slug: String? = nil

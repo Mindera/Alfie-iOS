@@ -1,0 +1,23 @@
+fragment MediaFragment on Media {
+    ... on Image {
+        ...ImageFragment
+    }
+    ... on Video {
+        alt
+        mediaContentType
+        sources {
+            format
+            mimeType
+            url
+        }
+        previewImage {
+            ...ImageFragment
+        }
+    }
+}
+
+fragment ImageFragment on Image {
+    alt
+    mediaContentType
+    url
+}
