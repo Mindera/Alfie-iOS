@@ -7,7 +7,6 @@ import Mocks
 import Model
 import OrderedCollections
 import SharedUI
-import SharedUI
 import SwiftUI
 
 struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {

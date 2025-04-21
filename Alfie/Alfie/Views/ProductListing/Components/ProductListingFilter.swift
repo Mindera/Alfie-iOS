@@ -2,7 +2,6 @@ import Combine
 import Model
 import Navigation
 import SharedUI
-import SharedUI
 import SwiftUI
 
 struct ProductListingFilter: View {

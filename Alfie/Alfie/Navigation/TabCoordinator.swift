@@ -4,7 +4,6 @@ import Foundation
 import Model
 import Navigation
 import SharedUI
-import SharedUI
 
 // MARK: - TabCoordinatorProtocol
 

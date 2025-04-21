@@ -1,6 +1,5 @@
 import Model
 import SharedUI
-import SharedUI
 import SwiftUI
 
 struct FeatureToggleView<ViewModel: FeatureToggleViewModelProtocol>: View {
