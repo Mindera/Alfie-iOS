@@ -9,12 +9,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "BFFGraphAPI",
-            targets: ["BFFGraphAPI"]
-        ),
-        .library(
-            name: "BFFGraphMocks",
-            targets: ["BFFGraphMocks"]
+            name: "BFFGraph",
+            targets: ["BFFGraph"]
         ),
         .library(
             name: "Common",
@@ -59,20 +55,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "BFFGraphAPI",
+            name: "BFFGraph",
             dependencies: [
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "ApolloAPI", package: "apollo-ios"),
-            ],
-            path: "Sources/BFFGraph/Api"
-        ),
-        .target(
-            name: "BFFGraphMocks",
-            dependencies: [
-                "BFFGraphAPI",
                 .product(name: "ApolloTestSupport", package: "apollo-ios"),
-            ],
-            path: "Sources/BFFGraph/Mocks"
+            ]
         ),
         
         .target(
@@ -85,7 +73,7 @@ let package = Package(
         .target(
             name: "Core",
             dependencies: [
-                "BFFGraphAPI",
+                "BFFGraph",
                 "Common",
                 "EasyStash",
                 "Model",
@@ -146,16 +134,23 @@ let package = Package(
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
             ]
         ),
-        
+
+        .testTarget(
+            name: "BFFGraphTests",
+            dependencies: [
+                "BFFGraph",
+                "Core",
+                .product(name: "Apollo", package: "apollo-ios"),
+            ]
+        ),
+
         .testTarget(
             name: "CoreTests",
             dependencies: [
-                "BFFGraphMocks",
                 "Common",
                 "Core",
                 "Mocks",
                 "TestUtils",
-                .product(name: "Apollo", package: "apollo-ios"),
             ]
         ),
 

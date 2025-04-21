@@ -1,4 +1,4 @@
-import BFFGraphAPI
+import BFFGraph
 import Common
 import Foundation
 import Model

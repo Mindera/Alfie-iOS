@@ -2,19 +2,19 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Product: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Product
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Product>>
+class Product: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Product
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Product>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<[KeyValuePair]>("attributes") public var attributes
     @Field<Brand>("brand") public var brand
     @Field<[Colour]>("colours") public var colours
     @Field<Variant>("defaultVariant") public var defaultVariant
-    @Field<BFFGraphAPI.ID>("id") public var id
+    @Field<BFFGraphApi.ID>("id") public var id
     @available(*, deprecated, message: "Unavailable from iSAMS, do not use")
     @Field<[String]>("labels") public var labels
     @Field<String>("longDescription") public var longDescription
@@ -27,13 +27,13 @@ public class Product: MockObject {
   }
 }
 
-public extension Mock where O == Product {
+extension Mock where O == Product {
   convenience init(
     attributes: [Mock<KeyValuePair>]? = nil,
     brand: Mock<Brand>? = nil,
     colours: [Mock<Colour>]? = nil,
     defaultVariant: Mock<Variant>? = nil,
-    id: BFFGraphAPI.ID? = nil,
+    id: BFFGraphApi.ID? = nil,
     labels: [String]? = nil,
     longDescription: String? = nil,
     name: String? = nil,

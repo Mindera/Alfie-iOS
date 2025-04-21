@@ -2,26 +2,26 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Size: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Size
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Size>>
+class Size: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Size
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Size>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<String>("description") public var description
-    @Field<BFFGraphAPI.ID>("id") public var id
+    @Field<BFFGraphApi.ID>("id") public var id
     @Field<String>("scale") public var scale
     @Field<SizeGuide>("sizeGuide") public var sizeGuide
     @Field<String>("value") public var value
   }
 }
 
-public extension Mock where O == Size {
+extension Mock where O == Size {
   convenience init(
     description: String? = nil,
-    id: BFFGraphAPI.ID? = nil,
+    id: BFFGraphApi.ID? = nil,
     scale: String? = nil,
     sizeGuide: Mock<SizeGuide>? = nil,
     value: String? = nil

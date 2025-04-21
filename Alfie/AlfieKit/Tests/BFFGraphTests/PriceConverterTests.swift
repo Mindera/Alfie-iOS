@@ -1,7 +1,6 @@
 import XCTest
 import ApolloTestSupport
-import BFFGraphAPI
-import BFFGraphMocks
+@testable import BFFGraph
 
 final class PriceConverterTests: XCTestCase {
     func test_price_valid() {

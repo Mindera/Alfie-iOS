@@ -2,21 +2,21 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Suggestion: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Suggestion
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Suggestion>>
+class Suggestion: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Suggestion
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Suggestion>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<[SuggestionBrand]>("brands") public var brands
     @Field<[SuggestionKeyword]>("keywords") public var keywords
     @Field<[SuggestionProduct]>("products") public var products
   }
 }
 
-public extension Mock where O == Suggestion {
+extension Mock where O == Suggestion {
   convenience init(
     brands: [Mock<SuggestionBrand>]? = nil,
     keywords: [Mock<SuggestionKeyword>]? = nil,
