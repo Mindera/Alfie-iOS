@@ -13,10 +13,6 @@ let package = Package(
             targets: ["BFFGraph"]
         ),
         .library(
-            name: "Common",
-            targets: ["Common"]
-        ),
-        .library(
             name: "Core",
             targets: ["Core"]
         ),
@@ -39,6 +35,10 @@ let package = Package(
         .library(
             name: "TestUtils",
             targets: ["TestUtils"]
+        ),
+        .library(
+            name: "Utils",
+            targets: ["Utils"]
         )
     ],
     dependencies: [
@@ -64,19 +64,12 @@ let package = Package(
         ),
         
         .target(
-            name: "Common",
-            dependencies: [
-                .product(name: "AlicerceLogging", package: "Alicerce")
-            ]
-        ),
-        
-        .target(
             name: "Core",
             dependencies: [
                 "BFFGraph",
-                "Common",
                 "EasyStash",
                 "Model",
+                "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
@@ -90,15 +83,17 @@ let package = Package(
         .target(
             name: "Mocks",
             dependencies: [
-                "Common",
-                "Model"
+                "Model",
+                "Utils",
             ]
         ),
         
         .target(
             name: "Model",
             dependencies: [
+                "Utils",
                 .product(name: "AlicerceAnalytics", package: "Alicerce"),
+                .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
@@ -110,11 +105,11 @@ let package = Package(
         .target(
             name: "SharedUI",
             dependencies: [
-                "Common",
                 "Core",
                 "Model",
                 "Navigation",
-                .product(name: "AlicerceLogging", package: "Alicerce")
+                "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
             ],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
@@ -135,6 +130,10 @@ let package = Package(
             ]
         ),
 
+        .target(
+            name: "Utils"
+        ),
+
         .testTarget(
             name: "BFFGraphTests",
             dependencies: [
@@ -147,10 +146,10 @@ let package = Package(
         .testTarget(
             name: "CoreTests",
             dependencies: [
-                "Common",
                 "Core",
                 "Mocks",
                 "TestUtils",
+                "Utils",
             ]
         ),
 
@@ -164,9 +163,9 @@ let package = Package(
         .testTarget(
             name: "SharedUITests",
             dependencies: [
-                "Common",
                 "Core",
-                "SharedUI"
+                "SharedUI",
+                "Utils",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])

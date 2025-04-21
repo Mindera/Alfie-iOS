@@ -1,5 +1,6 @@
 import AlicerceLogging
 import Foundation
+import Utils
 
 public final class NetworkClient: NetworkClientProtocol {
     private enum Headers: String {

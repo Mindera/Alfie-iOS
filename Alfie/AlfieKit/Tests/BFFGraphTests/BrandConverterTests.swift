@@ -1,6 +1,6 @@
 import ApolloTestSupport
 @testable import BFFGraph
-import Common
+import Utils
 import XCTest
 
 final class BrandConverterTests: XCTestCase {

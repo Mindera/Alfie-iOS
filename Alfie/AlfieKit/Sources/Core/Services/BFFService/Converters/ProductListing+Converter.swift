@@ -1,7 +1,7 @@
 import BFFGraph
-import Common
 import Foundation
 import Model
+import Utils
 
 extension BFFGraphAPI.ProductListingQuery.Data.ProductListing {
     public func convertToProductListing() -> ProductListing {

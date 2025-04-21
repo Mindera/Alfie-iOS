@@ -1,6 +1,6 @@
 import Combine
-import Common
 import SwiftUI
+import Utils
 
 public struct PaginatedControl: View {
     private enum Constants {
