@@ -1,7 +1,6 @@
 import Model
 import OrderedCollections
 import SharedUI
-import SharedUI
 import SwiftUI
 #if DEBUG
 import Mocks
