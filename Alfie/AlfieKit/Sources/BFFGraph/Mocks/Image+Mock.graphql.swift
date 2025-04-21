@@ -2,25 +2,25 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Image: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Image
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Image>>
+class Image: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Image
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Image>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<String>("alt") public var alt
-    @Field<GraphQLEnum<BFFGraphAPI.MediaContentType>>("mediaContentType") public var mediaContentType
-    @Field<BFFGraphAPI.URL>("url") public var url
+    @Field<GraphQLEnum<BFFGraphApi.MediaContentType>>("mediaContentType") public var mediaContentType
+    @Field<BFFGraphApi.URL>("url") public var url
   }
 }
 
-public extension Mock where O == Image {
+extension Mock where O == Image {
   convenience init(
     alt: String? = nil,
-    mediaContentType: GraphQLEnum<BFFGraphAPI.MediaContentType>? = nil,
-    url: BFFGraphAPI.URL? = nil
+    mediaContentType: GraphQLEnum<BFFGraphApi.MediaContentType>? = nil,
+    url: BFFGraphApi.URL? = nil
   ) {
     self.init()
     _setScalar(alt, for: \.alt)

@@ -2,21 +2,21 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class ProductListing: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.ProductListing
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<ProductListing>>
+class ProductListing: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.ProductListing
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<ProductListing>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<Pagination>("pagination") public var pagination
     @Field<[Product]>("products") public var products
     @Field<String>("title") public var title
   }
 }
 
-public extension Mock where O == ProductListing {
+extension Mock where O == ProductListing {
   convenience init(
     pagination: Mock<Pagination>? = nil,
     products: [Mock<Product>]? = nil,

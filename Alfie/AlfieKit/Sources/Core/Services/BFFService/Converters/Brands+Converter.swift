@@ -1,4 +1,4 @@
-import BFFGraphApi
+import BFFGraph
 import Model
 
 extension Collection where Element == BFFGraphApi.BrandsQuery.Data.Brand {

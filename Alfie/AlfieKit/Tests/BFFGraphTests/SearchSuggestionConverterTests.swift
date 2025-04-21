@@ -1,7 +1,6 @@
 import XCTest
 import ApolloTestSupport
-import BFFGraphAPI
-import BFFGraphMocks
+@testable import BFFGraph
 
 final class SearchSuggestionConverterTests: XCTestCase {
     func test_search_suggestion_valid() {

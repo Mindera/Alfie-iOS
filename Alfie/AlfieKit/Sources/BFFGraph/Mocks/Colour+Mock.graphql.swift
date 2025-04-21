@@ -2,24 +2,24 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Colour: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Colour
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Colour>>
+class Colour: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Colour
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Colour>>
 
-  public struct MockFields {
-    @Field<BFFGraphAPI.ID>("id") public var id
+  struct MockFields {
+    @Field<BFFGraphApi.ID>("id") public var id
     @Field<[Media]>("media") public var media
     @Field<String>("name") public var name
     @Field<Image>("swatch") public var swatch
   }
 }
 
-public extension Mock where O == Colour {
+extension Mock where O == Colour {
   convenience init(
-    id: BFFGraphAPI.ID? = nil,
+    id: BFFGraphApi.ID? = nil,
     media: [(any AnyMock)]? = nil,
     name: String? = nil,
     swatch: Mock<Image>? = nil
