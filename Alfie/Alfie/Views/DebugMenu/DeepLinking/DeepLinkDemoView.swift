@@ -1,6 +1,6 @@
-import Common
 import SharedUI
 import SwiftUI
+import Utils
 
 struct DeepLinkDemoView: View {
     @State private var customWebPath: String = "sale"

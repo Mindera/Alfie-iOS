@@ -1,7 +1,7 @@
 import Combine
-import Common
 import Foundation
 import Model
+import Utils
 
 private enum ConfigurationReleaseType: String {
     case store

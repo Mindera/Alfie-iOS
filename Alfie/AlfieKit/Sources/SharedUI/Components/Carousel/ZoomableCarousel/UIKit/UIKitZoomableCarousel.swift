@@ -1,7 +1,7 @@
 import Combine
-import Common
 import SwiftUI
 import UIKit
+import Utils
 
 final class UIKitZoomableCarousel<Content: View>: UIScrollView, UIScrollViewDelegate {
     private var didLoad = false

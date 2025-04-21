@@ -1,5 +1,5 @@
-import Common
 import Model
+import Utils
 
 public final class BFFClientDependencyContainer {
     public var reachabilityService: ReachabilityServiceProtocol

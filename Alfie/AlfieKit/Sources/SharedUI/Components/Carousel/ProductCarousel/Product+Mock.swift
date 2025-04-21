@@ -1,6 +1,6 @@
-import Common
 import Foundation
 import Model
+import Utils
 
 extension Product {
     public static let fixtures: [Product] = [

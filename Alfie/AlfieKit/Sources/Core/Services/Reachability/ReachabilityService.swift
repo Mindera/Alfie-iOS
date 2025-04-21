@@ -1,7 +1,7 @@
 import Combine
-import Common
 import Foundation
 import Model
+import Utils
 
 public final class ReachabilityService: ReachabilityServiceProtocol {
     private let monitor: NetworkPathMonitorProtocol

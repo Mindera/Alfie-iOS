@@ -4,8 +4,8 @@ import SharedUI
 import SwiftUI
 import WebKit
 #if DEBUG
-import Common
 import Mocks
+import Utils
 #endif
 
 struct WebView<ViewModel: WebViewModelProtocol>: View {
