@@ -1,5 +1,5 @@
 import Apollo
-import BFFGraphAPI
+import BFFGraph
 import Foundation
 
 final class AuthorizationInterceptor: ApolloInterceptor {

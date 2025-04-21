@@ -1,6 +1,5 @@
 import ApolloTestSupport
-import BFFGraphAPI
-import BFFGraphMocks
+@testable import BFFGraph
 
 extension Mock<Product> {
     static func mock(id: String = "",

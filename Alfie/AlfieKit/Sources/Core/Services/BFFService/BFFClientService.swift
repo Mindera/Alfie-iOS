@@ -1,6 +1,6 @@
 import AlicerceLogging
 import Apollo
-import BFFGraphAPI
+import BFFGraph
 import Foundation
 import Model
 

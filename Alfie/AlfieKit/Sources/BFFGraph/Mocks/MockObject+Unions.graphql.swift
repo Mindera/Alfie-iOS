@@ -2,8 +2,8 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public extension MockObject {
+extension MockObject {
   typealias Media = Union
 }

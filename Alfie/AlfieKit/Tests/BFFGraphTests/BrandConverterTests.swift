@@ -1,6 +1,5 @@
 import ApolloTestSupport
-import BFFGraphAPI
-import BFFGraphMocks
+@testable import BFFGraph
 import Common
 import XCTest
 

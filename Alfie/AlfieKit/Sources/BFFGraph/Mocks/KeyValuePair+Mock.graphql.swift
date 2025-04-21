@@ -2,20 +2,20 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class KeyValuePair: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.KeyValuePair
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<KeyValuePair>>
+class KeyValuePair: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.KeyValuePair
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<KeyValuePair>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<String>("key") public var key
     @Field<String>("value") public var value
   }
 }
 
-public extension Mock where O == KeyValuePair {
+extension Mock where O == KeyValuePair {
   convenience init(
     key: String? = nil,
     value: String? = nil

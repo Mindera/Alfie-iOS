@@ -2,25 +2,25 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class VideoSource: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.VideoSource
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<VideoSource>>
+class VideoSource: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.VideoSource
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<VideoSource>>
 
-  public struct MockFields {
-    @Field<GraphQLEnum<BFFGraphAPI.VideoFormat>>("format") public var format
+  struct MockFields {
+    @Field<GraphQLEnum<BFFGraphApi.VideoFormat>>("format") public var format
     @Field<String>("mimeType") public var mimeType
-    @Field<BFFGraphAPI.URL>("url") public var url
+    @Field<BFFGraphApi.URL>("url") public var url
   }
 }
 
-public extension Mock where O == VideoSource {
+extension Mock where O == VideoSource {
   convenience init(
-    format: GraphQLEnum<BFFGraphAPI.VideoFormat>? = nil,
+    format: GraphQLEnum<BFFGraphApi.VideoFormat>? = nil,
     mimeType: String? = nil,
-    url: BFFGraphAPI.URL? = nil
+    url: BFFGraphApi.URL? = nil
   ) {
     self.init()
     _setScalar(format, for: \.format)

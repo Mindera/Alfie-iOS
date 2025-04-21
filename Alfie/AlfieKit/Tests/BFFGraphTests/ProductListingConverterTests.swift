@@ -1,7 +1,7 @@
 import XCTest
 import ApolloTestSupport
-import BFFGraphAPI
-import BFFGraphMocks
+@testable import BFFGraph
+import Core
 
 final class ProductListingConverterTests: XCTestCase {
     func test_product_listing_valid() {

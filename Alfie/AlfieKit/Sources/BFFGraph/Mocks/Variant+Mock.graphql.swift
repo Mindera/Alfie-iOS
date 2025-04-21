@@ -2,30 +2,30 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Variant: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Variant
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Variant>>
+class Variant: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Variant
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Variant>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<[KeyValuePair]>("attributes") public var attributes
     @Field<Colour>("colour") public var colour
     @Field<Price>("price") public var price
     @Field<Size>("size") public var size
-    @Field<BFFGraphAPI.ID>("sku") public var sku
+    @Field<BFFGraphApi.ID>("sku") public var sku
     @Field<Int>("stock") public var stock
   }
 }
 
-public extension Mock where O == Variant {
+extension Mock where O == Variant {
   convenience init(
     attributes: [Mock<KeyValuePair>]? = nil,
     colour: Mock<Colour>? = nil,
     price: Mock<Price>? = nil,
     size: Mock<Size>? = nil,
-    sku: BFFGraphAPI.ID? = nil,
+    sku: BFFGraphApi.ID? = nil,
     stock: Int? = nil
   ) {
     self.init()
