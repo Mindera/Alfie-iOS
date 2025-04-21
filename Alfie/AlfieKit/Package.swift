@@ -107,7 +107,6 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Model",
-                "Navigation",
                 "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
             ],
