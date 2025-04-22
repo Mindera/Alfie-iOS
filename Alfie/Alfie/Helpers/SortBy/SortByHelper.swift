@@ -1,3 +1,4 @@
+import SharedUI
 import StyleGuide
 
 enum SortByHelper {

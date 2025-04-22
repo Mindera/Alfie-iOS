@@ -1,5 +1,6 @@
 import Foundation
 import Models
+import SharedUI
 
 final class BagViewModel: BagViewModelProtocol {
     @Published private(set) var products: [SelectionProduct]

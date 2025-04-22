@@ -1,4 +1,5 @@
 import Models
+import SharedUI
 import SwiftUI
 
 extension ConfigurationKey {

@@ -1,5 +1,6 @@
 import Models
 import Navigation
+import SharedUI
 import StyleGuide
 import SwiftUI
 

@@ -1,5 +1,6 @@
 import Foundation
 import Models
+import SharedUI
 
 extension WebFeature {
     var title: String {

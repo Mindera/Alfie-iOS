@@ -1,7 +1,7 @@
-/*
 // ⚠️ This file is automatically updated by SwiftGen - Do not modify ⚠️ — https://github.com/SwiftGen/SwiftGen
 
 {% if tables.count > 0 %}
+{% set accessModifier %}{% if param.publicAccess %}public{% else %}internal{% endif %}{% endset %}
 import Foundation
 
 // MARK: - Strings
@@ -37,26 +37,26 @@ import Foundation
   {% endif %}
   {% set translation string.translation|replace:'"','\"'|replace:'\t','\t' %}
   {% if string.types %}
-  static func {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}({% call parametersBlock string.types %}) -> String {
+  {{accessModifier}} static func {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}({% call parametersBlock string.types %}) -> String {
     return {{enumName}}.tr("{{table}}", "{{string.key}}", {%+ call argumentsBlock string.types %})
   }
   {% elif param.lookupFunction %}
-  static var {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}: String { return {{enumName}}.tr("{{table}}", "{{string.key}}") }
+  {{accessModifier}} static var {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}: String { return {{enumName}}.tr("{{table}}", "{{string.key}}") }
   {% else %}
-  static let {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = {{enumName}}.tr("{{table}}", "{{string.key}}")
+  {{accessModifier}} static let {{string.name|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = {{enumName}}.tr("{{table}}", "{{string.key}}")
   {% endif %}
   {% endfor %}
   {% for child in item.children %}
-  enum {{child.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+  {{accessModifier}} enum {{child.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
     {% filter indent:2," ",true %}{% call recursiveBlock table child %}{% endfilter %}
   }
   {% endfor %}
 {% endmacro %}
 {% set enumName %}{{param.enumName|default:"L10n"}}{% endset %}
-enum {{enumName}} {
+{{accessModifier}} enum {{enumName}} {
   {% if tables.count > 1 or param.forceFileNameEnum %}
   {% for table in tables %}
-  enum {{table.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+  {{accessModifier}} enum {{table.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
     {% filter indent:2," ",true %}{% call recursiveBlock table.name table.levels %}{% endfilter %}
   }
   {% endfor %}
@@ -108,21 +108,11 @@ private extension String.LocalizationValue.StringInterpolation {
   }
 }
 
-private final class BundleToken {
-    static let bundle: Bundle = {
-        #if SWIFT_PACKAGE
-        return Bundle.module
-        #else
-        return Bundle(for: BundleToken.self)
-        #endif
-    }()
-}
-
 #if DEBUG
 
 // MARK: - Testable Keys
 
-extension {{enumName}} {
+{{accessModifier}} extension {{enumName}} {
   enum Keys: String, RawRepresentable, CaseIterable {
     {% macro collectKeys table item %}
       {% for string in item.strings %}
@@ -143,4 +133,3 @@ extension {{enumName}} {
 {% else %}
 // No strings catalog found
 {% endif %}
-*/

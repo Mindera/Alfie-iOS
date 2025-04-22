@@ -419,10 +419,7 @@ The SwiftGenPlugin leverages Swift Package Manager (SPM) plugins by providing bo
 The build tool plugin does not have write permissions, restricting the generated `L10n+Generated.swift` file to the `DerivedData` folder.
 The command plugin allows generating the `L10n+Generated.swift` file directly in the desired location, but it must be run manually with the command:
 `swift package --allow-writing-to-package-directory generate-code-for-resources`.
-However, this requires a `Package.swift` file containing the plugin, which is not applicable for this project.
-Given these constraints, we opted for the build tool plugin. It is integrated into a build phase under the `Run Build Tool Plug-ins` section, where it generates a `Strings+Generated.swift` file in the `DerivedData` folder with all content commented out. To address this, a custom build phase script, `SwiftGen - Copy Generated Files from OUTPUT_DIR to Project`, is used to copy the file to the project directory as `L10n+Generated.swift`, with the comments (`/*` and `*/`) removed.
-
-*A copy-and-delete or move operation was not feasible because the file in `DerivedData` is required until the build process completes for the plugin to succeed. Additionally, both files cannot coexist simultaneously, as this would cause compile errors.*
+Given these constraints, we opted for the command plugin. It is integrated into a build phase under the `Run Build Tool Plug-ins` section, where it generates a `L10n+generated.swift` file in `SharedUI` library. To address this, a custom build phase script, `Run SwiftGen`, is used to run the command `swift package --allow-writing-to-package-directory generate-code-for-resources --config swiftgen.yml`. 
 
 For more information about SPM plugins, see the official [documentation](https://github.com/swiftlang/swift-package-manager/blob/main/Documentation/Plugins.md).
 
