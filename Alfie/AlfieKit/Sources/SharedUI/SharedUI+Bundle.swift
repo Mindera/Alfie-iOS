@@ -3,7 +3,7 @@ import Foundation
 final class BundleToken {}
 
 extension BundleToken {
-    public static let bundle: Bundle = {
+    static let bundle: Bundle = {
         #if SWIFT_PACKAGE
         return Bundle.module
         #else

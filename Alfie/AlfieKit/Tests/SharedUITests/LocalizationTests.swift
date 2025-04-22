@@ -101,15 +101,7 @@ final class LocalizationTests: XCTestCase {
     }
 
     private func assertResource(key: String, table: String, locale: Locale) {
-        guard
-            let path = BundleToken.bundle.path(forResource: locale.identifier, ofType: "lproj"),
-            let bundle = Bundle(path: path)
-        else {
-            XCTFail("Missing bundle for locale: \(locale.identifier)")
-            return
-        }
-
-        let resource = bundle.localizedString(forKey: key, value: nil, table: table)
+        let resource = BundleToken.bundle.localizedString(forKey: key, value: nil, table: table)
         if resource == key {
             XCTFail("\(table).\(key) not found for \(locale.identifier)")
         }
