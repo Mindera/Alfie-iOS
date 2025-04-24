@@ -1,7 +1,7 @@
-import BFFGraphApi
+import BFFGraphAPI
 import Models
 
-extension BFFGraphApi.ColourFragment {
+extension BFFGraphAPI.ColourFragment {
     func convertToColour() -> Product.Colour {
         Product.Colour(
             id: id,

@@ -1,15 +1,15 @@
-import BFFGraphApi
+import BFFGraphAPI
 import Common
 import Foundation
 import Models
 
-extension BFFGraphApi.GetProductQuery.Data.Product {
+extension BFFGraphAPI.GetProductQuery.Data.Product {
     public func convertToProduct() -> Product {
         fragments.productFragment.convertToProduct()
     }
 }
 
-extension BFFGraphApi.ProductFragment {
+extension BFFGraphAPI.ProductFragment {
     func convertToProduct() -> Product {
         let colors: [Product.Colour] = colours?.map { $0.fragments.colourFragment.convertToColour() } ?? []
 

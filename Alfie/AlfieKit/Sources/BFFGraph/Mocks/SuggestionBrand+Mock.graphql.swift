@@ -2,10 +2,10 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 
 public class SuggestionBrand: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.SuggestionBrand
+  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.SuggestionBrand
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<SuggestionBrand>>
 

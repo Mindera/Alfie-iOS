@@ -1,5 +1,5 @@
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 import XCTest
 
@@ -12,7 +12,7 @@ final class MediaConverterTests: XCTestCase {
             alt: "Accessibility description",
             url: "https://www.alfieproj.com/images/assetimages/footer/alfie.png"
         )
-        let mockMedia = BFFGraphApi.MediaFragment.from(image)
+        let mockMedia = BFFGraphAPI.MediaFragment.from(image)
 
         let media = mockMedia.convertToMedia()
 
@@ -33,7 +33,7 @@ final class MediaConverterTests: XCTestCase {
         let image = Mock<Image>(alt: nil,
                                 mediaContentType: .unknown("gif"),
                                 url: "url")
-        let mockMedia = BFFGraphApi.MediaFragment.from(image)
+        let mockMedia = BFFGraphAPI.MediaFragment.from(image)
 
         let media = mockMedia.convertToMedia()
 
@@ -42,7 +42,7 @@ final class MediaConverterTests: XCTestCase {
 
     func test_image_missing_url_no_image() {
         let image: Mock<Image> = .mock(url: "")
-        let mockMedia = BFFGraphApi.MediaFragment.from(image)
+        let mockMedia = BFFGraphAPI.MediaFragment.from(image)
 
         let media = mockMedia.convertToMedia()
 
@@ -63,7 +63,7 @@ final class MediaConverterTests: XCTestCase {
                 ),
             ]
         )
-        let mockMedia = BFFGraphApi.MediaFragment.from(video)
+        let mockMedia = BFFGraphAPI.MediaFragment.from(video)
 
         let media = mockMedia.convertToMedia()
 
@@ -88,7 +88,7 @@ final class MediaConverterTests: XCTestCase {
 
     func test_video_missing_url_video_with_only_preview_image() {
         let video: Mock<Video> = .mock(sources: [.mock(url: "")])
-        let mockMedia = BFFGraphApi.MediaFragment.from(video)
+        let mockMedia = BFFGraphAPI.MediaFragment.from(video)
 
         let media = mockMedia.convertToMedia()
 
@@ -109,7 +109,7 @@ final class MediaConverterTests: XCTestCase {
         let video: Mock<Video> = .mock(alt: "Accessibility description",
                                        previewImage: .mock(),
                                        sources: [source])
-        let mockMedia = BFFGraphApi.MediaFragment.from(video)
+        let mockMedia = BFFGraphAPI.MediaFragment.from(video)
 
         let media = mockMedia.convertToMedia()
 

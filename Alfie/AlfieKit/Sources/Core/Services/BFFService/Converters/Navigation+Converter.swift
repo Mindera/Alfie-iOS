@@ -1,9 +1,9 @@
 import Apollo
-import BFFGraphApi
+import BFFGraphAPI
 import Foundation
 import Models
 
-extension GraphQLEnum where T == BFFGraphApi.NavMenuItemType {
+extension GraphQLEnum where T == BFFGraphAPI.NavMenuItemType {
     func convertToNavigationItemType() -> NavigationItemType {
         guard let type = self.value else {
             return .listing // Assumed default
@@ -32,13 +32,13 @@ extension GraphQLEnum where T == BFFGraphApi.NavMenuItemType {
     }
 }
 
-extension Collection where Element == BFFGraphApi.GetHeaderNavQuery.Data.Navigation.Item {
+extension Collection where Element == BFFGraphAPI.GetHeaderNavQuery.Data.Navigation.Item {
     func convertToNavigationItems() -> [NavigationItem] {
         compactMap { $0.convertToNavigationItem() }
     }
 }
 
-extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation {
+extension BFFGraphAPI.GetHeaderNavQuery.Data.Navigation {
     func convertToNavigationItem() -> NavigationItem {
         NavigationItem(
             type: self.type.convertToNavigationItemType(),
@@ -51,13 +51,13 @@ extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation {
     }
 }
 
-extension Collection where Element == BFFGraphApi.GetHeaderNavQuery.Data.Navigation {
+extension Collection where Element == BFFGraphAPI.GetHeaderNavQuery.Data.Navigation {
     func convertToNavigationItems() -> [NavigationItem] {
         compactMap { $0.convertToNavigationItem() }
     }
 }
 
-extension BFFGraphApi.NavMenuItemFragment {
+extension BFFGraphAPI.NavMenuItemFragment {
     func convertToNavigationItem() -> NavigationItem {
         NavigationItem(
             type: self.type.convertToNavigationItemType(),
@@ -70,13 +70,13 @@ extension BFFGraphApi.NavMenuItemFragment {
     }
 }
 
-extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation.Item {
+extension BFFGraphAPI.GetHeaderNavQuery.Data.Navigation.Item {
     func convertToNavigationItem() -> NavigationItem {
         fragments.navMenuItemFragment.convertToNavigationItem()
     }
 }
 
-extension BFFGraphApi.GetHeaderNavQuery.Data.Navigation.Item.Media {
+extension BFFGraphAPI.GetHeaderNavQuery.Data.Navigation.Item.Media {
     func convertToMedia() -> Media? {
         guard let mediaImage = self.asImage?.fragments.imageFragment.convertToImage() else {
             return nil

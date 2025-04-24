@@ -1,6 +1,6 @@
 import AlicerceLogging
 import Apollo
-import BFFGraphApi
+import BFFGraphAPI
 import Models
 
 final class NetworkInterceptorProvider: InterceptorProvider {

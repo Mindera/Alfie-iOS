@@ -1,6 +1,6 @@
 import XCTest
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 
 final class SearchSuggestionConverterTests: XCTestCase {
@@ -30,7 +30,7 @@ final class SearchSuggestionConverterTests: XCTestCase {
                                                            keywords: [mockKeyword1, mockKeyword2],
                                                            products: [mockProduct])
 
-        let response = BFFGraphApi.GetSuggestionsQuery.Data.Suggestion.from(mockSearchSuggestion)
+        let response = BFFGraphAPI.GetSuggestionsQuery.Data.Suggestion.from(mockSearchSuggestion)
         let searchSuggestion = response.convertToSearchSuggestion()
 
         XCTAssertEqual(searchSuggestion.brands.count, 2)

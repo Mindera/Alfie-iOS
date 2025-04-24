@@ -1,5 +1,5 @@
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 
 extension Mock<Image> {
@@ -26,7 +26,7 @@ extension Mock<Video> {
 
 extension Mock<VideoSource> {
     static func mock(
-        format: BFFGraphApi.VideoFormat = .mp4,
+        format: BFFGraphAPI.VideoFormat = .mp4,
         mimeType: String = "video/mp4",
         url: String = "https://videos.pexels.com/video-files/3912502/3912502-uhd_2560_1440_25fps.mp4"
     ) -> Mock<VideoSource> {

@@ -9,8 +9,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "BFFGraphApi",
-            targets: ["BFFGraphApi"]
+            name: "BFFGraphAPI",
+            targets: ["BFFGraphAPI"]
         ),
         .library(
             name: "BFFGraphMocks",
@@ -63,7 +63,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "BFFGraphApi",
+            name: "BFFGraphAPI",
             dependencies: [
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "ApolloAPI", package: "apollo-ios"),
@@ -73,7 +73,7 @@ let package = Package(
         .target(
             name: "BFFGraphMocks",
             dependencies: [
-                "BFFGraphApi",
+                "BFFGraphAPI",
                 .product(name: "ApolloTestSupport", package: "apollo-ios"),
             ],
             path: "Sources/BFFGraph/Mocks"
@@ -89,7 +89,7 @@ let package = Package(
         .target(
             name: "Core",
             dependencies: [
-                "BFFGraphApi",
+                "BFFGraphAPI",
                 "Common",
                 "EasyStash",
                 "Models",

@@ -1,5 +1,5 @@
 {
-    "schemaNamespace" : "BFFGraphApi",
+    "schemaNamespace" : "BFFGraphAPI",
     "input" : {
         "operationSearchPaths" : [
             "**/*.graphql"
@@ -16,10 +16,10 @@
             }
         },
         "schemaTypes" : {
-            "path" : "Sources/BFFGraph/Api",
+            "path" : "Sources/BFFGraph/API",
             "moduleType" : {
                 "embeddedInTarget": {
-                    "name": "BFFGraphApi",
+                    "name": "BFFGraphAPI",
                     "accessModifier": "public"
                 }
             }

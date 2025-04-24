@@ -1,6 +1,6 @@
 import XCTest
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 
 final class PriceConverterTests: XCTestCase {
@@ -12,7 +12,7 @@ final class PriceConverterTests: XCTestCase {
                                                       amount: 20,
                                                       amountFormatted: "$20.00"))
 
-        let response = BFFGraphApi.PriceFragment.from(mockPrice)
+        let response = BFFGraphAPI.PriceFragment.from(mockPrice)
         let price = response.convertToPrice()
 
         XCTAssertEqual(price.amount.currencyCode, "AUD")
@@ -31,7 +31,7 @@ final class PriceConverterTests: XCTestCase {
                                                              amount: 100,
                                                              amountFormatted: "$100.00"))
 
-        let response = BFFGraphApi.PriceRangeFragment.from(mockPriceRange)
+        let response = BFFGraphAPI.PriceRangeFragment.from(mockPriceRange)
         let priceRange = response.convertToPriceRange()
 
         XCTAssertEqual(priceRange.low.currencyCode, "AUD")
@@ -47,7 +47,7 @@ final class PriceConverterTests: XCTestCase {
                                            amount: 1,
                                            amountFormatted: "$1.00")
 
-        let response = BFFGraphApi.MoneyFragment.from(mockMoney)
+        let response = BFFGraphAPI.MoneyFragment.from(mockMoney)
         let money = response.convertToMoney()
 
         XCTAssertEqual(money.currencyCode, "AUD")
