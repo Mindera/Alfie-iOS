@@ -1,9 +1,9 @@
-import BFFGraphApi
+import BFFGraphAPI
 import Common
 import Foundation
 import Models
 
-public extension MediaFragment {
+public extension BFFGraphAPI.MediaFragment {
     func convertToMedia() -> Media? {
         if let mediaVideo = self.asVideo?.convertToVideo() {
             return .video(mediaVideo)
@@ -15,7 +15,7 @@ public extension MediaFragment {
     }
 }
 
-extension ImageFragment {
+extension BFFGraphAPI.ImageFragment {
     func convertToImage() -> MediaImage? {
         guard
             url.isNotBlank,
@@ -28,13 +28,13 @@ extension ImageFragment {
     }
 }
 
-private extension MediaFragment.AsImage {
+private extension BFFGraphAPI.MediaFragment.AsImage {
     func convertToImage() -> MediaImage? {
         fragments.imageFragment.convertToImage()
     }
 }
 
-private extension MediaFragment.AsVideo {
+private extension BFFGraphAPI.MediaFragment.AsVideo {
     func convertToVideo() -> MediaVideo? {
         let sources: [VideoSource] = sources.compactMap { source -> VideoSource? in
             guard
@@ -52,7 +52,7 @@ private extension MediaFragment.AsVideo {
 }
 
 private extension VideoSource.VideoFormat {
-    init(from source: MediaFragment.AsVideo.Source) {
+    init(from source: BFFGraphAPI.MediaFragment.AsVideo.Source) {
         // swiftlint:disable vertical_whitespace_between_cases
         self = switch source.format {
         case .mp4:

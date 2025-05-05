@@ -1,7 +1,7 @@
-import BFFGraphApi
+import BFFGraphAPI
 import Models
 
-extension SizeTreeFragment {
+extension BFFGraphAPI.SizeTreeFragment {
     func convertToSize() -> Product.ProductSize {
         Product.ProductSize(
             id: id,
@@ -13,7 +13,7 @@ extension SizeTreeFragment {
     }
 }
 
-extension SizeTreeFragment.SizeGuide {
+extension BFFGraphAPI.SizeTreeFragment.SizeGuide {
     func convertToSizeGuide() -> Product.SizeGuide {
         Product.SizeGuide(
             id: id,
@@ -24,7 +24,7 @@ extension SizeTreeFragment.SizeGuide {
     }
 }
 
-extension SizeTreeFragment.SizeGuide.Size {
+extension BFFGraphAPI.SizeTreeFragment.SizeGuide.Size {
     func convertToSizeGuideSizes() -> Product.ProductSize {
         Product.ProductSize(
             id: id,

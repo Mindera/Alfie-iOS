@@ -1,5 +1,5 @@
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 import Common
 import XCTest
@@ -17,7 +17,7 @@ final class BrandConverterTests: XCTestCase {
             ]
         )
 
-        let response = BrandsQuery.Data.from(mockQuery)
+        let response = BFFGraphAPI.BrandsQuery.Data.from(mockQuery)
         let brands = response.brands.convertToBrands()
 
         XCTAssertEqual(brands.count, 2)

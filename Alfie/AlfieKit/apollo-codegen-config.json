@@ -1,0 +1,31 @@
+{
+    "schemaNamespace" : "BFFGraphAPI",
+    "input" : {
+        "operationSearchPaths" : [
+            "**/*.graphql"
+        ],
+        "schemaSearchPaths" : [
+            "**/*.graphqls"
+        ]
+    },
+    "output" : {
+        "testMocks" : {
+            "absolute" : {
+                "path": "Sources/BFFGraph/Mocks",
+                "accessModifier": "public"
+            }
+        },
+        "schemaTypes" : {
+            "path" : "Sources/BFFGraph/API",
+            "moduleType" : {
+                "embeddedInTarget": {
+                    "name": "BFFGraphAPI",
+                    "accessModifier": "public"
+                }
+            }
+        },
+        "operations" : {
+            "inSchemaModule" : {}
+        }
+    }
+}

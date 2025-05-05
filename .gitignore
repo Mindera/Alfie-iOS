@@ -103,6 +103,9 @@ DerivedData/
 # .swiftpm
 
 .build/
+Alfie/AlfieKit/.build
+Alfie/AlfieKit/.swiftpm
+Alfie/AlfieKit/Package.resolved
 
 # Accio dependency management
 Dependencies/
@@ -119,8 +122,9 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 **/*/xcuserdata
-Alfie/Packages/**/*/.swiftpm
-Alfie/Packages/*/Package.resolved
+
+# Apollo
+Alfie/AlfieKit/apollo-ios-cli
 
 # Secret management
 .gitsecret/keys/random_seed

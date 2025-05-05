@@ -1,5 +1,5 @@
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 import XCTest
 
@@ -10,7 +10,7 @@ final class AttributesConverterTests: XCTestCase {
             .init(key: "key2", value: "value"),
             .init(key: "key3", value: "value"),
         ]
-        let fragmentCollection: [AttributesFragment] = mockCollection.map { AttributesFragment.from($0) }
+        let fragmentCollection: [BFFGraphAPI.AttributesFragment] = mockCollection.map { BFFGraphAPI.AttributesFragment.from($0) }
 
         let attributeCollection = fragmentCollection.convertToAttributeCollection()
 
@@ -25,7 +25,7 @@ final class AttributesConverterTests: XCTestCase {
             .init(key: "key", value: "value1"),
             .init(key: "key", value: "value2"),
         ]
-        let fragmentCollection: [AttributesFragment] = mockCollection.map { AttributesFragment.from($0) }
+        let fragmentCollection: [BFFGraphAPI.AttributesFragment] = mockCollection.map { BFFGraphAPI.AttributesFragment.from($0) }
 
         let attributeCollection = fragmentCollection.convertToAttributeCollection()
 
@@ -39,7 +39,7 @@ final class AttributesConverterTests: XCTestCase {
             .init(key: "", value: "value2"),
             .init(key: "", value: "value3"),
         ]
-        let fragmentCollection: [AttributesFragment] = mockCollection.map { AttributesFragment.from($0) }
+        let fragmentCollection: [BFFGraphAPI.AttributesFragment] = mockCollection.map { BFFGraphAPI.AttributesFragment.from($0) }
 
         let attributeCollection = fragmentCollection.convertToAttributeCollection()
 

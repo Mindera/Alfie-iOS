@@ -1,5 +1,5 @@
 import Apollo
-import BFFGraphApi
+import BFFGraphAPI
 import Foundation
 import Models
 

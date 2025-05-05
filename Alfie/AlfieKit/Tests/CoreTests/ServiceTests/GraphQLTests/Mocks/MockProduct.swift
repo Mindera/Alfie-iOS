@@ -1,5 +1,5 @@
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 
 extension Mock<Product> {

@@ -1,8 +1,8 @@
-import BFFGraphApi
+import BFFGraphAPI
 import Foundation
 import Models
 
-public extension PriceRangeFragment {
+public extension BFFGraphAPI.PriceRangeFragment {
     func convertToPriceRange() -> PriceRange {
         PriceRange(
             low: low.fragments.moneyFragment.convertToMoney(),
@@ -11,7 +11,7 @@ public extension PriceRangeFragment {
     }
 }
 
-public extension PriceFragment {
+public extension BFFGraphAPI.PriceFragment {
     func convertToPrice() -> Price {
         Price(
             amount: amount.fragments.moneyFragment.convertToMoney(),
@@ -20,7 +20,7 @@ public extension PriceFragment {
     }
 }
 
-public extension MoneyFragment {
+public extension BFFGraphAPI.MoneyFragment {
     func convertToMoney() -> Money {
         Money(currencyCode: currencyCode, amount: amount, amountFormatted: amountFormatted)
     }

@@ -1,8 +1,8 @@
-import BFFGraphApi
+import BFFGraphAPI
 import Foundation
 import Models
 
-extension GetSuggestionsQuery.Data.Suggestion {
+extension BFFGraphAPI.GetSuggestionsQuery.Data.Suggestion {
     public func convertToSearchSuggestion() -> SearchSuggestion {
         SearchSuggestion(
             brands: brands.map { $0.fragments.suggestionBrandFragment.convertToSearchSuggestionBrand() },
@@ -12,19 +12,19 @@ extension GetSuggestionsQuery.Data.Suggestion {
     }
 }
 
-extension SuggestionBrandFragment {
+extension BFFGraphAPI.SuggestionBrandFragment {
     func convertToSearchSuggestionBrand() -> SearchSuggestionBrand {
         SearchSuggestionBrand(name: value, slug: slug, resultCount: results)
     }
 }
 
-extension SuggestionKeywordFragment {
+extension BFFGraphAPI.SuggestionKeywordFragment {
     func convertToSearchSuggestionKeyword() -> SearchSuggestionKeyword {
         SearchSuggestionKeyword(term: value, resultCount: results)
     }
 }
 
-extension SuggestionProductFragment {
+extension BFFGraphAPI.SuggestionProductFragment {
     func convertToSearchSuggestionProduct() -> SearchSuggestionProduct {
         SearchSuggestionProduct(
             id: id,

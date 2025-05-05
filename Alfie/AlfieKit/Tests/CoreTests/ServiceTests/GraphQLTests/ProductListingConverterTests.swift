@@ -1,6 +1,6 @@
 import XCTest
 import ApolloTestSupport
-import BFFGraphApi
+import BFFGraphAPI
 import BFFGraphMocks
 
 final class ProductListingConverterTests: XCTestCase {
@@ -17,7 +17,7 @@ final class ProductListingConverterTests: XCTestCase {
                                                       products: [.mock()],
                                                       title: "Product Listing Title")
 
-        let response = ProductListingQuery.Data.ProductListing.from(mockProductListing)
+        let response = BFFGraphAPI.ProductListingQuery.Data.ProductListing.from(mockProductListing)
         let productListing = response.convertToProductListing()
 
         XCTAssertEqual(productListing.products.count, 1)
