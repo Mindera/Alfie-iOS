@@ -6,7 +6,7 @@ import Mocks
 #endif
 
 struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
-    @EnvironmentObject var coordinador: Coordinator
+    @EnvironmentObject var coordinator: Coordinator
     @StateObject private var viewModel: ViewModel
 
     init(viewModel: ViewModel) {
@@ -24,7 +24,7 @@ struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
             ) {
                 ForEach(viewModel.products) { product in
                     Button(
-                        action: { coordinador.openDetails(for: product) },
+                        action: { coordinator.openDetails(for: product) },
                         label: {
                             VerticalProductCard(
                                 viewModel: viewModel.productCardViewModel(for: product)
@@ -55,7 +55,7 @@ private extension WishlistView {
         case .remove:
             viewModel.didSelectDelete(for: product)
         case .addToBag:
-            coordinador.openDetails(for: product)
+            coordinator.openDetails(for: product)
         case .wishlist:
             return
         }

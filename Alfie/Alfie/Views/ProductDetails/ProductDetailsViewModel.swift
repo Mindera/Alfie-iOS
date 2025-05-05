@@ -90,9 +90,7 @@ final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.priceType
     }
 
-    var isAddToBagEnabled: Bool {
-        productHasStock && hasColorSelected && hasSizeSelected
-    }
+    var isAddToBagEnabled: Bool { productHasStock && hasColorSelected && hasSizeSelected }
 
     private var hasColorSelected: Bool {
         !colorSelectionConfiguration.items.isEmpty ? selectedVariant?.colour != nil : true

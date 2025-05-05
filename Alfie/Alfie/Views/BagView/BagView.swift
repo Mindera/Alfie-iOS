@@ -6,7 +6,7 @@ import Mocks
 #endif
 
 struct BagView<ViewModel: BagViewModelProtocol>: View {
-    @EnvironmentObject var coordinador: Coordinator
+    @EnvironmentObject var coordinator: Coordinator
     @StateObject private var viewModel: ViewModel
 
     init(viewModel: ViewModel) {
@@ -17,7 +17,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         List {
             ForEach(viewModel.products) { product in
                 Button(
-                    action: { coordinador.openDetails(for: product) },
+                    action: { coordinator.openDetails(for: product) },
                     label: {
                         HorizontalProductCard(viewModel: viewModel.productCardViewModel(for: product))
                             .contentShape(Rectangle())
