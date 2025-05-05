@@ -49,7 +49,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     BagView(
         viewModel: MockBagViewModel(
             products: [
-                .init(product: Product.fixture())
+                .init(selectedProduct: .init(product: Product.fixture()))
             ]
         )
     )

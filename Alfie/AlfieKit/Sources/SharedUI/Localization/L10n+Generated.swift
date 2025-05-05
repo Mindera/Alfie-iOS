@@ -196,10 +196,10 @@ public enum L10n {
     }
     public enum Size {
       /// Size
-      static let title = L10n.tr("L10n", "product.size.title")
-      enum NoSelection {
+      public static let title = L10n.tr("L10n", "product.size.title")
+      public enum NoSelection {
         /// Select a size
-        static let title = L10n.tr("L10n", "product.size.no_selection.title")
+        public static let title = L10n.tr("L10n", "product.size.no_selection.title")
       }
     }
   }
