@@ -13,7 +13,7 @@ enum Screen: ScreenProtocol {
     case recentSearches
     case forceAppUpdate
     case debugMenu
-    case productDetails(_ type: ThemedProductDetailsScreen)
+    case productDetails(configuration: ProductDetailsConfiguration)
     case productListing(configuration: ProductListingScreenConfiguration)
     case categoryList(_ categories: [NavigationItem], title: String)
 
@@ -35,17 +35,18 @@ enum TabScreen: ScreenProtocol {
     static let allCases: [TabScreen] = [.home(), .shop(), .wishlist, .bag]
 }
 
-enum HomeTabConfig: Equatable, Hashable {
+enum HomeTabConfig: Hashable {
     case loggedIn(username: String, memberSince: Int)
     case loggedOut
 }
 
-enum ThemedProductDetailsScreen: Equatable, Hashable {
+enum ProductDetailsConfiguration: Hashable {
     case id(_ id: String)
     case product(_ product: Product)
+    case selectedProduct(_ selectedProduct: SelectedProduct)
 }
 
-struct ProductListingScreenConfiguration: Equatable, Hashable {
+struct ProductListingScreenConfiguration: Hashable {
     let category: String?
     let searchText: String?
     let urlQueryParameters: [String: String]?

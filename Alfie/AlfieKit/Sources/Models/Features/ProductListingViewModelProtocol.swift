@@ -26,7 +26,7 @@ public enum ProductListingViewMode {
 public protocol ProductListingViewModelProtocol: ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
     var products: [Product] { get }
-    var wishlistContent: [SelectionProduct] { get }
+    var wishlistContent: [SelectedProduct] { get }
     var style: ProductListingListStyle { get set }
     var showRefine: Bool { get set }
     var sortOption: String? { get set }

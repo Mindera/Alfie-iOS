@@ -1,6 +1,6 @@
 import Foundation
 
-public struct MediaImage {
+public struct MediaImage: Hashable {
     /// A description of the contents of the image for accessibility purposes.
     public let alt: String?
     /// The media content type.

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Product: Identifiable, Equatable, Hashable {
+public struct Product: Identifiable, Hashable {
     /// Unique ID for the product and its variants.
     public let id: String
     /// App refers to products (including variants) as style numbers, so this is the product's unique identifier.
@@ -54,20 +54,12 @@ public struct Product: Identifiable, Equatable, Hashable {
         self.variants = variants
         self.colours = colours
     }
-
-    public static func == (lhs: Product, rhs: Product) -> Bool {
-        lhs.styleNumber == rhs.styleNumber
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(styleNumber)
-    }
 }
 
 // MARK: - Product Properties Type
 
 extension Product {
-    public struct Variant {
+    public struct Variant: Hashable {
         /// A unique identifier for the variant.
         public let sku: String
         /// Size, if applicable.
@@ -103,7 +95,7 @@ extension Product {
         }
     }
 
-    public struct Colour {
+    public struct Colour: Hashable {
         /// Unique ID for the colour.
         public let id: String
         /// Image resolver for the colour swatch.
@@ -121,7 +113,7 @@ extension Product {
         }
     }
 
-    public struct ProductSize {
+    public struct ProductSize: Hashable {
         /// Unique size ID.
         public let id: String
         /// The size value (e.g. XS).
@@ -148,7 +140,7 @@ extension Product {
         }
     }
 
-    public struct SizeGuide {
+    public struct SizeGuide: Hashable {
         /// Unique size guide ID.
         public let id: String
         /// The name of the size guide (e.g. Men's shoes size guide).

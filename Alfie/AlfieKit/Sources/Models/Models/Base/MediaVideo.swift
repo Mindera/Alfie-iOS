@@ -1,6 +1,6 @@
 import Foundation
 
-public struct MediaVideo {
+public struct MediaVideo: Hashable {
     /// A description of the contents of the video for accessibility purposes.
     public let alt: String?
     /// The media content type.
@@ -18,7 +18,7 @@ public struct MediaVideo {
     }
 }
 
-public struct VideoSource {
+public struct VideoSource: Hashable {
     public enum VideoFormat: String {
         case mp4 = "MP4"
         case webm = "WEBM"

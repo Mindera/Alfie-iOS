@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Price {
+public struct Price: Hashable {
     /// The current price.
     public let amount: Money
     /// If discounted, the previous price.
@@ -12,7 +12,7 @@ public struct Price {
     }
 }
 
-public struct PriceRange {
+public struct PriceRange: Hashable {
     /// The lowest price.
     public let low: Money
     /// The highest price if not a 'from' range.
@@ -24,7 +24,7 @@ public struct PriceRange {
     }
 }
 
-public struct Money {
+public struct Money: Hashable {
     /// The 3-letter currency code  e.g. AUD.
     public let currencyCode: String
     /// The amount in minor units (e.g. for $1.23 this will be 123).

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Brand: Identifiable, Equatable {
+public struct Brand: Identifiable, Hashable {
     /// The ID for the brand
     public let id: String
     /// The display name of the brand

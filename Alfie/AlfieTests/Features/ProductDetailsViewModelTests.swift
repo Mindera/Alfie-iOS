@@ -53,7 +53,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       brand: .fixture(name: "Product Brand"),
                                       defaultVariant: variant,
                                       variants: [variant])
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
         XCTAssertEqual(sut.productName, product.name)
         XCTAssertEqual(sut.productTitle, product.brand.name)
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
@@ -73,7 +73,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
                                       variants: [variant])
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
         XCTAssertEqual(sut.sizingSelectionConfiguration.items.count, 0)
     }
 
@@ -84,7 +84,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertTrue(sut.productId.isEmpty)
 
         let productId = "1"
-        initViewModel(productId: productId)
+        initViewModel(configuration: .id(productId))
         XCTAssertEqual(sut.productId, productId)
     }
 
@@ -95,7 +95,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_product_title_is_available_after_fetching_product() {
         let product = Product.fixture(brand: .fixture(name: "Product Brand"))
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
@@ -109,7 +109,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_product_name_is_available_after_fetching_product() {
         let product = Product.fixture(name: "Product Name")
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
@@ -127,8 +127,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
             .image(.fixture(url: URL(string: "http://some.media.url.2")!)),
         ])
         let variant = Product.Variant.fixture(colour: color)
-        let product = Product.fixture(name: "Product Name", defaultVariant: variant, variants: [variant])
-        initViewModel(product: product)
+        let product = Product.fixture(name: "Product Name",
+                                      defaultVariant: variant,
+                                      variants: [variant])
+        initViewModel(configuration: .product(product))
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
@@ -153,7 +155,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_product_description_is_available_after_fetching_product() {
         let product = Product.fixture(longDescription: "Product Description")
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
@@ -166,7 +168,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
     
     func test_price_type_is_not_nil_with_sale_product() {
-        initViewModel(product: Product.blazer)
+        initViewModel(configuration: .product(Product.blazer))
         guard case .sale(let fullPrice, let finalPrice) = sut.priceType else {
             XCTFail("Unexpected price type")
             return
@@ -176,7 +178,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
     
     func test_price_type_is_not_nil_with_range_price_product() {
-        initViewModel(product: Product.hat)
+        initViewModel(configuration: .product(Product.hat))
         guard case .range(let lowerBound, let upperBound, let separator) = sut.priceType else {
             XCTFail("Unexpected price type")
             return
@@ -187,7 +189,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
     
     func test_price_type_is_not_nil_with_default_price_product() {
-        initViewModel(product: Product.necklace)
+        initViewModel(configuration: .product(Product.necklace))
         guard case .default(let price) = sut.priceType else {
             XCTFail("Unexpected price type")
             return
@@ -199,7 +201,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_product_is_fetched_when_view_appears() {
         let productId = "1"
-        initViewModel(productId: productId)
+        initViewModel(configuration: .id(productId))
 
         let expectation = expectation(description: "Wait for service call")
         mockProductService.onGetProductCalled = { id in
@@ -214,7 +216,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_product_is_not_fetched_when_view_appears_if_already_fetched() {
         let productId = "1"
-        initViewModel(productId: productId)
+        initViewModel(configuration: .id(productId))
 
         let firstExpectation = expectation(description: "Wait for service call")
         let secondExpectation = expectation(description: "Wait for success state")
@@ -336,7 +338,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_does_not_report_title_section_loading_when_placeholder_available() {
         let product = Product.fixture(name: "Product Name")
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
 
         let result = sut.shouldShowLoading(for: .titleHeader)
         XCTAssertFalse(result)
@@ -589,7 +591,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name",
                                       defaultVariant: variant1,
                                       variants: [variant1, variant2])
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
 
         mockProductService.onGetProductCalled = { _ in
             product
@@ -807,7 +809,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       brand: .fixture(name: "Product Brand"),
                                       variants: (expectedMatchedColors + expectedNonMatchedColors).map { Product.Variant.fixture(colour: $0) })
 
-        initViewModel(product: product)
+        initViewModel(configuration: .product(product))
         let swatchesSearchResult = sut.colorSwatches(filteredBy: "Col")
         XCTAssertTrue(swatchesSearchResult.map(\.name).contains(expectedMatchedColors.map(\.name)))
         XCTAssertFalse(swatchesSearchResult.map(\.name).contains(expectedNonMatchedColors.map(\.name)))
@@ -815,9 +817,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     // MARK: - Helper methods
 
-    private func initViewModel(productId: String = "", product: Product? = nil) {
-        sut = .init(productId: productId,
-                    product: product,
-                    dependencies: mockDependencies)
+    private func initViewModel(configuration: ProductDetailsConfiguration = .id("")) {
+        sut = .init(configuration: configuration, dependencies: mockDependencies)
     }
 }
