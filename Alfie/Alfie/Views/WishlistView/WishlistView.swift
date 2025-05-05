@@ -40,9 +40,6 @@ struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
             .padding(.horizontal, Spacing.space200)
         }
         .padding(.vertical, Spacing.space200)
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
     }
 }
 

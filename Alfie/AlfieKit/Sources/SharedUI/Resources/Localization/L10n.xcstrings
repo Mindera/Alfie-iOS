@@ -420,6 +420,28 @@
         }
       }
     },
+    "product.remove_from_bag.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from bag"
+          }
+        }
+      }
+    },
+    "product.remove_from_wishlist.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from wishlist"
+          }
+        }
+      }
+    },
     "product.size.no_selection.title" : {
       "extractionState" : "manual",
       "localizations" : {

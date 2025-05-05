@@ -1,8 +1,13 @@
+import Combine
 import Foundation
 import Models
 
 public final class MockWishlistService: WishlistServiceProtocol {
-    private var products: [WishlistProduct] = []
+    @Published private var products: [WishlistProduct] = []
+
+    public var productsPublisher: AnyPublisher<[WishlistProduct], Never> {
+        $products.eraseToAnyPublisher()
+    }
 
     public init() { }
 
@@ -20,7 +25,7 @@ public final class MockWishlistService: WishlistServiceProtocol {
         products = products.filter { $0.product.id != wishlistProduct.product.id }
     }
 
-    public func getWishlistContent() -> [WishlistProduct] {
-        products
+    public func containsProduct(_ wishlistProduct: WishlistProduct) -> Bool {
+        products.contains { $0.id == wishlistProduct.id }
     }
 }

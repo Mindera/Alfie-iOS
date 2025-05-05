@@ -181,7 +181,7 @@ struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
                 complementaryViews
                     .padding(.horizontal, horizontalPadding)
             }
-            addToBag
+            bagButton
         }
         .fullScreenCover(isPresented: $isMediaFullScreen) {
             fullscreenMediaCarousel
@@ -255,7 +255,7 @@ extension ProductDetailsView {
             }
 
             VStack {
-                addToBag
+                bagButton
                 addToWishlist
             }
             .padding(.vertical, Spacing.space100)
@@ -481,14 +481,11 @@ extension ProductDetailsView {
         }
     }
 
-    @ViewBuilder private var addToBag: some View {
-        if viewModel.shouldShow(section: .addToBag) {
+    @ViewBuilder private var bagButton: some View {
+        if viewModel.shouldShow(section: .bagButton) {
             VStack(spacing: Spacing.space0) {
-                let addToBagText = L10n.Product.AddToBag.Button.cta
-                let outOfStockText = L10n.Product.OutOfStock.Button.cta
-
                 ThemedButton(
-                    text: viewModel.productHasStock ? addToBagText : outOfStockText,
+                    text: viewModel.bagButtonTitle,
                     isDisabled: .init(
                         get: { !viewModel.isAddToBagEnabled },
                         set: { _ in }
@@ -502,10 +499,10 @@ extension ProductDetailsView {
     }
 
     @ViewBuilder private var addToWishlist: some View {
-        if viewModel.shouldShow(section: .addToWishlist) {
+        if viewModel.shouldShow(section: .wishlistButton) {
             VStack(spacing: Spacing.space0) {
                 ThemedButton(
-                    text: L10n.Product.AddToWishlist.Button.cta,
+                    text: viewModel.wishlistButtonTitle,
                     style: .secondary,
                     isFullWidth: true
                 ) {
@@ -608,7 +605,7 @@ private enum Constants {
         viewModel: MockProductDetailsViewModel(
             complementaryInfoToShow: [.paymentOptions, .returns],
             onShouldShowLoadingForSectionCalled: { _ in true },
-            onShouldShowSectionCalled: { section in section != .addToBag }
+            onShouldShowSectionCalled: { section in section != .bagButton }
         )
     )
     .environmentObject(Coordinator())
