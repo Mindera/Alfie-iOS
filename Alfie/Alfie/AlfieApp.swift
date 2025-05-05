@@ -1,9 +1,9 @@
-import Common
 import Core
-import Models
-import StyleGuide
+import Model
+import SharedUI
 import SwiftUI
 import UIKit
+import Utils
 
 final class AppState: ObservableObject {
     static let shared = AppState()

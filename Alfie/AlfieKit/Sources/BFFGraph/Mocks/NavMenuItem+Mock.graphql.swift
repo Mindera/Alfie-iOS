@@ -2,14 +2,14 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class NavMenuItem: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.NavMenuItem
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<NavMenuItem>>
+class NavMenuItem: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.NavMenuItem
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<NavMenuItem>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<[KeyValuePair?]>("attributes") public var attributes
     @Field<[NavMenuItem]>("items") public var items
     @Field<Media>("media") public var media
@@ -19,7 +19,7 @@ public class NavMenuItem: MockObject {
   }
 }
 
-public extension Mock where O == NavMenuItem {
+extension Mock where O == NavMenuItem {
   convenience init(
     attributes: [Mock<KeyValuePair>?]? = nil,
     items: [Mock<NavMenuItem>]? = nil,

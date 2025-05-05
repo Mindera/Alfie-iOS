@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public class MockWebViewModel: WebViewModelProtocol {
     public var state: WebViewState

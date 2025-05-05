@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 final class ProductListingStyleProvider: ProductListingStyleProviderProtocol {
     private let userDefaults: UserDefaultsProtocol

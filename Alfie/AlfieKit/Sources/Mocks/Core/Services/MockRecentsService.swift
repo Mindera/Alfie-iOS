@@ -1,5 +1,5 @@
 import Combine
-import Models
+import Model
 
 public final class MockRecentsService: RecentsServiceProtocol {
     public var recentSearches: [RecentSearch] = []
@@ -8,12 +8,12 @@ public final class MockRecentsService: RecentsServiceProtocol {
     public init() {}
 
     public var onAdd: ((RecentSearch) -> Void)?
-    public func add(_ recentSearch: Models.RecentSearch) {
+    public func add(_ recentSearch: Model.RecentSearch) {
         onAdd?(recentSearch)
     }
     
     public var onRemove: ((RecentSearch) -> Void)?
-    public func remove(_ recentSearch: Models.RecentSearch) {
+    public func remove(_ recentSearch: Model.RecentSearch) {
         onRemove?(recentSearch)
     }
 

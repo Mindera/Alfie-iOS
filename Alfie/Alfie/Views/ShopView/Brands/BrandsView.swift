@@ -1,7 +1,6 @@
-import Models
+import Model
 import OrderedCollections
 import SharedUI
-import StyleGuide
 import SwiftUI
 #if DEBUG
 import Mocks

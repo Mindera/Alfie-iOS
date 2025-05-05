@@ -1,6 +1,6 @@
 import AlicerceLogging
 import Foundation
-import Models
+import Model
 
 public final class WebViewConfigurationService: WebViewConfigurationServiceProtocol {
     private let bffClient: BFFClientServiceProtocol

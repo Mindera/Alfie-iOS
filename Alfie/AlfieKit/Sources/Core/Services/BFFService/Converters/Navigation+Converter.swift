@@ -1,7 +1,7 @@
 import Apollo
-import BFFGraphAPI
+import BFFGraph
 import Foundation
-import Models
+import Model
 
 extension GraphQLEnum where T == BFFGraphAPI.NavMenuItemType {
     func convertToNavigationItemType() -> NavigationItemType {

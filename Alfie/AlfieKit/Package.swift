@@ -9,16 +9,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "BFFGraphAPI",
-            targets: ["BFFGraphAPI"]
-        ),
-        .library(
-            name: "BFFGraphMocks",
-            targets: ["BFFGraphMocks"]
-        ),
-        .library(
-            name: "Common",
-            targets: ["Common"]
+            name: "BFFGraph",
+            targets: ["BFFGraph"]
         ),
         .library(
             name: "Core",
@@ -29,8 +21,8 @@ let package = Package(
             targets: ["Mocks"]
         ),
         .library(
-            name: "Models",
-            targets: ["Models"]
+            name: "Model",
+            targets: ["Model"]
         ),
         .library(
             name: "Navigation",
@@ -41,12 +33,12 @@ let package = Package(
             targets: ["SharedUI"]
         ),
         .library(
-            name: "StyleGuide",
-            targets: ["StyleGuide"]
-        ),
-        .library(
             name: "TestUtils",
             targets: ["TestUtils"]
+        ),
+        .library(
+            name: "Utils",
+            targets: ["Utils"]
         )
     ],
     dependencies: [
@@ -63,36 +55,21 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "BFFGraphAPI",
+            name: "BFFGraph",
             dependencies: [
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "ApolloAPI", package: "apollo-ios"),
-            ],
-            path: "Sources/BFFGraph/Api"
-        ),
-        .target(
-            name: "BFFGraphMocks",
-            dependencies: [
-                "BFFGraphAPI",
                 .product(name: "ApolloTestSupport", package: "apollo-ios"),
-            ],
-            path: "Sources/BFFGraph/Mocks"
-        ),
-        
-        .target(
-            name: "Common",
-            dependencies: [
-                .product(name: "AlicerceLogging", package: "Alicerce")
             ]
         ),
         
         .target(
             name: "Core",
             dependencies: [
-                "BFFGraphAPI",
-                "Common",
+                "BFFGraph",
                 "EasyStash",
-                "Models",
+                "Model",
+                "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
@@ -106,15 +83,17 @@ let package = Package(
         .target(
             name: "Mocks",
             dependencies: [
-                "Common",
-                "Models"
+                "Model",
+                "Utils",
             ]
         ),
         
         .target(
-            name: "Models",
+            name: "Model",
             dependencies: [
+                "Utils",
                 .product(name: "AlicerceAnalytics", package: "Alicerce"),
+                .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
@@ -125,19 +104,11 @@ let package = Package(
 
         .target(
             name: "SharedUI",
-            resources: [
-                .process("Resources/Localization/L10n.xcstrings")
-            ]
-        ),
-
-        .target(
-            name: "StyleGuide",
             dependencies: [
-                "Common",
                 "Core",
-                "Models",
-                "Navigation",
-                .product(name: "AlicerceLogging", package: "Alicerce")
+                "Model",
+                "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
             ],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
@@ -145,7 +116,8 @@ let package = Package(
                 .process("Theme/Color/Colors.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
                 .process("Theme/Toggle/ToggleColor.xcassets"),
-                .process("Theme/Typography/Resources/Fonts.xcassets")
+                .process("Theme/Typography/Resources/Fonts.xcassets"),
+                .process("Resources/Localization/L10n.xcstrings")
             ]
         ),
         
@@ -156,16 +128,27 @@ let package = Package(
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
             ]
         ),
-        
+
+        .target(
+            name: "Utils"
+        ),
+
+        .testTarget(
+            name: "BFFGraphTests",
+            dependencies: [
+                "BFFGraph",
+                "Core",
+                .product(name: "Apollo", package: "apollo-ios"),
+            ]
+        ),
+
         .testTarget(
             name: "CoreTests",
             dependencies: [
-                "BFFGraphMocks",
-                "Common",
                 "Core",
                 "Mocks",
                 "TestUtils",
-                .product(name: "Apollo", package: "apollo-ios"),
+                "Utils",
             ]
         ),
 
@@ -180,20 +163,12 @@ let package = Package(
             name: "SharedUITests",
             dependencies: [
                 "Core",
-                "SharedUI"
+                "SharedUI",
+                "Utils",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])
             ]
         ),
-        
-        .testTarget(
-            name: "StyleGuideTests",
-            dependencies: [
-                "Common",
-                "Core",
-                "StyleGuide"
-            ]
-        )
     ]
 )

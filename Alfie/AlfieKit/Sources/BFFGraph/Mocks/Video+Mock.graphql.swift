@@ -2,14 +2,14 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Video: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Video
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Video>>
+class Video: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Video
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Video>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<String>("alt") public var alt
     @Field<GraphQLEnum<BFFGraphAPI.MediaContentType>>("mediaContentType") public var mediaContentType
     @Field<Image>("previewImage") public var previewImage
@@ -17,7 +17,7 @@ public class Video: MockObject {
   }
 }
 
-public extension Mock where O == Video {
+extension Mock where O == Video {
   convenience init(
     alt: String? = nil,
     mediaContentType: GraphQLEnum<BFFGraphAPI.MediaContentType>? = nil,

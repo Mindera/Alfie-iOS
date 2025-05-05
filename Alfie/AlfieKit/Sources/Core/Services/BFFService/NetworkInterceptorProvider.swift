@@ -1,7 +1,7 @@
 import AlicerceLogging
 import Apollo
-import BFFGraphAPI
-import Models
+import BFFGraph
+import Model
 
 final class NetworkInterceptorProvider: InterceptorProvider {
     private let store: ApolloStore

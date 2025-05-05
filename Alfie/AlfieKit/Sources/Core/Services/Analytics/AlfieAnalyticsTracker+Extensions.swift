@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public extension AlfieAnalyticsTracker {
     // MARK: - Action Events

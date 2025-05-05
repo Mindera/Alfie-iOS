@@ -1,8 +1,7 @@
 import Combine
-import Models
+import Model
 import Navigation
 import SharedUI
-import StyleGuide
 import SwiftUI
 
 struct ProductListingFilter: View {

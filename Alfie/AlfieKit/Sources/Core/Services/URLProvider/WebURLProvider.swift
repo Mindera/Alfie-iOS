@@ -1,6 +1,7 @@
 import AlicerceLogging
 import Foundation
-import Models
+import Model
+import Utils
 
 public final class WebURLProvider: WebURLProviderProtocol {
     public var host: String

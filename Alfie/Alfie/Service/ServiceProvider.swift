@@ -1,12 +1,12 @@
-import Common
 import Core
 import Firebase
 import Foundation
-import Models
+import Model
 #if DEBUG
 import Mocks
 #endif
 import Network
+import Utils
 
 final class ServiceProvider: ServiceProviderProtocol {
     let analytics: AlfieAnalyticsTracker

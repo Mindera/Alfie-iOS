@@ -3,7 +3,7 @@ import TestUtils
 import XCTest
 @testable import Core
 import Mocks
-import Models
+import Model
 
 final class NavigationServiceTests: XCTestCase {
     private var sut: NavigationService!

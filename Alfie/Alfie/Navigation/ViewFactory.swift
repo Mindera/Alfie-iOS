@@ -1,8 +1,8 @@
 import Combine
 import Core
-import Models
+import Model
 import Navigation
-import StyleGuide
+import SharedUI
 import SwiftUI
 
 final class ViewFactory: ViewFactoryProtocol {

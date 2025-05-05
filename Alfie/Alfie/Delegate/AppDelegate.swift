@@ -1,13 +1,13 @@
 import AlicerceLogging
 import BrazeKit
 import Combine
-import Common
 import Core
 import Foundation
-import Models
+import Model
 import os.log
-import StyleGuide
+import SharedUI
 import UIKit
+import Utils
 #if DEBUG
 import Mocks
 #endif

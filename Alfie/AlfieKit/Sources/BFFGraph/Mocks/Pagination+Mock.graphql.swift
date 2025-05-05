@@ -2,14 +2,14 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Pagination: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Pagination
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Pagination>>
+class Pagination: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Pagination
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Pagination>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<Int>("limit") public var limit
     @Field<Int>("nextPage") public var nextPage
     @Field<Int>("offset") public var offset
@@ -20,7 +20,7 @@ public class Pagination: MockObject {
   }
 }
 
-public extension Mock where O == Pagination {
+extension Mock where O == Pagination {
   convenience init(
     limit: Int? = nil,
     nextPage: Int? = nil,

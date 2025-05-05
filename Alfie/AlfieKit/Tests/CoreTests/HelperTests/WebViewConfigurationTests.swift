@@ -1,5 +1,5 @@
 import XCTest
-import Models
+import Model
 
 final class WebViewConfigurationTests: XCTestCase {
     private static let sampleJson = """

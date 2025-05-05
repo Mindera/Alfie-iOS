@@ -2,14 +2,14 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class Product: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Product
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<Product>>
+class Product: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Product
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<Product>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<[KeyValuePair]>("attributes") public var attributes
     @Field<Brand>("brand") public var brand
     @Field<[Colour]>("colours") public var colours
@@ -27,7 +27,7 @@ public class Product: MockObject {
   }
 }
 
-public extension Mock where O == Product {
+extension Mock where O == Product {
   convenience init(
     attributes: [Mock<KeyValuePair>]? = nil,
     brand: Mock<Brand>? = nil,

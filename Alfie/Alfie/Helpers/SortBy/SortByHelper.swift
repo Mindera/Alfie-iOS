@@ -1,5 +1,4 @@
 import SharedUI
-import StyleGuide
 
 enum SortByHelper {
     static let options: [SortByItemProtocol] = [

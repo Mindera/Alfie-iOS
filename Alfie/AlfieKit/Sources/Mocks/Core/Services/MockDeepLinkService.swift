@@ -1,4 +1,4 @@
-import Models
+import Model
 import Foundation
 
 public final class MockDeepLinkService: DeepLinkServiceProtocol {

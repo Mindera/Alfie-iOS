@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 import SwiftUI
 
 public class MockProductListingViewModel: ProductListingViewModelProtocol {

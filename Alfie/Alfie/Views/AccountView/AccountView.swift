@@ -1,4 +1,4 @@
-import StyleGuide
+import SharedUI
 import SwiftUI
 #if DEBUG
 import Mocks

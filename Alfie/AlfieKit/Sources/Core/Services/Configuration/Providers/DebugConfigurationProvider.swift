@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public final class DebugConfigurationProvider: DebugConfigurationProviderProtocol {
     public static var shared: DebugConfigurationProviderProtocol = DebugConfigurationProvider()

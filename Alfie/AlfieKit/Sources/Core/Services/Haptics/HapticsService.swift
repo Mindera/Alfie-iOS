@@ -1,4 +1,4 @@
-import Models
+import Model
 import UIKit
 
 public final class HapticsService: HapticsServiceProtocol {

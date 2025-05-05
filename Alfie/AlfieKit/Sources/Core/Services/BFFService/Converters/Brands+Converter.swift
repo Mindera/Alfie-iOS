@@ -1,5 +1,5 @@
-import BFFGraphAPI
-import Models
+import BFFGraph
+import Model
 
 extension Collection where Element == BFFGraphAPI.BrandsQuery.Data.Brand {
     public func convertToBrands() -> [Brand] {

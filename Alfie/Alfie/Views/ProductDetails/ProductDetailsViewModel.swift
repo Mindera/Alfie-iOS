@@ -1,9 +1,8 @@
 import Combine
 import Core
 import Foundation
-import Models
+import Model
 import SharedUI
-import StyleGuide
 
 final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let dependencies: ProductDetailsDependencyContainer

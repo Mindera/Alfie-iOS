@@ -1,7 +1,6 @@
 import Core
-import Models
+import Model
 import SharedUI
-import StyleGuide
 import SwiftUI
 #if DEBUG
 import Mocks

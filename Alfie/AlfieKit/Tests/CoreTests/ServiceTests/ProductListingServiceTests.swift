@@ -1,7 +1,7 @@
 import Combine
 import TestUtils
 import Mocks
-import Models
+import Model
 import XCTest
 @testable import Core
 

@@ -1,5 +1,5 @@
 import AlicerceAnalytics
-import Models
+import Model
 
 public class MockAnalyticsTracker: AnalyticsTracker {
     public init() { }

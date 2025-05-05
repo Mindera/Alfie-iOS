@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public final class MockReachabilityService: ReachabilityServiceProtocol {
     @Published var isAvailable = true // By default have reachability to avoid tests unrelated with connection from failing

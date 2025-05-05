@@ -1,14 +1,13 @@
 import Combine
 import Core
 #if DEBUG
-import Common
 import Mocks
 #endif
-import Models
+import Model
 import OrderedCollections
 import SharedUI
-import StyleGuide
 import SwiftUI
+import Utils
 
 struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel

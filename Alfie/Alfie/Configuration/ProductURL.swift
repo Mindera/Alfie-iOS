@@ -1,4 +1,4 @@
-import Models
+import Model
 
 struct ProductURL: WebURLEndpoint {
     let slug: String

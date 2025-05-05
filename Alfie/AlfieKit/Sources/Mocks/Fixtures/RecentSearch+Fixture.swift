@@ -1,4 +1,4 @@
-import Models
+import Model
 
 extension RecentSearch {
     public static let recentSearch1 = RecentSearch.text(value: "gucci")

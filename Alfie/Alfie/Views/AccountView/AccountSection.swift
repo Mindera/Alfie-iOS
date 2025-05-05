@@ -1,4 +1,4 @@
-import StyleGuide
+import SharedUI
 
 // MARK: - AccountSection
 

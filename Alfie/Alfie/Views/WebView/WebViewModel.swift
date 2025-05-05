@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 final class WebViewModel: WebViewModelProtocol {
     private let webFeature: WebFeature?

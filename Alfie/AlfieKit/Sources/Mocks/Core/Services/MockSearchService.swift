@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public final class MockSearchService: SearchServiceProtocol {
     public init() { }

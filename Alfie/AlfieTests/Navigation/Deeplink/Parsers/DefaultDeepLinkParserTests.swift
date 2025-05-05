@@ -1,4 +1,4 @@
-import Models
+import Model
 import XCTest
 @testable import Alfie
 
