@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class Product: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Product
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Product
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Product>>
 
@@ -14,7 +14,7 @@ class Product: MockObject {
     @Field<Brand>("brand") public var brand
     @Field<[Colour]>("colours") public var colours
     @Field<Variant>("defaultVariant") public var defaultVariant
-    @Field<BFFGraphApi.ID>("id") public var id
+    @Field<BFFGraphAPI.ID>("id") public var id
     @available(*, deprecated, message: "Unavailable from iSAMS, do not use")
     @Field<[String]>("labels") public var labels
     @Field<String>("longDescription") public var longDescription
@@ -33,7 +33,7 @@ extension Mock where O == Product {
     brand: Mock<Brand>? = nil,
     colours: [Mock<Colour>]? = nil,
     defaultVariant: Mock<Variant>? = nil,
-    id: BFFGraphApi.ID? = nil,
+    id: BFFGraphAPI.ID? = nil,
     labels: [String]? = nil,
     longDescription: String? = nil,
     name: String? = nil,

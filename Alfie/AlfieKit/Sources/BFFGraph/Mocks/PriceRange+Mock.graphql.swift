@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class PriceRange: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.PriceRange
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.PriceRange
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<PriceRange>>
 

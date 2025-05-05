@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class Variant: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Variant
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Variant
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Variant>>
 
@@ -14,7 +14,7 @@ class Variant: MockObject {
     @Field<Colour>("colour") public var colour
     @Field<Price>("price") public var price
     @Field<Size>("size") public var size
-    @Field<BFFGraphApi.ID>("sku") public var sku
+    @Field<BFFGraphAPI.ID>("sku") public var sku
     @Field<Int>("stock") public var stock
   }
 }
@@ -25,7 +25,7 @@ extension Mock where O == Variant {
     colour: Mock<Colour>? = nil,
     price: Mock<Price>? = nil,
     size: Mock<Size>? = nil,
-    sku: BFFGraphApi.ID? = nil,
+    sku: BFFGraphAPI.ID? = nil,
     stock: Int? = nil
   ) {
     self.init()
