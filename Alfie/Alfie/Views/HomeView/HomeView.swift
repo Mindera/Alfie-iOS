@@ -8,7 +8,7 @@ import Mocks
 #endif
 
 struct HomeView<ViewModel: HomeViewModelProtocol>: View {
-    @EnvironmentObject var coordinador: Coordinator
+    @EnvironmentObject var coordinator: Coordinator
     @StateObject private var viewModel: ViewModel
     @State private var showSearchBar = true
     @Namespace private var animation
@@ -19,7 +19,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
 
     var body: some View {
         VStack {
-            if !coordinador.navigationAdapter.isPresentingFullScreenOverlay {
+            if !coordinator.navigationAdapter.isPresentingFullScreenOverlay {
                 ThemedSearchBarView(
                     searchText: .constant(""),
                     placeholder: L10n.Home.SearchBar.placeholder,
@@ -30,7 +30,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                 .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
                 .disabled(true)
                 .onTapGesture {
-                    coordinador.navigationAdapter.presentFullscreenOverlay(
+                    coordinator.navigationAdapter.presentFullscreenOverlay(
                         with: .search(
                             transition: .matchedGeometryEffect(
                                 id: Constants.searchBarGeometryID,

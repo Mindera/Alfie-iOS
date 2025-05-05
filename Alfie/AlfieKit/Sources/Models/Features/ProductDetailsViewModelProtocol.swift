@@ -68,6 +68,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var shouldShowMediaPaginatedControl: Bool { get }
     var hasSingleImage: Bool { get }
     var priceType: PriceType? { get }
+    var isAddToBagEnabled: Bool { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool

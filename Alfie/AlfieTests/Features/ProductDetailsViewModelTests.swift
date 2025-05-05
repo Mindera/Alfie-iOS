@@ -309,8 +309,9 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertNotNil(selectedVariant)
         XCTAssertEqual(selectedVariant?.colour?.id, variant1.colour?.id)
         XCTAssertEqual(selectedVariant?.colour?.name, variant1.colour?.name)
-        XCTAssertEqual(selectedVariant?.size?.id, variant1.size?.id)
-        XCTAssertEqual(selectedVariant?.size?.value, variant1.size?.value)
+        // We want size to never be pre-selected
+        XCTAssertEqual(selectedVariant?.size?.id, nil)
+        XCTAssertEqual(selectedVariant?.size?.value, nil)
         XCTAssertEqual(selectedVariant?.stock, variant1.stock)
     }
 

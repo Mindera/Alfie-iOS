@@ -1,9 +1,9 @@
 import Models
 
 public class MockBagViewModel: BagViewModelProtocol {
-    public var products: [SelectedProduct]
+    public var products: [BagProduct]
 
-    public init(products: [SelectedProduct] = []) {
+    public init(products: [BagProduct] = []) {
         self.products = products
     }
 
@@ -12,13 +12,13 @@ public class MockBagViewModel: BagViewModelProtocol {
         onViewDidAppearCalled?()
     }
 
-    public var onDidSelectDeleteCalled: ((SelectedProduct) -> Void)?
-    public func didSelectDelete(for selectedProduct: SelectedProduct) {
+    public var onDidSelectDeleteCalled: ((BagProduct) -> Void)?
+    public func didSelectDelete(for selectedProduct: BagProduct) {
         onDidSelectDeleteCalled?(selectedProduct)
     }
 
-    public var onProductCardViewModelCalled: ((SelectedProduct) -> HorizontalProductCardViewModel)?
-    public func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
+    public var onProductCardViewModelCalled: ((BagProduct) -> HorizontalProductCardViewModel)?
+    public func productCardViewModel(for selectedProduct: BagProduct) -> HorizontalProductCardViewModel {
         onProductCardViewModelCalled?(selectedProduct) ?? .init(
             image: nil,
             designer: "Yves Saint Laurent",
