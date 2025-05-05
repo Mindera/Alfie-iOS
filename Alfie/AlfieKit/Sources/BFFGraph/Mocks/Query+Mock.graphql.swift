@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class Query: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Query
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Query
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Query>>
 

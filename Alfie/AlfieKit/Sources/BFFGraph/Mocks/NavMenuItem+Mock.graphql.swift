@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class NavMenuItem: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.NavMenuItem
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.NavMenuItem
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<NavMenuItem>>
 
@@ -14,7 +14,7 @@ class NavMenuItem: MockObject {
     @Field<[NavMenuItem]>("items") public var items
     @Field<Media>("media") public var media
     @Field<String>("title") public var title
-    @Field<GraphQLEnum<BFFGraphApi.NavMenuItemType>>("type") public var type
+    @Field<GraphQLEnum<BFFGraphAPI.NavMenuItemType>>("type") public var type
     @Field<String>("url") public var url
   }
 }
@@ -25,7 +25,7 @@ extension Mock where O == NavMenuItem {
     items: [Mock<NavMenuItem>]? = nil,
     media: (any AnyMock)? = nil,
     title: String? = nil,
-    type: GraphQLEnum<BFFGraphApi.NavMenuItemType>? = nil,
+    type: GraphQLEnum<BFFGraphAPI.NavMenuItemType>? = nil,
     url: String? = nil
   ) {
     self.init()
