@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class Money: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Money
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Money
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Money>>
 

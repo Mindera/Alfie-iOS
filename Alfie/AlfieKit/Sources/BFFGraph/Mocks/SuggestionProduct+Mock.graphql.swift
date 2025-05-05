@@ -5,13 +5,13 @@ import ApolloTestSupport
 import BFFGraph
 
 class SuggestionProduct: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.SuggestionProduct
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.SuggestionProduct
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<SuggestionProduct>>
 
   struct MockFields {
     @Field<String>("brandName") public var brandName
-    @Field<BFFGraphApi.ID>("id") public var id
+    @Field<BFFGraphAPI.ID>("id") public var id
     @Field<[Media]>("media") public var media
     @Field<String>("name") public var name
     @Field<Price>("price") public var price
@@ -22,7 +22,7 @@ class SuggestionProduct: MockObject {
 extension Mock where O == SuggestionProduct {
   convenience init(
     brandName: String? = nil,
-    id: BFFGraphApi.ID? = nil,
+    id: BFFGraphAPI.ID? = nil,
     media: [(any AnyMock)]? = nil,
     name: String? = nil,
     price: Mock<Price>? = nil,

@@ -5,12 +5,12 @@ import ApolloTestSupport
 import BFFGraph
 
 class Colour: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Colour
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Colour
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Colour>>
 
   struct MockFields {
-    @Field<BFFGraphApi.ID>("id") public var id
+    @Field<BFFGraphAPI.ID>("id") public var id
     @Field<[Media]>("media") public var media
     @Field<String>("name") public var name
     @Field<Image>("swatch") public var swatch
@@ -19,7 +19,7 @@ class Colour: MockObject {
 
 extension Mock where O == Colour {
   convenience init(
-    id: BFFGraphApi.ID? = nil,
+    id: BFFGraphAPI.ID? = nil,
     media: [(any AnyMock)]? = nil,
     name: String? = nil,
     swatch: Mock<Image>? = nil

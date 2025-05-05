@@ -5,13 +5,13 @@ import ApolloTestSupport
 import BFFGraph
 
 class SizeGuide: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.SizeGuide
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.SizeGuide
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<SizeGuide>>
 
   struct MockFields {
     @Field<String>("description") public var description
-    @Field<BFFGraphApi.ID>("id") public var id
+    @Field<BFFGraphAPI.ID>("id") public var id
     @Field<String>("name") public var name
     @Field<[Size]>("sizes") public var sizes
   }
@@ -20,7 +20,7 @@ class SizeGuide: MockObject {
 extension Mock where O == SizeGuide {
   convenience init(
     description: String? = nil,
-    id: BFFGraphApi.ID? = nil,
+    id: BFFGraphAPI.ID? = nil,
     name: String? = nil,
     sizes: [Mock<Size>]? = nil
   ) {

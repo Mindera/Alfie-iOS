@@ -5,12 +5,12 @@ import ApolloTestSupport
 import BFFGraph
 
 class Brand: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Brand
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Brand
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Brand>>
 
   struct MockFields {
-    @Field<BFFGraphApi.ID>("id") public var id
+    @Field<BFFGraphAPI.ID>("id") public var id
     @Field<String>("name") public var name
     @Field<String>("slug") public var slug
   }

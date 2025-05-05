@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class Pagination: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.Pagination
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.Pagination
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<Pagination>>
 

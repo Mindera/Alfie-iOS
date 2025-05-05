@@ -5,7 +5,7 @@ import ApolloTestSupport
 import BFFGraph
 
 class SuggestionKeyword: MockObject {
-  static let objectType: ApolloAPI.Object = BFFGraphApi.Objects.SuggestionKeyword
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.SuggestionKeyword
   static let _mockFields = MockFields()
   typealias MockValueCollectionType = Array<Mock<SuggestionKeyword>>
 
