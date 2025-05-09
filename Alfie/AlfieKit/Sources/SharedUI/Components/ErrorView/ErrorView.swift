@@ -1,24 +1,26 @@
-import SharedUI
 import SwiftUI
-
-// MARK: - Constants
-
-private enum Constants {
-    static let iconSize: CGFloat = 48
-}
 
 // MARK: - ErrorView
 
-struct ErrorView: View {
+public struct ErrorView: View {
     // MARK: Inner types
 
-    struct ButtonConfiguration: Identifiable {
+    public struct ButtonConfiguration: Identifiable {
         let cta: String
         let action: () -> Void
 
-        var id: String {
+        public var id: String {
             cta
         }
+
+        public init(cta: String, action: @escaping () -> Void) {
+            self.cta = cta
+            self.action = action
+        }
+    }
+
+    public enum Constants {
+        public static let iconSize: CGFloat = 48
     }
 
     // MARK: Properties
@@ -35,7 +37,7 @@ struct ErrorView: View {
 
     // MARK: Lifecycle
 
-    init(
+    public init(
         spacing: CGFloat = Spacing.space200,
         icon: Image? = Icon.warning.image,
         iconColor: Color = Colors.primary.black,
@@ -57,7 +59,7 @@ struct ErrorView: View {
         self.buttons = buttons
     }
 
-    init(
+    public init(
         spacing: CGFloat = Spacing.space200,
         icon: Image? = Icon.warning.image,
         iconColor: Color = Colors.primary.black,
@@ -81,7 +83,7 @@ struct ErrorView: View {
         )
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: spacing) {
             Spacer()
 
