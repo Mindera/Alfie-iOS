@@ -1,18 +1,8 @@
+import AppFeature
 import Combine
 import Foundation
 import Model
 import OrderedCollections
-
-enum AppStartupScreen {
-    case loading
-    case forceUpdate
-    case error
-    case landing
-}
-
-protocol AppStartupServiceProtocol: ObservableObject {
-    var currentScreen: AppStartupScreen { get }
-}
 
 final class AppStartupService: AppStartupServiceProtocol {
     private let configurationService: ConfigurationServiceProtocol

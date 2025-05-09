@@ -1,7 +1,6 @@
 import Foundation
-import Model
 
-extension SelectionProduct {
+public extension SelectionProduct {
     var sizeText: String {
         var sizeValue: String = ""
         if let size {

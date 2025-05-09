@@ -39,4 +39,9 @@ public final class MockSearchViewModel: SearchViewModelProtocol {
     public func onTapSearchSuggestion(_ suggestion: SearchSuggestionKeyword) {
         onTapSearchSuggestionCalled?(suggestion)
     }
+
+    public var onCloseSearchCalled: (() -> Void)?
+    public func closeSearch() {
+        onCloseSearchCalled?()
+    }
 }

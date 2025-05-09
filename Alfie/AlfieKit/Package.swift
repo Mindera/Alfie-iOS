@@ -9,12 +9,20 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "AppFeature",
+            targets: ["AppFeature"]
+        ),
+        .library(
             name: "BFFGraph",
             targets: ["BFFGraph"]
         ),
         .library(
             name: "Core",
             targets: ["Core"]
+        ),
+        .library(
+            name: "Home",
+            targets: ["Home"]
         ),
         .library(
             name: "Mocks",
@@ -25,8 +33,20 @@ let package = Package(
             targets: ["Model"]
         ),
         .library(
+            name: "MyAccount",
+            targets: ["MyAccount"]
+        ),
+        .library(
             name: "Navigation",
             targets: ["Navigation"]
+        ),
+        .library(
+            name: "ProductDetails",
+            targets: ["ProductDetails"]
+        ),
+        .library(
+            name: "ProductListing",
+            targets: ["ProductListing"]
         ),
         .library(
             name: "SharedUI",
@@ -39,6 +59,14 @@ let package = Package(
         .library(
             name: "Utils",
             targets: ["Utils"]
+        ),
+        .library(
+            name: "Web",
+            targets: ["Web"]
+        ),
+        .library(
+            name: "Wishlist",
+            targets: ["Wishlist"]
         )
     ],
     dependencies: [
@@ -54,6 +82,17 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.0.3"),
     ],
     targets: [
+        .target(
+            name: "AppFeature",
+            dependencies: [
+                "Model",
+                "Home",
+                "Search",
+                "SharedUI",
+                "Wishlist"
+            ]
+        ),
+
         .target(
             name: "BFFGraph",
             dependencies: [
@@ -79,7 +118,22 @@ let package = Package(
                 .product(name: "NukeUI", package: "nuke"),
             ]
         ),
-        
+
+        .target(
+            name: "Home",
+            dependencies: [
+                "Core",
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "Search",
+                "SharedUI",
+                "Web",
+                "Wishlist"
+            ]
+        ),
+
         .target(
             name: "Mocks",
             dependencies: [
@@ -97,9 +151,46 @@ let package = Package(
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
-        
+
+
+        .target(
+            name: "MyAccount",
+            dependencies: [
+                "Model",
+                "SharedUI"
+            ]
+        ),
+
         .target(
             name: "Navigation"
+        ),
+
+        .target(
+            name: "ProductDetails",
+            dependencies: [
+                "Core",
+                "Model",
+                "SharedUI",
+                "Web"
+            ]
+        ),
+
+        .target(
+            name: "ProductListing",
+            dependencies: [
+                "Core",
+                "Model",
+                "ProductDetails",
+                "SharedUI"
+            ]
+        ),
+
+        .target(
+            name: "Search",
+            dependencies: [
+                "Model",
+                "SharedUI"
+            ]
         ),
 
         .target(
@@ -131,6 +222,27 @@ let package = Package(
 
         .target(
             name: "Utils"
+        ),
+
+        .target(
+            name: "Web",
+            dependencies: [
+                "Model",
+                "Utils",
+                "SharedUI"
+            ]
+        ),
+
+        .target(
+            name: "Wishlist",
+            dependencies: [
+                "Core",
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "SharedUI",
+                "Web"
+            ]
         ),
 
         .testTarget(
