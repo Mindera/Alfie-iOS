@@ -1,3 +1,4 @@
+import AppFeature
 import Core
 import Model
 import SharedUI
@@ -26,13 +27,20 @@ struct AlfieApp: App {
             if ProcessInfo.isRunningTests {
                 EmptyView()
             } else {
-                RootView(
-                    coordinator: appDelegate.tabCoordinator,
-                    startupScreenProvider: AppStartupService(
+                AppFeatureView(
+                    serviceProvider: appDelegate.serviceProvider,
+                    screenProvider: AppStartupService(
                         configurationService: appDelegate.serviceProvider.configurationService
                     ),
                     configurationService: appDelegate.serviceProvider.configurationService
                 )
+//                RootView(
+//                    coordinator: appDelegate.tabCoordinator,
+//                    startupScreenProvider: AppStartupService(
+//                        configurationService: appDelegate.serviceProvider.configurationService
+//                    ),
+//                    configurationService: appDelegate.serviceProvider.configurationService
+//                )
                 .onAppear {
                     setupDeepLinkHandlers()
                 }
