@@ -6,7 +6,7 @@ import Web
 public extension ProductListingRoute {
     @ViewBuilder
     func destination(
-        productDetailsViewModel: (String, Product?) -> some ProductDetailsViewModelProtocol2,
+        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
         webViewModel: (WebFeature) -> some WebViewModelProtocol2,
         productListingViewModel: (ProductListingScreenConfiguration2) -> some ProductListingViewModelProtocol2
     ) -> some View {

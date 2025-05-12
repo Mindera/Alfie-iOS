@@ -13,7 +13,7 @@ public struct WishlistFlowView: View {
                 .navigationDestination(for: WishlistRoute.self) { route in
                     route.destination(
                         accountViewModel: viewModel.makeAccountViewModel,
-                        productDetailsViewModel: viewModel.makeProductDetailsViewModel(productID:product:),
+                        productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
                         webViewModel: viewModel.makeWebViewModel(feature:),
                         wishlistViewModel: { viewModel.makeWishlistViewModel(isRoot: false) },
                         myAccountIntentViewBuilder: viewModel.myAccountIntentViewBuilder

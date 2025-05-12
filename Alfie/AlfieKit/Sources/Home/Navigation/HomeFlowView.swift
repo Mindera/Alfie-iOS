@@ -14,7 +14,7 @@ public struct HomeFlowView: View {
                 .navigationDestination(for: HomeRoute.self) { route in
                     route.destination(
                         accountViewModel: viewModel.makeAccountViewModel,
-                        productDetailsViewModel: viewModel.makeProductDetailsViewModel(productID:product:),
+                        productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
                         webViewModel: viewModel.makeWebViewModel(feature:),
                         productListingViewModel: viewModel.makeProductListingViewModel(configuration:),
                         myAccountIntentViewBuilder: viewModel.myAccountIntentViewBuilder(for:),

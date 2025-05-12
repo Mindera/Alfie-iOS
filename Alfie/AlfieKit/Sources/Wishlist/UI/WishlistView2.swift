@@ -22,11 +22,18 @@ public struct WishlistView2<ViewModel: WishlistViewModelProtocol2>: View {
                 spacing: Spacing.space200
             ) {
                 ForEach(viewModel.products) { product in
-                    VerticalProductCard(
-                        viewModel: viewModel.productCardViewModel(for: product)
-                    ) { _, type in
-                        handleUserAction(forProduct: product, actionType: type)
-                    }
+                    Button(
+                        action: { viewModel.didTapProduct(product) },
+                        label: {
+                            VerticalProductCard(
+                                viewModel: viewModel.productCardViewModel(for: product)
+                            ) { _, type in
+                                handleUserAction(forProduct: product, actionType: type)
+                            }
+                        }
+                    )
+                    .buttonStyle(.plain)
+                    .listRowInsets(EdgeInsets())
                 }
             }
             .padding(.horizontal, Spacing.space200)
@@ -44,7 +51,7 @@ public struct WishlistView2<ViewModel: WishlistViewModelProtocol2>: View {
 // MARK: - Private Methods
 
 private extension WishlistView2 {
-    func handleUserAction(forProduct product: SelectionProduct, actionType: VerticalProductCard.ProductUserActionType) {
+    func handleUserAction(forProduct product: SelectedProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
         case .remove:

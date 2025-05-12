@@ -10,7 +10,7 @@ public extension HomeRoute {
     @ViewBuilder
     func destination(
         accountViewModel: () -> some AccountViewModelProtocol2,
-        productDetailsViewModel: (String, Product?) -> some ProductDetailsViewModelProtocol2,
+        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
         webViewModel: (WebFeature) -> some WebViewModelProtocol2,
         productListingViewModel: (ProductListingScreenConfiguration2) -> some ProductListingViewModelProtocol2,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView,

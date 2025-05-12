@@ -61,12 +61,10 @@ public final class ProductListingFlowViewModel: ObservableObject {
     }
 
     func makeProductDetailsViewModel(
-        productID: String,
-        product: Product?
+        configuration: ProductDetailsConfiguration2
     ) -> some ProductDetailsViewModelProtocol2 {
         ProductDetailsViewModel2(
-            productId: productID,
-            product: product,
+            configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
                 webUrlProvider: serviceProvider.webUrlProvider,

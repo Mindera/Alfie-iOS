@@ -2,12 +2,13 @@ import Foundation
 import Model
 
 public protocol WishlistViewModelProtocol2: ObservableObject {
-    var products: [SelectionProduct] { get }
+    var products: [SelectedProduct] { get }
     var hasNavigationSeparator: Bool { get }
 
     func viewDidAppear()
-    func didSelectDelete(for product: SelectionProduct)
-    func didTapAddToBag(for product: SelectionProduct)
+    func didTapProduct(_ selectedProduct: SelectedProduct)
+    func didSelectDelete(for selectedProduct: SelectedProduct)
+    func didTapAddToBag(for selectedProduct: SelectedProduct)
     func didTapMyAccount()
-    func productCardViewModel(for product: SelectionProduct) -> VerticalProductCardViewModel
+    func productCardViewModel(for selectedProduct: SelectedProduct) -> VerticalProductCardViewModel
 }

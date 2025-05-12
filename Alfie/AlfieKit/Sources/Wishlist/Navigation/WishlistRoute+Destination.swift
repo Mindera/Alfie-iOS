@@ -8,7 +8,7 @@ public extension WishlistRoute {
     @ViewBuilder
     func destination(
         accountViewModel: () -> some AccountViewModelProtocol2,
-        productDetailsViewModel: (String, Product?) -> some ProductDetailsViewModelProtocol2,
+        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
         webViewModel: (WebFeature) -> some WebViewModelProtocol2,
         wishlistViewModel: () -> some WishlistViewModelProtocol2,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView
