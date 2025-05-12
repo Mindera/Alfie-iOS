@@ -12,7 +12,7 @@ public struct ProductListingFlowView: View {
             ProductListingView2(viewModel: viewModel.makeProductListingViewModel())
                 .navigationDestination(for: ProductListingRoute.self) { route in
                     route.destination(
-                        productDetailsViewModel: viewModel.makeProductDetailsViewModel(productID:product:),
+                        productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
                         webViewModel: viewModel.makeWebViewModel(feature:),
                         productListingViewModel: viewModel.makeProductListingViewModel(configuration:)
                     )

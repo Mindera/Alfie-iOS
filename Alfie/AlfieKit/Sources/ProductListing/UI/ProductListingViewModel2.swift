@@ -14,7 +14,7 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
     @Published public var style: ProductListingListStyle2
     @Published public var showRefine = false
     @Published public var sortOption: String?
-    @Published public private(set) var wishlistContent: [SelectionProduct]
+    @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
     @Published public private(set) var state: PaginatedViewState2<ProductListingViewStateModel2, ProductListingViewErrorType2>
 
@@ -80,11 +80,11 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
     }
 
     public func didSelect(_ product: Product) {
-        navigate(.productDetails(.productDetails(productID: product.id, product: product)))
+        navigate(.productDetails(.productDetails(.product(product))))
     }
 
     public func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.contains { $0.id == product.defaultVariant.sku }
+        wishlistContent.contains { $0.product.defaultVariant.sku == product.defaultVariant.sku }
     }
 
     public func didTapSearch() {
@@ -93,11 +93,12 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
         if !isFavorite {
-            let selectedProduct = SelectionProduct(product: product)
+            let selectedProduct = SelectedProduct(product: product)
             dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            dependencies.analytics.trackAddToWishlist(productID: product.id)
         } else {
-            dependencies.wishlistService.removeProduct(product.defaultVariant.sku)
+            let selectedProduct = SelectedProduct(product: product)
+            dependencies.wishlistService.removeProduct(selectedProduct)
             dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
         }
         wishlistContent = dependencies.wishlistService.getWishlistContent()

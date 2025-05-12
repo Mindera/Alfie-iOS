@@ -4,7 +4,7 @@ import Model
 public protocol ProductListingViewModelProtocol2: ObservableObject {
     var state: PaginatedViewState2<ProductListingViewStateModel2, ProductListingViewErrorType2> { get }
     var products: [Product] { get }
-    var wishlistContent: [SelectionProduct] { get }
+    var wishlistContent: [SelectedProduct] { get }
     var style: ProductListingListStyle2 { get set }
     var showRefine: Bool { get set }
     var sortOption: String? { get set }

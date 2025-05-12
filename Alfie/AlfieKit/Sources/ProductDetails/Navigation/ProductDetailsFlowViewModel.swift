@@ -5,23 +5,19 @@ import Web
 public final class ProductDetailsFlowViewModel: ObservableObject {
     @Published var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
-    private let productId: String
-    private let product: Product?
+    private let configuration: ProductDetailsConfiguration2
 
     public init(
-        productId: String,
-        product: Product?,
+        configuration: ProductDetailsConfiguration2,
         serviceProvider: ServiceProviderProtocol
     ) {
-        self.productId = productId
-        self.product = product
+        self.configuration = configuration
         self.serviceProvider = serviceProvider
     }
 
     func makeProductDetailsViewModel() -> some ProductDetailsViewModelProtocol2 {
         ProductDetailsViewModel2(
-            productId: productId,
-            product: product,
+            configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
                 webUrlProvider: serviceProvider.webUrlProvider,
@@ -36,12 +32,10 @@ public final class ProductDetailsFlowViewModel: ObservableObject {
     }
 
     func makeProductDetailsViewModel(
-        productID: String,
-        product: Product?
+        configuration: ProductDetailsConfiguration2
     ) -> some ProductDetailsViewModelProtocol2 {
         ProductDetailsViewModel2(
-            productId: productID,
-            product: product,
+            configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
                 webUrlProvider: serviceProvider.webUrlProvider,

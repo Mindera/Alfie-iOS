@@ -94,12 +94,10 @@ public final class HomeFlowViewModel: ObservableObject {
     }
 
     func makeProductDetailsViewModel(
-        productID: String,
-        product: Product?
+        configuration: ProductDetailsConfiguration2
     ) -> some ProductDetailsViewModelProtocol2 {
         ProductDetailsViewModel2(
-            productId: productID,
-            product: product,
+            configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
                 webUrlProvider: serviceProvider.webUrlProvider,
@@ -139,21 +137,28 @@ public final class HomeFlowViewModel: ObservableObject {
     private func searchIntentViewBuilder(for intent: SearchIntent) -> AnyView {
         switch intent {
         case .productListing(let searchTerm, let category):
-            AnyView(
+            return AnyView(
                 ProductListingView2(
                     viewModel: makeProductListingViewModelForSearch(searchTerm: searchTerm, category: category)
                 )
             )
 
         case .productDetails(let productID, let product):
-            AnyView(
+            let configuration: ProductDetailsConfiguration2
+            if let product {
+                configuration = .product(product)
+            } else {
+                configuration = .id(productID)
+            }
+
+            return AnyView(
                 ProductDetailsView2(
-                    viewModel: makeProductDetailsViewModelForSearch(productID: productID, product: product)
+                    viewModel: makeProductDetailsViewModelForSearch(configuration: configuration)
                 )
             )
 
         case .webFeature(let feature):
-            AnyView(
+            return AnyView(
                 WebView2(viewModel: makeWebViewModelForSearch(feature: feature))
             )
         }
@@ -187,8 +192,25 @@ public final class HomeFlowViewModel: ObservableObject {
         ) { [weak self] route in
             switch route {
             case .productDetails(let productDetailsRoute):
+                let productID: String
+                let product: Product?
+
                 switch productDetailsRoute {
-                case .productDetails(let productID, let product):
+                case .productDetails(let configuration):
+                    switch configuration {
+                    case .id(let configurationProductID):
+                        productID = configurationProductID
+                        product = nil
+
+                    case .product(let configurationProduct):
+                        productID = configurationProduct.id
+                        product = configurationProduct
+
+                    case .selectedProduct(let selectedProduct):
+                        productID = selectedProduct.product.id
+                        product = selectedProduct.product
+                    }
+
                     self?.searchFlowViewModel.navigate(
                         .searchIntent(.productDetails(productID: productID, product: product))
                     )
@@ -211,12 +233,10 @@ public final class HomeFlowViewModel: ObservableObject {
     }
 
     private func makeProductDetailsViewModelForSearch(
-        productID: String,
-        product: Product?
+        configuration: ProductDetailsConfiguration2
     ) -> some ProductDetailsViewModelProtocol2 {
         ProductDetailsViewModel2(
-            productId: productID,
-            product: product,
+            configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
                 webUrlProvider: serviceProvider.webUrlProvider,
