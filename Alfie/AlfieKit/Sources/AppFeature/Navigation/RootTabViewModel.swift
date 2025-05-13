@@ -70,6 +70,10 @@ public final class RootTabViewModel: ObservableObject {
             .assignWeakly(to: \.overlayView, on: self)
             .store(in: &subscriptions)
 
+        categorySelectorFlowViewModel.$overlayView
+            .assignWeakly(to: \.overlayView, on: self)
+            .store(in: &subscriptions)
+
         $overlayView
             .map { $0 != nil }
             .assignWeakly(to: \.isOverlayVisible, on: self)

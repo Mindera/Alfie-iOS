@@ -16,6 +16,7 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
     @Published public var sortOption: String?
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
+    private let showSearch: () -> Void
     @Published public private(set) var state: PaginatedViewState2<ProductListingViewStateModel2, ProductListingViewErrorType2>
 
     public enum Constants {
@@ -38,6 +39,10 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
         !(state.isLoadingFirstPage || mode == .searchResults)
     }
 
+    public var isWishlistEnabled: Bool {
+        dependencies.configurationService.isFeatureEnabled(.wishlist)
+    }
+
     public init(
         dependencies: ProductListingDependencyContainer2,
         category: String? = nil,
@@ -46,7 +51,8 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode2 = .listing,
         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize,
-        navigate: @escaping (ProductListingRoute) -> Void
+        navigate: @escaping (ProductListingRoute) -> Void,
+        showSearch: @escaping () -> Void
     ) {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
@@ -58,6 +64,7 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
         wishlistContent = dependencies.wishlistService.getWishlistContent()
         self.navigate = navigate
+        self.showSearch = showSearch
     }
 
     public func viewDidAppear() {
@@ -88,7 +95,7 @@ public final class ProductListingViewModel2: ProductListingViewModelProtocol2 {
     }
 
     public func didTapSearch() {
-        navigate(.search)
+        showSearch()
     }
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {

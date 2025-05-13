@@ -6,16 +6,19 @@ public final class ProductListingDependencyContainer2 {
     let plpStyleListProvider: ProductListingStyleProviderProtocol2
     let wishlistService: WishlistServiceProtocol
     let analytics: AlfieAnalyticsTracker
+    let configurationService: ConfigurationServiceProtocol
 
     public init(
         productListingService: ProductListingServiceProtocol,
         plpStyleListProvider: ProductListingStyleProviderProtocol2,
         wishlistService: WishlistServiceProtocol,
-        analytics: AlfieAnalyticsTracker
+        analytics: AlfieAnalyticsTracker,
+        configurationService: ConfigurationServiceProtocol
     ) {
         self.productListingService = productListingService
         self.plpStyleListProvider = plpStyleListProvider
         self.wishlistService = wishlistService
         self.analytics = analytics
+        self.configurationService = configurationService
     }
 }

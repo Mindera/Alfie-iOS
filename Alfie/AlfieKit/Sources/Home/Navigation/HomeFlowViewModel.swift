@@ -73,15 +73,16 @@ public final class HomeFlowViewModel: ObservableObject {
                 ),
                 plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics
+                analytics: serviceProvider.analytics,
+                configurationService: serviceProvider.configurationService
             ),
             category: configuration.category,
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
-            mode: configuration.mode
-        ) { [weak self] in
-            self?.navigate(.productListing($0))
-        }
+            mode: configuration.mode,
+            navigate: { [weak self] in self?.navigate(.productListing($0)) },
+            showSearch: { [weak self] in self?.isSearchPresented = true }
+        )
     }
 
     func makeProductDetailsViewModel(
@@ -175,53 +176,53 @@ public final class HomeFlowViewModel: ObservableObject {
                 ),
                 plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics
+                analytics: serviceProvider.analytics,
+                configurationService: serviceProvider.configurationService
             ),
             category: configuration.category,
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
-            mode: configuration.mode
-        ) { [weak self] route in
-            switch route {
-            case .productDetails(let productDetailsRoute):
-                let productID: String
-                let product: Product?
+            mode: configuration.mode,
+            navigate: { [weak self] route in
+                switch route {
+                case .productDetails(let productDetailsRoute):
+                    let productID: String
+                    let product: Product?
 
-                switch productDetailsRoute {
-                case .productDetails(let configuration):
-                    switch configuration {
-                    case .id(let configurationProductID):
-                        productID = configurationProductID
-                        product = nil
+                    switch productDetailsRoute {
+                    case .productDetails(let configuration):
+                        switch configuration {
+                        case .id(let configurationProductID):
+                            productID = configurationProductID
+                            product = nil
 
-                    case .product(let configurationProduct):
-                        productID = configurationProduct.id
-                        product = configurationProduct
+                        case .product(let configurationProduct):
+                            productID = configurationProduct.id
+                            product = configurationProduct
 
-                    case .selectedProduct(let selectedProduct):
-                        productID = selectedProduct.product.id
-                        product = selectedProduct.product
+                        case .selectedProduct(let selectedProduct):
+                            productID = selectedProduct.product.id
+                            product = selectedProduct.product
+                        }
+
+                        self?.searchFlowViewModel.navigate(
+                            .searchIntent(.productDetails(productID: productID, product: product))
+                        )
+
+                    case .webFeature(let feature):
+                        self?.searchFlowViewModel.navigate(.searchIntent(.webFeature(feature)))
                     }
 
+                case .productListing(let configuration):
                     self?.searchFlowViewModel.navigate(
-                        .searchIntent(.productDetails(productID: productID, product: product))
+                        .searchIntent(
+                            .productListing(searchTerm: configuration.searchText, category: configuration.category)
+                        )
                     )
-
-                case .webFeature(let feature):
-                    self?.searchFlowViewModel.navigate(.searchIntent(.webFeature(feature)))
                 }
-
-            case .productListing(let configuration):
-                self?.searchFlowViewModel.navigate(
-                    .searchIntent(
-                        .productListing(searchTerm: configuration.searchText, category: configuration.category)
-                    )
-                )
-
-            case .search:
-                self?.searchFlowViewModel.navigate(.search)
-            }
-        }
+            },
+            showSearch: { [weak self] in self?.isSearchPresented = true }
+        )
     }
 
     private func makeProductDetailsViewModelForSearch(

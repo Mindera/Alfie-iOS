@@ -2,6 +2,7 @@ import Combine
 import Core
 import Foundation
 import Model
+import Utils
 
 public final class SearchViewModel2: SearchViewModelProtocol2 {
     public typealias RecentSearchesViewModel = RecentSearchesViewModel2
@@ -131,6 +132,15 @@ extension SearchViewModel2 {
         }
         dependencies.recentsService?.add(.text(value: suggestion.term))
         navigate(.searchIntent(.productListing(searchTerm: suggestion.term, category: nil)))
+    }
+
+    public func onTapProduct(_ product: Product) {
+        navigate(.searchIntent(.productDetails(productID: product.id, product: product)))
+    }
+
+    public func onTapOpenBrands() {
+        guard let url = ThemedURL2.brands.internalUrl else { return }
+        ExternalAppLauncher.open(url: url)
     }
 
     public func viewDidAppear() {

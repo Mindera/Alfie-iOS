@@ -219,15 +219,13 @@ extension SearchView2 {
             )
         ) { _, _ in }
         .onTapGesture {
-//            coordinator.openDetails(for: product)
-            print("TBD: Open product details")
+            viewModel.onTapProduct(product)
         }
     }
 
     private func openBrands() {
         hideKeyboard()
-//        coordinator.openBrands()
-        print("TBD: Open brands")
+        viewModel.onTapOpenBrands()
         // Delay closing the search screen to avoid a flicker while changing tabs
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             viewModel.closeSearch()

@@ -15,6 +15,8 @@ public protocol SearchViewModelProtocol2: ObservableObject {
     func onSubmitSearch()
     func onTapSearchBrand(_ brand: SearchSuggestionBrand)
     func onTapSearchSuggestion(_ suggestion: SearchSuggestionKeyword)
+    func onTapProduct(_ product: Product)
+    func onTapOpenBrands()
     func viewDidAppear()
     func viewDidDisappear()
     func closeSearch()
