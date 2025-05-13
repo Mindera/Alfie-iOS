@@ -1,9 +1,11 @@
 import Foundation
 import MyAccount
 import ProductDetails
+import Wishlist
 
-public enum WishlistRoute: Hashable {
+public enum BagRoute: Hashable {
+    case bag
     case myAccount(MyAccountRoute)
     case productDetails(ProductDetailsRoute)
-    case wishlist
+    case wishlist(WishlistRoute)
 }

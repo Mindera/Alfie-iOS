@@ -1,6 +1,6 @@
 import Model
-import SwiftUI
 import ProductDetails
+import SwiftUI
 import Web
 
 public extension ProductListingRoute {

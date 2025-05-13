@@ -1,3 +1,5 @@
+import Bag
+import CategorySelector
 import Foundation
 import Home
 import Model
@@ -21,14 +23,16 @@ public struct RootTabView: View {
                 ForEach(viewModel.tabs, id: \.self) { tab in
                     switch tab {
                     case .bag:
-                        Text("TBD: Bag")
+                        BagFlowView(viewModel: viewModel.bagFlowViewModel)
+                            .environment(\.tabBarSize, tabBarSize)
 
                     case .home:
                         HomeFlowView(viewModel: viewModel.homeFlowViewModel)
                             .environment(\.tabBarSize, tabBarSize)
 
                     case .shop:
-                        Text("TBD: Shop")
+                        CategorySelectorFlowView(viewModel: viewModel.categorySelectorFlowViewModel)
+                            .environment(\.tabBarSize, tabBarSize)
 
                     case .wishlist:
                         WishlistFlowView(viewModel: viewModel.wishlistFlowViewModel)

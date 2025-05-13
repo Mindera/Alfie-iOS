@@ -4,7 +4,7 @@ import Foundation
 import Model
 import OrderedCollections
 
-final class BrandsViewModel: BrandsViewModelProtocol {
+final class BrandsViewModel2: BrandsViewModelProtocol {
     private enum Constants {
         static let placeholderTitleLowerBound: Int = 30
         static let placeholderTitleUpperBound: Int = 50
@@ -12,6 +12,7 @@ final class BrandsViewModel: BrandsViewModelProtocol {
     }
 
     private let brandsService: BrandsServiceProtocol
+    private let navigate: (CategorySelectorRoute) -> Void
     private lazy var placeholders: [Brand] = {
         (0..<Constants.placeholderItemCount).map { _ in
             .init(
@@ -34,8 +35,12 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         }
         .eraseToAnyPublisher()
 
-    init(brandsService: BrandsServiceProtocol) {
+    init(
+        brandsService: BrandsServiceProtocol,
+        navigate: @escaping (CategorySelectorRoute) -> Void
+    ) {
         self.brandsService = brandsService
+        self.navigate = navigate
         searchText = ""
     }
 
@@ -75,7 +80,20 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         }
     }
 
-    func didTapBrand(_ brand: Brand) { }
+    func didTapBrand(_ brand: Brand) {
+        navigate(
+            .productListing(
+                .productListing(
+                    .init(
+                        category: brand.slug,
+                        searchText: nil,
+                        urlQueryParameters: nil,
+                        mode: .listing
+                    )
+                )
+            )
+        )
+    }
 
     func searchFocusDidChange(isFocused: Bool) {
         searchFocusStateSubject.send(isFocused)
@@ -98,7 +116,7 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         do {
             brands = try await brandsService.getBrands()
         } catch {
-            log.error("Error fetching brands for Brands screen: \(error)")
+//            log.error("Error fetching brands for Brands screen: \(error)")
             state = .error(.generic)
             return
         }

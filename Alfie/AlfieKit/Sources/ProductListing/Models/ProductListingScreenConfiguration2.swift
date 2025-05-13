@@ -9,7 +9,7 @@ public struct ProductListingScreenConfiguration2: Equatable, Hashable {
     public init(
         category: String?,
         searchText: String?,
-        urlQueryParameters: [String : String]?,
+        urlQueryParameters: [String: String]?,
         mode: ProductListingViewMode2
     ) {
         self.category = category

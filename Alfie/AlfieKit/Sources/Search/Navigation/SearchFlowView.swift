@@ -4,14 +4,9 @@ import SwiftUI
 public struct SearchFlowView: View {
     @ObservedObject var viewModel: SearchFlowViewModel
     @Namespace private var animation
-    private let transition: SearchBarTransition?
 
-    public init(
-        viewModel: SearchFlowViewModel,
-        transition: SearchBarTransition? = nil
-    ) {
+    public init(viewModel: SearchFlowViewModel) {
         self.viewModel = viewModel
-        self.transition = transition
     }
 
     public var body: some View {
@@ -19,16 +14,26 @@ public struct SearchFlowView: View {
             NavigationStack(path: $viewModel.path) {
                 SearchView2(
                     viewModel: viewModel.makeSearchModel(),
-                    transition: transition
+                    transition: .matchedGeometryEffect(
+                        id: Constants.searchBarGeometryID,
+                        namespace: animation
+                    )
                 )
                 .navigationDestination(for: SearchRoute.self) { route in
                     route.destination(
                         searchViewModel: viewModel.makeSearchModel,
-                        transition: transition,
+                        transition: .matchedGeometryEffect(
+                            id: Constants.searchBarGeometryID,
+                            namespace: animation
+                        ),
                         intentViewBuilder: viewModel.intentViewBuilder
                     )
                 }
             }
         }
+    }
+
+    private enum Constants {
+        static let searchBarGeometryID = "SearchBar"
     }
 }

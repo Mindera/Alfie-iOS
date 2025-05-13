@@ -15,7 +15,6 @@ public final class HomeFlowViewModel: ObservableObject {
     @Published private var isSearchPresented = false
     @Published public var overlayView: AnyView?
     private var subscriptions = Set<AnyCancellable>()
-    @Namespace private var animation
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
         SearchFlowViewModel(
@@ -38,15 +37,7 @@ public final class HomeFlowViewModel: ObservableObject {
                 guard let self else { return }
 
                 if isSearchPresented {
-                    overlayView = AnyView(
-                        SearchFlowView(
-                            viewModel: searchFlowViewModel,
-                            transition: .matchedGeometryEffect(
-                                id: Constants.searchBarGeometryID,
-                                namespace: animation //
-                            )
-                        )
-                    )
+                    overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
                 } else {
                     overlayView = nil
                 }
@@ -160,6 +151,7 @@ public final class HomeFlowViewModel: ObservableObject {
         case .webFeature(let feature):
             return AnyView(
                 WebView2(viewModel: makeWebViewModelForSearch(feature: feature))
+                    .toolbarView(title: feature.title)
             )
         }
     }
@@ -281,9 +273,5 @@ public final class HomeFlowViewModel: ObservableObject {
         ) { [weak self] in
             self?.navigate(.wishlist($0))
         }
-    }
-
-    private enum Constants {
-        static let searchBarGeometryID = "SearchBar"
     }
 }

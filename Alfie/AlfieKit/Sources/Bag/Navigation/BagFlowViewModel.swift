@@ -3,8 +3,9 @@ import MyAccount
 import ProductDetails
 import SwiftUI
 import Web
+import Wishlist
 
-public final class WishlistFlowViewModel: ObservableObject {
+public final class BagFlowViewModel: ObservableObject {
     @Published var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
 
@@ -12,11 +13,10 @@ public final class WishlistFlowViewModel: ObservableObject {
         self.serviceProvider = serviceProvider
     }
 
-    func makeWishlistViewModel(isRoot: Bool) -> some WishlistViewModelProtocol2 {
-        WishlistViewModel2(
-            hasNavigationSeparator: !isRoot,
-            dependencies: WishlistDependencyContainer2(
-                wishlistService: serviceProvider.wishlistService,
+    func makeBagViewModel() -> some BagViewModelProtocol2 {
+        BagViewModel2(
+            isWishlistEnabled: serviceProvider.configurationService.isFeatureEnabled(.wishlist),
+            dependencies: BagDependencyContainer2(
                 bagService: serviceProvider.bagService,
                 analytics: serviceProvider.analytics
             )
@@ -63,16 +63,29 @@ public final class WishlistFlowViewModel: ObservableObject {
         )
     }
 
+    func makeWishlistViewModel() -> some WishlistViewModelProtocol2 {
+        WishlistViewModel2(
+            hasNavigationSeparator: true,
+            dependencies: WishlistDependencyContainer2(
+                wishlistService: serviceProvider.wishlistService,
+                bagService: serviceProvider.bagService,
+                analytics: serviceProvider.analytics
+            )
+        ) { [weak self] in
+            self?.navigate(.wishlist($0))
+        }
+    }
+
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
-                WishlistView2(viewModel: makeWishlistViewModel(isRoot: false))
+                WishlistView2(viewModel: makeWishlistViewModel())
             )
         }
     }
 
-    private func navigate(_ route: WishlistRoute) {
+    private func navigate(_ route: BagRoute) {
         path.append(route)
     }
 
