@@ -52,7 +52,7 @@ public enum ToolbarItemProvider2 {
         }
     }
 
-    private static func wishlistItem(
+    public static func wishlistItem(
         size: ToolBarButtonSize = .normal,
         openWishlistAction: @escaping () -> Void
     ) -> some View {

@@ -13,8 +13,16 @@ let package = Package(
             targets: ["AppFeature"]
         ),
         .library(
+            name: "Bag",
+            targets: ["Bag"]
+        ),
+        .library(
             name: "BFFGraph",
             targets: ["BFFGraph"]
+        ),
+        .library(
+            name: "CategorySelector",
+            targets: ["CategorySelector"]
         ),
         .library(
             name: "Core",
@@ -85,9 +93,22 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
+                "Bag",
+                "CategorySelector",
                 "Model",
                 "Home",
                 "Search",
+                "SharedUI",
+                "Wishlist"
+            ]
+        ),
+
+        .target(
+            name: "Bag",
+            dependencies: [
+                "Model",
+                "MyAccount",
+                "ProductDetails",
                 "SharedUI",
                 "Wishlist"
             ]
@@ -101,7 +122,23 @@ let package = Package(
                 .product(name: "ApolloTestSupport", package: "apollo-ios"),
             ]
         ),
-        
+
+        .target(
+            name: "CategorySelector",
+            dependencies: [
+                "Core",
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "SharedUI",
+                "Utils",
+                "Web",
+                "Wishlist",
+                .product(name: "OrderedCollections", package: "swift-collections"),
+            ]
+        ),
+
         .target(
             name: "Core",
             dependencies: [

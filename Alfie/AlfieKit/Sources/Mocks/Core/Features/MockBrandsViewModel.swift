@@ -26,6 +26,11 @@ public class MockBrandsViewModel: BrandsViewModelProtocol {
         onBrandsCalled?(section) ?? state.value?[section] ?? []
     }
 
+    public var onDidTapBrandCalled: ((Brand) -> Void)?
+    public func didTapBrand(_ brand: Brand) {
+        onDidTapBrandCalled?(brand)
+    }
+
     public var onSearchFocusDidChangeCalled: ((Bool) -> Void)?
     public func searchFocusDidChange(isFocused: Bool) {
         onSearchFocusDidChangeCalled?(isFocused)

@@ -1,4 +1,6 @@
+import CategorySelector
 import Combine
+import Bag
 import Foundation
 import Home
 import Model
@@ -10,6 +12,8 @@ public final class RootTabViewModel: ObservableObject {
     @Published var selectedTab: Model.Tab
     private let serviceProvider: ServiceProviderProtocol
 
+    let bagFlowViewModel: BagFlowViewModel
+    let categorySelectorFlowViewModel: CategorySelectorFlowViewModel
     let homeFlowViewModel: HomeFlowViewModel
     let wishlistFlowViewModel: WishlistFlowViewModel
     @Published var overlayView: AnyView?
@@ -29,6 +33,12 @@ public final class RootTabViewModel: ObservableObject {
         self.selectedTab = initialTab
         self.serviceProvider = serviceProvider
 
+        self.bagFlowViewModel = BagFlowViewModel(
+            serviceProvider: serviceProvider
+        )
+        self.categorySelectorFlowViewModel = CategorySelectorFlowViewModel(
+            serviceProvider: serviceProvider
+        )
         self.homeFlowViewModel = HomeFlowViewModel(
             serviceProvider: serviceProvider
         )
@@ -42,13 +52,13 @@ public final class RootTabViewModel: ObservableObject {
     func popToRoot(in tab: Model.Tab) {
         switch tab {
         case .bag:
-            print("TODO")
+            bagFlowViewModel.popToRoot()
 
         case .home:
             homeFlowViewModel.popToRoot()
 
         case .shop:
-            print("TODO")
+            categorySelectorFlowViewModel.popToRoot()
 
         case .wishlist:
             wishlistFlowViewModel.popToRoot()

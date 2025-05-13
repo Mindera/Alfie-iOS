@@ -14,6 +14,7 @@ public extension ProductDetailsRoute {
 
         case .webFeature(let feature):
             WebView2(viewModel: webViewModel(feature))
+                .toolbarView(title: feature.title)
         }
     }
 }

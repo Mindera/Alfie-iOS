@@ -10,6 +10,7 @@ public protocol BrandsViewModelProtocol: ObservableObject {
 
     func viewDidAppear()
     func brands(for section: String) -> [Brand]
+    func didTapBrand(_ brand: Brand)
     func searchFocusDidChange(isFocused: Bool)
 }
 
