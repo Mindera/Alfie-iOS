@@ -11,6 +11,7 @@ public protocol ProductListingViewModelProtocol2: ObservableObject {
     var title: String { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
+    var isWishlistEnabled: Bool { get }
 
     func viewDidAppear()
     func didDisplay(_ product: Product)

@@ -63,8 +63,7 @@ public struct ProductListingView2<ViewModel: ProductListingViewModelProtocol2>: 
                     viewModel: .init(
                         configuration: .init(
                             size: viewModel.style == .list ? .large : .medium,
-//                            hideAction: !coordinator.isWishlistEnabled
-                            hideAction: false
+                            hideAction: !viewModel.isWishlistEnabled
                         ),
                         product: product
                     ),
@@ -78,8 +77,6 @@ public struct ProductListingView2<ViewModel: ProductListingViewModelProtocol2>: 
                     isFavorite: viewModel.isFavoriteState(for: product)
                 )
                 .onTapGesture {
-//                    coordinator.openDetails(for: product)
-                    print("TBD: Open Product Details")
                     viewModel.didSelect(product)
                 }
                 .onAppear {

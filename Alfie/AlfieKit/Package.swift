@@ -131,6 +131,7 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Search",
                 "SharedUI",
                 "Utils",
                 "Web",
@@ -218,6 +219,7 @@ let package = Package(
                 "Core",
                 "Model",
                 "ProductDetails",
+                "Search",
                 "SharedUI"
             ]
         ),
@@ -226,6 +228,7 @@ let package = Package(
             name: "Search",
             dependencies: [
                 "Model",
+                "Utils",
                 "SharedUI"
             ]
         ),

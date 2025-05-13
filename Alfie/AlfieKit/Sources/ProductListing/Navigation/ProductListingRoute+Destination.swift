@@ -19,9 +19,6 @@ public extension ProductListingRoute {
 
         case .productListing(let configuration):
             ProductListingView2(viewModel: productListingViewModel(configuration))
-
-        case .search:
-            Text("TBD: Search")
         }
     }
 }
