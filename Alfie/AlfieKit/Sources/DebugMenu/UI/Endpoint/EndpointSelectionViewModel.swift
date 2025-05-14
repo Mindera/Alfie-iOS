@@ -1,16 +1,16 @@
 import Foundation
 import Model
 
-final class EndpointSelectionViewModel: ObservableObject {
+public final class EndpointSelectionViewModel: ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol
-    @Published var selectedEndpointOption: ApiEndpointOption?
-    @Published var customEndpointUrl: String
-    @Published private(set) var shouldShowUrlError = false
-    @Published private(set) var shouldShowSuccess = false
+    @Published public var selectedEndpointOption: ApiEndpointOption?
+    @Published public var customEndpointUrl: String
+    @Published public private(set) var shouldShowUrlError = false
+    @Published public private(set) var shouldShowSuccess = false
     private var isSaving = false
     let closeEndpointSelection: () -> Void
 
-    var isInputDisabled: Bool {
+    public var isInputDisabled: Bool {
         guard !isSaving else {
             return true
         }
@@ -18,7 +18,7 @@ final class EndpointSelectionViewModel: ObservableObject {
         return selectedEndpointOption != .custom(url: nil)
     }
 
-    var isSaveDisabled: Bool {
+    public var isSaveDisabled: Bool {
         guard !isSaving else {
             return true
         }
@@ -33,9 +33,9 @@ final class EndpointSelectionViewModel: ObservableObject {
         return selectedEndpointOption == apiEndpointService.currentApiEndpoint
     }
 
-    var availableEndpointOptions = ApiEndpointOption.allCases
+    public var availableEndpointOptions = ApiEndpointOption.allCases
 
-    var disabledEndpointOptions: [ApiEndpointOption] {
+    public var disabledEndpointOptions: [ApiEndpointOption] {
         guard !isSaving else {
             return ApiEndpointOption.allCases
         }
@@ -43,7 +43,7 @@ final class EndpointSelectionViewModel: ObservableObject {
         return [.preProd, .prod]
     }
 
-    init(
+    public init(
         apiEndpointService: ApiEndpointServiceProtocol,
         closeEndpointSelection: @escaping () -> Void
     ) {
@@ -57,7 +57,7 @@ final class EndpointSelectionViewModel: ObservableObject {
         }
     }
 
-    func didTapSave() {
+    public func didTapSave() {
         shouldShowUrlError = false
 
         guard let selectedEndpointOption else {
@@ -80,7 +80,7 @@ final class EndpointSelectionViewModel: ObservableObject {
         shouldShowSuccess = true
     }
 
-    func didDismissError() {
+    public func didDismissError() {
         shouldShowUrlError = false
     }
 }

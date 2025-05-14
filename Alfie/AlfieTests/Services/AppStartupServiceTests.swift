@@ -1,3 +1,4 @@
+import AppFeature
 import TestUtils
 import XCTest
 import Mocks
@@ -5,13 +6,15 @@ import Model
 @testable import Alfie
 
 final class AppStartupServiceTests: XCTestCase {
-    private var sut: AppStartupService!
+    private var sut: AppFeatureViewModel!
+    private var mockServiceProvider: MockServiceProvider!
     private var mockConfigurationService: MockConfigurationService!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockConfigurationService = .init()
-        sut = .init(AppStartupService(configurationService: mockConfigurationService, startupCompletionDelay: 0))
+        mockServiceProvider = .init(configurationService: mockConfigurationService)
+        sut = .init(AppFeatureViewModel(serviceProvider: mockServiceProvider, startupCompletionDelay: 0))
     }
 
     override func tearDownWithError() throws {

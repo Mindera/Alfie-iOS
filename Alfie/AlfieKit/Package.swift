@@ -99,6 +99,7 @@ let package = Package(
             dependencies: [
                 "Bag",
                 "CategorySelector",
+                "Mocks",
                 "Model",
                 "Home",
                 "Search",
@@ -167,6 +168,7 @@ let package = Package(
             name: "DebugMenu",
             dependencies: [
                 "Core",
+                "Mocks",
                 "Model",
                 "SharedUI"
             ]
@@ -253,6 +255,7 @@ let package = Package(
             name: "SharedUI",
             dependencies: [
                 "Core",
+                "Mocks",
                 "Model",
                 "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
