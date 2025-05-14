@@ -76,7 +76,7 @@ public enum ToolbarItemProvider2 {
         }
     }
 
-    private static func debugMenuItem(
+    public static func debugMenuItem(
         size: ToolBarButtonSize = .normal,
         openDebugMenuAction: @escaping () -> Void
     ) -> some View {

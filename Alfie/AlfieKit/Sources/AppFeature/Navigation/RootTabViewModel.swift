@@ -1,6 +1,6 @@
+import Bag
 import CategorySelector
 import Combine
-import Bag
 import Foundation
 import Home
 import Model

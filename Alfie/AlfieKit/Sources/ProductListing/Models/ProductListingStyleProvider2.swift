@@ -5,7 +5,7 @@ public final class ProductListingStyleProvider2: ProductListingStyleProviderProt
     private let userDefaults: UserDefaultsProtocol
     private let savedPlpListStyle = "PLP_LIST_STYLE"
 
-    private(set) public var style: ProductListingListStyle2 = .grid
+    public private(set) var style: ProductListingListStyle2 = .grid
 
     public init(userDefaults: UserDefaultsProtocol) {
         self.userDefaults = userDefaults

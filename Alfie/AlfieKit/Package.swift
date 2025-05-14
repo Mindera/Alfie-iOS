@@ -29,6 +29,10 @@ let package = Package(
             targets: ["Core"]
         ),
         .library(
+            name: "DebugMenu",
+            targets: ["DebugMenu"]
+        ),
+        .library(
             name: "Home",
             targets: ["Home"]
         ),
@@ -160,9 +164,19 @@ let package = Package(
         ),
 
         .target(
+            name: "DebugMenu",
+            dependencies: [
+                "Core",
+                "Model",
+                "SharedUI"
+            ]
+        ),
+
+        .target(
             name: "Home",
             dependencies: [
                 "Core",
+                "DebugMenu",
                 "Model",
                 "MyAccount",
                 "ProductDetails",

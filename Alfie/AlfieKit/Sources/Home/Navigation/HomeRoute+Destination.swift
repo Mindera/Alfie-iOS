@@ -6,6 +6,7 @@ import SwiftUI
 import Web
 import Wishlist
 
+// swiftlint:disable function_parameter_count
 public extension HomeRoute {
     @ViewBuilder
     func destination(
@@ -41,3 +42,4 @@ public extension HomeRoute {
         }
     }
 }
+// swiftlint:enable function_parameter_count

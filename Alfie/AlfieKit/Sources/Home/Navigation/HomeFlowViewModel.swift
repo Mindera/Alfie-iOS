@@ -47,7 +47,7 @@ public final class HomeFlowViewModel: ObservableObject {
 
     func makeHomeViewModel() -> some HomeViewModelProtocol2 {
         HomeViewModel2(
-            sessionService: serviceProvider.sessionService,
+            serviceProvider: serviceProvider,
             navigate: { [weak self] route in self?.navigate(route) },
             showSearch: { [weak self] in self?.isSearchPresented = true }
         )

@@ -7,7 +7,8 @@ extension View {
     func toolbarView(
         username: String?,
         memberSince: Int?,
-        myAccountAction: @escaping () -> Void
+        openDebugAction: @escaping () -> Void,
+        openMyAccountAction: @escaping () -> Void
     ) -> some View {
         self.modifier(
             DefaultToolbarModifier2(
@@ -29,12 +30,17 @@ extension View {
                     Spacer()
                 },
                 trailingItems: {
+                    // TODO: Remove debug menu for production releases
+                    ToolbarItemProvider2.debugMenuItem(size: .big) {
+                        openDebugAction()
+                    }
+
                     ThemedToolbarButton(
                         icon: .user,
                         accessibilityId: AccessibilityID.accountBtn,
                         toolBarButtonSize: .big
                     ) {
-                        myAccountAction()
+                        openMyAccountAction()
                     }
                 }
             )

@@ -3,6 +3,10 @@ import SwiftUI
 public struct ProgressableHorizontalScrollView<Content: View>: View {
     public struct ScrollViewConfiguration {
         let horizontalPadding: CGFloat
+
+        public init(horizontalPadding: CGFloat) {
+            self.horizontalPadding = horizontalPadding
+        }
     }
 
     public struct ProgressBarConfiguration {

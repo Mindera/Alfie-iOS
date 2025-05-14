@@ -103,7 +103,8 @@ final class ViewFactory: ViewFactoryProtocol {
             }
 
         case .debugMenu:
-            DebugMenuView(serviceProvider: serviceProvider)
+//            DebugMenuView(serviceProvider: serviceProvider)
+            EmptyView()
 
         case .webView(let url, _):
             WebView(

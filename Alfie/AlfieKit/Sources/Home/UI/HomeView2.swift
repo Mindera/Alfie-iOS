@@ -46,11 +46,23 @@ struct HomeView2<ViewModel: HomeViewModelProtocol2>: View {
         }
         .toolbarView(
             username: viewModel.username,
-            memberSince: viewModel.memberSince
-        ) {
-            viewModel.didTapMyAccount()
-        }
+            memberSince: viewModel.memberSince,
+            openDebugAction: {
+                viewModel.didTapDebugMenu()
+            },
+            openMyAccountAction: {
+                viewModel.didTapMyAccount()
+            }
+        )
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        .fullScreenCover(
+            isPresented: Binding(
+                get: { viewModel.fullScreenCover != nil },
+                set: { if !$0 { viewModel.fullScreenCover = nil } }
+            )
+        ) {
+            viewModel.fullScreenCover
+        }
     }
 }
 
