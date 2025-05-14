@@ -99,7 +99,9 @@ let package = Package(
                 "Home",
                 "Search",
                 "SharedUI",
-                "Wishlist"
+                "Wishlist",
+                "Utils",
+                .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
 

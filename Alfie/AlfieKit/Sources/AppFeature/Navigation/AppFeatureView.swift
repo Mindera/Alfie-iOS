@@ -2,38 +2,16 @@ import Model
 import SharedUI
 import SwiftUI
 
-public struct AppFeatureView<ScreenProvider: AppStartupServiceProtocol>: View {
-    @StateObject private var screenProvider: ScreenProvider
-    private let serviceProvider: ServiceProviderProtocol
-    private let configurationService: ConfigurationServiceProtocol
+public struct AppFeatureView<ViewModel: AppFeatureViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
 
-    public init(
-        serviceProvider: ServiceProviderProtocol,
-        screenProvider: ScreenProvider,
-        configurationService: ConfigurationServiceProtocol
-    ) {
-        _screenProvider = StateObject(wrappedValue: screenProvider)
-        self.serviceProvider = serviceProvider
-        self.configurationService = configurationService
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
-        view(for: screenProvider.currentScreen)
-            .animation(.emphasized, value: screenProvider.currentScreen)
-    }
-
-    private func makeRootTabViewModel() -> RootTabViewModel {
-        var tabs: [Model.Tab] = [.home, .shop, .bag]
-
-        if serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
-            tabs.insert(.wishlist, at: 2)
-        }
-
-        return RootTabViewModel(
-            tabs: tabs,
-            initialTab: .home,
-            serviceProvider: serviceProvider
-        )
+        view(for: viewModel.currentScreen)
+            .animation(.emphasized, value: viewModel.currentScreen)
     }
 }
 
@@ -51,12 +29,12 @@ extension AppFeatureView {
             Text("Error!") // TODO: Replace with actual error screen
 
         case .forceUpdate:
-            if let configuration = configurationService.forceAppUpdateInfo {
+            if let configuration = viewModel.appUpdateInfoConfiguration {
                 ForceAppUpdateView(configuration: configuration)
             }
 
         case .landing:
-            AppFeature.RootTabView(viewModel: makeRootTabViewModel())
+            AppFeature.RootTabView(viewModel: viewModel.rootTabViewModel)
                 .transition(.opacity)
         }
     }
