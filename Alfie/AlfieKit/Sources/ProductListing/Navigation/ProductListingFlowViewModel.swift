@@ -7,8 +7,9 @@ import Search
 import SwiftUI
 import Web
 
-public final class ProductListingFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = ProductListingRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
     @Published public var overlayView: AnyView?
@@ -247,17 +248,5 @@ public final class ProductListingFlowViewModel: ObservableObject {
                 webUrlProvider: serviceProvider.webUrlProvider
             )
         )
-    }
-
-    private func navigate(_ route: ProductListingRoute) {
-        path.append(route)
-    }
-
-    public func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    func pop() {
-        path.removeLast()
     }
 }

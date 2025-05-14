@@ -4,8 +4,9 @@ import ProductDetails
 import SwiftUI
 import Web
 
-public final class WishlistFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = WishlistRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
 
     public init(serviceProvider: ServiceProviderProtocol) {
@@ -70,17 +71,5 @@ public final class WishlistFlowViewModel: ObservableObject {
                 WishlistView2(viewModel: makeWishlistViewModel(isRoot: false))
             )
         }
-    }
-
-    private func navigate(_ route: WishlistRoute) {
-        path.append(route)
-    }
-
-    public func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    public func pop() {
-        path.removeLast()
     }
 }

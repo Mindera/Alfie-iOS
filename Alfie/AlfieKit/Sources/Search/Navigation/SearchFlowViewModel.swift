@@ -2,8 +2,9 @@ import Core
 import Model
 import SwiftUI
 
-public final class SearchFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = SearchRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     let intentViewBuilder: (SearchIntent) -> AnyView
     private let closeSearchAction: () -> Void
@@ -28,13 +29,5 @@ public final class SearchFlowViewModel: ObservableObject {
             navigate: { [weak self] in self?.navigate($0) },
             closeSearchAction: { [weak self] in self?.closeSearchAction() }
         )
-    }
-
-    public func navigate(_ route: SearchRoute) {
-        path.append(route)
-    }
-
-    public func pop() {
-        path.removeLast()
     }
 }

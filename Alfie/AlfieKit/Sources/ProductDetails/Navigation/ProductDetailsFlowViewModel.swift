@@ -2,8 +2,9 @@ import Model
 import SwiftUI
 import Web
 
-public final class ProductDetailsFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = ProductDetailsRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     private let configuration: ProductDetailsConfiguration2
 
@@ -58,17 +59,5 @@ public final class ProductDetailsFlowViewModel: ObservableObject {
                 webUrlProvider: serviceProvider.webUrlProvider
             )
         )
-    }
-
-    private func navigate(_ route: ProductDetailsRoute) {
-        path.append(route)
-    }
-
-    public func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    private func pop() {
-        path.removeLast()
     }
 }

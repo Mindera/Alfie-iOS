@@ -10,6 +10,7 @@ import Wishlist
 public extension HomeRoute {
     @ViewBuilder
     func destination(
+        homeViewModel: () -> some HomeViewModelProtocol2,
         accountViewModel: () -> some AccountViewModelProtocol2,
         productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
         webViewModel: (WebFeature) -> some WebViewModelProtocol2,
@@ -18,6 +19,9 @@ public extension HomeRoute {
         wishlistViewModel: () -> some WishlistViewModelProtocol2
     ) -> some View {
         switch self {
+        case .home:
+            HomeView2(viewModel: homeViewModel())
+
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(
                 accountViewModel: accountViewModel,

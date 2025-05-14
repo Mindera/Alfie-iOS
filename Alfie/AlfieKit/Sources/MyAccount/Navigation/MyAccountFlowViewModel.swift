@@ -1,8 +1,9 @@
 import Model
 import SwiftUI
 
-public final class MyAccountFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class MyAccountFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = MyAccountRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     let intentViewBuilder: (MyAccountIntent) -> AnyView
 
@@ -21,9 +22,5 @@ public final class MyAccountFlowViewModel: ObservableObject {
         ) { [weak self] in
             self?.navigate($0)
         }
-    }
-
-    private func navigate(_ route: MyAccountRoute) {
-        path.append(route)
     }
 }
