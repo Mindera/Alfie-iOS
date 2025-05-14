@@ -13,6 +13,7 @@ public struct HomeFlowView: View {
             HomeView2(viewModel: viewModel.makeHomeViewModel())
                 .navigationDestination(for: HomeRoute.self) { route in
                     route.destination(
+                        homeViewModel: viewModel.makeHomeViewModel,
                         accountViewModel: viewModel.makeAccountViewModel,
                         productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
                         webViewModel: viewModel.makeWebViewModel(feature:),

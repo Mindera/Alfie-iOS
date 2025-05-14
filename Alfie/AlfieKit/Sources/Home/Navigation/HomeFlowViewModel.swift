@@ -9,8 +9,9 @@ import SwiftUI
 import Web
 import Wishlist
 
-public final class HomeFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = HomeRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
     @Published public var overlayView: AnyView?
@@ -112,18 +113,6 @@ public final class HomeFlowViewModel: ObservableObject {
                 webUrlProvider: serviceProvider.webUrlProvider
             )
         )
-    }
-
-    private func navigate(_ route: HomeRoute) {
-        path.append(route)
-    }
-
-    public func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    func pop() {
-        path.removeLast()
     }
 
     private func searchIntentViewBuilder(for intent: SearchIntent) -> AnyView {

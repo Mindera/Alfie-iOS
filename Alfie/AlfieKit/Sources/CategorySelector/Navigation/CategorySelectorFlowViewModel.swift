@@ -9,8 +9,9 @@ import SwiftUI
 import Web
 import Wishlist
 
-public final class CategorySelectorFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = CategorySelectorRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
     @Published public var overlayView: AnyView?
@@ -316,17 +317,5 @@ public final class CategorySelectorFlowViewModel: ObservableObject {
                 WishlistView2(viewModel: makeWishlistViewModel())
             )
         }
-    }
-
-    func navigate(_ route: CategorySelectorRoute) {
-        path.append(route)
-    }
-
-    public func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    public func pop() {
-        path.removeLast()
     }
 }

@@ -5,8 +5,9 @@ import SwiftUI
 import Web
 import Wishlist
 
-public final class BagFlowViewModel: ObservableObject {
-    @Published var path = NavigationPath()
+public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
+    public typealias Route = BagRoute
+    @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
 
     public init(serviceProvider: ServiceProviderProtocol) {
@@ -83,17 +84,5 @@ public final class BagFlowViewModel: ObservableObject {
                 WishlistView2(viewModel: makeWishlistViewModel())
             )
         }
-    }
-
-    private func navigate(_ route: BagRoute) {
-        path.append(route)
-    }
-
-    public func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    public func pop() {
-        path.removeLast()
     }
 }

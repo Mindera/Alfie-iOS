@@ -65,6 +65,25 @@ public final class RootTabViewModel: ObservableObject {
         }
     }
 
+    func navigate(_ route: TabRoute) {
+        guard tabs.contains(route.tab) else { return }
+        selectedTab = route.tab
+
+        switch route {
+        case .bag(let bagRoute):
+            bagFlowViewModel.navigate(bagRoute)
+
+        case .home(let homeRoute):
+            homeFlowViewModel.navigate(homeRoute)
+
+        case .shop(let categorySelectorRoute):
+            categorySelectorFlowViewModel.navigate(categorySelectorRoute)
+
+        case .wishlist(let wishlistRoute):
+            wishlistFlowViewModel.navigate(wishlistRoute)
+        }
+    }
+
     private func setupBindings() {
         homeFlowViewModel.$overlayView
             .assignWeakly(to: \.overlayView, on: self)
