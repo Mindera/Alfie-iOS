@@ -11,7 +11,7 @@ extension View {
         didFail: Bool
     ) -> some View {
         self.modifier(
-            DefaultToolbarModifier2(
+            DefaultToolbarModifier(
                 hasDivider: true, // From VM?
                 leadingItems: {
                     EmptyView()
@@ -25,7 +25,7 @@ extension View {
                 },
                 trailingItems: {
                     if !didFail {
-                        ToolbarItemProvider2.shareItem(configuration: shareConfiguration)
+                        ToolbarItemProvider.shareItem(configuration: shareConfiguration)
                     } else {
                         EmptyView()
                     }

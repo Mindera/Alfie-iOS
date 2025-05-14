@@ -15,20 +15,20 @@ public extension CategorySelectorRoute {
         categoriesViewModel: () -> some CategoriesViewModelProtocol,
         brandsViewModel: () -> some BrandsViewModelProtocol,
         isStoreServicesEnabled: Bool,
-        servicesViewModel: () -> some WebViewModelProtocol2,
-        accountViewModel: () -> some AccountViewModelProtocol2,
+        servicesViewModel: () -> some WebViewModelProtocol,
+        accountViewModel: () -> some AccountViewModelProtocol,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView,
-        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
-        productListingViewModel: (ProductListingScreenConfiguration2) -> some ProductListingViewModelProtocol2,
+        productDetailsViewModel: (ProductDetailsConfiguration) -> some ProductDetailsViewModelProtocol,
+        productListingViewModel: (ProductListingScreenConfiguration) -> some ProductListingViewModelProtocol,
         subCategoriesViewModel: ([NavigationItem], NavigationItem) -> some CategoriesViewModelProtocol,
-        webViewModel: (WebFeature) -> some WebViewModelProtocol2,
-        urlWebViewModel: (URL, String) -> some WebViewModelProtocol2,
-        wishlistViewModel: () -> some WishlistViewModelProtocol2,
+        webViewModel: (WebFeature) -> some WebViewModelProtocol,
+        urlWebViewModel: (URL, String) -> some WebViewModelProtocol,
+        wishlistViewModel: () -> some WishlistViewModelProtocol,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) -> some View {
         switch self {
         case .categorySelector:
-            ShopView2(
+            ShopView(
                 isRoot: isRoot,
                 isWishlistEnabled: isWishlistEnabled,
                 categoriesViewModel: categoriesViewModel(),
@@ -58,10 +58,10 @@ public extension CategorySelectorRoute {
             )
 
         case .subCategories(let subCategories, let parent):
-            CategoriesView2(viewModel: subCategoriesViewModel(subCategories, parent))
+            CategoriesView(viewModel: subCategoriesViewModel(subCategories, parent))
 
         case .web(let url, let title):
-            WebView2(viewModel: urlWebViewModel(url, title))
+            WebView(viewModel: urlWebViewModel(url, title))
                 .toolbarView(title: title)
 
         case .wishlist(let wishlistRoute):

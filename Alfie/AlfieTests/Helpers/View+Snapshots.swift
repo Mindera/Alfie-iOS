@@ -19,7 +19,5 @@ extension View {
 
     private func coordinatedView(view: some View) -> some View {
         view
-            .environmentObject(Coordinator())
-            .environmentObject(TabCoordinator(tabs: TabCoordinator.Tab.allCases, activeTab: .home(), serviceProvider: MockServiceProvider()))
     }
 }

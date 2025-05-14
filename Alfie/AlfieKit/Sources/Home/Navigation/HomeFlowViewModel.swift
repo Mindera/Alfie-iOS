@@ -46,16 +46,18 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
             .store(in: &subscriptions)
     }
 
-    func makeHomeViewModel() -> some HomeViewModelProtocol2 {
-        HomeViewModel2(
+    // MARK: - View Models for HomeRoute
+
+    func makeHomeViewModel() -> some HomeViewModelProtocol {
+        HomeViewModel(
             serviceProvider: serviceProvider,
             navigate: { [weak self] route in self?.navigate(route) },
             showSearch: { [weak self] in self?.isSearchPresented = true }
         )
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol2 {
-        AccountViewModel2(
+    func makeAccountViewModel() -> some AccountViewModelProtocol {
+        AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
         ) { [weak self] in
@@ -64,15 +66,15 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
     }
 
     func makeProductListingViewModel(
-        configuration: ProductListingScreenConfiguration2
-    ) -> some ProductListingViewModelProtocol2 {
-        ProductListingViewModel2(
+        configuration: ProductListingScreenConfiguration
+    ) -> some ProductListingViewModelProtocol {
+        ProductListingViewModel(
             dependencies: .init(
                 productListingService: ProductListingService(
                     productService: serviceProvider.productService,
                     configuration: .init(type: .plp)
                 ),
-                plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService
@@ -87,9 +89,9 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
     }
 
     func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -104,10 +106,10 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider
@@ -115,17 +117,19 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
+    // MARK: - View Models for SearchIntent
+
     private func searchIntentViewBuilder(for intent: SearchIntent) -> AnyView {
         switch intent {
         case .productListing(let searchTerm, let category):
             return AnyView(
-                ProductListingView2(
+                ProductListingView(
                     viewModel: makeProductListingViewModelForSearch(searchTerm: searchTerm, category: category)
                 )
             )
 
         case .productDetails(let productID, let product):
-            let configuration: ProductDetailsConfiguration2
+            let configuration: ProductDetailsConfiguration
             if let product {
                 configuration = .product(product)
             } else {
@@ -133,14 +137,14 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
             }
 
             return AnyView(
-                ProductDetailsView2(
+                ProductDetailsView(
                     viewModel: makeProductDetailsViewModelForSearch(configuration: configuration)
                 )
             )
 
         case .webFeature(let feature):
             return AnyView(
-                WebView2(viewModel: makeWebViewModelForSearch(feature: feature))
+                WebView(viewModel: makeWebViewModelForSearch(feature: feature))
                     .toolbarView(title: feature.title)
             )
         }
@@ -149,21 +153,21 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
     private func makeProductListingViewModelForSearch(
         searchTerm: String?,
         category: String?
-    ) -> some ProductListingViewModelProtocol2 {
-        let configuration = ProductListingScreenConfiguration2(
+    ) -> some ProductListingViewModelProtocol {
+        let configuration = ProductListingScreenConfiguration(
             category: category,
             searchText: searchTerm,
             urlQueryParameters: nil,
             mode: .searchResults
         )
 
-        return ProductListingViewModel2(
+        return ProductListingViewModel(
             dependencies: .init(
                 productListingService: ProductListingService(
                     productService: serviceProvider.productService,
                     configuration: .init(type: .plp)
                 ),
-                plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService
@@ -215,9 +219,9 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
     }
 
     private func makeProductDetailsViewModelForSearch(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -232,10 +236,10 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider
@@ -243,19 +247,21 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
+    // MARK: - View Models for MyAccountIntent
+
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
-                WishlistView2(viewModel: makeWishlistViewModelForMyAccount())
+                WishlistView(viewModel: makeWishlistViewModelForMyAccount())
             )
         }
     }
 
-    func makeWishlistViewModelForMyAccount() -> some WishlistViewModelProtocol2 {
-        WishlistViewModel2(
+    func makeWishlistViewModelForMyAccount() -> some WishlistViewModelProtocol {
+        WishlistViewModel(
             hasNavigationSeparator: true,
-            dependencies: WishlistDependencyContainer2(
+            dependencies: WishlistDependencyContainer(
                 wishlistService: serviceProvider.wishlistService,
                 bagService: serviceProvider.bagService,
                 analytics: serviceProvider.analytics

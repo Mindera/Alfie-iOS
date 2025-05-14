@@ -3,12 +3,12 @@ import SwiftUI
 public extension MyAccountRoute {
     @ViewBuilder
     func destination(
-        accountViewModel: () -> some AccountViewModelProtocol2,
+        accountViewModel: () -> some AccountViewModelProtocol,
         intentViewBuilder: @escaping (MyAccountIntent) -> AnyView
     ) -> some View {
         switch self {
         case .myAccount:
-            AccountView2(viewModel: accountViewModel())
+            AccountView(viewModel: accountViewModel())
 
         case .myAccountIntent(let itent):
             intentViewBuilder(itent)

@@ -14,7 +14,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     @Published private var isSearchPresented = false
     @Published public var overlayView: AnyView?
     private var subscriptions = Set<AnyCancellable>()
-    private let productListingScreenConfiguration: ProductListingScreenConfiguration2
+    private let productListingScreenConfiguration: ProductListingScreenConfiguration
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
         SearchFlowViewModel(
@@ -28,7 +28,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
 
     public init(
         serviceProvider: ServiceProviderProtocol,
-        productListingScreenConfiguration: ProductListingScreenConfiguration2
+        productListingScreenConfiguration: ProductListingScreenConfiguration
     ) {
         self.serviceProvider = serviceProvider
         self.productListingScreenConfiguration = productListingScreenConfiguration
@@ -49,14 +49,16 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
             .store(in: &subscriptions)
     }
 
-    func makeProductListingViewModel() -> some ProductListingViewModelProtocol2 {
-        ProductListingViewModel2(
+    // MARK: - View Models for ProductListingRoute
+
+    func makeProductListingViewModel() -> some ProductListingViewModelProtocol {
+        ProductListingViewModel(
             dependencies: .init(
                 productListingService: ProductListingService(
                     productService: serviceProvider.productService,
                     configuration: .init(type: .plp)
                 ),
-                plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService
@@ -71,15 +73,15 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     }
 
     func makeProductListingViewModel(
-        configuration: ProductListingScreenConfiguration2
-    ) -> some ProductListingViewModelProtocol2 {
-        ProductListingViewModel2(
+        configuration: ProductListingScreenConfiguration
+    ) -> some ProductListingViewModelProtocol {
+        ProductListingViewModel(
             dependencies: .init(
                 productListingService: ProductListingService(
                     productService: serviceProvider.productService,
                     configuration: .init(type: .plp)
                 ),
-                plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService
@@ -94,9 +96,9 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     }
 
     func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -111,10 +113,10 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider
@@ -122,17 +124,19 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
         )
     }
 
+    // MARK: - View Models for SearchIntent
+
     private func searchIntentViewBuilder(for intent: SearchIntent) -> AnyView {
         switch intent {
         case .productListing(let searchTerm, let category):
             return AnyView(
-                ProductListingView2(
+                ProductListingView(
                     viewModel: makeProductListingViewModelForSearch(searchTerm: searchTerm, category: category)
                 )
             )
 
         case .productDetails(let productID, let product):
-            let configuration: ProductDetailsConfiguration2
+            let configuration: ProductDetailsConfiguration
             if let product {
                 configuration = .product(product)
             } else {
@@ -140,14 +144,14 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
             }
 
             return AnyView(
-                ProductDetailsView2(
+                ProductDetailsView(
                     viewModel: makeProductDetailsViewModelForSearch(configuration: configuration)
                 )
             )
 
         case .webFeature(let feature):
             return AnyView(
-                WebView2(viewModel: makeWebViewModelForSearch(feature: feature))
+                WebView(viewModel: makeWebViewModelForSearch(feature: feature))
                     .toolbarView(title: feature.title)
             )
         }
@@ -156,21 +160,21 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     private func makeProductListingViewModelForSearch(
         searchTerm: String?,
         category: String?
-    ) -> some ProductListingViewModelProtocol2 {
-        let configuration = ProductListingScreenConfiguration2(
+    ) -> some ProductListingViewModelProtocol {
+        let configuration = ProductListingScreenConfiguration(
             category: category,
             searchText: searchTerm,
             urlQueryParameters: nil,
             mode: .searchResults
         )
 
-        return ProductListingViewModel2(
+        return ProductListingViewModel(
             dependencies: .init(
                 productListingService: ProductListingService(
                     productService: serviceProvider.productService,
                     configuration: .init(type: .plp)
                 ),
-                plpStyleListProvider: ProductListingStyleProvider2(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService
@@ -222,9 +226,9 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     }
 
     private func makeProductDetailsViewModelForSearch(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -239,10 +243,10 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
         )
     }
 
-    private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider

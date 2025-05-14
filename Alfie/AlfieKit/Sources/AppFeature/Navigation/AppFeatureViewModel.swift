@@ -48,7 +48,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         self.appUpdateInfoConfiguration = serviceProvider.configurationService.forceAppUpdateInfo
 
         setupSubscriptions()
-        WebViewPreload2.preloadWebView()
+        WebViewPreload.preloadWebView()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)

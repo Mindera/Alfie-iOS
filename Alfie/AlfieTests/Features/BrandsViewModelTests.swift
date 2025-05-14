@@ -4,6 +4,7 @@ import Mocks
 import Model
 import XCTest
 @testable import Alfie
+@testable import CategorySelector
 
 final class BrandsViewModelTests: XCTestCase {
     private var sut: BrandsViewModel!
@@ -12,7 +13,7 @@ final class BrandsViewModelTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockBrandsService = MockBrandsService()
-        sut = .init(brandsService: mockBrandsService)
+        sut = .init(brandsService: mockBrandsService) { _ in }
     }
 
     override func tearDownWithError() throws {

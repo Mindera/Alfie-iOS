@@ -2,7 +2,6 @@ import Foundation
 import Model
 
 public class DebugMenuViewModel: ObservableObject {
-
     private let serviceProvider: ServiceProviderProtocol
     let configurationService: ConfigurationServiceProtocol
     let apiEndpointService: ApiEndpointServiceProtocol

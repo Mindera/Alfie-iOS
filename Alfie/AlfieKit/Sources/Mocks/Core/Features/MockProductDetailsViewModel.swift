@@ -73,6 +73,16 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         onDidTapAddToWishlistCalled?()
     }
 
+    public var onDidTapBackButtonCalled: (() -> Void)?
+    public func didTapBackButton() {
+        onDidTapBackButtonCalled?()
+    }
+
+    public var onOpenWebFeatureCalled: ((WebFeature) -> Void)?
+    public func openWebFeature(_ feature: WebFeature) {
+        onOpenWebFeatureCalled?(feature)
+    }
+
     public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?
     public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items

@@ -19,8 +19,10 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
         self.closeSearchAction = closeSearchAction
     }
 
-    func makeSearchModel() -> some SearchViewModelProtocol2 {
-        SearchViewModel2(
+    // MARK: - View Models for SearchRoute
+
+    func makeSearchModel() -> some SearchViewModelProtocol {
+        SearchViewModel(
             dependencies: .init(
                 recentsService: serviceProvider.recentsService,
                 searchService: serviceProvider.searchService,

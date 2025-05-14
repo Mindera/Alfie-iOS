@@ -6,7 +6,7 @@ public extension View {
     @ViewBuilder
     func toolbarView(title: String) -> some View {
         self.modifier(
-            DefaultToolbarModifier2(
+            DefaultToolbarModifier(
                 hasDivider: false,
                 leadingItems: {
                     EmptyView()

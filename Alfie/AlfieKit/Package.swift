@@ -49,10 +49,6 @@ let package = Package(
             targets: ["MyAccount"]
         ),
         .library(
-            name: "Navigation",
-            targets: ["Navigation"]
-        ),
-        .library(
             name: "ProductDetails",
             targets: ["ProductDetails"]
         ),
@@ -218,10 +214,6 @@ let package = Package(
         ),
 
         .target(
-            name: "Navigation"
-        ),
-
-        .target(
             name: "ProductDetails",
             dependencies: [
                 "Core",
@@ -320,13 +312,6 @@ let package = Package(
                 "Mocks",
                 "TestUtils",
                 "Utils",
-            ]
-        ),
-
-        .testTarget(
-            name: "NavigationTests",
-            dependencies: [
-                "Navigation"
             ]
         ),
 

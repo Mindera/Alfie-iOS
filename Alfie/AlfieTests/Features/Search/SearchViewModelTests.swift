@@ -3,6 +3,7 @@ import XCTest
 import Mocks
 import Model
 @testable import Alfie
+@testable import Search
 
 final class SearchViewModelTests: XCTestCase {
     private var immediateSchedulerMockDependencies: SearchDependencyContainer!
@@ -30,7 +31,11 @@ final class SearchViewModelTests: XCTestCase {
             searchService: mockSearchService,
             analytics: mockAnalytics
         )
-        sut = .init(dependencies: immediateSchedulerMockDependencies)
+        sut = .init(
+            dependencies: immediateSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
     }
 
     override func tearDownWithError() throws {
@@ -46,7 +51,11 @@ final class SearchViewModelTests: XCTestCase {
     // MARK: - Search text
 
     func test_searchText_withEmptyText_setsToEmptyState() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [.fixture()])
@@ -73,7 +82,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_searchText_withEmptyText_setsToRecentSearches() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [.fixture()])
@@ -101,7 +114,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_searchText_SetsToLoadingState() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         XCTAssertEmitsValue(
             from: sut.$state,
@@ -125,7 +142,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_clearing_search_text_when_recents_are_available_sets_recents_state() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [.fixture()])
@@ -152,7 +173,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_clearing_search_text_when_recents_are_not_available_sets_empty_state() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [.fixture()])
@@ -226,7 +251,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_does_not_show_recent_searches_when_view_appears_and_recents_are_not_available() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
         mockRecentsService.recentSearches = []
 
         XCTAssertNoEmit(
@@ -245,7 +274,11 @@ final class SearchViewModelTests: XCTestCase {
             searchService: mockSearchService,
             analytics: mockAnalytics
         )
-        sut = .init(dependencies: mockDependencies)
+        sut = .init(
+            dependencies: mockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         XCTAssertNoEmit(
             from: sut.$state.drop(while: { $0 == .empty }),
@@ -259,7 +292,11 @@ final class SearchViewModelTests: XCTestCase {
     // MARK: - Special cases
 
     func test_updating_search_text_sets_loading_state_if_current_state_is_no_results() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture()
@@ -290,7 +327,11 @@ final class SearchViewModelTests: XCTestCase {
     // MARK: - Search Suggestions
 
     func test_gets_search_suggestions_from_service_when_search_text_is_updated() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         let searchText = "something"
         let expectation = expectation(description: "Wait for service call")
@@ -306,7 +347,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_sets_no_results_state_when_service_fails_to_get_suggestions() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             throw BFFRequestError(type: .generic)
@@ -325,7 +370,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_sets_no_results_state_when_service_returns_no_suggestions() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture()
@@ -344,7 +393,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_sets_success_state_when_service_returns_suggestions() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [.fixture()])
@@ -367,7 +420,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestion_terms_are_available_after_fetching() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(keywords: [
@@ -391,7 +448,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestion_terms_returned_are_truncated_when_many_are_fetched() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(keywords: Array(repeating: SearchSuggestionKeyword.fixture(), count: 100))
@@ -414,7 +475,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestion_brands_are_available_after_fetching() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [
@@ -440,7 +505,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestion_brands_returned_are_truncated_when_many_are_fetched() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: Array(repeating: SearchSuggestionBrand.fixture(), count: 100))
@@ -463,7 +532,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestion_products_are_available_after_fetching() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(products: [
@@ -487,7 +560,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestion_products_returned_are_truncated_when_many_are_fetched() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(products: Array(repeating: SearchSuggestionProduct.fixture(), count: 100))
@@ -529,7 +606,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestions_are_not_fetched_if_search_term_is_the_same_as_before() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [
@@ -558,7 +639,11 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     func test_suggestions_are_fetched_if_search_term_is_the_same_as_before_but_view_reappeared_in_between() {
-        sut = .init(dependencies: testSchedulerMockDependencies)
+        sut = .init(
+            dependencies: testSchedulerMockDependencies,
+            navigate: { _ in },
+            closeSearchAction: {}
+        )
 
         mockSearchService.onGetSuggestionCalled = { _ in
             .fixture(brands: [

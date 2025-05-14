@@ -3,6 +3,7 @@ import Mocks
 import Model
 import XCTest
 @testable import Alfie
+@testable import ProductListing
 
 final class ProductListingViewModelTests: XCTestCase {
     private var sut: ProductListingViewModel!
@@ -18,8 +19,11 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
-            )
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
+            ),
+            navigate: { _ in },
+            showSearch: {}
         )
     }
 
@@ -36,11 +40,14 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
-            skeletonItemsSize: 2
+            skeletonItemsSize: 2,
+            navigate: { _ in },
+            showSearch: {}
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -54,11 +61,14 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             sort: "sort",
-            urlQueryParameters: ["category": "women/clothing"]
+            urlQueryParameters: ["category": "women/clothing"],
+            navigate: { _ in },
+            showSearch: {}
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -86,11 +96,14 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             searchText: "something",
-            sort: "sort"
+            sort: "sort",
+            navigate: { _ in },
+            showSearch: {}
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -129,11 +142,14 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             sort: "sort",
-            urlQueryParameters: ["category": "women/clothing"]
+            urlQueryParameters: ["category": "women/clothing"],
+            navigate: { _ in },
+            showSearch: {}
         )
 
         mockProductListing.onPageCalled = { _, _, _ in
@@ -185,12 +201,15 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             searchText: "something",
             sort: "sort",
-            mode: .listing
+            mode: .listing,
+            navigate: { _ in },
+            showSearch: {}
         )
 
         mockProductListing.totalOfRecords = 5
@@ -214,12 +233,15 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
             mode: .listing,
-            skeletonItemsSize: 2
+            skeletonItemsSize: 2,
+            navigate: { _ in },
+            showSearch: {}
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -232,12 +254,15 @@ final class ProductListingViewModelTests: XCTestCase {
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService()
             ),
             category: "clothing",
             searchText: "something",
             sort: "sort",
-            mode: .searchResults
+            mode: .searchResults,
+            navigate: { _ in },
+            showSearch: {}
         )
 
         mockProductListing.totalOfRecords = 5

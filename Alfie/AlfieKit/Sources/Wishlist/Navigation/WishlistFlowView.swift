@@ -9,7 +9,7 @@ public struct WishlistFlowView: View {
 
     public var body: some View {
         NavigationStack(path: $viewModel.path) {
-            WishlistView2(viewModel: viewModel.makeWishlistViewModel(isRoot: true))
+            WishlistView(viewModel: viewModel.makeWishlistViewModel(isRoot: true))
                 .navigationDestination(for: WishlistRoute.self) { route in
                     route.destination(
                         accountViewModel: viewModel.makeAccountViewModel,

@@ -10,7 +10,7 @@ public struct HomeFlowView: View {
 
     public var body: some View {
         NavigationStack(path: $viewModel.path) {
-            HomeView2(viewModel: viewModel.makeHomeViewModel())
+            HomeView(viewModel: viewModel.makeHomeViewModel())
                 .navigationDestination(for: HomeRoute.self) { route in
                     route.destination(
                         homeViewModel: viewModel.makeHomeViewModel,

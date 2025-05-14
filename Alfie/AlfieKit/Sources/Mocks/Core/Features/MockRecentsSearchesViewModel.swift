@@ -5,6 +5,11 @@ public final class MockRecentSearchesViewModel: RecentSearchesViewModelProtocol 
 
     public init() {}
 
+    public var onDidTapRecentSearch: ((RecentSearch) -> Void)?
+    public func didTapRecentSearch(_ recentSearch: RecentSearch) {
+        onDidTapRecentSearch?(recentSearch)
+    }
+
     public var onDidTapClearAll: (() -> Void)?
     public func didTapClearAll() {
         onDidTapClearAll?()

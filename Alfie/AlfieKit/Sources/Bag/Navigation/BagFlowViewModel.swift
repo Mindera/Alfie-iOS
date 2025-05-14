@@ -14,10 +14,10 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         self.serviceProvider = serviceProvider
     }
 
-    func makeBagViewModel() -> some BagViewModelProtocol2 {
-        BagViewModel2(
+    func makeBagViewModel() -> some BagViewModelProtocol {
+        BagViewModel(
             isWishlistEnabled: serviceProvider.configurationService.isFeatureEnabled(.wishlist),
-            dependencies: BagDependencyContainer2(
+            dependencies: BagDependencyContainer(
                 bagService: serviceProvider.bagService,
                 analytics: serviceProvider.analytics
             )
@@ -26,8 +26,8 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         }
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol2 {
-        AccountViewModel2(
+    func makeAccountViewModel() -> some AccountViewModelProtocol {
+        AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
         ) { [weak self] in
@@ -36,9 +36,9 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
     }
 
     func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -53,10 +53,10 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider
@@ -64,10 +64,10 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeWishlistViewModel() -> some WishlistViewModelProtocol2 {
-        WishlistViewModel2(
+    func makeWishlistViewModel() -> some WishlistViewModelProtocol {
+        WishlistViewModel(
             hasNavigationSeparator: true,
-            dependencies: WishlistDependencyContainer2(
+            dependencies: WishlistDependencyContainer(
                 wishlistService: serviceProvider.wishlistService,
                 bagService: serviceProvider.bagService,
                 analytics: serviceProvider.analytics
@@ -81,7 +81,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         switch intent {
         case .wishlist:
             AnyView(
-                WishlistView2(viewModel: makeWishlistViewModel())
+                WishlistView(viewModel: makeWishlistViewModel())
             )
         }
     }
