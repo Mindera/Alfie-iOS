@@ -9,7 +9,7 @@ extension View {
         myAccountAction: @escaping () -> Void
     ) -> some View {
         self.modifier(
-            DefaultToolbarModifier2(
+            DefaultToolbarModifier(
                 hasDivider: hasDivider,
                 leadingItems: {
                     if hasDivider {
@@ -35,7 +35,7 @@ extension View {
                     if hasDivider {
                         EmptyView()
                     } else {
-                        ToolbarItemProvider2.accountItem(size: .big) {
+                        ToolbarItemProvider.accountItem(size: .big) {
                             myAccountAction()
                         }
                     }

@@ -13,10 +13,12 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         self.serviceProvider = serviceProvider
     }
 
-    func makeWishlistViewModel(isRoot: Bool) -> some WishlistViewModelProtocol2 {
-        WishlistViewModel2(
+    // MARK: - View Models for WishlistRoute
+
+    func makeWishlistViewModel(isRoot: Bool) -> some WishlistViewModelProtocol {
+        WishlistViewModel(
             hasNavigationSeparator: !isRoot,
-            dependencies: WishlistDependencyContainer2(
+            dependencies: WishlistDependencyContainer(
                 wishlistService: serviceProvider.wishlistService,
                 bagService: serviceProvider.bagService,
                 analytics: serviceProvider.analytics
@@ -26,8 +28,8 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         }
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol2 {
-        AccountViewModel2(
+    func makeAccountViewModel() -> some AccountViewModelProtocol {
+        AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
         ) { [weak self] in
@@ -36,9 +38,9 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
     }
 
     func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -53,10 +55,10 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider
@@ -64,11 +66,13 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         )
     }
 
+    // MARK: - View Models for MyAccountIntent
+
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
-                WishlistView2(viewModel: makeWishlistViewModel(isRoot: false))
+                WishlistView(viewModel: makeWishlistViewModel(isRoot: false))
             )
         }
     }

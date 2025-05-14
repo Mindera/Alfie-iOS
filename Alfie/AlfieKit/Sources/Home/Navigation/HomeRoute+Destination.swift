@@ -10,17 +10,17 @@ import Wishlist
 public extension HomeRoute {
     @ViewBuilder
     func destination(
-        homeViewModel: () -> some HomeViewModelProtocol2,
-        accountViewModel: () -> some AccountViewModelProtocol2,
-        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
-        webViewModel: (WebFeature) -> some WebViewModelProtocol2,
-        productListingViewModel: (ProductListingScreenConfiguration2) -> some ProductListingViewModelProtocol2,
+        homeViewModel: () -> some HomeViewModelProtocol,
+        accountViewModel: () -> some AccountViewModelProtocol,
+        productDetailsViewModel: (ProductDetailsConfiguration) -> some ProductDetailsViewModelProtocol,
+        webViewModel: (WebFeature) -> some WebViewModelProtocol,
+        productListingViewModel: (ProductListingScreenConfiguration) -> some ProductListingViewModelProtocol,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView,
-        wishlistViewModel: () -> some WishlistViewModelProtocol2
+        wishlistViewModel: () -> some WishlistViewModelProtocol
     ) -> some View {
         switch self {
         case .home:
-            HomeView2(viewModel: homeViewModel())
+            HomeView(viewModel: homeViewModel())
 
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(

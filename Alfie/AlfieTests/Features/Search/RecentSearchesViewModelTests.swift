@@ -3,6 +3,7 @@ import Model
 import Mocks
 import XCTest
 @testable import Alfie
+@testable import Search
 
 final class RecentSearchesViewModelTests: XCTestCase {
     private var mockRecentsService: MockRecentsService!
@@ -17,7 +18,7 @@ final class RecentSearchesViewModelTests: XCTestCase {
             .recentSearch3,
             .recentSearch4
         ]).eraseToAnyPublisher()
-        sut = RecentSearchesViewModel(recentsService: mockRecentsService)
+        sut = RecentSearchesViewModel(recentsService: mockRecentsService) { _ in }
     }
 
     override func tearDown() {

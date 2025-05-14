@@ -26,7 +26,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
-    var tabCoordinator: TabCoordinator!
+//    var tabCoordinator: TabCoordinator!
     // swiftlint:enable implicitly_unwrapped_optional
     static var braze: Braze?
 
@@ -45,7 +45,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     public func rebootApp() {
         // Reset services and any other managers that need to be gracefuly terminated before the app reboots
         serviceProvider.resetServices()
-        tabCoordinator.removeCoordinatedViews()
+//        tabCoordinator.removeCoordinatedViews()
 
         // Recreate services
         bootstrap(application: nil)
@@ -73,16 +73,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        var tabs: [TabScreen] = [.home(), .shop(), .bag]
+//        var tabs: [TabScreen] = [.bag]
 
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
         isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
 
-        if isWishlistEnabled {
-            tabs.insert(.wishlist, at: 2)
-        }
+//        if isWishlistEnabled {
+//            tabs.insert(.wishlist, at: 2)
+//        }
 
-        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
+//        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .bag, serviceProvider: serviceProvider)
 
         featureAvailabilitySubscription = serviceProvider.configurationService.featureAvailabilityPublisher
             .sink { [weak self] featureAvailability in

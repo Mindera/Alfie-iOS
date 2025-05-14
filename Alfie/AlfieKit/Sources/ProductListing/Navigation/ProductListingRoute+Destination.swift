@@ -6,9 +6,9 @@ import Web
 public extension ProductListingRoute {
     @ViewBuilder
     func destination(
-        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
-        webViewModel: (WebFeature) -> some WebViewModelProtocol2,
-        productListingViewModel: (ProductListingScreenConfiguration2) -> some ProductListingViewModelProtocol2
+        productDetailsViewModel: (ProductDetailsConfiguration) -> some ProductDetailsViewModelProtocol,
+        webViewModel: (WebFeature) -> some WebViewModelProtocol,
+        productListingViewModel: (ProductListingScreenConfiguration) -> some ProductListingViewModelProtocol
     ) -> some View {
         switch self {
         case .productDetails(let productDetailsRoute):
@@ -18,7 +18,7 @@ public extension ProductListingRoute {
             )
 
         case .productListing(let configuration):
-            ProductListingView2(viewModel: productListingViewModel(configuration))
+            ProductListingView(viewModel: productListingViewModel(configuration))
         }
     }
 }

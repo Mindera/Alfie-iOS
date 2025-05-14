@@ -5,7 +5,7 @@ import Utils
 
 struct DeepLinkDemoView: View {
     @State private var customWebPath: String = "sale"
-    private let baseUrl = URL.fromString("alfie://\(ThemedURL2.hostWithPortComponent)/")
+    private let baseUrl = URL.fromString("alfie://\(ThemedURL.hostWithPortComponent)/")
     private var webViewUrl: URL {
         baseUrl.appending(path: customWebPath)
     }

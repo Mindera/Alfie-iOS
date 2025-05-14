@@ -5,12 +5,12 @@ import SwiftUI
 extension View {
     @ViewBuilder
     func toolbarView(
-        configuration: ProductListingScreenConfiguration2,
+        configuration: ProductListingScreenConfiguration,
         showSearchButton: Bool,
         openSearchAction: @escaping () -> Void
     ) -> some View {
         self.modifier(
-            DefaultToolbarModifier2(
+            DefaultToolbarModifier(
                 hasDivider: true,
                 leadingItems: {
                     EmptyView()
@@ -23,7 +23,7 @@ extension View {
                 },
                 trailingItems: {
                     if showSearchButton {
-                        ToolbarItemProvider2.searchItem(size: .normal, openSearchAction: openSearchAction)
+                        ToolbarItemProvider.searchItem(size: .normal, openSearchAction: openSearchAction)
                     } else {
                         EmptyView()
                     }

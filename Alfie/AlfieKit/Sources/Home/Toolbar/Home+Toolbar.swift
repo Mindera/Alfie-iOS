@@ -11,7 +11,7 @@ extension View {
         openMyAccountAction: @escaping () -> Void
     ) -> some View {
         self.modifier(
-            DefaultToolbarModifier2(
+            DefaultToolbarModifier(
                 hasDivider: false,
                 leadingItems: {
                     if let username, let memberSince {
@@ -31,7 +31,7 @@ extension View {
                 },
                 trailingItems: {
                     // TODO: Remove debug menu for production releases
-                    ToolbarItemProvider2.debugMenuItem(size: .big) {
+                    ToolbarItemProvider.debugMenuItem(size: .big) {
                         openDebugAction()
                     }
 

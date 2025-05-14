@@ -9,7 +9,7 @@ public struct ProductDetailsFlowView: View {
 
     public var body: some View {
         NavigationStack(path: $viewModel.path) {
-            ProductDetailsView2(viewModel: viewModel.makeProductDetailsViewModel())
+            ProductDetailsView(viewModel: viewModel.makeProductDetailsViewModel())
                 .navigationDestination(for: ProductDetailsRoute.self) { route in
                     route.destination(
                         productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),

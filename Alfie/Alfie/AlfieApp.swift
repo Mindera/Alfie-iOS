@@ -52,8 +52,7 @@ struct AlfieApp: App {
 
     private func setupDeepLinkHandlers() {
         let deepLinkHandler = DeepLinkHandler(
-            configurationService: appDelegate.serviceProvider.configurationService,
-            coordinator: appDelegate.tabCoordinator
+            configurationService: appDelegate.serviceProvider.configurationService
         )
         appDelegate.serviceProvider.deepLinkService.update(handlers: [deepLinkHandler])
     }

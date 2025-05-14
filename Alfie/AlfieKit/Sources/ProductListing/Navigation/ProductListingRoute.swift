@@ -5,5 +5,5 @@ import Search
 
 public enum ProductListingRoute: Hashable {
     case productDetails(ProductDetailsRoute)
-    case productListing(ProductListingScreenConfiguration2)
+    case productListing(ProductListingScreenConfiguration)
 }

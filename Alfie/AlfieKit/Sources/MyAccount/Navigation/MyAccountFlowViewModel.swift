@@ -15,8 +15,10 @@ public final class MyAccountFlowViewModel: ObservableObject, FlowViewModelProtoc
         self.intentViewBuilder = intentViewBuilder
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol2 {
-        AccountViewModel2(
+    // MARK: - View Models for MyAccountRoute
+
+    func makeAccountViewModel() -> some AccountViewModelProtocol {
+        AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
         ) { [weak self] in

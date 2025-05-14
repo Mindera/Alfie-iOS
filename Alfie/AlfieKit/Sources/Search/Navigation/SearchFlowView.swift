@@ -12,7 +12,7 @@ public struct SearchFlowView: View {
     public var body: some View {
         ZStack {
             NavigationStack(path: $viewModel.path) {
-                SearchView2(
+                SearchView(
                     viewModel: viewModel.makeSearchModel(),
                     transition: .matchedGeometryEffect(
                         id: Constants.searchBarGeometryID,

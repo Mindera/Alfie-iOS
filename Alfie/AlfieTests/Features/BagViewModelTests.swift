@@ -2,6 +2,7 @@ import Mocks
 import Model
 import XCTest
 @testable import Alfie
+@testable import Bag
 
 final class BagViewModelTests: XCTestCase {
     private var sut: BagViewModel!
@@ -13,7 +14,7 @@ final class BagViewModelTests: XCTestCase {
             bagService: MockBagService(),
             analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
         )
-        sut = .init(dependencies: mockDependencies)
+        sut = .init(isWishlistEnabled: false, dependencies: mockDependencies) { _ in }
     }
 
     override func tearDownWithError() throws {

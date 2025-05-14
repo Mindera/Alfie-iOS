@@ -2,6 +2,7 @@ import Mocks
 import Model
 import XCTest
 @testable import Alfie
+@testable import Web
 
 final class WebViewModelTests: XCTestCase {
     private var sut: WebViewModel!

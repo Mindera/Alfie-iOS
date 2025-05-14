@@ -9,7 +9,7 @@ public struct BagFlowView: View {
 
     public var body: some View {
         NavigationStack(path: $viewModel.path) {
-            BagView2(viewModel: viewModel.makeBagViewModel())
+            BagView(viewModel: viewModel.makeBagViewModel())
                 .navigationDestination(for: BagRoute.self) { route in
                     route.destination(
                         bagViewModel: viewModel.makeBagViewModel,

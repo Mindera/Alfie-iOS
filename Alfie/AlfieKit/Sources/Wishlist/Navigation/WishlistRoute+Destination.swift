@@ -7,10 +7,10 @@ import Web
 public extension WishlistRoute {
     @ViewBuilder
     func destination(
-        accountViewModel: () -> some AccountViewModelProtocol2,
-        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
-        webViewModel: (WebFeature) -> some WebViewModelProtocol2,
-        wishlistViewModel: () -> some WishlistViewModelProtocol2,
+        accountViewModel: () -> some AccountViewModelProtocol,
+        productDetailsViewModel: (ProductDetailsConfiguration) -> some ProductDetailsViewModelProtocol,
+        webViewModel: (WebFeature) -> some WebViewModelProtocol,
+        wishlistViewModel: () -> some WishlistViewModelProtocol,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView
     ) -> some View {
         switch self {
@@ -27,7 +27,7 @@ public extension WishlistRoute {
             )
 
         case .wishlist:
-            WishlistView2(viewModel: wishlistViewModel())
+            WishlistView(viewModel: wishlistViewModel())
         }
     }
 }

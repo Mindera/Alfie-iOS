@@ -2,6 +2,7 @@ import Model
 import Core
 import XCTest
 @testable import Alfie
+@testable import ProductListing
 
 final class ProductListingStyleProviderTests: XCTestCase {
     private static let userDefaultsSuiteName = "com.alfie.test.defaults"

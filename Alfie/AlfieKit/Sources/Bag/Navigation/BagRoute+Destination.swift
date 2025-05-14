@@ -9,16 +9,16 @@ import Wishlist
 public extension BagRoute {
     @ViewBuilder
     func destination(
-        bagViewModel: () -> some BagViewModelProtocol2,
-        accountViewModel: () -> some AccountViewModelProtocol2,
-        productDetailsViewModel: (ProductDetailsConfiguration2) -> some ProductDetailsViewModelProtocol2,
-        webViewModel: (WebFeature) -> some WebViewModelProtocol2,
-        wishlistViewModel: () -> some WishlistViewModelProtocol2,
+        bagViewModel: () -> some BagViewModelProtocol,
+        accountViewModel: () -> some AccountViewModelProtocol,
+        productDetailsViewModel: (ProductDetailsConfiguration) -> some ProductDetailsViewModelProtocol,
+        webViewModel: (WebFeature) -> some WebViewModelProtocol,
+        wishlistViewModel: () -> some WishlistViewModelProtocol,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView
     ) -> some View {
         switch self {
         case .bag:
-            BagView2(viewModel: bagViewModel())
+            BagView(viewModel: bagViewModel())
 
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(

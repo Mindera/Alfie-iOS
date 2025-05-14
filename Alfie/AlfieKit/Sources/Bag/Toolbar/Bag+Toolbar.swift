@@ -10,7 +10,7 @@ extension View {
         myAccountAction: @escaping () -> Void
     ) -> some View {
         self.modifier(
-            DefaultToolbarModifier2(
+            DefaultToolbarModifier(
                 hasDivider: false,
                 leadingItems: {
                     ThemedToolbarTitle(
@@ -23,11 +23,11 @@ extension View {
                 },
                 trailingItems: {
                     if isWishlistEnabled {
-                        ToolbarItemProvider2.wishlistItem(size: .big) {
+                        ToolbarItemProvider.wishlistItem(size: .big) {
                             openWishlistAction()
                         }
                     }
-                    ToolbarItemProvider2.accountItem(size: .big) {
+                    ToolbarItemProvider.accountItem(size: .big) {
                         myAccountAction()
                     }
                 }

@@ -2,10 +2,10 @@ import Combine
 import CombineSchedulers
 import Foundation
 import Model
-import Navigation
+//import Navigation
 
 final class DeepLinkHandler: DeepLinkHandlerProtocol {
-    private let coordinator: TabCoordinatorProtocol
+//    private let coordinator: TabCoordinatorProtocol
     private let configurationService: ConfigurationServiceProtocol
     private var pendingLinks: [DeepLink] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -13,21 +13,21 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
 
     init(
         configurationService: ConfigurationServiceProtocol,
-        coordinator: TabCoordinatorProtocol,
+//        coordinator: TabCoordinatorProtocol,
         scheduler: AnySchedulerOf<DispatchQueue> = .main
     ) {
         self.configurationService = configurationService
-        self.coordinator = coordinator
+//        self.coordinator = coordinator
 
-        self.coordinator.navigationAvailability
-            .receive(on: scheduler)
-            .sink { [weak self] isReadyToHandleLinks in
-                self?.isReadyToHandleLinks = isReadyToHandleLinks
-                if isReadyToHandleLinks {
-                    self?.handlePendingLinks()
-                }
-            }
-            .store(in: &subscriptions)
+//        self.coordinator.navigationAvailability
+//            .receive(on: scheduler)
+//            .sink { [weak self] isReadyToHandleLinks in
+//                self?.isReadyToHandleLinks = isReadyToHandleLinks
+//                if isReadyToHandleLinks {
+//                    self?.handlePendingLinks()
+//                }
+//            }
+//            .store(in: &subscriptions)
     }
 
     // MARK: - DeepLinkHandlerProtocol
@@ -55,56 +55,66 @@ final class DeepLinkHandler: DeepLinkHandlerProtocol {
             return
         }
 
-        var target: Screen?
+//        var target: Screen?
         switch deepLink.type {
         case .home:
-            target = Screen.tab(.home())
+//            target = Screen.tab(.home())
+            break
 
         case .shop(let route):
             switch route {
             case ThemedURL.brands.path:
-                target = Screen.tab(.shop(tab: .brands))
+//                target = Screen.tab(.shop(tab: .brands))
+                break
 
             case ThemedURL.services.path:
-                target = Screen.tab(.shop(tab: .services))
+//                target = Screen.tab(.shop(tab: .services))
+                break
 
             default:
-                target = Screen.tab(.shop(tab: .categories))
+//                target = Screen.tab(.shop(tab: .categories))
+                break
             }
 
         case .bag:
-            target = Screen.tab(.bag)
+//            target = Screen.tab(.bag)
+            break
 
         case .wishlist:
-            target = Screen.wishlist
+//            target = Screen.wishlist
+            break
 
         case .account:
-            target = Screen.account
+//            target = Screen.account
+            break
 
         case .productList(let paths, let searchText, let urlQueryParameters):
-            let configuration = ProductListingScreenConfiguration(
-                category: paths,
-                searchText: searchText,
-                urlQueryParameters: urlQueryParameters,
-                mode: .listing
-            )
-            target = Screen.productListing(configuration: configuration)
+//            let configuration = ProductListingScreenConfiguration(
+//                category: paths,
+//                searchText: searchText,
+//                urlQueryParameters: urlQueryParameters,
+//                mode: .listing
+//            )
+//            target = Screen.productListing(configuration: configuration)
+            break
 
         case .productDetail(let productId, _, _, _):
             // TODO: currently the API does not support fetching a product by the StyleNumber (that is parsed from the URL), just by ProductID, so all requests will return "not found"
-            target = Screen.productDetails(configuration: .id(productId))
+//            target = Screen.productDetails(configuration: .id(productId))
+            break
 
         case .webView(let url):
-            target = Screen.webView(url: url, title: "")
+//            target = Screen.webView(url: url, title: "")
+            break
 
         case .unknown:
             return
         }
 
-        if let target {
-            log.debug("Handling deeplink \(deepLink) by navigating to \(target)")
-            coordinator.navigate(to: target)
-        }
+//        if let target {
+//            log.debug("Handling deeplink \(deepLink) by navigating to \(target)")
+//            coordinator.navigate(to: target)
+//        }
     }
 
     // MARK: - Private

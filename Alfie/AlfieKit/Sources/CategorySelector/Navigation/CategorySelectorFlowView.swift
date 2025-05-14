@@ -9,7 +9,7 @@ public struct CategorySelectorFlowView: View {
 
     public var body: some View {
         NavigationStack(path: $viewModel.path) {
-            ShopView2(
+            ShopView(
                 isRoot: true,
                 isWishlistEnabled: viewModel.isWishlistEnabled,
                 categoriesViewModel: viewModel.makeCategoriesViewModel(),

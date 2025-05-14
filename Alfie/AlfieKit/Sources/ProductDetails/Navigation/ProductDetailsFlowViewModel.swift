@@ -6,18 +6,20 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
     public typealias Route = ProductDetailsRoute
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
-    private let configuration: ProductDetailsConfiguration2
+    private let configuration: ProductDetailsConfiguration
 
     public init(
-        configuration: ProductDetailsConfiguration2,
+        configuration: ProductDetailsConfiguration,
         serviceProvider: ServiceProviderProtocol
     ) {
         self.configuration = configuration
         self.serviceProvider = serviceProvider
     }
 
-    func makeProductDetailsViewModel() -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+    // MARK: - View Models for ProductDetailsRoute
+
+    func makeProductDetailsViewModel() -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -33,9 +35,9 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
     }
 
     func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration2
-    ) -> some ProductDetailsViewModelProtocol2 {
-        ProductDetailsViewModel2(
+        configuration: ProductDetailsConfiguration
+    ) -> some ProductDetailsViewModelProtocol {
+        ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
                 productService: serviceProvider.productService,
@@ -50,10 +52,10 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol2 {
-        WebViewModel2(
+    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+        WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer2(
+            dependencies: WebDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 webViewConfigurationService: serviceProvider.webViewConfigurationService,
                 webUrlProvider: serviceProvider.webUrlProvider

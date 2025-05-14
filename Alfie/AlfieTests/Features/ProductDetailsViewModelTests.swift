@@ -3,6 +3,7 @@ import Mocks
 import Model
 import XCTest
 @testable import Alfie
+@testable import ProductDetails
 
 final class ProductDetailsViewModelTests: XCTestCase {
     private var sut: ProductDetailsViewModel!
@@ -818,6 +819,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
     // MARK: - Helper methods
 
     private func initViewModel(configuration: ProductDetailsConfiguration = .id("")) {
-        sut = .init(configuration: configuration, dependencies: mockDependencies)
+        sut = .init(
+            configuration: configuration,
+            dependencies: mockDependencies,
+            goBackAction: {},
+            openWebfeatureAction: { _ in }
+        )
     }
 }

@@ -13,7 +13,6 @@
 		99FEB5452DCB934A00C61F77 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 99FEB5442DCB934A00C61F77 /* AppFeature */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
-		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
 /* End PBXBuildFile section */
 
@@ -84,7 +83,6 @@
 				9956126B2DB6837700796804 /* Utils in Frameworks */,
 				99FEB5452DCB934A00C61F77 /* AppFeature in Frameworks */,
 				994C3E692DAD4FFD00C77271 /* Model in Frameworks */,
-				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
 				99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */,
 				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
 				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
@@ -181,7 +179,6 @@
 			packageProductDependencies = (
 				C54DA2B62D368A40005142F4 /* Core */,
 				C54DA2B82D368A40005142F4 /* Mocks */,
-				C54DA2BC2D368A40005142F4 /* Navigation */,
 				99DCD9262D9FD27400A3CA25 /* SharedUI */,
 				994C3E682DAD4FFD00C77271 /* Model */,
 				9956126A2DB6837700796804 /* Utils */,
@@ -734,10 +731,6 @@
 		C54DA2B82D368A40005142F4 /* Mocks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Mocks;
-		};
-		C54DA2BC2D368A40005142F4 /* Navigation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Navigation;
 		};
 		C54DA59C2D369927005142F4 /* TestUtils */ = {
 			isa = XCSwiftPackageProductDependency;

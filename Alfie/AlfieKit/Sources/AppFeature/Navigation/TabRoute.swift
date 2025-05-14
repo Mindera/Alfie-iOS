@@ -13,15 +13,17 @@ enum TabRoute: Hashable {
 }
 
 extension TabRoute {
-
     var tab: Model.Tab {
         switch self {
         case .home:
             return .home
+
         case .bag:
             return .bag
+
         case .shop:
             return .shop
+
         case .wishlist:
             return .wishlist
         }
