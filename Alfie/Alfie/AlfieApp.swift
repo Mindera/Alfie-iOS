@@ -28,19 +28,10 @@ struct AlfieApp: App {
                 EmptyView()
             } else {
                 AppFeatureView(
-                    serviceProvider: appDelegate.serviceProvider,
-                    screenProvider: AppStartupService(
-                        configurationService: appDelegate.serviceProvider.configurationService
-                    ),
-                    configurationService: appDelegate.serviceProvider.configurationService
+                    viewModel: AppFeatureViewModel(
+                        serviceProvider: appDelegate.serviceProvider
+                    )
                 )
-//                RootView(
-//                    coordinator: appDelegate.tabCoordinator,
-//                    startupScreenProvider: AppStartupService(
-//                        configurationService: appDelegate.serviceProvider.configurationService
-//                    ),
-//                    configurationService: appDelegate.serviceProvider.configurationService
-//                )
                 .onAppear {
                     setupDeepLinkHandlers()
                 }
