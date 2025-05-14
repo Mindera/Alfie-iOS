@@ -1,11 +1,11 @@
 import SwiftUI
 
 public struct ThemedPageControlConfiguration {
-    let color: Color
-    let selectedColor: Color
-    let animationDuration: CGFloat
-    let size: CGFloat
-    let spacing: CGFloat
+    public let color: Color
+    public let selectedColor: Color
+    public let animationDuration: CGFloat
+    public let size: CGFloat
+    public let spacing: CGFloat
 
     public init(
         color: Color = Colors.primary.mono200,

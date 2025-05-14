@@ -17,9 +17,10 @@ public final class MyAccountFlowViewModel: ObservableObject {
     func makeAccountViewModel() -> some AccountViewModelProtocol2 {
         AccountViewModel2(
             configurationService: serviceProvider.configurationService,
-            sessionService: serviceProvider.sessionService,
-            navigate: { [weak self] in self?.navigate($0) }
-        )
+            sessionService: serviceProvider.sessionService
+        ) { [weak self] in
+            self?.navigate($0)
+        }
     }
 
     private func navigate(_ route: MyAccountRoute) {

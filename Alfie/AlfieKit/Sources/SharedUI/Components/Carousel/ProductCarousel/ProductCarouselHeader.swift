@@ -1,13 +1,13 @@
 import SwiftUI
 
-struct ProductCarouselHeader: View {
+public struct ProductCarouselHeader: View {
     private let title: String?
     private let subtitle: String?
     private let ctaTitle: String?
     private let ctaStyle: ButtonTheme
     private let ctaAction: (() -> Void)?
 
-    init(
+    public init(
         title: String? = nil,
         subtitle: String? = nil,
         ctaTitle: String? = nil,
@@ -21,7 +21,7 @@ struct ProductCarouselHeader: View {
         self.ctaAction = ctaAction
     }
 
-    var body: some View {
+    public var body: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: Spacing.space050) {
                 if let title {

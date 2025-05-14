@@ -2,14 +2,14 @@ import SwiftUI
 
 // MARK: - AccordionType
 
-enum AccordionType {
+public enum AccordionType {
     case small
     case large
 }
 
 // MARK: - AccordionView
 
-struct AccordionView<Content: View>: View {
+public struct AccordionView<Content: View>: View {
     private var text: String
     @Binding private var isDisabled: Bool
     private var type: AccordionType
@@ -17,7 +17,14 @@ struct AccordionView<Content: View>: View {
     private var notFirst: Bool
     private var content: () -> Content
 
-    init(text: String, isOpen: Bool = false, type: AccordionType = .small, isDisabled: Binding<Bool> = .constant(false), notFirst: Bool = false, content: @escaping () -> Content) {
+    public init(
+        text: String,
+        isOpen: Bool = false,
+        type: AccordionType = .small,
+        isDisabled: Binding<Bool> = .constant(false),
+        notFirst: Bool = false,
+        content: @escaping () -> Content
+    ) {
         self.text = text
         _isDisabled = isDisabled
         self.type = type
@@ -26,7 +33,7 @@ struct AccordionView<Content: View>: View {
         self.notFirst = notFirst
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: Spacing.space0) {
             if !notFirst {
                 Rectangle()
@@ -71,10 +78,10 @@ struct AccordionView<Content: View>: View {
 
 // MARK: - MyDisclosureStyle
 
-struct MyDisclosureStyle: DisclosureGroupStyle {
+public struct MyDisclosureStyle: DisclosureGroupStyle {
     var isDisabled: Bool
 
-    func makeBody(configuration: Configuration) -> some View {
+    public func makeBody(configuration: Configuration) -> some View {
         VStack {
             Button {
                 withAnimation {

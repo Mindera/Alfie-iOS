@@ -5,6 +5,7 @@ import SwiftUI
 import Web
 import Wishlist
 
+// swiftlint:disable function_parameter_count
 public extension BagRoute {
     @ViewBuilder
     func destination(
@@ -42,3 +43,4 @@ public extension BagRoute {
         }
     }
 }
+// swiftlint:enable function_parameter_count

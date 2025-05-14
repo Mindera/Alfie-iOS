@@ -37,7 +37,7 @@ public struct ThemedPageControl<CustomControl: View, DataType: Any>: View {
     }
 }
 
-extension ThemedPageControl where CustomControl == EmptyView {
+public extension ThemedPageControl where CustomControl == EmptyView {
     init(data: [DataType], selectedIndex: Binding<Int>, configuration: ThemedPageControlConfiguration) {
         self.init(data: data, selectedIndex: selectedIndex, configuration: configuration) { _, _ in EmptyView() }
     }
