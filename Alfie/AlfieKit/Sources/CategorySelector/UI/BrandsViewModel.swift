@@ -4,7 +4,7 @@ import Foundation
 import Model
 import OrderedCollections
 
-final class BrandsViewModel: BrandsViewModelProtocol {
+public final class BrandsViewModel: BrandsViewModelProtocol {
     private enum Constants {
         static let placeholderTitleLowerBound: Int = 30
         static let placeholderTitleUpperBound: Int = 50
@@ -25,11 +25,11 @@ final class BrandsViewModel: BrandsViewModelProtocol {
             )
         }
     }()
-    @Published private(set) var state: ViewState<OrderedDictionary<String, [Brand]>, BrandsViewErrorType> = .loading
+    @Published public private(set) var state: ViewState<OrderedDictionary<String, [Brand]>, BrandsViewErrorType> = .loading
     @Published public var searchText: String
 
     private var searchFocusStateSubject: PassthroughSubject<Bool, Never> = .init()
-    private(set) lazy var indexVisibilityPublisher: AnyPublisher<Bool, Never> = searchFocusStateSubject
+    public private(set) lazy var indexVisibilityPublisher: AnyPublisher<Bool, Never> = searchFocusStateSubject
         .map { [weak self] isFocused in
             isFocused ? false : self?.searchText.isEmpty == true
         }
@@ -44,7 +44,7 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         searchText = ""
     }
 
-    var sectionTitles: OrderedSet<String> {
+    public var sectionTitles: OrderedSet<String> {
         guard let brandsPerLetter = state.value else {
             return []
         }
@@ -58,13 +58,13 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         return OrderedSet(filteredTitles.sorted())
     }
 
-    func viewDidAppear() {
+    public func viewDidAppear() {
         Task {
             await loadItemsIfNeeded()
         }
     }
 
-    func brands(for section: String) -> [Brand] {
+    public func brands(for section: String) -> [Brand] {
         if state.isLoading {
             return placeholders
         }
@@ -80,7 +80,7 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         }
     }
 
-    func didTapBrand(_ brand: Brand) {
+    public func didTapBrand(_ brand: Brand) {
         navigate(
             .productListing(
                 .productListing(
@@ -95,7 +95,7 @@ final class BrandsViewModel: BrandsViewModelProtocol {
         )
     }
 
-    func searchFocusDidChange(isFocused: Bool) {
+    public func searchFocusDidChange(isFocused: Bool) {
         searchFocusStateSubject.send(isFocused)
     }
 

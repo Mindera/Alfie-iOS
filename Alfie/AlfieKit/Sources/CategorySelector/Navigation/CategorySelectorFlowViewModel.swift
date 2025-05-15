@@ -9,20 +9,21 @@ import SwiftUI
 import Web
 import Wishlist
 
-public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewModelProtocol {
+public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelProtocol {
     public typealias Route = CategorySelectorRoute
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
     @Published public private(set) var overlayView: AnyView?
     @Published public var activeShopTab: ShopViewTab = .categories
+    public var activeShopTabPublisher: AnyPublisher<ShopViewTab, Never> { $activeShopTab.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
-    var isWishlistEnabled: Bool {
+    public var isWishlistEnabled: Bool {
         serviceProvider.configurationService.isFeatureEnabled(.wishlist)
     }
 
-    var isStoreServicesEnabled: Bool {
+    public var isStoreServicesEnabled: Bool {
         serviceProvider.configurationService.isFeatureEnabled(.storeServices)
     }
 
@@ -57,7 +58,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
 
     // MARK: - View Models for CategorySelectorRoute
 
-    func makeCategoriesViewModel() -> some CategoriesViewModelProtocol {
+    public func makeCategoriesViewModel() -> CategoriesViewModel {
         CategoriesViewModel(
             navigationService: serviceProvider.navigationService,
             showToolbar: false,
@@ -67,13 +68,13 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         }
     }
 
-    func makeBrandsViewModel() -> some BrandsViewModelProtocol {
+    public func makeBrandsViewModel() -> BrandsViewModel {
         BrandsViewModel(brandsService: serviceProvider.brandsService) { [weak self] in
             self?.navigate($0)
         }
     }
 
-    func makeServicesViewModel() -> some WebViewModelProtocol {
+    public func makeServicesViewModel() -> WebViewModel {
         WebViewModel(
             webFeature: .storeServices,
             dependencies: WebDependencyContainer(
@@ -84,10 +85,10 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         )
     }
 
-    func makeSubCategoriesViewModel(
+    public func makeSubCategoriesViewModel(
         subCategories: [NavigationItem],
         parent: NavigationItem
-    ) -> some CategoriesViewModelProtocol {
+    ) -> CategoriesViewModel {
         // Initialize the categories view model to ignore local links (i.e. Shop tab links like Brands and Services)
         // as those will be handled by the view directly
         CategoriesViewModel(
@@ -100,7 +101,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         }
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol {
+    public func makeAccountViewModel() -> AccountViewModel {
         AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
@@ -109,9 +110,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         }
     }
 
-    func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration
-    ) -> some ProductDetailsViewModelProtocol {
+    public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
@@ -127,9 +126,9 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         )
     }
 
-    func makeProductListingViewModel(
+    public func makeProductListingViewModel(
         configuration: ProductListingScreenConfiguration
-    ) -> some ProductListingViewModelProtocol {
+    ) -> ProductListingViewModel {
         ProductListingViewModel(
             dependencies: ProductListingDependencyContainer(
                 productListingService: ProductListingService(
@@ -150,7 +149,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+    public func makeWebViewModel(feature: WebFeature) -> WebViewModel {
         WebViewModel(
             webFeature: feature,
             dependencies: WebDependencyContainer(
@@ -161,7 +160,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         )
     }
 
-    func makeURLWebViewModel(url: URL, title: String) -> some WebViewModelProtocol {
+    public func makeURLWebViewModel(url: URL, title: String) -> WebViewModel {
         WebViewModel(
             url: url,
             dependencies: WebDependencyContainer(
@@ -172,7 +171,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
         )
     }
 
-    func makeWishlistViewModel() -> some WishlistViewModelProtocol {
+    public func makeWishlistViewModel() -> WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: true,
             dependencies: WishlistDependencyContainer(
@@ -317,7 +316,7 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
 
     // MARK: - View Models for MyAccountIntent
 
-    func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
+    public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(

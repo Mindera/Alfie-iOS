@@ -1,10 +1,10 @@
 import SwiftUI
 
-public struct CategorySelectorFlowView: View {
-    @ObservedObject var viewModel: CategorySelectorFlowViewModel
+public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
 
-    public init(viewModel: CategorySelectorFlowViewModel) {
-        self.viewModel = viewModel
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
@@ -15,7 +15,7 @@ public struct CategorySelectorFlowView: View {
                 categoriesViewModel: viewModel.makeCategoriesViewModel(),
                 brandsViewModel: viewModel.makeBrandsViewModel(),
                 servicesViewModel: viewModel.isStoreServicesEnabled ? viewModel.makeServicesViewModel() : nil,
-                activeShopTabPublisher: viewModel.$activeShopTab.eraseToAnyPublisher()
+                activeShopTabPublisher: viewModel.activeShopTabPublisher
             ) {
                 viewModel.navigate($0)
             }
@@ -23,7 +23,7 @@ public struct CategorySelectorFlowView: View {
                 route.destination(
                     isRoot: false,
                     isWishlistEnabled: viewModel.isWishlistEnabled,
-                    activeShopTabPublisher: viewModel.$activeShopTab.eraseToAnyPublisher(),
+                    activeShopTabPublisher: viewModel.activeShopTabPublisher,
                     categoriesViewModel: viewModel.makeCategoriesViewModel,
                     brandsViewModel: viewModel.makeBrandsViewModel,
                     isStoreServicesEnabled: viewModel.isStoreServicesEnabled,

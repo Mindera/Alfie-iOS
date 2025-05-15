@@ -4,7 +4,7 @@ import Foundation
 import Model
 import Utils
 
-final class CategoriesViewModel: CategoriesViewModelProtocol {
+public final class CategoriesViewModel: CategoriesViewModelProtocol {
     private enum Constants {
         static let placeholderTitleLowerBound: Int = 30
         static let placeholderTitleUpperBound: Int = 50
@@ -47,10 +47,10 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
     }()
 
-    @Published private(set) var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading
-    lazy var openCategoryPublisher = openCategorySubject.eraseToAnyPublisher()
+    @Published public private(set) var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading
+    public lazy var openCategoryPublisher = openCategorySubject.eraseToAnyPublisher()
 
-    var categories: [NavigationItem] {
+    public var categories: [NavigationItem] {
         if state.isLoading {
             return placeholders
         }
@@ -62,7 +62,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         return model.categories
     }
 
-    var title: String {
+    public var title: String {
         guard case .success(let model) = state else {
             return ""
         }
@@ -70,7 +70,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         return model.title
     }
 
-    private(set) var shouldShowToolbar: Bool
+    public private(set) var shouldShowToolbar: Bool
     /// A bool controling if local tab navigation should be ignored (i.e., shop links like Brands and Service) so that they can be handled by the parent shop view
     private let ignoreLocalNavigation: Bool
     private let navigate: (CategorySelectorRoute) -> Void
@@ -101,13 +101,13 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         self.navigate = navigate
     }
 
-    func viewDidAppear() {
+    public func viewDidAppear() {
         Task {
             await loadItems()
         }
     }
 
-    func didSelectCategory(_ category: NavigationItem) {
+    public func didSelectCategory(_ category: NavigationItem) {
         // Special categories
         if let specialCategory = SpecialCategories.allCases.first(
             where: { $0.rawValue == category.url?.lowercased() }
