@@ -5,7 +5,7 @@ import SwiftUI
 import Web
 import Wishlist
 
-public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
+public final class BagFlowViewModel: BagFlowViewModelProtocol {
     public typealias Route = BagRoute
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
@@ -14,7 +14,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         self.serviceProvider = serviceProvider
     }
 
-    func makeBagViewModel() -> some BagViewModelProtocol {
+    public func makeBagViewModel() -> BagViewModel {
         BagViewModel(
             isWishlistEnabled: serviceProvider.configurationService.isFeatureEnabled(.wishlist),
             dependencies: BagDependencyContainer(
@@ -26,7 +26,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         }
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol {
+    public func makeAccountViewModel() -> AccountViewModel {
         AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
@@ -35,9 +35,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         }
     }
 
-    func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration
-    ) -> some ProductDetailsViewModelProtocol {
+    public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
@@ -53,7 +51,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+    public func makeWebViewModel(feature: WebFeature) -> WebViewModel {
         WebViewModel(
             webFeature: feature,
             dependencies: WebDependencyContainer(
@@ -64,7 +62,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeWishlistViewModel() -> some WishlistViewModelProtocol {
+    public func makeWishlistViewModel() ->  WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: true,
             dependencies: WishlistDependencyContainer(
@@ -77,7 +75,7 @@ public final class BagFlowViewModel: ObservableObject, FlowViewModelProtocol {
         }
     }
 
-    func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
+    public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
