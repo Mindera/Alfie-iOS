@@ -2,7 +2,7 @@ import Search
 import SwiftUI
 
 public struct HomeFlowView<ViewModel: HomeFlowViewModelProtocol>: View {
-    @StateObject var viewModel: ViewModel
+    @StateObject private var viewModel: ViewModel
 
     public init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)

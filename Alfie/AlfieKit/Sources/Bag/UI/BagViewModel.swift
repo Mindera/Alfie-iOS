@@ -2,9 +2,9 @@ import Foundation
 import Model
 import SharedUI
 
-final class BagViewModel: BagViewModelProtocol {
-    @Published private(set) var products: [SelectedProduct]
-    var isWishlistEnabled: Bool
+public final class BagViewModel: BagViewModelProtocol {
+    @Published public private(set) var products: [SelectedProduct]
+    public var isWishlistEnabled: Bool
 
     private let dependencies: BagDependencyContainer
     private let navigate: (BagRoute) -> Void
@@ -22,29 +22,29 @@ final class BagViewModel: BagViewModelProtocol {
 
     // MARK: - BagViewModelProtocol
 
-    func viewDidAppear() {
+    public func viewDidAppear() {
         products = dependencies.bagService.getBagContent()
     }
 
-    func didTapProduct(_ selectedProduct: SelectedProduct) {
+    public func didTapProduct(_ selectedProduct: SelectedProduct) {
         navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
     }
 
-    func didSelectDelete(for selectedProduct: SelectedProduct) {
+    public func didSelectDelete(for selectedProduct: SelectedProduct) {
         dependencies.bagService.removeProduct(selectedProduct)
         products = dependencies.bagService.getBagContent()
         dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
     }
 
-    func didTapMyAccount() {
+    public func didTapMyAccount() {
         navigate(.myAccount(.myAccount))
     }
 
-    func didTapWishlist() {
+    public func didTapWishlist() {
         navigate(.wishlist(.wishlist))
     }
 
-    func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
+    public func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
         .init(
             image: selectedProduct.media.first?.asImage?.url,
             designer: selectedProduct.brand.name,

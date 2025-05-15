@@ -1,10 +1,10 @@
 import SwiftUI
 
-public struct BagFlowView: View {
-    @ObservedObject var viewModel: BagFlowViewModel
+public struct BagFlowView<ViewModel: BagFlowViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
 
-    public init(viewModel: BagFlowViewModel) {
-        self.viewModel = viewModel
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
