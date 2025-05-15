@@ -16,8 +16,9 @@ public final class RootTabViewModel: ObservableObject {
     let categorySelectorFlowViewModel: CategorySelectorFlowViewModel
     let homeFlowViewModel: HomeFlowViewModel
     let wishlistFlowViewModel: WishlistFlowViewModel
-    @Published var overlayView: AnyView?
+    @Published private(set) var overlayView: AnyView?
     @Published var isOverlayVisible = false
+    @Published public var isReadyForNavigation = false
     private var subscriptions = Set<AnyCancellable>()
 
     public init(
@@ -68,19 +69,39 @@ public final class RootTabViewModel: ObservableObject {
     func navigate(_ route: TabRoute) {
         guard tabs.contains(route.tab) else { return }
         selectedTab = route.tab
+        overlayView = nil
 
         switch route {
         case .bag(let bagRoute):
-            bagFlowViewModel.navigate(bagRoute)
+            if case .bag = bagRoute {
+                popToRoot(in: .bag)
+            } else {
+                bagFlowViewModel.navigate(bagRoute)
+            }
 
         case .home(let homeRoute):
-            homeFlowViewModel.navigate(homeRoute)
+            if case .home = homeRoute {
+                popToRoot(in: .home)
+            } else {
+                homeFlowViewModel.navigate(homeRoute)
+            }
 
         case .shop(let categorySelectorRoute):
-            categorySelectorFlowViewModel.navigate(categorySelectorRoute)
+            switch categorySelectorRoute {
+            case .categorySelector(let shopViewTab):
+                popToRoot(in: .shop)
+                categorySelectorFlowViewModel.activeShopTab = shopViewTab
+
+            default:
+                categorySelectorFlowViewModel.navigate(categorySelectorRoute)
+            }
 
         case .wishlist(let wishlistRoute):
-            wishlistFlowViewModel.navigate(wishlistRoute)
+            if case .wishlist = wishlistRoute {
+                popToRoot(in: .wishlist)
+            } else {
+                wishlistFlowViewModel.navigate(wishlistRoute)
+            }
         }
     }
 
@@ -96,6 +117,10 @@ public final class RootTabViewModel: ObservableObject {
         $overlayView
             .map { $0 != nil }
             .assignWeakly(to: \.isOverlayVisible, on: self)
+            .store(in: &subscriptions)
+
+        $isReadyForNavigation
+            .sink { [weak self] in self?.serviceProvider.deepLinkService.updateAvailabilityOfHandlers(to: $0) }
             .store(in: &subscriptions)
     }
 }

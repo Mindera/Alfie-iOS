@@ -12,7 +12,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
-    @Published public var overlayView: AnyView?
+    @Published public private(set) var overlayView: AnyView?
     private var subscriptions = Set<AnyCancellable>()
     private let productListingScreenConfiguration: ProductListingScreenConfiguration
 

@@ -2,7 +2,7 @@ import Core
 import Foundation
 import Model
 
-extension DeepLinkService {
+public extension DeepLinkService {
     convenience init(configuration: LinkConfigurationProtocol) {
         let parsers: [DeepLinkParserProtocol] = [
             InternalDeepLinkParser(configuration: configuration),
@@ -10,6 +10,6 @@ extension DeepLinkService {
             ProductDetailsDeepLinkParser(configuration: configuration),
             DefaultDeepLinkParser(configuration: configuration),
         ] // Order is important!
-        self.init(parsers: parsers, configuration: configuration, log: log)
+        self.init(parsers: parsers, configuration: configuration/*, log: log*/)
     }
 }

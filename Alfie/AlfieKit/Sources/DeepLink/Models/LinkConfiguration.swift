@@ -1,10 +1,10 @@
 import Model
 
-struct LinkConfiguration: LinkConfigurationProtocol {
-    let schemes: [String]
-    let hosts: [String]
+public struct LinkConfiguration: LinkConfigurationProtocol {
+    public let schemes: [String]
+    public let hosts: [String]
 
-    init(
+    public init(
         schemes: [String] = ["https", "http", "alfie"],
         hosts: [String] = [
             ThemedURL.preferredHost,

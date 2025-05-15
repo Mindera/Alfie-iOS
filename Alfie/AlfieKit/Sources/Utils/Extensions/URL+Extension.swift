@@ -1,18 +1,18 @@
 import Foundation
 
-extension URL {
-    public var cleanPathComponents: [String] {
+public extension URL {
+    var cleanPathComponents: [String] {
         self.pathComponents
             .drop { $0 == "/" }
             .map { $0.lowercased() }
     }
 
     /// Returns the URLs path removing the initial / (if any)
-    public var cleanPath: String {
+    var cleanPath: String {
         self.cleanPathComponents.joined(separator: "/")
     }
 
-    public var queryParameters: [String: String]? {
+    var queryParameters: [String: String]? {
         guard
             let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
             let queryItems = components.queryItems
@@ -25,7 +25,7 @@ extension URL {
         }
     }
 
-    public static func fromString(_ string: String) -> URL {
+    static func fromString(_ string: String) -> URL {
         URL(string: string) ?? URL(filePath: "")
     }
 }

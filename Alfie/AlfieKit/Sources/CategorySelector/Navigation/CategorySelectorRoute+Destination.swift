@@ -1,3 +1,4 @@
+import Combine
 import Model
 import MyAccount
 import ProductDetails
@@ -12,6 +13,7 @@ public extension CategorySelectorRoute {
     func destination(
         isRoot: Bool,
         isWishlistEnabled: Bool,
+        activeShopTabPublisher: AnyPublisher<ShopViewTab, Never>,
         categoriesViewModel: () -> some CategoriesViewModelProtocol,
         brandsViewModel: () -> some BrandsViewModelProtocol,
         isStoreServicesEnabled: Bool,
@@ -27,13 +29,15 @@ public extension CategorySelectorRoute {
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) -> some View {
         switch self {
-        case .categorySelector:
+        case .categorySelector(let tab):
             ShopView(
                 isRoot: isRoot,
                 isWishlistEnabled: isWishlistEnabled,
                 categoriesViewModel: categoriesViewModel(),
                 brandsViewModel: brandsViewModel(),
-                servicesViewModel: isStoreServicesEnabled ? servicesViewModel() : nil
+                servicesViewModel: isStoreServicesEnabled ? servicesViewModel() : nil,
+                initialTab: tab,
+                activeShopTabPublisher: activeShopTabPublisher
             ) {
                 navigate($0)
             }

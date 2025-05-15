@@ -33,6 +33,10 @@ let package = Package(
             targets: ["DebugMenu"]
         ),
         .library(
+            name: "DeepLink",
+            targets: ["DeepLink"]
+        ),
+        .library(
             name: "Home",
             targets: ["Home"]
         ),
@@ -167,6 +171,17 @@ let package = Package(
                 "Mocks",
                 "Model",
                 "SharedUI"
+            ]
+        ),
+
+        .target(
+            name: "DeepLink",
+            dependencies: [
+                "Core",
+                "Model"
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-enable-bare-slash-regex"])
             ]
         ),
 
@@ -312,6 +327,16 @@ let package = Package(
                 "Mocks",
                 "TestUtils",
                 "Utils",
+            ]
+        ),
+
+        .testTarget(
+            name: "DeepLinkTests",
+            dependencies: [
+                "DeepLink",
+                "Mocks",
+                "Model",
+                "TestUtils"
             ]
         ),
 

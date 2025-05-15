@@ -2,7 +2,7 @@ import Foundation
 import Model
 
 extension URL {
-    public func httpSecureUrl(using configuration: LinkConfigurationProtocol) -> URL {
+    func httpSecureUrl(using configuration: LinkConfigurationProtocol) -> URL {
         guard
             self.scheme != configuration.defaultHttpScheme,
             var components = URLComponents(url: self, resolvingAgainstBaseURL: true)

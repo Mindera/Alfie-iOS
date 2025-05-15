@@ -1,6 +1,6 @@
 import Model
 import XCTest
-@testable import Alfie
+@testable import DeepLink
 
 final class InternalDeepLinkParserTests: XCTestCase {
     private var sut: InternalDeepLinkParser!

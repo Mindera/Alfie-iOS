@@ -25,6 +25,7 @@ struct ShopView<
     @State private var selectedSegment: Segment
     @State private var activeTab: ShopViewTab
     @State private var isVisible = false
+    private let activeShopTabPublisher: AnyPublisher<ShopViewTab, Never>
 
     init(
         isRoot: Bool,
@@ -33,6 +34,7 @@ struct ShopView<
         brandsViewModel: BrandsViewModel,
         servicesViewModel: ServicesViewModel?,
         initialTab tab: ShopViewTab = .categories,
+        activeShopTabPublisher: AnyPublisher<ShopViewTab, Never>,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.isRoot = isRoot
@@ -41,6 +43,7 @@ struct ShopView<
         self.categoriesView = CategoriesView(viewModel: categoriesViewModel)
         self.brandsView = BrandsView(viewModel: brandsViewModel)
         self.servicesView = servicesViewModel.flatMap { WebView(viewModel: $0) }
+        self.activeShopTabPublisher = activeShopTabPublisher
         self.navigate = navigate
         _selectedSegment = State(initialValue: Segment(id: tab.rawValue, title: tab.title, tab))
         _activeTab = State(initialValue: tab)
@@ -83,13 +86,9 @@ struct ShopView<
             openWishlistAction: { navigate(.wishlist(.wishlist)) },
             myAccountAction: { navigate(.myAccount(.myAccount)) }
         )
-        // TBD: See if there is the need to support something like this
-//        .onReceive(tabCoordinator.shopViewTabUpdatePublisher.receive(on: DispatchQueue.main)) { tab in
-//            guard let tab else {
-//                return
-//            }
-//            switchTabIfNecessary(tab, withAnimation: false)
-//        }
+        .onReceive(activeShopTabPublisher.receive(on: DispatchQueue.main)) { tab in
+            switchTabIfNecessary(tab, withAnimation: false)
+        }
         .onReceive(categoriesViewModel.openCategoryPublisher.receive(on: DispatchQueue.main)) { destination in
             // swiftlint:disable vertical_whitespace_between_cases
             switch destination {
@@ -204,7 +203,8 @@ private enum Constants {
                 webViewConfigurationService: MockWebViewConfigurationService(),
                 webUrlProvider: MockWebUrlProvider()
             )
-        )
+        ),
+        activeShopTabPublisher: Empty<ShopViewTab, Never>().eraseToAnyPublisher()
     ) { _ in }
 }
 #endif

@@ -1,5 +1,6 @@
 import AppFeature
 import Core
+import DeepLink
 import Model
 import SharedUI
 import SwiftUI
@@ -17,6 +18,7 @@ struct AlfieApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @StateObject private var appState = AppState.shared
+    @State private var appFeatureViewModel: AppFeatureViewModel?
 
     init() {
         try? FontManager.registerAll()
@@ -26,34 +28,40 @@ struct AlfieApp: App {
         WindowGroup {
             if ProcessInfo.isRunningTests {
                 EmptyView()
-            } else {
-                AppFeatureView(
-                    viewModel: AppFeatureViewModel(
-                        serviceProvider: appDelegate.serviceProvider
-                    )
-                )
-                .onAppear {
-                    setupDeepLinkHandlers()
-                }
-                .onOpenURL { url in
-                    open(url: url)
-                }
-                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
-                    userActivity.webpageURL.map {
-                        open(url: $0)
+            } else if let viewModel = appFeatureViewModel {
+                AppFeatureView(viewModel: viewModel)
+                    .onAppear {
+                        setupDeepLinkHandlers(viewModel: viewModel)
                     }
-                }
-                .id(appState.sessionID) // So that the view can be recreated / rebooted
+                    .onOpenURL { url in
+                        open(url: url)
+                    }
+                    .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                        userActivity.webpageURL.map {
+                            open(url: $0)
+                        }
+                    }
+                    .id(appState.sessionID) // So that the view can be recreated / rebooted
+            } else {
+                Color.clear
+                    .onAppear {
+                        // Lazy initialize once appDelegate is ready
+                        appFeatureViewModel = AppFeatureViewModel(
+                            serviceProvider: appDelegate.serviceProvider
+                        )
+                    }
             }
         }
     }
 
     // MARK: - Deep Linking
 
-    private func setupDeepLinkHandlers() {
+    private func setupDeepLinkHandlers(viewModel: AppFeatureViewModel) {
         let deepLinkHandler = DeepLinkHandler(
             configurationService: appDelegate.serviceProvider.configurationService
-        )
+        ) {
+            viewModel.navigate(for: $0)
+        }
         appDelegate.serviceProvider.deepLinkService.update(handlers: [deepLinkHandler])
     }
 

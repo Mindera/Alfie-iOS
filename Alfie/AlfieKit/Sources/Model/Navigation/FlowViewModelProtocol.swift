@@ -3,6 +3,7 @@ import SwiftUI
 
 public protocol FlowViewModelProtocol: ObservableObject {
     associatedtype Route: Hashable
+
     var path: NavigationPath { get set }
 
     func navigate(_ route: Route)

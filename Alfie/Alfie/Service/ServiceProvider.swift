@@ -1,4 +1,5 @@
 import Core
+import DeepLink
 import Firebase
 import Foundation
 import Model
