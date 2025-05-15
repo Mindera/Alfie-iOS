@@ -1,11 +1,11 @@
 import Search
 import SwiftUI
 
-public struct HomeFlowView: View {
-    @ObservedObject var viewModel: HomeFlowViewModel
+public struct HomeFlowView<ViewModel: HomeFlowViewModelProtocol>: View {
+    @StateObject var viewModel: ViewModel
 
-    public init(viewModel: HomeFlowViewModel) {
-        self.viewModel = viewModel
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {

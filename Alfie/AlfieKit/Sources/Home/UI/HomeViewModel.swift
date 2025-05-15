@@ -4,7 +4,7 @@ import Model
 import SharedUI
 import SwiftUI
 
-class HomeViewModel: HomeViewModelProtocol, ObservableObject {
+public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     private let serviceProvider: ServiceProviderProtocol
     private let sessionService: SessionServiceProtocol
     private let navigate: (HomeRoute) -> Void
@@ -12,23 +12,23 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     @Published private var isUserSignedIn = false
     private var subscriptions: Set<AnyCancellable> = []
 
-    var homeTitle: String {
+    public var homeTitle: String {
         L10n.Home.title
     }
 
-    var signInButtonText: String {
+    public var signInButtonText: String {
         isUserSignedIn ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta
     }
 
-    var username: String? {
+    public var username: String? {
         isUserSignedIn ? "Alfie" : nil
     }
 
-    var memberSince: Int? {
+    public var memberSince: Int? {
         isUserSignedIn ? 2024 : nil
     }
 
-    @Published var fullScreenCover: AnyView?
+    @Published public var fullScreenCover: AnyView?
 
     init(
         serviceProvider: ServiceProviderProtocol,
@@ -49,7 +49,7 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
             .store(in: &subscriptions)
     }
 
-    func didTapSignInButton() {
+    public func didTapSignInButton() {
         if isUserSignedIn {
             sessionService.signOutUser()
         } else {
@@ -57,7 +57,7 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         }
     }
 
-    func didTapDebugMenu() {
+    public func didTapDebugMenu() {
         fullScreenCover = AnyView(
             DebugMenuView(
                 viewModel: DebugMenuViewModel(
@@ -74,11 +74,11 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         )
     }
 
-    func didTapMyAccount() {
+    public func didTapMyAccount() {
         navigate(.myAccount(.myAccount))
     }
 
-    func didTapSearch() {
+    public func didTapSearch() {
         showSearch()
     }
 }

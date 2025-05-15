@@ -9,7 +9,7 @@ import SwiftUI
 import Web
 import Wishlist
 
-public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
+public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public typealias Route = HomeRoute
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
@@ -48,7 +48,7 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
 
     // MARK: - View Models for HomeRoute
 
-    func makeHomeViewModel() -> some HomeViewModelProtocol {
+    public func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
             serviceProvider: serviceProvider,
             navigate: { [weak self] route in self?.navigate(route) },
@@ -56,7 +56,7 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol {
+    public func makeAccountViewModel() -> AccountViewModel {
         AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
@@ -65,9 +65,9 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         }
     }
 
-    func makeProductListingViewModel(
+    public func makeProductListingViewModel(
         configuration: ProductListingScreenConfiguration
-    ) -> some ProductListingViewModelProtocol {
+    ) -> ProductListingViewModel {
         ProductListingViewModel(
             dependencies: .init(
                 productListingService: ProductListingService(
@@ -88,9 +88,7 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration
-    ) -> some ProductDetailsViewModelProtocol {
+    public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
@@ -106,7 +104,7 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+    public func makeWebViewModel(feature: WebFeature) -> WebViewModel {
         WebViewModel(
             webFeature: feature,
             dependencies: WebDependencyContainer(
@@ -249,7 +247,7 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
 
     // MARK: - View Models for MyAccountIntent
 
-    func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
+    public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
@@ -258,7 +256,7 @@ public final class HomeFlowViewModel: ObservableObject, FlowViewModelProtocol {
         }
     }
 
-    func makeWishlistViewModelForMyAccount() -> some WishlistViewModelProtocol {
+    public func makeWishlistViewModelForMyAccount() -> WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: true,
             dependencies: WishlistDependencyContainer(
