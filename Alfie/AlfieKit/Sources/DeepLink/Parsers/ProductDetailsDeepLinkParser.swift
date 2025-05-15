@@ -1,6 +1,7 @@
 import Foundation
 import Model
 import RegexBuilder
+import Utils
 
 final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
     let configuration: LinkConfigurationProtocol

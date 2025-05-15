@@ -65,4 +65,56 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             }
             .store(in: &subscriptions)
     }
+
+    public func navigate(for deepLinkType: DeepLink.LinkType) {
+        switch deepLinkType {
+        case .home:
+            rootTabViewModel.navigate(.home(.home))
+
+        case .shop(let route):
+            switch route {
+            case ThemedURL.brands.path:
+                rootTabViewModel.navigate(.shop(.categorySelector(.brands)))
+
+            case ThemedURL.services.path:
+                rootTabViewModel.navigate(.shop(.categorySelector(.services)))
+
+            default:
+                rootTabViewModel.navigate(.shop(.categorySelector(.categories)))
+            }
+
+        case .bag:
+            rootTabViewModel.navigate(.bag(.bag))
+
+        case .wishlist:
+            rootTabViewModel.navigate(.wishlist(.wishlist))
+
+        case .account:
+            rootTabViewModel.navigate(.home(.myAccount(.myAccount)))
+
+        case .productList(let paths, let searchText, let urlQueryParameters):
+            rootTabViewModel.navigate(
+                .shop(
+                    .productListing(
+                        .productListing(.init(
+                            category: paths,
+                            searchText: searchText,
+                            urlQueryParameters: urlQueryParameters,
+                            mode: .listing
+                        ))
+                    )
+                )
+            )
+
+        case .productDetail(let productId, _, _, _):
+            // TODO: currently the API does not support fetching a product by the StyleNumber (that is parsed from the URL), just by ProductID, so all requests will return "not found"
+            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.id(productId)))))
+
+        case .webView(let url):
+            rootTabViewModel.navigate(.shop(.web(url: url, title: "")))
+
+        case .unknown:
+            return
+        }
+    }
 }

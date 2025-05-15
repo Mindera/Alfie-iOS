@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8CD40F3E2DD607D500F482F7 /* DeepLink in Frameworks */ = {isa = PBXBuildFile; productRef = 8CD40F3D2DD607D500F482F7 /* DeepLink */; };
 		994C3E692DAD4FFD00C77271 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 994C3E682DAD4FFD00C77271 /* Model */; };
 		9956126B2DB6837700796804 /* Utils in Frameworks */ = {isa = PBXBuildFile; productRef = 9956126A2DB6837700796804 /* Utils */; };
 		99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */ = {isa = PBXBuildFile; productRef = 99DCD9262D9FD27400A3CA25 /* SharedUI */; };
@@ -81,6 +82,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9956126B2DB6837700796804 /* Utils in Frameworks */,
+				8CD40F3E2DD607D500F482F7 /* DeepLink in Frameworks */,
 				99FEB5452DCB934A00C61F77 /* AppFeature in Frameworks */,
 				994C3E692DAD4FFD00C77271 /* Model in Frameworks */,
 				99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */,
@@ -183,6 +185,7 @@
 				994C3E682DAD4FFD00C77271 /* Model */,
 				9956126A2DB6837700796804 /* Utils */,
 				99FEB5442DCB934A00C61F77 /* AppFeature */,
+				8CD40F3D2DD607D500F482F7 /* DeepLink */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -708,6 +711,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8CD40F3D2DD607D500F482F7 /* DeepLink */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DeepLink;
+		};
 		994C3E682DAD4FFD00C77271 /* Model */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Model;

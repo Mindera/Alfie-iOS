@@ -14,7 +14,8 @@ public final class CategorySelectorFlowViewModel: ObservableObject, FlowViewMode
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
-    @Published public var overlayView: AnyView?
+    @Published public private(set) var overlayView: AnyView?
+    @Published public var activeShopTab: ShopViewTab = .categories
     private var subscriptions = Set<AnyCancellable>()
 
     var isWishlistEnabled: Bool {

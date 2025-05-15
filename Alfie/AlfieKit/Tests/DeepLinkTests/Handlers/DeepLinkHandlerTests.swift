@@ -1,7 +1,8 @@
 import Mocks
 import Model
+import TestUtils
 import XCTest
-@testable import Alfie
+@testable import DeepLink
 
 final class DeepLinkHandlerTests: XCTestCase {
     private var sut: DeepLinkHandler!
@@ -383,6 +384,6 @@ final class DeepLinkHandlerTests: XCTestCase {
             configurationService: mockConfigurationService,
 //            coordinator: mockCoordinator,
             scheduler: .immediate
-        )
+        ) { _ in }
     }
 }

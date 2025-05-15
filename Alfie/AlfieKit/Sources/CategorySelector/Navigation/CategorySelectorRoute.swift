@@ -7,7 +7,7 @@ import Web
 import Wishlist
 
 public enum CategorySelectorRoute: Hashable {
-    case categorySelector
+    case categorySelector(ShopViewTab)
     case myAccount(MyAccountRoute)
     case productDetails(ProductDetailsRoute)
     case productListing(ProductListingRoute)

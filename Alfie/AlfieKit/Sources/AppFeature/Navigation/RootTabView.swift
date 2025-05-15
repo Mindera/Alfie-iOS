@@ -67,5 +67,8 @@ public struct RootTabView: View {
         }
         .ignoresSafeArea(.keyboard)
         .animation(.easeInOut(duration: 0.3), value: viewModel.isOverlayVisible)
+        .onAppear {
+            viewModel.isReadyForNavigation = true
+        }
     }
 }

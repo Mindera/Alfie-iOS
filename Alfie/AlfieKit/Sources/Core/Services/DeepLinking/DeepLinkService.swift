@@ -6,21 +6,25 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
     private var handlers: [DeepLinkHandlerProtocol]
     private let parsers: [DeepLinkParserProtocol]
     private let linkConfiguration: LinkConfigurationProtocol
-    private let log: Logger
+//    private let log: Logger
 
     public init(
         parsers: [DeepLinkParserProtocol],
         handlers: [DeepLinkHandlerProtocol] = [],
-        configuration: LinkConfigurationProtocol,
-        log: Logger
+        configuration: LinkConfigurationProtocol//,
+//        log: Logger
     ) {
         self.parsers = parsers
         self.handlers = handlers
         self.linkConfiguration = configuration
-        self.log = log
+//        self.log = log
     }
 
     // MARK: - DeepLinkServiceProtocol
+
+    public func updateAvailabilityOfHandlers(to availability: Bool) {
+        handlers.forEach { $0.isReadyToHandleLinks = availability }
+    }
 
     public func update(handlers: [DeepLinkHandlerProtocol]) {
         self.handlers = handlers
@@ -49,7 +53,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
         }
 
         guard let deepLink = deepLinkFromUrl(url) else {
-            log.warning("Could not create valid deeplink from URL \(url), creating fallback to open in webview")
+//            log.warning("Could not create valid deeplink from URL \(url), creating fallback to open in webview")
             let fallbackLink = DeepLink(type: .webView(url: url), fullUrl: url)
             handleDeepLink(fallbackLink)
             return
@@ -62,7 +66,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
 
     private func handleDeepLink(_ deepLink: DeepLink) {
         guard let handler = handlers.first(where: { $0.canHandleDeepLink(deepLink) }) else {
-            log.info("No handlers can handle deeplink \(deepLink), ignoring")
+//            log.info("No handlers can handle deeplink \(deepLink), ignoring")
             return
         }
 
@@ -71,7 +75,7 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
             return
         }
 
-        log.debug("Handler \(handler) will handle deeplink \(deepLink)")
+//        log.debug("Handler \(handler) will handle deeplink \(deepLink)")
         handler.handleDeepLink(deepLink)
     }
 

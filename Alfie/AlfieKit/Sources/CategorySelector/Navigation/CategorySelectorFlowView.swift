@@ -14,7 +14,8 @@ public struct CategorySelectorFlowView: View {
                 isWishlistEnabled: viewModel.isWishlistEnabled,
                 categoriesViewModel: viewModel.makeCategoriesViewModel(),
                 brandsViewModel: viewModel.makeBrandsViewModel(),
-                servicesViewModel: viewModel.isStoreServicesEnabled ? viewModel.makeServicesViewModel() : nil
+                servicesViewModel: viewModel.isStoreServicesEnabled ? viewModel.makeServicesViewModel() : nil,
+                activeShopTabPublisher: viewModel.$activeShopTab.eraseToAnyPublisher()
             ) {
                 viewModel.navigate($0)
             }
@@ -22,6 +23,7 @@ public struct CategorySelectorFlowView: View {
                 route.destination(
                     isRoot: false,
                     isWishlistEnabled: viewModel.isWishlistEnabled,
+                    activeShopTabPublisher: viewModel.$activeShopTab.eraseToAnyPublisher(),
                     categoriesViewModel: viewModel.makeCategoriesViewModel,
                     brandsViewModel: viewModel.makeBrandsViewModel,
                     isStoreServicesEnabled: viewModel.isStoreServicesEnabled,

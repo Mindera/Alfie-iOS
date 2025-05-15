@@ -15,8 +15,22 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
+        "identifier" : "DeepLinkTests",
+        "name" : "DeepLinkTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
         "identifier" : "CoreTests",
         "name" : "CoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BFFGraphTests",
+        "name" : "BFFGraphTests"
       }
     },
     {
@@ -29,22 +43,8 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "BFFGraphTests",
-        "name" : "BFFGraphTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
         "identifier" : "SharedUITests",
         "name" : "SharedUITests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "NavigationTests",
-        "name" : "NavigationTests"
       }
     }
   ],
