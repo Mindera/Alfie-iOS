@@ -1,7 +1,8 @@
 import DebugMenu
-import XCTest
 import Mocks
 import Model
+import TestUtils
+import XCTest
 @testable import Alfie
 
 final class EndpointSelectionViewModelTests: XCTestCase {
