@@ -15,6 +15,7 @@ final class ProductListingStyleProviderTests: XCTestCase {
     override func tearDownWithError() throws {
         sut = nil
         userDefaults.removeSuite(named: Self.userDefaultsSuiteName)
+        userDefaults.removePersistentDomain(forName: Self.userDefaultsSuiteName)
         userDefaults = nil
         try super.tearDownWithError()
     }

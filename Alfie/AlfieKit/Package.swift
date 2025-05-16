@@ -383,5 +383,14 @@ let package = Package(
                 .unsafeFlags(["-enable-bare-slash-regex"])
             ]
         ),
+
+        .testTarget(
+            name: "WebTests",
+            dependencies: [
+                "Mocks",
+                "TestUtils",
+                "Web",
+            ]
+        ),
     ]
 )
