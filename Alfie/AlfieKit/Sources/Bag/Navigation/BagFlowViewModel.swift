@@ -8,31 +8,22 @@ import Wishlist
 public final class BagFlowViewModel: BagFlowViewModelProtocol {
     public typealias Route = BagRoute
     @Published public var path = NavigationPath()
-    private let serviceProvider: ServiceProviderProtocol
+    private let dependencies: BagFlowDependencyContainer
 
-    public init(serviceProvider: ServiceProviderProtocol) {
-        self.serviceProvider = serviceProvider
+    public init(dependencies: BagFlowDependencyContainer) {
+        self.dependencies = dependencies
     }
 
     // MARK: - View Models for BagRoute
 
     public func makeBagViewModel() -> BagViewModel {
-        BagViewModel(
-            isWishlistEnabled: serviceProvider.configurationService.isFeatureEnabled(.wishlist),
-            dependencies: BagDependencyContainer(
-                bagService: serviceProvider.bagService,
-                analytics: serviceProvider.analytics
-            )
-        ) { [weak self] in
+        BagViewModel(dependencies: dependencies.bagDependencyContainer) { [weak self] in
             self?.navigate($0)
         }
     }
 
     public func makeAccountViewModel() -> AccountViewModel {
-        AccountViewModel(
-            configurationService: serviceProvider.configurationService,
-            sessionService: serviceProvider.sessionService
-        ) { [weak self] in
+        AccountViewModel(dependencies: dependencies.myAccountDependencyContainer) { [weak self] in
             self?.navigate(.myAccount($0))
         }
     }
@@ -40,14 +31,7 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
     public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
             openWebfeatureAction: { [weak self] in self?.navigate(.productDetails(.webFeature($0))) }
         )
@@ -56,22 +40,14 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
     public func makeWebViewModel(feature: WebFeature) -> WebViewModel {
         WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer(
-                deepLinkService: serviceProvider.deepLinkService,
-                webViewConfigurationService: serviceProvider.webViewConfigurationService,
-                webUrlProvider: serviceProvider.webUrlProvider
-            )
+            dependencies: dependencies.webDependencyContainer
         )
     }
 
     public func makeWishlistViewModel() -> WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: true,
-            dependencies: WishlistDependencyContainer(
-                wishlistService: serviceProvider.wishlistService,
-                bagService: serviceProvider.bagService,
-                analytics: serviceProvider.analytics
-            )
+            dependencies: dependencies.wishlistDependencyContainer
         ) { [weak self] in
             self?.navigate(.wishlist($0))
         }

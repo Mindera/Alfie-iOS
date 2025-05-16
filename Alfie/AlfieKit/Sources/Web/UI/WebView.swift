@@ -179,24 +179,20 @@ private struct WebViewRepresentable<ViewModel: WebViewModelProtocol>: UIViewRepr
     }
 }
 
-//#if DEBUG
-//#Preview("Ready") {
-//    WebView(viewModel: MockWebViewModel(state: .ready(URL.fromString("https://www.alfieproj.com/"))))
-//        .environmentObject(Coordinator())
-//}
-//
-//#Preview("Loading") {
-//    WebView(viewModel: MockWebViewModel(state: .loading))
-//        .environmentObject(Coordinator())
-//}
-//
-//#Preview("Error - Generic") {
-//    WebView(viewModel: MockWebViewModel(state: .error(.generic)))
-//        .environmentObject(Coordinator())
-//}
-//
-//#Preview("Error - No URL") {
-//    WebView(viewModel: MockWebViewModel(state: .error(.noUrl)))
-//        .environmentObject(Coordinator())
-//}
-//#endif
+#if DEBUG
+#Preview("Ready") {
+    WebView(viewModel: MockWebViewModel(state: .ready(URL.fromString("https://www.alfieproj.com/"))))
+}
+
+#Preview("Loading") {
+    WebView(viewModel: MockWebViewModel(state: .loading))
+}
+
+#Preview("Error - Generic") {
+    WebView(viewModel: MockWebViewModel(state: .error(.generic)))
+}
+
+#Preview("Error - No URL") {
+    WebView(viewModel: MockWebViewModel(state: .error(.noUrl)))
+}
+#endif

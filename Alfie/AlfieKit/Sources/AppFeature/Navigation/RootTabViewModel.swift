@@ -13,11 +13,10 @@ public final class RootTabViewModel<
     HomeFlowVM: HomeFlowViewModelProtocol,
     WishlistFlowVM: WishlistFlowViewModelProtocol
 >: RootTabViewModelProtocol
-    where BagFlowVM.Route == BagRoute,
-          CategorySelectorVM.Route == CategorySelectorRoute,
-          HomeFlowVM.Route == HomeRoute,
-          WishlistFlowVM.Route == WishlistRoute
-{
+where BagFlowVM.Route == BagRoute,
+CategorySelectorVM.Route == CategorySelectorRoute,
+HomeFlowVM.Route == HomeRoute,
+WishlistFlowVM.Route == WishlistRoute {
     public let tabs: [Model.Tab]
     @Published public var selectedTab: Model.Tab
     private let serviceProvider: ServiceProviderProtocol

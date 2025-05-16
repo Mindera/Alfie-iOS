@@ -10,7 +10,7 @@ import Web
 public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = ProductListingRoute
     @Published public var path = NavigationPath()
-    private let serviceProvider: ServiceProviderProtocol
+    private let dependencies: ProductListingFlowDependencyContainer
     @Published private var isSearchPresented = false
     @Published public private(set) var overlayView: AnyView?
     private var subscriptions = Set<AnyCancellable>()
@@ -18,7 +18,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
         SearchFlowViewModel(
-            serviceProvider: serviceProvider,
+            dependencies: dependencies.searchDependencyContainer,
             intentViewBuilder: { [weak self] in
                 self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
             },
@@ -27,10 +27,10 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     }()
 
     public init(
-        serviceProvider: ServiceProviderProtocol,
+        dependencies: ProductListingFlowDependencyContainer,
         productListingScreenConfiguration: ProductListingScreenConfiguration
     ) {
-        self.serviceProvider = serviceProvider
+        self.dependencies = dependencies
         self.productListingScreenConfiguration = productListingScreenConfiguration
         setupBindings()
     }
@@ -53,16 +53,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
 
     func makeProductListingViewModel() -> some ProductListingViewModelProtocol {
         ProductListingViewModel(
-            dependencies: .init(
-                productListingService: ProductListingService(
-                    productService: serviceProvider.productService,
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics,
-                configurationService: serviceProvider.configurationService
-            ),
+            dependencies: dependencies.productListingDependencyContainer,
             category: productListingScreenConfiguration.category,
             searchText: productListingScreenConfiguration.searchText,
             urlQueryParameters: productListingScreenConfiguration.urlQueryParameters,
@@ -76,16 +67,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
         configuration: ProductListingScreenConfiguration
     ) -> some ProductListingViewModelProtocol {
         ProductListingViewModel(
-            dependencies: .init(
-                productListingService: ProductListingService(
-                    productService: serviceProvider.productService,
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics,
-                configurationService: serviceProvider.configurationService
-            ),
+            dependencies: dependencies.productListingDependencyContainer,
             category: configuration.category,
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
@@ -100,28 +82,14 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     ) -> some ProductDetailsViewModelProtocol {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
             openWebfeatureAction: { [weak self] in self?.navigate(.productDetails(.webFeature($0))) }
         )
     }
 
     func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
-        WebViewModel(
-            webFeature: feature,
-            dependencies: WebDependencyContainer(
-                deepLinkService: serviceProvider.deepLinkService,
-                webViewConfigurationService: serviceProvider.webViewConfigurationService,
-                webUrlProvider: serviceProvider.webUrlProvider
-            )
-        )
+        WebViewModel(webFeature: feature, dependencies: dependencies.webDependencyContainer)
     }
 
     // MARK: - View Models for SearchIntent
@@ -169,16 +137,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
         )
 
         return ProductListingViewModel(
-            dependencies: .init(
-                productListingService: ProductListingService(
-                    productService: serviceProvider.productService,
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics,
-                configurationService: serviceProvider.configurationService
-            ),
+            dependencies: dependencies.productListingDependencyContainer,
             category: configuration.category,
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
@@ -230,14 +189,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     ) -> some ProductDetailsViewModelProtocol {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.searchFlowViewModel.pop() },
             openWebfeatureAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.webFeature($0))) }
         )
@@ -246,11 +198,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
     private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol {
         WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer(
-                deepLinkService: serviceProvider.deepLinkService,
-                webViewConfigurationService: serviceProvider.webViewConfigurationService,
-                webUrlProvider: serviceProvider.webUrlProvider
-            )
+            dependencies: dependencies.webDependencyContainer
         )
     }
 }

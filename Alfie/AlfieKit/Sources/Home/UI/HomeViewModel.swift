@@ -5,8 +5,9 @@ import SharedUI
 import SwiftUI
 
 public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
-    private let serviceProvider: ServiceProviderProtocol
     private let sessionService: SessionServiceProtocol
+    private let configurationService: ConfigurationServiceProtocol
+    private let apiEndpointService: ApiEndpointServiceProtocol
     private let navigate: (HomeRoute) -> Void
     private let showSearch: () -> Void
     @Published private var isUserSignedIn = false
@@ -31,12 +32,13 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     @Published public var fullScreenCover: AnyView?
 
     init(
-        serviceProvider: ServiceProviderProtocol,
+        dependencies: HomeDependencyContainer,
         navigate: @escaping (HomeRoute) -> Void,
         showSearch: @escaping () -> Void
     ) {
-        self.serviceProvider = serviceProvider
-        self.sessionService = serviceProvider.sessionService
+        self.sessionService = dependencies.sessionService
+        self.configurationService = dependencies.configurationService
+        self.apiEndpointService = dependencies.apiEndpointService
         self.navigate = navigate
         self.showSearch = showSearch
 
@@ -61,10 +63,12 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         fullScreenCover = AnyView(
             DebugMenuView(
                 viewModel: DebugMenuViewModel(
-                    serviceProvider: serviceProvider,
-                    closeMenuAction: { [weak self] in self?.fullScreenCover = nil },
+                    configurationService: configurationService,
+                    apiEndpointService: apiEndpointService,
+                    closeMenuAction: { [weak self] in self?.fullScreenCover = nil
+                    },
                     openForceAppUpdate: { [weak self] in
-                        if let configuration = self?.serviceProvider.configurationService.forceAppUpdateInfo {
+                        if let configuration = self?.configurationService.forceAppUpdateInfo {
                             self?.fullScreenCover = AnyView(ForceAppUpdateView(configuration: configuration))
                         }
                     },

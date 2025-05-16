@@ -1,9 +1,9 @@
 import Model
 import SharedUI
 import SwiftUI
-//#if DEBUG
-//import Mocks
-//#endif
+#if DEBUG
+import Mocks
+#endif
 
 public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
@@ -276,34 +276,30 @@ private enum Constants {
 
 // MARK: - Previews
 
-//#if DEBUG
-//#Preview("Empty") {
-//    SearchView(viewModel: MockSearchViewModel(state: .empty))
-//        .environmentObject(Coordinator())
-//}
-//
-//#Preview("Loading") {
-//    SearchView(viewModel: MockSearchViewModel(state: .loading))
-//        .environmentObject(Coordinator())
-//}
-//
-//#Preview("No Results") {
-//    SearchView(viewModel: MockSearchViewModel(state: .noResults, searchText: "Polo"))
-//        .environmentObject(Coordinator())
-//}
-//
-//#Preview("Results") {
-//    SearchView(
-//        viewModel: MockSearchViewModel(
-//            state: .success(suggestion: .fixture()),
-//            searchText: "polo",
-//            suggestionTerms: [
-//                .fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")
-//            ],
-//            suggestionBrands: [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")],
-//            suggestionProducts: Product.fixtures
-//        )
-//    )
-//    .environmentObject(Coordinator())
-//}
-//#endif
+#if DEBUG
+#Preview("Empty") {
+    SearchView(viewModel: MockSearchViewModel(state: .empty))
+}
+
+#Preview("Loading") {
+    SearchView(viewModel: MockSearchViewModel(state: .loading))
+}
+
+#Preview("No Results") {
+    SearchView(viewModel: MockSearchViewModel(state: .noResults, searchText: "Polo"))
+}
+
+#Preview("Results") {
+    SearchView(
+        viewModel: MockSearchViewModel(
+            state: .success(suggestion: .fixture()),
+            searchText: "polo",
+            suggestionTerms: [
+                .fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")
+            ],
+            suggestionBrands: [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")],
+            suggestionProducts: Product.fixtures
+        )
+    )
+}
+#endif

@@ -17,7 +17,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
     private let showSearch: () -> Void
-    @Published public private(set) var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
+    @Published public private(set) var state: PaginatedViewState<
+        ProductListingViewStateModel, ProductListingViewErrorType
+    >
 
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12

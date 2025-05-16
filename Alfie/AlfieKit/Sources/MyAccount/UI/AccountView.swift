@@ -91,9 +91,12 @@ private extension AccountSection {
 #Preview {
     AccountView(
         viewModel: AccountViewModel(
-            configurationService: MockConfigurationService(),
-            sessionService: MockSessionService()
-        ) { _ in }
+            dependencies: .init(
+                configurationService: MockConfigurationService(),
+                sessionService: MockSessionService()
+            )
+        ) { _ in
+        }
     )
 }
 #endif

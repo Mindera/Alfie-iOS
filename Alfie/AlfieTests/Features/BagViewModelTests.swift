@@ -12,9 +12,10 @@ final class BagViewModelTests: XCTestCase {
         try super.setUpWithError()
         mockDependencies = BagDependencyContainer(
             bagService: MockBagService(),
+            configurationService: MockConfigurationService(),
             analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
         )
-        sut = .init(isWishlistEnabled: false, dependencies: mockDependencies) { _ in }
+        sut = .init(dependencies: mockDependencies) { _ in }
     }
 
     override func tearDownWithError() throws {

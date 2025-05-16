@@ -6,10 +6,13 @@ public extension Model.Tab {
         switch self {
         case .bag:
             return "Bag"
+
         case .home:
             return "Home"
+
         case .shop:
             return "Shop"
+
         case .wishlist:
             return "Wishlist"
         }
@@ -19,10 +22,13 @@ public extension Model.Tab {
         switch self {
         case .home:
             .home
+
         case .shop:
             .store
+
         case .bag:
             .bag
+
         case .wishlist:
             .heart
         }
@@ -32,10 +38,13 @@ public extension Model.Tab {
         switch self {
         case .home:
             "home-tab"
+
         case .shop:
             "shop-tab"
+
         case .bag:
             "bag-tab"
+
         case .wishlist:
             "wishlist-tab"
         }

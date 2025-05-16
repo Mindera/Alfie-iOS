@@ -25,7 +25,9 @@ public final class BrandsViewModel: BrandsViewModelProtocol {
             )
         }
     }()
-    @Published public private(set) var state: ViewState<OrderedDictionary<String, [Brand]>, BrandsViewErrorType> = .loading
+    @Published public private(set) var state: ViewState<
+        OrderedDictionary<String, [Brand]>, BrandsViewErrorType
+    > = .loading
     @Published public var searchText: String
 
     private var searchFocusStateSubject: PassthroughSubject<Bool, Never> = .init()

@@ -99,6 +99,7 @@ let package = Package(
             dependencies: [
                 "Bag",
                 "CategorySelector",
+                "Core",
                 "Mocks",
                 "Model",
                 "Home",

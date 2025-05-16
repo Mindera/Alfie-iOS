@@ -11,12 +11,11 @@ public final class AccountViewModel: AccountViewModelProtocol {
     @Published public private(set) var sectionList: [AccountSection] = []
 
     public init(
-        configurationService: ConfigurationServiceProtocol,
-        sessionService: SessionServiceProtocol,
+        dependencies: MyAccountDependencyContainer,
         navigate: @escaping (MyAccountRoute) -> Void
     ) {
-        self.configurationService = configurationService
-        self.sessionService = sessionService
+        self.sessionService = dependencies.sessionService
+        self.configurationService = dependencies.configurationService
         self.navigate = navigate
 
         setupBindings()
