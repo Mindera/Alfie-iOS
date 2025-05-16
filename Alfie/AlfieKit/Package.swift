@@ -365,6 +365,14 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "DebugMenuTests",
+            dependencies: [
+                "DebugMenu",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "DeepLinkTests",
             dependencies: [
                 "Core",

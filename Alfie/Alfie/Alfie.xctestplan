@@ -15,8 +15,29 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
+        "identifier" : "WebTests",
+        "name" : "WebTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
         "identifier" : "CategorySelectorTests",
         "name" : "CategorySelectorTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "SearchTests",
+        "name" : "SearchTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BFFGraphTests",
+        "name" : "BFFGraphTests"
       }
     },
     {
@@ -24,6 +45,41 @@
         "containerPath" : "container:Alfie.xcodeproj",
         "identifier" : "BE8B02332B616979007AE489",
         "name" : "AlfieTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "AppFeatureTests",
+        "name" : "AppFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "CoreTests",
+        "name" : "CoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BagTests",
+        "name" : "BagTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "DeepLinkTests",
+        "name" : "DeepLinkTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "DebugMenuTests",
+        "name" : "DebugMenuTests"
       }
     },
     {
@@ -43,57 +99,8 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "BFFGraphTests",
-        "name" : "BFFGraphTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "AppFeatureTests",
-        "name" : "AppFeatureTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
         "identifier" : "ProductListingTests",
         "name" : "ProductListingTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "DeepLinkTests",
-        "name" : "DeepLinkTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "WebTests",
-        "name" : "WebTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "CoreTests",
-        "name" : "CoreTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "SearchTests",
-        "name" : "SearchTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "BagTests",
-        "name" : "BagTests"
       }
     }
   ],
