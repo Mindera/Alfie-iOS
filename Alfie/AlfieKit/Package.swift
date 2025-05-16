@@ -317,6 +317,16 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "AppFeatureTests",
+            dependencies: [
+                "AppFeature",
+                "Core",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "BagTests",
             dependencies: [
                 "Bag",
