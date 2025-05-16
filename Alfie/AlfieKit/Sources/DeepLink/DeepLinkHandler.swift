@@ -9,7 +9,7 @@ public final class DeepLinkHandler: DeepLinkHandlerProtocol {
     private let log: Logger
     private var pendingLinks: [DeepLink] = []
     private var subscriptions = Set<AnyCancellable>()
-    public var isReadyToHandleLinks = false
+    @Published public var isReadyToHandleLinks = false
     private let navigate: (DeepLink.LinkType) -> Void
 
     public init(
@@ -21,6 +21,12 @@ public final class DeepLinkHandler: DeepLinkHandlerProtocol {
         self.configurationService = configurationService
         self.log = log
         self.navigate = navigate
+
+        $isReadyToHandleLinks
+            .filter { $0 }
+            .receive(on: scheduler)
+            .sink { [weak self] _ in self?.handlePendingLinks() }
+            .store(in: &subscriptions)
     }
 
     // MARK: - DeepLinkHandlerProtocol
