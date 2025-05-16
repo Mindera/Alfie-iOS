@@ -13,9 +13,15 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let goBackAction: () -> Void
     private let openWebfeatureAction: (WebFeature) -> Void
 
-    @Published public private(set) var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
-    public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: [])
-    public private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: [])
+    @Published public private(set) var state: ViewState<
+        ProductDetailsViewStateModel, ProductDetailsViewErrorType
+    > = .loading
+    public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
+        items: []
+    )
+    public private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(
+        items: []
+    )
     public let productId: String
     private let initialSelectedProduct: SelectedProduct?
 
@@ -35,28 +41,14 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return model.selectedVariant
     }
 
-    public var productTitle: String {
-        product?.brand.name ?? ""
-    }
-
-    public var productName: String {
-        product?.name ?? ""
-    }
-
-    public var productImageUrls: [URL] {
-        selectedVariant?.media.compactMap {
-            $0.asImage?.url
-        } ?? []
-    }
-
+    public var productTitle: String { product?.brand.name ?? "" }
+    public var productName: String { product?.name ?? "" }
+    public var productImageUrls: [URL] { selectedVariant?.media.compactMap { $0.asImage?.url } ?? [] }
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] {
         // Don't show delivery for now as we don't know yet if it will be a webview or an API-driven native page
         [.paymentOptions, .returns]
     }
-
-    public var productDescription: String {
-        product?.longDescription ?? ""
-    }
+    public var productDescription: String { product?.longDescription ?? "" }
 
     public var shareConfiguration: ShareConfiguration? {
         guard
@@ -78,17 +70,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return ShareConfiguration(url: url, message: shareMessage, subject: shareSubject)
     }
 
-    public var shouldShowMediaPaginatedControl: Bool {
-        productImageUrls.count > 1
-    }
-
-    public var hasSingleImage: Bool {
-        productImageUrls.count == 1
-    }
-
-    public var priceType: PriceType? {
-        product?.priceType
-    }
+    public var shouldShowMediaPaginatedControl: Bool { productImageUrls.count > 1 }
+    public var hasSingleImage: Bool { productImageUrls.count == 1 }
+    public var priceType: PriceType? { product?.priceType }
 
     public init(
         configuration: ProductDetailsConfiguration,

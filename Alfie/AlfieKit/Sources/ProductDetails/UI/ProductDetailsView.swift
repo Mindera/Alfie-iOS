@@ -571,49 +571,45 @@ private enum Constants {
     static let colorChevronSize: CGFloat = 16
 }
 
-//#if DEBUG
-//#Preview("Loaded") {
-//    ProductDetailsView2(
-//        viewModel: MockProductDetailsViewModel(
-//            state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
-//            productName: "Nolita SW Signature Loafer",
-//            productImageUrls: [
-//                URL.fromString("https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
-//                URL.fromString("https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
-//            ],
-//            productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
-//            colorSelectionConfiguration: .init(
-//                items: [
-//                    .init(id: "1", name: "", type: .url(URL.fromString("URL.fromString(https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"))),
-//                    .init(id: "2", name: "", type: .url(URL.fromString("URL.fromString(https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"))),
-//                    .init(id: "3", name: "", type: .color(.green), isDisabled: true),
-//                    .init(id: "4", name: "", type: .color(.red)),
-//                ]
-//            ),
-//            complementaryInfoToShow: [.paymentOptions, .returns]
-//        )
-//    )
-//    .environmentObject(Coordinator())
-//}
-//
-//#Preview("Loading") {
-//    ProductDetailsView2(
-//        viewModel: MockProductDetailsViewModel(
-//            complementaryInfoToShow: [.paymentOptions, .returns],
-//            onShouldShowLoadingForSectionCalled: { _ in true },
-//            onShouldShowSectionCalled: { section in section != .addToBag }
-//        )
-//    )
-//    .environmentObject(Coordinator())
-//}
-//
-//#Preview("Error - Not found") {
-//    ProductDetailsView2(viewModel: MockProductDetailsViewModel(state: .error(.notFound)))
-//    .environmentObject(Coordinator())
-//}
-//
-//#Preview("Error - Generic") {
-//    ProductDetailsView2(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
-//    .environmentObject(Coordinator())
-//}
-//#endif // swiftlint:disable:this file_length
+#if DEBUG
+#Preview("Loaded") {
+    ProductDetailsView(
+        viewModel: MockProductDetailsViewModel(
+            state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
+            productName: "Nolita SW Signature Loafer",
+            productImageUrls: [
+                URL.fromString("https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
+                URL.fromString("https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
+            ],
+            productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
+            colorSelectionConfiguration: .init(
+                items: [
+                    .init(id: "1", name: "", type: .url(URL.fromString("URL.fromString(https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"))),
+                    .init(id: "2", name: "", type: .url(URL.fromString("URL.fromString(https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"))),
+                    .init(id: "3", name: "", type: .color(.green), isDisabled: true),
+                    .init(id: "4", name: "", type: .color(.red)),
+                ]
+            ),
+            complementaryInfoToShow: [.paymentOptions, .returns]
+        )
+    )
+}
+
+#Preview("Loading") {
+    ProductDetailsView(
+        viewModel: MockProductDetailsViewModel(
+            complementaryInfoToShow: [.paymentOptions, .returns],
+            onShouldShowLoadingForSectionCalled: { _ in true },
+            onShouldShowSectionCalled: { section in section != .addToBag }
+        )
+    )
+}
+
+#Preview("Error - Not found") {
+    ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.notFound)))
+}
+
+#Preview("Error - Generic") {
+    ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
+}
+#endif // swiftlint:disable:this file_length

@@ -26,7 +26,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
-//    var tabCoordinator: TabCoordinator!
     // swiftlint:enable implicitly_unwrapped_optional
     static var braze: Braze?
 
@@ -73,16 +72,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-//        var tabs: [TabScreen] = [.bag]
-
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
         isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
-
-//        if isWishlistEnabled {
-//            tabs.insert(.wishlist, at: 2)
-//        }
-
-//        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .bag, serviceProvider: serviceProvider)
 
         featureAvailabilitySubscription = serviceProvider.configurationService.featureAvailabilityPublisher
             .sink { [weak self] featureAvailability in

@@ -1,11 +1,17 @@
 import Bag
 import CategorySelector
 import Combine
+import Core
 import Foundation
 import Home
 import Model
+import MyAccount
 import OrderedCollections
+import ProductDetails
+import ProductListing
+import Search
 import Utils
+import Web
 import Wishlist
 
 public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
@@ -48,17 +54,97 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             tabs.insert(.wishlist, at: 2)
         }
 
+        let bagDependencyContainer = BagDependencyContainer(
+            bagService: serviceProvider.bagService,
+            configurationService: serviceProvider.configurationService,
+            analytics: serviceProvider.analytics
+        )
+        let myAccountDependencyContainer = MyAccountDependencyContainer(
+            configurationService: serviceProvider.configurationService,
+            sessionService: serviceProvider.sessionService
+        )
+        let productDetailsDependencyContainer = ProductDetailsDependencyContainer(
+            productService: serviceProvider.productService,
+            webUrlProvider: serviceProvider.webUrlProvider,
+            bagService: serviceProvider.bagService,
+            wishlistService: serviceProvider.wishlistService,
+            configurationService: serviceProvider.configurationService,
+            analytics: serviceProvider.analytics
+        )
+        let webDependencyContainer = WebDependencyContainer(
+            deepLinkService: serviceProvider.deepLinkService,
+            webViewConfigurationService: serviceProvider.webViewConfigurationService,
+            webUrlProvider: serviceProvider.webUrlProvider
+        )
+        let wishlistDependencyContainer = WishlistDependencyContainer(
+            wishlistService: serviceProvider.wishlistService,
+            bagService: serviceProvider.bagService,
+            analytics: serviceProvider.analytics
+        )
+        let categorySelectorDependencyContainer = CategorySelectorDependencyContainer(
+            navigationService: serviceProvider.navigationService,
+            brandsService: serviceProvider.brandsService,
+            configurationService: serviceProvider.configurationService
+        )
+        let productListingDependencyContainer = ProductListingDependencyContainer(
+            productListingService: ProductListingService(
+                productService: serviceProvider.productService,
+                configuration: .init(type: .plp)
+            ),
+            plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
+            wishlistService: serviceProvider.wishlistService,
+            analytics: serviceProvider.analytics,
+            configurationService: serviceProvider.configurationService
+        )
+        let searchDependencyContainer = SearchDependencyContainer(
+            recentsService: serviceProvider.recentsService,
+            searchService: serviceProvider.searchService,
+            analytics: serviceProvider.analytics
+        )
+        let homeDependencyContainer = HomeDependencyContainer(
+            configurationService: serviceProvider.configurationService,
+            apiEndpointService: serviceProvider.apiEndpointService,
+            sessionService: serviceProvider.sessionService
+        )
+
         let bagFlowViewModel = BagFlowViewModel(
-            serviceProvider: serviceProvider
+            dependencies: .init(
+                bagDependencyContainer: bagDependencyContainer,
+                myAccountDependencyContainer: myAccountDependencyContainer,
+                productDetailsDependencyContainer: productDetailsDependencyContainer,
+                webDependencyContainer: webDependencyContainer,
+                wishlistDependencyContainer: wishlistDependencyContainer
+            )
         )
         let categorySelectorFlowViewModel = CategorySelectorFlowViewModel(
-            serviceProvider: serviceProvider
+            dependencies: .init(
+                categorySelectorDependencyContainer: categorySelectorDependencyContainer,
+                webDependencyContainer: webDependencyContainer,
+                myAccountDependencyContainer: myAccountDependencyContainer,
+                productDetailsDependencyContainer: productDetailsDependencyContainer,
+                productListingDependencyContainer: productListingDependencyContainer,
+                wishlistDependencyContainer: wishlistDependencyContainer,
+                searchDependencyContainer: searchDependencyContainer
+            )
         )
         let homeFlowViewModel = HomeFlowViewModel(
-            serviceProvider: serviceProvider
+            dependencies: .init(
+                homeDependencyContainer: homeDependencyContainer,
+                myAccountDependencyContainer: myAccountDependencyContainer,
+                productListingDependencyContainer: productListingDependencyContainer,
+                productDetailsDependencyContainer: productDetailsDependencyContainer,
+                webDependencyContainer: webDependencyContainer,
+                wishlistDependencyContainer: wishlistDependencyContainer,
+                searchDependencyContainer: searchDependencyContainer
+            )
         )
         let wishlistFlowViewModel = WishlistFlowViewModel(
-            serviceProvider: serviceProvider
+            dependencies: .init(
+                wishlistDependencyContainer: wishlistDependencyContainer,
+                myAccountDependencyContainer: myAccountDependencyContainer,
+                productDetailsDependencyContainer: productDetailsDependencyContainer,
+                webDependencyContainer: webDependencyContainer
+            )
         )
 
         self.rootTabViewModel = RootTabViewModel(

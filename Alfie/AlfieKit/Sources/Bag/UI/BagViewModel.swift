@@ -10,11 +10,10 @@ public final class BagViewModel: BagViewModelProtocol {
     private let navigate: (BagRoute) -> Void
 
     init(
-        isWishlistEnabled: Bool,
         dependencies: BagDependencyContainer,
         navigate: @escaping (BagRoute) -> Void
     ) {
-        self.isWishlistEnabled = isWishlistEnabled
+        self.isWishlistEnabled = dependencies.configurationService.isFeatureEnabled(.wishlist)
         self.dependencies = dependencies
         self.navigate = navigate
         products = dependencies.bagService.getBagContent()

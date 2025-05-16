@@ -5,16 +5,16 @@ import SwiftUI
 public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = SearchRoute
     @Published public var path = NavigationPath()
-    private let serviceProvider: ServiceProviderProtocol
+    private let dependencies: SearchDependencyContainer
     let intentViewBuilder: (SearchIntent) -> AnyView
     private let closeSearchAction: () -> Void
 
     public init(
-        serviceProvider: ServiceProviderProtocol,
+        dependencies: SearchDependencyContainer,
         intentViewBuilder: @escaping (SearchIntent) -> AnyView,
         closeSearchAction: @escaping () -> Void
     ) {
-        self.serviceProvider = serviceProvider
+        self.dependencies = dependencies
         self.intentViewBuilder = intentViewBuilder
         self.closeSearchAction = closeSearchAction
     }
@@ -23,11 +23,7 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
 
     func makeSearchModel() -> some SearchViewModelProtocol {
         SearchViewModel(
-            dependencies: .init(
-                recentsService: serviceProvider.recentsService,
-                searchService: serviceProvider.searchService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies,
             navigate: { [weak self] in self?.navigate($0) },
             closeSearchAction: { [weak self] in self?.closeSearchAction() }
         )

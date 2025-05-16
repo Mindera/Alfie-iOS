@@ -12,7 +12,7 @@ import Wishlist
 public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public typealias Route = HomeRoute
     @Published public var path = NavigationPath()
-    private let serviceProvider: ServiceProviderProtocol
+    private let dependencies: HomeFlowDependencyContainer
     @Published private var isSearchPresented = false
     @Published private var overlayView: AnyView?
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
@@ -20,7 +20,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
         SearchFlowViewModel(
-            serviceProvider: serviceProvider,
+            dependencies: dependencies.searchDependencyContainer,
             intentViewBuilder: { [weak self] in
                 self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
             },
@@ -28,8 +28,8 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         )
     }()
 
-    public init(serviceProvider: ServiceProviderProtocol) {
-        self.serviceProvider = serviceProvider
+    public init(dependencies: HomeFlowDependencyContainer) {
+        self.dependencies = dependencies
         setupBindings()
     }
 
@@ -51,17 +51,14 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
 
     public func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
-            serviceProvider: serviceProvider,
+            dependencies: dependencies.homeDependencyContainer,
             navigate: { [weak self] route in self?.navigate(route) },
             showSearch: { [weak self] in self?.isSearchPresented = true }
         )
     }
 
     public func makeAccountViewModel() -> AccountViewModel {
-        AccountViewModel(
-            configurationService: serviceProvider.configurationService,
-            sessionService: serviceProvider.sessionService
-        ) { [weak self] in
+        AccountViewModel(dependencies: dependencies.myAccountDependencyContainer) { [weak self] in
             self?.navigate(.myAccount($0))
         }
     }
@@ -70,16 +67,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         configuration: ProductListingScreenConfiguration
     ) -> ProductListingViewModel {
         ProductListingViewModel(
-            dependencies: .init(
-                productListingService: ProductListingService(
-                    productService: serviceProvider.productService,
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics,
-                configurationService: serviceProvider.configurationService
-            ),
+            dependencies: dependencies.productListingDependencyContainer,
             category: configuration.category,
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
@@ -92,14 +80,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
             openWebfeatureAction: { [weak self] in self?.navigate(.productListing(.productDetails(.webFeature($0)))) }
         )
@@ -108,11 +89,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public func makeWebViewModel(feature: WebFeature) -> WebViewModel {
         WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer(
-                deepLinkService: serviceProvider.deepLinkService,
-                webViewConfigurationService: serviceProvider.webViewConfigurationService,
-                webUrlProvider: serviceProvider.webUrlProvider
-            )
+            dependencies: dependencies.webDependencyContainer
         )
     }
 
@@ -161,16 +138,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         )
 
         return ProductListingViewModel(
-            dependencies: .init(
-                productListingService: ProductListingService(
-                    productService: serviceProvider.productService,
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
-                wishlistService: serviceProvider.wishlistService,
-                analytics: serviceProvider.analytics,
-                configurationService: serviceProvider.configurationService
-            ),
+            dependencies: dependencies.productListingDependencyContainer,
             category: configuration.category,
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
@@ -222,28 +190,14 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     ) -> some ProductDetailsViewModelProtocol {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.searchFlowViewModel.pop() },
             openWebfeatureAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.webFeature($0))) }
         )
     }
 
     private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol {
-        WebViewModel(
-            webFeature: feature,
-            dependencies: WebDependencyContainer(
-                deepLinkService: serviceProvider.deepLinkService,
-                webViewConfigurationService: serviceProvider.webViewConfigurationService,
-                webUrlProvider: serviceProvider.webUrlProvider
-            )
-        )
+        WebViewModel(webFeature: feature, dependencies: dependencies.webDependencyContainer)
     }
 
     // MARK: - View Models for MyAccountIntent
@@ -260,11 +214,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public func makeWishlistViewModelForMyAccount() -> WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: true,
-            dependencies: WishlistDependencyContainer(
-                wishlistService: serviceProvider.wishlistService,
-                bagService: serviceProvider.bagService,
-                analytics: serviceProvider.analytics
-            )
+            dependencies: dependencies.wishlistDependencyContainer
         ) { [weak self] in
             self?.navigate(.wishlist($0))
         }

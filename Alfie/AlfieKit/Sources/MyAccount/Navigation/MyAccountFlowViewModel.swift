@@ -4,24 +4,21 @@ import SwiftUI
 public final class MyAccountFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = MyAccountRoute
     @Published public var path = NavigationPath()
-    private let serviceProvider: ServiceProviderProtocol
+    private let dependencies: MyAccountFlowDependencyContainer
     let intentViewBuilder: (MyAccountIntent) -> AnyView
 
     public init(
-        serviceProvider: ServiceProviderProtocol,
+        dependencies: MyAccountFlowDependencyContainer,
         intentViewBuilder: @escaping (MyAccountIntent) -> AnyView
     ) {
-        self.serviceProvider = serviceProvider
+        self.dependencies = dependencies
         self.intentViewBuilder = intentViewBuilder
     }
 
     // MARK: - View Models for MyAccountRoute
 
     func makeAccountViewModel() -> some AccountViewModelProtocol {
-        AccountViewModel(
-            configurationService: serviceProvider.configurationService,
-            sessionService: serviceProvider.sessionService
-        ) { [weak self] in
+        AccountViewModel(dependencies: dependencies.myAccountDependencyContainer) { [weak self] in
             self?.navigate($0)
         }
     }

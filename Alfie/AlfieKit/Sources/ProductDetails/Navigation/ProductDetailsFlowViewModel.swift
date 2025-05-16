@@ -5,15 +5,15 @@ import Web
 public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = ProductDetailsRoute
     @Published public var path = NavigationPath()
-    private let serviceProvider: ServiceProviderProtocol
+    private let dependencies: ProductDetailsFlowDependencyContainer
     private let configuration: ProductDetailsConfiguration
 
     public init(
         configuration: ProductDetailsConfiguration,
-        serviceProvider: ServiceProviderProtocol
+        dependencies: ProductDetailsFlowDependencyContainer
     ) {
         self.configuration = configuration
-        self.serviceProvider = serviceProvider
+        self.dependencies = dependencies
     }
 
     // MARK: - View Models for ProductDetailsRoute
@@ -21,14 +21,7 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
     func makeProductDetailsViewModel() -> some ProductDetailsViewModelProtocol {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
             openWebfeatureAction: { [weak self] in self?.navigate(.webFeature($0)) }
         )
@@ -39,14 +32,7 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
     ) -> some ProductDetailsViewModelProtocol {
         ProductDetailsViewModel(
             configuration: configuration,
-            dependencies: .init(
-                productService: serviceProvider.productService,
-                webUrlProvider: serviceProvider.webUrlProvider,
-                bagService: serviceProvider.bagService,
-                wishlistService: serviceProvider.wishlistService,
-                configurationService: serviceProvider.configurationService,
-                analytics: serviceProvider.analytics
-            ),
+            dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
             openWebfeatureAction: { [weak self] in self?.navigate(.webFeature($0)) }
         )
@@ -55,11 +41,7 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
     func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
         WebViewModel(
             webFeature: feature,
-            dependencies: WebDependencyContainer(
-                deepLinkService: serviceProvider.deepLinkService,
-                webViewConfigurationService: serviceProvider.webViewConfigurationService,
-                webUrlProvider: serviceProvider.webUrlProvider
-            )
+            dependencies: dependencies.webDependencyContainer
         )
     }
 }
