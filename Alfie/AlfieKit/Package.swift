@@ -355,6 +355,15 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "ProductDetailsTests",
+            dependencies: [
+                "ProductDetails",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "SharedUITests",
             dependencies: [
                 "Core",
