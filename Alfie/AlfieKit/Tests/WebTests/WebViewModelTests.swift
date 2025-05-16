@@ -1,7 +1,6 @@
 import Mocks
-import Model
+import TestUtils
 import XCTest
-@testable import Alfie
 @testable import Web
 
 final class WebViewModelTests: XCTestCase {
