@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import SwiftUI
 
@@ -5,6 +6,7 @@ public protocol FlowViewModelProtocol: ObservableObject {
     associatedtype Route: Hashable
 
     var path: NavigationPath { get set }
+    var overlayViewPublisher: AnyPublisher<AnyView?, Never> { get }
 
     func navigate(_ route: Route)
     func popToRoot()
@@ -12,6 +14,8 @@ public protocol FlowViewModelProtocol: ObservableObject {
 }
 
 public extension FlowViewModelProtocol where Self: ObservableObject {
+    var overlayViewPublisher: AnyPublisher<AnyView?, Never> { Empty<AnyView?, Never>().eraseToAnyPublisher() }
+
     func navigate(_ route: Route) {
         path.append(route)
     }

@@ -1,14 +1,23 @@
+import Bag
+import CategorySelector
 import Combine
 import Foundation
+import Home
 import Model
 import OrderedCollections
 import Utils
+import Wishlist
 
 public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
     private let configurationService: ConfigurationServiceProtocol
 
     @Published public private(set) var currentScreen: AppStartupScreen = .loading
-    public let rootTabViewModel: RootTabViewModel
+    public let rootTabViewModel: RootTabViewModel<
+        BagFlowViewModel,
+        CategorySelectorFlowViewModel,
+        HomeFlowViewModel,
+        WishlistFlowViewModel
+    >
     public let appUpdateInfoConfiguration: AppUpdateInfo?
     // CurrentValueSubject because if using @Published, the publisher will emit a new value a bit before the property is updated, leading to some nasty bugs on appStartupScreenCondition
     private var isLoading: CurrentValueSubject<Bool, Never> = .init(true)
@@ -39,10 +48,27 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             tabs.insert(.wishlist, at: 2)
         }
 
+        let bagFlowViewModel = BagFlowViewModel(
+            serviceProvider: serviceProvider
+        )
+        let categorySelectorFlowViewModel = CategorySelectorFlowViewModel(
+            serviceProvider: serviceProvider
+        )
+        let homeFlowViewModel = HomeFlowViewModel(
+            serviceProvider: serviceProvider
+        )
+        let wishlistFlowViewModel = WishlistFlowViewModel(
+            serviceProvider: serviceProvider
+        )
+
         self.rootTabViewModel = RootTabViewModel(
             tabs: tabs,
             initialTab: .home,
-            serviceProvider: serviceProvider
+            serviceProvider: serviceProvider,
+            bagFlowViewModel: bagFlowViewModel,
+            categorySelectorFlowViewModel: categorySelectorFlowViewModel,
+            homeFlowViewModel: homeFlowViewModel,
+            wishlistFlowViewModel: wishlistFlowViewModel
         )
 
         self.appUpdateInfoConfiguration = serviceProvider.configurationService.forceAppUpdateInfo

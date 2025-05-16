@@ -14,6 +14,8 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
         self.serviceProvider = serviceProvider
     }
 
+    // MARK: - View Models for BagRoute
+
     public func makeBagViewModel() -> BagViewModel {
         BagViewModel(
             isWishlistEnabled: serviceProvider.configurationService.isFeatureEnabled(.wishlist),
@@ -62,7 +64,7 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
         )
     }
 
-    public func makeWishlistViewModel() ->  WishlistViewModel {
+    public func makeWishlistViewModel() -> WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: true,
             dependencies: WishlistDependencyContainer(
@@ -75,12 +77,24 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
         }
     }
 
+    // MARK: - View Models for MyAccountIntent
+
     public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
                 WishlistView(viewModel: makeWishlistViewModel())
             )
+        }
+    }
+
+    // MARK: - FlowViewModelProtocol
+
+    public func navigate(_ route: BagRoute) {
+        if case .bag = route {
+            popToRoot()
+        } else {
+            path.append(route)
         }
     }
 }

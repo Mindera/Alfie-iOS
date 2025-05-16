@@ -7,24 +7,38 @@ import Model
 import SwiftUI
 import Wishlist
 
-public final class RootTabViewModel: ObservableObject {
-    let tabs: [Model.Tab]
-    @Published var selectedTab: Model.Tab
+public final class RootTabViewModel<
+    BagFlowVM: BagFlowViewModelProtocol,
+    CategorySelectorVM: CategorySelectorFlowViewModelProtocol,
+    HomeFlowVM: HomeFlowViewModelProtocol,
+    WishlistFlowVM: WishlistFlowViewModelProtocol
+>: RootTabViewModelProtocol
+    where BagFlowVM.Route == BagRoute,
+          CategorySelectorVM.Route == CategorySelectorRoute,
+          HomeFlowVM.Route == HomeRoute,
+          WishlistFlowVM.Route == WishlistRoute
+{
+    public let tabs: [Model.Tab]
+    @Published public var selectedTab: Model.Tab
     private let serviceProvider: ServiceProviderProtocol
 
-    let bagFlowViewModel: BagFlowViewModel
-    let categorySelectorFlowViewModel: CategorySelectorFlowViewModel
-    let homeFlowViewModel: HomeFlowViewModel
-    let wishlistFlowViewModel: WishlistFlowViewModel
-    @Published private(set) var overlayView: AnyView?
-    @Published var isOverlayVisible = false
+    public let bagFlowViewModel: BagFlowVM
+    public let categorySelectorFlowViewModel: CategorySelectorVM
+    public let homeFlowViewModel: HomeFlowVM
+    public let wishlistFlowViewModel: WishlistFlowVM
+    @Published public private(set) var overlayView: AnyView?
+    @Published public var isOverlayVisible = false
     @Published public var isReadyForNavigation = false
     private var subscriptions = Set<AnyCancellable>()
 
     public init(
         tabs: [Model.Tab],
         initialTab: Model.Tab,
-        serviceProvider: ServiceProviderProtocol
+        serviceProvider: ServiceProviderProtocol,
+        bagFlowViewModel: BagFlowVM,
+        categorySelectorFlowViewModel: CategorySelectorVM,
+        homeFlowViewModel: HomeFlowVM,
+        wishlistFlowViewModel: WishlistFlowVM
     ) {
         guard tabs.contains(initialTab) else {
             fatalError("Initial tab \(initialTab) does not exist in the list of tabs \(tabs)")
@@ -33,24 +47,15 @@ public final class RootTabViewModel: ObservableObject {
         self.tabs = tabs
         self.selectedTab = initialTab
         self.serviceProvider = serviceProvider
-
-        self.bagFlowViewModel = BagFlowViewModel(
-            serviceProvider: serviceProvider
-        )
-        self.categorySelectorFlowViewModel = CategorySelectorFlowViewModel(
-            serviceProvider: serviceProvider
-        )
-        self.homeFlowViewModel = HomeFlowViewModel(
-            serviceProvider: serviceProvider
-        )
-        self.wishlistFlowViewModel = WishlistFlowViewModel(
-            serviceProvider: serviceProvider
-        )
+        self.bagFlowViewModel = bagFlowViewModel
+        self.categorySelectorFlowViewModel = categorySelectorFlowViewModel
+        self.homeFlowViewModel = homeFlowViewModel
+        self.wishlistFlowViewModel = wishlistFlowViewModel
 
         setupBindings()
     }
 
-    func popToRoot(in tab: Model.Tab) {
+    public func popToRoot(in tab: Model.Tab) {
         switch tab {
         case .bag:
             bagFlowViewModel.popToRoot()
@@ -66,51 +71,32 @@ public final class RootTabViewModel: ObservableObject {
         }
     }
 
-    func navigate(_ route: TabRoute) {
+    public func navigate(_ route: TabRoute) {
         guard tabs.contains(route.tab) else { return }
         selectedTab = route.tab
         overlayView = nil
 
         switch route {
         case .bag(let bagRoute):
-            if case .bag = bagRoute {
-                popToRoot(in: .bag)
-            } else {
-                bagFlowViewModel.navigate(bagRoute)
-            }
+            bagFlowViewModel.navigate(bagRoute)
 
         case .home(let homeRoute):
-            if case .home = homeRoute {
-                popToRoot(in: .home)
-            } else {
-                homeFlowViewModel.navigate(homeRoute)
-            }
+            homeFlowViewModel.navigate(homeRoute)
 
         case .shop(let categorySelectorRoute):
-            switch categorySelectorRoute {
-            case .categorySelector(let shopViewTab):
-                popToRoot(in: .shop)
-                categorySelectorFlowViewModel.activeShopTab = shopViewTab
-
-            default:
-                categorySelectorFlowViewModel.navigate(categorySelectorRoute)
-            }
+            categorySelectorFlowViewModel.navigate(categorySelectorRoute)
 
         case .wishlist(let wishlistRoute):
-            if case .wishlist = wishlistRoute {
-                popToRoot(in: .wishlist)
-            } else {
-                wishlistFlowViewModel.navigate(wishlistRoute)
-            }
+            wishlistFlowViewModel.navigate(wishlistRoute)
         }
     }
 
     private func setupBindings() {
-        homeFlowViewModel.$overlayView
+        homeFlowViewModel.overlayViewPublisher
             .assignWeakly(to: \.overlayView, on: self)
             .store(in: &subscriptions)
 
-        categorySelectorFlowViewModel.$overlayView
+        categorySelectorFlowViewModel.overlayViewPublisher
             .assignWeakly(to: \.overlayView, on: self)
             .store(in: &subscriptions)
 

@@ -4,17 +4,15 @@ import MyAccount
 import ProductDetails
 import SwiftUI
 
-public protocol BagFlowViewModelProtocol: ObservableObject, FlowViewModelProtocol {
-    associatedtype BagViewModel: BagViewModelProtocol
+public protocol WishlistFlowViewModelProtocol: ObservableObject, FlowViewModelProtocol {
+    associatedtype WishlistViewModel: WishlistViewModelProtocol
     associatedtype AccountViewModel: AccountViewModelProtocol
     associatedtype ProductDetailsViewModel: ProductDetailsViewModelProtocol
     associatedtype WebViewModel: WebViewModelProtocol
-    associatedtype WishlistViewModel: WishlistViewModelProtocol
 
-    func makeBagViewModel() -> BagViewModel
+    func makeWishlistViewModel(isRoot: Bool) -> WishlistViewModel
     func makeAccountViewModel() -> AccountViewModel
     func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel
     func makeWebViewModel(feature: WebFeature) -> WebViewModel
-    func makeWishlistViewModel() -> WishlistViewModel
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView
 }

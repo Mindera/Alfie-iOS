@@ -8,13 +8,13 @@ import SharedUI
 import SwiftUI
 import Wishlist
 
-public struct RootTabView: View {
-    @ObservedObject private var viewModel: RootTabViewModel
+public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
     @State private var badgeNumbers: [Model.Tab: Int?] = [:]
     @State private var tabBarSize: CGSize = .zero
 
-    public init(viewModel: RootTabViewModel) {
-        self.viewModel = viewModel
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {

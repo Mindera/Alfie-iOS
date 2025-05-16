@@ -5,7 +5,7 @@ import Home
 import Model
 import Wishlist
 
-enum TabRoute: Hashable {
+public enum TabRoute: Hashable {
     case home(HomeRoute)
     case bag(BagRoute)
     case shop(CategorySelectorRoute)
