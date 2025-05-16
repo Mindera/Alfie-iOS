@@ -1,9 +1,8 @@
 import AlicerceLogging
-import Combine
 import Mocks
 import Model
+import TestUtils
 import XCTest
-@testable import Alfie
 @testable import ProductDetails
 
 final class ProductDetailsViewModelTests: XCTestCase {

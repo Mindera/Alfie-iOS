@@ -15,6 +15,13 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
+        "identifier" : "SharedUITests",
+        "name" : "SharedUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
         "identifier" : "CoreTests",
         "name" : "CoreTests"
       }
@@ -29,20 +36,6 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "BagTests",
-        "name" : "BagTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "SharedUITests",
-        "name" : "SharedUITests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
         "identifier" : "BFFGraphTests",
         "name" : "BFFGraphTests"
       }
@@ -52,6 +45,20 @@
         "containerPath" : "container:Alfie.xcodeproj",
         "identifier" : "BE8B02332B616979007AE489",
         "name" : "AlfieTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "ProductDetailsTests",
+        "name" : "ProductDetailsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BagTests",
+        "name" : "BagTests"
       }
     }
   ],
