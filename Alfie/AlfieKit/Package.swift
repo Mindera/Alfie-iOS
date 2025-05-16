@@ -320,7 +320,6 @@ let package = Package(
             name: "AppFeatureTests",
             dependencies: [
                 "AppFeature",
-                "Core",
                 "Mocks",
                 "TestUtils",
             ]
@@ -339,7 +338,6 @@ let package = Package(
             dependencies: [
                 "BFFGraph",
                 "Core",
-                .product(name: "Apollo", package: "apollo-ios"),
             ]
         ),
 
@@ -347,9 +345,7 @@ let package = Package(
             name: "CategorySelectorTests",
             dependencies: [
                 "CategorySelector",
-                "Core",
                 "Mocks",
-                "Model",
                 "TestUtils",
             ]
         ),
@@ -360,7 +356,6 @@ let package = Package(
                 "Core",
                 "Mocks",
                 "TestUtils",
-                "Utils",
             ]
         ),
 
@@ -375,10 +370,8 @@ let package = Package(
         .testTarget(
             name: "DeepLinkTests",
             dependencies: [
-                "Core",
                 "DeepLink",
                 "Mocks",
-                "Model",
                 "TestUtils",
             ]
         ),
@@ -406,7 +399,6 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Mocks",
-                "Model",
                 "Search",
                 "TestUtils",
             ]
@@ -415,9 +407,7 @@ let package = Package(
         .testTarget(
             name: "SharedUITests",
             dependencies: [
-                "Core",
                 "SharedUI",
-                "Utils",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])
