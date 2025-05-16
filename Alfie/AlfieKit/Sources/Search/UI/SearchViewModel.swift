@@ -194,8 +194,7 @@ extension SearchViewModel {
             suggestion = try await dependencies.searchService.getSuggestion(term: newSearchTerm)
             lastSearchedText = newSearchTerm
         } catch {
-            // TODO: Logger?
-//            log.error("Error fetching suggestion for search term \(newSearchTerm): \(error)")
+            dependencies.log.error("Error fetching suggestion for search term \(newSearchTerm): \(error)")
             state = .noResults
             return
         }

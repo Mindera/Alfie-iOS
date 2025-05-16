@@ -334,6 +334,7 @@ let package = Package(
         .testTarget(
             name: "DeepLinkTests",
             dependencies: [
+                "Core",
                 "DeepLink",
                 "Mocks",
                 "Model",

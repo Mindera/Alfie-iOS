@@ -1,3 +1,4 @@
+import AlicerceLogging
 import CombineSchedulers
 import Foundation
 import Model
@@ -10,6 +11,7 @@ public final class ProductDetailsDependencyContainer {
     let wishlistService: WishlistServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let analytics: AlfieAnalyticsTracker
+    let log: Logger
 
     public init(
         scheduler: AnySchedulerOf<DispatchQueue> = .main,
@@ -18,7 +20,8 @@ public final class ProductDetailsDependencyContainer {
         bagService: BagServiceProtocol,
         wishlistService: WishlistServiceProtocol,
         configurationService: ConfigurationServiceProtocol,
-        analytics: AlfieAnalyticsTracker
+        analytics: AlfieAnalyticsTracker,
+        log: Logger
     ) {
         self.scheduler = scheduler
         self.productService = productService
@@ -27,5 +30,6 @@ public final class ProductDetailsDependencyContainer {
         self.wishlistService = wishlistService
         self.configurationService = configurationService
         self.analytics = analytics
+        self.log = log
     }
 }

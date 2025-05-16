@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Combine
 import Core
 import Foundation
@@ -29,6 +30,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     private let navigationService: NavigationServiceProtocol?
+    private let log: Logger
     private let openCategorySubject: PassthroughSubject<CategoriesNavigationDestination, Never> = .init()
     private lazy var placeholders: [NavigationItem] = {
         (0..<Constants.placeholderItemCount).map { _ in
@@ -77,23 +79,27 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     init(
         navigationService: NavigationServiceProtocol,
+        log: Logger,
         showToolbar: Bool = false,
         ignoreLocalNavigation: Bool,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.navigationService = navigationService
+        self.log = log
         self.shouldShowToolbar = showToolbar
         self.ignoreLocalNavigation = ignoreLocalNavigation
         self.navigate = navigate
     }
 
     init(
+        log: Logger,
         categories: [NavigationItem],
         title: String,
         showToolbar: Bool = true,
         ignoreLocalNavigation: Bool,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
+        self.log = log
         self.navigationService = nil
         self.state = .success(.init(categories: categories, title: title))
         self.shouldShowToolbar = showToolbar
@@ -129,7 +135,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             var url = URL(string: "https://\(ThemedURL.hostWithPortComponent)"),
             let categoryUrl = category.url
         else {
-//            log.error("Error building URL for category from navigation item: \(category)")
+            log.error("Error building URL for category from navigation item: \(category)")
             state = .error(.generic)
             return
         }
@@ -189,7 +195,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         do {
             navigationItems = try await navigationService.getNavigationItems(for: .shop)
         } catch {
-//            log.error("Error fetching categories navigation items for Shop screen: \(error)")
+            log.error("Error fetching categories navigation items for Shop screen: \(error)")
             state = .error(.generic)
             return
         }

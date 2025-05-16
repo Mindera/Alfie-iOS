@@ -1,3 +1,4 @@
+import AlicerceLogging
 import CombineSchedulers
 import XCTest
 import Mocks
@@ -13,6 +14,7 @@ final class SearchViewModelTests: XCTestCase {
     private var sut: SearchViewModel!
     private let mockAnalytics = MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
     private var testScheduler: TestSchedulerOf<DispatchQueue>!
+    private var log = Log.DummyLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -22,14 +24,16 @@ final class SearchViewModelTests: XCTestCase {
             scheduler: .immediate,
             recentsService: mockRecentsService,
             searchService: mockSearchService,
-            analytics: mockAnalytics
+            analytics: mockAnalytics,
+            log: log
         )
         testScheduler = DispatchQueue.test
         testSchedulerMockDependencies = SearchDependencyContainer(
             scheduler: testScheduler.eraseToAnyScheduler(),
             recentsService: mockRecentsService,
             searchService: mockSearchService,
-            analytics: mockAnalytics
+            analytics: mockAnalytics,
+            log: log
         )
         sut = .init(
             dependencies: immediateSchedulerMockDependencies,
@@ -272,7 +276,8 @@ final class SearchViewModelTests: XCTestCase {
             scheduler: testScheduler.eraseToAnyScheduler(),
             recentsService: nil,
             searchService: mockSearchService,
-            analytics: mockAnalytics
+            analytics: mockAnalytics,
+            log: log
         )
         sut = .init(
             dependencies: mockDependencies,

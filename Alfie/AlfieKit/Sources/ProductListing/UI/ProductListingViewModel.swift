@@ -136,7 +136,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             productListing = try await dependencies.productListingService
                 .paged(categoryId: category, query: query, sort: sortOption)
         } catch {
-//            log.error("Error fetching product listing (first page): \(error)")
+            dependencies.log.error("Error fetching product listing (first page): \(error)")
             state = .error(.generic)
             return
         }
@@ -162,7 +162,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             productListing = try await dependencies.productListingService
                 .next(categoryId: category, query: query, sort: sortOption)
         } catch {
-//            log.error("Error fetching product listing (following page): \(error)")
+            dependencies.log.error("Error fetching product listing (following page): \(error)")
             state = .error(.generic)
             return
         }

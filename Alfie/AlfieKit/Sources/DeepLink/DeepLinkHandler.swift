@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Combine
 import CombineSchedulers
 import Foundation
@@ -5,6 +6,7 @@ import Model
 
 public final class DeepLinkHandler: DeepLinkHandlerProtocol {
     private let configurationService: ConfigurationServiceProtocol
+    private let log: Logger
     private var pendingLinks: [DeepLink] = []
     private var subscriptions = Set<AnyCancellable>()
     public var isReadyToHandleLinks = false
@@ -12,10 +14,12 @@ public final class DeepLinkHandler: DeepLinkHandlerProtocol {
 
     public init(
         configurationService: ConfigurationServiceProtocol,
+        log: Logger,
         scheduler: AnySchedulerOf<DispatchQueue> = .main,
         navigate: @escaping (DeepLink.LinkType) -> Void
     ) {
         self.configurationService = configurationService
+        self.log = log
         self.navigate = navigate
     }
 
@@ -38,12 +42,12 @@ public final class DeepLinkHandler: DeepLinkHandlerProtocol {
 
     public func handleDeepLink(_ deepLink: DeepLink) {
         guard canHandleDeepLink(deepLink) else {
-//            log.warning("Cannot handle deeplink \(deepLink), ignoring")
+            log.warning("Cannot handle deeplink \(deepLink), ignoring")
             return
         }
 
         guard isReadyToHandleLinks else {
-//            log.info("App is not yet ready to handle deeplink \(deepLink), adding it to pending list")
+            log.info("App is not yet ready to handle deeplink \(deepLink), adding it to pending list")
             pendingLinks.append(deepLink)
             return
         }
@@ -59,7 +63,7 @@ public final class DeepLinkHandler: DeepLinkHandlerProtocol {
         }
 
         let pendingLink = pendingLinks.removeFirst()
-//        log.debug("App is ready to handle deeplinks, handle pending deeplink \(pendingLinks)")
+        log.debug("App is ready to handle deeplinks, handle pending deeplink \(pendingLinks)")
         handleDeepLink(pendingLink)
 
         if !pendingLinks.isEmpty {

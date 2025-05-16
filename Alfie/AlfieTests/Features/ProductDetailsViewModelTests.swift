@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Combine
 import Mocks
 import Model
@@ -22,7 +23,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
             bagService: MockBagService(),
             wishlistService: MockWishlistService(),
             configurationService: MockConfigurationService(),
-            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+            log: Log.DummyLogger()
         )
     }
 

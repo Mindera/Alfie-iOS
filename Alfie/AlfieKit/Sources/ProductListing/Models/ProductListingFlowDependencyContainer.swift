@@ -1,4 +1,3 @@
-import Core
 import Model
 import ProductDetails
 import Search
