@@ -1,4 +1,4 @@
-import Core
+import AlicerceLogging
 import Model
 import MyAccount
 import ProductDetails
@@ -15,6 +15,7 @@ public final class CategorySelectorFlowDependencyContainer {
     let productListingDependencyContainer: ProductListingDependencyContainer
     let wishlistDependencyContainer: WishlistDependencyContainer
     let searchDependencyContainer: SearchDependencyContainer
+    let log: Logger
 
     public init(
         categorySelectorDependencyContainer: CategorySelectorDependencyContainer,
@@ -23,7 +24,8 @@ public final class CategorySelectorFlowDependencyContainer {
         productDetailsDependencyContainer: ProductDetailsDependencyContainer,
         productListingDependencyContainer: ProductListingDependencyContainer,
         wishlistDependencyContainer: WishlistDependencyContainer,
-        searchDependencyContainer: SearchDependencyContainer
+        searchDependencyContainer: SearchDependencyContainer,
+        log: Logger
     ) {
         self.categorySelectorDependencyContainer = categorySelectorDependencyContainer
         self.webDependencyContainer = webDependencyContainer
@@ -32,5 +34,6 @@ public final class CategorySelectorFlowDependencyContainer {
         self.productListingDependencyContainer = productListingDependencyContainer
         self.wishlistDependencyContainer = wishlistDependencyContainer
         self.searchDependencyContainer = searchDependencyContainer
+        self.log = log
     }
 }

@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Bag
 import CategorySelector
 import Combine
@@ -44,6 +45,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
 
     public init(
         serviceProvider: ServiceProviderProtocol,
+        log: Logger,
         startupCompletionDelay: CGFloat = 2
     ) {
         self.configurationService = serviceProvider.configurationService
@@ -69,7 +71,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             bagService: serviceProvider.bagService,
             wishlistService: serviceProvider.wishlistService,
             configurationService: serviceProvider.configurationService,
-            analytics: serviceProvider.analytics
+            analytics: serviceProvider.analytics,
+            log: log
         )
         let webDependencyContainer = WebDependencyContainer(
             deepLinkService: serviceProvider.deepLinkService,
@@ -94,12 +97,14 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
             wishlistService: serviceProvider.wishlistService,
             analytics: serviceProvider.analytics,
-            configurationService: serviceProvider.configurationService
+            configurationService: serviceProvider.configurationService,
+            log: log
         )
         let searchDependencyContainer = SearchDependencyContainer(
             recentsService: serviceProvider.recentsService,
             searchService: serviceProvider.searchService,
-            analytics: serviceProvider.analytics
+            analytics: serviceProvider.analytics,
+            log: log
         )
         let homeDependencyContainer = HomeDependencyContainer(
             configurationService: serviceProvider.configurationService,
@@ -124,7 +129,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productDetailsDependencyContainer: productDetailsDependencyContainer,
                 productListingDependencyContainer: productListingDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
-                searchDependencyContainer: searchDependencyContainer
+                searchDependencyContainer: searchDependencyContainer,
+                log: log
             )
         )
         let homeFlowViewModel = HomeFlowViewModel(
@@ -160,7 +166,9 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         self.appUpdateInfoConfiguration = serviceProvider.configurationService.forceAppUpdateInfo
 
         setupSubscriptions()
-        WebViewPreload.preloadWebView()
+        WebViewPreload.preloadWebView {
+            log.debug("Preloaded WebView")
+        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)

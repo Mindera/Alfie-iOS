@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Combine
 import Mocks
 import Model
@@ -9,6 +10,7 @@ final class ProductListingViewModelTests: XCTestCase {
     private var sut: ProductListingViewModel!
     private var mockProductListing: MockProductListingService!
     private var mockWishlistService: MockWishlistService!
+    private let log = Log.DummyLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -20,7 +22,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             navigate: { _ in },
             showSearch: {}
@@ -41,7 +44,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
@@ -62,7 +66,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             sort: "sort",
@@ -97,7 +102,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             searchText: "something",
@@ -143,7 +149,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             sort: "sort",
@@ -202,7 +209,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             searchText: "something",
@@ -234,7 +242,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             urlQueryParameters: ["category": "women/clothing"],
@@ -255,7 +264,8 @@ final class ProductListingViewModelTests: XCTestCase {
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
                 wishlistService: mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService()
+                configurationService: MockConfigurationService(),
+                log: log
             ),
             category: "clothing",
             searchText: "something",

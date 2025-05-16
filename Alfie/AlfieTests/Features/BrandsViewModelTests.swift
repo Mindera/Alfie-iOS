@@ -1,3 +1,4 @@
+import AlicerceLogging
 import TestUtils
 import OrderedCollections
 import Mocks
@@ -13,7 +14,7 @@ final class BrandsViewModelTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockBrandsService = MockBrandsService()
-        sut = .init(brandsService: mockBrandsService) { _ in }
+        sut = .init(brandsService: mockBrandsService, log: Log.DummyLogger()) { _ in }
     }
 
     override func tearDownWithError() throws {

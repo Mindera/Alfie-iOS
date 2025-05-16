@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Mocks
 import Model
 import TestUtils
@@ -382,7 +383,7 @@ final class DeepLinkHandlerTests: XCTestCase {
     private func createSut() {
         sut = .init(
             configurationService: mockConfigurationService,
-//            coordinator: mockCoordinator,
+            log: Log.DummyLogger(),
             scheduler: .immediate
         ) { _ in }
     }

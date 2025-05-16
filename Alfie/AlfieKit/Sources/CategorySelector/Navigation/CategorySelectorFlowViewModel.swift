@@ -62,6 +62,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     public func makeCategoriesViewModel() -> CategoriesViewModel {
         CategoriesViewModel(
             navigationService: dependencies.categorySelectorDependencyContainer.navigationService,
+            log: dependencies.log,
             showToolbar: false,
             ignoreLocalNavigation: true
         ) { [weak self] in
@@ -70,7 +71,10 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     }
 
     public func makeBrandsViewModel() -> BrandsViewModel {
-        BrandsViewModel(brandsService: dependencies.categorySelectorDependencyContainer.brandsService) { [weak self] in
+        BrandsViewModel(
+            brandsService: dependencies.categorySelectorDependencyContainer.brandsService,
+            log: dependencies.log
+        ) { [weak self] in
             self?.navigate($0)
         }
     }
@@ -86,6 +90,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
         // Initialize the categories view model to ignore local links (i.e. Shop tab links like Brands and Services)
         // as those will be handled by the view directly
         CategoriesViewModel(
+            log: dependencies.log,
             categories: subCategories,
             title: parent.title,
             showToolbar: true,

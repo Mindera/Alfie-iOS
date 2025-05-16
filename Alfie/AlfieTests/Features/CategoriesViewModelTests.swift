@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Mocks
 import Model
 import XCTest
@@ -7,11 +8,12 @@ import XCTest
 final class CategoriesViewModelTests: XCTestCase {
     private var sut: CategoriesViewModel!
     private var mockNavigationService: MockNavigationService!
+    private var log = Log.DummyLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockNavigationService = MockNavigationService()
-        sut = .init(navigationService: mockNavigationService, ignoreLocalNavigation: false) { _ in }
+        sut = .init(navigationService: mockNavigationService, log: log, ignoreLocalNavigation: false) { _ in }
     }
 
     override func tearDownWithError() throws {
@@ -134,7 +136,7 @@ final class CategoriesViewModelTests: XCTestCase {
     }
 
     func test_ignores_loads_items_from_service_when_view_appears_if_categories_init_is_used() {
-        sut = .init(categories: [], title: "", ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: "", ignoreLocalNavigation: false) { _ in }
 
         let expectation = expectation(description: "Wait for no service call")
         expectation.isInverted = true
@@ -151,7 +153,7 @@ final class CategoriesViewModelTests: XCTestCase {
 
     func test_categories_are_available_immediately_on_categories_init() {
         let fixtures = NavigationItem.fixtures
-        sut = .init(categories: fixtures, title: "", ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: fixtures, title: "", ignoreLocalNavigation: false) { _ in }
         XCTAssertEqual(sut.categories.count, fixtures.count)
     }
 
@@ -308,7 +310,7 @@ final class CategoriesViewModelTests: XCTestCase {
 
     func test_title_is_available_when_passed_on_categories_init() {
         let title = "Some Title"
-        sut = .init(categories: [], title: title, ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: title, ignoreLocalNavigation: false) { _ in }
         XCTAssertEqual(sut.title, title)
     }
 
@@ -319,16 +321,26 @@ final class CategoriesViewModelTests: XCTestCase {
     // MARK: - Toolbar
 
     func test_show_toolbar_is_properly_set_on_init() {
-        sut = .init(categories: [], title: "", showToolbar: true, ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: "", showToolbar: true, ignoreLocalNavigation: false) { _ in }
         XCTAssertTrue(sut.shouldShowToolbar)
 
-        sut = .init(categories: [], title: "", showToolbar: false, ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: "", showToolbar: false, ignoreLocalNavigation: false) { _ in }
         XCTAssertFalse(sut.shouldShowToolbar)
 
-        sut = .init(navigationService: mockNavigationService, showToolbar: true, ignoreLocalNavigation: false) { _ in }
+        sut = .init(
+            navigationService: mockNavigationService,
+            log: log,
+            showToolbar: true,
+            ignoreLocalNavigation: false
+        ) { _ in }
         XCTAssertTrue(sut.shouldShowToolbar)
 
-        sut = .init(navigationService: mockNavigationService, showToolbar: false, ignoreLocalNavigation: false) { _ in }
+        sut = .init(
+            navigationService: mockNavigationService,
+            log: log,
+            showToolbar: false,
+            ignoreLocalNavigation: false
+        ) { _ in }
         XCTAssertFalse(sut.shouldShowToolbar)
     }
 

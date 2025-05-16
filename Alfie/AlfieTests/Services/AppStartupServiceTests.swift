@@ -1,3 +1,4 @@
+import AlicerceLogging
 import AppFeature
 import TestUtils
 import XCTest
@@ -14,7 +15,13 @@ final class AppStartupServiceTests: XCTestCase {
         try super.setUpWithError()
         mockConfigurationService = .init()
         mockServiceProvider = .init(configurationService: mockConfigurationService)
-        sut = .init(AppFeatureViewModel(serviceProvider: mockServiceProvider, startupCompletionDelay: 0))
+        sut = .init(
+            AppFeatureViewModel(
+                serviceProvider: mockServiceProvider,
+                log: Log.DummyLogger(),
+                startupCompletionDelay: 0
+            )
+        )
     }
 
     override func tearDownWithError() throws {

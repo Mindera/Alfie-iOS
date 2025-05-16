@@ -6,11 +6,11 @@ import WebKit
 // https://stackoverflow.com/questions/74301868/wkwebview-ios-slow-on-first-launch
 
 public enum WebViewPreload {
-    public static func preloadWebView() {
+    public static func preloadWebView(completion: (() -> Void)? = nil) {
         Task.detached {
             let webView = await WKWebView()
             await webView.loadHTMLString("", baseURL: nil)
-//            log.debug("Preloaded WebView")
+            completion?()
         }
     }
 }

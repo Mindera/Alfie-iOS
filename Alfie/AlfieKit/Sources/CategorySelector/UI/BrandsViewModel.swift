@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Combine
 import Core
 import Foundation
@@ -12,6 +13,7 @@ public final class BrandsViewModel: BrandsViewModelProtocol {
     }
 
     private let brandsService: BrandsServiceProtocol
+    private let log: Logger
     private let navigate: (CategorySelectorRoute) -> Void
     private lazy var placeholders: [Brand] = {
         (0..<Constants.placeholderItemCount).map { _ in
@@ -39,9 +41,11 @@ public final class BrandsViewModel: BrandsViewModelProtocol {
 
     init(
         brandsService: BrandsServiceProtocol,
+        log: Logger,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.brandsService = brandsService
+        self.log = log
         self.navigate = navigate
         searchText = ""
     }
@@ -118,7 +122,7 @@ public final class BrandsViewModel: BrandsViewModelProtocol {
         do {
             brands = try await brandsService.getBrands()
         } catch {
-//            log.error("Error fetching brands for Brands screen: \(error)")
+            log.error("Error fetching brands for Brands screen: \(error)")
             state = .error(.generic)
             return
         }

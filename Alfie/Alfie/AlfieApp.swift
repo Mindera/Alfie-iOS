@@ -47,7 +47,8 @@ struct AlfieApp: App {
                     .onAppear {
                         // Lazy initialize once appDelegate is ready
                         appFeatureViewModel = AppFeatureViewModel(
-                            serviceProvider: appDelegate.serviceProvider
+                            serviceProvider: appDelegate.serviceProvider,
+                            log: log
                         )
                     }
             }
@@ -58,7 +59,8 @@ struct AlfieApp: App {
 
     private func setupDeepLinkHandlers(viewModel: AppFeatureViewModel) {
         let deepLinkHandler = DeepLinkHandler(
-            configurationService: appDelegate.serviceProvider.configurationService
+            configurationService: appDelegate.serviceProvider.configurationService,
+            log: log
         ) {
             viewModel.navigate(for: $0)
         }

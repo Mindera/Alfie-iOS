@@ -44,7 +44,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     public func rebootApp() {
         // Reset services and any other managers that need to be gracefuly terminated before the app reboots
         serviceProvider.resetServices()
-//        tabCoordinator.removeCoordinatedViews()
 
         // Recreate services
         bootstrap(application: nil)
@@ -64,7 +63,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         } else {
             Alfie.log = createLogger()
             CoreBootstrap.bootstrapFirebaseApp(log: log)
-            StyleGuideLogger.set(logger: log)
+            SharedUILogger.set(logger: log)
             serviceProvider = ServiceProvider()
             if let application {
                 application.registerForRemoteNotifications()

@@ -60,7 +60,7 @@ final class ServiceProvider: ServiceProviderProtocol {
             authenticationService: authenticationService,
             country: defaultInitializationCountry
         )
-        deepLinkService = DeepLinkService(configuration: LinkConfiguration())
+        deepLinkService = DeepLinkService(configuration: LinkConfiguration(), log: log)
         hapticsService = HapticsService.instance
         reachabilityService = ReachabilityService(monitor: NWPathMonitor())
         storageService = StorageService()
