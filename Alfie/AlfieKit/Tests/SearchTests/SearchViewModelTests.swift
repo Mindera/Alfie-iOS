@@ -3,7 +3,6 @@ import CombineSchedulers
 import XCTest
 import Mocks
 import Model
-@testable import Alfie
 @testable import Search
 
 final class SearchViewModelTests: XCTestCase {

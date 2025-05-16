@@ -383,6 +383,17 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "SearchTests",
+            dependencies: [
+                "Core",
+                "Mocks",
+                "Model",
+                "Search",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "SharedUITests",
             dependencies: [
                 "Core",

@@ -3,7 +3,7 @@ import Combine
 import Core
 import Model
 import Mocks
-@testable import Alfie
+@testable import Search
 
 final class RecentsServiceTests: XCTestCase {
     private var mockStorageService: MockStorageService!

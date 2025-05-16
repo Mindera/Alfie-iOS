@@ -1,8 +1,7 @@
 import Combine
-import Model
 import Mocks
 import XCTest
-@testable import Alfie
+import TestUtils
 @testable import Search
 
 final class RecentSearchesViewModelTests: XCTestCase {

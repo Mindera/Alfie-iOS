@@ -14,44 +14,9 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:Alfie.xcodeproj",
-        "identifier" : "BE8B02332B616979007AE489",
-        "name" : "AlfieTests"
-      }
-    },
-    {
-      "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "CoreTests",
-        "name" : "CoreTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "BagTests",
-        "name" : "BagTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "ProductListingTests",
-        "name" : "ProductListingTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "DeepLinkTests",
-        "name" : "DeepLinkTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "BFFGraphTests",
-        "name" : "BFFGraphTests"
+        "identifier" : "WebTests",
+        "name" : "WebTests"
       }
     },
     {
@@ -64,8 +29,43 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "WebTests",
-        "name" : "WebTests"
+        "identifier" : "ProductDetailsTests",
+        "name" : "ProductDetailsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BagTests",
+        "name" : "BagTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "SearchTests",
+        "name" : "SearchTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BFFGraphTests",
+        "name" : "BFFGraphTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "DeepLinkTests",
+        "name" : "DeepLinkTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Alfie.xcodeproj",
+        "identifier" : "BE8B02332B616979007AE489",
+        "name" : "AlfieTests"
       }
     },
     {
@@ -78,8 +78,15 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "ProductDetailsTests",
-        "name" : "ProductDetailsTests"
+        "identifier" : "ProductListingTests",
+        "name" : "ProductListingTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "CoreTests",
+        "name" : "CoreTests"
       }
     }
   ],
