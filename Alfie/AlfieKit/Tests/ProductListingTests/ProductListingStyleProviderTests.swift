@@ -1,7 +1,4 @@
-import Model
-import Core
 import XCTest
-@testable import Alfie
 @testable import ProductListing
 
 final class ProductListingStyleProviderTests: XCTestCase {

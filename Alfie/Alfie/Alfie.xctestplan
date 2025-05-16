@@ -22,6 +22,13 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
+        "identifier" : "ProductDetailsTests",
+        "name" : "ProductDetailsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
         "identifier" : "CoreTests",
         "name" : "CoreTests"
       }
@@ -29,8 +36,8 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "DeepLinkTests",
-        "name" : "DeepLinkTests"
+        "identifier" : "ProductListingTests",
+        "name" : "ProductListingTests"
       }
     },
     {
@@ -42,16 +49,16 @@
     },
     {
       "target" : {
-        "containerPath" : "container:Alfie.xcodeproj",
-        "identifier" : "BE8B02332B616979007AE489",
-        "name" : "AlfieTests"
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "DeepLinkTests",
+        "name" : "DeepLinkTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:AlfieKit",
-        "identifier" : "ProductDetailsTests",
-        "name" : "ProductDetailsTests"
+        "containerPath" : "container:Alfie.xcodeproj",
+        "identifier" : "BE8B02332B616979007AE489",
+        "name" : "AlfieTests"
       }
     },
     {
