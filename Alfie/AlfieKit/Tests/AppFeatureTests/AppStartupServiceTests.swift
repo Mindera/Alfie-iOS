@@ -1,10 +1,8 @@
 import AlicerceLogging
-import AppFeature
+import Mocks
 import TestUtils
 import XCTest
-import Mocks
-import Model
-@testable import Alfie
+@testable import AppFeature
 
 final class AppStartupServiceTests: XCTestCase {
     private var sut: AppFeatureViewModel!
