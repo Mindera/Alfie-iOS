@@ -61,6 +61,10 @@ let package = Package(
             targets: ["ProductListing"]
         ),
         .library(
+            name: "Search",
+            targets: ["Search"]
+        ),
+        .library(
             name: "SharedUI",
             targets: ["SharedUI"]
         ),
@@ -100,13 +104,13 @@ let package = Package(
                 "Bag",
                 "CategorySelector",
                 "Core",
+                "Home",
                 "Mocks",
                 "Model",
-                "Home",
                 "Search",
                 "SharedUI",
-                "Wishlist",
                 "Utils",
+                "Wishlist",
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
@@ -118,7 +122,7 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "SharedUI",
-                "Wishlist"
+                "Wishlist",
             ]
         ),
 
@@ -171,7 +175,7 @@ let package = Package(
                 "Core",
                 "Mocks",
                 "Model",
-                "SharedUI"
+                "SharedUI",
             ]
         ),
 
@@ -179,7 +183,7 @@ let package = Package(
             name: "DeepLink",
             dependencies: [
                 "Core",
-                "Model"
+                "Model",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])
@@ -198,7 +202,7 @@ let package = Package(
                 "Search",
                 "SharedUI",
                 "Web",
-                "Wishlist"
+                "Wishlist",
             ]
         ),
 
@@ -225,7 +229,7 @@ let package = Package(
             name: "MyAccount",
             dependencies: [
                 "Model",
-                "SharedUI"
+                "SharedUI",
             ]
         ),
 
@@ -235,7 +239,7 @@ let package = Package(
                 "Core",
                 "Model",
                 "SharedUI",
-                "Web"
+                "Web",
             ]
         ),
 
@@ -246,7 +250,7 @@ let package = Package(
                 "Model",
                 "ProductDetails",
                 "Search",
-                "SharedUI"
+                "SharedUI",
             ]
         ),
 
@@ -254,8 +258,8 @@ let package = Package(
             name: "Search",
             dependencies: [
                 "Model",
+                "SharedUI",
                 "Utils",
-                "SharedUI"
             ]
         ),
 
@@ -295,8 +299,8 @@ let package = Package(
             name: "Web",
             dependencies: [
                 "Model",
+                "SharedUI",
                 "Utils",
-                "SharedUI"
             ]
         ),
 
@@ -308,7 +312,15 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "SharedUI",
-                "Web"
+                "Web",
+            ]
+        ),
+
+        .testTarget(
+            name: "BagTests",
+            dependencies: [
+                "Bag",
+                "Mocks",
             ]
         ),
 
@@ -338,7 +350,7 @@ let package = Package(
                 "DeepLink",
                 "Mocks",
                 "Model",
-                "TestUtils"
+                "TestUtils",
             ]
         ),
 
