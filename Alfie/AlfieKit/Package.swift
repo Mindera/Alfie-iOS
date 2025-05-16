@@ -344,6 +344,17 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "CategorySelectorTests",
+            dependencies: [
+                "CategorySelector",
+                "Core",
+                "Mocks",
+                "Model",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "CoreTests",
             dependencies: [
                 "Core",

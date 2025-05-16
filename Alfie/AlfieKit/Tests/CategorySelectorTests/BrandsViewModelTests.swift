@@ -4,7 +4,6 @@ import OrderedCollections
 import Mocks
 import Model
 import XCTest
-@testable import Alfie
 @testable import CategorySelector
 
 final class BrandsViewModelTests: XCTestCase {
