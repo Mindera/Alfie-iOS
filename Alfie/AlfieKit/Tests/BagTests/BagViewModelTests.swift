@@ -1,7 +1,5 @@
 import Mocks
-import Model
 import XCTest
-@testable import Alfie
 @testable import Bag
 
 final class BagViewModelTests: XCTestCase {
