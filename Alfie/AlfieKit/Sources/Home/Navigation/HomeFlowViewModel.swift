@@ -14,7 +14,8 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
-    @Published public private(set) var overlayView: AnyView?
+    @Published private var overlayView: AnyView?
+    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
@@ -266,6 +267,16 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             )
         ) { [weak self] in
             self?.navigate(.wishlist($0))
+        }
+    }
+
+    // MARK: - FlowViewModelProtocol
+
+    public func navigate(_ route: HomeRoute) {
+        if case .home = route {
+            popToRoot()
+        } else {
+            path.append(route)
         }
     }
 }

@@ -32,4 +32,14 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
             closeSearchAction: { [weak self] in self?.closeSearchAction() }
         )
     }
+
+    // MARK: - FlowViewModelProtocol
+
+    public func navigate(_ route: SearchRoute) {
+        if case .search = route {
+            popToRoot()
+        } else {
+            path.append(route)
+        }
+    }
 }

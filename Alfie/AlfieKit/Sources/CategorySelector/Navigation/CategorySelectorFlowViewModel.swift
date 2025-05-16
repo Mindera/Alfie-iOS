@@ -14,8 +14,9 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
     @Published private var isSearchPresented = false
-    @Published public private(set) var overlayView: AnyView?
-    @Published public var activeShopTab: ShopViewTab = .categories
+    @Published private var overlayView: AnyView?
+    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
+    @Published private var activeShopTab: ShopViewTab = .categories
     public var activeShopTabPublisher: AnyPublisher<ShopViewTab, Never> { $activeShopTab.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
@@ -322,6 +323,19 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
             AnyView(
                 WishlistView(viewModel: makeWishlistViewModel())
             )
+        }
+    }
+
+    // MARK: - FlowViewModelProtocol
+
+    public func navigate(_ route: CategorySelectorRoute) {
+        switch route {
+        case .categorySelector(let shopViewTab):
+            popToRoot()
+            activeShopTab = shopViewTab
+
+        default:
+            path.append(route)
         }
     }
 }

@@ -4,7 +4,7 @@ import ProductDetails
 import SwiftUI
 import Web
 
-public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtocol {
+public final class WishlistFlowViewModel: WishlistFlowViewModelProtocol {
     public typealias Route = WishlistRoute
     @Published public var path = NavigationPath()
     private let serviceProvider: ServiceProviderProtocol
@@ -15,7 +15,7 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
 
     // MARK: - View Models for WishlistRoute
 
-    func makeWishlistViewModel(isRoot: Bool) -> some WishlistViewModelProtocol {
+    public func makeWishlistViewModel(isRoot: Bool) -> WishlistViewModel {
         WishlistViewModel(
             hasNavigationSeparator: !isRoot,
             dependencies: WishlistDependencyContainer(
@@ -28,7 +28,7 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         }
     }
 
-    func makeAccountViewModel() -> some AccountViewModelProtocol {
+    public func makeAccountViewModel() -> AccountViewModel {
         AccountViewModel(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
@@ -37,9 +37,7 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         }
     }
 
-    func makeProductDetailsViewModel(
-        configuration: ProductDetailsConfiguration
-    ) -> some ProductDetailsViewModelProtocol {
+    public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
             dependencies: .init(
@@ -55,7 +53,7 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
         )
     }
 
-    func makeWebViewModel(feature: WebFeature) -> some WebViewModelProtocol {
+    public func makeWebViewModel(feature: WebFeature) -> WebViewModel {
         WebViewModel(
             webFeature: feature,
             dependencies: WebDependencyContainer(
@@ -68,12 +66,22 @@ public final class WishlistFlowViewModel: ObservableObject, FlowViewModelProtoco
 
     // MARK: - View Models for MyAccountIntent
 
-    func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
+    public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
         switch intent {
         case .wishlist:
             AnyView(
                 WishlistView(viewModel: makeWishlistViewModel(isRoot: false))
             )
+        }
+    }
+
+    // MARK: - FlowViewModelProtocol
+
+    public func navigate(_ route: WishlistRoute) {
+        if case .wishlist = route {
+            popToRoot()
+        } else {
+            path.append(route)
         }
     }
 }

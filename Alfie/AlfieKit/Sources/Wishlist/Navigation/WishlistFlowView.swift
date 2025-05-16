@@ -1,10 +1,10 @@
 import SwiftUI
 
-public struct WishlistFlowView: View {
-    @ObservedObject var viewModel: WishlistFlowViewModel
+public struct WishlistFlowView<ViewModel: WishlistFlowViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
 
-    public init(viewModel: WishlistFlowViewModel) {
-        self.viewModel = viewModel
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {

@@ -25,4 +25,14 @@ public final class MyAccountFlowViewModel: ObservableObject, FlowViewModelProtoc
             self?.navigate($0)
         }
     }
+
+    // MARK: - FlowViewModelProtocol
+
+    public func navigate(_ route: MyAccountRoute) {
+        if case .myAccount = route {
+            popToRoot()
+        } else {
+            path.append(route)
+        }
+    }
 }
