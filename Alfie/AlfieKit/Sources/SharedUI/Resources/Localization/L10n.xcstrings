@@ -420,6 +420,17 @@
         }
       }
     },
+    "product.size.no_selection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a size"
+          }
+        }
+      }
+    },
     "product.size.title" : {
       "extractionState" : "manual",
       "localizations" : {

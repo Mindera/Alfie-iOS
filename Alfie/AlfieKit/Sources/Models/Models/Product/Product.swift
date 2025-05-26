@@ -27,6 +27,21 @@ public struct Product: Identifiable, Hashable {
     /// Colour objects also include the Product media for each color.
     public let colours: [Colour]?
 
+    /// The 'default' variant but without a size.
+    ///
+    /// ⚠️ The default variant should only have a color associated, not a size, but given the current API model that isn't happening, so
+    /// we enforce an unnatural way of handling product variants. This should be refactored once the new backend model is available.
+    public var defaultVariantWithoutSize: Variant {
+        .init(
+            sku: defaultVariant.sku,
+            size: nil,
+            colour: defaultVariant.colour,
+            attributes: defaultVariant.attributes,
+            stock: defaultVariant.stock,
+            price: defaultVariant.price
+        )
+    }
+
     public init(
         id: String,
         styleNumber: String,
