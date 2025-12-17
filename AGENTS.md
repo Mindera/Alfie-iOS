@@ -1,35 +1,38 @@
 # Alfie iOS - AI Agent Instructions
 
 **Project**: Alfie iOS E-Commerce Application  
-**Platform**: iOS 16+  
-**Language**: Swift 5.9+  
-**Architecture**: MVVM with Modular Swift Packages  
+**Platform**: iOS 16+ | **Language**: Swift 5.9+ | **Architecture**: MVVM  
 **Last Updated**: December 2024
 
-This file provides context to AI coding assistants following the [AGENTS.md standard](https://agents.md/).  
-For detailed implementation guidelines, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
+This file provides quick context for AI coding assistants following the [AGENTS.md standard](https://agents.md/).  
+📚 **For detailed implementation guidelines, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md)**.
+
+---
+
+## 🚨 CRITICAL: Build Verification
+
+**Every code change MUST be verified with a successful build.**
+
+```bash
+./Alfie/scripts/build-for-verification.sh
+```
+
+- ✅ Execute after making changes
+- ✅ Wait for "BUILD SUCCEEDED" message  
+- ✅ Fix errors and re-run until success
+- ❌ Pre-build verification is NOT sufficient
 
 ---
 
 ## Project Overview
 
-Alfie is a native iOS e-commerce application built with SwiftUI. The app allows users to browse products, search, manage a wishlist, and shop with an intuitive mobile experience. Data is fetched from a GraphQL BFF (Backend-For-Frontend) API.
-
-**Key Features**:
-- Product browsing by category
-- Search with suggestions
-- Wishlist management
-- Shopping bag
-- Product details with variants
-- User authentication
+Alfie is a native iOS e-commerce app built with SwiftUI. Features include product browsing, search, wishlist, shopping bag, and user authentication. Data is fetched from a GraphQL BFF API.
 
 ---
 
-## Architecture
+## Architecture Summary
 
 ### MVVM Pattern
-
-Every feature follows strict MVVM architecture:
 
 ```
 Feature/
@@ -38,553 +41,97 @@ Feature/
 └── FeatureDependencyContainer.swift  # Filtered dependencies
 ```
 
-**State Management**:
-- Use `ViewState<Value, Error>` for simple flows
-- Use `PaginatedViewState<Value, Error>` for lists with pagination
-- All state changes trigger UI updates via `@Published` properties
+- **State**: Use `ViewState<Value, Error>` or `PaginatedViewState<Value, Error>`
+- **Navigation**: Always through `Coordinator` (never direct)
+- **Dependencies**: Inject via `DependencyContainer` (never `ServiceProvider` directly)
 
-### Navigation
+### Module Structure (`Alfie/AlfieKit/`)
 
-Custom navigation framework with:
-- **Coordinator**: Handles all navigation logic (injected as `@EnvironmentObject`)
-- **Screen**: Enum defining all possible destinations
-- **ViewFactory**: Creates Views with their dependencies
-- Views never navigate directly—always through Coordinator
-
-### Modular Package Structure
-
-Code organized in `Alfie/AlfieKit/` Swift Package with modules:
-- **BFFGraphAPI**: Apollo-generated GraphQL types (auto-generated)
-- **Core**: Services layer (API, auth, analytics, persistence)
-- **Models**: Domain models and protocols
-- **StyleGuide**: Design system (colors, typography, components)
-- **Navigation**: Navigation framework protocols
-- **SharedUI**: Localization resources
-- **Mocks**: Test mocks
-- **TestUtils**: Testing utilities
+| Module | Purpose |
+|--------|---------|
+| **BFFGraphAPI** | Apollo-generated GraphQL types (auto-generated) |
+| **Core** | Services layer (API, auth, analytics) |
+| **Models** | Domain models and protocols |
+| **StyleGuide** | Design system (colors, typography, components) |
+| **SharedUI** | Localization resources |
+| **Mocks** | Test mocks |
 
 ---
 
-## Technology Stack
+## Key Rules
 
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| **Swift** | Programming language | 5.9+ |
-| **SwiftUI** | UI framework | iOS 16+ |
-| **Apollo iOS** | GraphQL client | 1.19.0 |
-| **Firebase** | Analytics, Crashlytics, Remote Config | 11.11.0 |
-| **Braze** | Marketing automation | 11.9.0 |
-| **Nuke** | Image loading/caching | 12.8.0 |
-| **Alicerce** | Utilities, logging | 0.18.0 |
-| **XCTest** | Unit testing | Native |
-| **Snapshot Testing** | UI testing | 1.18.3 |
+### ✅ Always
 
-**Build Tools**:
-- Xcode 15+
-- Swift Package Manager
-- Fastlane (CI/CD)
-- SwiftGen (code generation)
-- SwiftLint (code quality)
+- Create ViewModel protocols for mocking
+- Use `L10n` for all user-facing strings
+- Navigate through Coordinator
+- Run build verification after code changes
 
----
+### ❌ Never
 
-## Key Conventions
-
-### Code Style
-
-- **SwiftLint enforced**: See `Alfie/.swiftlint.yml`
-- **Trailing commas**: Mandatory
-- **Function length**: Max 200 lines
-- **Type length**: Max 400 lines
-- **Naming**: CamelCase for types, camelCase for properties/functions
-- **Fatal errors**: Use `queuedFatalError` instead of `fatalError`
-
-### File Naming
-
-- ViewModels: `<Feature>ViewModel.swift`
-- Views: `<Feature>View.swift`
-- Services: `<Feature>Service.swift` with `<Feature>ServiceProtocol`
-- Dependency Containers: `<Feature>DependencyContainer.swift`
-
-### Dependency Injection
-
-```swift
-// ✅ Good: ViewModel receives dependencies via DependencyContainer
-final class FeatureViewModel {
-    private let dependencies: FeatureDependencyContainer
-    
-    init(dependencies: FeatureDependencyContainer) {
-        self.dependencies = dependencies
-    }
-}
-
-// ❌ Bad: Never access ServiceProvider directly from ViewModel
-```
-
-### Localization
-
-- **All user-facing strings** must use `L10n` generated enums
-- Location: `AlfieKit/Sources/SharedUI/Resources/Localization/L10n.xcstrings`
-- Naming: ReverseDomain + SnakeCase (e.g., `plp.error_view.title`)
-- Generated code: Auto-generated by SwiftGen on build
-
-```swift
-// ✅ Good
-Text(L10n.Home.title)
-Text(L10n.Plp.NumberOfResults.message(count))
-
-// ❌ Bad
-Text("Home")
-```
+- Access `ServiceProvider` from ViewModels
+- Hardcode user-facing strings
+- Edit auto-generated files (`BFFGraphAPI`, `L10n+Generated.swift`)
+- Use `fatalError` (use `queuedFatalError`)
+- Edit `project.pbxproj` directly
 
 ---
 
 ## Development Workflow
 
-### Spec-Driven Development ⭐
+### 1. Spec-Driven Development
 
-**Always follow this process**:
+1. Write spec in `Docs/Specs/Features/<Feature>.md`
+2. Break into small, independent tasks
+3. Implement one task at a time
 
-1. **Write Spec First** → Create detailed spec in `Docs/Specs/Features/<Feature>.md`
-2. **Break Into Tasks** → Extract smallest possible, independent tasks
-3. **Implement One Task at a Time** → Follow the implementation checklist
+### 2. Feature Implementation
 
-**Spec Template**: See `Docs/Specs/TEMPLATE.md`
+See [Feature Implementation Checklist](.github/copilot-instructions.md#feature-implementation-checklist) in copilot-instructions.md.
 
-### GraphQL Workflow
-
-1. Create query in `AlfieKit/Sources/BFFGraph/CodeGen/Queries/<Feature>/Queries.graphql`
-2. Define fragments in `Fragments/` subdirectory
-3. Extend schema in `CodeGen/Schema/schema-<feature>.graphqls`
-4. Run codegen: `cd Alfie/scripts && ./run-apollo-codegen.sh`
-5. Create converters in `Core/Services/BFFService/Converters/`
-6. Implement service in `Core/Services/`
-
-### Testing Strategy
-
-- **Unit Tests**: ViewModels, services (use mocks from `Mocks` module)
-- **Service Tests**: GraphQL converters, API integration
-- **Localization Tests**: All keys exist, pluralization works
-- **Snapshot Tests**: UI components match designs
-- **Pattern**: Given-When-Then for test structure
-
----
-
-## Important Constraints
-
-### Security
-
-- ⚠️ **Never commit unencrypted sensitive files**
-- Use `git-secret` for sensitive data (requires GPG keys)
-- Encrypted files: `GoogleService-Info.plist` (Debug/Release)
-
-### Architecture Rules
-
-❌ **NEVER**:
-- Access `ServiceProvider` from ViewModels (use DependencyContainer)
-- Hardcode user-facing strings (use `L10n`)
-- Bypass Coordinator for navigation
-- Edit auto-generated files (`BFFGraphAPI`, `L10n+Generated.swift`)
-- Use `fatalError` (use `queuedFatalError`)
-- Create custom UI without checking StyleGuide first
-
-✅ **ALWAYS**:
-- Create ViewModel protocol for mocking
-- Use `@Published` for observable state
-- Follow MVVM strictly
-- Write tests for new features
-- Update localization for all user-facing text
-- Run SwiftLint before committing
-
-### State Management
-
-```swift
-// Use appropriate state type
-enum ViewState<Value, StateError: Error> {
-    case loading
-    case success(Value)
-    case error(StateError)
-}
-
-enum PaginatedViewState<Value, StateError: Error> {
-    case loadingFirstPage(Value)
-    case loadingNextPage(Value)
-    case success(Value)
-    case error(StateError)
-}
-```
-
----
-
-## Common Tasks
-
-### Adding a New Feature
-
-1. Create spec in `Docs/Specs/Features/<Feature>.md`
-2. Define models in `Models/Models/<Feature>/`
-3. Create service protocol in `Core/Services/<Feature>/`
-4. Add GraphQL query (if needed) and run codegen
-5. Implement service and register in `ServiceProvider`
-6. Create ViewModel protocol in `Models/Features/`
-7. Create ViewModel, DependencyContainer, and View
-8. Add `Screen` case and update `ViewFactory`
-9. Add Coordinator navigation methods
-10. Add localization strings and build project
-11. Write tests
-12. Verify against spec acceptance criteria
-
-### Adding Localization
-
-1. Open `L10n.xcstrings` in Xcode
-2. Add entry with ReverseDomain + SnakeCase key
-3. Provide translations for all languages
-4. Build project to generate `L10n+Generated.swift`
-5. Use: `Text(L10n.Feature.key)`
-
-### Adding GraphQL Query
-
-1. Create `Queries.graphql` and fragments
-2. Extend schema in `schema-<feature>.graphqls`
-3. Run: `cd Alfie/scripts && ./run-apollo-codegen.sh`
-4. Create converter extension
-5. Add fetch method in `BFFClientService`
-
----
-
-## Project Structure
-
-```
-Alfie-iOS/
-├── AGENTS.md                          # This file
-├── .github/
-│   └── copilot-instructions.md        # Detailed Copilot guide
-├── Docs/
-│   ├── Specs/                         # Feature specifications
-│   │   ├── README.md
-│   │   ├── TEMPLATE.md
-│   │   └── Features/
-│   ├── NavigationScheme.jpeg
-│   └── ProjectScheme.jpeg
-├── Alfie/
-│   ├── Alfie/                         # Main app target
-│   │   ├── Views/                     # ViewModels, Views, Containers
-│   │   ├── Navigation/                # Coordinator, Screen, Factory
-│   │   └── Service/                   # ServiceProvider
-│   ├── AlfieKit/                      # Swift Package
-│   │   ├── Sources/
-│   │   │   ├── BFFGraph/              # GraphQL
-│   │   │   ├── Core/                  # Services
-│   │   │   ├── Models/                # Domain models
-│   │   │   ├── StyleGuide/            # Design system
-│   │   │   └── ...
-│   │   └── Tests/
-│   └── scripts/                       # Build scripts
-├── Gemfile                            # Ruby dependencies
-└── Brewfile                           # macOS dependencies
-```
-
----
-
-## 🚨 CRITICAL: Build Verification Requirement
-
-**⚠️ EVERY CODE CHANGE MUST BE VERIFIED WITH A SUCCESSFUL BUILD ⚠️**
-
-### Mandatory Build Execution
-
-If you are an AI agent that modifies code, you **MUST**:
-
-1. ✅ Execute the build script after making changes
-2. ✅ Wait for build completion and capture output
-3. ✅ Verify "✅ BUILD SUCCEEDED" message appears
-4. ✅ Fix any errors and re-run until build succeeds
-5. ✅ Only then mark task as complete
-
-**Pre-build code verification is NOT sufficient - you MUST run the actual build.**
-
-### Build Command
+### 3. GraphQL Workflow
 
 ```bash
-# Recommended: Use the portable build script (works on all machines)
-./Alfie/scripts/build-for-verification.sh
-
-# Alternative: Use xcodebuild directly with generic destination
-cd /path/to/Alfie-iOS && \
-xcodebuild -project Alfie/Alfie.xcodeproj -scheme Alfie \
-  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
-  clean build
+# After creating/updating .graphql files:
+cd Alfie/scripts && ./run-apollo-codegen.sh
 ```
-
-**Why use the script?**
-- ✅ Automatically finds available simulator
-- ✅ Works across different developer machines
-- ✅ Provides clear success/failure messages
-- ✅ Saves build log for debugging
-- ✅ Suggests common fixes for build errors
-
-### Why Build Execution Matters
-
-- **Prevents broken code** from being committed
-- **Catches compilation errors** immediately
-- **Validates imports** and module dependencies
-- **Ensures L10n code generation** worked correctly
-- **Verifies all files** are linked in Xcode project
-- **Confirms protocol conformance** is complete
-- **Detects missing dependencies** before PR
-
-### Build Failure Response
-
-If build fails:
-1. Read and analyze ALL compilation errors
-2. Common issues:
-   - Missing imports (`import Models`, `import StyleGuide`, etc.)
-   - Unresolved symbols (typos in L10n keys, missing enum cases)
-   - Type mismatches (incorrect protocol conformance)
-   - Missing exhaustive switch cases
-   - Syntax errors
-3. Fix ALL errors
-4. Re-run build until successful
-
-**A task is only complete when the build executes successfully.**
 
 ---
 
 ## Quick Commands
 
 ```bash
-# Install dependencies
-brew bundle install
-
-# Decrypt sensitive files (requires GPG keys)
-git secret reveal
-
-# Generate GraphQL code
-cd Alfie/scripts && ./run-apollo-codegen.sh
-
-# Generate localization code (or build project)
-swift package --allow-writing-to-package-directory generate-code-for-resources
-
-# Build project (MANDATORY after code changes)
-./Alfie/scripts/build-for-verification.sh
-
-# Run tests
-xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie \
-  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
-
-# Lint code
-cd Alfie && swiftlint
+./Alfie/scripts/build-for-verification.sh    # Build (MANDATORY)
+cd Alfie/scripts && ./run-apollo-codegen.sh  # GraphQL codegen
+git secret reveal                             # Decrypt sensitive files
+brew bundle install                           # Install dependencies
 ```
 
 ---
 
-## Specialized AI Agents
+## Specialized Agents
 
-The following specialized agents can help with specific tasks. **All agents that modify code MUST execute build verification.**
+All code-modifying agents **MUST execute build verification**.
 
-### 🧑‍💻 ios-feature-developer
-
-**Responsibilities**:
-- Implement new features following MVVM architecture
-- Create ViewModels, Views, DependencyContainers
-- Add navigation support (Screen, Coordinator, ViewFactory)
-- Add localization strings
-- **🚨 MUST execute build after implementation**
-
-**Must Do**:
-- ✅ Read feature spec first
-- ✅ Create ViewModel protocol for mocking
-- ✅ Use DependencyContainer for dependencies
-- ✅ Navigate through Coordinator
-- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
-
-**Agent Instruction File**: See instructions at top of this file
-
----
-
-### 🧪 testing-specialist
-
-**Responsibilities**:
-- Write unit tests for ViewModels
-- Create mock implementations
-- Test ViewState transitions
-- Write snapshot tests for UI components
-- **Build verification not required** (tests run separately)
-
-**Must Do**:
-- ✅ Follow Given-When-Then pattern
-- ✅ Create mocks in `Mocks/Core/Features/`
-- ✅ Test all state transitions
-- ✅ Verify test coverage for new code
-
----
-
-### 🌐 graphql-specialist
-
-**Responsibilities**:
-- Create GraphQL queries and fragments
-- Extend schema definitions
-- Run Apollo codegen
-- Create converter extensions
-- Update BFFClientService
-- **🚨 MUST execute build after codegen**
-
-**Must Do**:
-- ✅ Define reusable fragments
-- ✅ Run `./run-apollo-codegen.sh`
-- ✅ Create type-safe converters
-- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
-
-**Never**:
-- ❌ Edit auto-generated `BFFGraphAPI` files manually
-
----
-
-### 🌍 localization-specialist
-
-**Responsibilities**:
-- Add entries to `L10n.xcstrings`
-- Provide translations for all languages
-- Define pluralization rules
-- **🚨 MUST execute build to generate L10n code**
-
-**Must Do**:
-- ✅ Use ReverseDomain + SnakeCase naming
-- ✅ Add translations for all supported languages
-- ✅ Test pluralization variations
-- ✅ **Execute xcodebuild to generate L10n+Generated.swift**
-- ✅ **Verify BUILD SUCCEEDED**
-
----
-
-### 📝 spec-writer
-
-**Responsibilities**:
-- Write feature specifications
-- Document acceptance criteria
-- Define data models and API contracts
-- Update spec status when implemented
-- **Build verification not required** (documentation only)
-
-**Must Do**:
-- ✅ Follow `Docs/Specs/TEMPLATE.md` structure
-- ✅ Define clear acceptance criteria
-- ✅ Include UI/UX flows
-- ✅ Document analytics events
-- ✅ List edge cases
-
----
-
-### 🔒 mobile-security-specialist
-
-**Responsibilities**:
-- Review code for security issues
-- Ensure sensitive data protection
-- Verify Keychain usage for credentials
-- Check for hardcoded secrets
-- Validate network security
-- **Build verification recommended** after security fixes
-
-**Must Do**:
-- ✅ Check for credentials in code
-- ✅ Verify HTTPS usage
-- ✅ Validate input sanitization
-- ✅ Ensure git-secret usage for sensitive files
-
----
-
-### 🎨 ui-component-developer
-
-**Responsibilities**:
-- Create reusable StyleGuide components
-- Follow design system patterns
-- Implement accessibility features
-- Create component previews
-- **🚨 MUST execute build after component creation**
-
-**Must Do**:
-- ✅ Use existing Colors, Typography, Spacing
-- ✅ Add accessibility labels and hints
-- ✅ Create SwiftUI previews
-- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
-
----
-
-### 🐛 bug-fixer
-
-**Responsibilities**:
-- Fix reported bugs
-- Address compilation errors
-- Resolve build issues
-- Fix failing tests
-- **🚨 MUST execute build after fixes**
-
-**Must Do**:
-- ✅ Reproduce the bug first
-- ✅ Fix root cause, not symptoms
-- ✅ Add tests to prevent regression
-- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
-
----
-
-### Build Verification for All Code-Modifying Agents
-
-**If you are an agent that changes code files, you MUST**:
-
-```bash
-# Execute this command after your changes
-./Alfie/scripts/build-for-verification.sh
-```
-
-**Wait for completion and verify**:
-- "BUILD SUCCEEDED" message appears
-- No compilation errors
-- All imports resolve correctly
-- Generated code (L10n) is up to date
-
-**If build fails**:
-- Read and fix ALL compilation errors
-- Re-run build until successful
-- Only then mark task complete
+| Agent | Responsibility | Build Required |
+|-------|----------------|----------------|
+| 🧑‍💻 ios-feature-developer | MVVM features, navigation | ✅ Yes |
+| 🌐 graphql-specialist | Queries, fragments, converters | ✅ Yes |
+| 🌍 localization-specialist | L10n.xcstrings entries | ✅ Yes |
+| 🎨 ui-component-developer | StyleGuide components | ✅ Yes |
+| 🐛 bug-fixer | Bug fixes, build issues | ✅ Yes |
+| 🧪 testing-specialist | Unit tests, mocks | ❌ No |
+| 📝 spec-writer | Feature specifications | ❌ No |
+| 🔒 mobile-security-specialist | Security review | ⚠️ Recommended |
 
 ---
 
 ## Resources
 
-- **Detailed Instructions**: [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
-- **Feature Specs**: [`Docs/Specs/`](Docs/Specs/)
-- **Spec Template**: [`Docs/Specs/TEMPLATE.md`](Docs/Specs/TEMPLATE.md)
-- **Mock Server**: [Alfie-Mocks Repository](https://github.com/Mindera/Alfie-Mocks)
-- **AGENTS.md Standard**: [https://agents.md/](https://agents.md/)
+- 📖 **Detailed Guide**: [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
+- 📋 **Spec Template**: [`Docs/Specs/TEMPLATE.md`](Docs/Specs/TEMPLATE.md)
+- 🔗 **AGENTS.md Standard**: [https://agents.md/](https://agents.md/)
 
 ---
 
-## AI Assistant Tips
-
-When implementing features:
-
-1. **Read the spec first** - Check `Docs/Specs/Features/` for requirements
-2. **Follow patterns** - Look at existing features for consistency
-3. **Check StyleGuide** - Reusable components in `AlfieKit/Sources/StyleGuide/`
-4. **Use protocols** - All ViewModels need protocols for mocking
-5. **🚨 EXECUTE BUILD** - Run xcodebuild after every code change (MANDATORY)
-6. **Test your code** - Write unit tests, especially for ViewModels
-7. **Localize strings** - Every user-facing text needs an `L10n` key
-8. **Update spec status** - Mark as "Implemented" with PR link when done
-
-### Build Verification Checklist
-
-After implementing any feature:
-
-- [ ] Code changes completed
-- [ ] Imports verified
-- [ ] L10n strings added (if applicable)
-- [ ] **🚨 BUILD COMMAND EXECUTED**
-- [ ] **BUILD SUCCEEDED** message confirmed
-- [ ] No compilation errors
-- [ ] Tests written
-- [ ] Spec updated
-
-**Remember**: A feature is NOT complete until the build executes successfully.
-
----
-
-**Note**: This is a living document. Update when architectural decisions change or new patterns emerge.
+**Note**: This is a summary. See [copilot-instructions.md](.github/copilot-instructions.md) for complete details.

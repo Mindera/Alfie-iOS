@@ -4,28 +4,6 @@ This document provides project-specific context and guidelines for GitHub Copilo
 
 ---
 
-## ⚠️ CRITICAL: Build Execution Requirement
-
-**🚨 EVERY IMPLEMENTATION MUST EXECUTE BUILD SCRIPT AND VERIFY SUCCESS 🚨**
-
-Before considering ANY task complete, you **MUST**:
-
-1. ✅ Execute the build verification script:
-   ```bash
-   ./Alfie/scripts/build-for-verification.sh
-   ```
-
-2. ✅ Wait for build to complete and capture output
-3. ✅ Verify "✅ BUILD SUCCEEDED" message appears
-4. ✅ If build fails, fix errors and re-run until success
-5. ✅ Only then mark task as complete
-
-**Pre-build code verification is NOT sufficient - you MUST run the actual build.**
-
-See [Build Verification Section](#-build-verification---critical-requirement) for complete details.
-
----
-
 ## Project Overview
 
 Alfie is a native iOS e-commerce application built with SwiftUI (iOS 16+) following MVVM architecture with a modular package structure. The app fetches data from a GraphQL BFF API and includes features like product browsing, search, wishlist, and bag functionality.
@@ -573,243 +551,90 @@ Use this checklist for systematic feature implementation:
 16. ✅ **Add ViewFactory Case** in `Navigation/ViewFactory.swift`
 17. ✅ **Add Coordinator Methods** in `Navigation/Coordinator.swift`
 18. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
-19. ✅ **Build Project** to auto-generate L10n code
-20. ✅ **EXECUTE BUILD & VERIFY** - **MANDATORY STEP - MUST RUN THE BUILD**
-    - **YOU MUST execute the build verification script**
-    - **DO NOT just verify code - ACTUALLY RUN THE BUILD**
-    - Execute: `./Alfie/scripts/build-for-verification.sh`
-    - **CRITICAL**: A task is only considered complete when the build executes successfully
-    - Pre-build verification is NOT sufficient - you must run the actual build
-    - Fix any build errors immediately and re-run until build succeeds
-    - Verify all imports are correct and dependencies are resolved
-21. ✅ **Write Tests**:
-    - CoreTests for services and converters
-    - Unit tests for ViewModel (using mocks)
-    - SharedUITests for localization (test pluralization)
-    - Snapshot tests for new UI components
-22. ✅ **Verify Against Spec** - Check all acceptance criteria met
-23. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
+19. ✅ **Build & Verify** - Execute `./Alfie/scripts/build-for-verification.sh` (see [Build Verification](#-build-verification))
+20. ✅ **Write Tests** - CoreTests, ViewModel tests, localization tests, snapshot tests
+21. ✅ **Verify Against Spec** - Check all acceptance criteria met
+22. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
 
 ---
 
-## 🏗️ Build Verification - CRITICAL REQUIREMENT
+## 🏗️ Build Verification
 
-### Every Implementation MUST Execute Build Successfully
+**Every code change MUST be verified with a successful build.**
 
-**A task or feature is ONLY considered complete when you EXECUTE the build command and it succeeds.**
-
-#### Build Execution Process (MANDATORY):
-
-1. **After completing implementation steps**, YOU MUST execute the build script:
-   ```bash
-   # REQUIRED: Run this portable build script
-   ./Alfie/scripts/build-for-verification.sh
-   ```
-   
-   **Why use the script?**
-   - ✅ Works on all developer machines (no hardcoded simulator IDs)
-   - ✅ Automatically finds available simulator
-   - ✅ Provides clear success/failure messages
-   - ✅ Saves build log for debugging
-   - ✅ Suggests common fixes
-
-   **Alternative (if script unavailable):**
-   ```bash
-   cd /path/to/Alfie-iOS && \
-   xcodebuild -project Alfie/Alfie.xcodeproj \
-     -scheme Alfie \
-     -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
-     clean build
-   ```
-
-2. **Pre-build verification is NOT enough**:
-   - ❌ DO NOT just check code correctness
-   - ❌ DO NOT just verify imports exist
-   - ❌ DO NOT assume it will build
-   - ✅ MUST actually execute the build script
-   - ✅ MUST wait for build to complete
-   - ✅ MUST read and report build output
-
-3. **If build fails**:
-   - ❌ Task is NOT complete
-   - Read and analyze all compilation errors from build output
-   - Common issues:
-     - Missing imports (`import Models`, `import StyleGuide`, etc.)
-     - Unresolved symbols (typos in L10n keys, missing enum cases)
-     - Type mismatches (incorrect ViewModel protocol conformance)
-     - Missing files in Xcode project
-     - Syntax errors
-   - Fix ALL errors
-   - Re-run build command until it succeeds
-
-4. **If build succeeds**:
-   - ✅ Task is complete
-   - Report "✅ BUILD SUCCEEDED" with output
-   - Proceed to testing phase
-   - Update spec status to "Implemented"
-
-#### Why Executing Build Matters:
-
-- **Prevents broken code** from being committed
-- **Catches runtime issues** that code review misses
-- **Validates L10n code generation** actually worked
-- **Ensures all files** are properly linked in Xcode project
-- **Verifies Swift syntax** compiles correctly
-- **Confirms module imports** resolve at compile time
-- **Detects missing dependencies** immediately
-- **Validates protocol conformance** is complete
-
-#### Build Execution Checklist:
-
-- [ ] Build script executed via shell
-- [ ] Build output captured and analyzed
-- [ ] Zero compilation errors reported
-- [ ] "✅ BUILD SUCCEEDED" message confirmed
-- [ ] Build time recorded (~30-60 seconds typical)
-- [ ] All warnings reviewed (should be minimal)
-
-### MANDATORY Build Execution:
-
-**YOU MUST:**
-✅ Execute the build script using available shell tools
-✅ Wait for build process to complete
-✅ Capture and read the full build output
-✅ Report build success/failure with details
-✅ Fix errors and re-run if build fails
-✅ Only mark task complete after successful build execution
-
-**YOU MUST NOT:**
-❌ Skip build execution and just verify code
-❌ Assume code will build without running it
-❌ Mark task complete without executing build
-❌ Rely only on code review/verification
-❌ Say "build should succeed" without running it
-❌ Move to next task before build succeeds
-
-### Build Command Template:
+### Build Command
 
 ```bash
 # Recommended: Use the portable build script
 ./Alfie/scripts/build-for-verification.sh
 
-# Alternative: Use xcodebuild directly with generic destination
-xcodebuild -project Alfie/Alfie.xcodeproj \
-  -scheme Alfie \
+# Alternative: Use xcodebuild directly
+xcodebuild -project Alfie/Alfie.xcodeproj -scheme Alfie \
   -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
   clean build
 ```
+
+### Process
+
+1. Execute the build script after completing implementation
+2. Wait for "✅ BUILD SUCCEEDED" message
+3. If build fails: fix errors, re-run until success
+4. Only mark task complete after successful build
+
+**Why use the script?**
+- Works on all developer machines (no hardcoded simulator IDs)
+- Automatically finds available simulator
+- Provides clear success/failure messages
+- Saves build log for debugging
+
+### Common Build Errors
+
+| Error | Fix |
+|-------|-----|
+| Missing imports | Add `import Models`, `import StyleGuide`, etc. |
+| Unresolved symbols | Check L10n key typos, missing enum cases |
+| Type mismatches | Verify protocol conformance |
+| Missing files | Notify user to add files to Xcode project |
 
 ---
 
 ## 🚫 Xcode Project File Management
 
-### NEVER Edit project.pbxproj Directly
+**CRITICAL**: Never edit `Alfie.xcodeproj/project.pbxproj` directly.
 
-**CRITICAL RULE**: The `Alfie.xcodeproj/project.pbxproj` file is managed exclusively by Xcode and must **NEVER** be edited directly by agents or scripts.
+### Files Requiring Xcode Integration
 
-#### When You Create New Files
-
-**YOU MUST notify the user** so they can add the file reference in Xcode:
+When creating new `.swift` files in `Alfie/Alfie/` (app target), notify the user:
 
 ```
-✅ File created: Alfie/Alfie/Views/NewFeature/NewFeatureView.swift
-
 ⚠️ ACTION REQUIRED: Please add this file to the Xcode project:
 1. Open Alfie.xcodeproj in Xcode
-2. Right-click the Views/NewFeature/ folder
+2. Right-click the appropriate folder
 3. Select "Add Files to Alfie..."
-4. Navigate to and select: NewFeatureView.swift
-5. Ensure "Alfie" target is checked
-6. Click "Add"
+4. Select the file and ensure "Alfie" target is checked
+5. Run: ./Alfie/scripts/build-for-verification.sh
 ```
 
-#### Files That Need Xcode Integration
+### Files Auto-Discovered (No Action Needed)
 
-Always notify the user when creating:
-- ✅ New `.swift` files in `Alfie/Alfie/` (app target)
-- ✅ New view files, view models, dependency containers
-- ✅ New coordinator files or navigation components
-- ✅ New service files in the app target
-- ✅ New configuration files
-
-#### Files That Don't Need Xcode Integration
-
-These are automatically picked up (no notification needed):
-- ✅ Files in `AlfieKit/Sources/` (Swift Package - auto-discovered)
-- ✅ Files in `AlfieKit/Tests/` (Swift Package - auto-discovered)
-- ✅ GraphQL `.graphql` files (not in Xcode project)
-- ✅ Documentation `.md` files
-- ✅ Scripts in `scripts/` directory
-
-#### Notification Template
-
-When creating files in the app target, always include:
-
-```markdown
-## ✅ Files Created
-
-The following files have been created and need to be added to the Xcode project:
-
-1. `Alfie/Alfie/Views/Feature/FeatureView.swift`
-2. `Alfie/Alfie/Views/Feature/FeatureViewModel.swift`
-3. `Alfie/Alfie/Views/Feature/FeatureDependencyContainer.swift`
-
-### 📋 Next Steps for User:
-
-Please add these files to the Xcode project:
-1. Open `Alfie.xcodeproj` in Xcode
-2. Navigate to the appropriate group/folder in Project Navigator
-3. Right-click → "Add Files to Alfie..."
-4. Select all the files listed above
-5. Ensure the "Alfie" target is checked in the dialog
-6. Click "Add"
-
-After adding files, please run the build verification:
-```bash
-./Alfie/scripts/build-for-verification.sh
-```
-```
-
-#### Why This Matters
-
-- ❌ Editing `project.pbxproj` manually causes merge conflicts
-- ❌ Direct edits corrupt Xcode project structure
-- ❌ Build fails when files aren't registered in project
-- ✅ Xcode manages references, UUIDs, and target memberships correctly
-- ✅ User has control over file organization
-- ✅ Prevents accidental file duplication or misplacement
-
-#### Build Verification After Adding Files
-
-After the user adds files in Xcode, they should run:
-```bash
-./Alfie/scripts/build-for-verification.sh
-```
-
-This ensures:
-- Files are properly linked to the target
-- All imports resolve correctly
-- No compilation errors introduced
-
-**Remember**: Creating the file is only half the job - the user must add it to the Xcode project before the build will succeed.
+- Files in `AlfieKit/Sources/` and `AlfieKit/Tests/` (Swift Package)
+- GraphQL `.graphql` files
+- Documentation and scripts
 
 ---
 
 ## Things to AVOID
 
-❌ **Don't** access `ServiceProvider` from ViewModels (use DependencyContainer)  
-❌ **Don't** hardcode user-facing strings (use `L10n`)  
-❌ **Don't** bypass the Coordinator for navigation  
-❌ **Don't** create new localization tables (use `L10n`)  
-❌ **Don't** edit auto-generated files (`L10n+Generated.swift`, `BFFGraphAPI`, `BFFGraphMocks`)  
-❌ **Don't** use `fatalError` (use `queuedFatalError` from Alicerce)  
-❌ **Don't** commit sensitive files unencrypted  
-❌ **Don't** create custom UI without checking StyleGuide components first  
-❌ **Don't** use `ViewState` for paginated lists (use `PaginatedViewState`)  
-❌ **Don't** create ViewModels without protocols (needed for mocking)  
-❌ **Don't** edit `Alfie.xcodeproj/project.pbxproj` file directly - this is managed by Xcode ⚠️  
-❌ **Don't** consider a task complete without EXECUTING the build script ⚠️ 🚨  
-❌ **Don't** skip build execution and only verify code - YOU MUST RUN THE BUILD ⚠️ 🚨
+❌ Access `ServiceProvider` from ViewModels (use DependencyContainer)  
+❌ Hardcode user-facing strings (use `L10n`)  
+❌ Bypass Coordinator for navigation  
+❌ Edit auto-generated files (`L10n+Generated.swift`, `BFFGraphAPI`, `BFFGraphMocks`)  
+❌ Use `fatalError` (use `queuedFatalError`)  
+❌ Commit sensitive files unencrypted  
+❌ Create custom UI without checking StyleGuide first  
+❌ Create ViewModels without protocols  
+❌ Edit `project.pbxproj` directly  
+❌ Skip build verification
 
 ---
 
@@ -872,250 +697,39 @@ xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie -destination 'platf
 
 ## Code Review Guidelines
 
-When reviewing pull requests, prioritize checking these items based on severity:
+### PR Review Checklist
 
-### 🔴 Critical Issues (Block Merge)
-
-These violations break core architectural principles or introduce security risks:
-
-- **MVVM Architecture Violations**
-  - ViewModels accessing `ServiceProvider` directly instead of using `DependencyContainer`
-  - Business logic in Views instead of ViewModels
-  - Navigation logic in Views instead of through `Coordinator`
-  
-- **Hardcoded Strings**
-  - User-facing text not using `L10n` localization
-  - Missing entries in `L10n.xcstrings`
-  - Strings that should be localizable but aren't
-
-- **Navigation Violations**
-  - Views calling navigation directly instead of through `@EnvironmentObject Coordinator`
-  - Missing `Screen` case in `Navigation/Screen.swift`
-  - Missing view factory implementation
-
-- **Missing ViewModel Protocol**
-  - ViewModel implemented without corresponding protocol in `Models/Features/`
-  - Cannot be mocked for testing
-
-- **Security Issues**
-  - Credentials, API keys, or secrets in code
-  - Sensitive data stored in `UserDefaults` (should use Keychain)
-  - Sensitive data logged to console
-  - Unencrypted sensitive files committed (check git-secret usage)
-  - HTTP endpoints for sensitive data (must use HTTPS)
-
-- **State Management Violations**
-  - Not using `ViewState` or `PaginatedViewState` enums
-  - State not marked with `@Published`
-  - Mutable state exposed publicly
-
-### 🟠 High Priority (Fix Before Merge)
-
-These issues affect code quality and maintainability:
-
-- **Missing Tests**
-  - New ViewModels without unit tests
-  - ViewState transitions not tested
-  - Business logic not covered by tests
-  - No mock implementation for new ViewModel protocol
-
-- **GraphQL Issues**
-  - Queries without reusable fragments
-  - Codegen not run after GraphQL changes
-  - Missing converters for BFF types
-  - Editing generated code in `BFFGraphAPI`
-
-- **Localization Issues**
-  - Localization keys not added to `L10n.xcstrings`
-  - Missing translations for all supported languages
-  - Pluralization rules not defined
-  - Incorrect key naming (must be ReverseDomain + SnakeCase)
-
-- **Dependency Injection**
-  - Dependencies not passed via DependencyContainer
-  - ServiceProvider accessed from wrong layer
-  - Circular dependencies
-
-- **State Management**
-  - ViewState transitions not properly handled
-  - Missing loading states
-  - Error states not handled
-  - Pagination logic incomplete
-
-### 🟡 Medium Priority (Should Fix)
-
-Code quality and maintainability concerns:
-
-- **SwiftLint Violations**
-  - Function length exceeds 200 lines
-  - Type length exceeds 400 lines
-  - Missing trailing commas
-  - Force unwrapping without safety check
-  - Using `fatalError` instead of `queuedFatalError`
-
-- **Code Complexity**
-  - Deeply nested conditionals
-  - Large switch statements that could be simplified
-  - Duplicate code that should be extracted
-
-- **Edge Cases**
-  - Empty state handling missing
-  - Nil/optional handling incomplete
-  - Pagination edge cases not considered
-  - Error scenarios not handled
-
-- **Error Handling**
-  - Generic error messages
-  - Errors not properly propagated
-  - Missing error logging
-
-- **Documentation**
-  - Complex logic without explanatory comments
-  - Public APIs without documentation
-  - Non-obvious behavior not documented
-
-### 🟢 Best Practices (Nice to Have)
-
-Suggestions for improvement:
-
-- **Dependency Injection**
-  - All dependencies properly injected via DependencyContainer
-  - No direct service instantiation
-
-- **State Management**
-  - Proper use of `ViewState<Value, Error>` for simple flows
-  - Proper use of `PaginatedViewState<Value, Error>` for lists
-  - All state marked with `@Published`
-
-- **StyleGuide Compliance**
-  - Using existing components from `StyleGuide/Components/`
-  - Following design system patterns
-  - Consistent spacing and layout
-
-- **Test Coverage**
-  - Unit tests for all ViewModels
-  - Converter tests for GraphQL types
-  - Localization tests for new strings
-  - Edge cases covered
-
-- **Analytics**
-  - Events tracked for user actions
-  - Proper event naming conventions
-  - Analytics tested
-
-- **Code Organization**
-  - Files in correct module locations
-  - Logical grouping of related code
-  - Clear separation of concerns
-
-### Review Checklist
-
-For each PR, verify:
-
-- [ ] **Architecture**: Follows MVVM pattern strictly
-- [ ] **Dependencies**: Proper DependencyContainer usage
-- [ ] **Navigation**: Through Coordinator only
+- [ ] **Architecture**: MVVM pattern, DependencyContainer usage, Coordinator navigation
 - [ ] **Localization**: All strings use L10n
 - [ ] **State**: ViewState/PaginatedViewState used correctly
-- [ ] **Tests**: ViewModels have unit tests
-- [ ] **Protocols**: ViewModel protocols exist for mocking
-- [ ] **Security**: No credentials, proper data storage
-- [ ] **GraphQL**: Fragments used, codegen run
+- [ ] **Tests**: ViewModels have unit tests, protocols exist for mocking
+- [ ] **Security**: No credentials, Keychain for sensitive data, HTTPS only
+- [ ] **GraphQL**: Fragments used, codegen run, no edits to generated files
 - [ ] **SwiftLint**: No violations
-- [ ] **StyleGuide**: Existing components reused
 
-### Common Anti-Patterns to Flag
+### 🔴 Critical (Block Merge)
 
-❌ **Bad**:
-```swift
-// Accessing ServiceProvider from ViewModel
-final class ViewModel {
-    func fetchData() {
-        let service = ServiceProvider.shared.someService // ❌ Wrong!
-    }
-}
+- ViewModels accessing `ServiceProvider` directly
+- Hardcoded user-facing strings
+- Navigation bypassing Coordinator
+- Missing ViewModel protocols
+- Credentials/secrets in code
+- State not using `ViewState` enums
 
-// Hardcoded strings
-Text("Product Details") // ❌ Wrong!
+### 🟠 High Priority
 
-// Direct navigation from View
-Button("Go") {
-    navigationPath.append(ProductDetailView()) // ❌ Wrong!
-}
+- Missing tests for ViewModels
+- GraphQL queries without fragments
+- Missing localization translations
+- Dependencies not via DependencyContainer
 
-// No protocol for ViewModel
-final class FeatureViewModel { // ❌ No protocol!
-    // ...
-}
+### Security Review Points
 
-// State not using ViewState enum
-final class ViewModel {
-    @Published var isLoading: Bool // ❌ Wrong!
-    @Published var data: Product?
-    @Published var error: Error?
-}
-```
-
-✅ **Good**:
-```swift
-// Proper dependency injection
-final class ViewModel: ViewModelProtocol {
-    private let dependencies: FeatureDependencyContainer
-    
-    init(dependencies: FeatureDependencyContainer) {
-        self.dependencies = dependencies
-    }
-    
-    func fetchData() {
-        let service = dependencies.someService // ✅ Correct!
-    }
-}
-
-// Localized strings
-Text(L10n.Pdp.title) // ✅ Correct!
-
-// Navigation through Coordinator
-Button("Go") {
-    coordinator.navigateToProductDetail(id: productId) // ✅ Correct!
-}
-
-// Protocol for mocking
-protocol FeatureViewModelProtocol: ObservableObject {
-    var state: ViewState<Product, FeatureError> { get }
-}
-final class FeatureViewModel: FeatureViewModelProtocol { // ✅ Correct!
-    @Published private(set) var state: ViewState<Product, FeatureError>
-}
-
-// Proper state management
-final class ViewModel {
-    @Published private(set) var state: ViewState<Product, FeatureError> // ✅ Correct!
-}
-```
-
-### Security-Specific Review Points
-
-When reviewing for security issues:
-
-- **Credentials**: Check for API keys, tokens, passwords in code
-- **Data Storage**: Sensitive data must use Keychain, not UserDefaults
-- **Logging**: No sensitive data (tokens, PII) in logs
-- **Network**: All sensitive endpoints use HTTPS
-- **git-secret**: Sensitive files properly encrypted
-- **Input Validation**: User inputs properly validated and sanitized
-- **Deep Links**: URL parameters validated before use
-
-### Testing Review Points
-
-When reviewing test coverage:
-
-- **ViewModel Tests**: All ViewState transitions tested
-- **Given-When-Then**: Tests follow proper structure
-- **Mocks**: Using mocks from `Mocks` module
-- **Edge Cases**: Empty states, errors, loading states tested
-- **Converters**: GraphQL converter tests for new types
-- **Localization**: Keys tested for all languages
-- **Isolation**: Tests don't depend on each other
+- No API keys, tokens, passwords in code
+- Sensitive data uses Keychain, not UserDefaults
+- No PII in logs
+- git-secret for sensitive files
+- Input validation on deep links
 
 ---
 
