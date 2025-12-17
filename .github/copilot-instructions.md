@@ -4,6 +4,28 @@ This document provides project-specific context and guidelines for GitHub Copilo
 
 ---
 
+## ⚠️ CRITICAL: Build Execution Requirement
+
+**🚨 EVERY IMPLEMENTATION MUST EXECUTE BUILD SCRIPT AND VERIFY SUCCESS 🚨**
+
+Before considering ANY task complete, you **MUST**:
+
+1. ✅ Execute the build verification script:
+   ```bash
+   ./Alfie/scripts/build-for-verification.sh
+   ```
+
+2. ✅ Wait for build to complete and capture output
+3. ✅ Verify "✅ BUILD SUCCEEDED" message appears
+4. ✅ If build fails, fix errors and re-run until success
+5. ✅ Only then mark task as complete
+
+**Pre-build code verification is NOT sufficient - you MUST run the actual build.**
+
+See [Build Verification Section](#-build-verification---critical-requirement) for complete details.
+
+---
+
 ## Project Overview
 
 Alfie is a native iOS e-commerce application built with SwiftUI (iOS 16+) following MVVM architecture with a modular package structure. The app fetches data from a GraphQL BFF API and includes features like product browsing, search, wishlist, and bag functionality.

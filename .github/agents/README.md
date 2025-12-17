@@ -2,12 +2,26 @@
 
 This directory contains custom agent profiles for GitHub Copilot coding agent. Each agent is specialized for specific tasks in the Alfie iOS project.
 
+## 🎯 Feature Orchestrator
+
+### **feature-orchestrator** 🎭
+**Purpose**: Orchestrate complete feature development from idea to production  
+**Tools**: read, search, edit, agent  
+**Focus**: Workflow coordination, quality gates, agent delegation, progress tracking  
+
+**Use when**: Building complete features end-to-end, coordinating multiple agents, ensuring quality
+
+**This is your starting point for new features!**
+
+---
+
 ## Available Agents
 
 ### 1. **ios-feature-developer** 🎯
 **Purpose**: Implement complete iOS features following MVVM architecture  
 **Tools**: read, search, edit  
 **Focus**: ViewModels, Views, DependencyContainers, Navigation, State Management  
+**Build Verification**: ✅ **REQUIRED** - Must run `./Alfie/scripts/build-for-verification.sh`
 
 **Use when**: Building new features, implementing screens, creating ViewModels
 
@@ -17,6 +31,7 @@ This directory contains custom agent profiles for GitHub Copilot coding agent. E
 **Purpose**: GraphQL queries, mutations, fragments, and Apollo codegen  
 **Tools**: read, search, edit  
 **Focus**: Queries, Fragments, Schema, Converters, BFFClientService  
+**Build Verification**: ✅ **REQUIRED** - Must run after codegen
 
 **Use when**: Adding API queries, creating GraphQL fragments, running codegen
 
@@ -26,6 +41,7 @@ This directory contains custom agent profiles for GitHub Copilot coding agent. E
 **Purpose**: Write comprehensive tests (unit, snapshot, localization)  
 **Tools**: read, search, edit  
 **Focus**: ViewModel tests, Converter tests, Localization tests, Snapshot tests  
+**Build Verification**: ⚪ Tests run separately with `xcodebuild test`
 
 **Use when**: Writing tests, testing ViewState transitions, mocking dependencies
 
@@ -53,6 +69,7 @@ This directory contains custom agent profiles for GitHub Copilot coding agent. E
 **Purpose**: Manage localized strings in String Catalog  
 **Tools**: read, search, edit  
 **Focus**: L10n.xcstrings, String keys, Pluralization, Localization tests  
+**Build Verification**: ✅ **REQUIRED** - Must build to generate L10n code
 
 **Use when**: Adding user-facing strings, translating content, testing localization
 
@@ -90,18 +107,23 @@ gh copilot chat --agent graphql-specialist
 
 ## Agent Collaboration
 
-Agents are designed to work together:
+Agents are designed to work together, orchestrated by `feature-orchestrator`:
 
 ```
-Feature Implementation Flow:
-1. spec-writer → Create specification
-2. mobile-security-specialist → Review security requirements
-3. graphql-specialist → Create API queries
-4. ios-feature-developer → Implement feature
-5. testing-specialist → Write tests
-6. localization-specialist → Add strings
-7. mobile-security-specialist → Final security review
+Complete Feature Development Flow (Orchestrated):
+
+feature-orchestrator coordinates:
+  1. spec-writer → Create specification
+  2. mobile-security-specialist → Review security requirements  
+  3. graphql-specialist → Create API queries
+  4. localization-specialist → Add strings
+  5. ios-feature-developer → Implement feature
+  6. testing-specialist → Write tests
+  7. mobile-security-specialist → Final security audit
+  8. feature-orchestrator → Final verification & sign-off
 ```
+
+**Recommended Approach**: Start with `@feature-orchestrator` for new features. It will coordinate all other agents automatically.
 
 ---
 
@@ -132,6 +154,7 @@ Each agent has:
 
 | Task | Recommended Agent |
 |------|-------------------|
+| **New feature (end-to-end)** | `feature-orchestrator` ⭐ |
 | Implement new feature | `ios-feature-developer` |
 | Add GraphQL query | `graphql-specialist` |
 | Write tests | `testing-specialist` |
@@ -139,16 +162,20 @@ Each agent has:
 | Create feature spec | `spec-writer` |
 | Add translations | `localization-specialist` |
 
+⭐ **Start here for new features** - The orchestrator will coordinate all other agents.
+
 ### Agent Selection Tips
 
 ✅ **Do**:
-- Choose agent that matches the task
-- Let agents collaborate (reference other agents)
-- Use spec-writer before ios-feature-developer
+- **Start with `feature-orchestrator` for complete features**
+- Choose specialized agent for specific tasks
+- Let orchestrator coordinate the workflow
+- Use spec-writer before implementation
 - Use security-specialist for PR reviews
 
 ❌ **Don't**:
 - Use wrong agent for task (e.g., testing-specialist for feature implementation)
+- Skip the orchestrator for complex features
 - Skip security reviews
 - Forget to generate code after GraphQL changes
 - Skip spec creation for new features
