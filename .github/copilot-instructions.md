@@ -4,6 +4,28 @@ This document provides project-specific context and guidelines for GitHub Copilo
 
 ---
 
+## ⚠️ CRITICAL: Build Execution Requirement
+
+**🚨 EVERY IMPLEMENTATION MUST EXECUTE BUILD SCRIPT AND VERIFY SUCCESS 🚨**
+
+Before considering ANY task complete, you **MUST**:
+
+1. ✅ Execute the build verification script:
+   ```bash
+   ./Alfie/scripts/build-for-verification.sh
+   ```
+
+2. ✅ Wait for build to complete and capture output
+3. ✅ Verify "✅ BUILD SUCCEEDED" message appears
+4. ✅ If build fails, fix errors and re-run until success
+5. ✅ Only then mark task as complete
+
+**Pre-build code verification is NOT sufficient - you MUST run the actual build.**
+
+See [Build Verification Section](#-build-verification---critical-requirement) for complete details.
+
+---
+
 ## Project Overview
 
 Alfie is a native iOS e-commerce application built with SwiftUI (iOS 16+) following MVVM architecture with a modular package structure. The app fetches data from a GraphQL BFF API and includes features like product browsing, search, wishlist, and bag functionality.
@@ -524,6 +546,8 @@ Tackle tasks **one by one**, following the implementation checklist below.
 
 **Always refer back to the spec** for requirements. If requirements change during implementation, **update the spec first**, then update code.
 
+**After implementation, EXECUTE the build command to verify - this is MANDATORY.**
+
 ### Feature Implementation Checklist
 
 Use this checklist for systematic feature implementation:
@@ -549,13 +573,130 @@ Use this checklist for systematic feature implementation:
 16. ✅ **Add Coordinator Methods** in `Navigation/Coordinator.swift`
 17. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
 18. ✅ **Build Project** to auto-generate L10n code
-19. ✅ **Write Tests**:
+19. ✅ **EXECUTE BUILD & VERIFY** - **MANDATORY STEP - MUST RUN THE BUILD**
+    - **YOU MUST execute the build verification script**
+    - **DO NOT just verify code - ACTUALLY RUN THE BUILD**
+    - Execute: `./Alfie/scripts/build-for-verification.sh`
+    - **CRITICAL**: A task is only considered complete when the build executes successfully
+    - Pre-build verification is NOT sufficient - you must run the actual build
+    - Fix any build errors immediately and re-run until build succeeds
+    - Verify all imports are correct and dependencies are resolved
+20. ✅ **Write Tests**:
     - CoreTests for services and converters
     - Unit tests for ViewModel (using mocks)
     - SharedUITests for localization (test pluralization)
     - Snapshot tests for new UI components
-20. ✅ **Verify Against Spec** - Check all acceptance criteria met
-21. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
+21. ✅ **Verify Against Spec** - Check all acceptance criteria met
+22. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
+
+---
+
+## 🏗️ Build Verification - CRITICAL REQUIREMENT
+
+### Every Implementation MUST Execute Build Successfully
+
+**A task or feature is ONLY considered complete when you EXECUTE the build command and it succeeds.**
+
+#### Build Execution Process (MANDATORY):
+
+1. **After completing implementation steps**, YOU MUST execute the build script:
+   ```bash
+   # REQUIRED: Run this portable build script
+   ./Alfie/scripts/build-for-verification.sh
+   ```
+   
+   **Why use the script?**
+   - ✅ Works on all developer machines (no hardcoded simulator IDs)
+   - ✅ Automatically finds available simulator
+   - ✅ Provides clear success/failure messages
+   - ✅ Saves build log for debugging
+   - ✅ Suggests common fixes
+
+   **Alternative (if script unavailable):**
+   ```bash
+   cd /path/to/Alfie-iOS && \
+   xcodebuild -project Alfie/Alfie.xcodeproj \
+     -scheme Alfie \
+     -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+     clean build
+   ```
+
+2. **Pre-build verification is NOT enough**:
+   - ❌ DO NOT just check code correctness
+   - ❌ DO NOT just verify imports exist
+   - ❌ DO NOT assume it will build
+   - ✅ MUST actually execute the build script
+   - ✅ MUST wait for build to complete
+   - ✅ MUST read and report build output
+
+3. **If build fails**:
+   - ❌ Task is NOT complete
+   - Read and analyze all compilation errors from build output
+   - Common issues:
+     - Missing imports (`import Models`, `import StyleGuide`, etc.)
+     - Unresolved symbols (typos in L10n keys, missing enum cases)
+     - Type mismatches (incorrect ViewModel protocol conformance)
+     - Missing files in Xcode project
+     - Syntax errors
+   - Fix ALL errors
+   - Re-run build command until it succeeds
+
+4. **If build succeeds**:
+   - ✅ Task is complete
+   - Report "✅ BUILD SUCCEEDED" with output
+   - Proceed to testing phase
+   - Update spec status to "Implemented"
+
+#### Why Executing Build Matters:
+
+- **Prevents broken code** from being committed
+- **Catches runtime issues** that code review misses
+- **Validates L10n code generation** actually worked
+- **Ensures all files** are properly linked in Xcode project
+- **Verifies Swift syntax** compiles correctly
+- **Confirms module imports** resolve at compile time
+- **Detects missing dependencies** immediately
+- **Validates protocol conformance** is complete
+
+#### Build Execution Checklist:
+
+- [ ] Build script executed via shell
+- [ ] Build output captured and analyzed
+- [ ] Zero compilation errors reported
+- [ ] "✅ BUILD SUCCEEDED" message confirmed
+- [ ] Build time recorded (~30-60 seconds typical)
+- [ ] All warnings reviewed (should be minimal)
+
+### MANDATORY Build Execution:
+
+**YOU MUST:**
+✅ Execute the build script using available shell tools
+✅ Wait for build process to complete
+✅ Capture and read the full build output
+✅ Report build success/failure with details
+✅ Fix errors and re-run if build fails
+✅ Only mark task complete after successful build execution
+
+**YOU MUST NOT:**
+❌ Skip build execution and just verify code
+❌ Assume code will build without running it
+❌ Mark task complete without executing build
+❌ Rely only on code review/verification
+❌ Say "build should succeed" without running it
+❌ Move to next task before build succeeds
+
+### Build Command Template:
+
+```bash
+# Recommended: Use the portable build script
+./Alfie/scripts/build-for-verification.sh
+
+# Alternative: Use xcodebuild directly with generic destination
+xcodebuild -project Alfie/Alfie.xcodeproj \
+  -scheme Alfie \
+  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+  clean build
+```
 
 ---
 
@@ -571,6 +712,8 @@ Use this checklist for systematic feature implementation:
 ❌ **Don't** create custom UI without checking StyleGuide components first  
 ❌ **Don't** use `ViewState` for paginated lists (use `PaginatedViewState`)  
 ❌ **Don't** create ViewModels without protocols (needed for mocking)  
+❌ **Don't** consider a task complete without EXECUTING the build script ⚠️ 🚨  
+❌ **Don't** skip build execution and only verify code - YOU MUST RUN THE BUILD ⚠️ 🚨
 
 ---
 
@@ -616,7 +759,7 @@ cd Alfie/scripts && ./run-apollo-codegen.sh
 swift package --allow-writing-to-package-directory generate-code-for-resources
 
 # Run tests
-xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie -destination 'platform=iOS Simulator,name=iPhone 15'
+xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
 ```
 
 ### Key Dependencies

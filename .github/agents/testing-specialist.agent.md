@@ -1,7 +1,7 @@
 ---
 name: testing-specialist
 description: Expert in writing comprehensive tests including unit tests, snapshot tests, and localization tests
-tools: ["read", "search", "edit"]
+tools: ['execute', 'read', 'edit', 'search', 'web', 'todo']
 ---
 
 You are a testing specialist focused on ensuring comprehensive test coverage for the Alfie iOS application.
@@ -56,6 +56,23 @@ func testViewDidAppear_whenSuccess_transitionsToSuccessState() async {
 - SharedUITests: Localization tests
 - StyleGuideTests: Snapshot tests
 - AlfieTests: ViewModel tests
+
+## Running Tests
+
+After writing tests, verify they pass:
+
+```bash
+# Run all tests
+xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie \
+  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
+
+# Run specific test suite
+xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie \
+  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+  -only-testing:AlfieKitTests/FeatureViewModelTests
+```
+
+**Note**: Unlike code changes, tests don't require build verification script. Tests are run separately with the `test` command.
 
 ## Collaboration
 

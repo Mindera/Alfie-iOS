@@ -285,6 +285,69 @@ Alfie-iOS/
 
 ---
 
+## 🚨 CRITICAL: Build Verification Requirement
+
+**⚠️ EVERY CODE CHANGE MUST BE VERIFIED WITH A SUCCESSFUL BUILD ⚠️**
+
+### Mandatory Build Execution
+
+If you are an AI agent that modifies code, you **MUST**:
+
+1. ✅ Execute the build script after making changes
+2. ✅ Wait for build completion and capture output
+3. ✅ Verify "✅ BUILD SUCCEEDED" message appears
+4. ✅ Fix any errors and re-run until build succeeds
+5. ✅ Only then mark task as complete
+
+**Pre-build code verification is NOT sufficient - you MUST run the actual build.**
+
+### Build Command
+
+```bash
+# Recommended: Use the portable build script (works on all machines)
+./Alfie/scripts/build-for-verification.sh
+
+# Alternative: Use xcodebuild directly with generic destination
+cd /path/to/Alfie-iOS && \
+xcodebuild -project Alfie/Alfie.xcodeproj -scheme Alfie \
+  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+  clean build
+```
+
+**Why use the script?**
+- ✅ Automatically finds available simulator
+- ✅ Works across different developer machines
+- ✅ Provides clear success/failure messages
+- ✅ Saves build log for debugging
+- ✅ Suggests common fixes for build errors
+
+### Why Build Execution Matters
+
+- **Prevents broken code** from being committed
+- **Catches compilation errors** immediately
+- **Validates imports** and module dependencies
+- **Ensures L10n code generation** worked correctly
+- **Verifies all files** are linked in Xcode project
+- **Confirms protocol conformance** is complete
+- **Detects missing dependencies** before PR
+
+### Build Failure Response
+
+If build fails:
+1. Read and analyze ALL compilation errors
+2. Common issues:
+   - Missing imports (`import Models`, `import StyleGuide`, etc.)
+   - Unresolved symbols (typos in L10n keys, missing enum cases)
+   - Type mismatches (incorrect protocol conformance)
+   - Missing exhaustive switch cases
+   - Syntax errors
+3. Fix ALL errors
+4. Re-run build until successful
+
+**A task is only complete when the build executes successfully.**
+
+---
+
 ## Quick Commands
 
 ```bash
@@ -300,13 +363,187 @@ cd Alfie/scripts && ./run-apollo-codegen.sh
 # Generate localization code (or build project)
 swift package --allow-writing-to-package-directory generate-code-for-resources
 
+# Build project (MANDATORY after code changes)
+./Alfie/scripts/build-for-verification.sh
+
 # Run tests
 xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie \
-  -destination 'platform=iOS Simulator,name=iPhone 15'
+  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
 
 # Lint code
 cd Alfie && swiftlint
 ```
+
+---
+
+## Specialized AI Agents
+
+The following specialized agents can help with specific tasks. **All agents that modify code MUST execute build verification.**
+
+### 🧑‍💻 ios-feature-developer
+
+**Responsibilities**:
+- Implement new features following MVVM architecture
+- Create ViewModels, Views, DependencyContainers
+- Add navigation support (Screen, Coordinator, ViewFactory)
+- Add localization strings
+- **🚨 MUST execute build after implementation**
+
+**Must Do**:
+- ✅ Read feature spec first
+- ✅ Create ViewModel protocol for mocking
+- ✅ Use DependencyContainer for dependencies
+- ✅ Navigate through Coordinator
+- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
+
+**Agent Instruction File**: See instructions at top of this file
+
+---
+
+### 🧪 testing-specialist
+
+**Responsibilities**:
+- Write unit tests for ViewModels
+- Create mock implementations
+- Test ViewState transitions
+- Write snapshot tests for UI components
+- **Build verification not required** (tests run separately)
+
+**Must Do**:
+- ✅ Follow Given-When-Then pattern
+- ✅ Create mocks in `Mocks/Core/Features/`
+- ✅ Test all state transitions
+- ✅ Verify test coverage for new code
+
+---
+
+### 🌐 graphql-specialist
+
+**Responsibilities**:
+- Create GraphQL queries and fragments
+- Extend schema definitions
+- Run Apollo codegen
+- Create converter extensions
+- Update BFFClientService
+- **🚨 MUST execute build after codegen**
+
+**Must Do**:
+- ✅ Define reusable fragments
+- ✅ Run `./run-apollo-codegen.sh`
+- ✅ Create type-safe converters
+- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
+
+**Never**:
+- ❌ Edit auto-generated `BFFGraphAPI` files manually
+
+---
+
+### 🌍 localization-specialist
+
+**Responsibilities**:
+- Add entries to `L10n.xcstrings`
+- Provide translations for all languages
+- Define pluralization rules
+- **🚨 MUST execute build to generate L10n code**
+
+**Must Do**:
+- ✅ Use ReverseDomain + SnakeCase naming
+- ✅ Add translations for all supported languages
+- ✅ Test pluralization variations
+- ✅ **Execute xcodebuild to generate L10n+Generated.swift**
+- ✅ **Verify BUILD SUCCEEDED**
+
+---
+
+### 📝 spec-writer
+
+**Responsibilities**:
+- Write feature specifications
+- Document acceptance criteria
+- Define data models and API contracts
+- Update spec status when implemented
+- **Build verification not required** (documentation only)
+
+**Must Do**:
+- ✅ Follow `Docs/Specs/TEMPLATE.md` structure
+- ✅ Define clear acceptance criteria
+- ✅ Include UI/UX flows
+- ✅ Document analytics events
+- ✅ List edge cases
+
+---
+
+### 🔒 mobile-security-specialist
+
+**Responsibilities**:
+- Review code for security issues
+- Ensure sensitive data protection
+- Verify Keychain usage for credentials
+- Check for hardcoded secrets
+- Validate network security
+- **Build verification recommended** after security fixes
+
+**Must Do**:
+- ✅ Check for credentials in code
+- ✅ Verify HTTPS usage
+- ✅ Validate input sanitization
+- ✅ Ensure git-secret usage for sensitive files
+
+---
+
+### 🎨 ui-component-developer
+
+**Responsibilities**:
+- Create reusable StyleGuide components
+- Follow design system patterns
+- Implement accessibility features
+- Create component previews
+- **🚨 MUST execute build after component creation**
+
+**Must Do**:
+- ✅ Use existing Colors, Typography, Spacing
+- ✅ Add accessibility labels and hints
+- ✅ Create SwiftUI previews
+- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
+
+---
+
+### 🐛 bug-fixer
+
+**Responsibilities**:
+- Fix reported bugs
+- Address compilation errors
+- Resolve build issues
+- Fix failing tests
+- **🚨 MUST execute build after fixes**
+
+**Must Do**:
+- ✅ Reproduce the bug first
+- ✅ Fix root cause, not symptoms
+- ✅ Add tests to prevent regression
+- ✅ **Execute xcodebuild and verify BUILD SUCCEEDED**
+
+---
+
+### Build Verification for All Code-Modifying Agents
+
+**If you are an agent that changes code files, you MUST**:
+
+```bash
+# Execute this command after your changes
+./Alfie/scripts/build-for-verification.sh
+```
+
+**Wait for completion and verify**:
+- "BUILD SUCCEEDED" message appears
+- No compilation errors
+- All imports resolve correctly
+- Generated code (L10n) is up to date
+
+**If build fails**:
+- Read and fix ALL compilation errors
+- Re-run build until successful
+- Only then mark task complete
 
 ---
 
@@ -328,9 +565,25 @@ When implementing features:
 2. **Follow patterns** - Look at existing features for consistency
 3. **Check StyleGuide** - Reusable components in `AlfieKit/Sources/StyleGuide/`
 4. **Use protocols** - All ViewModels need protocols for mocking
-5. **Test your code** - Write unit tests, especially for ViewModels
-6. **Localize strings** - Every user-facing text needs an `L10n` key
-7. **Update spec status** - Mark as "Implemented" with PR link when done
+5. **🚨 EXECUTE BUILD** - Run xcodebuild after every code change (MANDATORY)
+6. **Test your code** - Write unit tests, especially for ViewModels
+7. **Localize strings** - Every user-facing text needs an `L10n` key
+8. **Update spec status** - Mark as "Implemented" with PR link when done
+
+### Build Verification Checklist
+
+After implementing any feature:
+
+- [ ] Code changes completed
+- [ ] Imports verified
+- [ ] L10n strings added (if applicable)
+- [ ] **🚨 BUILD COMMAND EXECUTED**
+- [ ] **BUILD SUCCEEDED** message confirmed
+- [ ] No compilation errors
+- [ ] Tests written
+- [ ] Spec updated
+
+**Remember**: A feature is NOT complete until the build executes successfully.
 
 ---
 
