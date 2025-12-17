@@ -568,12 +568,13 @@ Use this checklist for systematic feature implementation:
 11. ✅ **Create DependencyContainer** in `Views/<Feature>/<Feature>DependencyContainer.swift`
 12. ✅ **Create ViewModel** in `Views/<Feature>/<Feature>ViewModel.swift`
 13. ✅ **Create View** in `Views/<Feature>/<Feature>View.swift`
-14. ✅ **Add Screen Case** in `Navigation/Screen.swift`
-15. ✅ **Add ViewFactory Case** in `Navigation/ViewFactory.swift`
-16. ✅ **Add Coordinator Methods** in `Navigation/Coordinator.swift`
-17. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
-18. ✅ **Build Project** to auto-generate L10n code
-19. ✅ **EXECUTE BUILD & VERIFY** - **MANDATORY STEP - MUST RUN THE BUILD**
+14. ✅ **NOTIFY USER** to add new files (steps 11-13) to Xcode project (see [Xcode Project File Management](#-xcode-project-file-management))
+15. ✅ **Add Screen Case** in `Navigation/Screen.swift`
+16. ✅ **Add ViewFactory Case** in `Navigation/ViewFactory.swift`
+17. ✅ **Add Coordinator Methods** in `Navigation/Coordinator.swift`
+18. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
+19. ✅ **Build Project** to auto-generate L10n code
+20. ✅ **EXECUTE BUILD & VERIFY** - **MANDATORY STEP - MUST RUN THE BUILD**
     - **YOU MUST execute the build verification script**
     - **DO NOT just verify code - ACTUALLY RUN THE BUILD**
     - Execute: `./Alfie/scripts/build-for-verification.sh`
@@ -581,13 +582,13 @@ Use this checklist for systematic feature implementation:
     - Pre-build verification is NOT sufficient - you must run the actual build
     - Fix any build errors immediately and re-run until build succeeds
     - Verify all imports are correct and dependencies are resolved
-20. ✅ **Write Tests**:
+21. ✅ **Write Tests**:
     - CoreTests for services and converters
     - Unit tests for ViewModel (using mocks)
     - SharedUITests for localization (test pluralization)
     - Snapshot tests for new UI components
-21. ✅ **Verify Against Spec** - Check all acceptance criteria met
-22. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
+22. ✅ **Verify Against Spec** - Check all acceptance criteria met
+23. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
 
 ---
 
@@ -700,6 +701,100 @@ xcodebuild -project Alfie/Alfie.xcodeproj \
 
 ---
 
+## 🚫 Xcode Project File Management
+
+### NEVER Edit project.pbxproj Directly
+
+**CRITICAL RULE**: The `Alfie.xcodeproj/project.pbxproj` file is managed exclusively by Xcode and must **NEVER** be edited directly by agents or scripts.
+
+#### When You Create New Files
+
+**YOU MUST notify the user** so they can add the file reference in Xcode:
+
+```
+✅ File created: Alfie/Alfie/Views/NewFeature/NewFeatureView.swift
+
+⚠️ ACTION REQUIRED: Please add this file to the Xcode project:
+1. Open Alfie.xcodeproj in Xcode
+2. Right-click the Views/NewFeature/ folder
+3. Select "Add Files to Alfie..."
+4. Navigate to and select: NewFeatureView.swift
+5. Ensure "Alfie" target is checked
+6. Click "Add"
+```
+
+#### Files That Need Xcode Integration
+
+Always notify the user when creating:
+- ✅ New `.swift` files in `Alfie/Alfie/` (app target)
+- ✅ New view files, view models, dependency containers
+- ✅ New coordinator files or navigation components
+- ✅ New service files in the app target
+- ✅ New configuration files
+
+#### Files That Don't Need Xcode Integration
+
+These are automatically picked up (no notification needed):
+- ✅ Files in `AlfieKit/Sources/` (Swift Package - auto-discovered)
+- ✅ Files in `AlfieKit/Tests/` (Swift Package - auto-discovered)
+- ✅ GraphQL `.graphql` files (not in Xcode project)
+- ✅ Documentation `.md` files
+- ✅ Scripts in `scripts/` directory
+
+#### Notification Template
+
+When creating files in the app target, always include:
+
+```markdown
+## ✅ Files Created
+
+The following files have been created and need to be added to the Xcode project:
+
+1. `Alfie/Alfie/Views/Feature/FeatureView.swift`
+2. `Alfie/Alfie/Views/Feature/FeatureViewModel.swift`
+3. `Alfie/Alfie/Views/Feature/FeatureDependencyContainer.swift`
+
+### 📋 Next Steps for User:
+
+Please add these files to the Xcode project:
+1. Open `Alfie.xcodeproj` in Xcode
+2. Navigate to the appropriate group/folder in Project Navigator
+3. Right-click → "Add Files to Alfie..."
+4. Select all the files listed above
+5. Ensure the "Alfie" target is checked in the dialog
+6. Click "Add"
+
+After adding files, please run the build verification:
+```bash
+./Alfie/scripts/build-for-verification.sh
+```
+```
+
+#### Why This Matters
+
+- ❌ Editing `project.pbxproj` manually causes merge conflicts
+- ❌ Direct edits corrupt Xcode project structure
+- ❌ Build fails when files aren't registered in project
+- ✅ Xcode manages references, UUIDs, and target memberships correctly
+- ✅ User has control over file organization
+- ✅ Prevents accidental file duplication or misplacement
+
+#### Build Verification After Adding Files
+
+After the user adds files in Xcode, they should run:
+```bash
+./Alfie/scripts/build-for-verification.sh
+```
+
+This ensures:
+- Files are properly linked to the target
+- All imports resolve correctly
+- No compilation errors introduced
+
+**Remember**: Creating the file is only half the job - the user must add it to the Xcode project before the build will succeed.
+
+---
+
 ## Things to AVOID
 
 ❌ **Don't** access `ServiceProvider` from ViewModels (use DependencyContainer)  
@@ -712,6 +807,7 @@ xcodebuild -project Alfie/Alfie.xcodeproj \
 ❌ **Don't** create custom UI without checking StyleGuide components first  
 ❌ **Don't** use `ViewState` for paginated lists (use `PaginatedViewState`)  
 ❌ **Don't** create ViewModels without protocols (needed for mocking)  
+❌ **Don't** edit `Alfie.xcodeproj/project.pbxproj` file directly - this is managed by Xcode ⚠️  
 ❌ **Don't** consider a task complete without EXECUTING the build script ⚠️ 🚨  
 ❌ **Don't** skip build execution and only verify code - YOU MUST RUN THE BUILD ⚠️ 🚨
 
