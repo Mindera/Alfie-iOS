@@ -105,11 +105,6 @@ DerivedData/
 .build/
 Alfie/AlfieKit/.build
 Alfie/AlfieKit/.swiftpm
-# Alfie/AlfieKit/Package.resolved - Tracking for reproducible builds
-
-# Accio dependency management
-Dependencies/
-.accio/
 
 # fastlane
 # It is recommended to not store the screenshots in the git repo.
