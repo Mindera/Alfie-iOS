@@ -30,7 +30,7 @@ struct TabBarView: View {
             TabView(selection: $tabCoordinator.activeTab) {
                 ForEach($tabCoordinator.tabs, id: \.self) { $tab in
                     tabCoordinator.view(for: tab)
-                        .toolbar(tabCoordinator.shouldShowTabBar ? .visible : .hidden, for: .tabBar)
+                        .toolbar(.hidden, for: .tabBar)
                 }
             }
             .onChange(of: tabCoordinator.activeTab) { _ in
