@@ -105,7 +105,7 @@ DerivedData/
 .build/
 Alfie/AlfieKit/.build
 Alfie/AlfieKit/.swiftpm
-Alfie/AlfieKit/Package.resolved
+# Alfie/AlfieKit/Package.resolved - Tracking for reproducible builds
 
 # Accio dependency management
 Dependencies/
