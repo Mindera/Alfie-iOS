@@ -102,7 +102,7 @@ jobs:
           git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Run Tests
-        run: bundle exec fastlane ios test --env default
+        run: bundle exec fastlane ios test --env default --verbose
         env:
           BUILD_CONFIGURATION: "Debug"
 
