@@ -3,13 +3,24 @@ name: Alfie CI/CD
 on:
   push:
     branches:
-      - 'main'
-  
+      - "main"
+
   pull_request:
     branches:
-      - 'main'
+      - "main"
 
   workflow_dispatch:
+    inputs:
+      run_tests:
+        description: "Run tests job"
+        required: false
+        default: true
+        type: boolean
+      run_release:
+        description: "Run release job"
+        required: false
+        default: false
+        type: boolean
 
 env:
   DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
@@ -19,6 +30,7 @@ env:
 
 jobs:
   run-tests:
+    if: github.event_name != 'workflow_dispatch' || inputs.run_tests
     runs-on: macos-15
     steps:
       - name: Checkout Code
@@ -26,14 +38,14 @@ jobs:
 
       - name: Install Homebrew formulas
         run: |
-            brew update
-            brew bundle install
-      
+          brew update
+          brew bundle install
+
       - name: bundle install
         run: |
-            gem install bundler --no-document
-            bundle install --jobs 4 --retry 3
-      
+          gem install bundler --no-document
+          bundle install --jobs 4 --retry 3
+
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
           SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
@@ -46,33 +58,33 @@ jobs:
         run: bundle exec fastlane ios test --env default
         env:
           BUILD_CONFIGURATION: "Debug"
-      
+
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Test artifacts
           path: |
-              ${{ env.ARTIFACTS_PATH }}/*.xcresult
-              ${{ env.ARTIFACTS_PATH }}/*.junit
+            ${{ env.ARTIFACTS_PATH }}/*.xcresult
+            ${{ env.ARTIFACTS_PATH }}/*.junit
           retention-days: 7
 
   release:
     needs: run-tests
     runs-on: macos-15
-    if: github.event_name == 'push'
+    if: (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.run_release)) && !cancelled()
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Install Homebrew formulas
         run: |
-            brew update
-            brew bundle install
-      
+          brew update
+          brew bundle install
+
       - name: bundle install
         run: |
-            gem install bundler --no-document
-            bundle install --jobs 4 --retry 3
+          gem install bundler --no-document
+          bundle install --jobs 4 --retry 3
 
       - name: Set up SSH for Bitbucket
         run: |
@@ -80,7 +92,7 @@ jobs:
           echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
-      
+
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
           SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
