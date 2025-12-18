@@ -145,6 +145,7 @@ jobs:
       - name: Configure Bundler
         run: |
           bundle config set --local path 'vendor/bundle'
+          bundle install --jobs 4 --retry 3
 
       - name: Set up SSH for Bitbucket
         run: |
