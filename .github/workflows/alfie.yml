@@ -138,7 +138,7 @@ jobs:
           path: |
             ~/Library/Caches/org.swift.swiftpm
             ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          key: spm-${{ runner.os }}-${{ hashFiles('AlfieKit/Package.swift', 'AlfieKit/Package.resolved') }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
           restore-keys: |
             spm-${{ runner.os }}-
 
