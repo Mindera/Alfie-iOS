@@ -9,24 +9,6 @@ on:
     branches:
       - "main"
 
-  workflow_dispatch:
-    inputs:
-      run_setup:
-        description: "Run setup job"
-        required: false
-        default: true
-        type: boolean
-      run_unit_tests:
-        description: "Run unit-tests job"
-        required: false
-        default: true
-        type: boolean
-      run_release:
-        description: "Run release job"
-        required: false
-        default: false
-        type: boolean
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -37,7 +19,6 @@ env:
 
 jobs:
   setup:
-    if: github.event_name != 'workflow_dispatch' || inputs.run_setup
     runs-on: macos-15
     timeout-minutes: 15
     steps:
@@ -76,7 +57,6 @@ jobs:
 
   unit-tests:
     needs: setup
-    if: (github.event_name != 'workflow_dispatch' || inputs.run_unit_tests) && !cancelled()
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -120,7 +100,7 @@ jobs:
           git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Run Tests
-        run: bundle exec fastlane ios test --env default --verbose
+        run: bundle exec fastlane ios test --env default
         env:
           BUILD_CONFIGURATION: "Debug"
 
@@ -138,7 +118,7 @@ jobs:
     needs: [setup, unit-tests]
     runs-on: macos-15
     timeout-minutes: 60
-    if: (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.run_release)) && !cancelled()
+    if: github.event_name == 'push'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
