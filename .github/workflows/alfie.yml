@@ -3,37 +3,94 @@ name: Alfie CI/CD
 on:
   push:
     branches:
-      - 'main'
-  
+      - "main"
+
   pull_request:
     branches:
-      - 'main'
+      - "main"
 
-  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  DEVELOPER_DIR: "/Applications/Xcode_16.2.app/Contents/Developer"
   ARTIFACTS_PATH: "/tmp/alfie-artifacts"
-  DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro"
   SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
 
 jobs:
-  run-tests:
+  setup:
     runs-on: macos-15
+    timeout-minutes: 15
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache Homebrew
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+            /usr/local/Homebrew
+          key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
+          restore-keys: |
+            brew-${{ runner.os }}-
+
+      - name: Cache Ruby Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+          restore-keys: |
+            gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
+            gems-${{ runner.os }}-
 
       - name: Install Homebrew formulas
         run: |
-            brew update
-            brew bundle install
-      
-      - name: bundle install
+          brew update
+          brew bundle install
+
+      - name: Install Ruby dependencies
         run: |
-            gem install bundler --no-document
-            bundle install --jobs 4 --retry 3
-      
+          gem install bundler --no-document
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs 4 --retry 3
+
+  unit-tests:
+    needs: setup
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Restore Ruby Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+          restore-keys: |
+            gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
+            gems-${{ runner.os }}-
+
+      - name: Restore Swift Package Manager Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Install Homebrew formulas
+        run: |
+          brew bundle install
+
+      - name: Install Ruby dependencies
+        run: |
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs 4 --retry 3
+
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
           SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
@@ -46,33 +103,49 @@ jobs:
         run: bundle exec fastlane ios test --env default
         env:
           BUILD_CONFIGURATION: "Debug"
-      
-      - name: Archive Artifacts
+
+      - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Test artifacts
+          name: test-results
           path: |
-              ${{ env.ARTIFACTS_PATH }}/*.xcresult
-              ${{ env.ARTIFACTS_PATH }}/*.junit
+            ${{ env.ARTIFACTS_PATH }}/*.xcresult
+            ${{ env.ARTIFACTS_PATH }}/*.junit
           retention-days: 7
 
   release:
-    needs: run-tests
+    needs: [setup, unit-tests]
     runs-on: macos-15
+    timeout-minutes: 60
     if: github.event_name == 'push'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Homebrew formulas
+      - name: Restore Ruby Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+          restore-keys: |
+            gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
+            gems-${{ runner.os }}-
+
+      - name: Restore Swift Package Manager Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Configure Bundler
         run: |
-            brew update
-            brew bundle install
-      
-      - name: bundle install
-        run: |
-            gem install bundler --no-document
-            bundle install --jobs 4 --retry 3
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs 4 --retry 3
 
       - name: Set up SSH for Bitbucket
         run: |
@@ -80,7 +153,7 @@ jobs:
           echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
-      
+
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
           SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
