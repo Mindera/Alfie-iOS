@@ -3,10 +3,9 @@ import Mocks
 import Model
 import TestUtils
 import XCTest
-@testable import Alfie
 
 final class EndpointSelectionViewModelTests: XCTestCase {
-    private var sut: EndpointSelectionViewModel!
+    private var sut: DebugMenu.EndpointSelectionViewModel!
     private var mockEndpointService: MockApiEndpointService!
 
     override func setUpWithError() throws {
