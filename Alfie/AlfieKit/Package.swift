@@ -422,5 +422,39 @@ let package = Package(
                 "Web",
             ]
         ),
+
+        .testTarget(
+            name: "HomeTests",
+            dependencies: [
+                "Home",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "MyAccountTests",
+            dependencies: [
+                "MyAccount",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "WishlistTests",
+            dependencies: [
+                "Wishlist",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "UtilsTests",
+            dependencies: [
+                "Utils",
+            ]
+        ),
     ]
 )
