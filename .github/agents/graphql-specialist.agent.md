@@ -16,7 +16,7 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 4. Run codegen: `cd Alfie/scripts && ./run-apollo-codegen.sh`
 5. Create converters in `Core/Services/BFFService/Converters/`
 6. Add fetch method in `BFFClientService.swift`
-7. **Run build**: `./Alfie/scripts/build-for-verification.sh`
+7. **Verify**: `./Alfie/scripts/verify.sh` (build + tests)
 
 ## Key Rules
 

@@ -551,35 +551,36 @@ Use this checklist for systematic feature implementation:
 16. ✅ **Add ViewFactory Case** in `Navigation/ViewFactory.swift`
 17. ✅ **Add Coordinator Methods** in `Navigation/Coordinator.swift`
 18. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
-19. ✅ **Build & Verify** - Execute `./Alfie/scripts/build-for-verification.sh` (see [Build Verification](#-build-verification))
-20. ✅ **Write Tests** - CoreTests, ViewModel tests, localization tests, snapshot tests
-21. ✅ **Verify Against Spec** - Check all acceptance criteria met
-22. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
+19. ✅ **Verify** - Execute `./Alfie/scripts/verify.sh` (runs build + tests)
+20. ✅ **Verify Against Spec** - Check all acceptance criteria met
+21. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
 
 ---
 
-## 🏗️ Build Verification
+## 🏗️ Verification
 
-**Every code change MUST be verified with a successful build.**
+**Every code change MUST be verified with build + tests.**
 
-### Build Command
+### Verify Command
 
 ```bash
-# Recommended: Use the portable build script
+# Recommended: Run full verification (build + tests)
+./Alfie/scripts/verify.sh
+
+# Build only (if you need to iterate on compilation)
 ./Alfie/scripts/build-for-verification.sh
 
-# Alternative: Use xcodebuild directly
-xcodebuild -project Alfie/Alfie.xcodeproj -scheme Alfie \
-  -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
-  clean build
+# Tests only (after successful build)
+./Alfie/scripts/test-for-verification.sh --skip-build
 ```
 
 ### Process
 
-1. Execute the build script after completing implementation
-2. Wait for "✅ BUILD SUCCEEDED" message
-3. If build fails: fix errors, re-run until success
-4. Only mark task complete after successful build
+1. Execute `./Alfie/scripts/verify.sh` after completing implementation
+2. Wait for "✅ FULL VERIFICATION PASSED" message
+3. If build fails: fix errors, re-run
+4. If tests fail: fix logic, re-run
+5. Only mark task complete after full verification passes
 
 **Why use the script?**
 - Works on all developer machines (no hardcoded simulator IDs)
@@ -612,7 +613,7 @@ When creating new `.swift` files in `Alfie/Alfie/` (app target), notify the user
 2. Right-click the appropriate folder
 3. Select "Add Files to Alfie..."
 4. Select the file and ensure "Alfie" target is checked
-5. Run: ./Alfie/scripts/build-for-verification.sh
+5. Run: ./Alfie/scripts/verify.sh
 ```
 
 ### Files Auto-Discovered (No Action Needed)
@@ -667,6 +668,9 @@ Alfie/
 ### Common Commands
 
 ```bash
+# Full verification (build + tests) - ALWAYS RUN AFTER CODE CHANGES
+./Alfie/scripts/verify.sh
+
 # Decrypt sensitive files (requires GPG keys)
 git secret reveal
 
@@ -678,9 +682,6 @@ cd Alfie/scripts && ./run-apollo-codegen.sh
 
 # Generate localization code (automatic on build, or manually)
 swift package --allow-writing-to-package-directory generate-code-for-resources
-
-# Run tests
-xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
 ```
 
 ### Key Dependencies

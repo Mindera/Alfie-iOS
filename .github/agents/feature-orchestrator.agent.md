@@ -146,12 +146,8 @@ Legend: ✅ Complete | 🔄 In Progress | ⬜ Not Started
 ## Final Verification
 
 ```bash
-# Build
-./Alfie/scripts/build-for-verification.sh
-
-# Tests
-xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+# Full verification (build + tests)
+./Alfie/scripts/verify.sh
 ```
 
 **Feature is complete when**: All 8 phases pass with quality gates met.

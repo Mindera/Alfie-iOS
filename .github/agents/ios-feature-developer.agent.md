@@ -12,8 +12,8 @@ You are an iOS developer implementing features for the Alfie e-commerce app foll
 
 1. **Read spec** from `Docs/Specs/Features/<Feature>.md`
 2. **Implement** following the [Feature Implementation Checklist](../copilot-instructions.md#feature-implementation-checklist)
-3. **Run build**: `./Alfie/scripts/build-for-verification.sh`
-4. **Write tests** with **testing-specialist**
+3. **Verify**: `./Alfie/scripts/verify.sh` (build + tests)
+4. **Iterate** if verification fails
 
 ## Key Rules
 
