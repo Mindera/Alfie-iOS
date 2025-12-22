@@ -24,28 +24,65 @@ List who needs this feature and why:
 - **As a** [type of user], **I want** [goal] **so that** [benefit]
 
 Example:
-- As a shopper, I want to view products by category so that I can browse relevant items
-- As a shopper, I want to sort products by price so that I can find items within my budget
-- As a shopper, I want to add products to my wishlist so that I can save items for later
+- **As a** shopper, **I want to** view products by category **so that** I can browse relevant items
+- **As a** shopper, **I want** to sort products by price **so that** I can find items within my budget
+- **As a** shopper, **I want** to add products to my wishlist **so that** I can save items for later
 
 ---
 
 ## Acceptance Criteria
 
-Clear, testable conditions that must be met:
+Clear, testable conditions that must be met. The acceptance criteria must cover all core functionality and scenarios but should avoid obvious or trivial scenarios where possible. 
 
-- [ ] [Specific, measurable requirement]
-- [ ] [Specific, measurable requirement]
-- [ ] [Specific, measurable requirement]
+Tips
+- Where possible, order the acceptance criteria in the natural flow of the feature / user. 
+- Use _italics_ to emphasis UI elements.
+- UI element names should be capitalized. 
+- Follow this acceptance criteria template.
+- Write scenarios as regular markdown (no code fences) in your actual spec.
+
+**Template Format:**
+```markdown
+### Scenario 1: A short human readable scenario description
+
+**GIVEN** describe the initial state of the app, user or environment  
+AND (optionally) concatenate additional states  
+**WHEN** usually a single action or event  
+**THEN** describe the main change in state  
+AND (optionally) concatenate additional changes
+
+### Scenario 2: Another short human readable scenario following on from the previous one if possible
+
+**GIVEN** the previous scenario THEN state  
+**WHEN** a new event happens  
+**THEN** describe the main change in state
+```
 
 Example:
-- [ ] Products display in grid (2 columns) or list (1 column) layout on iPhone
-- [ ] Products display in grid (3 columns) or list (2 columns) on iPad
-- [ ] Pagination automatically loads more products when user scrolls to bottom
-- [ ] Sort options include: price (low to high), price (high to low), newest, name
-- [ ] Wishlist toggle per product with visual feedback
-- [ ] Error states show with retry button
-- [ ] Empty state shows when no products found
+
+```markdown
+### Scenario 1: Unauthenticated users are shown login screen on startup
+
+**GIVEN** the app is starting
+AND the user is not logged in
+**WHEN** the _Splash screen_ finishes
+**THEN** the user is navigated to the _Login screen_
+
+### Scenario 2: User is shown validation errors on login
+
+**GIVEN** the user is on the _Login screen_
+AND the user has entered an invalid email / username
+**WHEN** the user finishes entering their email (input loses focus, or Return press on keyboard)
+**THEN** the user is shown a validation inline error (see [link to figma](https://www.figma.com/file))
+
+### Scenario 3: User enters email and password
+
+**GIVEN** the user is on the _Login screen_
+AND the user has entered a valid email and password
+**WHEN** the user taps on the _Login button_
+**THEN** the login api service is called
+AND the loading indicator is shown
+```
 
 ---
 
@@ -147,36 +184,6 @@ query ProductListingQuery(
     }
 }
 ```
-
----
-
-## UI/UX Flows
-
-Step-by-step user interactions:
-
-### Flow 1: [Primary Flow Name]
-
-1. User [action]
-2. System [response]
-3. User [action]
-4. System [response]
-
-Example:
-
-### Flow 1: Initial Product Listing Load
-
-1. User navigates to PLP from Shop tab
-2. System shows loading skeleton (12 items)
-3. System fetches first page of products (offset=0, limit=20)
-4. System displays products in grid layout
-5. User scrolls to bottom
-6. System loads next page automatically
-
-### Flow 2: Product Selection
-
-1. User taps product card
-2. System navigates to Product Details View
-3. System passes product data to PDP
 
 ---
 

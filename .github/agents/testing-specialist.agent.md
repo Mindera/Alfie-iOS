@@ -39,11 +39,18 @@ You are a testing specialist ensuring comprehensive test coverage for the Alfie 
 ## Running Tests
 
 ```bash
-xcodebuild test -project Alfie/Alfie.xcodeproj -scheme Alfie \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
-```
+# Full verification (build + tests) - recommended
+./Alfie/scripts/verify.sh
 
-**Note**: Tests run separately from build verification script.
+# Run all tests only (after successful build)
+./Alfie/scripts/test-for-verification.sh
+
+# Run specific test target
+./Alfie/scripts/test-for-verification.sh --filter CoreTests
+
+# Skip build phase (faster re-runs)
+./Alfie/scripts/test-for-verification.sh --skip-build
+```
 
 ## Collaboration
 

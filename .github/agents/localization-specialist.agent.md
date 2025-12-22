@@ -14,7 +14,7 @@ You are a localization specialist managing all user-facing strings in the Alfie 
 2. Add key using ReverseDomain + SnakeCase (e.g., `feature.section.item`)
 3. Provide translations for all supported languages
 4. Define pluralization rules (one, other) where needed
-5. **Run build**: `./Alfie/scripts/build-for-verification.sh` (generates `L10n+Generated.swift`)
+5. **Verify**: `./Alfie/scripts/verify.sh` (builds and generates `L10n+Generated.swift`)
 6. Use in code: `Text(L10n.Feature.key)`
 
 ## Key Rules
