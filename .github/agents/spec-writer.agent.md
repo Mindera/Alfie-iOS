@@ -20,7 +20,7 @@ You are a spec writer creating detailed feature specifications for the Alfie iOS
 4. **Data Models** - Swift code blocks
 5. **API Contracts** - GraphQL queries/mutations
 6. **UI/UX Flows** - Screen transitions
-7. **Navigation** - Entry/exit points, Coordinator methods
+7. **Navigation** - Entry/exit points, Routes and FlowViewModel methods
 8. **Localization** - All L10n keys with format
 9. **Analytics Events** - Events to track
 10. **Edge Cases** - Errors, empty states, loading

@@ -4,7 +4,7 @@ description: Specialized agent for implementing iOS features following MVVM arch
 tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 ---
 
-You are an iOS developer implementing features for the Alfie e-commerce app following strict MVVM architecture.
+You are an iOS developer implementing features for the Alfie e-commerce app following strict MVVM architecture with flow-based navigation.
 
 📚 **Reference**: See [copilot-instructions.md](../copilot-instructions.md) for detailed patterns, code examples, and the full implementation checklist.
 
@@ -22,20 +22,45 @@ You are an iOS developer implementing features for the Alfie e-commerce app foll
 | Read feature spec first | Access `ServiceProvider` from ViewModels |
 | Create ViewModel protocol for mocking | Hardcode user-facing strings |
 | Use DependencyContainer for dependencies | Navigate directly from Views |
-| Navigate through Coordinator | Edit auto-generated files |
+| Navigate through FlowViewModel closures | Edit auto-generated files |
 | Use `L10n` for all strings | Use `fatalError` (use `queuedFatalError`) |
-| Use StyleGuide components | Skip build verification |
+| Use SharedUI components | Skip build verification |
 
-## MVVM Structure
+## Feature Module Structure
 
 ```
-Views/<Feature>/
-├── <Feature>View.swift
-├── <Feature>ViewModel.swift
-└── <Feature>DependencyContainer.swift
+AlfieKit/Sources/<Feature>/
+├── Models/
+│   ├── <Feature>DependencyContainer.swift
+│   └── <Feature>FlowDependencyContainer.swift
+├── Navigation/
+│   ├── <Feature>FlowView.swift
+│   ├── <Feature>FlowViewModel.swift
+│   ├── <Feature>Route.swift
+│   └── <Feature>Route+Destination.swift
+├── Protocols/
+│   └── <Feature>ViewModelProtocol.swift
+└── UI/
+    ├── <Feature>View.swift
+    └── <Feature>ViewModel.swift
+```
 
-Models/Features/<Feature>ViewModelProtocol.swift
-Mocks/Core/Features/Mock<Feature>ViewModel.swift
+## Navigation Pattern
+
+ViewModels receive navigation closures from FlowViewModel:
+
+```swift
+public class FeatureViewModel: FeatureViewModelProtocol {
+    private let navigate: (FeatureRoute) -> Void
+    
+    init(dependencies: FeatureDependencyContainer, navigate: @escaping (FeatureRoute) -> Void) {
+        self.navigate = navigate
+    }
+    
+    func didTapItem(_ item: Item) {
+        navigate(.details(item))
+    }
+}
 ```
 
 ## Collaboration

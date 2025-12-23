@@ -6,63 +6,81 @@ This document provides project-specific context and guidelines for GitHub Copilo
 
 ## Project Overview
 
-Alfie is a native iOS e-commerce application built with SwiftUI (iOS 16+) following MVVM architecture with a modular package structure. The app fetches data from a GraphQL BFF API and includes features like product browsing, search, wishlist, and bag functionality.
+Alfie is a native iOS e-commerce application built with SwiftUI (iOS 16+) following MVVM architecture with a modular, feature-based package structure. The app fetches data from a GraphQL BFF API and includes features like product browsing, search, wishlist, and bag functionality.
 
 ---
 
 ## Architecture & Code Organization
 
-### MVVM Pattern
+### MVVM Pattern with Flow-Based Navigation
 
-The codebase follows a strict MVVM architecture with the following components:
+The codebase follows a strict MVVM architecture with feature modules. Each feature is a separate Swift Package module containing its own Views, ViewModels, DependencyContainers, and Navigation (Flow/Routes).
 
 #### ViewModel
-- **Location**: `Alfie/Alfie/Views/<Feature>/<Feature>ViewModel.swift`
-- **Protocol**: Define a protocol in `Alfie/AlfieKit/Sources/Models/Features/` for mockability
+- **Location**: `Alfie/AlfieKit/Sources/<Feature>/UI/<Feature>ViewModel.swift`
+- **Protocol**: Define a protocol in `Alfie/AlfieKit/Sources/<Feature>/Protocols/` for mockability
 - **Properties**: Use `@Published` for observable state
 - **State Management**: Use `ViewState<Value, Error>` or `PaginatedViewState<Value, Error>` enums
 - **Dependencies**: Inject via DependencyContainer, never access ServiceProvider directly
+- **Navigation**: Receive navigation closures from FlowViewModel (e.g., `navigate: (Route) -> Void`)
 
 **Example Pattern**:
 ```swift
-final class FeatureViewModel: FeatureViewModelProtocol {
+public class FeatureViewModel: FeatureViewModelProtocol, ObservableObject {
     private let dependencies: FeatureDependencyContainer
+    private let navigate: (FeatureRoute) -> Void
     @Published private(set) var state: ViewState<FeatureModel, FeatureError>
     
-    init(dependencies: FeatureDependencyContainer) {
+    init(
+        dependencies: FeatureDependencyContainer,
+        navigate: @escaping (FeatureRoute) -> Void
+    ) {
         self.dependencies = dependencies
+        self.navigate = navigate
         state = .loading
+    }
+    
+    func didTapItem(_ item: Item) {
+        navigate(.details(item))
     }
 }
 ```
 
 #### DependencyContainer
-- **Location**: `Alfie/Alfie/Views/<Feature>/<Feature>DependencyContainer.swift`
+- **Location**: `Alfie/AlfieKit/Sources/<Feature>/Models/<Feature>DependencyContainer.swift`
+- **Flow Container**: `Alfie/AlfieKit/Sources/<Feature>/Models/<Feature>FlowDependencyContainer.swift`
 - **Purpose**: Filter ServiceProvider dependencies so ViewModels only access what they need
-- **Pattern**: Protocol not required, concrete class only
+- **Pattern**: Concrete class, no protocol required
 
 **Example Pattern**:
 ```swift
-final class FeatureDependencyContainer {
+public final class FeatureDependencyContainer {
     let someService: SomeServiceProtocol
-    let analytics: AlfieAnalyticsTracker
+    let configurationService: ConfigurationServiceProtocol
     
-    init(someService: SomeServiceProtocol, analytics: AlfieAnalyticsTracker) {
+    public init(someService: SomeServiceProtocol, configurationService: ConfigurationServiceProtocol) {
         self.someService = someService
-        self.analytics = analytics
+        self.configurationService = configurationService
     }
+}
+
+// Flow container aggregates all sub-feature containers
+public final class FeatureFlowDependencyContainer {
+    let featureDependencyContainer: FeatureDependencyContainer
+    let subFeatureDependencyContainer: SubFeatureDependencyContainer
+    
+    public init(...) { ... }
 }
 ```
 
 #### View
-- **Location**: `Alfie/Alfie/Views/<Feature>/<Feature>View.swift`
-- **Pattern**: Use `@StateObject` for ViewModel, `@EnvironmentObject` for Coordinator
+- **Location**: `Alfie/AlfieKit/Sources/<Feature>/UI/<Feature>View.swift`
+- **Pattern**: Use `@StateObject` for ViewModel, generic over ViewModel protocol
 - **State Handling**: Switch on `viewModel.state` to render appropriate UI
 
 **Example Pattern**:
 ```swift
 struct FeatureView<ViewModel: FeatureViewModelProtocol>: View {
-    @EnvironmentObject private var coordinator: Coordinator
     @StateObject private var viewModel: ViewModel
     
     init(viewModel: ViewModel) {
@@ -103,64 +121,173 @@ public enum PaginatedViewState<Value, StateError: Error> {
 }
 ```
 
-### Navigation
+### Navigation (Flow-Based Architecture)
 
-The app uses a custom navigation framework with these components:
+The app uses a flow-based navigation architecture where each feature manages its own navigation stack.
 
-#### Coordinator
-- **Location**: `Alfie/Alfie/Navigation/Coordinator.swift`
-- **Purpose**: Handle all navigation logic, injected as `@EnvironmentObject`
-- **Methods**: Named for user actions (e.g., `didTapBackButton()`, `openSearch()`, `didTap(_ product:)`)
-- **Never**: Views should never call NavigationAdapter directly
+#### FlowViewModel
+- **Location**: `Alfie/AlfieKit/Sources/<Feature>/Navigation/<Feature>FlowViewModel.swift`
+- **Protocol**: Conforms to `FlowViewModelProtocol` from `Model` module
+- **Purpose**: Manages NavigationPath, creates ViewModels, handles navigation actions
+- **Pattern**: Uses `@Published var path = NavigationPath()` for SwiftUI navigation
 
-#### Screen Enum
-- **Location**: `Alfie/Alfie/Navigation/Screen.swift`
-- **Purpose**: Define all possible navigation destinations
-- **Pattern**: Enum conforming to `ScreenProtocol` with associated values for configuration
-
-#### ViewFactory
-- **Location**: `Alfie/Alfie/Navigation/ViewFactory.swift`
-- **Purpose**: Instantiate Views with their ViewModels and DependencyContainers
-- **Dependency**: Weakly holds ServiceProvider to avoid retain cycles
-
-**Navigation Example**:
+**FlowViewModelProtocol**:
 ```swift
-// In Coordinator
-public func openProductDetails(productId: String) {
-    navigationAdapter.push(.productDetails(configuration: .id(productId)))
+public protocol FlowViewModelProtocol: ObservableObject {
+    associatedtype Route: Hashable
+    
+    var path: NavigationPath { get set }
+    var overlayViewPublisher: AnyPublisher<AnyView?, Never> { get }
+    
+    func navigate(_ route: Route)
+    func popToRoot()
+    func pop()
 }
+```
 
-// In View
-Button("View Details") {
-    coordinator.openProductDetails(productId: product.id)
+**Example FlowViewModel**:
+```swift
+public final class FeatureFlowViewModel: FeatureFlowViewModelProtocol {
+    public typealias Route = FeatureRoute
+    @Published public var path = NavigationPath()
+    private let dependencies: FeatureFlowDependencyContainer
+    
+    public init(dependencies: FeatureFlowDependencyContainer) {
+        self.dependencies = dependencies
+    }
+    
+    public func makeFeatureViewModel() -> FeatureViewModel {
+        FeatureViewModel(
+            dependencies: dependencies.featureDependencyContainer,
+            navigate: { [weak self] route in self?.navigate(route) }
+        )
+    }
+    
+    public func navigate(_ route: FeatureRoute) {
+        path.append(route)
+    }
 }
+```
+
+#### FlowView
+- **Location**: `Alfie/AlfieKit/Sources/<Feature>/Navigation/<Feature>FlowView.swift`
+- **Purpose**: Wraps NavigationStack and provides .navigationDestination routing
+
+**Example FlowView**:
+```swift
+public struct FeatureFlowView<ViewModel: FeatureFlowViewModelProtocol>: View {
+    @StateObject private var viewModel: ViewModel
+    
+    public init(viewModel: ViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
+    public var body: some View {
+        NavigationStack(path: $viewModel.path) {
+            FeatureView(viewModel: viewModel.makeFeatureViewModel())
+                .navigationDestination(for: FeatureRoute.self) { route in
+                    route.destination(...)
+                }
+        }
+    }
+}
+```
+
+#### Route Enum
+- **Location**: `Alfie/AlfieKit/Sources/<Feature>/Navigation/<Feature>Route.swift`
+- **Purpose**: Define all navigation destinations within a feature
+- **Destination Extension**: `<Feature>Route+Destination.swift` maps routes to views
+
+**Example Route**:
+```swift
+public enum FeatureRoute: Hashable {
+    case details(DetailsConfiguration)
+    case subFeature(SubFeatureRoute)
+}
+```
+
+#### Tab-Based Navigation
+- **AppRoute**: Top-level routing (tabs)
+- **TabRoute**: Routes to each tab's flow (`home`, `bag`, `shop`, `wishlist`)
+- **Feature Flows**: Each tab has its own FlowView/FlowViewModel
+
+**Navigation Hierarchy**:
+```
+AppFeatureView
+├── RootTabView (tab bar)
+│   ├── HomeFlowView (home tab)
+│   │   ├── HomeView
+│   │   ├── ProductListingView
+│   │   ├── ProductDetailsView
+│   │   └── ...
+│   ├── CategorySelectorFlowView (shop tab)
+│   ├── WishlistFlowView (wishlist tab)
+│   └── BagFlowView (bag tab)
 ```
 
 ---
 
 ## Module Structure (AlfieKit Package)
 
-The project uses Swift Package Manager with a modular architecture in `Alfie/AlfieKit/`:
+The project uses Swift Package Manager with a modular, feature-based architecture in `Alfie/AlfieKit/`:
 
-### Core Modules
+### Infrastructure Modules
 
-- **BFFGraphAPI**: Apollo-generated GraphQL API types (auto-generated, don't edit manually)
-- **BFFGraphMocks**: Apollo-generated test mocks for GraphQL (auto-generated, don't edit manually)
-- **Common**: Shared utilities, networking, logging, extensions
-- **Core**: Services layer (BFF client, authentication, analytics, deep linking, persistence, etc.)
-- **Models**: Domain models, view protocols, analytics events (shared between app and packages)
-- **Mocks**: Mock implementations for testing (excluded from SwiftLint)
-- **Navigation**: Navigation framework protocols (CoordinatorProtocol, ScreenProtocol, etc.)
-- **SharedUI**: Localization resources (L10n.xcstrings) and generated strings
-- **StyleGuide**: Design system (colors, typography, spacing, reusable components)
+- **BFFGraph**: Apollo GraphQL types, queries, schema, and generated mocks (auto-generated API layer)
+- **Core**: Core services layer (BFF client, authentication, analytics, persistence, etc.)
+- **Model**: Domain models, service protocols, navigation protocols, analytics events
+- **Mocks**: Mock implementations for testing (services, features)
+- **SharedUI**: Localization (L10n.xcstrings), theme, reusable UI components
+- **Utils**: Shared utilities and extensions
 - **TestUtils**: Testing utilities (snapshot testing helpers, test schedulers)
+- **DeepLink**: Deep linking handling
+
+### Feature Modules
+
+Each feature is a self-contained module with its own navigation, views, and view models:
+
+- **AppFeature**: App shell, tab bar, root navigation (RootTabView, AppFeatureView)
+- **Home**: Home tab feature
+- **ProductListing**: Product listing/search results
+- **ProductDetails**: Product detail pages
+- **Search**: Search functionality
+- **CategorySelector**: Shop tab with category navigation
+- **Wishlist**: Wishlist feature
+- **Bag**: Shopping bag feature
+- **MyAccount**: User account screens
+- **Web**: WebView wrapper for web-based features
+- **DebugMenu**: Debug/developer menu (DEBUG builds only)
+
+### Feature Module Structure
+
+Each feature module follows this structure:
+```
+<Feature>/
+├── Models/
+│   ├── <Feature>DependencyContainer.swift
+│   └── <Feature>FlowDependencyContainer.swift
+├── Navigation/
+│   ├── <Feature>FlowView.swift
+│   ├── <Feature>FlowViewModel.swift
+│   ├── <Feature>Route.swift
+│   └── <Feature>Route+Destination.swift
+├── Protocols/
+│   ├── <Feature>ViewModelProtocol.swift
+│   └── <Feature>FlowViewModelProtocol.swift
+├── UI/
+│   ├── <Feature>View.swift
+│   └── <Feature>ViewModel.swift
+└── Toolbar/  (optional)
+    └── <Feature>+Toolbar.swift
+```
 
 ### Module Dependencies
 
-- **App target** depends on all modules
-- **Models** is the most foundational (minimal dependencies)
-- **Core** depends on Models, Common, BFFGraphAPI
-- **StyleGuide** depends on Core, Models, Navigation, Common
+- **App target** depends on AppFeature and Core modules
+- **Model** is the most foundational (depends only on Utils)
+- **Core** depends on Model, Utils, BFFGraph
+- **SharedUI** depends on Core, Model, Mocks
+- **Feature modules** depend on Model, SharedUI, Core, and other feature modules as needed
 
 ---
 
@@ -172,7 +299,7 @@ The project uses Swift Package Manager with a modular architecture in `Alfie/Alf
 2. **Define fragments**: `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Queries/<Feature>/Fragments/<Model>Fragment.graphql`
 3. **Extend schema**: Add `schema-<feature>.graphqls` in `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Schema/`
 4. **Generate code**: Run `cd Alfie/scripts && ./run-apollo-codegen.sh`
-5. **Create local models**: Add domain models in `Alfie/AlfieKit/Sources/Models/Models/`
+5. **Create local models**: Add domain models in `Alfie/AlfieKit/Sources/Model/Models/`
 6. **Add converters**: Create `<Model>+Converter.swift` in `Alfie/AlfieKit/Sources/Core/Services/BFFService/Converters/`
 7. **Update BFFClientService**: Add fetch method in `Alfie/AlfieKit/Sources/Core/Services/BFFService/BFFClientService.swift`
 
@@ -264,33 +391,34 @@ Text(L10n.Plp.NumberOfResults.message(count))
 
 ### Theme System
 
-- **Colors**: Use `ThemedColors` from StyleGuide (e.g., `.foreground`, `.accent`, `.background`)
-- **Typography**: Use `.themedFont()` modifier with predefined styles
-- **Spacing**: Use `Spacing` enum values (`.spacing1` to `.spacing12`)
-- **Shadows**: Use `Shadow` enum values (`.shadowLevel1` to `.shadowLevel4`)
-- **Corner Radius**: Use `CornerRadius` enum values
+- **Colors**: Use themed colors from SharedUI (e.g., `ThemedColor.primary`)
+- **Typography**: Use `theme.font` with predefined styles (e.g., `theme.font.header.h3()`)
+- **Spacing**: Use `Spacing` enum values (e.g., `Spacing.space200`)
+- **Icons**: Use `Icon` enum (e.g., `Icon.home.image`)
 
 **Example**:
 ```swift
-Text("Hello")
-    .themedFont(.body)
-    .foregroundStyle(ThemedColors.foreground)
-    .padding(.spacing4)
+Text.build(theme.font.header.h3("Title"))
+Icon.home.image
+    .resizable()
+    .frame(width: 75)
+ThemedButton(text: "Action") {
+    viewModel.didTapButton()
+}
+.padding(.horizontal, Spacing.space200)
 ```
 
 ### Reusable Components
 
-Located in `Alfie/AlfieKit/Sources/StyleGuide/Components/`:
+Located in `Alfie/AlfieKit/Sources/SharedUI/Components/`:
 
 - **Buttons**: `ThemedButton`, various button styles
-- **Indicators**: `BadgeViewModifier`, `PaginatedControl`, `ThemedPageControl`
-- **Product Cards**: `ProductCardLarge`, `ProductCardSmall`
-- **Toolbars**: `Toolbar` with various configurations
+- **Search**: `ThemedSearchBarView` with themes (`.soft`, etc.)
+- **Product Cards**: Product display components
+- **Toolbars**: `toolbarView` modifier for consistent navigation bars
 - **Loaders**: `LoaderView` with configurable sizes
-- **Chips**: `Chip` component
-- **Snackbar**: `SnackbarView` with modifier
 
-**Always use existing StyleGuide components** instead of creating custom UI from scratch.
+**Always use existing SharedUI components** instead of creating custom UI from scratch.
 
 ---
 
@@ -303,8 +431,9 @@ Located in `Alfie/AlfieKit/Sources/StyleGuide/Components/`:
 - **Access**: Only ViewFactory and top-level app code should access directly
 - **Pattern**: Protocol-based services for testability
 
-**Key Services**:
-- `BFFClientServiceProtocol`: GraphQL API client
+**Key Services** (protocols defined in `Model/Services/`):
+- `ProductServiceProtocol`: Product data fetching
+- `BrandsServiceProtocol`: Brands data
 - `AuthenticationServiceProtocol`: User authentication
 - `WishlistServiceProtocol`: Wishlist management
 - `BagServiceProtocol`: Shopping bag
@@ -314,10 +443,15 @@ Located in `Alfie/AlfieKit/Sources/StyleGuide/Components/`:
 - `ConfigurationServiceProtocol`: Feature flags and remote config
 - `AlfieAnalyticsTracker`: Analytics events
 - `NavigationServiceProtocol`: Navigation state management
+- `SessionServiceProtocol`: User session management
+- `ReachabilityServiceProtocol`: Network connectivity
+- `WebURLProviderProtocol`: Web URL generation
+- `WebViewConfigurationServiceProtocol`: WebView configuration
 
 ### Service Implementation Pattern
 
-Services are located in `Alfie/AlfieKit/Sources/Core/Services/`:
+Service protocols are defined in `Alfie/AlfieKit/Sources/Model/Services/`:
+Service implementations are in `Alfie/AlfieKit/Sources/Core/Services/`:
 
 ```swift
 public protocol FeatureServiceProtocol {
@@ -354,19 +488,33 @@ public final class FeatureService: FeatureServiceProtocol {
 ### Naming Conventions
 
 - **ViewModels**: `<Feature>ViewModel.swift`
+- **FlowViewModels**: `<Feature>FlowViewModel.swift`
 - **Views**: `<Feature>View.swift`
+- **FlowViews**: `<Feature>FlowView.swift`
 - **DependencyContainers**: `<Feature>DependencyContainer.swift`
+- **FlowDependencyContainers**: `<Feature>FlowDependencyContainer.swift`
+- **Routes**: `<Feature>Route.swift`
 - **Services**: `<Feature>Service.swift` with `<Feature>ServiceProtocol`
-- **Models**: Descriptive names in `Models` module
+- **Models**: Descriptive names in `Model` module
 - **Localization keys**: ReverseDomain + SnakeCase (e.g., `feature.section.item`)
 
-### Code Organization
+### Code Organization (Feature Module)
 
 ```
-Feature/
-├── FeatureView.swift           # SwiftUI View
-├── FeatureViewModel.swift      # ViewModel implementation
-└── FeatureDependencyContainer.swift  # Dependencies
+<Feature>/
+├── Models/
+│   ├── <Feature>DependencyContainer.swift
+│   └── <Feature>FlowDependencyContainer.swift
+├── Navigation/
+│   ├── <Feature>FlowView.swift
+│   ├── <Feature>FlowViewModel.swift
+│   ├── <Feature>Route.swift
+│   └── <Feature>Route+Destination.swift
+├── Protocols/
+│   └── <Feature>ViewModelProtocol.swift
+└── UI/
+    ├── <Feature>View.swift
+    └── <Feature>ViewModel.swift
 ```
 
 ### Preview Pattern
@@ -375,12 +523,10 @@ Feature/
 #if DEBUG
 #Preview("Success") {
     FeatureView(viewModel: MockFeatureViewModel(state: .success(mockData)))
-        .environmentObject(Coordinator())
 }
 
 #Preview("Loading") {
     FeatureView(viewModel: MockFeatureViewModel(state: .loading))
-        .environmentObject(Coordinator())
 }
 #endif
 ```
@@ -418,10 +564,23 @@ private func loadData() async {
 ### Test Structure
 
 - **Location**: `Alfie/AlfieKit/Tests/`
-- **CoreTests**: Test services and business logic
-- **SharedUITests**: Test localization and UI utilities
-- **NavigationTests**: Test navigation framework
-- **StyleGuideTests**: Test theme and components
+- Test directories mirror feature modules:
+  - **AppFeatureTests**: App shell tests
+  - **CoreTests**: Core services tests
+  - **HomeTests**: Home feature tests
+  - **ProductListingTests**: Product listing tests
+  - **ProductDetailsTests**: Product details tests
+  - **SearchTests**: Search tests
+  - **CategorySelectorTests**: Category selector tests
+  - **WishlistTests**: Wishlist tests
+  - **BagTests**: Bag tests
+  - **SharedUITests**: Localization and UI tests
+  - **DeepLinkTests**: Deep link tests
+  - **DebugMenuTests**: Debug menu tests
+  - **WebTests**: Web view tests
+  - **MyAccountTests**: Account tests
+  - **BFFGraphTests**: GraphQL tests
+  - **UtilsTests**: Utility tests
 
 ### Testing Pattern
 
@@ -445,7 +604,8 @@ final class FeatureServiceTests: XCTestCase {
 
 - **Mock ViewModels**: Located in `Alfie/AlfieKit/Sources/Mocks/Core/Features/`
 - **Mock Services**: Located in `Alfie/AlfieKit/Sources/Mocks/Core/Services/`
-- **BFF Mocks**: Auto-generated by Apollo in `BFFGraphMocks`
+- **BFF Mocks**: Located in `Alfie/AlfieKit/Sources/BFFGraph/Mocks/` (Apollo-generated)
+- **Fixtures**: Located in `Alfie/AlfieKit/Sources/Mocks/Fixtures/`
 - **Pattern**: Conform to same protocol as real implementation
 
 ### Snapshot Testing
@@ -499,7 +659,7 @@ Create a comprehensive spec document in `Docs/Specs/Features/<FeatureName>.md`.
 - **Data Models** - Structures and relationships (Swift code blocks)
 - **API Contracts** - GraphQL queries/mutations with expected response shapes
 - **UI/UX Flows** - Screen transitions and user interactions
-- **Navigation** - Entry points, exit points, Coordinator methods
+- **Navigation** - Entry points, exit points, Routes and FlowViewModel methods
 - **Localization** - All user-facing strings with their keys
 - **Analytics** - Events to track with parameters
 - **Edge Cases** - Error scenarios, empty states, loading states
@@ -531,8 +691,8 @@ Tackle tasks **one by one**, following the implementation checklist below.
 Use this checklist for systematic feature implementation:
 
 1. ✅ **Create Spec Document** in `Docs/Specs/Features/<Feature>.md`
-2. ✅ **Define Domain Models** in `Alfie/AlfieKit/Sources/Models/Models/<Feature>/`
-3. ✅ **Create Service Protocol** in `Alfie/AlfieKit/Sources/Core/Services/<Feature>/`
+2. ✅ **Define Domain Models** in `Alfie/AlfieKit/Sources/Model/Models/<Feature>/`
+3. ✅ **Create Service Protocol** in `Alfie/AlfieKit/Sources/Model/Services/<Feature>/`
 4. ✅ **Add GraphQL Query** (if API needed):
    - Create `Queries.graphql` in `AlfieKit/Sources/BFFGraph/CodeGen/Queries/<Feature>/`
    - Create fragments in `Fragments/` subdirectory
@@ -540,20 +700,25 @@ Use this checklist for systematic feature implementation:
 5. ✅ **Run Apollo Codegen**: `cd Alfie/scripts && ./run-apollo-codegen.sh`
 6. ✅ **Create Converters** in `Core/Services/BFFService/Converters/<Feature>+Converter.swift`
 7. ✅ **Implement Service** in `Core/Services/<Feature>/`
-8. ✅ **Register Service** in `ServiceProvider.swift`
-9. ✅ **Create ViewModel Protocol** in `Models/Features/<Feature>ViewModelProtocol.swift`
+8. ✅ **Register Service** in `Alfie/Alfie/Service/ServiceProvider.swift`
+9. ✅ **Create Feature Module** in `AlfieKit/Sources/<Feature>/`:
+   - Create `<Feature>DependencyContainer.swift` in `Models/`
+   - Create `<Feature>FlowDependencyContainer.swift` in `Models/`
+   - Create `<Feature>ViewModelProtocol.swift` in `Protocols/`
+   - Create `<Feature>FlowViewModelProtocol.swift` in `Protocols/`
+   - Create `<Feature>Route.swift` in `Navigation/`
+   - Create `<Feature>Route+Destination.swift` in `Navigation/`
+   - Create `<Feature>FlowView.swift` in `Navigation/`
+   - Create `<Feature>FlowViewModel.swift` in `Navigation/`
+   - Create `<Feature>View.swift` in `UI/`
+   - Create `<Feature>ViewModel.swift` in `UI/`
 10. ✅ **Create Mock ViewModel** in `Mocks/Core/Features/Mock<Feature>ViewModel.swift`
-11. ✅ **Create DependencyContainer** in `Views/<Feature>/<Feature>DependencyContainer.swift`
-12. ✅ **Create ViewModel** in `Views/<Feature>/<Feature>ViewModel.swift`
-13. ✅ **Create View** in `Views/<Feature>/<Feature>View.swift`
-14. ✅ **NOTIFY USER** to add new files (steps 11-13) to Xcode project (see [Xcode Project File Management](#-xcode-project-file-management))
-15. ✅ **Add Screen Case** in `Navigation/Screen.swift`
-16. ✅ **Add ViewFactory Case** in `Navigation/ViewFactory.swift`
-17. ✅ **Add Coordinator Methods** in `Navigation/Coordinator.swift`
-18. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
-19. ✅ **Verify** - Execute `./Alfie/scripts/verify.sh` (runs build + tests)
-20. ✅ **Verify Against Spec** - Check all acceptance criteria met
-21. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
+11. ✅ **Add to Package.swift**: Add new target and product in `AlfieKit/Package.swift`
+12. ✅ **Integrate with Navigation**: Add route to parent feature's Route enum
+13. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
+14. ✅ **Verify** - Execute `./Alfie/scripts/verify.sh` (runs build + tests)
+15. ✅ **Verify Against Spec** - Check all acceptance criteria met
+16. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
 
 ---
 
@@ -592,7 +757,7 @@ Use this checklist for systematic feature implementation:
 
 | Error | Fix |
 |-------|-----|
-| Missing imports | Add `import Models`, `import StyleGuide`, etc. |
+| Missing imports | Add `import Model`, `import SharedUI`, `import Core`, etc. |
 | Unresolved symbols | Check L10n key typos, missing enum cases |
 | Type mismatches | Verify protocol conformance |
 | Missing files | Notify user to add files to Xcode project |
@@ -618,9 +783,11 @@ When creating new `.swift` files in `Alfie/Alfie/` (app target), notify the user
 
 ### Files Auto-Discovered (No Action Needed)
 
-- Files in `AlfieKit/Sources/` and `AlfieKit/Tests/` (Swift Package)
+- Files in `AlfieKit/Sources/` and `AlfieKit/Tests/` (Swift Package - auto-discovered)
 - GraphQL `.graphql` files
 - Documentation and scripts
+
+**Note**: Most new feature code goes in AlfieKit modules and is auto-discovered.
 
 ---
 
@@ -628,11 +795,11 @@ When creating new `.swift` files in `Alfie/Alfie/` (app target), notify the user
 
 ❌ Access `ServiceProvider` from ViewModels (use DependencyContainer)  
 ❌ Hardcode user-facing strings (use `L10n`)  
-❌ Bypass Coordinator for navigation  
-❌ Edit auto-generated files (`L10n+Generated.swift`, `BFFGraphAPI`, `BFFGraphMocks`)  
+❌ Bypass FlowViewModel for navigation (pass navigation closures from FlowViewModel)  
+❌ Edit auto-generated files (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`)  
 ❌ Use `fatalError` (use `queuedFatalError`)  
 ❌ Commit sensitive files unencrypted  
-❌ Create custom UI without checking StyleGuide first  
+❌ Create custom UI without checking SharedUI first  
 ❌ Create ViewModels without protocols  
 ❌ Edit `project.pbxproj` directly  
 ❌ Skip build verification
@@ -645,23 +812,33 @@ When creating new `.swift` files in `Alfie/Alfie/` (app target), notify the user
 
 ```
 Alfie/
-├── Alfie/                          # Main app target
-│   ├── Views/                      # ViewModels, Views, DependencyContainers
-│   ├── Navigation/                 # Coordinator, Screen, ViewFactory
+├── Alfie/                          # Main app target (minimal code)
+│   ├── Views/                      # App-specific views (Info only)
 │   ├── Service/                    # ServiceProvider
+│   ├── Delegate/                   # AppDelegate
 │   └── Configuration/              # App config, URLs, sensitive files
-├── AlfieKit/                       # Swift Package
+├── AlfieKit/                       # Swift Package (feature modules)
 │   ├── Sources/
+│   │   ├── AppFeature/             # App shell, tab bar, root navigation
 │   │   ├── BFFGraph/               # GraphQL (queries, schema, codegen)
-│   │   ├── Common/                 # Shared utilities
-│   │   ├── Core/                   # Services layer
-│   │   ├── Models/                 # Domain models
+│   │   ├── Bag/                    # Bag feature module
+│   │   ├── CategorySelector/       # Shop tab feature module
+│   │   ├── Core/                   # Core services layer
+│   │   ├── DebugMenu/              # Debug menu (DEBUG only)
+│   │   ├── DeepLink/               # Deep linking
+│   │   ├── Home/                   # Home feature module
 │   │   ├── Mocks/                  # Test mocks
-│   │   ├── Navigation/             # Navigation protocols
-│   │   ├── SharedUI/               # Localization
-│   │   ├── StyleGuide/             # Design system
-│   │   └── TestUtils/              # Test helpers
-│   └── Tests/                      # Unit tests
+│   │   ├── Model/                  # Domain models, protocols
+│   │   ├── MyAccount/              # Account feature module
+│   │   ├── ProductDetails/         # Product details feature module
+│   │   ├── ProductListing/         # Product listing feature module
+│   │   ├── Search/                 # Search feature module
+│   │   ├── SharedUI/               # Localization, theme, components
+│   │   ├── TestUtils/              # Test helpers
+│   │   ├── Utils/                  # Utilities
+│   │   ├── Web/                    # WebView feature module
+│   │   └── Wishlist/               # Wishlist feature module
+│   └── Tests/                      # Unit tests (per module)
 └── scripts/                        # Build scripts (Apollo codegen)
 ```
 
@@ -700,7 +877,7 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 
 ### PR Review Checklist
 
-- [ ] **Architecture**: MVVM pattern, DependencyContainer usage, Coordinator navigation
+- [ ] **Architecture**: MVVM pattern, DependencyContainer usage, FlowViewModel navigation
 - [ ] **Localization**: All strings use L10n
 - [ ] **State**: ViewState/PaginatedViewState used correctly
 - [ ] **Tests**: ViewModels have unit tests, protocols exist for mocking
@@ -712,7 +889,7 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 
 - ViewModels accessing `ServiceProvider` directly
 - Hardcoded user-facing strings
-- Navigation bypassing Coordinator
+- Navigation bypassing FlowViewModel
 - Missing ViewModel protocols
 - Credentials/secrets in code
 - State not using `ViewState` enums

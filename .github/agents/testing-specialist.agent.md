@@ -21,10 +21,11 @@ You are a testing specialist ensuring comprehensive test coverage for the Alfie 
 
 | Location | Purpose |
 |----------|---------|
-| `CoreTests` | Service tests, GraphQL converters |
-| `SharedUITests` | Localization tests |
-| `StyleGuideTests` | Snapshot tests |
-| `AlfieTests` | ViewModel tests |
+| `CoreTests` | Core services tests, GraphQL converters |
+| `<Feature>Tests` | Feature-specific ViewModel tests (e.g., `HomeTests`, `ProductListingTests`) |
+| `SharedUITests` | Localization tests, UI utilities |
+| `BFFGraphTests` | GraphQL query/converter tests |
+| `DeepLinkTests` | Deep link handling tests |
 
 ## Key Rules
 
