@@ -1,13 +1,14 @@
 import AlicerceLogging
+import AppFeature
 import BrazeKit
 import Combine
-import Common
 import Core
 import Foundation
-import Models
+import Model
 import os.log
-import StyleGuide
+import SharedUI
 import UIKit
+import Utils
 #if DEBUG
 import Mocks
 #endif
@@ -25,7 +26,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private(set) static var instance: AppDelegate! = nil
     var serviceProvider: ServiceProviderProtocol!
-    var tabCoordinator: TabCoordinator!
     // swiftlint:enable implicitly_unwrapped_optional
     static var braze: Braze?
 
@@ -44,7 +44,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     public func rebootApp() {
         // Reset services and any other managers that need to be gracefuly terminated before the app reboots
         serviceProvider.resetServices()
-        tabCoordinator.removeCoordinatedViews()
 
         // Recreate services
         bootstrap(application: nil)
@@ -64,7 +63,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         } else {
             Alfie.log = createLogger()
             CoreBootstrap.bootstrapFirebaseApp(log: log)
-            StyleGuideLogger.set(logger: log)
+            SharedUILogger.set(logger: log)
             serviceProvider = ServiceProvider()
             if let application {
                 application.registerForRemoteNotifications()
@@ -72,16 +71,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        var tabs: [TabScreen] = [.home(), .shop(), .bag]
-
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
         isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
-
-        if isWishlistEnabled {
-            tabs.insert(.wishlist, at: 2)
-        }
-
-        tabCoordinator = TabCoordinator(tabs: tabs, activeTab: .home(), serviceProvider: serviceProvider)
 
         featureAvailabilitySubscription = serviceProvider.configurationService.featureAvailabilityPublisher
             .sink { [weak self] featureAvailability in

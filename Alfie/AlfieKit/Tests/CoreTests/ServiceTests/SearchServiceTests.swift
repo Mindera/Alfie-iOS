@@ -1,6 +1,6 @@
 @testable import Core
 import Mocks
-import Models
+import Model
 import XCTest
 
 final class SearchServiceTests: XCTestCase {

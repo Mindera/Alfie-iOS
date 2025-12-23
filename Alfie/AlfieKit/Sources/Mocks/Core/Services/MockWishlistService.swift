@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public final class MockWishlistService: WishlistServiceProtocol {
     private var products: [SelectedProduct] = []

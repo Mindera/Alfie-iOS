@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 import SwiftUI
 
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
@@ -13,6 +13,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var sortOption: String?
     public var showSearchButton = false
     public var showRefine: Bool = false
+    public var isWishlistEnabled: Bool = false
 
     public init(
         state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>,
@@ -43,6 +44,11 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var onIsFavoriteStateCalled: ((Product) -> Bool)?
     public func isFavoriteState(for product: Product) -> Bool {
         onIsFavoriteStateCalled?(product) ?? false
+    }
+
+    public var didTapSearchCalled: (() -> Void)?
+    public func didTapSearch() {
+        didTapSearchCalled?()
     }
 
     public var onSetListStyleCalled: ((ProductListingListStyle) -> Void)?

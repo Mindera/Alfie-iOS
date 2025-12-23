@@ -1,8 +1,13 @@
-import Models
+import Model
 import Foundation
 
 public final class MockDeepLinkService: DeepLinkServiceProtocol {
     public init() { }
+
+    public var onUpdateAvailabilityOfHandlersCalled: ((Bool) -> Void)?
+    public func updateAvailabilityOfHandlers(to availability: Bool) {
+        onUpdateAvailabilityOfHandlersCalled?(availability)
+    }
 
     public var onUpdateHandlersCalled: (([DeepLinkHandlerProtocol]) -> Void)?
     public func update(handlers: [DeepLinkHandlerProtocol]) {

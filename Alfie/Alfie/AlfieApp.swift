@@ -1,9 +1,11 @@
-import Common
+import AppFeature
 import Core
-import Models
-import StyleGuide
+import DeepLink
+import Model
+import SharedUI
 import SwiftUI
 import UIKit
+import Utils
 
 final class AppState: ObservableObject {
     static let shared = AppState()
@@ -16,6 +18,7 @@ struct AlfieApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @StateObject private var appState = AppState.shared
+    @State private var appFeatureViewModel: AppFeatureViewModel?
 
     init() {
         try? FontManager.registerAll()
@@ -25,37 +28,42 @@ struct AlfieApp: App {
         WindowGroup {
             if ProcessInfo.isRunningTests {
                 EmptyView()
-            } else {
-                RootView(
-                    coordinator: appDelegate.tabCoordinator,
-                    startupScreenProvider: AppStartupService(
-                        configurationService: appDelegate.serviceProvider.configurationService
-                    ),
-                    configurationService: appDelegate.serviceProvider.configurationService
-                )
-                .onAppear {
-                    setupDeepLinkHandlers()
-                }
-                .onOpenURL { url in
-                    open(url: url)
-                }
-                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
-                    userActivity.webpageURL.map {
-                        open(url: $0)
+            } else if let viewModel = appFeatureViewModel {
+                AppFeatureView(viewModel: viewModel)
+                    .onAppear {
+                        setupDeepLinkHandlers(viewModel: viewModel)
                     }
-                }
-                .id(appState.sessionID) // So that the view can be recreated / rebooted
+                    .onOpenURL { url in
+                        open(url: url)
+                    }
+                    .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                        userActivity.webpageURL.map {
+                            open(url: $0)
+                        }
+                    }
+                    .id(appState.sessionID) // So that the view can be recreated / rebooted
+            } else {
+                Color.clear
+                    .onAppear {
+                        // Lazy initialize once appDelegate is ready
+                        appFeatureViewModel = AppFeatureViewModel(
+                            serviceProvider: appDelegate.serviceProvider,
+                            log: log
+                        )
+                    }
             }
         }
     }
 
     // MARK: - Deep Linking
 
-    private func setupDeepLinkHandlers() {
+    private func setupDeepLinkHandlers(viewModel: AppFeatureViewModel) {
         let deepLinkHandler = DeepLinkHandler(
             configurationService: appDelegate.serviceProvider.configurationService,
-            coordinator: appDelegate.tabCoordinator
-        )
+            log: log
+        ) {
+            viewModel.navigate(for: $0)
+        }
         appDelegate.serviceProvider.deepLinkService.update(handlers: [deepLinkHandler])
     }
 

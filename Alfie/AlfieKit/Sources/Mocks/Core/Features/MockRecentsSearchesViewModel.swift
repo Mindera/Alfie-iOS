@@ -1,9 +1,14 @@
-import Models
+import Model
 
 public final class MockRecentSearchesViewModel: RecentSearchesViewModelProtocol {
     public var recentSearches: [RecentSearch] = []
 
     public init() {}
+
+    public var onDidTapRecentSearch: ((RecentSearch) -> Void)?
+    public func didTapRecentSearch(_ recentSearch: RecentSearch) {
+        onDidTapRecentSearch?(recentSearch)
+    }
 
     public var onDidTapClearAll: (() -> Void)?
     public func didTapClearAll() {

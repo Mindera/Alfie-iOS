@@ -2,20 +2,20 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class PriceRange: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.PriceRange
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<PriceRange>>
+class PriceRange: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.PriceRange
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<PriceRange>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<Money>("high") public var high
     @Field<Money>("low") public var low
   }
 }
 
-public extension Mock where O == PriceRange {
+extension Mock where O == PriceRange {
   convenience init(
     high: Mock<Money>? = nil,
     low: Mock<Money>? = nil

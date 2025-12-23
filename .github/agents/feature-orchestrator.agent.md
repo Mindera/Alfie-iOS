@@ -89,7 +89,7 @@ Spec: Docs/Specs/Features/<Feature>.md (Testing Strategy section)
 ### Phase 7: Security Audit
 ```
 @mobile-security-specialist Audit [Feature Name].
-Files: Views/<Feature>/, Core/Services/<Feature>/
+Files: AlfieKit/Sources/<Feature>/, Core/Services/<Feature>/
 ```
 
 ## Quality Gates
@@ -102,7 +102,7 @@ Each phase must pass before proceeding:
 | 2 | Security requirements identified |
 | 3 | ✅ BUILD SUCCEEDED after codegen |
 | 4 | ✅ BUILD SUCCEEDED, L10n generated |
-| 5 | ✅ BUILD SUCCEEDED, MVVM followed |
+| 5 | ✅ BUILD SUCCEEDED, MVVM + Flow navigation followed |
 | 6 | ✅ ALL TESTS PASS |
 | 7 | No critical security issues |
 | 8 | Final build + tests pass |

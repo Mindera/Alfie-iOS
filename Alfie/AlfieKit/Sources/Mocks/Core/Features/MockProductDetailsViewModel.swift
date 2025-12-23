@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading
@@ -71,6 +71,16 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var onDidTapAddToWishlistCalled: (() -> Void)?
     public func didTapAddToWishlist() {
         onDidTapAddToWishlistCalled?()
+    }
+
+    public var onDidTapBackButtonCalled: (() -> Void)?
+    public func didTapBackButton() {
+        onDidTapBackButtonCalled?()
+    }
+
+    public var onOpenWebFeatureCalled: ((WebFeature) -> Void)?
+    public func openWebFeature(_ feature: WebFeature) {
+        onOpenWebFeatureCalled?(feature)
     }
 
     public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?

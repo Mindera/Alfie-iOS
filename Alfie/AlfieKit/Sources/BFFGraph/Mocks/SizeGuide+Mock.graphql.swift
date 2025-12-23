@@ -2,14 +2,14 @@
 // This file was automatically generated and should not be edited.
 
 import ApolloTestSupport
-import BFFGraphAPI
+import BFFGraph
 
-public class SizeGuide: MockObject {
-  public static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.SizeGuide
-  public static let _mockFields = MockFields()
-  public typealias MockValueCollectionType = Array<Mock<SizeGuide>>
+class SizeGuide: MockObject {
+  static let objectType: ApolloAPI.Object = BFFGraphAPI.Objects.SizeGuide
+  static let _mockFields = MockFields()
+  typealias MockValueCollectionType = Array<Mock<SizeGuide>>
 
-  public struct MockFields {
+  struct MockFields {
     @Field<String>("description") public var description
     @Field<BFFGraphAPI.ID>("id") public var id
     @Field<String>("name") public var name
@@ -17,7 +17,7 @@ public class SizeGuide: MockObject {
   }
 }
 
-public extension Mock where O == SizeGuide {
+extension Mock where O == SizeGuide {
   convenience init(
     description: String? = nil,
     id: BFFGraphAPI.ID? = nil,

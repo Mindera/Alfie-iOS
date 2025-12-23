@@ -2,7 +2,7 @@ import AlicerceLogging
 import Combine
 import FirebaseRemoteConfig
 import Foundation
-import Models
+import Model
 
 public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderProtocol {
     public var isReady: Bool { isReadySubject.value }

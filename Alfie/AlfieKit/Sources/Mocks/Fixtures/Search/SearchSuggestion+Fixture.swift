@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension SearchSuggestion {
     public static func fixture(id: String = UUID().uuidString,

@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8CD40F3E2DD607D500F482F7 /* DeepLink in Frameworks */ = {isa = PBXBuildFile; productRef = 8CD40F3D2DD607D500F482F7 /* DeepLink */; };
+		994C3E692DAD4FFD00C77271 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 994C3E682DAD4FFD00C77271 /* Model */; };
+		9956126B2DB6837700796804 /* Utils in Frameworks */ = {isa = PBXBuildFile; productRef = 9956126A2DB6837700796804 /* Utils */; };
 		99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */ = {isa = PBXBuildFile; productRef = 99DCD9262D9FD27400A3CA25 /* SharedUI */; };
+		99FEB5452DCB934A00C61F77 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 99FEB5442DCB934A00C61F77 /* AppFeature */; };
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
-		C54DA2BB2D368A40005142F4 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BA2D368A40005142F4 /* Models */; };
-		C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BC2D368A40005142F4 /* Navigation */; };
-		C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2BE2D368A40005142F4 /* StyleGuide */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
-		C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = C5DCD5F32D3EA0B70005AAB0 /* Common */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,11 +81,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C54DA2BD2D368A40005142F4 /* Navigation in Frameworks */,
-				C54DA2BF2D368A40005142F4 /* StyleGuide in Frameworks */,
-				C54DA2BB2D368A40005142F4 /* Models in Frameworks */,
+				9956126B2DB6837700796804 /* Utils in Frameworks */,
+				8CD40F3E2DD607D500F482F7 /* DeepLink in Frameworks */,
+				99FEB5452DCB934A00C61F77 /* AppFeature in Frameworks */,
+				994C3E692DAD4FFD00C77271 /* Model in Frameworks */,
 				99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */,
-				C5DCD5F42D3EA0B70005AAB0 /* Common in Frameworks */,
 				C54DA2B92D368A40005142F4 /* Mocks in Frameworks */,
 				C54DA2B72D368A40005142F4 /* Core in Frameworks */,
 			);
@@ -181,11 +181,11 @@
 			packageProductDependencies = (
 				C54DA2B62D368A40005142F4 /* Core */,
 				C54DA2B82D368A40005142F4 /* Mocks */,
-				C54DA2BA2D368A40005142F4 /* Models */,
-				C54DA2BC2D368A40005142F4 /* Navigation */,
-				C54DA2BE2D368A40005142F4 /* StyleGuide */,
-				C5DCD5F32D3EA0B70005AAB0 /* Common */,
 				99DCD9262D9FD27400A3CA25 /* SharedUI */,
+				994C3E682DAD4FFD00C77271 /* Model */,
+				9956126A2DB6837700796804 /* Utils */,
+				99FEB5442DCB934A00C61F77 /* AppFeature */,
+				8CD40F3D2DD607D500F482F7 /* DeepLink */,
 			);
 			productName = Alfie;
 			productReference = BE8B02242B616976007AE489 /* Alfie.app */;
@@ -711,9 +711,25 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8CD40F3D2DD607D500F482F7 /* DeepLink */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DeepLink;
+		};
+		994C3E682DAD4FFD00C77271 /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Model;
+		};
+		9956126A2DB6837700796804 /* Utils */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Utils;
+		};
 		99DCD9262D9FD27400A3CA25 /* SharedUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedUI;
+		};
+		99FEB5442DCB934A00C61F77 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
 		};
 		C54DA2B62D368A40005142F4 /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -723,25 +739,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Mocks;
 		};
-		C54DA2BA2D368A40005142F4 /* Models */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Models;
-		};
-		C54DA2BC2D368A40005142F4 /* Navigation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Navigation;
-		};
-		C54DA2BE2D368A40005142F4 /* StyleGuide */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = StyleGuide;
-		};
 		C54DA59C2D369927005142F4 /* TestUtils */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TestUtils;
-		};
-		C5DCD5F32D3EA0B70005AAB0 /* Common */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Common;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

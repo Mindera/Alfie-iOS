@@ -22,7 +22,7 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 
 | ✅ Do | ❌ Don't |
 |-------|---------|
-| Use fragments for reusability | Edit generated `BFFGraphAPI` code |
+| Use fragments for reusability | Edit generated `BFFGraph/API` code |
 | Run codegen after every change | Create queries without fragments |
 | Handle optional fields gracefully | Over-fetch data |
 | Test converters | Skip build verification |

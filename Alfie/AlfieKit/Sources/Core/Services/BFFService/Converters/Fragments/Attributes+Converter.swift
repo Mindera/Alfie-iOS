@@ -1,5 +1,5 @@
-import BFFGraphAPI
-import Models
+import BFFGraph
+import Model
 
 // MARK: Dictionary Attributes
 

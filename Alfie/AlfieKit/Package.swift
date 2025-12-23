@@ -9,44 +9,80 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "BFFGraphAPI",
-            targets: ["BFFGraphAPI"]
+            name: "AppFeature",
+            targets: ["AppFeature"]
         ),
         .library(
-            name: "BFFGraphMocks",
-            targets: ["BFFGraphMocks"]
+            name: "Bag",
+            targets: ["Bag"]
         ),
         .library(
-            name: "Common",
-            targets: ["Common"]
+            name: "BFFGraph",
+            targets: ["BFFGraph"]
+        ),
+        .library(
+            name: "CategorySelector",
+            targets: ["CategorySelector"]
         ),
         .library(
             name: "Core",
             targets: ["Core"]
         ),
         .library(
+            name: "DebugMenu",
+            targets: ["DebugMenu"]
+        ),
+        .library(
+            name: "DeepLink",
+            targets: ["DeepLink"]
+        ),
+        .library(
+            name: "Home",
+            targets: ["Home"]
+        ),
+        .library(
             name: "Mocks",
             targets: ["Mocks"]
         ),
         .library(
-            name: "Models",
-            targets: ["Models"]
+            name: "Model",
+            targets: ["Model"]
         ),
         .library(
-            name: "Navigation",
-            targets: ["Navigation"]
+            name: "MyAccount",
+            targets: ["MyAccount"]
+        ),
+        .library(
+            name: "ProductDetails",
+            targets: ["ProductDetails"]
+        ),
+        .library(
+            name: "ProductListing",
+            targets: ["ProductListing"]
+        ),
+        .library(
+            name: "Search",
+            targets: ["Search"]
         ),
         .library(
             name: "SharedUI",
             targets: ["SharedUI"]
         ),
         .library(
-            name: "StyleGuide",
-            targets: ["StyleGuide"]
-        ),
-        .library(
             name: "TestUtils",
             targets: ["TestUtils"]
+        ),
+        .library(
+            name: "Utils",
+            targets: ["Utils"]
+        ),
+        .library(
+            name: "Web",
+            targets: ["Web"]
+        ),
+        .library(
+            name: "Wishlist",
+            targets: ["Wishlist"]
         )
     ],
     dependencies: [
@@ -63,36 +99,66 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "BFFGraphAPI",
+            name: "AppFeature",
+            dependencies: [
+                "Bag",
+                "CategorySelector",
+                "Core",
+                "Home",
+                "Mocks",
+                "Model",
+                "Search",
+                "SharedUI",
+                "Utils",
+                "Wishlist",
+                .product(name: "OrderedCollections", package: "swift-collections"),
+            ]
+        ),
+
+        .target(
+            name: "Bag",
+            dependencies: [
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "SharedUI",
+                "Wishlist",
+            ]
+        ),
+
+        .target(
+            name: "BFFGraph",
             dependencies: [
                 .product(name: "Apollo", package: "apollo-ios"),
                 .product(name: "ApolloAPI", package: "apollo-ios"),
-            ],
-            path: "Sources/BFFGraph/Api"
-        ),
-        .target(
-            name: "BFFGraphMocks",
-            dependencies: [
-                "BFFGraphAPI",
                 .product(name: "ApolloTestSupport", package: "apollo-ios"),
-            ],
-            path: "Sources/BFFGraph/Mocks"
-        ),
-        
-        .target(
-            name: "Common",
-            dependencies: [
-                .product(name: "AlicerceLogging", package: "Alicerce")
             ]
         ),
-        
+
+        .target(
+            name: "CategorySelector",
+            dependencies: [
+                "Core",
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "Search",
+                "SharedUI",
+                "Utils",
+                "Web",
+                "Wishlist",
+                .product(name: "OrderedCollections", package: "swift-collections"),
+            ]
+        ),
+
         .target(
             name: "Core",
             dependencies: [
-                "BFFGraphAPI",
-                "Common",
+                "BFFGraph",
                 "EasyStash",
-                "Models",
+                "Model",
+                "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "BrazeKit", package: "braze-swift-sdk"),
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
@@ -102,42 +168,109 @@ let package = Package(
                 .product(name: "NukeUI", package: "nuke"),
             ]
         ),
-        
+
+        .target(
+            name: "DebugMenu",
+            dependencies: [
+                "Core",
+                "Mocks",
+                "Model",
+                "SharedUI",
+            ]
+        ),
+
+        .target(
+            name: "DeepLink",
+            dependencies: [
+                "Core",
+                "Model",
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-enable-bare-slash-regex"])
+            ]
+        ),
+
+        .target(
+            name: "Home",
+            dependencies: [
+                "Core",
+                "DebugMenu",
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "Search",
+                "SharedUI",
+                "Web",
+                "Wishlist",
+            ]
+        ),
+
         .target(
             name: "Mocks",
             dependencies: [
-                "Common",
-                "Models"
+                "Model",
+                "Utils",
             ]
         ),
         
         .target(
-            name: "Models",
+            name: "Model",
             dependencies: [
+                "Utils",
                 .product(name: "AlicerceAnalytics", package: "Alicerce"),
+                .product(name: "AlicerceLogging", package: "Alicerce"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
-        
+
+
         .target(
-            name: "Navigation"
+            name: "MyAccount",
+            dependencies: [
+                "Model",
+                "SharedUI",
+            ]
+        ),
+
+        .target(
+            name: "ProductDetails",
+            dependencies: [
+                "Core",
+                "Model",
+                "SharedUI",
+                "Web",
+            ]
+        ),
+
+        .target(
+            name: "ProductListing",
+            dependencies: [
+                "Core",
+                "Model",
+                "ProductDetails",
+                "Search",
+                "SharedUI",
+            ]
+        ),
+
+        .target(
+            name: "Search",
+            dependencies: [
+                "Model",
+                "SharedUI",
+                "Utils",
+            ]
         ),
 
         .target(
             name: "SharedUI",
-            resources: [
-                .process("Resources/Localization/L10n.xcstrings")
-            ]
-        ),
-
-        .target(
-            name: "StyleGuide",
             dependencies: [
-                "Common",
                 "Core",
-                "Models",
-                "Navigation",
-                .product(name: "AlicerceLogging", package: "Alicerce")
+                "Mocks",
+                "Model",
+                "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
             ],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
@@ -145,7 +278,8 @@ let package = Package(
                 .process("Theme/Color/Colors.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
                 .process("Theme/Toggle/ToggleColor.xcassets"),
-                .process("Theme/Typography/Resources/Fonts.xcassets")
+                .process("Theme/Typography/Resources/Fonts.xcassets"),
+                .process("Resources/Localization/L10n.xcstrings")
             ]
         ),
         
@@ -156,44 +290,171 @@ let package = Package(
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
             ]
         ),
-        
-        .testTarget(
-            name: "CoreTests",
+
+        .target(
+            name: "Utils"
+        ),
+
+        .target(
+            name: "Web",
             dependencies: [
-                "BFFGraphMocks",
-                "Common",
+                "Model",
+                "SharedUI",
+                "Utils",
+            ]
+        ),
+
+        .target(
+            name: "Wishlist",
+            dependencies: [
                 "Core",
-                "Mocks",
-                "TestUtils",
-                .product(name: "Apollo", package: "apollo-ios"),
+                "Model",
+                "MyAccount",
+                "ProductDetails",
+                "SharedUI",
+                "Web",
             ]
         ),
 
         .testTarget(
-            name: "NavigationTests",
+            name: "AppFeatureTests",
             dependencies: [
-                "Navigation"
+                "AppFeature",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "BagTests",
+            dependencies: [
+                "Bag",
+                "Mocks",
+            ]
+        ),
+
+        .testTarget(
+            name: "BFFGraphTests",
+            dependencies: [
+                "BFFGraph",
+                "Core",
+            ]
+        ),
+
+        .testTarget(
+            name: "CategorySelectorTests",
+            dependencies: [
+                "CategorySelector",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "CoreTests",
+            dependencies: [
+                "Core",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "DebugMenuTests",
+            dependencies: [
+                "DebugMenu",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "DeepLinkTests",
+            dependencies: [
+                "DeepLink",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "ProductDetailsTests",
+            dependencies: [
+                "ProductDetails",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "ProductListingTests",
+            dependencies: [
+                "ProductListing",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "SearchTests",
+            dependencies: [
+                "Core",
+                "Mocks",
+                "Search",
+                "TestUtils",
             ]
         ),
 
         .testTarget(
             name: "SharedUITests",
             dependencies: [
-                "Core",
-                "SharedUI"
+                "SharedUI",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])
             ]
         ),
-        
+
         .testTarget(
-            name: "StyleGuideTests",
+            name: "WebTests",
             dependencies: [
-                "Common",
-                "Core",
-                "StyleGuide"
+                "Mocks",
+                "TestUtils",
+                "Web",
             ]
-        )
+        ),
+
+        .testTarget(
+            name: "HomeTests",
+            dependencies: [
+                "Home",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "MyAccountTests",
+            dependencies: [
+                "MyAccount",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "WishlistTests",
+            dependencies: [
+                "Wishlist",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "UtilsTests",
+            dependencies: [
+                "Utils",
+            ]
+        ),
     ]
 )

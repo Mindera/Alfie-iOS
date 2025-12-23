@@ -1,5 +1,5 @@
-import BFFGraphAPI
-import Models
+import BFFGraph
+import Model
 
 extension BFFGraphAPI.VariantFragment {
     /// Transforms a `VariantFragment` into a local model `Product.Variant`

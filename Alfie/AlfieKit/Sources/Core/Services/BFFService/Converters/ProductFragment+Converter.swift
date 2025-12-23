@@ -1,7 +1,7 @@
-import BFFGraphAPI
-import Common
+import BFFGraph
 import Foundation
-import Models
+import Model
+import Utils
 
 extension BFFGraphAPI.GetProductQuery.Data.Product {
     public func convertToProduct() -> Product {

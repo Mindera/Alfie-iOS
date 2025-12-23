@@ -1,5 +1,5 @@
 import Combine
-import Models
+import Model
 import Network
 
 extension NWPathMonitor: NetworkPathMonitorProtocol {

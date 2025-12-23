@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 public final class MockProductListingService: ProductListingServiceProtocol {
     public init() { }
@@ -7,7 +7,7 @@ public final class MockProductListingService: ProductListingServiceProtocol {
     public var totalOfRecords: Int? = 0
 
     public var onPageCalled: ((String?, String?, String?) throws -> ProductListing)?
-    public func paged(categoryId: String?, query: String?, sort: String?) async throws -> Models.ProductListing {
+    public func paged(categoryId: String?, query: String?, sort: String?) async throws -> Model.ProductListing {
         guard let productListing = try onPageCalled?(categoryId, query, sort) else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }

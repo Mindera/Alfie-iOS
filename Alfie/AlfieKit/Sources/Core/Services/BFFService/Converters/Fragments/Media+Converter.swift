@@ -1,7 +1,7 @@
-import BFFGraphAPI
-import Common
+import BFFGraph
 import Foundation
-import Models
+import Model
+import Utils
 
 public extension BFFGraphAPI.MediaFragment {
     func convertToMedia() -> Media? {

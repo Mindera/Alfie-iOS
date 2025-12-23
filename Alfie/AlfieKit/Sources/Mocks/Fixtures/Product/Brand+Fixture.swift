@@ -1,5 +1,5 @@
 import Foundation
-import Models
+import Model
 
 extension Brand {
     public static let fixtures: [Brand] = [
