@@ -15,7 +15,7 @@ final class AlfieUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func addToCartExample() throws {
+    func testAddToCartFullFlow() throws {
         let app = XCUIApplication()
         app.activate()
         app/*@START_MENU_TOKEN@*/.images["storefront"]/*[[".otherElements[\"shop-tab\"].images",".otherElements.images[\"storefront\"]",".images[\"storefront\"]"],[[[-1,2],[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch.tap()
