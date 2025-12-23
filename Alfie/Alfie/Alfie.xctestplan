@@ -15,22 +15,29 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "CoreTests",
-        "name" : "CoreTests"
+        "identifier" : "WebTests",
+        "name" : "WebTests"
       }
     },
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "NavigationTests",
-        "name" : "NavigationTests"
+        "identifier" : "CategorySelectorTests",
+        "name" : "CategorySelectorTests"
       }
     },
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "SharedUITests",
-        "name" : "SharedUITests"
+        "identifier" : "SearchTests",
+        "name" : "SearchTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BFFGraphTests",
+        "name" : "BFFGraphTests"
       }
     },
     {
@@ -43,8 +50,57 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
-        "identifier" : "StyleGuideTests",
-        "name" : "StyleGuideTests"
+        "identifier" : "AppFeatureTests",
+        "name" : "AppFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "CoreTests",
+        "name" : "CoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BagTests",
+        "name" : "BagTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "DeepLinkTests",
+        "name" : "DeepLinkTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "DebugMenuTests",
+        "name" : "DebugMenuTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "SharedUITests",
+        "name" : "SharedUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "ProductDetailsTests",
+        "name" : "ProductDetailsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "ProductListingTests",
+        "name" : "ProductListingTests"
       }
     }
   ],

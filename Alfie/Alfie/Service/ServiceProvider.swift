@@ -1,12 +1,13 @@
-import Common
 import Core
+import DeepLink
 import Firebase
 import Foundation
-import Models
+import Model
 #if DEBUG
 import Mocks
 #endif
 import Network
+import Utils
 
 final class ServiceProvider: ServiceProviderProtocol {
     let analytics: AlfieAnalyticsTracker
@@ -59,7 +60,7 @@ final class ServiceProvider: ServiceProviderProtocol {
             authenticationService: authenticationService,
             country: defaultInitializationCountry
         )
-        deepLinkService = DeepLinkService(configuration: LinkConfiguration())
+        deepLinkService = DeepLinkService(configuration: LinkConfiguration(), log: log)
         hapticsService = HapticsService.instance
         reachabilityService = ReachabilityService(monitor: NWPathMonitor())
         storageService = StorageService()

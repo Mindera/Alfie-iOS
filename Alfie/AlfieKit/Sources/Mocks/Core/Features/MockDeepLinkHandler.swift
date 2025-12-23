@@ -1,6 +1,7 @@
-import Models
+import Model
 
 public class MockDeepLinkHandler: DeepLinkHandlerProtocol {
+    public var isReadyToHandleLinks = true
 
     public init() { }
     

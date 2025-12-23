@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public class MockConfigurationService: ConfigurationServiceProtocol {
     public var isForceAppUpdateAvailable: Bool = false

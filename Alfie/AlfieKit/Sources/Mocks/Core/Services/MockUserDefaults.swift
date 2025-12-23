@@ -1,4 +1,4 @@
-import Models
+import Model
 
 public final class MockUserDefaults: UserDefaultsProtocol {
     public var onSetCalled: ((_: Any?, _: String) -> Void)?

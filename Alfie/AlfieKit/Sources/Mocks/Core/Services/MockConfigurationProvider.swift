@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public class MockConfigurationProvider: ConfigurationProviderProtocol {
     public let isReadySubject: CurrentValueSubject<Bool, Never> = .init(true)

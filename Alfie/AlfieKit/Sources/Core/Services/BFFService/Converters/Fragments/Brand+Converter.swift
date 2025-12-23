@@ -1,5 +1,5 @@
-import BFFGraphAPI
-import Models
+import BFFGraph
+import Model
 
 extension BFFGraphAPI.BrandFragment {
     func convertToBrand() -> Brand {

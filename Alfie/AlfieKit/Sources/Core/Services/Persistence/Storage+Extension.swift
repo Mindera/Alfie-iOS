@@ -1,5 +1,5 @@
 import EasyStash
-import Models
+import Model
 
 extension Storage: StorageProtocol {
     public func load<T: Codable>(forKey key: String, as: T.Type, withExpiry expiry: StorageExpiry) throws -> T {

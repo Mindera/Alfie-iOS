@@ -1,6 +1,6 @@
 import Combine
 import Foundation
-import Models
+import Model
 
 public class MockCategoriesViewModel: CategoriesViewModelProtocol {
     public var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading

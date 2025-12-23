@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 import OrderedCollections
-import Models
+import Model
 
 public class MockBrandsViewModel: BrandsViewModelProtocol {
     public var state: ViewState<OrderedDictionary<String, [Brand]>, BrandsViewErrorType>
@@ -24,6 +24,11 @@ public class MockBrandsViewModel: BrandsViewModelProtocol {
     public var onBrandsCalled: ((String) -> [Brand])?
     public func brands(for section: String) -> [Brand] {
         onBrandsCalled?(section) ?? state.value?[section] ?? []
+    }
+
+    public var onDidTapBrandCalled: ((Brand) -> Void)?
+    public func didTapBrand(_ brand: Brand) {
+        onDidTapBrandCalled?(brand)
     }
 
     public var onSearchFocusDidChangeCalled: ((Bool) -> Void)?

@@ -1,7 +1,7 @@
 import Apollo
-import BFFGraphAPI
+import BFFGraph
 import Foundation
-import Models
+import Model
 
 final class NetworkPreConditionInterceptor: ApolloInterceptor {
     var id: String = UUID().uuidString

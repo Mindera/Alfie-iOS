@@ -1,6 +1,6 @@
 import Core
 import Foundation
-import Models
+import Model
 
 final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     private let apiUrlUserDefaultsKey: String

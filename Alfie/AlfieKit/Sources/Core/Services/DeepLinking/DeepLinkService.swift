@@ -1,6 +1,6 @@
 import AlicerceLogging
 import Foundation
-import Models
+import Model
 
 public final class DeepLinkService: DeepLinkServiceProtocol {
     private var handlers: [DeepLinkHandlerProtocol]
@@ -21,6 +21,10 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
     }
 
     // MARK: - DeepLinkServiceProtocol
+
+    public func updateAvailabilityOfHandlers(to availability: Bool) {
+        handlers.forEach { $0.isReadyToHandleLinks = availability }
+    }
 
     public func update(handlers: [DeepLinkHandlerProtocol]) {
         self.handlers = handlers
