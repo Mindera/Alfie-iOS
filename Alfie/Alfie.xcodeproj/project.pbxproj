@@ -62,6 +62,7 @@
 				Alfie.xctestplan,
 				"Configuration/Debug/GoogleService-Info.plist",
 				"Configuration/Debug/GoogleService-Info.plist.secret",
+				"Configuration/Release/GoogleService-Info.plist",
 				"Configuration/Release/GoogleService-Info.plist.secret",
 				Info.plist,
 			);
