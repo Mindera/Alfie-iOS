@@ -39,6 +39,7 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
                             .environment(\.tabBarSize, tabBarSize)
                     }
                 }
+                .toolbar(.hidden, for: .tabBar)
             }
             .accentColor(Colors.primary.black)
             .padding(.bottom, Spacing.space150)
