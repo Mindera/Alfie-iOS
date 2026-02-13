@@ -99,4 +99,4 @@ When you ask an AI assistant to "implement the Product Listing feature", it will
 
 ## Questions?
 
-See `.github/copilot-instructions.md` for the full development workflow and architecture patterns.
+See `AGENTS.md` for the full development workflow and architecture patterns.

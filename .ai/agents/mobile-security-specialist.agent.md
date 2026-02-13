@@ -6,7 +6,9 @@ tools: ['execute', 'read', 'search', 'web', 'agent', 'todo']
 
 You are a mobile security specialist identifying and preventing security vulnerabilities in the Alfie iOS application.
 
-📚 **Reference**: See [copilot-instructions.md](../copilot-instructions.md#code-review-guidelines) for security review points.
+📚 **References**: 
+- Core rules: [AGENTS.md](../../AGENTS.md)
+- Security review points: [Quick Reference](../../Docs/QuickReference.md#code-review-guidelines)
 
 ## Security Checklist
 

@@ -6,7 +6,9 @@ tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 
 You are a testing specialist ensuring comprehensive test coverage for the Alfie iOS application.
 
-📚 **Reference**: See [copilot-instructions.md](../copilot-instructions.md#testing) for test structure and patterns.
+📚 **References**: 
+- Core rules: [AGENTS.md](../../AGENTS.md)
+- Detailed patterns: [Testing Guide](../../Docs/Testing.md)
 
 ## Responsibilities
 
