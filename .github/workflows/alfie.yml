@@ -98,8 +98,17 @@ jobs:
           SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
         run: |
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+          chmod 600 ~/.gnupg/gpg-agent.conf
+          chmod 600 ~/.gnupg/gpg.conf
           echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
-          git secret reveal -p "$SECRETS_GPG_PASSPHRASE" -v
+          gpg-connect-agent reloadagent /bye || true
+          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Run Tests
         run: bundle exec fastlane ios test --env default
@@ -161,7 +170,16 @@ jobs:
           SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
         run: |
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+          chmod 600 ~/.gnupg/gpg-agent.conf
+          chmod 600 ~/.gnupg/gpg.conf
           echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          gpg-connect-agent reloadagent /bye || true
           git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Build and deploy release to TestFlight
