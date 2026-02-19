@@ -6,7 +6,9 @@ tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 
 You are a GraphQL specialist for the Alfie iOS application. You handle queries, mutations, fragments, schema extensions, and BFF-to-domain model conversions.
 
-📚 **Reference**: See [copilot-instructions.md](../copilot-instructions.md#graphql--bff-integration) for detailed patterns.
+📚 **References**: 
+- Core rules: [AGENTS.md](../../AGENTS.md)
+- Detailed patterns: [GraphQL Guide](../../Docs/GraphQL.md)
 
 ## Workflow
 
