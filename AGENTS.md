@@ -15,10 +15,10 @@ Alfie uses specialized AI agents for different development tasks. All agents are
 | `feature-orchestrator` | Coordinate full feature development lifecycle | `.ai/agents/feature-orchestrator.agent.md` |
 | `spec-writer` | Create comprehensive feature specifications | `.ai/agents/spec-writer.agent.md` |
 | `graphql-specialist` | GraphQL queries, mutations, and Apollo codegen | `.ai/agents/graphql-specialist.agent.md` |
-| `ios-feature-developer` | MVVM iOS feature implementation | `.ai/agents/ios-feature-developer.agent.md` |
+| `feature-developer` | MVVM iOS feature implementation | `.ai/agents/feature-developer.agent.md` |
 | `localization-specialist` | L10n string catalog management | `.ai/agents/localization-specialist.agent.md` |
 | `testing-specialist` | Unit tests, snapshot tests, and test coverage | `.ai/agents/testing-specialist.agent.md` |
-| `mobile-security-specialist` | Security audits and vulnerability identification | `.ai/agents/mobile-security-specialist.agent.md` |
+| `security-specialist` | Security audits and vulnerability identification | `.ai/agents/security-specialist.agent.md` |
 
 ### Usage
 
@@ -26,7 +26,7 @@ AI tools should read the agent definition from `.ai/agents/<agent-name>.agent.md
 
 **Example:**
 ```
-Acting as the ios-feature-developer agent (see .ai/agents/ios-feature-developer.agent.md),
+Acting as the feature-developer agent (see .ai/agents/feature-developer.agent.md),
 implement the Product Details feature following the spec in Docs/Specs/Features/ProductDetails.md
 ```
 

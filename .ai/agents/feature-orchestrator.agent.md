@@ -23,12 +23,12 @@ You are the Feature Orchestrator for the Alfie iOS application. You coordinate s
 | Phase | Agent | Output |
 |-------|-------|--------|
 | 1. Specification | `spec-writer` | `Docs/Specs/Features/<Feature>.md` |
-| 2. Security Review | `mobile-security-specialist` | Security requirements |
+| 2. Security Review | `security-specialist` | Security requirements |
 | 3. GraphQL Layer | `graphql-specialist` | Queries, fragments, converters |
 | 4. Localization | `localization-specialist` | L10n.xcstrings entries |
-| 5. Implementation | `ios-feature-developer` | MVVM feature code |
+| 5. Implementation | `feature-developer` | MVVM feature code |
 | 6. Testing | `testing-specialist` | Unit tests, snapshots |
-| 7. Security Audit | `mobile-security-specialist` | Security checklist |
+| 7. Security Audit | `security-specialist` | Security checklist |
 | 8. Final Verification | (orchestrator) | Build & test pass |
 
 ## Phase Dependencies
@@ -77,7 +77,7 @@ Keys needed: [list from spec]
 
 ### Phase 5: Implementation
 ```
-@ios-feature-developer Implement [Feature Name].
+@feature-developer Implement [Feature Name].
 Spec: Docs/Specs/Features/<Feature>.md
 Prerequisites complete: ✅ GraphQL, ✅ L10n
 ```
@@ -90,7 +90,7 @@ Spec: Docs/Specs/Features/<Feature>.md (Testing Strategy section)
 
 ### Phase 7: Security Audit
 ```
-@mobile-security-specialist Audit [Feature Name].
+@security-specialist Audit [Feature Name].
 Files: AlfieKit/Sources/<Feature>/, Core/Services/<Feature>/
 ```
 
@@ -137,12 +137,12 @@ Legend: ✅ Complete | 🔄 In Progress | ⬜ Not Started
 
 ### Test Failure
 1. Identify failing tests
-2. Delegate fix to `testing-specialist` or `ios-feature-developer`
+2. Delegate fix to `testing-specialist` or `feature-developer`
 3. Re-run tests
 
 ### Security Issues
 1. Document findings
-2. Delegate fixes to `ios-feature-developer`
+2. Delegate fixes to `feature-developer`
 3. Re-audit until resolved
 
 ## Final Verification

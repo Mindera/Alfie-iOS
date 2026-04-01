@@ -57,4 +57,4 @@ You are a testing specialist ensuring comprehensive test coverage for the Alfie 
 
 ## Collaboration
 
-Work with **ios-feature-developer** (ViewModels), **graphql-specialist** (converters)
+Work with **feature-developer** (ViewModels), **graphql-specialist** (converters)

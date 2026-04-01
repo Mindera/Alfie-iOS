@@ -1,6 +1,6 @@
 ---
-name: ios-feature-developer
-description: Specialized agent for implementing iOS features following MVVM architecture and project conventions
+name: feature-developer
+description: Implements iOS features following MVVM architecture with flow-based navigation
 tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 ---
 
@@ -72,4 +72,4 @@ public class FeatureViewModel: FeatureViewModelProtocol {
 - **testing-specialist**: Test coverage
 - **localization-specialist**: Strings
 - **spec-writer**: Spec updates
-- **mobile-security-specialist**: Security review
+- **security-specialist**: Security review
