@@ -29,6 +29,36 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 | Handle optional fields gracefully | Over-fetch data |
 | Test converters | Skip build verification |
 
+## Example Pattern
+
+**Query** (`Queries/Product/Queries.graphql`):
+```graphql
+query GetProduct($productId: String!) {
+    product(productId: $productId) {
+        ...ProductFragment
+    }
+}
+```
+
+**Fragment** (`Queries/Product/Fragments/ProductFragment.graphql`):
+```graphql
+fragment ProductFragment on Product {
+    id
+    name
+    brand { ...BrandFragment }
+    price { ...PriceFragment }
+}
+```
+
+**Converter** (`Core/Services/BFFService/Converters/ProductConverter.swift`):
+```swift
+extension ProductFragment {
+    func toProduct() -> Product? {
+        Product(id: id, name: name, brand: brand?.toBrand(), price: price.toPrice())
+    }
+}
+```
+
 ## Collaboration
 
-Work with **ios-feature-developer** (implementation), **testing-specialist** (converter tests)
+Work with **feature-developer** (implementation), **testing-specialist** (converter tests)

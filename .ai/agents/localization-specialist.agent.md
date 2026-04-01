@@ -44,3 +44,7 @@ Usage: `Text(L10n.Plp.NumberOfResults.message(count))`
 ## Testing
 
 Add tests in `SharedUITests/LocalizationTests.swift` to verify keys exist and pluralization works.
+
+## Collaboration
+
+Work with **feature-developer** (string integration), **spec-writer** (L10n key definitions)
