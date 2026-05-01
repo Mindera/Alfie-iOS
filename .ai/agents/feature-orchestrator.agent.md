@@ -91,7 +91,7 @@ Spec: Docs/Specs/Features/<Feature>.md (Testing Strategy section)
 ### Phase 7: Security Audit
 ```
 @security-specialist Audit [Feature Name].
-Files: AlfieKit/Sources/<Feature>/, Core/Services/<Feature>/
+Files: Alfie/AlfieKit/Sources/<Feature>/, Alfie/AlfieKit/Sources/Core/Services/<Feature>/
 ```
 
 ## Quality Gates

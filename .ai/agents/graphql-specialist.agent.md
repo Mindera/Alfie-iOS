@@ -12,11 +12,11 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 
 ## Workflow
 
-1. Create query in `AlfieKit/Sources/BFFGraph/CodeGen/Queries/<Feature>/Queries.graphql`
-2. Create fragments in `Queries/<Feature>/Fragments/<Model>Fragment.graphql`
-3. Extend schema in `CodeGen/Schema/schema-<feature>.graphqls` (if needed)
+1. Create query in `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Queries/<Feature>/Queries.graphql`
+2. Create fragments in `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Queries/<Feature>/<SubFeature>/Fragments/<Model>Fragment.graphql`
+3. Extend schema in `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Schema/schema-<feature>.graphqls` (if needed)
 4. Run codegen: `cd Alfie/scripts && ./run-apollo-codegen.sh`
-5. Create converters in `Core/Services/BFFService/Converters/`
+5. Create converters in `Alfie/AlfieKit/Sources/Core/Services/BFFService/Converters/`
 6. Add fetch method in `BFFClientService.swift`
 7. **Verify**: `./Alfie/scripts/verify.sh` (build + tests)
 
@@ -31,7 +31,7 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 
 ## Example Pattern
 
-**Query** (`AlfieKit/Sources/BFFGraph/CodeGen/Queries/Products/Queries.graphql`):
+**Query** (`Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Queries/Products/Queries.graphql`):
 ```graphql
 query GetProduct($productId: ID!) {
     product(id: $productId) {
@@ -40,7 +40,7 @@ query GetProduct($productId: ID!) {
 }
 ```
 
-**Fragment** (`AlfieKit/Sources/BFFGraph/CodeGen/Queries/Products/Details/Fragments/ProductFragment.graphql`):
+**Fragment** (`Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Queries/Products/Details/Fragments/ProductFragment.graphql`):
 ```graphql
 fragment ProductFragment on Product {
     id
@@ -50,11 +50,22 @@ fragment ProductFragment on Product {
 }
 ```
 
-**Converter** (`Core/Services/BFFService/Converters/ProductFragment+Converter.swift`):
+**Converter** (`Alfie/AlfieKit/Sources/Core/Services/BFFService/Converters/ProductFragment+Converter.swift`):
 ```swift
+// Simplified — see actual file for all required fields
 extension BFFGraphAPI.ProductFragment {
     func convertToProduct() -> Product {
-        Product(id: id, name: name, brand: brand.fragments.brandFragment.convertToBrand())
+        Product(
+            id: id,
+            styleNumber: styleNumber,
+            name: name,
+            brand: brand.fragments.brandFragment.convertToBrand(),
+            shortDescription: shortDescription,
+            longDescription: longDescription,
+            slug: slug,
+            defaultVariant: defaultVariant.fragments.variantFragment.convertToVariant(colours: []),
+            variants: variants.map { $0.fragments.variantFragment.convertToVariant(colours: []) }
+        )
     }
 }
 ```
