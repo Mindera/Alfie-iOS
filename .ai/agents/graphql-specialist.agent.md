@@ -31,30 +31,30 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 
 ## Example Pattern
 
-**Query** (`Queries/Product/Queries.graphql`):
+**Query** (`AlfieKit/Sources/BFFGraph/CodeGen/Queries/Products/Queries.graphql`):
 ```graphql
-query GetProduct($productId: String!) {
-    product(productId: $productId) {
+query GetProduct($productId: ID!) {
+    product(id: $productId) {
         ...ProductFragment
     }
 }
 ```
 
-**Fragment** (`Queries/Product/Fragments/ProductFragment.graphql`):
+**Fragment** (`AlfieKit/Sources/BFFGraph/CodeGen/Queries/Products/Details/Fragments/ProductFragment.graphql`):
 ```graphql
 fragment ProductFragment on Product {
     id
     name
     brand { ...BrandFragment }
-    price { ...PriceFragment }
+    priceRange { ...PriceRangeFragment }
 }
 ```
 
-**Converter** (`Core/Services/BFFService/Converters/ProductConverter.swift`):
+**Converter** (`Core/Services/BFFService/Converters/ProductFragment+Converter.swift`):
 ```swift
-extension ProductFragment {
-    func toProduct() -> Product? {
-        Product(id: id, name: name, brand: brand?.toBrand(), price: price.toPrice())
+extension BFFGraphAPI.ProductFragment {
+    func convertToProduct() -> Product {
+        Product(id: id, name: name, brand: brand.fragments.brandFragment.convertToBrand())
     }
 }
 ```
