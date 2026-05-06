@@ -129,11 +129,11 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             isLoading: .constant(false)
         )
         .modifier(
-            TapHighlightableModifier {
-                viewModel.didTapBrand(brand)
-            }
+            TapHighlightableModifier(
+                action: { viewModel.didTapBrand(brand) },
+                accessibilityId: "brand-item"
+            )
         )
-        .accessibilityIdentifier("brand-item")
     }
 
     private func placeholderItemView(_ placeholder: Brand) -> some View {

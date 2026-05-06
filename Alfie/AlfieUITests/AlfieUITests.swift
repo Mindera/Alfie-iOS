@@ -15,44 +15,64 @@ final class AlfieUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testAddToCartFullFlow() throws {
+    private let defaultTimeout: TimeInterval = 5
+
+    /// Waits for an element to exist and fails the test with `message` if it does not appear in time.
+    private func waitFor(_ element: XCUIElement, _ message: String, timeout: TimeInterval? = nil) {
+        XCTAssertTrue(element.waitForExistence(timeout: timeout ?? defaultTimeout), message)
+    }
+
+    func testAddToBagFullFlow() throws {
         let app = XCUIApplication()
         app.launch()
-        app/*@START_MENU_TOKEN@*/.images["storefront"]/*[[".otherElements[\"shop-tab\"].images",".otherElements.images[\"storefront\"]",".images[\"storefront\"]"],[[[-1,2],[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch.tap()
-        app/*@START_MENU_TOKEN@*/.scrollViews.buttons["Brands"].firstMatch/*[[".buttons",".matching(identifier: \"Brands\")",".element(boundBy: 1)",".containing(.staticText, identifier: \"Brands\").firstMatch",".matching(identifier: \"category-item\").containing(.staticText, identifier: \"Brands\").firstMatch",".scrollViews.buttons[\"Brands\"].firstMatch"],[[[-1,5],[-1,0,1]],[[-1,3],[-1,4],[-1,1,2]],[[-1,3],[-1,2]]],[0]]@END_MENU_TOKEN@*/.tap()
-        // Tap the first available brand instead of relying on a specific brand name
+
+        // 1. Switch to the Shop tab
+        let shopTab = app.otherElements["shop-tab"]
+        waitFor(shopTab, "Shop tab should exist")
+        shopTab.tap()
+
+        // 2. Select the Brands segment within Shop
+        let brandsSegment = app.buttons["segmented-option-brands"]
+        waitFor(brandsSegment, "Brands segment should exist")
+        brandsSegment.tap()
+
+        // 3. Tap the first available brand (avoid coupling the test to specific data)
         let firstBrand = app.buttons.matching(identifier: "brand-item").element(boundBy: 0)
-        XCTAssertTrue(firstBrand.waitForExistence(timeout: 5), "At least one brand should be available")
+        waitFor(firstBrand, "At least one brand should be available")
         firstBrand.tap()
-        app.images.matching(identifier: "product-image").element(boundBy: 0).tap()
 
-        // Wait for PDP to load and capture product name from the title header
-        let addToBagButton = app.buttons["Add to bag"]
-        XCTAssertTrue(addToBagButton.waitForExistence(timeout: 5), "Add to bag button should exist")
+        // 4. Open the first product in the listing
+        let firstProduct = app.images.matching(identifier: "product-image").element(boundBy: 0)
+        waitFor(firstProduct, "At least one product should be available")
+        firstProduct.tap()
 
-        // The product name is shown in the title header - get the first static text in the scroll view content
-        // which contains the product name (displayed in titleHeader view)
-        let productNameOnPDP = app.scrollViews.firstMatch.staticTexts.firstMatch
-        XCTAssertTrue(productNameOnPDP.waitForExistence(timeout: 5), "Product name should be visible on PDP")
+        // 5. Capture the product name shown on the PDP, then add to bag
+        let productNameOnPDP = app.staticTexts["product-name-pdp"]
+        waitFor(productNameOnPDP, "Product name should be visible on PDP")
         let expectedProductName = productNameOnPDP.label
 
-        // Tap "Add to bag" button
+        let addToBagButton = app.buttons["add-to-bag-button"]
+        waitFor(addToBagButton, "Add to bag button should exist")
         addToBagButton.tap()
 
-        // Navigate back from PDP - tap the first button in navigation bar
+        // 6. Pop back from PDP so the tab bar becomes visible again.
         let backButton = app.navigationBars.buttons.firstMatch
-        XCTAssertTrue(backButton.waitForExistence(timeout: 5), "Back button should exist")
+        waitFor(backButton, "Back button should exist on PDP")
         backButton.tap()
 
-        // Navigate to bag tab
+        // 7. Switch to the Bag tab
         let bagTab = app.otherElements["bag-tab"]
-        XCTAssertTrue(bagTab.waitForExistence(timeout: 5), "Bag tab should exist")
+        waitFor(bagTab, "Bag tab should exist")
         bagTab.tap()
 
-        // Verify the product in the bag matches the one we added
+        // 7. Verify the product in the bag matches the one we added
         let productNameInBag = app.staticTexts.matching(identifier: "product-name").firstMatch
-        XCTAssertTrue(productNameInBag.waitForExistence(timeout: 5), "Product name should be visible in bag")
-        XCTAssertEqual(productNameInBag.label, expectedProductName, "Product in bag should match the product that was added")
+        waitFor(productNameInBag, "Product name should be visible in bag")
+        XCTAssertEqual(
+            productNameInBag.label,
+            expectedProductName,
+            "Product in bag should match the product that was added"
+        )
     }
 
     func testLaunchPerformance() throws {
