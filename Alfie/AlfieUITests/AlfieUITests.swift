@@ -17,7 +17,7 @@ final class AlfieUITests: XCTestCase {
 
     func testAddToCartFullFlow() throws {
         let app = XCUIApplication()
-        app.activate()
+        app.launch()
         app/*@START_MENU_TOKEN@*/.images["storefront"]/*[[".otherElements[\"shop-tab\"].images",".otherElements.images[\"storefront\"]",".images[\"storefront\"]"],[[[-1,2],[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch.tap()
         app/*@START_MENU_TOKEN@*/.scrollViews.buttons["Brands"].firstMatch/*[[".buttons",".matching(identifier: \"Brands\")",".element(boundBy: 1)",".containing(.staticText, identifier: \"Brands\").firstMatch",".matching(identifier: \"category-item\").containing(.staticText, identifier: \"Brands\").firstMatch",".scrollViews.buttons[\"Brands\"].firstMatch"],[[[-1,5],[-1,0,1]],[[-1,3],[-1,4],[-1,1,2]],[[-1,3],[-1,2]]],[0]]@END_MENU_TOKEN@*/.tap()
         app/*@START_MENU_TOKEN@*/.buttons["04AugPhilos"]/*[[".otherElements.buttons[\"04AugPhilos\"]",".buttons[\"04AugPhilos\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch.tap()
