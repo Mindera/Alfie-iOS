@@ -12,7 +12,14 @@ final class AlfieUITests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        // Attach a final screenshot to the test report. With `.deleteOnSuccess`, the
+        // attachment is kept only when the test fails — giving us a visual snapshot
+        // of the screen state at the moment things went wrong, with no noise on green runs.
+        let screenshot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "Final screen — \(name)"
+        attachment.lifetime = .deleteOnSuccess
+        add(attachment)
     }
 
     private let defaultTimeout: TimeInterval = 5
