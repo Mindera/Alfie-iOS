@@ -20,7 +20,10 @@ final class AlfieUITests: XCTestCase {
         app.launch()
         app/*@START_MENU_TOKEN@*/.images["storefront"]/*[[".otherElements[\"shop-tab\"].images",".otherElements.images[\"storefront\"]",".images[\"storefront\"]"],[[[-1,2],[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch.tap()
         app/*@START_MENU_TOKEN@*/.scrollViews.buttons["Brands"].firstMatch/*[[".buttons",".matching(identifier: \"Brands\")",".element(boundBy: 1)",".containing(.staticText, identifier: \"Brands\").firstMatch",".matching(identifier: \"category-item\").containing(.staticText, identifier: \"Brands\").firstMatch",".scrollViews.buttons[\"Brands\"].firstMatch"],[[[-1,5],[-1,0,1]],[[-1,3],[-1,4],[-1,1,2]],[[-1,3],[-1,2]]],[0]]@END_MENU_TOKEN@*/.tap()
-        app/*@START_MENU_TOKEN@*/.buttons["04AugPhilos"]/*[[".otherElements.buttons[\"04AugPhilos\"]",".buttons[\"04AugPhilos\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.firstMatch.tap()
+        // Tap the first available brand instead of relying on a specific brand name
+        let firstBrand = app.buttons.matching(identifier: "brand-item").element(boundBy: 0)
+        XCTAssertTrue(firstBrand.waitForExistence(timeout: 5), "At least one brand should be available")
+        firstBrand.tap()
         app.images.matching(identifier: "product-image").element(boundBy: 0).tap()
 
         // Wait for PDP to load and capture product name from the title header

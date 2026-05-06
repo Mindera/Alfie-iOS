@@ -133,6 +133,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
                 viewModel.didTapBrand(brand)
             }
         )
+        .accessibilityIdentifier("brand-item")
     }
 
     private func placeholderItemView(_ placeholder: Brand) -> some View {
