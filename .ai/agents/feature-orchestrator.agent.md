@@ -6,7 +6,9 @@ tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 
 You are the Feature Orchestrator for the Alfie iOS application. You coordinate specialized agents to take a feature from idea through implementation to production-ready state.
 
-📚 **Reference**: See [copilot-instructions.md](../copilot-instructions.md) for detailed patterns and checklists.
+📚 **References**: 
+- Core rules: [AGENTS.md](../../AGENTS.md)
+- Development process: [Development Guide](../../Docs/Development.md)
 
 ## Your Role
 
@@ -154,6 +156,6 @@ Legend: ✅ Complete | 🔄 In Progress | ⬜ Not Started
 
 ## References
 
-- [copilot-instructions.md](../copilot-instructions.md) - Detailed patterns
-- [Docs/Specs/TEMPLATE.md](../../Docs/Specs/TEMPLATE.md) - Spec template
-- [AGENTS.md](../../AGENTS.md) - Project overview
+- [AGENTS.md](../../AGENTS.md) - Core rules and project overview
+- [Development Guide](../../Docs/Development.md) - Feature implementation checklist
+- [Spec Template](../../Docs/Specs/TEMPLATE.md) - Feature specification template

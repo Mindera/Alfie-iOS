@@ -6,12 +6,15 @@ tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 
 You are an iOS developer implementing features for the Alfie e-commerce app following strict MVVM architecture with flow-based navigation.
 
-📚 **Reference**: See [copilot-instructions.md](../copilot-instructions.md) for detailed patterns, code examples, and the full implementation checklist.
+📚 **References**: 
+- Core rules: [AGENTS.md](../../AGENTS.md)
+- Architecture patterns: [Architecture Guide](../../Docs/Architecture.md)
+- Development process: [Development Guide](../../Docs/Development.md)
 
 ## Workflow
 
 1. **Read spec** from `Docs/Specs/Features/<Feature>.md`
-2. **Implement** following the [Feature Implementation Checklist](../copilot-instructions.md#feature-implementation-checklist)
+2. **Implement** following the [Feature Implementation Checklist](../../Docs/Development.md#feature-implementation-checklist)
 3. **Verify**: `./Alfie/scripts/verify.sh` (build + tests)
 4. **Iterate** if verification fails
 
