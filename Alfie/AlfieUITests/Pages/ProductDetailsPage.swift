@@ -1,14 +1,10 @@
+import AccessibilityIdentifiers
 import XCTest
 
 // MARK: - ProductDetailsPage
 //
 // Page Object for the Product Details (PDP) screen. Wraps `XCUIApplication`
 // queries behind named accessors so UI tests stay readable.
-//
-// Identifier values mirror `AccessibilityID.ProductDetails.*` in the
-// `AccessibilityIdentifiers` SPM module. Once that module is linked to the
-// `AlfieUITests` target in Xcode, replace the literals below with
-// `AccessibilityID.ProductDetails.*` and `import AccessibilityIdentifiers`.
 final class ProductDetailsPage {
     private let app: XCUIApplication
 
@@ -19,35 +15,35 @@ final class ProductDetailsPage {
     // MARK: - Elements
 
     var titleHeader: XCUIElement {
-        app.staticTexts["productDetails.title.header"]
+        app.staticTexts[AccessibilityID.ProductDetails.titleHeader]
     }
 
     var productImage: XCUIElement {
-        app.otherElements["productDetails.product.image"]
+        app.otherElements[AccessibilityID.ProductDetails.productImage]
     }
 
     var productTitle: XCUIElement {
-        app.staticTexts["productDetails.product.title"]
+        app.staticTexts[AccessibilityID.ProductDetails.productTitle]
     }
 
     var productDescription: XCUIElement {
-        app.staticTexts["productDetails.description.text"]
+        app.staticTexts[AccessibilityID.ProductDetails.productDescription]
     }
 
     var colourSelector: XCUIElement {
-        app.otherElements["productDetails.colour.selector"]
+        app.otherElements[AccessibilityID.ProductDetails.colourSelector]
     }
 
     var sizeSelector: XCUIElement {
-        app.otherElements["productDetails.size.selector"]
+        app.otherElements[AccessibilityID.ProductDetails.sizeSelector]
     }
 
     var addToBagButton: XCUIElement {
-        app.buttons["productDetails.addToBag.button"]
+        app.buttons[AccessibilityID.ProductDetails.addToBagButton]
     }
 
     var addToWishlistButton: XCUIElement {
-        app.buttons["productDetails.addToWishlist.button"]
+        app.buttons[AccessibilityID.ProductDetails.addToWishlistButton]
     }
 
     // MARK: - Actions

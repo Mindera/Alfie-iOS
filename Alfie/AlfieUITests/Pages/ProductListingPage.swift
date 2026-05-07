@@ -1,14 +1,10 @@
+import AccessibilityIdentifiers
 import XCTest
 
 // MARK: - ProductListingPage
 //
 // Page Object for the Product Listing screen. Wraps `XCUIApplication` queries
 // behind named accessors so UI tests stay readable and survive UI refactors.
-//
-// Identifier values mirror `AccessibilityID.ProductListing.*` in the
-// `AccessibilityIdentifiers` SPM module. Once that module is linked to the
-// `AlfieUITests` target in Xcode, replace the literals below with
-// `AccessibilityID.ProductListing.*` and `import AccessibilityIdentifiers`.
 final class ProductListingPage {
     private let app: XCUIApplication
 
@@ -19,19 +15,19 @@ final class ProductListingPage {
     // MARK: - Elements
 
     var filterButton: XCUIElement {
-        app.buttons["productListing.filter.button"]
+        app.buttons[AccessibilityID.ProductListing.filterButton]
     }
 
     var resultsLabel: XCUIElement {
-        app.staticTexts["productListing.results.label"]
+        app.staticTexts[AccessibilityID.ProductListing.resultsLabel]
     }
 
     var listStyleGridButton: XCUIElement {
-        app.buttons["productListing.listStyle.grid.button"]
+        app.buttons[AccessibilityID.ProductListing.listStyleGridButton]
     }
 
     var listStyleListButton: XCUIElement {
-        app.buttons["productListing.listStyle.list.button"]
+        app.buttons[AccessibilityID.ProductListing.listStyleListButton]
     }
 
     // MARK: - Actions

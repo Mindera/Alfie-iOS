@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8CD40F3E2DD607D500F482F7 /* DeepLink in Frameworks */ = {isa = PBXBuildFile; productRef = 8CD40F3D2DD607D500F482F7 /* DeepLink */; };
+		96CF08BE2FACB3B200BF1224 /* AccessibilityIdentifiers in Frameworks */ = {isa = PBXBuildFile; productRef = 96CF08BD2FACB3B200BF1224 /* AccessibilityIdentifiers */; };
 		994C3E692DAD4FFD00C77271 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 994C3E682DAD4FFD00C77271 /* Model */; };
 		9956126B2DB6837700796804 /* Utils in Frameworks */ = {isa = PBXBuildFile; productRef = 9956126A2DB6837700796804 /* Utils */; };
 		99DCD9272D9FD27400A3CA25 /* SharedUI in Frameworks */ = {isa = PBXBuildFile; productRef = 99DCD9262D9FD27400A3CA25 /* SharedUI */; };
@@ -103,6 +104,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96CF08BE2FACB3B200BF1224 /* AccessibilityIdentifiers in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -714,6 +716,10 @@
 		8CD40F3D2DD607D500F482F7 /* DeepLink */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DeepLink;
+		};
+		96CF08BD2FACB3B200BF1224 /* AccessibilityIdentifiers */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AccessibilityIdentifiers;
 		};
 		994C3E682DAD4FFD00C77271 /* Model */ = {
 			isa = XCSwiftPackageProductDependency;

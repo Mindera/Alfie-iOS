@@ -91,17 +91,6 @@ final class ProductListingPage {
 }
 ```
 
-### One-time Xcode setup for the UITest target
-
-The `AlfieUITests` target must link the `AccessibilityIdentifiers` package product so tests can reference `AccessibilityID.*` directly:
-
-1. Open `Alfie.xcodeproj` in Xcode.
-2. Select the `AlfieUITests` target → **General** → **Frameworks and Libraries**.
-3. Click `+` → choose `AccessibilityIdentifiers` from the `AlfieKit` package.
-4. Build.
-
-Until that link exists, page objects under `Alfie/AlfieUITests/Pages/` use string literals that mirror the `AccessibilityID` values. Once linked, swap the literals for `AccessibilityID.*` references.
-
 ## Migration
 
 The pilot migration covers `ProductListing`. The remaining ~16 files using file-local `private enum AccessibilityId` will be migrated incrementally:
