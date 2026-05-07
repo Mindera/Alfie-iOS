@@ -12,14 +12,14 @@ public enum AccessibilityID {
     // MARK: - ProductDetails
 
     public enum ProductDetails {
-        public static let titleHeader = "title-header"
-        public static let productImage = "product-image"
-        public static let productTitle = "product-title"
-        public static let productDescription = "product-description"
-        public static let colourSelector = "colour-selector"
-        public static let sizeSelector = "size-selector"
-        public static let addToBagButton = "add-to-bag-button"
-        public static let addToWishlistButton = "add-to-wishlist-button"
+        public static let titleHeader = "productDetails.title.header"
+        public static let productImage = "productDetails.product.image"
+        public static let productTitle = "productDetails.product.title"
+        public static let productDescription = "productDetails.description.text"
+        public static let colourSelector = "productDetails.colour.selector"
+        public static let sizeSelector = "productDetails.size.selector"
+        public static let addToBagButton = "productDetails.addToBag.button"
+        public static let addToWishlistButton = "productDetails.addToWishlist.button"
     }
 
     // MARK: - ProductListing
