@@ -9,6 +9,19 @@ import Foundation
 /// (always derived from a stable model id, never from an array index).
 public enum AccessibilityID {
 
+    // MARK: - ProductDetails
+
+    public enum ProductDetails {
+        public static let titleHeader = "title-header"
+        public static let productImage = "product-image"
+        public static let productTitle = "product-title"
+        public static let productDescription = "product-description"
+        public static let colourSelector = "colour-selector"
+        public static let sizeSelector = "size-selector"
+        public static let addToBagButton = "add-to-bag-button"
+        public static let addToWishlistButton = "add-to-wishlist-button"
+    }
+
     // MARK: - ProductListing
 
     public enum ProductListing {

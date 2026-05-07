@@ -244,6 +244,7 @@ let package = Package(
         .target(
             name: "ProductDetails",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "SharedUI",
