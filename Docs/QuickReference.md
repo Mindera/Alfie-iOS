@@ -71,6 +71,7 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 - [ ] **Localization**: All strings use L10n
 - [ ] **State**: ViewState/PaginatedViewState used correctly
 - [ ] **Tests**: ViewModels have unit tests, protocols exist for mocking
+- [ ] **Accessibility IDs**: New UI elements use `AccessibilityID` from `AccessibilityIdentifiers` (see `Docs/Accessibility.md`)
 - [ ] **Security**: No credentials, Keychain for sensitive data, HTTPS only
 - [ ] **GraphQL**: Fragments used, codegen run, no edits to generated files
 - [ ] **SwiftLint**: No violations

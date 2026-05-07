@@ -9,6 +9,10 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "AccessibilityIdentifiers",
+            targets: ["AccessibilityIdentifiers"]
+        ),
+        .library(
             name: "AppFeature",
             targets: ["AppFeature"]
         ),
@@ -98,6 +102,10 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.0.3"),
     ],
     targets: [
+        .target(
+            name: "AccessibilityIdentifiers"
+        ),
+
         .target(
             name: "AppFeature",
             dependencies: [
@@ -246,6 +254,7 @@ let package = Package(
         .target(
             name: "ProductListing",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "ProductDetails",
