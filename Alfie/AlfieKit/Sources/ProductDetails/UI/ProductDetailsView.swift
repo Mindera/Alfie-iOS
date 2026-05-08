@@ -339,6 +339,7 @@ extension ProductDetailsView {
                     .foregroundStyle(Colors.primary.black)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
+                    .accessibilityIdentifier("product-name-pdp")
             }
         }
     }
@@ -490,6 +491,7 @@ extension ProductDetailsView {
                 ) {
                     viewModel.didTapAddToBag()
                 }
+                .accessibilityIdentifier("add-to-bag-button")
             }
         }
     }

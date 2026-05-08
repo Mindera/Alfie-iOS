@@ -82,7 +82,7 @@ public struct ThemedSegmentView: View {
             }
         }
         .accessibilityAddTraits(.isButton)
-        .accessibilityIdentifier(AccessibilityId.segmentedOption)
+        .accessibilityIdentifier("\(AccessibilityId.segmentedOption)-\(segment.id)")
         .if(
             currectSelected == segment,
             whenTrue: { segment in segment.accessibilityAddTraits(.isSelected) },
