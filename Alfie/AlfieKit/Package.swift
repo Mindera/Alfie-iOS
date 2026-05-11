@@ -146,6 +146,7 @@ let package = Package(
         .target(
             name: "CategorySelector",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "MyAccount",

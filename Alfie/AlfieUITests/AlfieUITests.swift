@@ -36,10 +36,10 @@ final class AlfieUITests: XCTestCase {
 
     /// End-to-end journey: Home → Shop → Brands → first brand → first product → add to bag → verify in bag.
     ///
-    /// Locators outside PDP still use raw identifier strings (`shop-tab`,
-    /// `segmented-option-brands`, `brand-item`, `product-image`, `bag-tab`,
-    /// `product-name`). Migrating them into the `AccessibilityIdentifiers`
-    /// module is tracked as a separate follow-up.
+    /// Locators outside PDP and Brands still use raw identifier strings
+    /// (`shop-tab`, `segmented-option-brands`, `product-image`, `bag-tab`,
+    /// `product-name`). Migrating the remainder into the
+    /// `AccessibilityIdentifiers` module is tracked as a separate follow-up.
     func testAddToBagFullFlow() throws {
         let pdp = ProductDetailsPage(app: app)
         var expectedProductName = ""
@@ -57,7 +57,7 @@ final class AlfieUITests: XCTestCase {
         }
 
         XCTContext.runActivity(named: "Open the first available brand") { _ in
-            let firstBrand = app.buttons.matching(identifier: "brand-item").element(boundBy: 0)
+            let firstBrand = app.buttons.matching(identifier: AccessibilityID.Brands.item).element(boundBy: 0)
             waitFor(firstBrand, "At least one brand should be available")
             firstBrand.tap()
         }

@@ -9,6 +9,12 @@ import Foundation
 /// (always derived from a stable model id, never from an array index).
 public enum AccessibilityID {
 
+    // MARK: - Brands
+
+    public enum Brands {
+        public static let item = "brands.item.button"
+    }
+
     // MARK: - ProductDetails
 
     public enum ProductDetails {
