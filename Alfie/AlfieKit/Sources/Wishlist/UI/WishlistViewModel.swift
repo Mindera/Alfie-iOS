@@ -56,8 +56,6 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
             priceType: selectedProduct.priceType,
             colorTitle: L10n.Product.Color.title + ":",
             color: selectedProduct.colour?.name ?? "",
-            sizeTitle: nil,
-            size: nil,
             addToBagTitle: L10n.Product.AddToBag.Button.cta,
             outOfStockTitle: L10n.Product.OutOfStock.Button.cta,
             isAddToBagDisabled: selectedProduct.stock == .zero

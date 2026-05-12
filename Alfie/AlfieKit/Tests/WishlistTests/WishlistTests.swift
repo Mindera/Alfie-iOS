@@ -24,22 +24,6 @@ final class WishlistTests: XCTestCase {
         )
     }
 
-    // MARK: - WishlistViewModel.productCardViewModel(for:)
-
-    func test_productCardViewModel_hidesSizeFields_whenSelectedProductHasSize() {
-        let cardViewModel = makeProductCardViewModel(variantSize: .fixture(value: "M"))
-
-        XCTAssertNil(cardViewModel.sizeTitle)
-        XCTAssertNil(cardViewModel.size)
-    }
-
-    func test_productCardViewModel_hidesSizeFields_whenSelectedProductHasNoSize() {
-        let cardViewModel = makeProductCardViewModel(variantSize: nil)
-
-        XCTAssertNil(cardViewModel.sizeTitle)
-        XCTAssertNil(cardViewModel.size)
-    }
-
     // MARK: - Helpers
 
     private func makeSUT(
@@ -58,13 +42,5 @@ final class WishlistTests: XCTestCase {
         )
         trackForMemoryLeak(sut, file: file, line: line)
         return sut
-    }
-
-    private func makeProductCardViewModel(variantSize: Product.ProductSize?) -> VerticalProductCardViewModel {
-        let colour = Product.Colour.fixture(id: "green", name: "Green")
-        let variant = Product.Variant.fixture(size: variantSize, colour: colour)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
-        let selected = SelectedProduct(product: product, selectedVariant: variant)
-        return makeSUT().productCardViewModel(for: selected)
     }
 }

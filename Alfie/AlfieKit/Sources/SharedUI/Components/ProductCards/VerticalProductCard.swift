@@ -41,9 +41,6 @@ public struct VerticalProductCard: View {
                     productNameView
                     if !viewModel.configuration.hideDetails {
                         productColorView
-                        if viewModel.sizeTitle != nil || viewModel.size != nil {
-                            productSizeView
-                        }
                     }
                 }
 
@@ -129,24 +126,6 @@ public struct VerticalProductCard: View {
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.productColor)
-    }
-
-    private var productSizeView: some View {
-        HStack(spacing: Spacing.space100) {
-            if let sizeTitle = viewModel.sizeTitle {
-                Text(sizeTitle)
-                    .font(Font(viewModel.configuration.smallTextFont))
-                    .foregroundStyle(Colors.primary.mono500)
-            }
-            if let size = viewModel.size {
-                Text(size)
-                    .font(Font(viewModel.configuration.smallTextFont))
-                    .foregroundStyle(Colors.primary.mono700)
-            }
-        }
-        .lineLimit(Constants.productSizeLineLimit)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityId.productSize)
     }
 
     private var productPriceView: some View {
@@ -239,7 +218,6 @@ private enum AccessibilityId {
     static let productDesigner = "product-designer"
     static let productName = "product-name"
     static let productColor = "product-color"
-    static let productSize = "product-size"
     static let productPrice = "product-price-component"
     static let productWishlistButton = "product-add-wishlist-btn"
     static let productRemoveFromWishlistButton = "product-remove-from-wishlist-btn"
@@ -249,7 +227,6 @@ private enum Constants {
     static let productDesignerLineLimit: Int = 1
     static let productNameLineLimit: Int = 2
     static let productColorLineLimit: Int = 1
-    static let productSizeLineLimit: Int = 1
     static let iconSmallSize: CGFloat = 24
     static let iconLargeSize: CGFloat = 32
     static let imageAspectRatio: CGFloat = 0.75
