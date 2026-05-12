@@ -39,8 +39,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {
-        dependencies.bagService.addProduct(selectedProduct)
-        dependencies.analytics.trackAddToBag(productID: selectedProduct.product.id)
+        navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
     }
 
     public func didTapMyAccount() {

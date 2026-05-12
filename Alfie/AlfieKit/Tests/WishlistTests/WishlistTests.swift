@@ -1,9 +1,28 @@
 import Mocks
 import Model
+import ProductDetails
 import XCTest
 @testable import Wishlist
 
 final class WishlistTests: XCTestCase {
+    // MARK: - WishlistViewModel.didTapAddToBag
+
+    func test_didTapAddToBag_navigatesToProductDetailsWithSelectedProduct() {
+        let colour = Product.Colour.fixture(id: "green", name: "Green")
+        let variant = Product.Variant.fixture(size: .fixture(value: "M"), colour: colour)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        let selected = SelectedProduct(product: product, selectedVariant: variant)
+        var capturedRoutes: [WishlistRoute] = []
+        let sut = makeSUT(navigate: { capturedRoutes.append($0) })
+
+        sut.didTapAddToBag(for: selected)
+
+        XCTAssertEqual(
+            capturedRoutes,
+            [.productDetails(.productDetails(.selectedProduct(selected)))]
+        )
+    }
+
     // MARK: - WishlistViewModel.productCardViewModel(for:)
 
     func test_productCardViewModel_neverPassesSizeFields_evenWhenSelectedProductHasSize() {
@@ -34,7 +53,7 @@ final class WishlistTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeSUT() -> WishlistViewModel {
+    private func makeSUT(navigate: @escaping (WishlistRoute) -> Void = { _ in }) -> WishlistViewModel {
         let dependencies = WishlistDependencyContainer(
             wishlistService: MockWishlistService(),
             bagService: MockBagService(),
@@ -43,7 +62,7 @@ final class WishlistTests: XCTestCase {
         return WishlistViewModel(
             hasNavigationSeparator: false,
             dependencies: dependencies,
-            navigate: { _ in }
+            navigate: navigate
         )
     }
 }
