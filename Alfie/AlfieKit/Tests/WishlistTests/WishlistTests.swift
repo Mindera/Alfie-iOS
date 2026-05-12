@@ -1,62 +1,55 @@
 import Mocks
 import Model
 import ProductDetails
-import XCTest
+import Testing
 @testable import Wishlist
 
-final class WishlistTests: XCTestCase {
+struct WishlistTests {
     // MARK: - WishlistViewModel.didTapAddToBag
 
-    func test_didTapAddToBag_navigatesToProductDetailsWithSelectedProduct() {
+    @Test("didTapAddToBag navigates to PDP with the selected product and does not add to bag")
+    func didTapAddToBag_navigatesToProductDetails_andDoesNotAddToBag() {
         let colour = Product.Colour.fixture(id: "green", name: "Green")
         let variant = Product.Variant.fixture(size: .fixture(value: "M"), colour: colour)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
         let selected = SelectedProduct(product: product, selectedVariant: variant)
+        let bagService = MockBagService()
         var capturedRoutes: [WishlistRoute] = []
-        let sut = makeSUT(navigate: { capturedRoutes.append($0) })
+        let sut = makeSUT(bagService: bagService, navigate: { capturedRoutes.append($0) })
 
         sut.didTapAddToBag(for: selected)
 
-        XCTAssertEqual(
-            capturedRoutes,
-            [.productDetails(.productDetails(.selectedProduct(selected)))]
-        )
+        #expect(capturedRoutes == [.productDetails(.productDetails(.selectedProduct(selected)))])
+        #expect(bagService.getBagContent().isEmpty)
     }
 
     // MARK: - WishlistViewModel.productCardViewModel(for:)
 
-    func test_productCardViewModel_neverPassesSizeFields_evenWhenSelectedProductHasSize() {
-        let colour = Product.Colour.fixture(id: "green", name: "Green")
-        let variant = Product.Variant.fixture(size: .fixture(value: "M"), colour: colour)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
-        let selected = SelectedProduct(product: product, selectedVariant: variant)
-        let sut = makeSUT()
+    @Test("productCardViewModel hides size fields when the selected product has a size")
+    func productCardViewModel_hidesSizeFields_whenSelectedProductHasSize() {
+        let cardViewModel = makeProductCardViewModel(variantSize: .fixture(value: "M"))
 
-        let cardViewModel = sut.productCardViewModel(for: selected)
-
-        XCTAssertNil(cardViewModel.sizeTitle)
-        XCTAssertNil(cardViewModel.size)
+        #expect(cardViewModel.sizeTitle == nil)
+        #expect(cardViewModel.size == nil)
     }
 
-    func test_productCardViewModel_neverPassesSizeFields_whenSelectedProductHasNoSize() {
-        let colour = Product.Colour.fixture(id: "green", name: "Green")
-        let variant = Product.Variant.fixture(size: nil, colour: colour)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
-        let selected = SelectedProduct(product: product, selectedVariant: variant)
-        let sut = makeSUT()
+    @Test("productCardViewModel hides size fields when the selected product has no size")
+    func productCardViewModel_hidesSizeFields_whenSelectedProductHasNoSize() {
+        let cardViewModel = makeProductCardViewModel(variantSize: nil)
 
-        let cardViewModel = sut.productCardViewModel(for: selected)
-
-        XCTAssertNil(cardViewModel.sizeTitle)
-        XCTAssertNil(cardViewModel.size)
+        #expect(cardViewModel.sizeTitle == nil)
+        #expect(cardViewModel.size == nil)
     }
 
     // MARK: - Helpers
 
-    private func makeSUT(navigate: @escaping (WishlistRoute) -> Void = { _ in }) -> WishlistViewModel {
+    private func makeSUT(
+        bagService: BagServiceProtocol = MockBagService(),
+        navigate: @escaping (WishlistRoute) -> Void = { _ in }
+    ) -> WishlistViewModel {
         let dependencies = WishlistDependencyContainer(
             wishlistService: MockWishlistService(),
-            bagService: MockBagService(),
+            bagService: bagService,
             analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
         )
         return WishlistViewModel(
@@ -64,5 +57,13 @@ final class WishlistTests: XCTestCase {
             dependencies: dependencies,
             navigate: navigate
         )
+    }
+
+    private func makeProductCardViewModel(variantSize: Product.ProductSize?) -> VerticalProductCardViewModel {
+        let colour = Product.Colour.fixture(id: "green", name: "Green")
+        let variant = Product.Variant.fixture(size: variantSize, colour: colour)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        let selected = SelectedProduct(product: product, selectedVariant: variant)
+        return makeSUT().productCardViewModel(for: selected)
     }
 }
