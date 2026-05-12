@@ -68,6 +68,31 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sizingSelectionConfiguration.items.first?.name, size.value)
     }
     
+    func test_size_swatch_is_not_pre_selected_on_init_with_product() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
+        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+    }
+
+    func test_size_swatch_is_not_pre_selected_after_product_fetch() {
+        initViewModel()
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        mockProductService.onGetProductCalled = { _ in product }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
+        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+    }
+
     func test_sizing_selection_configuration_is_unavailable_when_there_is_no_selected_variant_on_init() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")

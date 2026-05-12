@@ -296,15 +296,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
 
-        var selectedSwatch: SizingSwatch?
-        if let selectedVariant {
-            selectedSwatch = sizingSwatches.first { $0.id == selectedVariant.size?.id }
-        }
-
+        // Size is never auto-selected on PDP entry — the user must tap a swatch.
         sizingSelectionConfiguration = .init(
             selectedTitle: L10n.Product.Size.title + ":",
             items: sizingSwatches,
-            selectedItem: selectedSwatch
+            selectedItem: nil
         )
         sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
             .receive(on: dependencies.scheduler)
