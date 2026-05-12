@@ -1,14 +1,13 @@
 import Mocks
 import Model
 import ProductDetails
-import Testing
+import XCTest
 @testable import Wishlist
 
-struct WishlistTests {
+final class WishlistTests: XCTestCase {
     // MARK: - WishlistViewModel.didTapAddToBag
 
-    @Test("didTapAddToBag navigates to PDP with the selected product")
-    func didTapAddToBag_navigatesToProductDetails() {
+    func test_didTapAddToBag_navigatesToProductDetailsWithSelectedProduct() {
         let colour = Product.Colour.fixture(id: "green", name: "Green")
         let variant = Product.Variant.fixture(size: .fixture(value: "M"), colour: colour)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
@@ -18,25 +17,26 @@ struct WishlistTests {
 
         sut.didTapAddToBag(for: selected)
 
-        #expect(capturedRoutes == [.productDetails(.productDetails(.selectedProduct(selected)))])
+        XCTAssertEqual(
+            capturedRoutes,
+            [.productDetails(.productDetails(.selectedProduct(selected)))]
+        )
     }
 
     // MARK: - WishlistViewModel.productCardViewModel(for:)
 
-    @Test("productCardViewModel hides size fields when the selected product has a size")
-    func productCardViewModel_hidesSizeFields_whenSelectedProductHasSize() {
+    func test_productCardViewModel_hidesSizeFields_whenSelectedProductHasSize() {
         let cardViewModel = makeProductCardViewModel(variantSize: .fixture(value: "M"))
 
-        #expect(cardViewModel.sizeTitle == nil)
-        #expect(cardViewModel.size == nil)
+        XCTAssertNil(cardViewModel.sizeTitle)
+        XCTAssertNil(cardViewModel.size)
     }
 
-    @Test("productCardViewModel hides size fields when the selected product has no size")
-    func productCardViewModel_hidesSizeFields_whenSelectedProductHasNoSize() {
+    func test_productCardViewModel_hidesSizeFields_whenSelectedProductHasNoSize() {
         let cardViewModel = makeProductCardViewModel(variantSize: nil)
 
-        #expect(cardViewModel.sizeTitle == nil)
-        #expect(cardViewModel.size == nil)
+        XCTAssertNil(cardViewModel.sizeTitle)
+        XCTAssertNil(cardViewModel.size)
     }
 
     // MARK: - Helpers
