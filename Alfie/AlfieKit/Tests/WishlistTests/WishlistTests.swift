@@ -1,6 +1,7 @@
 import Mocks
 import Model
 import ProductDetails
+import TestUtils
 import XCTest
 @testable import Wishlist
 
@@ -42,17 +43,21 @@ final class WishlistTests: XCTestCase {
     // MARK: - Helpers
 
     private func makeSUT(
-        navigate: @escaping (WishlistRoute) -> Void = { _ in }
+        navigate: @escaping (WishlistRoute) -> Void = { _ in },
+        file: StaticString = #filePath,
+        line: UInt = #line
     ) -> WishlistViewModel {
         let dependencies = WishlistDependencyContainer(
             wishlistService: MockWishlistService(),
             analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
         )
-        return WishlistViewModel(
+        let sut = WishlistViewModel(
             hasNavigationSeparator: false,
             dependencies: dependencies,
             navigate: navigate
         )
+        trackForMemoryLeak(sut, file: file, line: line)
+        return sut
     }
 
     private func makeProductCardViewModel(variantSize: Product.ProductSize?) -> VerticalProductCardViewModel {
