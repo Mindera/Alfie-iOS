@@ -72,7 +72,6 @@ private extension WishlistView {
             hasNavigationSeparator: true,
             dependencies: WishlistDependencyContainer(
                 wishlistService: MockWishlistService(),
-                bagService: MockBagService(),
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
             )
         ) { _ in }

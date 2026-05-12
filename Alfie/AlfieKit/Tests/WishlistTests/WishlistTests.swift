@@ -7,20 +7,18 @@ import Testing
 struct WishlistTests {
     // MARK: - WishlistViewModel.didTapAddToBag
 
-    @Test("didTapAddToBag navigates to PDP with the selected product and does not add to bag")
-    func didTapAddToBag_navigatesToProductDetails_andDoesNotAddToBag() {
+    @Test("didTapAddToBag navigates to PDP with the selected product")
+    func didTapAddToBag_navigatesToProductDetails() {
         let colour = Product.Colour.fixture(id: "green", name: "Green")
         let variant = Product.Variant.fixture(size: .fixture(value: "M"), colour: colour)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
         let selected = SelectedProduct(product: product, selectedVariant: variant)
-        let bagService = MockBagService()
         var capturedRoutes: [WishlistRoute] = []
-        let sut = makeSUT(bagService: bagService, navigate: { capturedRoutes.append($0) })
+        let sut = makeSUT(navigate: { capturedRoutes.append($0) })
 
         sut.didTapAddToBag(for: selected)
 
         #expect(capturedRoutes == [.productDetails(.productDetails(.selectedProduct(selected)))])
-        #expect(bagService.getBagContent().isEmpty)
     }
 
     // MARK: - WishlistViewModel.productCardViewModel(for:)
@@ -44,12 +42,10 @@ struct WishlistTests {
     // MARK: - Helpers
 
     private func makeSUT(
-        bagService: BagServiceProtocol = MockBagService(),
         navigate: @escaping (WishlistRoute) -> Void = { _ in }
     ) -> WishlistViewModel {
         let dependencies = WishlistDependencyContainer(
             wishlistService: MockWishlistService(),
-            bagService: bagService,
             analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
         )
         return WishlistViewModel(
