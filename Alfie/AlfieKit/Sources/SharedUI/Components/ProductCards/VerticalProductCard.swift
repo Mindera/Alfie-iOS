@@ -41,7 +41,9 @@ public struct VerticalProductCard: View {
                     productNameView
                     if !viewModel.configuration.hideDetails {
                         productColorView
-                        productSizeView
+                        if viewModel.sizeTitle != nil || viewModel.size != nil {
+                            productSizeView
+                        }
                     }
                 }
 
