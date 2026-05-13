@@ -172,8 +172,14 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         (selectedVariant?.stock ?? 0) > 0
     }
 
+    public var isAddToBagEnabled: Bool {
+        productHasStock
+            && colorSelectionConfiguration.selectedItem != nil
+            && sizingSelectionConfiguration.selectedItem != nil
+    }
+
     public func didTapAddToBag() {
-        guard let selectedProduct else { return }
+        guard isAddToBagEnabled, let selectedProduct else { return }
         dependencies.bagService.addProduct(selectedProduct)
         dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
     }
