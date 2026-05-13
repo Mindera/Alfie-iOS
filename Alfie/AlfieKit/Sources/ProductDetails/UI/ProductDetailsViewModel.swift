@@ -172,10 +172,16 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         (selectedVariant?.stock ?? 0) > 0
     }
 
+    /// True when the user is offered an interactive size choice (more than one size swatch).
+    /// When false, the size is implicit (sizeless product or a single available size).
+    public var canShowSizeSelector: Bool {
+        sizingSelectionConfiguration.items.count > 1
+    }
+
     public var isAddToBagEnabled: Bool {
         productHasStock
             && colorSelectionConfiguration.selectedItem != nil
-            && sizingSelectionConfiguration.selectedItem != nil
+            && (!canShowSizeSelector || sizingSelectionConfiguration.selectedItem != nil)
     }
 
     public func didTapAddToBag() {

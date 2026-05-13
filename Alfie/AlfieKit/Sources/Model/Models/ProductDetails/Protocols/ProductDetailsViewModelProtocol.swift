@@ -8,6 +8,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productName: String { get }
     var productHasStock: Bool { get }
     var isAddToBagEnabled: Bool { get }
+    var canShowSizeSelector: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
     var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> { get }

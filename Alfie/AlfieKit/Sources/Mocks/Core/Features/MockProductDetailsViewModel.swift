@@ -9,6 +9,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productTitle: String = ""
     public var productHasStock: Bool = true
     public var isAddToBagEnabled: Bool = true
+    public var canShowSizeSelector: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
     public var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch>
