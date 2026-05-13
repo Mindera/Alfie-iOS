@@ -9,6 +9,10 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "AccessibilityIdentifiers",
+            targets: ["AccessibilityIdentifiers"]
+        ),
+        .library(
             name: "AppFeature",
             targets: ["AppFeature"]
         ),
@@ -99,6 +103,10 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "AccessibilityIdentifiers"
+        ),
+
+        .target(
             name: "AppFeature",
             dependencies: [
                 "Bag",
@@ -138,6 +146,7 @@ let package = Package(
         .target(
             name: "CategorySelector",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "MyAccount",
@@ -236,6 +245,7 @@ let package = Package(
         .target(
             name: "ProductDetails",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "SharedUI",
@@ -246,6 +256,7 @@ let package = Package(
         .target(
             name: "ProductListing",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "ProductDetails",
