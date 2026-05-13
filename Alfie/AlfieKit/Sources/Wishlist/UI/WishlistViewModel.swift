@@ -33,7 +33,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didSelectDelete(for selectedProduct: SelectedProduct) {
-        dependencies.wishlistService.removeProduct(selectedProduct)
+        dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
         dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
         products = dependencies.wishlistService.getWishlistContent()
     }
