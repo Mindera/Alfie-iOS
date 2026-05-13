@@ -172,6 +172,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         (selectedVariant?.stock ?? 0) > 0
     }
 
+    /// True when at least one variant of the product has stock.
+    /// Use this for the CTA label (avoid showing "Out of Stock" while the product is still buyable in another size).
+    public var productHasAnyStock: Bool {
+        product?.variants.contains { $0.stock > 0 } ?? false
+    }
+
     /// True when the user is offered an interactive size choice (more than one size swatch).
     /// When false, the size is implicit (sizeless product or a single available size).
     public var canShowSizeSelector: Bool {

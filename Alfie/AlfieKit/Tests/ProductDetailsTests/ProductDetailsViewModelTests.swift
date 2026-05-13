@@ -225,6 +225,32 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertTrue(sut.isAddToBagEnabled)
     }
 
+    func test_productHasAnyStock_isTrue_whenAtLeastOneVariantHasStock() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 0)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 3)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertTrue(sut.productHasAnyStock)
+    }
+
+    func test_productHasAnyStock_isFalse_whenEveryVariantIsOutOfStock() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 0)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 0)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertFalse(sut.productHasAnyStock)
+    }
+
+    func test_productHasAnyStock_isFalse_whenProductIsNotLoaded() {
+        initViewModel()
+
+        XCTAssertFalse(sut.productHasAnyStock)
+    }
+
     func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)

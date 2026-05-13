@@ -7,6 +7,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productTitle: String { get }
     var productName: String { get }
     var productHasStock: Bool { get }
+    var productHasAnyStock: Bool { get }
     var isAddToBagEnabled: Bool { get }
     var canShowSizeSelector: Bool { get }
     var productImageUrls: [URL] { get }

@@ -478,7 +478,7 @@ extension ProductDetailsView {
                 let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
                 ThemedButton(
-                    text: viewModel.productHasStock ? addToBagText : outOfStockText,
+                    text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
                     isDisabled: .init(
                         get: { !viewModel.isAddToBagEnabled },
                         set: { _ in }
