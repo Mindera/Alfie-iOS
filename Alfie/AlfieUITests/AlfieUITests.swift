@@ -70,7 +70,9 @@ final class AlfieUITests: XCTestCase {
 
         XCTContext.runActivity(named: "PDP is visible, capture product name") { _ in
             pdp.assertVisible(timeout: timeout)
-            expectedProductName = pdp.productTitle.label
+            let name = pdp.productTitle.label
+            XCTAssertFalse(name.isEmpty, "Product title should be non-empty on PDP")
+            expectedProductName = name
         }
 
         XCTContext.runActivity(named: "Add to bag") { _ in

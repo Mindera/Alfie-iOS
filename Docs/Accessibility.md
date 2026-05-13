@@ -14,7 +14,7 @@ Examples:
 productListing.filter.button
 productListing.results.label
 productListing.row.{id}.image
-productDetails.addToCart.button
+productDetails.addToBag.button
 checkout.shipping.textField
 ```
 

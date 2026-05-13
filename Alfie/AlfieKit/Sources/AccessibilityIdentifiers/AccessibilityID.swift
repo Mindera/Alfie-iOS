@@ -1,5 +1,3 @@
-import Foundation
-
 /// Centralised registry of accessibility identifiers used across the app and
 /// consumed by UI tests. Identifiers follow the convention:
 ///
@@ -37,6 +35,8 @@ public enum AccessibilityID {
         public static let listStyleGridButton = "productListing.listStyle.grid.button"
         public static let listStyleListButton = "productListing.listStyle.list.button"
 
+        /// Returns a row-scoped prefix for composing element identifiers within a listing row.
+        /// Append a type suffix for specific elements: `row(id:) + ".image"`, `row(id:) + ".button"`, etc.
         public static func row(id: String) -> String {
             "productListing.row.\(id)"
         }

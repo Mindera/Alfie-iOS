@@ -19,6 +19,7 @@ final class ProductDetailsPage {
     }
 
     var productImage: XCUIElement {
+        // The media carousel is a container view, not an XCUIElement image — queried as otherElements.
         app.otherElements[AccessibilityID.ProductDetails.productImage]
     }
 
