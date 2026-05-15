@@ -96,13 +96,13 @@ final class ServiceProvider: ServiceProviderProtocol {
         bagService = BagService(
             store: UserDefaultsStore(
                 userDefaults: userDefaults,
-                storageKey: BagStorageKey.items.rawValue
+                storageKey: StorageKey.bagItems.rawValue
             )
         )
         wishlistService = WishlistService(
             store: UserDefaultsStore(
                 userDefaults: userDefaults,
-                storageKey: WishlistStorageKey.items.rawValue
+                storageKey: StorageKey.wishlistItems.rawValue
             )
         )
         sessionService = SessionService(analytics: analytics)
