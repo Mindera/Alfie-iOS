@@ -93,7 +93,12 @@ final class ServiceProvider: ServiceProviderProtocol {
         brandsService = BrandsService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
-        bagService = BagService()
+        bagService = BagService(
+            store: UserDefaultsStore(
+                userDefaults: userDefaults,
+                storageKey: BagStorageKey.items.rawValue
+            )
+        )
         wishlistService = WishlistService(
             store: UserDefaultsStore(
                 userDefaults: userDefaults,
