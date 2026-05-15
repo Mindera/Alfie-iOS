@@ -1,25 +1,20 @@
 import Foundation
 import Model
 
+// TODO: Update with an actual implementation with storage
 public final class WishlistService: WishlistServiceProtocol {
-    private let store: WishlistStoreProtocol
-    private var products: [SelectedProduct]
+    private var products: [SelectedProduct] = []
 
-    public init(store: WishlistStoreProtocol) {
-        self.store = store
-        self.products = store.load()
-    }
+    public init() { }
 
     public func addProduct(_ product: SelectedProduct) {
         guard !products.contains(where: { $0.id == product.id }) else { return }
 
         products.append(product)
-        store.save(products)
     }
 
     public func removeProduct(withId productId: String) {
         products = products.filter { $0.product.id != productId }
-        store.save(products)
     }
 
     public func getWishlistContent() -> [SelectedProduct] {
