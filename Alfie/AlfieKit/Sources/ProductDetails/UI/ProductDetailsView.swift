@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Combine
 import Core
 #if DEBUG
@@ -309,6 +310,7 @@ extension ProductDetailsView {
                 .padding(.bottom, Spacing.space200)
         }
         .writingSize(to: $carouselSize)
+        .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
     }
 
     private var fullscreenMediaCarousel: some View {
@@ -335,7 +337,7 @@ extension ProductDetailsView {
                     .foregroundStyle(Colors.primary.black)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
-                    .accessibilityIdentifier("product-name-pdp")
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.productTitle)
             }
         }
     }
@@ -393,6 +395,7 @@ extension ProductDetailsView {
                 }
                 .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
                 .writingSize(to: $colorSelectorSize)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
             } else if canShowColorPickers {
                 if let selectedColor = viewModel.colorSelectionConfiguration.selectedItem {
                     PickerMenu(isModalPresented: $showColorSheet) {
@@ -430,6 +433,7 @@ extension ProductDetailsView {
                 }
             }
             .shimmering(while: shimmeringBinding(for: .sizeSelector), animateOnStateTransition: false)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeSelector)
         }
     }
 
@@ -467,6 +471,7 @@ extension ProductDetailsView {
 
                 Text.build(theme.font.paragraph.normal(viewModel.productDescription))
                     .foregroundStyle(Colors.primary.black)
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
             }
         }
     }
@@ -487,7 +492,7 @@ extension ProductDetailsView {
                 ) {
                     viewModel.didTapAddToBag()
                 }
-                .accessibilityIdentifier("add-to-bag-button")
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.addToBagButton)
             }
         }
     }
@@ -502,6 +507,7 @@ extension ProductDetailsView {
                 ) {
                     viewModel.didTapAddToWishlist()
                 }
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
             }
         }
     }

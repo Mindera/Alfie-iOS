@@ -58,6 +58,7 @@ implement the Product Details feature following the spec in Docs/Specs/Features/
 - Use `L10n` for all user-facing strings (from `L10n.xcstrings`)
 - Define protocols for all ViewModels (for mockability)
 - Pass navigation closures from `FlowViewModel` to `ViewModel`
+- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier — never hardcode strings (see `Docs/Accessibility.md`)
 - Run `./Alfie/scripts/verify.sh` after every code change
 
 ### ❌ NEVER
@@ -93,6 +94,7 @@ When you need specific guidance, read the appropriate guide:
 - **GraphQL Integration** → `Docs/GraphQL.md`
 - **Localization (L10n)** → `Docs/Localization.md`
 - **Testing & Mocking** → `Docs/Testing.md`
+- **Accessibility Identifiers (UI tests)** → `Docs/Accessibility.md`
 - **Feature Development Process** → `Docs/Development.md`
 - **Code Style & Conventions** → `Docs/CodeStyle.md`
 - **Quick Reference (dirs, commands, deps)** → `Docs/QuickReference.md`
