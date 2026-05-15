@@ -15,6 +15,7 @@ public final class MockBagStore: BagStoreProtocol {
     }
 
     public func save(_ products: [SelectedProduct]) {
+        loadStub = products
         saveInvocations.append(products)
         onSaveCalled?(products)
     }

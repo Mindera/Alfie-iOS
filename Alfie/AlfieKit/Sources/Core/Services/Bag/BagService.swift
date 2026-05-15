@@ -3,14 +3,13 @@ import Model
 
 public final class BagService: BagServiceProtocol {
     private let store: BagStoreProtocol
-    private var products: [SelectedProduct]
 
     public init(store: BagStoreProtocol) {
         self.store = store
-        self.products = store.load()
     }
 
     public func addProduct(_ product: SelectedProduct) {
+        var products = store.load()
         guard !products.contains(where: { $0.id == product.id }) else { return }
 
         products.append(product)
@@ -18,11 +17,11 @@ public final class BagService: BagServiceProtocol {
     }
 
     public func removeProduct(_ product: SelectedProduct) {
-        products = products.filter { $0.id != product.id }
+        let products = store.load().filter { $0.id != product.id }
         store.save(products)
     }
 
     public func getBagContent() -> [SelectedProduct] {
-        products
+        store.load()
     }
 }
