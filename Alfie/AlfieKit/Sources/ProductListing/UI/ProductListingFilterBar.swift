@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -63,13 +64,13 @@ struct ProductListingFilterBar: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityIdentifier(AccessibilityId.filterButton)
+        .accessibilityIdentifier(AccessibilityID.ProductListing.filterButton)
     }
 
     private var resultInfoView: some View {
         Text.build(theme.font.tiny.normal(L10n.Plp.NumberOfResults.message(total)))
             .foregroundStyle(Colors.primary.mono500)
-            .accessibilityIdentifier(AccessibilityId.resultsLabel)
+            .accessibilityIdentifier(AccessibilityID.ProductListing.resultsLabel)
     }
 
     // MARK: - Constants
@@ -80,12 +81,6 @@ struct ProductListingFilterBar: View {
         static let filterIcon: CGFloat = 16.0
     }
 
-    // MARK: - Accessibility Id's
-
-    private enum AccessibilityId {
-        static let filterButton = "filter-btn"
-        static let resultsLabel = "results-lbl"
-    }
 }
 
 #Preview {

@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Foundation
 import Model
 import SharedUI
@@ -18,7 +19,10 @@ extension View {
                 },
                 principalItems: {
                     if !didFail {
-                        ThemedToolbarTitle(style: .text(productTitle))
+                        ThemedToolbarTitle(
+                            style: .text(productTitle),
+                            accessibilityId: AccessibilityID.ProductDetails.titleHeader
+                        )
                     } else {
                         EmptyView()
                     }
@@ -35,8 +39,3 @@ extension View {
     }
 }
 
-// MARK: - AccessibilityId
-
-private enum AccessibilityID {
-    static let titleHeader = "title-header"
-}

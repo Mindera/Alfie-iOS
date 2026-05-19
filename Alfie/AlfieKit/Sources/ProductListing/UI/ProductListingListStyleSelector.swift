@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -24,7 +25,7 @@ struct ProductListingListStyleSelector: View {
                     )
             }
             .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityId.listTypeGridButton)
+            .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleGridButton)
             Button {
                 selectedStyle = .list
             } label: {
@@ -38,7 +39,7 @@ struct ProductListingListStyleSelector: View {
                     )
             }
             .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityId.listTypeListButton)
+            .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleListButton)
         }
     }
 
@@ -46,8 +47,4 @@ struct ProductListingListStyleSelector: View {
         static let filterIcon: CGFloat = 16.0
     }
 
-    private enum AccessibilityId {
-        static let listTypeGridButton = "listTypeGridButton"
-        static let listTypeListButton = "listTypeListButton"
-    }
 }

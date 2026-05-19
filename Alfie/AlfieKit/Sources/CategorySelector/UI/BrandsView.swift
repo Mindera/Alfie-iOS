@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import OrderedCollections
 import SharedUI
@@ -129,9 +130,10 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
             isLoading: .constant(false)
         )
         .modifier(
-            TapHighlightableModifier {
-                viewModel.didTapBrand(brand)
-            }
+            TapHighlightableModifier(
+                action: { viewModel.didTapBrand(brand) },
+                accessibilityId: AccessibilityID.Brands.item
+            )
         )
     }
 
