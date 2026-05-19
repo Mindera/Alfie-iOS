@@ -21,7 +21,7 @@ env:
 
 jobs:
   setup:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 15
     steps:
       - name: Checkout Code
@@ -59,7 +59,7 @@ jobs:
 
   unit-tests:
     needs: setup
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 30
     steps:
       - name: Checkout Code
@@ -127,7 +127,7 @@ jobs:
 
   release:
     needs: [setup, unit-tests]
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
