@@ -153,6 +153,10 @@ jobs:
           restore-keys: |
             spm-${{ runner.os }}-
 
+      - name: Install Homebrew formulas
+        run: |
+          brew bundle install
+
       - name: Configure Bundler
         run: |
           bundle config set --local path 'vendor/bundle'
