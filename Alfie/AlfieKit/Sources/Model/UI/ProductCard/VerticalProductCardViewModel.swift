@@ -9,8 +9,6 @@ public struct VerticalProductCardViewModel {
     public var priceType: PriceType
     public var colorTitle: String?
     public var color: String?
-    public var sizeTitle: String?
-    public var size: String?
     public var addToBagTitle: String?
     public var outOfStockTitle: String?
     public var isAddToBagDisabled = false
@@ -24,8 +22,6 @@ public struct VerticalProductCardViewModel {
         priceType: PriceType,
         colorTitle: String? = nil,
         color: String? = nil,
-        sizeTitle: String? = nil,
-        size: String? = nil,
         addToBagTitle: String? = nil,
         outOfStockTitle: String? = nil,
         isAddToBagDisabled: Bool = false
@@ -38,8 +34,6 @@ public struct VerticalProductCardViewModel {
         self.priceType = priceType
         self.colorTitle = colorTitle
         self.color = color
-        self.sizeTitle = sizeTitle
-        self.size = size
         self.addToBagTitle = addToBagTitle
         self.outOfStockTitle = outOfStockTitle
         self.isAddToBagDisabled = isAddToBagDisabled
@@ -51,8 +45,6 @@ public extension VerticalProductCardViewModel {
         configuration: VerticalProductCardConfiguration,
         product: Product,
         colorTitle: String? = nil,
-        sizeTitle: String? = nil,
-        oneSizeTitle: String? = nil,
         addToBagTitle: String? = nil,
         outOfStockTitle: String? = nil,
         isAddToBagDisabled: Bool = false
@@ -64,8 +56,6 @@ public extension VerticalProductCardViewModel {
         self.name = product.name
         self.colorTitle = colorTitle
         self.color = product.defaultVariant.colour?.name
-        self.sizeTitle = sizeTitle
-        self.size = product.isSingleSizeProduct ? oneSizeTitle : product.sizeText
         self.priceType = product.priceType
         self.addToBagTitle = addToBagTitle
         self.outOfStockTitle = outOfStockTitle

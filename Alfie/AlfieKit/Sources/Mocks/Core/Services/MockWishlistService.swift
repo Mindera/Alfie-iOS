@@ -12,8 +12,8 @@ public final class MockWishlistService: WishlistServiceProtocol {
         products.append(product)
     }
 
-    public func removeProduct(_ product: SelectedProduct) {
-        products = products.filter { $0.id != product.id }
+    public func removeProduct(withId productId: String) {
+        products = products.filter { $0.product.id != productId }
     }
 
     public func getWishlistContent() -> [SelectedProduct] {

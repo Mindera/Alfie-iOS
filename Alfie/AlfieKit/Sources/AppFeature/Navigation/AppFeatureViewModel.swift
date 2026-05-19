@@ -81,7 +81,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         )
         let wishlistDependencyContainer = WishlistDependencyContainer(
             wishlistService: serviceProvider.wishlistService,
-            bagService: serviceProvider.bagService,
             analytics: serviceProvider.analytics
         )
         let categorySelectorDependencyContainer = CategorySelectorDependencyContainer(

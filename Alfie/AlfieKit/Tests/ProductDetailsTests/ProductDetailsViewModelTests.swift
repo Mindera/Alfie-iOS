@@ -68,6 +68,31 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sizingSelectionConfiguration.items.first?.name, size.value)
     }
     
+    func test_size_swatch_is_not_pre_selected_on_init_with_product() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
+        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+    }
+
+    func test_size_swatch_is_not_pre_selected_after_product_fetch() {
+        initViewModel()
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        mockProductService.onGetProductCalled = { _ in product }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
+        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+    }
+
     func test_sizing_selection_configuration_is_unavailable_when_there_is_no_selected_variant_on_init() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
@@ -139,6 +164,114 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.productImageUrls.count, variant.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant.media[0].asImage?.url.absoluteString)
         XCTAssertEqual(sut.productImageUrls[1].absoluteString, variant.media[1].asImage?.url.absoluteString)
+    }
+
+    // MARK: - Add to Bag gating
+
+    func test_isAddToBagEnabled_isFalseOnInit_forMultiSizeProduct_evenWithStock() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertFalse(sut.isAddToBagEnabled)
+    }
+
+    func test_isAddToBagEnabled_becomesTrue_afterSizeIsSelected_onMultiSizeProduct() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        initViewModel(configuration: .product(product))
+
+        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first
+
+        XCTAssertTrue(sut.isAddToBagEnabled)
+    }
+
+    func test_isAddToBagEnabled_isFalse_whenSelectedVariantIsOutOfStock() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color, stock: 0)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first
+
+        XCTAssertFalse(sut.isAddToBagEnabled)
+    }
+
+    func test_isAddToBagEnabled_isTrueOnInit_forSingleSizeProduct_withStock() {
+        // Product has sizes, but only one size variant exists (e.g. only available in M).
+        // The View renders a non-interactive singleSizeView, so the user can't tap a swatch —
+        // treat the size as implicitly selected.
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "m", value: "M")
+        let variant = Product.Variant.fixture(size: size, colour: color, stock: 5)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertTrue(sut.isAddToBagEnabled)
+    }
+
+    func test_isAddToBagEnabled_isTrueOnInit_forSizelessProduct_withStock() {
+        // Product has no size dimension at all (e.g. a necklace).
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let variant = Product.Variant.fixture(size: nil, colour: color, stock: 5)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertTrue(sut.isAddToBagEnabled)
+    }
+
+    func test_productHasAnyStock_isTrue_whenAtLeastOneVariantHasStock() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 0)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 3)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertTrue(sut.productHasAnyStock)
+    }
+
+    func test_productHasAnyStock_isFalse_whenEveryVariantIsOutOfStock() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 0)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 0)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertFalse(sut.productHasAnyStock)
+    }
+
+    func test_productHasAnyStock_isFalse_whenProductIsNotLoaded() {
+        initViewModel()
+
+        XCTAssertFalse(sut.productHasAnyStock)
+    }
+
+    func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
+        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
+        let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+        let mockBagService = MockBagService()
+        mockDependencies = ProductDetailsDependencyContainer(
+            scheduler: .immediate,
+            productService: mockProductService,
+            webUrlProvider: mockWebUrlProvider,
+            bagService: mockBagService,
+            wishlistService: MockWishlistService(),
+            configurationService: MockConfigurationService(),
+            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+            log: Log.DummyLogger()
+        )
+        initViewModel(configuration: .product(product))
+
+        sut.didTapAddToBag()
+
+        XCTAssertTrue(mockBagService.getBagContent().isEmpty)
     }
 
     func test_complementary_info_options_to_display_are_available() {

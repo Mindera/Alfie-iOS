@@ -40,10 +40,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         viewModel.sizingSelectionConfiguration.items.count > 6
     }
 
-    private var canShowSizeSelector: Bool {
-        viewModel.sizingSelectionConfiguration.items.count > 1
-    }
-
     private var isOneSize: Bool {
         viewModel.sizingSelectionConfiguration.items.count == 1
     }
@@ -418,7 +414,7 @@ extension ProductDetailsView {
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: Spacing.space150) {
-                if canShowSizeSelector {
+                if viewModel.canShowSizeSelector {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.sizingSelectionConfiguration,
                         isExpandable: canShowSizePickers
@@ -487,9 +483,9 @@ extension ProductDetailsView {
                 let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
                 ThemedButton(
-                    text: viewModel.productHasStock ? addToBagText : outOfStockText,
+                    text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
                     isDisabled: .init(
-                        get: { !viewModel.productHasStock },
+                        get: { !viewModel.isAddToBagEnabled },
                         set: { _ in }
                     ),
                     isFullWidth: true

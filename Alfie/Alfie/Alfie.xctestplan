@@ -102,6 +102,13 @@
         "identifier" : "ProductListingTests",
         "name" : "ProductListingTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "WishlistTests",
+        "name" : "WishlistTests"
+      }
     }
   ],
   "version" : 1
