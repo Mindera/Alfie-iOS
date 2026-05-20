@@ -39,6 +39,15 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
 }
 
 enum ApiEndpointUrl: String {
+    /// Toggle the `dev` environment to point at the legacy Alfie-Mocks server
+    /// (`localhost:4000`) instead of the BFF (`localhost:3000`). Useful during the
+    /// schema-divergence transition while iOS queries are migrated to the BFF.
+    /// Flip in code and rebuild.
+    static var useLegacyMockDev: Bool = false
+
+    /// Legacy Alfie-Mocks server URL — used as the `dev` URL when `useLegacyMockDev` is `true`.
+    static let legacyMockDevUrl = "http://localhost:4000/"
+
     // Local dev: aligned with the BFF default port. BFFClientService appends `graphql` /
     // `config/webviews` to this base, so it must stay an origin root (trailing slash, no path).
     case dev = "http://localhost:3000/"
@@ -52,7 +61,7 @@ enum ApiEndpointUrl: String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch option {
         case .dev:
-            ApiEndpointUrl.dev.rawValue
+            useLegacyMockDev ? legacyMockDevUrl : ApiEndpointUrl.dev.rawValue
         case .preProd:
             ApiEndpointUrl.preProd.rawValue
         case .prod:
