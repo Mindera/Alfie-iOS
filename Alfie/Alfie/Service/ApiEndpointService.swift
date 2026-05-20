@@ -39,9 +39,13 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
 }
 
 enum ApiEndpointUrl: String {
-    case dev = "http://localhost:4000/"
-    case preProd = "https://api-preprod.localhost:4000/"
-    case prod = "https://api.localhost:4000/"
+    // Local dev: aligned with the BFF default port. BFFClientService appends `graphql` /
+    // `config/webviews` to this base, so it must stay an origin root (trailing slash, no path).
+    case dev = "http://localhost:3000/"
+    // TODO: Real PreProd/Prod BFF environment URLs are not provisioned yet — these are
+    // explicit TBD placeholders. Replace once the real environments exist.
+    case preProd = "https://preprod.bff.tbd.invalid/"
+    case prod = "https://prod.bff.tbd.invalid/"
     case custom = "https://api-preview-000.localhost:4000/"
 
     static func url(for option: ApiEndpointOption) -> String {

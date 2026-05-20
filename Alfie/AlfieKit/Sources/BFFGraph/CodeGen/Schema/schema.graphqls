@@ -1,0 +1,156 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Barcode {
+  type: String!
+  value: String!
+}
+
+type Dimensions {
+  height: Float
+  length: Float
+  width: Float
+}
+
+type Image {
+  altText: String
+  url: String!
+}
+
+type Inventory {
+  available: Int
+}
+
+type Metafield {
+  key: String!
+  value: String!
+}
+
+input MetafieldFilterInput {
+  key: String!
+  namespace: String!
+  value: String!
+}
+
+input MetafieldIdentifierInput {
+  key: String!
+  namespace: String!
+}
+
+type Money {
+  amount: Float!
+  currencyCode: String!
+}
+
+type MoneyRange {
+  maxVariantPrice: Money!
+  minVariantPrice: Money!
+}
+
+type OmniProduct {
+  brandName: String
+  categories: [String]
+  createdAt: String
+  defaultVariantId: String
+  descriptionHtml: String
+  extensions: [Metafield]
+  fulfillmentType: String
+  id: ID!
+  images: [Image!]!
+  inventoryTotal: Int
+  media: [Image]
+  name: String!
+  options: [ProductOption]
+  priceRange: MoneyRange!
+  primaryImage: Image
+  productType: String
+  rating: Rating
+  relatedProducts: [String]
+  seo: Seo
+  slug: String!
+  tags: [String]
+  taxCategory: String
+  updatedAt: String
+  variants: [ProductVariant]
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+input ProductFilterInput {
+  brandNames: [String!]
+  inventory: Boolean
+  maxPrice: Float
+  metafields: [MetafieldFilterInput!]
+  minPrice: Float
+  productTypes: [String!]
+}
+
+type ProductListResponse {
+  pageInfo: PageInfo
+  products: [OmniProduct!]!
+  totalCount: Int
+}
+
+type ProductOption {
+  name: String!
+  values: [String!]!
+}
+
+enum ProductSortEnum {
+  NAME_ASC
+  NEWEST
+  OLDEST
+  PRICE_ASC
+  PRICE_DESC
+  RECENTLY_UPDATED
+  RELEVANCE
+}
+
+type ProductVariant {
+  attributes: [Metafield]
+  barcodes: [Barcode]
+  compareAtPrice: Money
+  cost: Money
+  createdAt: String
+  dimensions: Dimensions
+  id: ID!
+  inventory: Inventory
+  media: [Image]
+  optionValues: [VariantOption!]!
+  position: Int
+  price: Money!
+  productId: ID!
+  shippingRequired: Boolean!
+  sku: String!
+  taxCategory: String
+  updatedAt: String
+  weight: Float
+}
+
+type Query {
+  productDetails(handle: String!, platform: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
+  productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, platform: String, sort: ProductSortEnum! = NEWEST): ProductListResponse!
+  searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, platform: String, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
+}
+
+type Rating {
+  average: Float!
+  count: Int!
+}
+
+type Seo {
+  description: String
+  keywords: [String]
+  title: String
+}
+
+type VariantOption {
+  name: String!
+  value: String!
+}
