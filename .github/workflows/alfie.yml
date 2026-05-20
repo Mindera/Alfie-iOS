@@ -21,7 +21,7 @@ env:
 
 jobs:
   setup:
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 15
     steps:
       - name: Checkout Code
@@ -59,7 +59,7 @@ jobs:
 
   unit-tests:
     needs: setup
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 30
     steps:
       - name: Checkout Code
@@ -127,7 +127,7 @@ jobs:
 
   release:
     needs: [setup, unit-tests]
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     if: github.event_name == 'push'
     steps:
@@ -153,17 +153,21 @@ jobs:
           restore-keys: |
             spm-${{ runner.os }}-
 
+      - name: Install Homebrew formulas
+        run: |
+          brew bundle install
+
       - name: Configure Bundler
         run: |
           bundle config set --local path 'vendor/bundle'
           bundle install --jobs 4 --retry 3
 
-      - name: Set up SSH for Bitbucket
+      - name: Set up SSH for match repo
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+          echo "${{ secrets.MATCH_GIT_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
 
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
