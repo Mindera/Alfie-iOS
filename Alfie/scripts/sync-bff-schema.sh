@@ -4,7 +4,8 @@
 #
 # Steps:
 #   1. Locate the Alfie-BFF repo (sibling checkout by default; override via ALFIE_BFF_PATH).
-#   2. Check out `main` and pull the latest code — read-only: this never writes to the BFF repo.
+#   2. Check out `main` and pull the latest code in the BFF repo. The script does change
+#      the BFF repo's checked-out branch and HEAD, but never commits or pushes to it.
 #   3. Copy the BFF's generated schema (src/schema.gql) into this repo as the committed
 #      Apollo codegen input: AlfieKit/Sources/BFFGraph/CodeGen/Schema/schema.graphqls
 #   4. Run Apollo codegen.
@@ -35,7 +36,7 @@ if [ ! -d "${BFF_REPO_PATH}/.git" ]; then
     exit 1
 fi
 
-# --- 2. Check out main & pull latest (read-only w.r.t. the BFF repo) ---------
+# --- 2. Check out main & pull latest (no commits/pushes to the BFF repo) -----
 # Only tracked-file modifications matter — `git checkout`/`pull` never touch untracked
 # files (build output, .env, node_modules, etc.), so those must not block the sync.
 if [ -n "$(git -C "${BFF_REPO_PATH}" status --porcelain --untracked-files=no)" ]; then

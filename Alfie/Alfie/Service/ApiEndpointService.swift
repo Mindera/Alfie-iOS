@@ -55,7 +55,7 @@ enum ApiEndpointUrl: String {
     // explicit TBD placeholders. Replace once the real environments exist.
     case preProd = "https://preprod.bff.tbd.invalid/"
     case prod = "https://prod.bff.tbd.invalid/"
-    case custom = "https://api-preview-000.localhost:4000/"
+    case custom = "https://api-preview-000.localhost:3000/"
 
     static func url(for option: ApiEndpointOption) -> String {
         // swiftlint:disable vertical_whitespace_between_cases

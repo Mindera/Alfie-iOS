@@ -69,8 +69,8 @@ cd Alfie/scripts
 
 The script:
 
-1. In the Alfie-BFF repo: checks out `main` and pulls the latest — **read-only**, it
-   never writes to or commits in the BFF repo.
+1. In the Alfie-BFF repo: checks out `main` and pulls the latest. The script does change
+   the BFF repo's checked-out branch and HEAD, but **never commits or pushes** to it.
 2. Copies the BFF's `src/schema.gql` → `BFFGraph/CodeGen/Schema/schema.graphqls`.
 3. Runs Apollo codegen (`run-apollo-codegen.sh`) to regenerate the typed Swift API
    under `BFFGraph/API/`.
