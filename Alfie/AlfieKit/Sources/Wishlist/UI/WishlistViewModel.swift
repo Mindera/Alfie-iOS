@@ -33,14 +33,13 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didSelectDelete(for selectedProduct: SelectedProduct) {
-        dependencies.wishlistService.removeProduct(selectedProduct)
+        dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
         dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
         products = dependencies.wishlistService.getWishlistContent()
     }
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {
-        dependencies.bagService.addProduct(selectedProduct)
-        dependencies.analytics.trackAddToBag(productID: selectedProduct.product.id)
+        navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
     }
 
     public func didTapMyAccount() {
@@ -57,8 +56,6 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
             priceType: selectedProduct.priceType,
             colorTitle: L10n.Product.Color.title + ":",
             color: selectedProduct.colour?.name ?? "",
-            sizeTitle: L10n.Product.Size.title + ":",
-            size: selectedProduct.size == nil ? L10n.Product.OneSize.title : selectedProduct.sizeText,
             addToBagTitle: L10n.Product.AddToBag.Button.cta,
             outOfStockTitle: L10n.Product.OutOfStock.Button.cta,
             isAddToBagDisabled: selectedProduct.stock == .zero

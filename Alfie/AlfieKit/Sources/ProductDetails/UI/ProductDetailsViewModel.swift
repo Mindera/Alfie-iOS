@@ -172,8 +172,26 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         (selectedVariant?.stock ?? 0) > 0
     }
 
+    /// True when at least one variant of the product has stock.
+    /// Use this for the CTA label (avoid showing "Out of Stock" while the product is still buyable in another size).
+    public var productHasAnyStock: Bool {
+        product?.variants.contains { $0.stock > 0 } ?? false
+    }
+
+    /// True when the user is offered an interactive size choice (more than one size swatch).
+    /// When false, the size is implicit (sizeless product or a single available size).
+    public var canShowSizeSelector: Bool {
+        sizingSelectionConfiguration.items.count > 1
+    }
+
+    public var isAddToBagEnabled: Bool {
+        productHasStock
+            && colorSelectionConfiguration.selectedItem != nil
+            && (!canShowSizeSelector || sizingSelectionConfiguration.selectedItem != nil)
+    }
+
     public func didTapAddToBag() {
-        guard let selectedProduct else { return }
+        guard isAddToBagEnabled, let selectedProduct else { return }
         dependencies.bagService.addProduct(selectedProduct)
         dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
     }
@@ -296,15 +314,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
 
-        var selectedSwatch: SizingSwatch?
-        if let selectedVariant {
-            selectedSwatch = sizingSwatches.first { $0.id == selectedVariant.size?.id }
-        }
-
+        // Size is never auto-selected on PDP entry — the user must tap a swatch.
         sizingSelectionConfiguration = .init(
             selectedTitle: L10n.Product.Size.title + ":",
             items: sizingSwatches,
-            selectedItem: selectedSwatch
+            selectedItem: nil
         )
         sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
             .receive(on: dependencies.scheduler)

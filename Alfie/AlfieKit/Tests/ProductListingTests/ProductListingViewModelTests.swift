@@ -36,6 +36,65 @@ final class ProductListingViewModelTests: XCTestCase {
         try super.tearDownWithError()
     }
 
+    // MARK: - Wishlist heart toggle
+
+    func test_isFavoriteState_returnsTrue_whenProductIsInWishlist() {
+        let productId = "product-1"
+        let blueVariant = Product.Variant.fixture(colour: .fixture(id: "blue", name: "Blue"))
+        let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
+        let product = Product.fixture(id: productId, defaultVariant: redVariant, variants: [blueVariant, redVariant])
+        // Match by product id, regardless of which variant happens to be stored.
+        mockWishlistService.addProduct(SelectedProduct(product: product, selectedVariant: blueVariant))
+        sut = makeSUT()
+
+        XCTAssertTrue(sut.isFavoriteState(for: product))
+    }
+
+    func test_didTapAddToWishlist_whenUntoggling_removesProductFromWishlist() {
+        let productId = "product-1"
+        let blueVariant = Product.Variant.fixture(colour: .fixture(id: "blue", name: "Blue"))
+        let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
+        let product = Product.fixture(id: productId, defaultVariant: redVariant, variants: [blueVariant, redVariant])
+        // Defensive: pre-load multiple entries to confirm every row sharing the product id is removed.
+        mockWishlistService.addProduct(SelectedProduct(product: product, selectedVariant: blueVariant))
+        mockWishlistService.addProduct(SelectedProduct(product: product, selectedVariant: redVariant))
+        XCTAssertEqual(mockWishlistService.getWishlistContent().count, 2)
+        sut = makeSUT()
+
+        sut.didTapAddToWishlist(for: product, isFavorite: true)
+
+        XCTAssertTrue(mockWishlistService.getWishlistContent().isEmpty)
+    }
+
+    func test_didTapAddToWishlist_whenUntoggling_doesNotAffectOtherProducts() {
+        let otherProduct = Product.fixture(id: "other")
+        mockWishlistService.addProduct(SelectedProduct(product: otherProduct))
+        let targetProduct = Product.fixture(id: "target")
+        mockWishlistService.addProduct(SelectedProduct(product: targetProduct))
+        sut = makeSUT()
+
+        sut.didTapAddToWishlist(for: targetProduct, isFavorite: true)
+
+        let remaining = mockWishlistService.getWishlistContent()
+        XCTAssertEqual(remaining.count, 1)
+        XCTAssertEqual(remaining.first?.product.id, "other")
+    }
+
+    private func makeSUT() -> ProductListingViewModel {
+        .init(
+            dependencies: ProductListingDependencyContainer(
+                productListingService: mockProductListing,
+                plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
+                wishlistService: mockWishlistService,
+                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+                configurationService: MockConfigurationService(),
+                log: log
+            ),
+            navigate: { _ in },
+            showSearch: {}
+        )
+    }
+
     func test_loading_first_page_shows_skeleton_items() {
         sut = .init(
             dependencies: ProductListingDependencyContainer(

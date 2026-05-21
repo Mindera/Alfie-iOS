@@ -93,7 +93,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.contains { $0.product.defaultVariant.sku == product.defaultVariant.sku }
+        wishlistContent.contains { $0.product.id == product.id }
     }
 
     public func didTapSearch() {
@@ -106,8 +106,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             dependencies.wishlistService.addProduct(selectedProduct)
             dependencies.analytics.trackAddToWishlist(productID: product.id)
         } else {
-            let selectedProduct = SelectedProduct(product: product)
-            dependencies.wishlistService.removeProduct(selectedProduct)
+            dependencies.wishlistService.removeProduct(withId: product.id)
             dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
         }
         wishlistContent = dependencies.wishlistService.getWishlistContent()
