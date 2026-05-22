@@ -4,8 +4,8 @@
 import ApolloAPI
 
 public extension BFFGraphAPI.Objects {
-  static let Image = ApolloAPI.Object(
-    typename: "Image",
+  static let OmniProduct = ApolloAPI.Object(
+    typename: "OmniProduct",
     implementedInterfaces: [],
     keyFields: nil
   )

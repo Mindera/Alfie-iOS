@@ -13,6 +13,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
     private let apolloClient: ApolloClient
     private let dependencies: BFFClientDependencyContainer
     private let baseUrl: Foundation.URL
+    private let log: Logger
 
     public init(
         url: Foundation.URL,
@@ -23,6 +24,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) {
         self.dependencies = dependencies
         self.baseUrl = url
+        self.log = log
 
         let client = URLSessionClient(sessionConfiguration: sessionConfiguration)
         let cache = InMemoryNormalizedCache()
@@ -48,22 +50,14 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        let navigation = try await executeFetch(
-            BFFGraphAPI.GetHeaderNavQuery(
-                handle: handle.rawValue,
-                fetchMedia: includeMedia,
-                fetchSubItems: includeSubItems
-            )
-        ).navigation
-
-        return navigation.convertToNavigationItems()
+        // ALFMOB-331: BFF schema migration in progress. Header nav query is gone from the
+        // new schema; this stub keeps the build green until a follow-up ticket rewires it.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getProduct(id: String) async throws -> Product {
-        guard let product = try await executeFetch(BFFGraphAPI.GetProductQuery(productId: id)).product else {
-            throw BFFRequestError(type: .emptyResponse)
-        }
-        return product.convertToProduct()
+        // ALFMOB-331: BFF schema migration. PDP migration is tracked by ALFMOB-332.
+        throw BFFRequestError(type: .generic)
     }
 
     public func productListing(
@@ -73,28 +67,44 @@ public final class BFFClientService: BFFClientServiceProtocol {
         query: String?,
         sort: String?
     ) async throws -> ProductListing {
-        guard let productList = try await executeFetch(
-            BFFGraphAPI.ProductListingQuery(
-                offset: offset,
-                limit: limit,
-                categoryId: categoryId.map { .some($0) } ?? .none,
-                query: query.map { .some($0) } ?? .none,
-                sort: sort.map { .some(.case(.init(rawValue: $0) ?? .aZ )) } ?? .none
-            )
-        ).productListing
-        else {
-            throw BFFRequestError(type: .emptyResponse)
+        // ALFMOB-331 AC 1: rewire to BFF's productList query. Cursor pagination, sort and
+        // filter wiring land in subsequent ACs — for now we always fetch the first page
+        // with the default sort.
+        guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
+            log.error("productList called without a collectionHandle; aborting.")
+            throw BFFRequestError(type: .generic)
         }
-        return productList.convertToProductListing()
+
+        log.info("productList → collectionHandle=\(collectionHandle) limit=\(limit)")
+
+        do {
+            let response = try await executeFetch(
+                BFFGraphAPI.ProductListQuery(
+                    collectionHandle: collectionHandle,
+                    after: .none,
+                    limit: limit,
+                    filters: .none
+                )
+            ).productList
+
+            log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+
+            return response.convertToProductListing()
+        } catch {
+            log.error("productList failed: \(error)")
+            throw error
+        }
     }
 
     public func getBrands() async throws -> [Brand] {
-        let brands = try await executeFetch(BFFGraphAPI.BrandsQuery()).brands
-        return brands.convertToBrands()
+        // ALFMOB-331: BFF schema migration. The new schema removed the brands query;
+        // a follow-up will reintroduce/replace it.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getSearchSuggestion(term: String) async throws -> SearchSuggestion {
-        try await executeFetch(BFFGraphAPI.GetSuggestionsQuery(term: term)).suggestion.convertToSearchSuggestion()
+        // ALFMOB-331: BFF schema migration. Search migration is tracked by ALFMOB-333.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getWebViewConfig() async throws -> WebViewConfiguration {

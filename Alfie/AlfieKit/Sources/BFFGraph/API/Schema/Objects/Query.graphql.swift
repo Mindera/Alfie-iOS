@@ -4,7 +4,6 @@
 import ApolloAPI
 
 public extension BFFGraphAPI.Objects {
-  /// The Query root for the schema.
   static let Query = ApolloAPI.Object(
     typename: "Query",
     implementedInterfaces: [],

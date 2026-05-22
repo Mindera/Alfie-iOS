@@ -4,31 +4,79 @@ import ApolloTestSupport
 import Core
 
 final class ProductListingConverterTests: XCTestCase {
-    func test_product_listing_valid() {
-        let pagination = Mock<Pagination>(limit: 40,
-                                          nextPage: 3,
-                                          offset: 20,
-                                          page: 2,
-                                          pages: 5,
-                                          previousPage: 1,
-                                          total: 81)
+    func test_product_list_response_converts_to_product_listing() {
+        let money = Mock<Money>(amount: 19.99, currencyCode: "AUD")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        let product = Mock<OmniProduct>(
+            brandName: "Acme",
+            descriptionHtml: "<p>Hello</p>",
+            id: "prod-1",
+            inventoryTotal: 10,
+            name: "Test Product",
+            priceRange: priceRange,
+            productType: "Shoes",
+            slug: "test-product"
+        )
+        let pageInfo = Mock<PageInfo>(endCursor: "cursor-1", hasNextPage: true)
+        let mockResponse = Mock<ProductListResponse>(pageInfo: pageInfo, products: [product], totalCount: 42)
 
-        let mockProductListing = Mock<ProductListing>(pagination: pagination,
-                                                      products: [.mock()],
-                                                      title: "Product Listing Title")
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
 
-        let response = BFFGraphAPI.ProductListingQuery.Data.ProductListing.from(mockProductListing)
-        let productListing = response.convertToProductListing()
+        XCTAssertEqual(listing.products.count, 1)
+        XCTAssertEqual(listing.products.first?.id, "prod-1")
+        XCTAssertEqual(listing.products.first?.name, "Test Product")
+        XCTAssertEqual(listing.products.first?.brand.name, "Acme")
+        XCTAssertEqual(listing.pagination.total, 42)
+    }
 
-        XCTAssertEqual(productListing.products.count, 1)
-        XCTAssertEqual(productListing.title, "Product Listing Title")
+    func test_empty_products_yields_empty_listing() {
+        let pageInfo = Mock<PageInfo>(endCursor: nil, hasNextPage: false)
+        let mockResponse = Mock<ProductListResponse>(pageInfo: pageInfo, products: [], totalCount: 0)
 
-        XCTAssertEqual(productListing.pagination.limit, 40)
-        XCTAssertEqual(productListing.pagination.nextPage, 3)
-        XCTAssertEqual(productListing.pagination.offset, 20)
-        XCTAssertEqual(productListing.pagination.page, 2)
-        XCTAssertEqual(productListing.pagination.pages, 5)
-        XCTAssertEqual(productListing.pagination.previousPage, 1)
-        XCTAssertEqual(productListing.pagination.total, 81)
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        XCTAssertTrue(listing.products.isEmpty)
+        XCTAssertEqual(listing.pagination.total, 0)
+    }
+
+    func test_collapses_price_range_when_min_equals_max() {
+        let money = Mock<Money>(amount: 25.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        let product = Mock<OmniProduct>(id: "p1", name: "Single Price", priceRange: priceRange, slug: "p1")
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        XCTAssertEqual(listing.products.first?.priceRange?.low.amount, 2500)
+        XCTAssertNil(listing.products.first?.priceRange?.high)
+    }
+
+    func test_preserves_price_range_when_min_differs_from_max() {
+        let low = Mock<Money>(amount: 10.00, currencyCode: "GBP")
+        let high = Mock<Money>(amount: 50.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: high, minVariantPrice: low)
+        let product = Mock<OmniProduct>(id: "p1", name: "Ranged", priceRange: priceRange, slug: "p1")
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        XCTAssertEqual(listing.products.first?.priceRange?.low.amount, 1000)
+        XCTAssertEqual(listing.products.first?.priceRange?.high?.amount, 5000)
+    }
+
+    func test_missing_brand_name_falls_back_to_empty_string() {
+        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        let product = Mock<OmniProduct>(brandName: nil, id: "p1", name: "No Brand", priceRange: priceRange, slug: "p1")
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        XCTAssertEqual(listing.products.first?.brand.name, "")
     }
 }

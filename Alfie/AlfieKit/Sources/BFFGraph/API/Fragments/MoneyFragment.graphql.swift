@@ -6,7 +6,7 @@
 public extension BFFGraphAPI {
   struct MoneyFragment: BFFGraphAPI.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      #"fragment MoneyFragment on Money { __typename currencyCode amount amountFormatted }"#
+      #"fragment MoneyFragment on Money { __typename amount currencyCode }"#
     }
 
     public let __data: DataDict
@@ -15,17 +15,12 @@ public extension BFFGraphAPI {
     public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Money }
     public static var __selections: [ApolloAPI.Selection] { [
       .field("__typename", String.self),
+      .field("amount", Double.self),
       .field("currencyCode", String.self),
-      .field("amount", Int.self),
-      .field("amountFormatted", String.self),
     ] }
 
-    /// The 3-letter currency code e.g. AUD.
+    public var amount: Double { __data["amount"] }
     public var currencyCode: String { __data["currencyCode"] }
-    /// The amount in minor units (e.g. for $1.23 this will be 123).
-    public var amount: Int { __data["amount"] }
-    /// The amount formatted according to the client locale (e.g. $1.23).
-    public var amountFormatted: String { __data["amountFormatted"] }
   }
 
 }
