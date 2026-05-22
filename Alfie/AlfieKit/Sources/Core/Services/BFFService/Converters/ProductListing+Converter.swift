@@ -5,19 +5,11 @@ import Utils
 
 extension BFFGraphAPI.ProductListQuery.Data.ProductList {
     public func convertToProductListing() -> ProductListing {
-        // ALFMOB-331 AC 1: minimal mapping from the new productList response.
-        // Cursor pagination, totalCount surfacing and the slimmer Product model will be
-        // wired in ACs 2 & 5; for now we keep the existing Pagination shape populated
-        // with sensible defaults so the screen can render.
         let mappedProducts = products.map { $0.fragments.productListItemFragment.convertToProduct() }
         let pagination = ProductListing.Pagination(
-            offset: 0,
-            limit: mappedProducts.count,
             total: totalCount ?? mappedProducts.count,
-            pages: pageInfo?.hasNextPage == true ? 2 : 1,
-            page: 1,
-            nextPage: nil,
-            previousPage: nil
+            endCursor: pageInfo?.endCursor,
+            hasNextPage: pageInfo?.hasNextPage ?? false
         )
         return ProductListing(
             title: "",

@@ -61,27 +61,27 @@ public final class BFFClientService: BFFClientServiceProtocol {
     }
 
     public func productListing(
-        offset: Int,
+        after: String?,
         limit: Int,
         categoryId: String?,
         query: String?,
         sort: String?
     ) async throws -> ProductListing {
-        // ALFMOB-331 AC 1: rewire to BFF's productList query. Cursor pagination, sort and
-        // filter wiring land in subsequent ACs — for now we always fetch the first page
-        // with the default sort.
+        // ALFMOB-331 AC 2: cursor-based pagination via BFF's `productList`. Sort and filter
+        // wiring land in subsequent ACs — for now we always use the default sort and no
+        // filters.
         guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
             log.error("productList called without a collectionHandle; aborting.")
             throw BFFRequestError(type: .generic)
         }
 
-        log.info("productList → collectionHandle=\(collectionHandle) limit=\(limit)")
+        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit)")
 
         do {
             let response = try await executeFetch(
                 BFFGraphAPI.ProductListQuery(
                     collectionHandle: collectionHandle,
-                    after: .none,
+                    after: after.map { .some($0) } ?? .none,
                     limit: limit,
                     filters: .none
                 )

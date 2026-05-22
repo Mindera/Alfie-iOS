@@ -231,7 +231,7 @@ final class ProductListingViewModelTests: XCTestCase {
         )
 
         mockProductListing.onPageCalled = { _, _, _ in
-            ProductListing.fixture(pagination: .fixture(nextPage: 1),
+            ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true),
                                    products: Product.fixtures)
         }
 

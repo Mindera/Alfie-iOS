@@ -28,6 +28,8 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertEqual(listing.products.first?.name, "Test Product")
         XCTAssertEqual(listing.products.first?.brand.name, "Acme")
         XCTAssertEqual(listing.pagination.total, 42)
+        XCTAssertEqual(listing.pagination.endCursor, "cursor-1")
+        XCTAssertTrue(listing.pagination.hasNextPage)
     }
 
     func test_empty_products_yields_empty_listing() {
@@ -39,6 +41,8 @@ final class ProductListingConverterTests: XCTestCase {
 
         XCTAssertTrue(listing.products.isEmpty)
         XCTAssertEqual(listing.pagination.total, 0)
+        XCTAssertNil(listing.pagination.endCursor)
+        XCTAssertFalse(listing.pagination.hasNextPage)
     }
 
     func test_collapses_price_range_when_min_equals_max() {

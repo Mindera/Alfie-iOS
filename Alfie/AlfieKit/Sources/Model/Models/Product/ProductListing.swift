@@ -1,38 +1,20 @@
 import Foundation
 
 public struct ProductListing {
+    /// Cursor-based pagination state returned by the BFF's `productList` query.
     public struct Pagination {
-        /// Start point
-        public let offset: Int
-        /// Records to return
-        public let limit: Int
-        /// The total number of results
+        /// Total number of records available for the query, when reported by the BFF.
         public let total: Int
-        /// Number of pages based on offset
-        public let pages: Int
-        /// Current page
-        public let page: Int
-        /// Offset of next page if page exists
-        public let nextPage: Int?
-        /// Offset of previous page if page exists
-        public let previousPage: Int?
+        /// Opaque cursor pointing at the last record returned by this response — pass back
+        /// as `after` to fetch the next page. `nil` when there is no further page.
+        public let endCursor: String?
+        /// Whether the BFF has more records after this page.
+        public let hasNextPage: Bool
 
-        public init(
-            offset: Int,
-            limit: Int,
-            total: Int,
-            pages: Int,
-            page: Int,
-            nextPage: Int? = nil,
-            previousPage: Int? = nil
-        ) {
-            self.offset = offset
-            self.limit = limit
+        public init(total: Int, endCursor: String?, hasNextPage: Bool) {
             self.total = total
-            self.pages = pages
-            self.page = page
-            self.nextPage = nextPage
-            self.previousPage = previousPage
+            self.endCursor = endCursor
+            self.hasNextPage = hasNextPage
         }
     }
 

@@ -13,7 +13,7 @@ final class ProductListingServiceTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockClientService = MockBFFClientService()
-        paginationConfiguration = .init(type: .plp, initialPage: 0)
+        paginationConfiguration = .init(type: .plp)
         sut = .init(
             productService: ProductService(bffClient: mockClientService),
             configuration: paginationConfiguration
@@ -26,10 +26,10 @@ final class ProductListingServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_first_page_calls_bff_service_with_params() {
+    func test_first_page_calls_bff_service_with_nil_cursor() {
         let expectation = expectation(description: "Wait for service call")
-        mockClientService.onProductListingCalled = { offset, limit, categoryId, query, sort in
-            XCTAssertEqual(offset, self.paginationConfiguration.initialPage)
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort in
+            XCTAssertNil(after)
             XCTAssertEqual(limit, self.paginationConfiguration.pageSize)
             XCTAssertEqual(categoryId, "category id")
             XCTAssertEqual(query, "query")
@@ -49,7 +49,7 @@ final class ProductListingServiceTests: XCTestCase {
         let expectation = expectation(description: "Wait for service call")
         mockClientService.onProductListingCalled = { _, _, _, _, _ in
             expectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(nextPage: 1))
+            return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true))
         }
 
         Task {
@@ -79,7 +79,7 @@ final class ProductListingServiceTests: XCTestCase {
         let calledExpectation = expectation(description: "Wait for service call")
         mockClientService.onProductListingCalled = { _, _, _, _, _ in
             calledExpectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(nextPage: nil))
+            return ProductListing.fixture(pagination: .fixture(endCursor: nil, hasNextPage: false))
         }
 
         Task {
@@ -98,42 +98,49 @@ final class ProductListingServiceTests: XCTestCase {
         }
 
         Task {
-            _ = try await sut.next()
+            _ = try? await sut.next()
         }
 
         wait(for: [notCalledExpectation], timeout: .inverted)
     }
 
-    func test_next_page_calls_bff_service_while_has_next_pages() async {
-        let expectation = expectation(description: "Wait for service call for 2 pages")
-        expectation.expectedFulfillmentCount = 2
-        mockClientService.onProductListingCalled = { offset, _, _, _, _ in
-            expectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(nextPage: offset < 1 ? offset + 1 : nil))
+    func test_next_page_forwards_stored_cursor() async throws {
+        let firstCall = expectation(description: "First page")
+        mockClientService.onProductListingCalled = { after, _, _, _, _ in
+            XCTAssertNil(after)
+            firstCall.fulfill()
+            return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-A", hasNextPage: true))
         }
+        _ = try await sut.paged()
+        await fulfillment(of: [firstCall], timeout: .default)
+        XCTAssertTrue(sut.hasNext())
 
+        let secondCall = expectation(description: "Second page")
+        mockClientService.onProductListingCalled = { after, _, _, _, _ in
+            XCTAssertEqual(after, "cursor-A")
+            secondCall.fulfill()
+            return ProductListing.fixture(pagination: .fixture(endCursor: nil, hasNextPage: false))
+        }
+        _ = try await sut.next()
+        await fulfillment(of: [secondCall], timeout: .default)
+        XCTAssertFalse(sut.hasNext())
+    }
+
+    func test_next_throws_when_no_cursor_available() async {
         do {
-            // first page successfully
-            _ = try await sut.paged(categoryId: "try 1", query: "query 1", sort: "sort 1")
-            XCTAssertTrue(sut.hasNext())
-            // second page successfully but no next page
-            _ = try await sut.next(categoryId: "try 2", query: "query 2", sort: "sort 2")
-            XCTAssertFalse(sut.hasNext())
-            // third page failure
-            _ = try await sut.next(categoryId: "try 3", query: "query 3", sort: "sort 3")
+            _ = try await sut.next(categoryId: "cat", query: "q", sort: "s")
+            XCTFail("Expected next() to throw when no cursor is set")
         } catch {
-            guard case let bffError = error as? BFFRequestError,
-                  case .product(let productError) = bffError?.type,
+            guard let bffError = error as? BFFRequestError,
+                  case .product(let productError) = bffError.type,
                   case .noProducts(let category, let query, let sort) = productError
             else {
-                XCTFail("Unexpected error thrown")
+                XCTFail("Unexpected error thrown: \(error)")
                 return
             }
-            XCTAssertEqual(category, "try 3")
-            XCTAssertEqual(query, "query 3")
-            XCTAssertEqual(sort, "sort 3")
+            XCTAssertEqual(category, "cat")
+            XCTAssertEqual(query, "q")
+            XCTAssertEqual(sort, "s")
         }
-
-        await fulfillment(of: [expectation], timeout: .default)
     }
 }
