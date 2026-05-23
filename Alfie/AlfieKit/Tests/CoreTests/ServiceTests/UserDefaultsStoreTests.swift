@@ -89,7 +89,10 @@ final class UserDefaultsStoreTests: XCTestCase {
         let url = try XCTUnwrap(URL(string: "https://example.com/a.jpg"))
         let colour = Product.Colour.fixture(name: "Blue", media: [.image(.fixture(url: url))])
         let size = Product.ProductSize.fixture(value: "M", scale: "US")
-        let price = Price.fixture(amount: .fixture(amountFormatted: "$50"))
+        let price = Price.fixture(
+            amount: .fixture(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00"),
+            was: nil
+        )
         let variant = Product.Variant.fixture(
             sku: "sku-1",
             size: size,
@@ -120,10 +123,11 @@ final class UserDefaultsStoreTests: XCTestCase {
         XCTAssertEqual(roundTripped.media.first?.asImage?.url, original.media.first?.asImage?.url)
         XCTAssertEqual(roundTripped.colour?.name, original.colour?.name)
         XCTAssertEqual(roundTripped.sizeText, original.sizeText)
-        XCTAssertEqual(
-            PersistedPriceTypeDTO(from: roundTripped.priceType),
-            PersistedPriceTypeDTO(from: original.priceType)
-        )
+        // Full price fidelity (currency code + numeric amount + formatted) round-trips.
+        XCTAssertEqual(roundTripped.selectedVariant.price.amount.currencyCode, "AUD")
+        XCTAssertEqual(roundTripped.selectedVariant.price.amount.amount, 5000)
+        XCTAssertEqual(roundTripped.selectedVariant.price.amount.amountFormatted, "$50.00")
+        XCTAssertNil(roundTripped.selectedVariant.price.was)
     }
 
     // MARK: - Helpers

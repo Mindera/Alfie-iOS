@@ -96,6 +96,34 @@ final class PersistedProductDTOTests: XCTestCase {
         XCTAssertNil(dto.imageURL)
     }
 
+    func test_initFromSelectedProduct_capturesFullPrice_whenNotOnSale() {
+        let money = Money.fixture(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00")
+        let price = Price.fixture(amount: money, was: nil)
+        let variant = Product.Variant.fixture(price: price)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
+        let dto = PersistedProductDTO(from: SelectedProduct(product: product, selectedVariant: variant))
+
+        XCTAssertEqual(dto.price.amount.currencyCode, "AUD")
+        XCTAssertEqual(dto.price.amount.amount, 5000)
+        XCTAssertEqual(dto.price.amount.amountFormatted, "$50.00")
+        XCTAssertNil(dto.price.was)
+    }
+
+    func test_initFromSelectedProduct_capturesPreviousPrice_whenOnSale() {
+        let current = Money.fixture(currencyCode: "AUD", amount: 8000, amountFormatted: "$80.00")
+        let was = Money.fixture(currencyCode: "AUD", amount: 10_000, amountFormatted: "$100.00")
+        let price = Price.fixture(amount: current, was: was)
+        let variant = Product.Variant.fixture(price: price)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
+        let dto = PersistedProductDTO(from: SelectedProduct(product: product, selectedVariant: variant))
+
+        XCTAssertEqual(dto.price.amount.amount, 8000)
+        XCTAssertEqual(dto.price.was?.amount, 10_000)
+        XCTAssertEqual(dto.price.was?.amountFormatted, "$100.00")
+    }
+
     // MARK: - DTO → Domain (`selectedProduct`)
 
     func test_selectedProduct_exposesIdentifiers() {
@@ -155,6 +183,52 @@ final class PersistedProductDTOTests: XCTestCase {
         XCTAssertNil(dto.selectedProduct.colour)
     }
 
+    func test_selectedProduct_restoresFullPriceFidelity() {
+        let dto = PersistedProductDTO.testFixture(
+            price: PersistedPriceDTO(
+                amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00"),
+                was: PersistedMoneyDTO(currencyCode: "AUD", amount: 6500, amountFormatted: "$65.00")
+            )
+        )
+
+        let restored = dto.selectedProduct.selectedVariant.price
+
+        XCTAssertEqual(restored.amount.currencyCode, "AUD")
+        XCTAssertEqual(restored.amount.amount, 5000)
+        XCTAssertEqual(restored.amount.amountFormatted, "$50.00")
+        XCTAssertEqual(restored.was?.amount, 6500)
+        XCTAssertEqual(restored.was?.amountFormatted, "$65.00")
+    }
+
+    func test_selectedProduct_priceType_isSale_whenPersistedPriceHasWas() {
+        let dto = PersistedProductDTO.testFixture(
+            price: PersistedPriceDTO(
+                amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 8000, amountFormatted: "$80.00"),
+                was: PersistedMoneyDTO(currencyCode: "AUD", amount: 10_000, amountFormatted: "$100.00")
+            )
+        )
+
+        guard case let .sale(fullPrice, finalPrice) = dto.selectedProduct.priceType else {
+            return XCTFail("Expected sale priceType, got \(dto.selectedProduct.priceType)")
+        }
+        XCTAssertEqual(fullPrice, "$100.00")
+        XCTAssertEqual(finalPrice, "$80.00")
+    }
+
+    func test_selectedProduct_priceType_isDefault_whenPersistedPriceHasNoWas() {
+        let dto = PersistedProductDTO.testFixture(
+            price: PersistedPriceDTO(
+                amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00"),
+                was: nil
+            )
+        )
+
+        guard case let .default(price) = dto.selectedProduct.priceType else {
+            return XCTFail("Expected default priceType, got \(dto.selectedProduct.priceType)")
+        }
+        XCTAssertEqual(price, "$50.00")
+    }
+
     // MARK: - Codable
 
     func test_dto_codableRoundTrip() throws {
@@ -166,7 +240,10 @@ final class PersistedProductDTOTests: XCTestCase {
             imageURL: URL(string: "https://example.com/a.jpg"),
             colourName: "Blue",
             sizeText: "M US",
-            priceType: .sale(fullPrice: "$100", finalPrice: "$80"),
+            price: PersistedPriceDTO(
+                amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 8000, amountFormatted: "$80.00"),
+                was: PersistedMoneyDTO(currencyCode: "AUD", amount: 10_000, amountFormatted: "$100.00")
+            ),
             stock: 3
         )
 
@@ -176,13 +253,14 @@ final class PersistedProductDTOTests: XCTestCase {
         XCTAssertEqual(decoded, original)
     }
 
-    // MARK: - SelectedProduct → DTO → SelectedProduct (full documented field set)
+    // MARK: - SelectedProduct → DTO → SelectedProduct (full round-trip)
 
-    func test_selectedProductRoundTrip_preservesDocumentedFields() throws {
+    func test_selectedProductRoundTrip_preservesAllCapturedFields() throws {
         let url = try XCTUnwrap(URL(string: "https://example.com/a.jpg"))
         let colour = Product.Colour.fixture(name: "Blue", media: [.image(.fixture(url: url))])
         let size = Product.ProductSize.fixture(value: "M", scale: "US")
-        let price = Price.fixture(amount: .fixture(amountFormatted: "$50"))
+        let money = Money.fixture(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00")
+        let price = Price.fixture(amount: money, was: nil)
         let variant = Product.Variant.fixture(
             sku: "sku-1",
             size: size,
@@ -209,82 +287,86 @@ final class PersistedProductDTOTests: XCTestCase {
         XCTAssertEqual(roundTripped.media.first?.asImage?.url, original.media.first?.asImage?.url)
         XCTAssertEqual(roundTripped.colour?.name, original.colour?.name)
         XCTAssertEqual(roundTripped.sizeText, original.sizeText)
-        XCTAssertEqual(
-            PersistedPriceTypeDTO(from: roundTripped.priceType),
-            PersistedPriceTypeDTO(from: original.priceType)
-        )
+        // Full Price fidelity round-trips, including numeric amount and currency.
+        XCTAssertEqual(roundTripped.selectedVariant.price.amount.currencyCode, "AUD")
+        XCTAssertEqual(roundTripped.selectedVariant.price.amount.amount, 5000)
+        XCTAssertEqual(roundTripped.selectedVariant.price.amount.amountFormatted, "$50.00")
+        XCTAssertNil(roundTripped.selectedVariant.price.was)
     }
 }
 
-// MARK: - PersistedPriceTypeDTO
+// MARK: - PersistedPriceDTO / PersistedMoneyDTO
 
-final class PersistedPriceTypeDTOTests: XCTestCase {
+final class PersistedPriceDTOTests: XCTestCase {
 
     // MARK: - init(from:)
 
-    func test_initFrom_mapsDefaultCase() {
-        let dto = PersistedPriceTypeDTO(from: .default(price: "$10"))
+    func test_initFromPrice_capturesAmount_andNilWas_whenNotOnSale() {
+        let price = Price.fixture(
+            amount: .fixture(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00"),
+            was: nil
+        )
 
-        XCTAssertEqual(dto, .default(price: "$10"))
+        let dto = PersistedPriceDTO(from: price)
+
+        XCTAssertEqual(dto.amount.currencyCode, "AUD")
+        XCTAssertEqual(dto.amount.amount, 5000)
+        XCTAssertEqual(dto.amount.amountFormatted, "$50.00")
+        XCTAssertNil(dto.was)
     }
 
-    func test_initFrom_mapsSaleCase() {
-        let dto = PersistedPriceTypeDTO(from: .sale(fullPrice: "$20", finalPrice: "$15"))
+    func test_initFromPrice_capturesAmountAndWas_whenOnSale() {
+        let price = Price.fixture(
+            amount: .fixture(currencyCode: "AUD", amount: 8000, amountFormatted: "$80.00"),
+            was: .fixture(currencyCode: "AUD", amount: 10_000, amountFormatted: "$100.00")
+        )
 
-        XCTAssertEqual(dto, .sale(fullPrice: "$20", finalPrice: "$15"))
+        let dto = PersistedPriceDTO(from: price)
+
+        XCTAssertEqual(dto.amount.amount, 8000)
+        XCTAssertEqual(dto.was?.amount, 10_000)
+        XCTAssertEqual(dto.was?.amountFormatted, "$100.00")
     }
 
-    func test_initFrom_mapsRangeCase() {
-        let dto = PersistedPriceTypeDTO(from: .range(lowerBound: "$5", upperBound: "$25", separator: "-"))
+    // MARK: - domain (DTO → Price)
 
-        XCTAssertEqual(dto, .range(lowerBound: "$5", upperBound: "$25", separator: "-"))
-    }
+    func test_domain_reconstructsPriceFaithfully() {
+        let dto = PersistedPriceDTO(
+            amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00"),
+            was: PersistedMoneyDTO(currencyCode: "AUD", amount: 6500, amountFormatted: "$65.00")
+        )
 
-    // MARK: - synthesizedPrice round-trip
+        let price = dto.domain
 
-    func test_synthesizedPrice_defaultRoundTripsViaSelectedProduct() {
-        let original = PersistedPriceTypeDTO.default(price: "$50")
-        let variant = Product.Variant.fixture(price: original.synthesizedPrice)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
-        let selected = SelectedProduct(product: product, selectedVariant: variant)
-
-        XCTAssertEqual(PersistedPriceTypeDTO(from: selected.priceType), original)
-    }
-
-    func test_synthesizedPrice_saleRoundTripsViaSelectedProduct() {
-        let original = PersistedPriceTypeDTO.sale(fullPrice: "$100", finalPrice: "$80")
-        let variant = Product.Variant.fixture(price: original.synthesizedPrice)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
-        let selected = SelectedProduct(product: product, selectedVariant: variant)
-
-        XCTAssertEqual(PersistedPriceTypeDTO(from: selected.priceType), original)
+        XCTAssertEqual(price.amount.currencyCode, "AUD")
+        XCTAssertEqual(price.amount.amount, 5000)
+        XCTAssertEqual(price.amount.amountFormatted, "$50.00")
+        XCTAssertEqual(price.was?.amount, 6500)
+        XCTAssertEqual(price.was?.amountFormatted, "$65.00")
     }
 
     // MARK: - Codable
 
-    func test_dto_codableRoundTrip_defaultCase() throws {
-        let original = PersistedPriceTypeDTO.default(price: "$10")
+    func test_dto_codableRoundTrip_default() throws {
+        let original = PersistedPriceDTO(
+            amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 5000, amountFormatted: "$50.00"),
+            was: nil
+        )
 
         let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(PersistedPriceTypeDTO.self, from: data)
+        let decoded = try JSONDecoder().decode(PersistedPriceDTO.self, from: data)
 
         XCTAssertEqual(decoded, original)
     }
 
-    func test_dto_codableRoundTrip_saleCase() throws {
-        let original = PersistedPriceTypeDTO.sale(fullPrice: "$20", finalPrice: "$15")
+    func test_dto_codableRoundTrip_sale() throws {
+        let original = PersistedPriceDTO(
+            amount: PersistedMoneyDTO(currencyCode: "AUD", amount: 8000, amountFormatted: "$80.00"),
+            was: PersistedMoneyDTO(currencyCode: "AUD", amount: 10_000, amountFormatted: "$100.00")
+        )
 
         let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(PersistedPriceTypeDTO.self, from: data)
-
-        XCTAssertEqual(decoded, original)
-    }
-
-    func test_dto_codableRoundTrip_rangeCase() throws {
-        let original = PersistedPriceTypeDTO.range(lowerBound: "$5", upperBound: "$25", separator: "-")
-
-        let data = try JSONEncoder().encode(original)
-        let decoded = try JSONDecoder().decode(PersistedPriceTypeDTO.self, from: data)
+        let decoded = try JSONDecoder().decode(PersistedPriceDTO.self, from: data)
 
         XCTAssertEqual(decoded, original)
     }
@@ -303,7 +385,7 @@ private extension PersistedProductDTO {
         imageURL: URL? = nil,
         colourName: String? = nil,
         sizeText: String? = nil,
-        priceType: PersistedPriceTypeDTO = .default(price: ""),
+        price: PersistedPriceDTO = .testDefault,
         stock: Int = 0
     ) -> PersistedProductDTO {
         .init(
@@ -314,8 +396,15 @@ private extension PersistedProductDTO {
             imageURL: imageURL,
             colourName: colourName,
             sizeText: sizeText,
-            priceType: priceType,
+            price: price,
             stock: stock
         )
     }
+}
+
+private extension PersistedPriceDTO {
+    static let testDefault = PersistedPriceDTO(
+        amount: PersistedMoneyDTO(currencyCode: "", amount: 0, amountFormatted: ""),
+        was: nil
+    )
 }

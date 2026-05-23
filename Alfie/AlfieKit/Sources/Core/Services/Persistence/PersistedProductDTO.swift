@@ -14,15 +14,25 @@ struct PersistedProductDTO: Codable, Hashable {
     let colourName: String?
     /// Pre-rendered size text (e.g. "M US"); `nil` when the product has no size dimension.
     let sizeText: String?
-    let priceType: PersistedPriceTypeDTO
+    /// Full price fidelity (numeric amount + currency + formatted) so the rehydrated
+    /// `SelectedProduct` supports both display and downstream math (subtotal, taxes, etc.).
+    let price: PersistedPriceDTO
     let stock: Int
 }
 
-/// Codable mirror of the domain `PriceType` enum, used for persistence only.
-enum PersistedPriceTypeDTO: Codable, Hashable {
-    case `default`(price: String)
-    case sale(fullPrice: String, finalPrice: String)
-    case range(lowerBound: String, upperBound: String, separator: String)
+/// Codable mirror of the domain `Price` value, used for persistence only.
+struct PersistedPriceDTO: Codable, Hashable {
+    let amount: PersistedMoneyDTO
+    /// Previous price when the variant is on sale; `nil` otherwise.
+    let was: PersistedMoneyDTO?
+}
+
+/// Codable mirror of the domain `Money` value, used for persistence only.
+struct PersistedMoneyDTO: Codable, Hashable {
+    let currencyCode: String
+    /// Amount in minor units (e.g. cents).
+    let amount: Int
+    let amountFormatted: String
 }
 
 // MARK: - Domain → DTO
@@ -37,33 +47,39 @@ extension PersistedProductDTO {
             imageURL: selectedProduct.media.first?.asImage?.url,
             colourName: selectedProduct.colour?.name,
             sizeText: selectedProduct.size == nil ? nil : selectedProduct.sizeText,
-            priceType: PersistedPriceTypeDTO(from: selectedProduct.priceType),
+            price: PersistedPriceDTO(from: selectedProduct.price),
             stock: selectedProduct.stock
         )
     }
 }
 
-extension PersistedPriceTypeDTO {
-    init(from priceType: PriceType) {
-        switch priceType {
-        case .default(let price):
-            self = .default(price: price)
-        case .sale(let fullPrice, let finalPrice):
-            self = .sale(fullPrice: fullPrice, finalPrice: finalPrice)
-        case .range(let lowerBound, let upperBound, let separator):
-            self = .range(lowerBound: lowerBound, upperBound: upperBound, separator: separator)
-        }
+extension PersistedPriceDTO {
+    init(from price: Price) {
+        self.init(
+            amount: PersistedMoneyDTO(from: price.amount),
+            was: price.was.map(PersistedMoneyDTO.init)
+        )
+    }
+}
+
+extension PersistedMoneyDTO {
+    init(from money: Money) {
+        self.init(
+            currencyCode: money.currencyCode,
+            amount: money.amount,
+            amountFormatted: money.amountFormatted
+        )
     }
 }
 
 // MARK: - DTO → Domain
 
 extension PersistedProductDTO {
-    /// Rebuilds a minimal `SelectedProduct` from the persisted snapshot.
+    /// Rebuilds a `SelectedProduct` from the persisted snapshot.
     ///
-    /// Only fields captured by the DTO are populated; everything else on `Product`
-    /// (e.g. `variants`, `colours`, `longDescription`) is a stub. Sufficient for
-    /// rendering Wishlist rows; PDP navigation re-fetches the full product.
+    /// Fields captured by the DTO are restored faithfully (including full `Price` fidelity).
+    /// Anything not captured (e.g. `variants`, `colours`, `longDescription`, `slug`) is a stub —
+    /// sufficient for rendering Wishlist/Bag rows. PDP navigation re-fetches the full product.
     var selectedProduct: SelectedProduct {
         let mediaList: [Media]? = imageURL.map { url in
             [.image(MediaImage(alt: nil, mediaContentType: .image, url: url))]
@@ -82,7 +98,7 @@ extension PersistedProductDTO {
             colour: colour,
             attributes: nil,
             stock: stock,
-            price: priceType.synthesizedPrice
+            price: price.domain
         )
 
         let product = Product(
@@ -101,27 +117,14 @@ extension PersistedProductDTO {
     }
 }
 
-extension PersistedPriceTypeDTO {
-    /// Reconstructs a `Price` whose computed `priceType` round-trips back to `self`.
-    var synthesizedPrice: Price {
-        switch self {
-        case .default(let price):
-            return Price(
-                amount: Money(currencyCode: "", amount: 0, amountFormatted: price),
-                was: nil
-            )
-        case .sale(let fullPrice, let finalPrice):
-            return Price(
-                amount: Money(currencyCode: "", amount: 0, amountFormatted: finalPrice),
-                was: Money(currencyCode: "", amount: 0, amountFormatted: fullPrice)
-            )
-        case .range(let lowerBound, _, _):
-            // `SelectedProduct.priceType` only emits `.default` / `.sale`, so this branch
-            // should not be reached via `init(from:)`. Map defensively to a single amount.
-            return Price(
-                amount: Money(currencyCode: "", amount: 0, amountFormatted: lowerBound),
-                was: nil
-            )
-        }
+extension PersistedPriceDTO {
+    var domain: Price {
+        Price(amount: amount.domain, was: was?.domain)
+    }
+}
+
+extension PersistedMoneyDTO {
+    var domain: Money {
+        Money(currencyCode: currencyCode, amount: amount, amountFormatted: amountFormatted)
     }
 }
