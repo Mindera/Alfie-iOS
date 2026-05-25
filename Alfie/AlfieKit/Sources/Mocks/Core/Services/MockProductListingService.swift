@@ -6,9 +6,9 @@ public final class MockProductListingService: ProductListingServiceProtocol {
 
     public var totalOfRecords: Int? = 0
 
-    public var onPageCalled: ((String?, String?, String?) throws -> ProductListing)?
-    public func paged(categoryId: String?, query: String?, sort: String?) async throws -> Model.ProductListing {
-        guard let productListing = try onPageCalled?(categoryId, query, sort) else {
+    public var onPageCalled: ((String?, String?, String?, ProductFilterInput?) throws -> ProductListing)?
+    public func paged(categoryId: String?, query: String?, sort: String?, filters: ProductFilterInput?) async throws -> Model.ProductListing {
+        guard let productListing = try onPageCalled?(categoryId, query, sort, filters) else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
         return productListing
@@ -20,10 +20,10 @@ public final class MockProductListingService: ProductListingServiceProtocol {
     }
 
     public var onNextCalled: (
-        (String?, String?, String?) throws -> ProductListing
+        (String?, String?, String?, ProductFilterInput?) throws -> ProductListing
     )?
-    public func next(categoryId: String?, query: String?, sort: String?) async throws -> ProductListing {
-        guard let productListing = try onNextCalled?(categoryId, query, sort) else {
+    public func next(categoryId: String?, query: String?, sort: String?, filters: ProductFilterInput?) async throws -> ProductListing {
+        guard let productListing = try onNextCalled?(categoryId, query, sort, filters) else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
         return productListing

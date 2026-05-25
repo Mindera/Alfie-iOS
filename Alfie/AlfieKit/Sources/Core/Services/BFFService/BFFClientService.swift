@@ -65,16 +65,17 @@ public final class BFFClientService: BFFClientServiceProtocol {
         limit: Int,
         categoryId: String?,
         query: String?,
-        sort: String?
+        sort: String?,
+        filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        // ALFMOB-331 AC 3: sort translated to BFF's `ProductSortEnum`. Filters land in AC 4.
         guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
             log.error("productList called without a collectionHandle; aborting.")
             throw BFFRequestError(type: .generic)
         }
 
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
-        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) (caller=\(sort ?? "nil"))")
+        let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
+        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
             let response = try await executeFetch(
@@ -82,7 +83,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                     collectionHandle: collectionHandle,
                     after: after.map { .some($0) } ?? .none,
                     limit: limit,
-                    filters: .none,
+                    filters: resolvedFilters,
                     sort: .some(.case(resolvedSort))
                 )
             ).productList

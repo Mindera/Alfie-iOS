@@ -14,6 +14,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public var style: ProductListingListStyle
     @Published public var showRefine = false
     @Published public var sortOption: String?
+    // ALFMOB-331 AC 4: BFF `ProductFilterInput` shape is plumbed end-to-end. The Refine UI
+    // doesn't expose filter dimensions yet, so this stays `nil` until a follow-up wires the
+    // sheet to populate it (brandNames / productTypes / price range / inventory).
+    @Published public var filters: ProductFilterInput?
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
     private let showSearch: () -> Void
@@ -58,7 +62,6 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     ) {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
-        // TODO: - review filtering later, API not supporting for now
         self.category = category
         self.mode = mode
         sortOption = sort
@@ -136,7 +139,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         do {
             productListing = try await dependencies.productListingService
-                .paged(categoryId: category, query: query, sort: sortOption)
+                .paged(categoryId: category, query: query, sort: sortOption, filters: filters)
         } catch {
             dependencies.log.error("Error fetching product listing (first page): \(error)")
             state = .error(.generic)
@@ -162,7 +165,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         do {
             productListing = try await dependencies.productListingService
-                .next(categoryId: category, query: query, sort: sortOption)
+                .next(categoryId: category, query: query, sort: sortOption, filters: filters)
         } catch {
             dependencies.log.error("Error fetching product listing (following page): \(error)")
             state = .error(.generic)

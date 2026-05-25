@@ -24,14 +24,14 @@ final class ProductListingServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_first_page_calls_bff_service_with_nil_cursor() async throws {
+    func test_first_page_calls_bff_service_with_nil_cursor_and_no_filters() async throws {
         var captured: ProductListingCall?
-        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort in
-            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort)
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
             return ProductListing.fixture()
         }
 
-        _ = try await sut.paged(categoryId: "category id", query: "query", sort: "sort")
+        _ = try await sut.paged(categoryId: "category id", query: "query", sort: "sort", filters: nil)
 
         let call = try XCTUnwrap(captured)
         XCTAssertNil(call.after)
@@ -39,10 +39,25 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertEqual(call.categoryId, "category id")
         XCTAssertEqual(call.query, "query")
         XCTAssertEqual(call.sort, "sort")
+        XCTAssertNil(call.filters)
+    }
+
+    func test_first_page_forwards_filters() async throws {
+        var captured: ProductListingCall?
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
+            return ProductListing.fixture()
+        }
+        let filters = ProductFilterInput(brandNames: ["Acme"], minPrice: 10, productTypes: ["Shoes"])
+
+        _ = try await sut.paged(filters: filters)
+
+        let call = try XCTUnwrap(captured)
+        XCTAssertEqual(call.filters, filters)
     }
 
     func test_pagination_info_provides_next_page() async throws {
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
             ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true))
         }
 
@@ -52,7 +67,7 @@ final class ProductListingServiceTests: XCTestCase {
     }
 
     func test_pagination_info_provides_total_records() async throws {
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
             ProductListing.fixture(pagination: .fixture(total: 101))
         }
 
@@ -62,7 +77,7 @@ final class ProductListingServiceTests: XCTestCase {
     }
 
     func test_next_throws_when_no_next_page() async throws {
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
             ProductListing.fixture(pagination: .fixture(endCursor: nil, hasNextPage: false))
         }
         _ = try await sut.paged()
@@ -79,23 +94,27 @@ final class ProductListingServiceTests: XCTestCase {
         }
     }
 
-    func test_next_page_forwards_stored_cursor() async throws {
+    func test_next_page_forwards_stored_cursor_and_filters() async throws {
+        let filters = ProductFilterInput(brandNames: ["Acme"])
+
         var firstCall: ProductListingCall?
-        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort in
-            firstCall = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort)
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            firstCall = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
             return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-A", hasNextPage: true))
         }
-        _ = try await sut.paged()
+        _ = try await sut.paged(filters: filters)
         XCTAssertNil(try XCTUnwrap(firstCall).after)
         XCTAssertTrue(sut.hasNext())
 
         var secondCall: ProductListingCall?
-        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort in
-            secondCall = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort)
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            secondCall = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
             return ProductListing.fixture(pagination: .fixture(endCursor: nil, hasNextPage: false))
         }
-        _ = try await sut.next()
-        XCTAssertEqual(try XCTUnwrap(secondCall).after, "cursor-A")
+        _ = try await sut.next(filters: filters)
+        let second = try XCTUnwrap(secondCall)
+        XCTAssertEqual(second.after, "cursor-A")
+        XCTAssertEqual(second.filters, filters)
         XCTAssertFalse(sut.hasNext())
     }
 
@@ -125,4 +144,5 @@ private struct ProductListingCall {
     let categoryId: String?
     let query: String?
     let sort: String?
+    let filters: ProductFilterInput?
 }

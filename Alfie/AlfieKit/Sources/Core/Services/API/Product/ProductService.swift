@@ -25,14 +25,16 @@ public final class ProductService: ProductServiceProtocol {
         limit: Int,
         categoryId: String?,
         query: String?,
-        sort: String?
+        sort: String?,
+        filters: ProductFilterInput?
     ) async throws -> ProductListing {
         guard let productListing = try? await bffClient.productListing(
             after: after,
             limit: limit,
             categoryId: categoryId,
             query: query,
-            sort: sort
+            sort: sort,
+            filters: filters
         )
         else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))

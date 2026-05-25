@@ -32,14 +32,16 @@ public final class ProductListingService: ProductListingServiceProtocol {
     public func paged(
         categoryId: String? = nil,
         query: String? = nil,
-        sort: String? = nil
+        sort: String? = nil,
+        filters: ProductFilterInput? = nil
     ) async throws -> ProductListing {
         let result = try await productService.productListing(
             after: nil,
             limit: configuration.pageSize,
             categoryId: categoryId,
             query: query,
-            sort: sort
+            sort: sort,
+            filters: filters
         )
         updateState(from: result.pagination)
         return result
@@ -54,7 +56,8 @@ public final class ProductListingService: ProductListingServiceProtocol {
     public func next(
         categoryId: String? = nil,
         query: String? = nil,
-        sort: String? = nil
+        sort: String? = nil,
+        filters: ProductFilterInput? = nil
     ) async throws -> ProductListing {
         guard hasNextPage, let endCursor else {
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
@@ -64,7 +67,8 @@ public final class ProductListingService: ProductListingServiceProtocol {
             limit: configuration.pageSize,
             categoryId: categoryId,
             query: query,
-            sort: sort
+            sort: sort,
+            filters: filters
         )
         updateState(from: result.pagination)
         return result

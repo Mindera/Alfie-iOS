@@ -67,17 +67,19 @@ final class ProductServiceTests: XCTestCase {
 
     func test_get_productList_calls_bff_service() async throws {
         var captured: ProductListingCall?
-        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort in
-            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort)
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
             return ProductListing.fixture()
         }
+        let filters = ProductFilterInput(brandNames: ["Acme"])
 
         _ = try await sut.productListing(
             after: "cursor-1",
             limit: 2,
             categoryId: "category id",
             query: "query",
-            sort: "sort"
+            sort: "sort",
+            filters: filters
         )
 
         let call = try XCTUnwrap(captured)
@@ -86,6 +88,7 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(call.categoryId, "category id")
         XCTAssertEqual(call.query, "query")
         XCTAssertEqual(call.sort, "sort")
+        XCTAssertEqual(call.filters, filters)
     }
 }
 
@@ -97,4 +100,5 @@ private struct ProductListingCall {
     let categoryId: String?
     let query: String?
     let sort: String?
+    let filters: ProductFilterInput?
 }

@@ -16,9 +16,9 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return product
     }
 
-    public var onProductListingCalled: ((String?, Int, String?, String?, String?) throws -> ProductListing)?
-    public func productListing(after: String?, limit: Int, categoryId: String?, query: String?, sort: String?) async throws -> ProductListing {
-        guard let productListing = try onProductListingCalled?(after, limit, categoryId, query, sort) else {
+    public var onProductListingCalled: ((String?, Int, String?, String?, String?, ProductFilterInput?) throws -> ProductListing)?
+    public func productListing(after: String?, limit: Int, categoryId: String?, query: String?, sort: String?, filters: ProductFilterInput?) async throws -> ProductListing {
+        guard let productListing = try onProductListingCalled?(after, limit, categoryId, query, sort, filters) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return productListing
