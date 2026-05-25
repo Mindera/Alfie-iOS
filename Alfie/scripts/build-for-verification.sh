@@ -14,12 +14,12 @@ echo "📂 Project: $PROJECT_FILE"
 echo "📱 Scheme: $SCHEME"
 echo ""
 
-# Try to build with generic iOS Simulator destination (most portable)
-echo "🎯 Attempting build with generic iOS Simulator destination..."
+# Try to build test bundles with generic iOS Simulator destination (most portable)
+echo "🎯 Attempting build-for-testing with generic iOS Simulator destination..."
 xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
-    build 2>&1 | tee /tmp/alfie_build.log
+    build-for-testing 2>&1 | tee /tmp/alfie_build.log
 
 BUILD_RESULT=${PIPESTATUS[0]}
 
@@ -53,11 +53,11 @@ if grep -q "Unable to find a device matching the provided destination" /tmp/alfi
     echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID)"
     echo ""
     
-    # Build with specific simulator
+    # Build test bundles with specific simulator
     xcodebuild -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -destination "id=$SIMULATOR_ID" \
-        build 2>&1 | tee /tmp/alfie_build.log
+        build-for-testing 2>&1 | tee /tmp/alfie_build.log
     
     BUILD_RESULT=${PIPESTATUS[0]}
     

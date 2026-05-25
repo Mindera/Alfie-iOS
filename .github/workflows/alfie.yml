@@ -8,6 +8,9 @@ on:
   pull_request:
     branches:
       - "main"
+    paths-ignore:
+      - "**/*.md"
+      - "Docs/**"
 
   workflow_dispatch:
 
@@ -20,15 +23,15 @@ env:
   SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
 
 jobs:
-  setup:
-    runs-on: macos-15
-    timeout-minutes: 15
+  unit-tests:
+    runs-on: macos-26
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
       - name: Cache Homebrew
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/Library/Caches/Homebrew
@@ -37,36 +40,8 @@ jobs:
           restore-keys: |
             brew-${{ runner.os }}-
 
-      - name: Cache Ruby Gems
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: vendor/bundle
-          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
-          restore-keys: |
-            gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
-            gems-${{ runner.os }}-
-
-      - name: Install Homebrew formulas
-        run: |
-          brew update
-          brew bundle install
-
-      - name: Install Ruby dependencies
-        run: |
-          gem install bundler --no-document
-          bundle config set --local path 'vendor/bundle'
-          bundle install --jobs 4 --retry 3
-
-  unit-tests:
-    needs: setup
-    runs-on: macos-15
-    timeout-minutes: 30
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
       - name: Restore Ruby Gems
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: vendor/bundle
           key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
@@ -75,18 +50,25 @@ jobs:
             gems-${{ runner.os }}-
 
       - name: Restore Swift Package Manager Cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
             ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             spm-${{ runner.os }}-
 
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: build/DerivedData
+          key: derived-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: |
+            derived-${{ runner.os }}-
+
       - name: Install Homebrew formulas
-        run: |
-          brew bundle install
+        run: brew bundle install
 
       - name: Install Ruby dependencies
         run: |
@@ -116,8 +98,8 @@ jobs:
           BUILD_CONFIGURATION: "Debug"
 
       - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: test-results
           path: |
@@ -126,16 +108,26 @@ jobs:
           retention-days: 7
 
   release:
-    needs: [setup, unit-tests]
-    runs-on: macos-15
+    needs: [unit-tests]
+    runs-on: macos-26
     timeout-minutes: 60
     if: github.event_name == 'push'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: Cache Homebrew
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+            /usr/local/Homebrew
+          key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
+          restore-keys: |
+            brew-${{ runner.os }}-
 
       - name: Restore Ruby Gems
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: vendor/bundle
           key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
@@ -144,26 +136,29 @@ jobs:
             gems-${{ runner.os }}-
 
       - name: Restore Swift Package Manager Cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
             ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             spm-${{ runner.os }}-
+
+      - name: Install Homebrew formulas
+        run: brew bundle install
 
       - name: Configure Bundler
         run: |
           bundle config set --local path 'vendor/bundle'
           bundle install --jobs 4 --retry 3
 
-      - name: Set up SSH for Bitbucket
+      - name: Set up SSH for match repo
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.BITBUCKET_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa bitbucket.org >> ~/.ssh/known_hosts
+          echo "${{ secrets.MATCH_GIT_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
 
       - name: Import GPG Private Key and Decrypt sensitive files
         env:
