@@ -114,6 +114,46 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertTrue(domainProduct.defaultVariant.media.isEmpty)
     }
 
+    func test_money_rounding_edge_cases() throws {
+        let cases: [(amount: Double, expectedMinorUnits: Int)] = [
+            (0.00, 0),
+            (0.01, 1),
+            (0.10, 10),
+            (19.99, 1999),
+            (100.00, 10000),
+            (1234.567, 123457)
+        ]
+
+        for (amount, expectedMinorUnits) in cases {
+            let money = Mock<Money>(amount: amount, currencyCode: "GBP")
+            let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+            let product = Mock<OmniProduct>(id: "p1", name: "x", priceRange: priceRange, slug: "p1")
+            let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+            let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+            let listing = response.convertToProductListing()
+
+            let mapped = try XCTUnwrap(listing.products.first?.priceRange?.low.amount)
+            XCTAssertEqual(mapped, expectedMinorUnits, "amount \(amount) should round to \(expectedMinorUnits) minor units, got \(mapped)")
+        }
+    }
+
+    func test_invalid_primary_image_url_yields_no_media() throws {
+        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        // Empty URL string makes URL(string:) return nil → converter must skip media
+        // gracefully instead of crashing or fabricating a placeholder.
+        let image = Mock<Image>(altText: "bogus", url: "")
+        let product = Mock<OmniProduct>(id: "p1", name: "Bad URL", priceRange: priceRange, primaryImage: image, slug: "p1")
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        let domainProduct = try XCTUnwrap(listing.products.first)
+        XCTAssertTrue(domainProduct.defaultVariant.media.isEmpty)
+    }
+
     func test_missing_brand_name_falls_back_to_empty_string() {
         let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
         let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
