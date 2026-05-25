@@ -79,7 +79,7 @@ public final class ProductListingService: ProductListingServiceProtocol {
     private func updateState(from pagination: ProductListing.Pagination) {
         endCursor = pagination.endCursor
         hasNextPage = pagination.hasNextPage
-        total = pagination.total
+        total = pagination.totalCount
     }
 }
 

@@ -7,7 +7,7 @@ extension BFFGraphAPI.ProductListQuery.Data.ProductList {
     public func convertToProductListing() -> ProductListing {
         let mappedProducts = products.map { $0.fragments.productListItemFragment.convertToProduct() }
         let pagination = ProductListing.Pagination(
-            total: totalCount ?? mappedProducts.count,
+            totalCount: totalCount ?? mappedProducts.count,
             endCursor: pageInfo?.endCursor,
             hasNextPage: pageInfo?.hasNextPage ?? false
         )

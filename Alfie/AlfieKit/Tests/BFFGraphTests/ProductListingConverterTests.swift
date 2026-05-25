@@ -27,7 +27,7 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertEqual(listing.products.first?.id, "prod-1")
         XCTAssertEqual(listing.products.first?.name, "Test Product")
         XCTAssertEqual(listing.products.first?.brand.name, "Acme")
-        XCTAssertEqual(listing.pagination.total, 42)
+        XCTAssertEqual(listing.pagination.totalCount, 42)
         XCTAssertEqual(listing.pagination.endCursor, "cursor-1")
         XCTAssertTrue(listing.pagination.hasNextPage)
     }
@@ -40,7 +40,7 @@ final class ProductListingConverterTests: XCTestCase {
         let listing = response.convertToProductListing()
 
         XCTAssertTrue(listing.products.isEmpty)
-        XCTAssertEqual(listing.pagination.total, 0)
+        XCTAssertEqual(listing.pagination.totalCount, 0)
         XCTAssertNil(listing.pagination.endCursor)
         XCTAssertFalse(listing.pagination.hasNextPage)
     }

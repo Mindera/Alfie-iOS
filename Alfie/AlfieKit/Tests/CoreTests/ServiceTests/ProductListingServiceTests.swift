@@ -68,7 +68,7 @@ final class ProductListingServiceTests: XCTestCase {
 
     func test_pagination_info_provides_total_records() async throws {
         mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
-            ProductListing.fixture(pagination: .fixture(total: 101))
+            ProductListing.fixture(pagination: .fixture(totalCount: 101))
         }
 
         _ = try await sut.paged()

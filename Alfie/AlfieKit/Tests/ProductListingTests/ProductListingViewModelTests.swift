@@ -36,6 +36,18 @@ final class ProductListingViewModelTests: XCTestCase {
         try super.tearDownWithError()
     }
 
+    // MARK: - totalCount surfacing (AC 5)
+
+    func test_totalNumberOfProducts_surfaces_service_totalOfRecords() {
+        mockProductListing.totalOfRecords = 42
+        XCTAssertEqual(sut.totalNumberOfProducts, 42)
+    }
+
+    func test_totalNumberOfProducts_defaults_to_zero_when_total_unknown() {
+        mockProductListing.totalOfRecords = nil
+        XCTAssertEqual(sut.totalNumberOfProducts, 0)
+    }
+
     // MARK: - Wishlist heart toggle
 
     func test_isFavoriteState_returnsTrue_whenProductIsInWishlist() {
