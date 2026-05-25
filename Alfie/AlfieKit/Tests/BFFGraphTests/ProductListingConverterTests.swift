@@ -72,6 +72,35 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertEqual(listing.products.first?.priceRange?.high?.amount, 5000)
     }
 
+    func test_primary_image_maps_to_default_variant_media() throws {
+        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        let image = Mock<Image>(altText: "Hero alt", url: "https://cdn.alfie.test/p1.jpg")
+        let product = Mock<OmniProduct>(id: "p1", name: "Imaged", priceRange: priceRange, primaryImage: image, slug: "p1")
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        let domainProduct = try XCTUnwrap(listing.products.first)
+        let mediaImage = try XCTUnwrap(domainProduct.defaultVariant.media.first?.asImage)
+        XCTAssertEqual(mediaImage.url.absoluteString, "https://cdn.alfie.test/p1.jpg")
+        XCTAssertEqual(mediaImage.alt, "Hero alt")
+    }
+
+    func test_missing_primary_image_yields_no_default_variant_media() throws {
+        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        let product = Mock<OmniProduct>(id: "p1", name: "Imageless", priceRange: priceRange, primaryImage: nil, slug: "p1")
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        let domainProduct = try XCTUnwrap(listing.products.first)
+        XCTAssertTrue(domainProduct.defaultVariant.media.isEmpty)
+    }
+
     func test_missing_brand_name_falls_back_to_empty_string() {
         let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
         let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)

@@ -25,10 +25,24 @@ extension BFFGraphAPI.ProductListItemFragment {
         let highMoneyRaw = priceRange.maxVariantPrice.fragments.moneyFragment.toDomainMoney()
         let highMoney: Money? = highMoneyRaw == lowMoney ? nil : highMoneyRaw
 
+        // The list-item shape gives us a single `primaryImage` per product (no colour
+        // variants from the BFF yet). Wrap it in a synthetic `Product.Colour` so the
+        // existing card view models — which read `defaultVariant.media.first` via
+        // `colour?.media` — pick the image up. When the BFF starts returning per-colour
+        // media this can be swapped for a real mapping.
+        let colour: Product.Colour? = primaryImage.flatMap { image in
+            guard let url = URL(string: image.url) else { return nil }
+            return Product.Colour(
+                swatch: nil,
+                name: "",
+                media: [.image(MediaImage(alt: image.altText, mediaContentType: .image, url: url))]
+            )
+        }
+
         let placeholderVariant = Product.Variant(
             sku: "",
             size: nil,
-            colour: nil,
+            colour: colour,
             attributes: nil,
             stock: inventoryTotal ?? 0,
             price: Price(amount: lowMoney, was: nil)
@@ -46,7 +60,7 @@ extension BFFGraphAPI.ProductListItemFragment {
             attributes: nil,
             defaultVariant: placeholderVariant,
             variants: [],
-            colours: nil
+            colours: colour.map { [$0] }
         )
     }
 }
