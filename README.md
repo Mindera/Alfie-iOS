@@ -427,30 +427,13 @@ For more information about SPM plugins, see the official [documentation](https:/
 
 ## GraphQL
 
-This project uses GraphQL for fetching data from the BFF API. Data is fetched using queries defined by us that return models mapping the API as defined by our queries. The main advantage is that we can add or remove fields or change the returned data without requiring any changes on the API side, as long as we ask fields and data available within the defined schema.
+This project uses GraphQL to fetch data from the BFF API. The schema is **owned by the BFF** and synced into this repo (committed at `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Schema/schema.graphqls`), so codegen and builds stay self-contained.
 
-#### How to add a new query
+For the BFF integration workflow, see [`Docs/GraphQL.md`](Docs/GraphQL.md):
 
-If a new feature being developed requires us to add a new query to fetch data from the BFF API, we need to:
-
-1. Create a new folder in `Packages/Sources/BFFGraph/CodeGen/Queries/<Feature>`
-2. Add a `Queries.graphql` file in that folder and add the query or queries you need (use existing queries as examples if necessary)
-3. It is recommended to use fragments to describe the returned models, so if possible define them and add them to a `Fragments` folder as `<Model>Fragment.graphql` files
-4. Update the schema by adding a `schema-<feature>.graphqls` file to `Packages/Sources/BFFGraph/CodeGen/Schema`
-5. The schema file you add should extend the `Query` type with the new query or queries and also add all the new types necessary for the feature
-6. Open the terminal app, cd to `Alfie/scripts` and run `./run-apollo-codegen.sh` 
-7. Confirm that new query objects, new models and respective mocks were added to the repository
-8. Create the local models that the app will use for the feature in the `Models` package, mapping the BFF models as required
-9. In `Packages/Sources/Core/Services/BFFService/Converters` add the necessary converter extensions to convert BFF models into the newly created local models
-10. Add the fetch method for the new query in the `BFFClientService` instance, including the conversion to the internal models;
-
-#### How to update a query
-
-If a new field is required or no longer necessary for an existing feature, we need to:
-
-1. Update the corresponding query to add / remove the field (or just update the fragment if that's the case)
-2. Run the generate command as described in step 6 above
-3. Update the local model and / or the conversion methods
+- **Running the app against a local BFF** — starting the BFF, pointing the app at it
+- **Syncing the BFF schema** — `Alfie/scripts/sync-bff-schema.sh`
+- **Adding / updating queries** — query, fragment, and converter patterns
 
 ---
 
