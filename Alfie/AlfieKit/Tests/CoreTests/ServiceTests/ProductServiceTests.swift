@@ -65,6 +65,39 @@ final class ProductServiceTests: XCTestCase {
 
     // MARK: - Get Product List
 
+    func test_productListing_maps_emptyResponse_to_noProducts() async {
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
+            throw BFFRequestError(type: .emptyResponse)
+        }
+
+        do {
+            _ = try await sut.productListing(after: nil, limit: 1, categoryId: "c", query: nil, sort: nil, filters: nil)
+            XCTFail("Expected productListing to throw")
+        } catch let error as BFFRequestError {
+            guard case .product(.noProducts) = error.type else {
+                XCTFail("Expected .product(.noProducts), got \(error.type)")
+                return
+            }
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func test_productListing_maps_other_bff_errors_to_generic_product_error() async {
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
+            throw BFFRequestError(type: .generic)
+        }
+
+        do {
+            _ = try await sut.productListing(after: nil, limit: 1, categoryId: "c", query: nil, sort: nil, filters: nil)
+            XCTFail("Expected productListing to throw")
+        } catch let error as BFFRequestError {
+            XCTAssertEqual(error.type, .product(.generic))
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func test_get_productList_calls_bff_service() async throws {
         var captured: ProductListingCall?
         mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in

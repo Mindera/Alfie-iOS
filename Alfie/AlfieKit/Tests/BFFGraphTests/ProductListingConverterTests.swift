@@ -45,6 +45,19 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertFalse(listing.pagination.hasNextPage)
     }
 
+    func test_missing_totalCount_passes_through_as_nil() {
+        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
+        let product = Mock<OmniProduct>(id: "p1", name: "Total-less", priceRange: priceRange, slug: "p1")
+        // BFF omits totalCount → converter must preserve nil, not invent products.count.
+        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: nil)
+
+        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
+        let listing = response.convertToProductListing()
+
+        XCTAssertNil(listing.pagination.totalCount)
+    }
+
     func test_collapses_price_range_when_min_equals_max() {
         let money = Mock<Money>(amount: 25.00, currencyCode: "GBP")
         let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)

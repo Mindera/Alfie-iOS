@@ -68,9 +68,14 @@ public final class BFFClientService: BFFClientServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
+        // `productList` requires a `collectionHandle`. The PLP screen can be entered in
+        // `.searchResults` mode with `categoryId == nil` — that path needs to call the
+        // BFF's `searchProducts` query instead, which is owned by ALFMOB-333. Until that
+        // lands we surface a typed "no products" error rather than firing a request the
+        // BFF will reject.
         guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
-            log.error("productList called without a collectionHandle; aborting.")
-            throw BFFRequestError(type: .generic)
+            log.error("productList called without a collectionHandle (search-mode wiring pending ALFMOB-333); returning noProducts.")
+            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
 
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)

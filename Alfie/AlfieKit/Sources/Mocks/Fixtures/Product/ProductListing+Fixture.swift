@@ -12,7 +12,7 @@ extension ProductListing {
 }
 
 extension ProductListing.Pagination {
-    public static func fixture(totalCount: Int = 0,
+    public static func fixture(totalCount: Int? = 0,
                                endCursor: String? = nil,
                                hasNextPage: Bool = false) -> ProductListing.Pagination {
         .init(totalCount: totalCount,

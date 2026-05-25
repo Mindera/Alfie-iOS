@@ -28,17 +28,27 @@ public final class ProductService: ProductServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        guard let productListing = try? await bffClient.productListing(
-            after: after,
-            limit: limit,
-            categoryId: categoryId,
-            query: query,
-            sort: sort,
-            filters: filters
-        )
-        else {
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
+        do {
+            return try await bffClient.productListing(
+                after: after,
+                limit: limit,
+                categoryId: categoryId,
+                query: query,
+                sort: sort,
+                filters: filters
+            )
+        } catch let error as BFFRequestError {
+            // Only "no data" responses should surface as a noProducts state; genuine
+            // failures (network, decoding, server errors) get the generic product error so
+            // the UI can render an error state rather than a misleading empty list.
+            switch error.type {
+            case .emptyResponse, .product(.noProducts):
+                throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
+            default:
+                throw BFFRequestError(type: .product(.generic))
+            }
+        } catch {
+            throw BFFRequestError(type: .product(.generic))
         }
-        return productListing
     }
 }
