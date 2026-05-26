@@ -125,25 +125,30 @@ public final class BFFClientService: BFFClientServiceProtocol {
     // MARK: - Private
 
     private func executeFetch<Query: GraphQLQuery>(_ query: Query) async throws -> Query.Data {
-        try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self else {
-                continuation.resume(with: .failure(BFFRequestError(type: .generic)))
-                return
-            }
+        try Task.checkCancellation()
 
-            self.apolloClient.fetch(query: query, queue: DispatchQueue.main) { result in
-                if let failure = Self.resultAsFailure(result) {
-                    continuation.resume(with: .failure(failure))
-                    return
+        // Capture Apollo's `Cancellable` in a thread-safe box so the cancellation
+        // handler can abort the in-flight request if the caller's task is cancelled
+        // (e.g. user backs out of PLP mid-fetch). Without this we'd leak a network
+        // round-trip and silently drop the response.
+        let box = CancellableBox()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
+                let cancellable = apolloClient.fetch(query: query) { result in
+                    if let failure = Self.resultAsFailure(result) {
+                        continuation.resume(throwing: failure)
+                        return
+                    }
+                    guard let data = Self.resultAsSuccess(result)?.data else {
+                        continuation.resume(throwing: BFFRequestError(type: .generic))
+                        return
+                    }
+                    continuation.resume(returning: data)
                 }
-
-                guard let data = Self.resultAsSuccess(result)?.data else {
-                    continuation.resume(with: .failure(BFFRequestError(type: .generic)))
-                    return
-                }
-
-                continuation.resume(returning: data)
+                box.set(cancellable)
             }
+        } onCancel: {
+            box.cancel()
         }
     }
 
@@ -174,5 +179,27 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
 
         return success
+    }
+}
+
+// MARK: - Cancellation bridge
+
+/// Thread-safe box that lets `withTaskCancellationHandler`'s `onCancel` closure call
+/// `cancel()` on an Apollo `Cancellable` produced inside the continuation closure.
+/// The two callbacks can fire on different threads (and the cancel can fire before the
+/// continuation has finished setting up), so the box serialises access with a lock.
+private final class CancellableBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var cancellable: (any Apollo.Cancellable)?
+
+    func set(_ cancellable: any Apollo.Cancellable) {
+        lock.lock(); defer { lock.unlock() }
+        self.cancellable = cancellable
+    }
+
+    func cancel() {
+        lock.lock(); defer { lock.unlock() }
+        cancellable?.cancel()
+        cancellable = nil
     }
 }
