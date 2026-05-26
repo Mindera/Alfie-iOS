@@ -4,24 +4,21 @@ import ApolloTestSupport
 import Core
 
 final class ProductListingConverterTests: XCTestCase {
-    func test_product_list_response_converts_to_product_listing() {
-        let money = Mock<Money>(amount: 19.99, currencyCode: "AUD")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-        let product = Mock<OmniProduct>(
+    func test_product_list_response_converts_to_product_listing() throws {
+        let listing = makeResponse(
             brandName: "Acme",
             descriptionHtml: "<p>Hello</p>",
-            id: "prod-1",
-            inventoryTotal: 10,
+            productId: "prod-1",
             name: "Test Product",
-            priceRange: priceRange,
             productType: "Shoes",
-            slug: "test-product"
-        )
-        let pageInfo = Mock<PageInfo>(endCursor: "cursor-1", hasNextPage: true)
-        let mockResponse = Mock<ProductListResponse>(pageInfo: pageInfo, products: [product], totalCount: 42)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+            slug: "test-product",
+            inventoryTotal: 10,
+            amount: 19.99,
+            currencyCode: "AUD",
+            totalCount: 42,
+            endCursor: "cursor-1",
+            hasNextPage: true
+        ).convertToProductListing()
 
         XCTAssertEqual(listing.products.count, 1)
         XCTAssertEqual(listing.products.first?.id, "prod-1")
@@ -33,11 +30,8 @@ final class ProductListingConverterTests: XCTestCase {
     }
 
     func test_empty_products_yields_empty_listing() {
-        let pageInfo = Mock<PageInfo>(endCursor: nil, hasNextPage: false)
-        let mockResponse = Mock<ProductListResponse>(pageInfo: pageInfo, products: [], totalCount: 0)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(products: [], totalCount: 0, endCursor: nil, hasNextPage: false)
+            .convertToProductListing()
 
         XCTAssertTrue(listing.products.isEmpty)
         XCTAssertEqual(listing.pagination.totalCount, 0)
@@ -46,54 +40,30 @@ final class ProductListingConverterTests: XCTestCase {
     }
 
     func test_missing_totalCount_passes_through_as_nil() {
-        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-        let product = Mock<OmniProduct>(id: "p1", name: "Total-less", priceRange: priceRange, slug: "p1")
         // BFF omits totalCount → converter must preserve nil, not invent products.count.
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: nil)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(totalCount: nil).convertToProductListing()
 
         XCTAssertNil(listing.pagination.totalCount)
     }
 
-    func test_collapses_price_range_when_min_equals_max() {
-        let money = Mock<Money>(amount: 25.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-        let product = Mock<OmniProduct>(id: "p1", name: "Single Price", priceRange: priceRange, slug: "p1")
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+    func test_drops_high_when_price_range_min_equals_max() {
+        let listing = makeResponse(amount: 25.00).convertToProductListing()
 
         XCTAssertEqual(listing.products.first?.priceRange?.low.amount, 2500)
         XCTAssertNil(listing.products.first?.priceRange?.high)
     }
 
     func test_preserves_price_range_when_min_differs_from_max() {
-        let low = Mock<Money>(amount: 10.00, currencyCode: "GBP")
-        let high = Mock<Money>(amount: 50.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: high, minVariantPrice: low)
-        let product = Mock<OmniProduct>(id: "p1", name: "Ranged", priceRange: priceRange, slug: "p1")
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(amount: 10.00, highAmount: 50.00).convertToProductListing()
 
         XCTAssertEqual(listing.products.first?.priceRange?.low.amount, 1000)
         XCTAssertEqual(listing.products.first?.priceRange?.high?.amount, 5000)
     }
 
     func test_primary_image_maps_to_default_variant_media() throws {
-        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-        let image = Mock<Image>(altText: "Hero alt", url: "https://cdn.alfie.test/p1.jpg")
-        let product = Mock<OmniProduct>(id: "p1", name: "Imaged", priceRange: priceRange, primaryImage: image, slug: "p1")
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(
+            primaryImage: Mock<Image>(altText: "Hero alt", url: "https://cdn.alfie.test/p1.jpg")
+        ).convertToProductListing()
 
         let domainProduct = try XCTUnwrap(listing.products.first)
         let mediaImage = try XCTUnwrap(domainProduct.defaultVariant.media.first?.asImage)
@@ -102,19 +72,15 @@ final class ProductListingConverterTests: XCTestCase {
     }
 
     func test_missing_primary_image_yields_no_default_variant_media() throws {
-        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-        let product = Mock<OmniProduct>(id: "p1", name: "Imageless", priceRange: priceRange, primaryImage: nil, slug: "p1")
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(primaryImage: nil).convertToProductListing()
 
         let domainProduct = try XCTUnwrap(listing.products.first)
         XCTAssertTrue(domainProduct.defaultVariant.media.isEmpty)
     }
 
     func test_money_rounding_edge_cases() throws {
+        // Float→Int via `Int((amount * 100).rounded())` — boundary cases prove the
+        // rounding behaviour we depend on for currency representation.
         let cases: [(amount: Double, expectedMinorUnits: Int)] = [
             (0.00, 0),
             (0.01, 1),
@@ -125,44 +91,80 @@ final class ProductListingConverterTests: XCTestCase {
         ]
 
         for (amount, expectedMinorUnits) in cases {
-            let money = Mock<Money>(amount: amount, currencyCode: "GBP")
-            let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-            let product = Mock<OmniProduct>(id: "p1", name: "x", priceRange: priceRange, slug: "p1")
-            let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-            let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-            let listing = response.convertToProductListing()
-
+            let listing = makeResponse(amount: amount).convertToProductListing()
             let mapped = try XCTUnwrap(listing.products.first?.priceRange?.low.amount)
-            XCTAssertEqual(mapped, expectedMinorUnits, "amount \(amount) should round to \(expectedMinorUnits) minor units, got \(mapped)")
+            XCTAssertEqual(
+                mapped, expectedMinorUnits,
+                "amount \(amount) should round to \(expectedMinorUnits) minor units, got \(mapped)"
+            )
         }
     }
 
     func test_invalid_primary_image_url_yields_no_media() throws {
-        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
         // Empty URL string makes URL(string:) return nil → converter must skip media
         // gracefully instead of crashing or fabricating a placeholder.
-        let image = Mock<Image>(altText: "bogus", url: "")
-        let product = Mock<OmniProduct>(id: "p1", name: "Bad URL", priceRange: priceRange, primaryImage: image, slug: "p1")
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(primaryImage: Mock<Image>(altText: "bogus", url: ""))
+            .convertToProductListing()
 
         let domainProduct = try XCTUnwrap(listing.products.first)
         XCTAssertTrue(domainProduct.defaultVariant.media.isEmpty)
     }
 
     func test_missing_brand_name_falls_back_to_empty_string() {
-        let money = Mock<Money>(amount: 5.00, currencyCode: "GBP")
-        let priceRange = Mock<MoneyRange>(maxVariantPrice: money, minVariantPrice: money)
-        let product = Mock<OmniProduct>(brandName: nil, id: "p1", name: "No Brand", priceRange: priceRange, slug: "p1")
-        let mockResponse = Mock<ProductListResponse>(products: [product], totalCount: 1)
-
-        let response = BFFGraphAPI.ProductListQuery.Data.ProductList.from(mockResponse)
-        let listing = response.convertToProductListing()
+        let listing = makeResponse(brandName: nil).convertToProductListing()
 
         XCTAssertEqual(listing.products.first?.brand.name, "")
+    }
+}
+
+// MARK: - Test factory
+
+private extension ProductListingConverterTests {
+    /// Builds an Apollo `ProductListQuery.Data.ProductList` from a single mocked
+    /// `OmniProduct`. Defaults cover the common case so each test only declares the
+    /// fields it actually exercises. Tests call `.convertToProductListing()` on the
+    /// result to obtain the domain `ProductListing`.
+    ///
+    /// Pass `products: []` to bypass the single-product builder entirely (empty-listing
+    /// path). `highAmount` defaults to `nil`, in which case min == max; supply a value
+    /// to drive the ranged-price scenario.
+    func makeResponse(
+        brandName: String? = "Acme",
+        descriptionHtml: String? = nil,
+        productId: String = "p1",
+        name: String = "Product",
+        productType: String? = nil,
+        slug: String = "p1",
+        inventoryTotal: Int? = nil,
+        amount: Double = 5.00,
+        highAmount: Double? = nil,
+        currencyCode: String = "GBP",
+        primaryImage: Mock<Image>? = nil,
+        products: [Mock<OmniProduct>]? = nil,
+        totalCount: Int? = 1,
+        endCursor: String? = nil,
+        hasNextPage: Bool = false
+    ) -> BFFGraphAPI.ProductListQuery.Data.ProductList {
+        let low = Mock<Money>(amount: amount, currencyCode: currencyCode)
+        let high = highAmount.map { Mock<Money>(amount: $0, currencyCode: currencyCode) } ?? low
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: high, minVariantPrice: low)
+        let defaultProduct = Mock<OmniProduct>(
+            brandName: brandName,
+            descriptionHtml: descriptionHtml,
+            id: productId,
+            inventoryTotal: inventoryTotal,
+            name: name,
+            priceRange: priceRange,
+            primaryImage: primaryImage,
+            productType: productType,
+            slug: slug
+        )
+        let pageInfo = Mock<PageInfo>(endCursor: endCursor, hasNextPage: hasNextPage)
+        let response = Mock<ProductListResponse>(
+            pageInfo: pageInfo,
+            products: products ?? [defaultProduct],
+            totalCount: totalCount
+        )
+        return BFFGraphAPI.ProductListQuery.Data.ProductList.from(response)
     }
 }

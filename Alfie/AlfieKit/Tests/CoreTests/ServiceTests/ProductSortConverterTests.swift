@@ -3,29 +3,24 @@ import BFFGraph
 import XCTest
 
 final class ProductSortConverterTests: XCTestCase {
-    func test_maps_price_high_to_low() {
-        XCTAssertEqual(BFFGraphAPI.ProductSortEnum.from(sortOption: "HIGH_TO_LOW"), .priceDesc)
-    }
+    func test_sort_option_mapping() {
+        // The Refine sheet stores raw `SortByType` strings. We map each one (and any
+        // missing/unknown value) into a BFF `ProductSortEnum` at the BFF boundary.
+        let cases: [(input: String?, expected: BFFGraphAPI.ProductSortEnum, label: String)] = [
+            ("HIGH_TO_LOW", .priceDesc, "price: high → low"),
+            ("LOW_TO_HIGH", .priceAsc,  "price: low → high"),
+            ("A_Z",         .nameAsc,   "alpha A → Z"),
+            ("Z_A",         .newest,    "alpha Z → A falls back (BFF lacks NAME_DESC)"),
+            (nil,           .newest,    "nil → default NEWEST"),
+            ("BOGUS",       .newest,    "unknown raw value → default NEWEST")
+        ]
 
-    func test_maps_price_low_to_high() {
-        XCTAssertEqual(BFFGraphAPI.ProductSortEnum.from(sortOption: "LOW_TO_HIGH"), .priceAsc)
-    }
-
-    func test_maps_alpha_ascending() {
-        XCTAssertEqual(BFFGraphAPI.ProductSortEnum.from(sortOption: "A_Z"), .nameAsc)
-    }
-
-    func test_alpha_descending_falls_back_to_newest_pending_bff_support() {
-        // BFF doesn't yet expose NAME_DESC — Z_A intentionally falls back to NEWEST until
-        // the BFF team adds the enum case.
-        XCTAssertEqual(BFFGraphAPI.ProductSortEnum.from(sortOption: "Z_A"), .newest)
-    }
-
-    func test_nil_falls_back_to_newest() {
-        XCTAssertEqual(BFFGraphAPI.ProductSortEnum.from(sortOption: nil), .newest)
-    }
-
-    func test_unknown_value_falls_back_to_newest() {
-        XCTAssertEqual(BFFGraphAPI.ProductSortEnum.from(sortOption: "BOGUS"), .newest)
+        for (input, expected, label) in cases {
+            XCTAssertEqual(
+                BFFGraphAPI.ProductSortEnum.from(sortOption: input),
+                expected,
+                label
+            )
+        }
     }
 }
