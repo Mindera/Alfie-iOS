@@ -25,6 +25,11 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         ProductListingViewStateModel, ProductListingViewErrorType
     >
 
+    /// Cursor state for cursor-based pagination. Lives on the ViewModel (which is the
+    /// only caller that needs to drive "load more" decisions); the service itself is
+    /// stateless and just fetches the page identified by `after`.
+    private var pagination: ProductListing.Pagination?
+
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
     }
@@ -38,7 +43,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public var totalNumberOfProducts: Int {
-        dependencies.productListingService.totalOfRecords ?? 0
+        pagination?.totalCount ?? 0
     }
 
     public var showSearchButton: Bool {
@@ -139,7 +144,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         do {
             productListing = try await dependencies.productListingService
-                .paged(categoryId: category, query: query, sort: sortOption, filters: filters)
+                .page(after: nil, categoryId: category, query: query, sort: sortOption, filters: filters)
         } catch {
             dependencies.log.error("Error fetching product listing (first page): \(error)")
             state = .error(.generic)
@@ -151,12 +156,16 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             return
         }
 
+        pagination = productListing.pagination
         state = .success(.init(title: productListing.title, products: productListing.products))
     }
 
     @MainActor
     private func loadMoreProducts() async {
-        guard dependencies.productListingService.hasNext(), case .success(let model) = state else {
+        guard
+            pagination?.hasNextPage == true,
+            case .success(let model) = state
+        else {
             return
         }
 
@@ -165,7 +174,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         do {
             productListing = try await dependencies.productListingService
-                .next(categoryId: category, query: query, sort: sortOption, filters: filters)
+                .page(after: pagination?.endCursor, categoryId: category, query: query, sort: sortOption, filters: filters)
         } catch {
             dependencies.log.error("Error fetching product listing (following page): \(error)")
             state = .error(.generic)
@@ -177,6 +186,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             return
         }
 
+        pagination = productListing.pagination
         state = .success(.init(title: title, products: model.products + productListing.products))
     }
 }

@@ -38,13 +38,27 @@ final class ProductListingViewModelTests: XCTestCase {
 
     // MARK: - totalCount surfacing (AC 5)
 
-    func test_totalNumberOfProducts_surfaces_service_totalOfRecords() {
-        mockProductListing.totalOfRecords = 42
+    func test_totalNumberOfProducts_surfaces_latest_response_totalCount() {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onPageCalled = { _, _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(totalCount: 42), products: Array(Product.fixtures.prefix(5)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
         XCTAssertEqual(sut.totalNumberOfProducts, 42)
     }
 
-    func test_totalNumberOfProducts_defaults_to_zero_when_total_unknown() {
-        mockProductListing.totalOfRecords = nil
+    func test_totalNumberOfProducts_defaults_to_zero_before_first_response() {
+        XCTAssertEqual(sut.totalNumberOfProducts, 0)
+    }
+
+    func test_totalNumberOfProducts_defaults_to_zero_when_totalCount_omitted() {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onPageCalled = { _, _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(totalCount: nil), products: Array(Product.fixtures.prefix(5)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
         XCTAssertEqual(sut.totalNumberOfProducts, 0)
     }
 
@@ -105,7 +119,15 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.wishlistContent.first?.product.id, "other")
     }
 
-    private func makeSUT(wishlistService: WishlistServiceProtocol? = nil) -> ProductListingViewModel {
+    private func makeSUT(
+        category: String? = nil,
+        searchText: String? = nil,
+        sort: String? = nil,
+        urlQueryParameters: [String: String]? = nil,
+        mode: ProductListingViewMode = .listing,
+        skeletonItemsSize: Int = ProductListingViewModel.Constants.defaultSkeletonItemsSize,
+        wishlistService: WishlistServiceProtocol? = nil
+    ) -> ProductListingViewModel {
         .init(
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
@@ -115,6 +137,12 @@ final class ProductListingViewModelTests: XCTestCase {
                 configurationService: MockConfigurationService(),
                 log: log
             ),
+            category: category,
+            searchText: searchText,
+            sort: sort,
+            urlQueryParameters: urlQueryParameters,
+            mode: mode,
+            skeletonItemsSize: skeletonItemsSize,
             navigate: { _ in },
             showSearch: {}
         )
@@ -162,12 +190,12 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.state.isLoadingFirstPage)
         XCTAssertEqual(sut.title, "")
 
-        mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query, sort, _ in
+        mockProductListing.onPageCalled = { _, categoryId, query, sort, _ in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "women/clothing")
             XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
+                                          pagination: .fixture(totalCount: 5),
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
@@ -198,12 +226,12 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.state.isLoadingFirstPage)
         XCTAssertEqual(sut.title, "")
 
-        mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query, sort, _ in
+        mockProductListing.onPageCalled = { _, categoryId, query, sort, _ in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
             XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
+                                          pagination: .fixture(totalCount: 5),
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
@@ -215,7 +243,7 @@ final class ProductListingViewModelTests: XCTestCase {
     }
 
     func test_fetch_first_page_failure_returns_error() {
-        mockProductListing.onPageCalled = { categoryId, query, sort, _ in
+        mockProductListing.onPageCalled = { _, categoryId, query, sort, _ in
             throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
 
@@ -242,13 +270,17 @@ final class ProductListingViewModelTests: XCTestCase {
             showSearch: {}
         )
 
-        mockProductListing.onPageCalled = { _, _, _, _ in
-            ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true),
-                                   products: Product.fixtures)
-        }
-
-        mockProductListing.onHasNextCalled = { true }
-        mockProductListing.onNextCalled = { categoryId, query, sort, _ in
+        // First call (after == nil) returns a page with hasNextPage=true + cursor.
+        // Second call (after == "cursor-1") proves the VM forwarded the stored cursor and
+        // also propagated category/query/sort across the second request.
+        mockProductListing.onPageCalled = { after, categoryId, query, sort, _ in
+            if after == nil {
+                return ProductListing.fixture(
+                    pagination: .fixture(endCursor: "cursor-1", hasNextPage: true),
+                    products: Product.fixtures
+                )
+            }
+            XCTAssertEqual(after, "cursor-1")
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "women/clothing")
             XCTAssertEqual(sort, "sort")
@@ -265,8 +297,7 @@ final class ProductListingViewModelTests: XCTestCase {
     }
 
     func test_does_not_fetch_next_page_when_no_next_page() {
-        mockProductListing.onHasNextCalled = { false }
-        mockProductListing.onPageCalled = { _, _, _, _ in
+        mockProductListing.onPageCalled = { _, _, _, _, _ in
             ProductListing.fixture(products: Product.fixtures)
         }
 
@@ -277,8 +308,7 @@ final class ProductListingViewModelTests: XCTestCase {
         guard let penultimateProduct = Product.fixtures[safe: Product.fixtures.count - 2] else {
             return
         }
-        mockProductListing.onHasNextCalled = { false }
-        mockProductListing.onPageCalled = { _, _, _, _ in
+        mockProductListing.onPageCalled = { _, _, _, _, _ in
             ProductListing.fixture(products: Product.fixtures)
         }
 
@@ -303,12 +333,12 @@ final class ProductListingViewModelTests: XCTestCase {
             showSearch: {}
         )
 
-        mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query, sort, _ in
+        mockProductListing.onPageCalled = { _, categoryId, query, sort, _ in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
             XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
+                                          pagination: .fixture(totalCount: 5),
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
@@ -358,12 +388,12 @@ final class ProductListingViewModelTests: XCTestCase {
             showSearch: {}
         )
 
-        mockProductListing.totalOfRecords = 5
-        mockProductListing.onPageCalled = { categoryId, query, sort, _ in
+        mockProductListing.onPageCalled = { _, categoryId, query, sort, _ in
             XCTAssertEqual(categoryId, "clothing")
             XCTAssertEqual(query, "something")
             XCTAssertEqual(sort, "sort")
             return ProductListing.fixture(title: "Women's Clothing",
+                                          pagination: .fixture(totalCount: 5),
                                           products: Array(Product.fixtures.prefix(5)))
         }
 
