@@ -123,7 +123,7 @@ public final class BrandsViewModel: BrandsViewModelProtocol {
             brands = try await brandsService.getBrands()
         } catch {
             log.error("Error fetching brands for Brands screen: \(error)")
-            state = .error(.generic)
+            state = .error(BrandsViewErrorType.from(error: error))
             return
         }
 

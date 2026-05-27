@@ -147,7 +147,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
                 .page(after: nil, categoryId: category, query: query, sort: sortOption, filters: filters)
         } catch {
             dependencies.log.error("Error fetching product listing (first page): \(error)")
-            state = .error(.generic)
+            state = .error(ProductListingViewErrorType.from(error: error))
             return
         }
 
@@ -177,7 +177,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
                 .page(after: pagination?.endCursor, categoryId: category, query: query, sort: sortOption, filters: filters)
         } catch {
             dependencies.log.error("Error fetching product listing (following page): \(error)")
-            state = .error(.generic)
+            state = .error(ProductListingViewErrorType.from(error: error))
             return
         }
 

@@ -196,7 +196,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             navigationItems = try await navigationService.getNavigationItems(for: .shop)
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
-            state = .error(.generic)
+            state = .error(CategoriesViewErrorType.from(error: error))
             return
         }
 

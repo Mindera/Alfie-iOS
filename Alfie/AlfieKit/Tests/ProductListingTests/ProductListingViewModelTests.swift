@@ -250,7 +250,27 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertTrue(sut.state.didFail)
-        XCTAssertEqual(sut.state.failure, .generic)
+        XCTAssertEqual(sut.state.failure, .noResults)
+    }
+
+    func test_fetch_first_page_rate_limited_returns_rate_limited_state() {
+        mockProductListing.onPageCalled = { _, _, _, _, _ in
+            throw BFFRequestError(type: .rateLimited(retryAfter: 5))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure, .rateLimited)
+    }
+
+    func test_fetch_first_page_server_error_returns_server_error_state() {
+        mockProductListing.onPageCalled = { _, _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure, .serverError)
     }
 
     func test_fetch_next_page_with_filter_params_when_displays_last_item() {
