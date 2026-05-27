@@ -6,6 +6,9 @@ public struct BFFRequestError: Error {
         case emptyResponse
         case noInternet
         case product(BFFProductRequestErrorType)
+        case rateLimited(retryAfter: TimeInterval?)
+        case timeout
+        case serverError(status: Int)
     }
 
     public enum BFFProductRequestErrorType: Equatable {
@@ -17,11 +20,13 @@ public struct BFFRequestError: Error {
     public let type: BFFRequestErrorType
     public let error: Error?
     public let errorMessage: String?
+    public let retryCount: Int
 
-    public init(type: BFFRequestErrorType, error: Error? = nil, message: String? = nil) {
+    public init(type: BFFRequestErrorType, error: Error? = nil, message: String? = nil, retryCount: Int = 0) {
         self.type = type
         self.error = error
         self.errorMessage = message ?? error?.localizedDescription
+        self.retryCount = retryCount
     }
 
     public var isNotFound: Bool {

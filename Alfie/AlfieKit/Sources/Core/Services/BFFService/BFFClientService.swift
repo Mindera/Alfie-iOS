@@ -26,6 +26,11 @@ public final class BFFClientService: BFFClientServiceProtocol {
         self.baseUrl = url
         self.log = log
 
+        // Enforce explicit timeouts so BFF calls can't hang the UI. `.default` inherits
+        // a 60s request / 7-day resource budget, which is far too lax for mobile.
+        sessionConfiguration.timeoutIntervalForRequest = 30
+        sessionConfiguration.timeoutIntervalForResource = 60
+
         let client = URLSessionClient(sessionConfiguration: sessionConfiguration)
         let cache = InMemoryNormalizedCache()
         let store = ApolloStore(cache: cache)
@@ -132,24 +137,47 @@ public final class BFFClientService: BFFClientServiceProtocol {
         // (e.g. user backs out of PLP mid-fetch). Without this we'd leak a network
         // round-trip and silently drop the response.
         let box = CancellableBox()
-        return try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
-                let cancellable = apolloClient.fetch(query: query) { result in
-                    if let failure = Self.resultAsFailure(result) {
-                        continuation.resume(throwing: failure)
-                        return
+        do {
+            return try await withTaskCancellationHandler {
+                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
+                    let cancellable = apolloClient.fetch(query: query) { result in
+                        if let failure = Self.resultAsFailure(result) {
+                            continuation.resume(throwing: failure)
+                            return
+                        }
+                        guard let data = Self.resultAsSuccess(result)?.data else {
+                            continuation.resume(throwing: BFFRequestError(type: .generic))
+                            return
+                        }
+                        continuation.resume(returning: data)
                     }
-                    guard let data = Self.resultAsSuccess(result)?.data else {
-                        continuation.resume(throwing: BFFRequestError(type: .generic))
-                        return
-                    }
-                    continuation.resume(returning: data)
+                    box.set(cancellable)
                 }
-                box.set(cancellable)
+            } onCancel: {
+                box.cancel()
             }
-        } onCancel: {
-            box.cancel()
+        } catch let error as BFFRequestError {
+            recordTelemetry(error: error, operationName: Query.operationName)
+            throw error
+        } catch {
+            throw error
         }
+    }
+
+    private func recordTelemetry(error: BFFRequestError, operationName: String) {
+        guard let telemetry = dependencies.errorTelemetry else { return }
+        let httpStatus: Int? = {
+            switch error.type {
+            case .serverError(let status): return status
+            default: return nil
+            }
+        }()
+        telemetry.record(
+            error: error,
+            operationName: operationName,
+            httpStatus: httpStatus,
+            graphqlErrorCode: nil
+        )
     }
 
     private static func resultAsFailure<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> BFFRequestError? {
@@ -162,11 +190,21 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 return nil
             }
 
+            // GraphQL-level rate-limit signalling: BFF may surface throttling as a
+            // 200 + an error with extensions.code == "RATE_LIMITED" / "THROTTLED".
+            let code = errors.first?.extensions?["code"] as? String
+            if let code, code == "RATE_LIMITED" || code == "THROTTLED" {
+                return BFFRequestError(type: .rateLimited(retryAfter: nil), message: errors.first?.message)
+            }
+
             return BFFRequestError(type: .generic, message: errors.first?.message)
 
         case .failure(let error):
-            guard let bffError = error as? BFFRequestError else { return BFFRequestError(type: .generic, error: error) }
-            return bffError
+            if let bffError = error as? BFFRequestError { return bffError }
+            if let urlError = error as? URLError, urlError.code == .timedOut {
+                return BFFRequestError(type: .timeout, error: error)
+            }
+            return BFFRequestError(type: .generic, error: error)
         }
     }
 
