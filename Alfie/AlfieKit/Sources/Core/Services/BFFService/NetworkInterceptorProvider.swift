@@ -30,7 +30,11 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         // Order is very important, check the default request chain here:
         // https://www.apollographql.com/docs/ios/networking/request-pipeline#default-interceptors
 
-        interceptors.append(MaxRetryInterceptor())
+        // MaxRetryInterceptor stays at the front as a safety cap on total retry passes.
+        // BackoffRetryInterceptor enforces the business retry budget (3 attempts) and
+        // calls chain.retry(), which re-enters MaxRetryInterceptor — so its limit must
+        // exceed BackoffRetryInterceptor.Configuration.maxRetries.
+        interceptors.append(MaxRetryInterceptor(maxRetriesAllowed: 5))
         interceptors.append(CacheReadInterceptor(store: self.store))
         interceptors.append(NetworkPreConditionInterceptor(reachabilityService: self.reachabilityService)) // Custom
         interceptors.append(AuthorizationInterceptor()) // Custom
@@ -41,6 +45,11 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         if logRequests {
             interceptors.append(ResponseLogInterceptor(log: log)) // Custom
         }
+        // Order matters: BackoffRetry gets first crack at 5xx/429/430 and may call
+        // chain.retry(). RateLimitMapping handles surviving 429/430 (retry-after over
+        // cap or retries exhausted). ResponseCode catches everything else.
+        interceptors.append(BackoffRetryInterceptor()) // Custom
+        interceptors.append(RateLimitMappingInterceptor()) // Custom
         interceptors.append(ResponseCodeInterceptor())
         interceptors.append(MultipartResponseParsingInterceptor())
         interceptors.append(JSONResponseParsingInterceptor())
