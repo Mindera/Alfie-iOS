@@ -17,15 +17,31 @@ import Model
 /// in `BFFClientService.resultAsFailure` and rely on user-tap retry.
 final class RetryInterceptor: ApolloInterceptor {
     struct Configuration {
-        var baseDelay: TimeInterval = 0.5
-        var multiplier: Double = 2.0
-        var maxRetries: Int = 3
-        var perAttemptCap: TimeInterval = 8
-        var retryAfterCap: TimeInterval = 30
+        let baseDelay: TimeInterval
+        let multiplier: Double
+        let maxRetries: Int
+        let perAttemptCap: TimeInterval
+        let retryAfterCap: TimeInterval
         /// Schedules `work` to run after `delay`. Overridable for deterministic tests
         /// (pass `{ _, work in work() }` to fire synchronously).
-        var scheduleRetry: @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { delay, work in
-            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay, execute: work)
+        let scheduleRetry: @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void
+
+        init(
+            baseDelay: TimeInterval = 0.5,
+            multiplier: Double = 2.0,
+            maxRetries: Int = 3,
+            perAttemptCap: TimeInterval = 8,
+            retryAfterCap: TimeInterval = 30,
+            scheduleRetry: @escaping @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { delay, work in
+                DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay, execute: work)
+            }
+        ) {
+            self.baseDelay = baseDelay
+            self.multiplier = multiplier
+            self.maxRetries = maxRetries
+            self.perAttemptCap = perAttemptCap
+            self.retryAfterCap = retryAfterCap
+            self.scheduleRetry = scheduleRetry
         }
 
         /// Buffer added to `maxRetries` when sizing Apollo's `MaxRetryInterceptor` safety

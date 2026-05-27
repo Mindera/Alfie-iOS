@@ -9,14 +9,18 @@ import XCTest
 final class RetryInterceptorTests: XCTestCase {
     /// Configuration that fires retries synchronously on the calling thread so tests
     /// are race-free and finish in microseconds.
-    private func makeConfig(maxRetries: Int = 3, retryAfterCap: TimeInterval = 30) -> RetryInterceptor.Configuration {
+    private func makeConfig(
+        maxRetries: Int = 3,
+        retryAfterCap: TimeInterval = 30,
+        scheduleRetry: @escaping @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { _, work in work() }
+    ) -> RetryInterceptor.Configuration {
         RetryInterceptor.Configuration(
             baseDelay: 0.001,
             multiplier: 2.0,
             maxRetries: maxRetries,
             perAttemptCap: 0.05,
             retryAfterCap: retryAfterCap,
-            scheduleRetry: { _, work in work() }
+            scheduleRetry: scheduleRetry
         )
     }
 
@@ -35,8 +39,7 @@ final class RetryInterceptorTests: XCTestCase {
     func test_chain_safety_cap_tracks_tuned_max_retries() {
         // If someone bumps maxRetries, the safety cap must scale with it — this is
         // the whole point of computing the cap from the configuration.
-        var config = RetryInterceptor.Configuration()
-        config.maxRetries = 7
+        let config = RetryInterceptor.Configuration(maxRetries: 7)
         XCTAssertEqual(config.chainSafetyCap, 9)
     }
 
@@ -184,12 +187,11 @@ final class RetryInterceptorTests: XCTestCase {
         // Regression guard: a bug that scheduled two retries per intercept would
         // pass the basic retry tests above. Use a custom scheduler that runs work
         // synchronously AND counts how many times it was scheduled.
-        var scheduleCount = 0
-        var config = makeConfig()
-        config.scheduleRetry = { _, work in
-            scheduleCount += 1
+        let counter = TestCounter()
+        let config = makeConfig(scheduleRetry: { _, work in
+            counter.increment()
             work()
-        }
+        })
         let chain = MockRequestChain()
         let interceptor = RetryInterceptor(configuration: config)
 
@@ -200,7 +202,7 @@ final class RetryInterceptorTests: XCTestCase {
             completion: { _ in }
         )
 
-        XCTAssertEqual(scheduleCount, 1, "Each interceptAsync invocation must schedule at most one retry")
+        XCTAssertEqual(counter.value, 1, "Each interceptAsync invocation must schedule at most one retry")
         XCTAssertEqual(chain.retryCount, 1)
     }
 
@@ -211,9 +213,8 @@ final class RetryInterceptorTests: XCTestCase {
         // Apollo only retains the interceptor for the duration of the operation;
         // if it deinits while a backoff is in flight, the spawned work must not
         // crash or fire on a stale chain.
-        var pendingWork: (() -> Void)?
-        var config = makeConfig()
-        config.scheduleRetry = { _, work in pendingWork = work }
+        let pending = PendingWorkBox()
+        let config = makeConfig(scheduleRetry: { _, work in pending.set(work) })
 
         let chain = MockRequestChain()
         do {
@@ -229,7 +230,7 @@ final class RetryInterceptorTests: XCTestCase {
         chain.setCancelled(true)
         // Firing the captured work after interceptor deinit must not crash and must
         // not invoke chain.retry on a cancelled chain.
-        pendingWork?()
+        pending.fire()
 
         XCTAssertEqual(chain.retryCount, 0, "Cancelled chain must not be retried even after deinit")
     }
@@ -254,5 +255,43 @@ final class RetryInterceptorTests: XCTestCase {
 
         XCTAssertEqual(chain.retryCount, 0)
         XCTAssertEqual(chain.proceedCount, 1)
+    }
+}
+
+// MARK: - Test helpers
+
+/// Reference-type counter used inside `@Sendable` scheduler closures (which can't
+/// capture mutable value-type state).
+private final class TestCounter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _value: Int = 0
+
+    var value: Int {
+        lock.lock(); defer { lock.unlock() }
+        return _value
+    }
+
+    func increment() {
+        lock.lock(); defer { lock.unlock() }
+        _value += 1
+    }
+}
+
+/// Reference-type holder for capturing a scheduled work closure from inside an
+/// `@Sendable` scheduler so the test can fire it manually later.
+private final class PendingWorkBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var work: (() -> Void)?
+
+    func set(_ work: @escaping () -> Void) {
+        lock.lock(); defer { lock.unlock() }
+        self.work = work
+    }
+
+    func fire() {
+        lock.lock()
+        let captured = work
+        lock.unlock()
+        captured?()
     }
 }
