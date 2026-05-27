@@ -63,10 +63,17 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private var errorView: some View {
-        ErrorView(
-            title: L10n.Shop.Categories.ErrorView.title,
-            message: L10n.Shop.Categories.ErrorView.message
-        )
+        let (title, message): (String, String) = {
+            switch viewModel.state.failure {
+            case .rateLimited:
+                return (L10n.Shop.Categories.ErrorView.RateLimited.title, L10n.Shop.Categories.ErrorView.RateLimited.message)
+            case .serverError:
+                return (L10n.Shop.Categories.ErrorView.ServerError.title, L10n.Shop.Categories.ErrorView.ServerError.message)
+            default:
+                return (L10n.Shop.Categories.ErrorView.title, L10n.Shop.Categories.ErrorView.message)
+            }
+        }()
+        return ErrorView(title: title, message: message)
     }
 
     private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color) -> some View {
