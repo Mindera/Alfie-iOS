@@ -15,7 +15,7 @@ import Model
 /// `NetworkFetchInterceptor`, which bypasses subsequent interceptors — so this class
 /// only retries HTTP-status-based failures. Transport timeouts are typed as `.timeout`
 /// in `BFFClientService.resultAsFailure` and rely on user-tap retry.
-final class BackoffRetryInterceptor: ApolloInterceptor {
+final class RetryInterceptor: ApolloInterceptor {
     struct Configuration {
         var baseDelay: TimeInterval = 0.5
         var multiplier: Double = 2.0

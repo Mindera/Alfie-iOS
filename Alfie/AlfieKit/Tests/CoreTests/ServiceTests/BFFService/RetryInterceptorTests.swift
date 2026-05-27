@@ -6,11 +6,11 @@ import Foundation
 import Model
 import XCTest
 
-final class BackoffRetryInterceptorTests: XCTestCase {
+final class RetryInterceptorTests: XCTestCase {
     /// Configuration that fires retries synchronously on the calling thread so tests
     /// are race-free and finish in microseconds.
-    private func makeConfig(maxRetries: Int = 3, retryAfterCap: TimeInterval = 30) -> BackoffRetryInterceptor.Configuration {
-        BackoffRetryInterceptor.Configuration(
+    private func makeConfig(maxRetries: Int = 3, retryAfterCap: TimeInterval = 30) -> RetryInterceptor.Configuration {
+        RetryInterceptor.Configuration(
             baseDelay: 0.001,
             multiplier: 2.0,
             maxRetries: maxRetries,
@@ -25,7 +25,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
     func test_retries_on_transient_statuses() {
         for status in [500, 502, 503, 504, 429, 430] {
             let chain = MockRequestChain()
-            let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+            let interceptor = RetryInterceptor(configuration: makeConfig())
 
             interceptor.interceptAsync(
                 chain: chain,
@@ -45,7 +45,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
     func test_does_not_retry_on_non_transient_statuses() {
         for status in [200, 204, 400, 401, 403, 404, 501, 505] {
             let chain = MockRequestChain()
-            let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+            let interceptor = RetryInterceptor(configuration: makeConfig())
 
             interceptor.interceptAsync(
                 chain: chain,
@@ -64,7 +64,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
 
     func test_exhausted_5xx_retries_surface_server_error_with_retry_count() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: makeConfig(maxRetries: 3))
+        let interceptor = RetryInterceptor(configuration: makeConfig(maxRetries: 3))
         let response = InterceptorTestHelpers.makeResponse(status: 503)
 
         // Simulate Apollo re-running the chain on each chain.retry() by invoking
@@ -88,7 +88,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
 
     func test_exhausted_429_retries_surface_rate_limited_with_retry_count() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: makeConfig(maxRetries: 2))
+        let interceptor = RetryInterceptor(configuration: makeConfig(maxRetries: 2))
         let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "1"])
 
         for _ in 0..<2 {
@@ -109,7 +109,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
 
     func test_retry_after_exceeding_cap_surfaces_rate_limited_immediately() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+        let interceptor = RetryInterceptor(configuration: makeConfig())
         let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "60"])
 
         interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
@@ -126,7 +126,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
 
     func test_retries_when_retry_after_within_cap() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+        let interceptor = RetryInterceptor(configuration: makeConfig())
         let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "5"])
 
         interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
@@ -140,7 +140,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
     func test_cancelled_chain_fires_completion_with_url_cancelled_error() {
         let chain = MockRequestChain()
         chain.setCancelled(true)
-        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+        let interceptor = RetryInterceptor(configuration: makeConfig())
 
         let expectation = XCTestExpectation(description: "completion called on cancelled chain")
         interceptor.interceptAsync(
@@ -171,7 +171,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
             work()
         }
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: config)
+        let interceptor = RetryInterceptor(configuration: config)
 
         interceptor.interceptAsync(
             chain: chain,
@@ -197,7 +197,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
 
         let chain = MockRequestChain()
         do {
-            let interceptor = BackoffRetryInterceptor(configuration: config)
+            let interceptor = RetryInterceptor(configuration: config)
             interceptor.interceptAsync(
                 chain: chain,
                 request: InterceptorTestHelpers.makeRequest(),
@@ -220,7 +220,7 @@ final class BackoffRetryInterceptorTests: XCTestCase {
         // APQ surfaces 'PersistedQueryNotFound' as HTTP 200 with a GraphQL error
         // payload — not a 5xx — so the status-based check naturally passes through.
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+        let interceptor = RetryInterceptor(configuration: makeConfig())
 
         let body = #"{"errors":[{"message":"PersistedQueryNotFound","extensions":{"code":"PERSISTED_QUERY_NOT_FOUND"}}]}"#
         let response = InterceptorTestHelpers.makeResponse(status: 200, bodyJSON: body)

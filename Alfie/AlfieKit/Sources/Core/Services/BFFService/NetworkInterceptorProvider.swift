@@ -31,9 +31,9 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         // https://www.apollographql.com/docs/ios/networking/request-pipeline#default-interceptors
 
         // MaxRetryInterceptor stays at the front as a safety cap on total retry passes.
-        // BackoffRetryInterceptor enforces the business retry budget (3 attempts) and
+        // RetryInterceptor enforces the business retry budget (3 attempts) and
         // calls chain.retry(), which re-enters MaxRetryInterceptor — so its limit must
-        // exceed BackoffRetryInterceptor.Configuration.maxRetries.
+        // exceed RetryInterceptor.Configuration.maxRetries.
         interceptors.append(MaxRetryInterceptor(maxRetriesAllowed: 5))
         interceptors.append(CacheReadInterceptor(store: self.store))
         interceptors.append(NetworkPreConditionInterceptor(reachabilityService: self.reachabilityService)) // Custom
@@ -45,10 +45,10 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         if logRequests {
             interceptors.append(ResponseLogInterceptor(log: log)) // Custom
         }
-        // BackoffRetryInterceptor handles all retryable transient failures
+        // RetryInterceptor handles all retryable transient failures
         // (5xx subset + 429 / 430) and, on give-up, emits a typed BFFRequestError
         // carrying the observed retry count. ResponseCode catches everything else.
-        interceptors.append(BackoffRetryInterceptor()) // Custom
+        interceptors.append(RetryInterceptor()) // Custom
         interceptors.append(ResponseCodeInterceptor())
         interceptors.append(MultipartResponseParsingInterceptor())
         interceptors.append(JSONResponseParsingInterceptor())
