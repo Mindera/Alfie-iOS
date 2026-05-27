@@ -20,6 +20,26 @@ final class RetryInterceptorTests: XCTestCase {
         )
     }
 
+    // MARK: - Safety cap
+
+    func test_chain_safety_cap_exceeds_max_retries_by_buffer() {
+        let config = RetryInterceptor.Configuration()
+        XCTAssertGreaterThan(
+            config.chainSafetyCap,
+            config.maxRetries,
+            "chainSafetyCap must be > maxRetries — otherwise Apollo's MaxRetryInterceptor would trip before RetryInterceptor's own give-up logic"
+        )
+        XCTAssertEqual(config.chainSafetyCap, config.maxRetries + RetryInterceptor.Configuration.safetyCapBuffer)
+    }
+
+    func test_chain_safety_cap_tracks_tuned_max_retries() {
+        // If someone bumps maxRetries, the safety cap must scale with it — this is
+        // the whole point of computing the cap from the configuration.
+        var config = RetryInterceptor.Configuration()
+        config.maxRetries = 7
+        XCTAssertEqual(config.chainSafetyCap, 9)
+    }
+
     // MARK: - Retry on transient HTTP failures
 
     func test_retries_on_transient_statuses() {

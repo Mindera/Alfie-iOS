@@ -27,6 +27,16 @@ final class RetryInterceptor: ApolloInterceptor {
         var scheduleRetry: @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { delay, work in
             DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay, execute: work)
         }
+
+        /// Buffer added to `maxRetries` when sizing Apollo's `MaxRetryInterceptor` safety
+        /// cap. Larger than 0 so a single off-by-one in retry accounting can't trip the
+        /// cap before this interceptor's own give-up logic runs.
+        static let safetyCapBuffer: Int = 2
+
+        /// Apollo `MaxRetryInterceptor.maxRetriesAllowed` value that pairs with this
+        /// configuration. Use at the call site so the chain's safety cap auto-tracks
+        /// whatever `maxRetries` is configured to.
+        var chainSafetyCap: Int { maxRetries + Self.safetyCapBuffer }
     }
 
     var id: String = UUID().uuidString
@@ -35,7 +45,7 @@ final class RetryInterceptor: ApolloInterceptor {
     // a fresh instance per operation; never share across operations or this counter
     // will leak between requests. Mutated only on Apollo's processing queue.
     private var retryCount: Int = 0
-    private let configuration: Configuration
+    let configuration: Configuration
 
     init(configuration: Configuration = Configuration()) {
         self.configuration = configuration
