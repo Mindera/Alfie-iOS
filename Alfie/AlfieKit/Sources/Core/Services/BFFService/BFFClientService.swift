@@ -157,22 +157,22 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 box.cancel()
             }
         } catch let error as BFFRequestError {
-            recordTelemetry(error: error, operationName: Query.operationName)
+            reportError(error, operationName: Query.operationName)
             throw error
         } catch {
             throw error
         }
     }
 
-    private func recordTelemetry(error: BFFRequestError, operationName: String) {
-        guard let telemetry = dependencies.errorTelemetry else { return }
+    private func reportError(_ error: BFFRequestError, operationName: String) {
+        guard let reporter = dependencies.errorReporter else { return }
         let httpStatus: Int? = {
             switch error.type {
             case .serverError(let status): return status
             default: return nil
             }
         }()
-        telemetry.record(
+        reporter.report(
             error: error,
             operationName: operationName,
             httpStatus: httpStatus,

@@ -3,7 +3,7 @@ import Foundation
 import Model
 import XCTest
 
-final class BFFErrorTelemetryTests: XCTestCase {
+final class BFFErrorReporterTests: XCTestCase {
     // MARK: - Category mapping
 
     func test_category_mapping() {
@@ -21,7 +21,7 @@ final class BFFErrorTelemetryTests: XCTestCase {
         ]
 
         for (type, expected) in cases {
-            XCTAssertEqual(BFFErrorTelemetry.category(for: type), expected, "category for \(type)")
+            XCTAssertEqual(BFFErrorReporter.category(for: type), expected, "category for \(type)")
         }
     }
 
@@ -45,7 +45,7 @@ final class BFFErrorTelemetryTests: XCTestCase {
 
         for (type, expected) in cases {
             XCTAssertEqual(
-                BFFErrorTelemetry.shouldRecordAsNonFatal(type),
+                BFFErrorReporter.shouldRecordAsNonFatal(type),
                 expected,
                 "shouldRecordAsNonFatal for \(type)"
             )

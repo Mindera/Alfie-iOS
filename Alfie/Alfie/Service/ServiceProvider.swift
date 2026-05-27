@@ -73,11 +73,11 @@ final class ServiceProvider: ServiceProviderProtocol {
         // BFF API (GraphQL + REST)
         // Pass false if you wish to remove console clutter
         let restClient = NetworkClient(logRequests: true, logResponses: true, log: log)
-        let bffErrorTelemetry = BFFErrorTelemetry(analytics: analytics, log: log)
+        let bffErrorReporter = BFFErrorReporter(analytics: analytics, log: log)
         let bffDependencies = BFFClientDependencyContainer(
             reachabilityService: reachabilityService,
             restNetworkClient: restClient,
-            errorTelemetry: bffErrorTelemetry
+            errorReporter: bffErrorReporter
         )
         let apiUrl = apiEndpointService.apiEndpoint(for: apiEndpointService.currentApiEndpoint)
         log.debug("Initializing BFF API with endpoint \(apiUrl.absoluteString)")

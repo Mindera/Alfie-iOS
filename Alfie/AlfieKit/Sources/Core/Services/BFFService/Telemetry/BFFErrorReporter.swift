@@ -2,8 +2,8 @@ import AlicerceLogging
 import Foundation
 import Model
 
-public protocol BFFErrorTelemetryProtocol {
-    func record(
+public protocol BFFErrorReporterProtocol {
+    func report(
         error: BFFRequestError,
         operationName: String,
         httpStatus: Int?,
@@ -11,11 +11,11 @@ public protocol BFFErrorTelemetryProtocol {
     )
 }
 
-/// Records BFF failures to Analytics (always) and Crashlytics (server / generic only).
+/// Reports BFF failures to Analytics (always) and Crashlytics (server / generic only).
 /// Rate-limit, timeout, and network categories are expected operational signals — we
-/// surface them as Analytics events but keep them out of Crashlytics non-fatals so
+/// surface them as Analytics events but keep them out of Crashlytics breadcrumbs so
 /// the dashboard signal stays meaningful.
-public final class BFFErrorTelemetry: BFFErrorTelemetryProtocol {
+public final class BFFErrorReporter: BFFErrorReporterProtocol {
     private let analytics: AlfieAnalyticsTracker
     private let log: Logger
 
@@ -24,7 +24,7 @@ public final class BFFErrorTelemetry: BFFErrorTelemetryProtocol {
         self.log = log
     }
 
-    public func record(
+    public func report(
         error: BFFRequestError,
         operationName: String,
         httpStatus: Int?,
