@@ -158,6 +158,62 @@ final class BackoffRetryInterceptorTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    // MARK: - No leaked extra retries
+
+    func test_single_intercept_call_triggers_exactly_one_retry() {
+        // Regression guard: a bug that scheduled two retries per intercept would
+        // pass the basic retry tests above. Use a custom scheduler that runs work
+        // synchronously AND counts how many times it was scheduled.
+        var scheduleCount = 0
+        var config = makeConfig()
+        config.scheduleRetry = { _, work in
+            scheduleCount += 1
+            work()
+        }
+        let chain = MockRequestChain()
+        let interceptor = BackoffRetryInterceptor(configuration: config)
+
+        interceptor.interceptAsync(
+            chain: chain,
+            request: InterceptorTestHelpers.makeRequest(),
+            response: InterceptorTestHelpers.makeResponse(status: 503),
+            completion: { _ in }
+        )
+
+        XCTAssertEqual(scheduleCount, 1, "Each interceptAsync invocation must schedule at most one retry")
+        XCTAssertEqual(chain.retryCount, 1)
+    }
+
+    // MARK: - Interceptor deinit safety
+
+    func test_deinit_during_pending_retry_does_not_call_completion_after_chain_cancelled() {
+        // Capture the work closure so we can fire it after `interceptor` is gone.
+        // Apollo only retains the interceptor for the duration of the operation;
+        // if it deinits while a backoff is in flight, the spawned work must not
+        // crash or fire on a stale chain.
+        var pendingWork: (() -> Void)?
+        var config = makeConfig()
+        config.scheduleRetry = { _, work in pendingWork = work }
+
+        let chain = MockRequestChain()
+        do {
+            let interceptor = BackoffRetryInterceptor(configuration: config)
+            interceptor.interceptAsync(
+                chain: chain,
+                request: InterceptorTestHelpers.makeRequest(),
+                response: InterceptorTestHelpers.makeResponse(status: 503),
+                completion: { _ in }
+            )
+        } // interceptor goes out of scope here
+
+        chain.setCancelled(true)
+        // Firing the captured work after interceptor deinit must not crash and must
+        // not invoke chain.retry on a cancelled chain.
+        pendingWork?()
+
+        XCTAssertEqual(chain.retryCount, 0, "Cancelled chain must not be retried even after deinit")
+    }
+
     // MARK: - APQ passthrough
 
     func test_apq_persisted_query_not_found_is_not_retried() {

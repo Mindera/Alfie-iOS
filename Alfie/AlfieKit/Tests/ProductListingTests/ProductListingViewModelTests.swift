@@ -260,6 +260,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
+        XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .rateLimited)
     }
 
@@ -270,6 +271,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
+        XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .serverError)
     }
 
