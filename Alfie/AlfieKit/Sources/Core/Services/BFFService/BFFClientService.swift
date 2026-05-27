@@ -190,13 +190,6 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 return nil
             }
 
-            // GraphQL-level rate-limit signalling: BFF may surface throttling as a
-            // 200 + an error with extensions.code == "RATE_LIMITED" / "THROTTLED".
-            let code = errors.first?.extensions?["code"] as? String
-            if let code, code == "RATE_LIMITED" || code == "THROTTLED" {
-                return BFFRequestError(type: .rateLimited(retryAfter: nil), message: errors.first?.message)
-            }
-
             return BFFRequestError(type: .generic, message: errors.first?.message)
 
         case .failure(let error):
