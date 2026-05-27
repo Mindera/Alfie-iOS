@@ -29,4 +29,23 @@ public extension AlfieAnalyticsTracker {
     func trackUser(isSignedIn: Bool) {
         track(.state(.isUserSignedIn(isSignedIn), nil))
     }
+
+    // MARK: - BFF Telemetry
+
+    func trackBFFError(
+        operationName: String,
+        category: String,
+        httpStatus: Int?,
+        retryCount: Int,
+        graphqlErrorCode: String?
+    ) {
+        var parameters: [AnalyticsParameter: Any] = [
+            .operationName: operationName,
+            .errorCategory: category,
+            .retryCount: retryCount,
+        ]
+        if let httpStatus { parameters[.httpStatus] = httpStatus }
+        if let graphqlErrorCode { parameters[.graphqlErrorCode] = graphqlErrorCode }
+        track(.action(.bffError, parameters))
+    }
 }
