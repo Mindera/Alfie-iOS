@@ -3,175 +3,180 @@ import ApolloAPI
 import BFFGraph
 @testable import Core
 import Foundation
+import Model
 import XCTest
 
 final class BackoffRetryInterceptorTests: XCTestCase {
-    private let fastConfig = BackoffRetryInterceptor.Configuration(
-        baseDelay: 0.001,
-        multiplier: 2.0,
-        maxRetries: 3,
-        perAttemptCap: 0.05,
-        retryAfterCap: 30
-    )
+    /// Configuration that fires retries synchronously on the calling thread so tests
+    /// are race-free and finish in microseconds.
+    private func makeConfig(maxRetries: Int = 3, retryAfterCap: TimeInterval = 30) -> BackoffRetryInterceptor.Configuration {
+        BackoffRetryInterceptor.Configuration(
+            baseDelay: 0.001,
+            multiplier: 2.0,
+            maxRetries: maxRetries,
+            perAttemptCap: 0.05,
+            retryAfterCap: retryAfterCap,
+            scheduleRetry: { _, work in work() }
+        )
+    }
 
     // MARK: - Retry on transient HTTP failures
 
-    func test_retries_on_500() async {
-        await assertRetried(forStatus: 500)
-    }
+    func test_retries_on_transient_statuses() {
+        for status in [500, 502, 503, 504, 429, 430] {
+            let chain = MockRequestChain()
+            let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
 
-    func test_retries_on_502() async {
-        await assertRetried(forStatus: 502)
-    }
+            interceptor.interceptAsync(
+                chain: chain,
+                request: InterceptorTestHelpers.makeRequest(),
+                response: InterceptorTestHelpers.makeResponse(status: status),
+                completion: { _ in }
+            )
 
-    func test_retries_on_503() async {
-        await assertRetried(forStatus: 503)
-    }
-
-    func test_retries_on_504() async {
-        await assertRetried(forStatus: 504)
-    }
-
-    func test_retries_on_429() async {
-        await assertRetried(forStatus: 429)
-    }
-
-    func test_retries_on_430() async {
-        await assertRetried(forStatus: 430)
+            XCTAssertEqual(chain.retryCount, 1, "Status \(status) should trigger one retry")
+            XCTAssertEqual(chain.proceedCount, 0, "Status \(status) should not call proceed before retry")
+            XCTAssertEqual(chain.handleErrorCount, 0, "Status \(status) should not surface an error on first attempt")
+        }
     }
 
     // MARK: - No retry on non-transient responses
 
-    func test_does_not_retry_on_200() async {
-        let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
+    func test_does_not_retry_on_non_transient_statuses() {
+        for status in [200, 204, 400, 401, 403, 404, 501, 505] {
+            let chain = MockRequestChain()
+            let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
 
-        interceptor.interceptAsync(
-            chain: chain,
-            request: InterceptorTestHelpers.makeRequest(),
-            response: InterceptorTestHelpers.makeResponse(status: 200),
-            completion: { _ in }
-        )
+            interceptor.interceptAsync(
+                chain: chain,
+                request: InterceptorTestHelpers.makeRequest(),
+                response: InterceptorTestHelpers.makeResponse(status: status),
+                completion: { _ in }
+            )
 
-        await Task.yield()
-        XCTAssertEqual(chain.retryCount, 0)
-        XCTAssertEqual(chain.proceedCount, 1)
+            XCTAssertEqual(chain.retryCount, 0, "Status \(status) must not retry")
+            XCTAssertEqual(chain.proceedCount, 1, "Status \(status) must proceed downstream")
+            XCTAssertEqual(chain.handleErrorCount, 0)
+        }
     }
 
-    func test_does_not_retry_on_404() async {
+    // MARK: - Retry exhaustion → typed error with retry count
+
+    func test_exhausted_5xx_retries_surface_server_error_with_retry_count() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
-
-        interceptor.interceptAsync(
-            chain: chain,
-            request: InterceptorTestHelpers.makeRequest(),
-            response: InterceptorTestHelpers.makeResponse(status: 404),
-            completion: { _ in }
-        )
-
-        await Task.yield()
-        XCTAssertEqual(chain.retryCount, 0)
-        XCTAssertEqual(chain.proceedCount, 1)
-    }
-
-    func test_does_not_retry_on_501() async {
-        // 501 Not Implemented is permanent; must not retry.
-        let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
-
-        interceptor.interceptAsync(
-            chain: chain,
-            request: InterceptorTestHelpers.makeRequest(),
-            response: InterceptorTestHelpers.makeResponse(status: 501),
-            completion: { _ in }
-        )
-
-        await Task.yield()
-        XCTAssertEqual(chain.retryCount, 0)
-        XCTAssertEqual(chain.proceedCount, 1)
-    }
-
-    // MARK: - Retry exhaustion
-
-    func test_proceeds_after_exhausting_max_retries() async throws {
-        let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
-        let request = InterceptorTestHelpers.makeRequest()
+        let interceptor = BackoffRetryInterceptor(configuration: makeConfig(maxRetries: 3))
         let response = InterceptorTestHelpers.makeResponse(status: 503)
 
-        for _ in 0..<fastConfig.maxRetries {
-            interceptor.interceptAsync(chain: chain, request: request, response: response, completion: { _ in })
-            try await Task.sleep(nanoseconds: 50_000_000) // 50ms — ample for fastConfig waits
+        // Simulate Apollo re-running the chain on each chain.retry() by invoking
+        // interceptAsync once per attempt. After maxRetries=3 retries, the next
+        // intercept must surface a typed error.
+        for _ in 0..<3 {
+            interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
         }
+        interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
 
-        // One more pass — should proceed without retrying further.
-        interceptor.interceptAsync(chain: chain, request: request, response: response, completion: { _ in })
-        try await Task.sleep(nanoseconds: 50_000_000)
+        XCTAssertEqual(chain.retryCount, 3)
+        XCTAssertEqual(chain.handleErrorCount, 1, "After exhaustion, must surface typed error via handleErrorAsync")
+        guard let bff = chain.capturedError as? BFFRequestError,
+              case .serverError(let status) = bff.type else {
+            XCTFail("Expected .serverError; got \(String(describing: chain.capturedError))")
+            return
+        }
+        XCTAssertEqual(status, 503)
+        XCTAssertEqual(bff.retryCount, 3, "Final error must carry the observed retry count for telemetry")
+    }
 
-        XCTAssertEqual(chain.retryCount, fastConfig.maxRetries, "Should retry exactly maxRetries times")
-        XCTAssertEqual(chain.proceedCount, 1, "After exhaustion, must proceed so downstream can map the error")
+    func test_exhausted_429_retries_surface_rate_limited_with_retry_count() {
+        let chain = MockRequestChain()
+        let interceptor = BackoffRetryInterceptor(configuration: makeConfig(maxRetries: 2))
+        let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "1"])
+
+        for _ in 0..<2 {
+            interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
+        }
+        interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
+
+        guard let bff = chain.capturedError as? BFFRequestError,
+              case .rateLimited(let retryAfter) = bff.type else {
+            XCTFail("Expected .rateLimited")
+            return
+        }
+        XCTAssertEqual(retryAfter, 1)
+        XCTAssertEqual(bff.retryCount, 2)
     }
 
     // MARK: - Retry-After handling
 
-    func test_does_not_retry_when_retry_after_exceeds_cap() async throws {
+    func test_retry_after_exceeding_cap_surfaces_rate_limited_immediately() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
+        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
         let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "60"])
 
         interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
-        try await Task.sleep(nanoseconds: 50_000_000)
 
         XCTAssertEqual(chain.retryCount, 0, "Retry-After of 60s exceeds 30s cap — must not retry")
-        XCTAssertEqual(chain.proceedCount, 1, "Must proceed so RateLimitMappingInterceptor can surface .rateLimited")
+        XCTAssertEqual(chain.handleErrorCount, 1)
+        guard let bff = chain.capturedError as? BFFRequestError, case .rateLimited(let retryAfter) = bff.type else {
+            XCTFail("Expected .rateLimited")
+            return
+        }
+        XCTAssertEqual(retryAfter, 60)
+        XCTAssertEqual(bff.retryCount, 0, "No retries attempted, retryCount must be 0")
     }
 
-    func test_retries_when_retry_after_within_cap() async throws {
+    func test_retries_when_retry_after_within_cap() {
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
-        let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "0"])
+        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+        let response = InterceptorTestHelpers.makeResponse(status: 429, headers: ["Retry-After": "5"])
 
         interceptor.interceptAsync(chain: chain, request: InterceptorTestHelpers.makeRequest(), response: response, completion: { _ in })
-        try await Task.sleep(nanoseconds: 50_000_000)
 
         XCTAssertEqual(chain.retryCount, 1)
+        XCTAssertEqual(chain.handleErrorCount, 0)
+    }
+
+    // MARK: - Cancellation safety
+
+    func test_cancelled_chain_fires_completion_with_url_cancelled_error() {
+        let chain = MockRequestChain()
+        chain.setCancelled(true)
+        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+
+        let expectation = XCTestExpectation(description: "completion called on cancelled chain")
+        interceptor.interceptAsync(
+            chain: chain,
+            request: InterceptorTestHelpers.makeRequest(),
+            response: InterceptorTestHelpers.makeResponse(status: 503),
+            completion: { result in
+                if case .failure(let error) = result, (error as? URLError)?.code == .cancelled {
+                    expectation.fulfill()
+                }
+            }
+        )
+
+        XCTAssertEqual(chain.retryCount, 0, "Cancelled chain must not retry")
+        wait(for: [expectation], timeout: 1.0)
     }
 
     // MARK: - APQ passthrough
 
-    func test_apq_persisted_query_not_found_is_not_retried() async throws {
-        // APQ surfaces 'PersistedQueryNotFound' as HTTP 200 with a GraphQL error code.
-        // BackoffRetryInterceptor's status-based logic naturally skips this — verify.
+    func test_apq_persisted_query_not_found_is_not_retried() {
+        // APQ surfaces 'PersistedQueryNotFound' as HTTP 200 with a GraphQL error
+        // payload — not a 5xx — so the status-based check naturally passes through.
         let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
+        let interceptor = BackoffRetryInterceptor(configuration: makeConfig())
+
+        let body = #"{"errors":[{"message":"PersistedQueryNotFound","extensions":{"code":"PERSISTED_QUERY_NOT_FOUND"}}]}"#
+        let response = InterceptorTestHelpers.makeResponse(status: 200, bodyJSON: body)
 
         interceptor.interceptAsync(
             chain: chain,
             request: InterceptorTestHelpers.makeRequest(),
-            response: InterceptorTestHelpers.makeResponse(status: 200),
+            response: response,
             completion: { _ in }
         )
-        try await Task.sleep(nanoseconds: 10_000_000)
 
         XCTAssertEqual(chain.retryCount, 0)
         XCTAssertEqual(chain.proceedCount, 1)
-    }
-
-    // MARK: - Helpers
-
-    private func assertRetried(forStatus status: Int, file: StaticString = #file, line: UInt = #line) async {
-        let chain = MockRequestChain()
-        let interceptor = BackoffRetryInterceptor(configuration: fastConfig)
-
-        interceptor.interceptAsync(
-            chain: chain,
-            request: InterceptorTestHelpers.makeRequest(),
-            response: InterceptorTestHelpers.makeResponse(status: status),
-            completion: { _ in }
-        )
-
-        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms — ample for first backoff under fastConfig
-        XCTAssertEqual(chain.retryCount, 1, "Status \(status) should trigger one retry", file: file, line: line)
-        XCTAssertEqual(chain.proceedCount, 0, "Status \(status) should not call proceed before retry", file: file, line: line)
     }
 }

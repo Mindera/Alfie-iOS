@@ -25,7 +25,8 @@ enum InterceptorTestHelpers {
 
     static func makeResponse(
         status: Int,
-        headers: [String: String] = [:]
+        headers: [String: String] = [:],
+        bodyJSON: String = ""
     ) -> HTTPResponse<BFFGraphAPI.ProductListQuery> {
         let http = HTTPURLResponse(
             url: endpoint,
@@ -35,7 +36,7 @@ enum InterceptorTestHelpers {
         )!
         return HTTPResponse<BFFGraphAPI.ProductListQuery>(
             response: http,
-            rawData: Data(),
+            rawData: bodyJSON.data(using: .utf8) ?? Data(),
             parsedResponse: nil
         )
     }

@@ -45,11 +45,10 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         if logRequests {
             interceptors.append(ResponseLogInterceptor(log: log)) // Custom
         }
-        // Order matters: BackoffRetry gets first crack at 5xx/429/430 and may call
-        // chain.retry(). RateLimitMapping handles surviving 429/430 (retry-after over
-        // cap or retries exhausted). ResponseCode catches everything else.
+        // BackoffRetryInterceptor handles all retryable transient failures
+        // (5xx subset + 429 / 430) and, on give-up, emits a typed BFFRequestError
+        // carrying the observed retry count. ResponseCode catches everything else.
         interceptors.append(BackoffRetryInterceptor()) // Custom
-        interceptors.append(RateLimitMappingInterceptor()) // Custom
         interceptors.append(ResponseCodeInterceptor())
         interceptors.append(MultipartResponseParsingInterceptor())
         interceptors.append(JSONResponseParsingInterceptor())

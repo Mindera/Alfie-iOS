@@ -1,37 +1,4 @@
-import Apollo
-import ApolloAPI
-import BFFGraph
 import Foundation
-import Model
-
-/// Maps surviving HTTP 429 / 430 responses (after `BackoffRetryInterceptor` declined
-/// or exhausted retries) to a typed `BFFRequestError.rateLimited(retryAfter:)`.
-/// Must run after `BackoffRetryInterceptor` and before `ResponseCodeInterceptor`.
-final class RateLimitMappingInterceptor: ApolloInterceptor {
-    var id: String = UUID().uuidString
-
-    func interceptAsync<Operation: GraphQLOperation>(
-        chain: any RequestChain,
-        request: HTTPRequest<Operation>,
-        response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
-    ) {
-        guard let statusCode = response?.httpResponse.statusCode,
-              statusCode == 429 || statusCode == 430
-        else {
-            chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
-            return
-        }
-
-        let retryAfter = RetryAfterParser.parse(headerValue: response?.httpResponse.value(forHTTPHeaderField: "Retry-After"))
-        chain.handleErrorAsync(
-            BFFRequestError(type: .rateLimited(retryAfter: retryAfter)),
-            request: request,
-            response: response,
-            completion: completion
-        )
-    }
-}
 
 /// Parses the `Retry-After` HTTP header per RFC 7231 §7.1.3. Accepts a delta-seconds
 /// integer or any of the three RFC 7231 §7.1.1.1 date formats. Returns `nil` on
@@ -57,7 +24,7 @@ enum RetryAfterParser {
         let patterns = [
             "EEE, dd MMM yyyy HH:mm:ss zzz", // IMF-fixdate
             "EEEE, dd-MMM-yy HH:mm:ss zzz",  // RFC 850
-            "EEE MMM d HH:mm:ss yyyy"         // asctime (timezone implied UTC)
+            "EEE MMM d HH:mm:ss yyyy"         // asctime
         ]
         return patterns.map { pattern in
             let formatter = DateFormatter()

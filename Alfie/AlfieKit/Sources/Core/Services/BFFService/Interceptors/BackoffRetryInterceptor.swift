@@ -4,7 +4,10 @@ import BFFGraph
 import Foundation
 import Model
 
-/// Retries transient HTTP failures (5xx, 429, 430) with exponential backoff.
+/// Retries transient HTTP failures (5xx, 429, 430) with exponential backoff, then
+/// surfaces a typed `BFFRequestError` carrying the final status + observed retry
+/// count when retries are exhausted or declined.
+///
 /// Placed after `NetworkFetchInterceptor`/`ResponseLogInterceptor` so it can inspect
 /// `HTTPResponse.httpResponse.statusCode` before `ResponseCodeInterceptor` throws.
 ///
@@ -19,13 +22,18 @@ final class BackoffRetryInterceptor: ApolloInterceptor {
         var maxRetries: Int = 3
         var perAttemptCap: TimeInterval = 8
         var retryAfterCap: TimeInterval = 30
+        /// Schedules `work` to run after `delay`. Overridable for deterministic tests
+        /// (pass `{ _, work in work() }` to fire synchronously).
+        var scheduleRetry: @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { delay, work in
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay, execute: work)
+        }
     }
 
     var id: String = UUID().uuidString
 
     // Per-operation state. `NetworkInterceptorProvider.interceptors(for:)` constructs
-    // a fresh instance per operation; never share an instance across operations or
-    // this counter will leak between requests.
+    // a fresh instance per operation; never share across operations or this counter
+    // will leak between requests. Mutated only on Apollo's processing queue.
     private var retryCount: Int = 0
     private let configuration: Configuration
 
@@ -39,60 +47,72 @@ final class BackoffRetryInterceptor: ApolloInterceptor {
         response: HTTPResponse<Operation>?,
         completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
     ) {
-        // Never retry non-idempotent operations.
-        guard Operation.operationType == .query else {
-            chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
-            return
-        }
-
-        guard let statusCode = response?.httpResponse.statusCode,
-              let decision = retryDecision(for: statusCode, response: response)
+        // Never retry non-idempotent operations, and only act on completed responses
+        // that carry a status code we care about.
+        guard Operation.operationType == .query,
+              let statusCode = response?.httpResponse.statusCode,
+              let kind = TransientFailureKind(statusCode: statusCode)
         else {
             chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
             return
         }
 
-        guard retryCount < configuration.maxRetries else {
-            chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
+        let retryAfter: TimeInterval? = (kind == .rateLimit)
+            ? RetryAfterParser.parse(headerValue: response?.httpResponse.value(forHTTPHeaderField: "Retry-After"))
+            : nil
+
+        let withinRetryBudget = retryCount < configuration.maxRetries
+        let retryAfterFits = retryAfter.map { $0 <= configuration.retryAfterCap } ?? true
+
+        guard withinRetryBudget, retryAfterFits else {
+            // Give up — surface a typed BFFRequestError carrying the observed retry
+            // count so downstream telemetry can record it.
+            let typedError = BFFRequestError(
+                type: kind.toErrorType(statusCode: statusCode, retryAfter: retryAfter),
+                retryCount: retryCount
+            )
+            chain.handleErrorAsync(typedError, request: request, response: response, completion: completion)
             return
         }
 
-        let delay = delayForNextAttempt(retryAfter: decision.retryAfter)
+        let delay = retryAfter ?? exponentialDelay()
         retryCount += 1
 
-        Task { [weak self, weak chain] in
-            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-            guard let chain = chain, chain.isCancelled == false, self != nil else { return }
+        configuration.scheduleRetry(delay) { [weak chain] in
+            guard let chain, !chain.isCancelled else {
+                // Caller cancelled mid-backoff. Fail the continuation explicitly
+                // rather than letting it hang until the URLSession resource timeout.
+                completion(.failure(URLError(.cancelled)))
+                return
+            }
             chain.retry(request: request, completion: completion)
         }
     }
 
-    // MARK: - Private
-
-    private struct RetryDecision {
-        let retryAfter: TimeInterval?
+    private func exponentialDelay() -> TimeInterval {
+        let computed = configuration.baseDelay * pow(configuration.multiplier, Double(retryCount))
+        return min(computed, configuration.perAttemptCap)
     }
+}
 
-    private func retryDecision<Operation>(
-        for statusCode: Int,
-        response: HTTPResponse<Operation>?
-    ) -> RetryDecision? {
+// MARK: - Transient failure classification
+
+private enum TransientFailureKind {
+    case server      // 5xx subset we treat as transient
+    case rateLimit   // 429 / 430
+
+    init?(statusCode: Int) {
         switch statusCode {
-        case 500, 502, 503, 504:
-            return RetryDecision(retryAfter: nil)
-        case 429, 430:
-            let retryAfter = response.flatMap { RetryAfterParser.parse(headerValue: $0.httpResponse.value(forHTTPHeaderField: "Retry-After")) }
-            // Beyond cap → don't retry; let RateLimitMappingInterceptor surface .rateLimited.
-            if let retryAfter, retryAfter > configuration.retryAfterCap { return nil }
-            return RetryDecision(retryAfter: retryAfter)
-        default:
-            return nil
+        case 500, 502, 503, 504: self = .server
+        case 429, 430: self = .rateLimit
+        default: return nil
         }
     }
 
-    private func delayForNextAttempt(retryAfter: TimeInterval?) -> TimeInterval {
-        if let retryAfter { return retryAfter }
-        let computed = configuration.baseDelay * pow(configuration.multiplier, Double(retryCount))
-        return min(computed, configuration.perAttemptCap)
+    func toErrorType(statusCode: Int, retryAfter: TimeInterval?) -> BFFRequestError.BFFRequestErrorType {
+        switch self {
+        case .server: return .serverError(status: statusCode)
+        case .rateLimit: return .rateLimited(retryAfter: retryAfter)
+        }
     }
 }
