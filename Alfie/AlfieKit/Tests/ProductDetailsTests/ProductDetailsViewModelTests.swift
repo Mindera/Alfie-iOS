@@ -251,7 +251,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertFalse(sut.productHasAnyStock)
     }
 
-    func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() {
+    func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() async {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
         let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
@@ -271,7 +271,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         sut.didTapAddToBag()
 
-        XCTAssertTrue(mockBagService.getBagContent().isEmpty)
+        let content = await mockBagService.getBagContent()
+        XCTAssertTrue(content.isEmpty)
     }
 
     func test_complementary_info_options_to_display_are_available() {

@@ -1,15 +1,17 @@
 import Foundation
 import Model
 
-public final class BagService: BagServiceProtocol {
+public actor BagService: BagServiceProtocol {
     private let store: BagStoreProtocol
+    /// In-memory cache hydrated once from the store; reads served from here, writes persist through.
+    private var products: [SelectedProduct]
 
     public init(store: BagStoreProtocol) {
         self.store = store
+        self.products = store.load()
     }
 
     public func addProduct(_ product: SelectedProduct) {
-        var products = store.load()
         guard !products.contains(where: { $0.id == product.id }) else { return }
 
         products.append(product)
@@ -17,11 +19,11 @@ public final class BagService: BagServiceProtocol {
     }
 
     public func removeProduct(_ product: SelectedProduct) {
-        let products = store.load().filter { $0.id != product.id }
+        products = products.filter { $0.id != product.id }
         store.save(products)
     }
 
     public func getBagContent() -> [SelectedProduct] {
-        store.load()
+        products
     }
 }

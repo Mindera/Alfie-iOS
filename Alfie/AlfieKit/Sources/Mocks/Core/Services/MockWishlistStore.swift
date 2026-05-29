@@ -3,6 +3,7 @@ import Model
 
 public final class MockWishlistStore: WishlistStoreProtocol {
     public var loadStub: [SelectedProduct]
+    public private(set) var loadCount = 0
     public private(set) var saveInvocations: [[SelectedProduct]] = []
     public var onSaveCalled: (([SelectedProduct]) -> Void)?
 
@@ -11,7 +12,8 @@ public final class MockWishlistStore: WishlistStoreProtocol {
     }
 
     public func load() -> [SelectedProduct] {
-        loadStub
+        loadCount += 1
+        return loadStub
     }
 
     public func save(_ products: [SelectedProduct]) {

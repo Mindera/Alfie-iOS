@@ -64,13 +64,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
-        wishlistContent = dependencies.wishlistService.getWishlistContent()
+        wishlistContent = []
         self.navigate = navigate
         self.showSearch = showSearch
     }
 
     public func viewDidAppear() {
-        wishlistContent = dependencies.wishlistService.getWishlistContent()
+        Task { @MainActor in
+            wishlistContent = await dependencies.wishlistService.getWishlistContent()
+        }
         Task {
             await loadProductsIfNeeded()
         }
@@ -101,15 +103,16 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
-        if !isFavorite {
-            let selectedProduct = SelectedProduct(product: product)
-            dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToWishlist(productID: product.id)
-        } else {
-            dependencies.wishlistService.removeProduct(withId: product.id)
-            dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+        Task { @MainActor in
+            if !isFavorite {
+                await dependencies.wishlistService.addProduct(SelectedProduct(product: product))
+                dependencies.analytics.trackAddToWishlist(productID: product.id)
+            } else {
+                await dependencies.wishlistService.removeProduct(withId: product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+            }
+            wishlistContent = await dependencies.wishlistService.getWishlistContent()
         }
-        wishlistContent = dependencies.wishlistService.getWishlistContent()
     }
 
     public func didApplyFilters() {

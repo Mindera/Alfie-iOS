@@ -44,10 +44,14 @@ final class ProductListingViewModelTests: XCTestCase {
         let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
         let product = Product.fixture(id: productId, defaultVariant: redVariant, variants: [blueVariant, redVariant])
         // Match by product id, regardless of which variant happens to be stored.
-        mockWishlistService.addProduct(SelectedProduct(product: product, selectedVariant: blueVariant))
-        sut = makeSUT()
+        let service = MockWishlistService(products: [SelectedProduct(product: product, selectedVariant: blueVariant)])
+        sut = makeSUT(wishlistService: service)
+        let viewModel = sut!
 
-        XCTAssertTrue(sut.isFavoriteState(for: product))
+        // `wishlistContent` is hydrated asynchronously on appear.
+        XCTAssertEmitsValue(from: viewModel.$wishlistContent, where: { !$0.isEmpty }, afterTrigger: { viewModel.viewDidAppear() })
+
+        XCTAssertTrue(viewModel.isFavoriteState(for: product))
     }
 
     func test_didTapAddToWishlist_whenUntoggling_removesProductFromWishlist() {
@@ -56,36 +60,45 @@ final class ProductListingViewModelTests: XCTestCase {
         let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
         let product = Product.fixture(id: productId, defaultVariant: redVariant, variants: [blueVariant, redVariant])
         // Defensive: pre-load multiple entries to confirm every row sharing the product id is removed.
-        mockWishlistService.addProduct(SelectedProduct(product: product, selectedVariant: blueVariant))
-        mockWishlistService.addProduct(SelectedProduct(product: product, selectedVariant: redVariant))
-        XCTAssertEqual(mockWishlistService.getWishlistContent().count, 2)
-        sut = makeSUT()
+        let service = MockWishlistService(products: [
+            SelectedProduct(product: product, selectedVariant: blueVariant),
+            SelectedProduct(product: product, selectedVariant: redVariant)
+        ])
+        sut = makeSUT(wishlistService: service)
+        let viewModel = sut!
 
-        sut.didTapAddToWishlist(for: product, isFavorite: true)
-
-        XCTAssertTrue(mockWishlistService.getWishlistContent().isEmpty)
+        XCTAssertEmitsValue(
+            from: viewModel.$wishlistContent,
+            where: { $0.isEmpty },
+            afterTrigger: { viewModel.didTapAddToWishlist(for: product, isFavorite: true) }
+        )
     }
 
     func test_didTapAddToWishlist_whenUntoggling_doesNotAffectOtherProducts() {
         let otherProduct = Product.fixture(id: "other")
-        mockWishlistService.addProduct(SelectedProduct(product: otherProduct))
         let targetProduct = Product.fixture(id: "target")
-        mockWishlistService.addProduct(SelectedProduct(product: targetProduct))
-        sut = makeSUT()
+        let service = MockWishlistService(products: [
+            SelectedProduct(product: otherProduct),
+            SelectedProduct(product: targetProduct)
+        ])
+        sut = makeSUT(wishlistService: service)
+        let viewModel = sut!
 
-        sut.didTapAddToWishlist(for: targetProduct, isFavorite: true)
+        XCTAssertEmitsValue(
+            from: viewModel.$wishlistContent,
+            where: { $0.count == 1 },
+            afterTrigger: { viewModel.didTapAddToWishlist(for: targetProduct, isFavorite: true) }
+        )
 
-        let remaining = mockWishlistService.getWishlistContent()
-        XCTAssertEqual(remaining.count, 1)
-        XCTAssertEqual(remaining.first?.product.id, "other")
+        XCTAssertEqual(viewModel.wishlistContent.first?.product.id, "other")
     }
 
-    private func makeSUT() -> ProductListingViewModel {
+    private func makeSUT(wishlistService: WishlistServiceProtocol? = nil) -> ProductListingViewModel {
         .init(
             dependencies: ProductListingDependencyContainer(
                 productListingService: mockProductListing,
                 plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: mockWishlistService,
+                wishlistService: wishlistService ?? mockWishlistService,
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
                 configurationService: MockConfigurationService(),
                 log: log

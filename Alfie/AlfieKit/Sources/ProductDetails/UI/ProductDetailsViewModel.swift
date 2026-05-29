@@ -192,14 +192,18 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public func didTapAddToBag() {
         guard isAddToBagEnabled, let selectedProduct else { return }
-        dependencies.bagService.addProduct(selectedProduct)
-        dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
+        Task {
+            await dependencies.bagService.addProduct(selectedProduct)
+            dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
+        }
     }
 
     public func didTapAddToWishlist() {
         guard let selectedProduct else { return }
-        dependencies.wishlistService.addProduct(selectedProduct)
-        dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+        Task {
+            await dependencies.wishlistService.addProduct(selectedProduct)
+            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+        }
     }
 
     public func didTapBackButton() {
