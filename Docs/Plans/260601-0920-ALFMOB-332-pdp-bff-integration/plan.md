@@ -45,7 +45,11 @@ stack lands in `main`, then rebase.
   single-price products (`low == high`), so `Product.priceType` reaches its `.sale` branch and shows
   the struck-through `was` price. Covered by 3 converter tests. (Range products still show `.range`;
   the model can't express range + sale simultaneously — accepted.)
-- **Variant media dropped when a variant has no colour option** — `Product.Variant.media` reads
+- ✅ **Variant media for colourless products now surfaced (fixed 2026-06-01)** — Shopify single-option
+  ("Title") products (e.g. `sandals-lv`, `capucines-bb`) showed a blank PDP carousel because media was
+  carried only on a `colour` that didn't exist. Converter now wraps variant media (falling back to the
+  product `primaryImage`) in a nameless colour when there's no colour option. 2 tests added.
+- ~~Variant media dropped when a variant has no colour option~~ (superseded by the fix above) — `Product.Variant.media` reads
   `colour?.media`; a colourless variant with images shows an empty carousel. Model coupling; edge case
   (most PDP products have colour). (Important — confirm BFF contract or carry media without colour)
 - **Money `Float`→minor-units rounding + `amountFormatted` locale** — inherited from PLP

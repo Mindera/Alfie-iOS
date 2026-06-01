@@ -55,6 +55,33 @@ final class ProductDetailsConverterTests: XCTestCase {
         XCTAssertEqual(swatch.url.absoluteString, "https://cdn.alfie.test/red.jpg")
     }
 
+    func test_variant_without_colour_option_still_surfaces_its_media() throws {
+        // Shopify single-option ("Title") products have no colour dimension; their media must still
+        // reach the PDP carousel (which reads variant.media via colour?.media).
+        let product = makeFragment(
+            variants: [
+                makeVariant(
+                    id: "v1",
+                    options: [("Title", "Default Title")],
+                    media: [Mock<Image>(altText: "shot", url: "https://cdn.alfie.test/x.jpg")]
+                )
+            ]
+        ).convertToProduct()
+
+        let variant = try XCTUnwrap(product.variants.first)
+        XCTAssertEqual(variant.media.compactMap { $0.asImage?.url.absoluteString }, ["https://cdn.alfie.test/x.jpg"])
+    }
+
+    func test_variant_without_media_falls_back_to_product_primary_image() throws {
+        let product = makeFragment(
+            primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
+            variants: [makeVariant(id: "v1", options: [("Title", "Default Title")])]
+        ).convertToProduct()
+
+        let variant = try XCTUnwrap(product.variants.first)
+        XCTAssertEqual(variant.media.first?.asImage?.url.absoluteString, "https://cdn.alfie.test/hero.jpg")
+    }
+
     // MARK: - Default variant
 
     func test_default_variant_matches_default_variant_id() {

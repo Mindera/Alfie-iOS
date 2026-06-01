@@ -6,7 +6,11 @@ import Utils
 extension BFFGraphAPI.ProductDetailsFragment {
     func convertToProduct() -> Product {
         let fragmentVariants = (variants ?? []).compactMap { $0 }
-        let domainVariants = fragmentVariants.map { $0.convertToVariant() }
+        // Product-level image used as a media fallback for variants that carry none of their own.
+        let fallbackMedia: [Media] = primaryImage
+            .flatMap { image in URL(string: image.url).map { ($0, image.altText) } }
+            .map { [.image(MediaImage(alt: $0.1, mediaContentType: .image, url: $0.0))] } ?? []
+        let domainVariants = fragmentVariants.map { $0.convertToVariant(fallbackMedia: fallbackMedia) }
 
         // `defaultVariantId` is matched against the BFF variant `id`, which the domain
         // `Product.Variant` does not carry — so resolve the default by index here, while we
@@ -104,22 +108,29 @@ extension BFFGraphAPI.ProductDetailsFragment {
 }
 
 extension BFFGraphAPI.ProductDetailsFragment.Variant {
-    func convertToVariant() -> Product.Variant {
-        let domainMedia: [Media] = (media ?? []).compactMap { $0?.toDomainMedia() }
+    func convertToVariant(fallbackMedia: [Media]) -> Product.Variant {
+        let variantMedia: [Media] = (media ?? []).compactMap { $0?.toDomainMedia() }
+        // The PDP carousel reads `Product.Variant.media`, which is derived from the variant's
+        // colour. Use the variant's own media, falling back to the product image when it has none.
+        let resolvedMedia = variantMedia.isEmpty ? fallbackMedia : variantMedia
 
-        // Reconstruct typed colour/size from the generic `optionValues[]` by matching the
-        // option name case-insensitively. Unknown option names fall through to nil so the
-        // selectors simply don't render for that dimension.
-        let colour: Product.Colour? = optionValues
-            .first { $0.name.isColourOptionName }
-            .map { option in
-                Product.Colour(
-                    id: option.value,
-                    swatch: domainMedia.first?.asImage,
-                    name: option.value,
-                    media: domainMedia
-                )
-            }
+        // Reconstruct typed colour/size from the generic `optionValues[]` by matching the option
+        // name case-insensitively. When there is no colour dimension (e.g. Shopify single-option
+        // "Title" products) we still wrap the media in a nameless colour so it isn't lost — without
+        // it `Product.Variant.media` (== `colour?.media`) would be empty and the carousel blank.
+        let colour: Product.Colour?
+        if let colourOption = optionValues.first(where: { $0.name.isColourOptionName }) {
+            colour = Product.Colour(
+                id: colourOption.value,
+                swatch: resolvedMedia.first?.asImage,
+                name: colourOption.value,
+                media: resolvedMedia
+            )
+        } else if !resolvedMedia.isEmpty {
+            colour = Product.Colour(id: "", swatch: resolvedMedia.first?.asImage, name: "", media: resolvedMedia)
+        } else {
+            colour = nil
+        }
 
         let size: Product.ProductSize? = optionValues
             .first { $0.name.isSizeOptionName }
