@@ -17,13 +17,15 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
         self.hasNavigationSeparator = hasNavigationSeparator
         self.dependencies = dependencies
         self.navigate = navigate
-        products = dependencies.wishlistService.getWishlistContent()
+        products = []
     }
 
     // MARK: - WishListViewModelProtocol
 
     public func viewDidAppear() {
-        products = dependencies.wishlistService.getWishlistContent()
+        Task { @MainActor in
+            products = await dependencies.wishlistService.getWishlistContent()
+        }
     }
 
     public func didTapProduct(_ selectedProduct: SelectedProduct) {
@@ -33,9 +35,11 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didSelectDelete(for selectedProduct: SelectedProduct) {
-        dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
-        dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
-        products = dependencies.wishlistService.getWishlistContent()
+        Task { @MainActor in
+            await dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
+            dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
+            products = await dependencies.wishlistService.getWishlistContent()
+        }
     }
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {

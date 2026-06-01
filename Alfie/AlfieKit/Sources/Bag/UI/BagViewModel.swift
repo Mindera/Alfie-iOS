@@ -16,13 +16,15 @@ public final class BagViewModel: BagViewModelProtocol {
         self.isWishlistEnabled = dependencies.configurationService.isFeatureEnabled(.wishlist)
         self.dependencies = dependencies
         self.navigate = navigate
-        products = dependencies.bagService.getBagContent()
+        products = []
     }
 
     // MARK: - BagViewModelProtocol
 
     public func viewDidAppear() {
-        products = dependencies.bagService.getBagContent()
+        Task { @MainActor in
+            products = await dependencies.bagService.getBagContent()
+        }
     }
 
     public func didTapProduct(_ selectedProduct: SelectedProduct) {
@@ -30,9 +32,11 @@ public final class BagViewModel: BagViewModelProtocol {
     }
 
     public func didSelectDelete(for selectedProduct: SelectedProduct) {
-        dependencies.bagService.removeProduct(selectedProduct)
-        products = dependencies.bagService.getBagContent()
-        dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
+        Task { @MainActor in
+            await dependencies.bagService.removeProduct(selectedProduct)
+            products = await dependencies.bagService.getBagContent()
+            dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
+        }
     }
 
     public func didTapMyAccount() {

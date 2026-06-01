@@ -4,7 +4,7 @@ import Model
 import TestUtils
 import XCTest
 
-final class WishlistServiceTests: XCTestCase {
+final class BagServiceTests: XCTestCase {
 
     // MARK: - init
 
@@ -15,14 +15,14 @@ final class WishlistServiceTests: XCTestCase {
         ]
         let (sut, _) = makeSUT(initialContent: stored)
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertEqual(content.map(\.id), stored.map(\.id))
     }
 
     func test_init_withEmptyStore_returnsEmptyContent() async {
         let (sut, _) = makeSUT()
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertTrue(content.isEmpty)
     }
 
@@ -34,20 +34,20 @@ final class WishlistServiceTests: XCTestCase {
 
     // MARK: - addProduct
 
-    func test_addProduct_appendsProductToWishlist() async {
+    func test_addProduct_appendsProductToBag() async {
         let (sut, _) = makeSUT()
-        let product = Product.fixture(id: "product-1")
+        let product = SelectedProduct(product: .fixture(id: "product-1"))
 
-        await sut.addProduct(SelectedProduct(product: product))
+        await sut.addProduct(product)
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertEqual(content.count, 1)
         XCTAssertEqual(content.first?.product.id, "product-1")
     }
 
     func test_addProduct_persistsToStore() async throws {
         let (sut, store) = makeSUT()
-        let product = SelectedProduct(product: .fixture(id: "p1"))
+        let product = SelectedProduct(product: .fixture(id: "product-1"))
 
         await sut.addProduct(product)
 
@@ -64,7 +64,7 @@ final class WishlistServiceTests: XCTestCase {
         await sut.addProduct(selected)
         await sut.addProduct(selected)
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertEqual(content.count, 1)
         // Duplicate add short-circuits, so only one save invocation.
         XCTAssertEqual(store.saveInvocations.count, 1)
@@ -79,28 +79,29 @@ final class WishlistServiceTests: XCTestCase {
         await sut.addProduct(SelectedProduct(product: product, selectedVariant: blue))
         await sut.addProduct(SelectedProduct(product: product, selectedVariant: red))
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertEqual(content.count, 2)
     }
 
-    // MARK: - removeProduct(withId:)
+    // MARK: - removeProduct
 
-    func test_removeProduct_withId_removesEntryMatchingProductId() async {
+    func test_removeProduct_removesMatchingEntry() async {
         let (sut, _) = makeSUT()
-        let product = Product.fixture(id: "product-1")
-        await sut.addProduct(SelectedProduct(product: product))
+        let product = SelectedProduct(product: .fixture(id: "product-1"))
+        await sut.addProduct(product)
 
-        await sut.removeProduct(withId: "product-1")
+        await sut.removeProduct(product)
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertTrue(content.isEmpty)
     }
 
-    func test_removeProduct_withId_persistsToStore() async throws {
+    func test_removeProduct_persistsToStore() async throws {
         let (sut, store) = makeSUT()
-        await sut.addProduct(SelectedProduct(product: .fixture(id: "product-1")))
+        let product = SelectedProduct(product: .fixture(id: "product-1"))
+        await sut.addProduct(product)
 
-        await sut.removeProduct(withId: "product-1")
+        await sut.removeProduct(product)
 
         // 1 save on add + 1 on remove
         XCTAssertEqual(store.saveInvocations.count, 2)
@@ -108,41 +109,27 @@ final class WishlistServiceTests: XCTestCase {
         XCTAssertTrue(lastSave.isEmpty)
     }
 
-    func test_removeProduct_withId_removesAllEntriesMatchingProductId() async {
+    func test_removeProduct_doesNotAffectOtherProducts() async {
         let (sut, _) = makeSUT()
-        let blueVariant = Product.Variant.fixture(colour: .fixture(id: "blue", name: "Blue"))
-        let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
-        let product = Product.fixture(id: "product-1", defaultVariant: redVariant, variants: [blueVariant, redVariant])
-        await sut.addProduct(SelectedProduct(product: product, selectedVariant: blueVariant))
-        await sut.addProduct(SelectedProduct(product: product, selectedVariant: redVariant))
-        let beforeRemoval = await sut.getWishlistContent()
-        XCTAssertEqual(beforeRemoval.count, 2)
+        let keep = SelectedProduct(product: .fixture(id: "keep"))
+        let remove = SelectedProduct(product: .fixture(id: "remove"))
+        await sut.addProduct(keep)
+        await sut.addProduct(remove)
 
-        await sut.removeProduct(withId: "product-1")
+        await sut.removeProduct(remove)
 
-        let content = await sut.getWishlistContent()
-        XCTAssertTrue(content.isEmpty)
-    }
-
-    func test_removeProduct_withId_doesNotAffectOtherProducts() async {
-        let (sut, _) = makeSUT()
-        await sut.addProduct(SelectedProduct(product: Product.fixture(id: "keep")))
-        await sut.addProduct(SelectedProduct(product: Product.fixture(id: "remove")))
-
-        await sut.removeProduct(withId: "remove")
-
-        let remaining = await sut.getWishlistContent()
+        let remaining = await sut.getBagContent()
         XCTAssertEqual(remaining.count, 1)
         XCTAssertEqual(remaining.first?.product.id, "keep")
     }
 
-    func test_removeProduct_withId_isNoOp_whenProductIdNotInWishlist() async {
+    func test_removeProduct_isNoOp_whenProductNotInBag() async {
         let (sut, _) = makeSUT()
-        await sut.addProduct(SelectedProduct(product: Product.fixture(id: "keep")))
+        await sut.addProduct(SelectedProduct(product: .fixture(id: "keep")))
 
-        await sut.removeProduct(withId: "missing")
+        await sut.removeProduct(SelectedProduct(product: .fixture(id: "missing")))
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
         XCTAssertEqual(content.count, 1)
     }
 
@@ -151,9 +138,9 @@ final class WishlistServiceTests: XCTestCase {
     func test_storeLoadedOnceAtInit_notOnEveryRead() async {
         let (sut, store) = makeSUT()
 
-        _ = await sut.getWishlistContent()
+        _ = await sut.getBagContent()
         await sut.addProduct(SelectedProduct(product: .fixture(id: "p1")))
-        _ = await sut.getWishlistContent()
+        _ = await sut.getBagContent()
 
         // Hydrated once at init; reads/writes are served from the in-memory cache.
         XCTAssertEqual(store.loadCount, 1)
@@ -164,7 +151,7 @@ final class WishlistServiceTests: XCTestCase {
         // Mutate the store behind the service's back — a cached read must ignore it.
         store.loadStub = [SelectedProduct(product: .fixture(id: "external"))]
 
-        let content = await sut.getWishlistContent()
+        let content = await sut.getBagContent()
 
         XCTAssertEqual(content.map(\.product.id), ["p1"])
     }
@@ -175,9 +162,9 @@ final class WishlistServiceTests: XCTestCase {
         initialContent: [SelectedProduct] = [],
         file: StaticString = #filePath,
         line: UInt = #line
-    ) -> (sut: WishlistService, store: MockWishlistStore) {
-        let store = MockWishlistStore(initialContent: initialContent)
-        let sut = WishlistService(store: store)
+    ) -> (sut: BagService, store: MockBagStore) {
+        let store = MockBagStore(initialContent: initialContent)
+        let sut = BagService(store: store)
         trackForMemoryLeak(store, file: file, line: line)
         trackForMemoryLeak(sut, file: file, line: line)
         return (sut, store)

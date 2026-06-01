@@ -30,26 +30,32 @@ final class WishlistTests: XCTestCase {
         let blueVariant = Product.Variant.fixture(colour: .fixture(id: "blue", name: "Blue"))
         let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
         let product = Product.fixture(id: "product-1", defaultVariant: redVariant, variants: [blueVariant, redVariant])
-        let wishlistService = MockWishlistService()
-        wishlistService.addProduct(SelectedProduct(product: product, selectedVariant: blueVariant))
-        wishlistService.addProduct(SelectedProduct(product: product, selectedVariant: redVariant))
+        let wishlistService = MockWishlistService(products: [
+            SelectedProduct(product: product, selectedVariant: blueVariant),
+            SelectedProduct(product: product, selectedVariant: redVariant)
+        ])
         let sut = makeSUT(wishlistService: wishlistService)
 
-        sut.didSelectDelete(for: SelectedProduct(product: product, selectedVariant: redVariant))
-
-        XCTAssertTrue(wishlistService.getWishlistContent().isEmpty)
+        // The delete reloads `products` from the service; both variants share `product-1` so all go.
+        XCTAssertEmitsValue(
+            from: sut.$products,
+            where: { $0.isEmpty },
+            afterTrigger: { sut.didSelectDelete(for: SelectedProduct(product: product, selectedVariant: redVariant)) }
+        )
     }
 
     func test_didSelectDelete_refreshesPublishedProducts() {
         let product = Product.fixture(id: "product-1")
-        let wishlistService = MockWishlistService()
-        wishlistService.addProduct(SelectedProduct(product: product))
+        let wishlistService = MockWishlistService(products: [SelectedProduct(product: product)])
         let sut = makeSUT(wishlistService: wishlistService)
-        XCTAssertEqual(sut.products.count, 1)
 
-        sut.didSelectDelete(for: SelectedProduct(product: product))
+        XCTAssertEmitsValue(from: sut.$products, where: { $0.count == 1 }, afterTrigger: { sut.viewDidAppear() })
 
-        XCTAssertTrue(sut.products.isEmpty)
+        XCTAssertEmitsValue(
+            from: sut.$products,
+            where: { $0.isEmpty },
+            afterTrigger: { sut.didSelectDelete(for: SelectedProduct(product: product)) }
+        )
     }
 
     // MARK: - Helpers
