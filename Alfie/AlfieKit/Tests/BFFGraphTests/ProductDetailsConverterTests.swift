@@ -135,6 +135,15 @@ final class ProductDetailsConverterTests: XCTestCase {
         XCTAssertEqual(product.longDescription, "Tom & Jerry <3 &lt; tag")
     }
 
+    func test_strips_html_block_tags_without_running_text_together() {
+        let product = makeFragment(
+            descriptionHtml: "<p>First.</p><p>Second.</p><ul><li>A</li><li>B</li></ul>",
+            variants: [makeVariant(id: "v1")]
+        ).convertToProduct()
+
+        XCTAssertEqual(product.longDescription, "First. Second. A B")
+    }
+
     func test_missing_brand_name_falls_back_to_empty_string() {
         let product = makeFragment(brandName: nil, variants: [makeVariant(id: "v1")])
             .convertToProduct()
@@ -175,6 +184,18 @@ final class ProductDetailsConverterTests: XCTestCase {
         }
         XCTAssertEqual(fullPrice, "50.00 GBP")
         XCTAssertEqual(finalPrice, "30.00 GBP")
+    }
+
+    func test_compare_at_price_not_above_price_is_not_treated_as_sale() {
+        // compareAtPrice <= price is bad data → no `was`, so no struck-through "sale".
+        let product = makeFragment(
+            variants: [makeVariant(id: "v1", amount: 30, compareAt: 30)]
+        ).convertToProduct()
+
+        XCTAssertNil(product.defaultVariant.price.was)
+        guard case .default = product.priceType else {
+            return XCTFail("Expected .default, got \(product.priceType)")
+        }
     }
 
     // MARK: - No-variant fallback

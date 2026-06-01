@@ -133,7 +133,12 @@ extension BFFGraphAPI.ProductDetailsFragment.Variant {
                 )
             }
 
-        let was = compareAtPrice?.fragments.moneyFragment.toDomainMoney()
+        let amount = price.fragments.moneyFragment.toDomainMoney()
+        // Only treat `compareAtPrice` as a genuine markdown ("was") when it is strictly higher than
+        // the current price. A BFF value equal to or below `price` would otherwise render a bogus
+        // sale (was ≤ now / a price increase).
+        let compareAt = compareAtPrice?.fragments.moneyFragment.toDomainMoney()
+        let was: Money? = (compareAt?.amount ?? 0) > amount.amount ? compareAt : nil
 
         return Product.Variant(
             sku: sku,
@@ -141,7 +146,7 @@ extension BFFGraphAPI.ProductDetailsFragment.Variant {
             colour: colour,
             attributes: nil,
             stock: inventory?.available ?? 0,
-            price: Model.Price(amount: price.fragments.moneyFragment.toDomainMoney(), was: was)
+            price: Model.Price(amount: amount, was: was)
         )
     }
 }
@@ -154,12 +159,15 @@ extension BFFGraphAPI.ProductDetailsFragment.Variant.Medium {
 }
 
 private extension String {
+    private var normalisedOptionName: String {
+        trimmingCharacters(in: .whitespaces).lowercased()
+    }
+
     var isColourOptionName: Bool {
-        let name = lowercased()
-        return name == "color" || name == "colour"
+        normalisedOptionName == "color" || normalisedOptionName == "colour"
     }
 
     var isSizeOptionName: Bool {
-        lowercased() == "size"
+        normalisedOptionName == "size"
     }
 }

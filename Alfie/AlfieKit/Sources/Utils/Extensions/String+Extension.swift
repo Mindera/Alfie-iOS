@@ -24,18 +24,27 @@ extension String {
     }
 
     /// Strips HTML tags and decodes the most common entities, yielding plain text.
-    /// Regex-based (not `NSAttributedString`) so it is deterministic and safe to call
-    /// off the main thread — the BFF response converter runs on a background task.
+    /// Regex-based (not `NSAttributedString`) so it is deterministic and has no main-thread
+    /// requirement — suitable for the BFF response converter.
     public func strippingHTML() -> String {
-        replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-            .replacingOccurrences(of: "&lt;", with: "<")
-            .replacingOccurrences(of: "&gt;", with: ">")
-            .replacingOccurrences(of: "&quot;", with: "\"")
-            .replacingOccurrences(of: "&#39;", with: "'")
-            // Decode &amp; last so an encoded entity like "&amp;lt;" yields "&lt;", not "<".
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .trim()
+        // Turn block-level boundaries into spaces first, so adjacent blocks (e.g.
+        // `<p>A</p><p>B</p>`) don't run together once the tags are removed.
+        replacingOccurrences(
+            of: "(?i)</(p|div|li|h[1-6]|tr|td)>|<br[^>]*>",
+            with: " ",
+            options: .regularExpression
+        )
+        .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+        .replacingOccurrences(of: "&nbsp;", with: " ")
+        .replacingOccurrences(of: "&lt;", with: "<")
+        .replacingOccurrences(of: "&gt;", with: ">")
+        .replacingOccurrences(of: "&quot;", with: "\"")
+        .replacingOccurrences(of: "&#39;", with: "'")
+        // Decode &amp; last so an encoded entity like "&amp;lt;" yields "&lt;", not "<".
+        .replacingOccurrences(of: "&amp;", with: "&")
+        // Collapse the runs of whitespace the block substitutions may have introduced.
+        .replacingOccurrences(of: " {2,}", with: " ", options: .regularExpression)
+        .trim()
     }
 
     public var isNotBlank: Bool {
