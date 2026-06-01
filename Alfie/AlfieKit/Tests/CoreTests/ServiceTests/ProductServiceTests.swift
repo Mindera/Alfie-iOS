@@ -22,24 +22,27 @@ final class ProductServiceTests: XCTestCase {
     // MARK: - Get Product
 
     func test_get_product_calls_bff_service() async throws {
-        var capturedId: String?
-        mockClientService.onGetProductCalled = { productId in
-            capturedId = productId
+        var capturedHandle: String?
+        var capturedPlatform: BFFPlatform?
+        mockClientService.onGetProductCalled = { handle, platform in
+            capturedHandle = handle
+            capturedPlatform = platform
             return Product.fixture()
         }
 
-        _ = try await sut.getProduct(id: "id")
+        _ = try await sut.getProduct(handle: "the-handle", platform: .shopify)
 
-        XCTAssertEqual(capturedId, "id")
+        XCTAssertEqual(capturedHandle, "the-handle")
+        XCTAssertEqual(capturedPlatform, .shopify)
     }
 
     func test_get_product_throws_no_product_error_when_not_found() async {
-        mockClientService.onGetProductCalled = { _ in
+        mockClientService.onGetProductCalled = { _, _ in
             throw BFFRequestError(type: .emptyResponse)
         }
 
         do {
-            _ = try await sut.getProduct(id: "id")
+            _ = try await sut.getProduct(handle: "the-handle", platform: .shopify)
             XCTFail("Expected getProduct to throw")
         } catch let error as BFFRequestError {
             XCTAssertEqual(error.type, .product(.noProduct))
@@ -49,12 +52,12 @@ final class ProductServiceTests: XCTestCase {
     }
 
     func test_get_product_throws_generic_error_when_bff_service_fails() async {
-        mockClientService.onGetProductCalled = { _ in
+        mockClientService.onGetProductCalled = { _, _ in
             throw BFFRequestError(type: .generic)
         }
 
         do {
-            _ = try await sut.getProduct(id: "id")
+            _ = try await sut.getProduct(handle: "the-handle", platform: .shopify)
             XCTFail("Expected getProduct to throw")
         } catch let error as BFFRequestError {
             XCTAssertEqual(error.type, .product(.generic))
