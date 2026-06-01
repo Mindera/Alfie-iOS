@@ -30,12 +30,15 @@ public extension BFFGraphAPI {
     public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
       case "Image": return BFFGraphAPI.Objects.Image
+      case "Inventory": return BFFGraphAPI.Objects.Inventory
       case "Money": return BFFGraphAPI.Objects.Money
       case "MoneyRange": return BFFGraphAPI.Objects.MoneyRange
       case "OmniProduct": return BFFGraphAPI.Objects.OmniProduct
       case "PageInfo": return BFFGraphAPI.Objects.PageInfo
       case "ProductListResponse": return BFFGraphAPI.Objects.ProductListResponse
+      case "ProductVariant": return BFFGraphAPI.Objects.ProductVariant
       case "Query": return BFFGraphAPI.Objects.Query
+      case "VariantOption": return BFFGraphAPI.Objects.VariantOption
       default: return nil
       }
     }
