@@ -142,6 +142,41 @@ final class ProductDetailsConverterTests: XCTestCase {
         XCTAssertEqual(product.brand.name, "")
     }
 
+    // MARK: - Price range vs sale
+
+    func test_single_price_product_has_no_price_range() {
+        // low == high → no range, so priceType can fall through to .sale/.default.
+        let product = makeFragment(amount: 30, variants: [makeVariant(id: "v1", amount: 30)])
+            .convertToProduct()
+
+        XCTAssertNil(product.priceRange)
+    }
+
+    func test_price_range_kept_when_variants_span_prices() throws {
+        let product = makeFragment(
+            amount: 30,
+            highAmount: 50,
+            variants: [makeVariant(id: "v1", amount: 30)]
+        ).convertToProduct()
+
+        let range = try XCTUnwrap(product.priceRange)
+        XCTAssertEqual(range.low.amount, 3000)
+        XCTAssertEqual(range.high?.amount, 5000)
+    }
+
+    func test_discounted_single_price_product_renders_sale() throws {
+        // Single effective price + a compareAtPrice → priceType must be .sale (was/now), not .default.
+        let product = makeFragment(
+            variants: [makeVariant(id: "v1", amount: 30, compareAt: 50)]
+        ).convertToProduct()
+
+        guard case let .sale(fullPrice, finalPrice) = product.priceType else {
+            return XCTFail("Expected .sale, got \(product.priceType)")
+        }
+        XCTAssertEqual(fullPrice, "50.00 GBP")
+        XCTAssertEqual(finalPrice, "30.00 GBP")
+    }
+
     // MARK: - No-variant fallback
 
     func test_empty_variants_synthesises_default_variant() {
@@ -206,6 +241,7 @@ private extension ProductDetailsConverterTests {
         options: [(String, String)] = [],
         available: Int? = nil,
         amount: Double = 5.00,
+        compareAt: Double? = nil,
         currencyCode: String = "GBP",
         media: [Mock<Image>] = []
     ) -> Mock<ProductVariant> {
@@ -213,6 +249,9 @@ private extension ProductDetailsConverterTests {
         variant.id = id
         variant.sku = "sku-\(id)"
         variant.price = Mock<Money>(amount: amount, currencyCode: currencyCode)
+        if let compareAt {
+            variant.compareAtPrice = Mock<Money>(amount: compareAt, currencyCode: currencyCode)
+        }
         variant.optionValues = options.map { Mock<VariantOption>(name: $0.0, value: $0.1) }
         if let available {
             variant.inventory = Mock<Inventory>(available: available)

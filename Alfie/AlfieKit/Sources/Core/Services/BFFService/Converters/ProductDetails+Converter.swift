@@ -20,7 +20,12 @@ extension BFFGraphAPI.ProductDetailsFragment {
 
         let lowMoney = priceRange.minVariantPrice.fragments.moneyFragment.toDomainMoney()
         let highMoneyRaw = priceRange.maxVariantPrice.fragments.moneyFragment.toDomainMoney()
-        let highMoney: Money? = highMoneyRaw == lowMoney ? nil : highMoneyRaw
+        // Only expose a price range when the variants actually span different prices. For a single
+        // effective price, leave `priceRange` nil so `Product.priceType` falls through to its `.sale`
+        // branch (struck-through `was` price) instead of being forced to `.default`/`.range`.
+        let domainPriceRange: Model.PriceRange? = highMoneyRaw == lowMoney
+            ? nil
+            : Model.PriceRange(low: lowMoney, high: highMoneyRaw)
 
         let colours = aggregateColours(from: domainVariants)
 
@@ -32,7 +37,7 @@ extension BFFGraphAPI.ProductDetailsFragment {
             shortDescription: "",
             longDescription: descriptionHtml?.strippingHTML(),
             slug: slug,
-            priceRange: Model.PriceRange(low: lowMoney, high: highMoney),
+            priceRange: domainPriceRange,
             attributes: nil,
             defaultVariant: defaultVariant,
             variants: domainVariants,
