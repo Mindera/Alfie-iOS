@@ -62,9 +62,24 @@ public final class BFFClientService: BFFClientServiceProtocol {
         throw BFFRequestError(type: .generic)
     }
 
-    public func getProduct(id: String) async throws -> Product {
-        // ALFMOB-331: BFF schema migration. PDP migration is tracked by ALFMOB-332.
-        throw BFFRequestError(type: .generic)
+    public func getProduct(handle: String, platform: BFFPlatform) async throws -> Product {
+        log.info("productDetails → handle=\(handle) platform=\(platform.rawValue)")
+
+        do {
+            let product = try await executeFetch(
+                BFFGraphAPI.ProductDetailsQuery(handle: handle, platform: platform.rawValue)
+            ).productDetails
+
+            guard let product else {
+                log.error("productDetails ← null for handle=\(handle)")
+                throw BFFRequestError(type: .product(.noProduct))
+            }
+
+            return product.fragments.productDetailsFragment.convertToProduct()
+        } catch {
+            log.error("productDetails failed: \(error)")
+            throw error
+        }
     }
 
     public func productListing(

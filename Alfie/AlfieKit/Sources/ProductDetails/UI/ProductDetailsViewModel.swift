@@ -23,6 +23,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         items: []
     )
     public let productId: String
+    /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
+    /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
+    private let productHandle: String
+    /// The BFF `productDetails(platform:)` argument. Predefined app-level choice (see `BFFPlatform`) —
+    /// not derived per-product.
+    private let platform: BFFPlatform = .predefined
     private let initialSelectedProduct: SelectedProduct?
 
     private var product: Product? {
@@ -87,11 +93,15 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         switch configuration {
         case .id(let productId):
             self.productId = productId
+            // TODO: ALFMOB-332 — deep-link entry only has the numeric id, not the BFF handle (slug).
+            // Using the id as the handle until the handle source is confirmed (Open Q #1).
+            self.productHandle = productId
             self.initialSelectedProduct = nil
             self.baseProduct = nil
 
         case .product(let product):
             self.productId = product.id
+            self.productHandle = product.slug
             self.initialSelectedProduct = nil
             self.baseProduct = product
 
@@ -102,6 +112,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         case .selectedProduct(let selectedProduct):
             self.productId = selectedProduct.product.id
+            self.productHandle = selectedProduct.product.slug
             self.initialSelectedProduct = selectedProduct
             baseProduct = selectedProduct.product
 
@@ -235,7 +246,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         let product: Product
 
         do {
-            product = try await dependencies.productService.getProduct(id: productId)
+            product = try await dependencies.productService.getProduct(handle: productHandle, platform: platform)
         } catch {
             dependencies.log.error("Error fetching product \(productId): \(error)")
             state = .error(ProductDetailsViewErrorType.from(error: error))
