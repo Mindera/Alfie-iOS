@@ -34,10 +34,17 @@ stack lands in `main`, then rebase.
   the handle (TODO marker) pending Open Q #1 (handle source). Deep-link parser / FlowViewModel /
   AppFeature not yet rewired.
 
+### Accepted for now (decided 2026-06-01)
+- **Colour swatch imagery** — the BFF exposes no dedicated swatch source (`Image` is only `{url,altText}`,
+  no hex). Swatches fall back to the variant's first product photo, else a solid colour. **Accepted as-is**
+  — colours still function (selection drives the variant); proper swatches (BFF hex value or dedicated
+  swatch-image URL; iOS `SwatchType` already supports both) to be wired when the BFF provides them.
+
 ### Code-review follow-ups (deferred, not blocking Phase 1-2)
-- **Sale price never renders on PDP** — `Product.priceType` only returns `.sale` when `priceRange == nil`,
-  but the converter always sets `priceRange`, so `compareAtPrice`→`was` is captured but never displayed.
-  Needs a design decision on range-vs-sale display precedence. (Important)
+- ✅ **Sale price now renders (AC3, fixed 2026-06-01)** — converter now leaves `priceRange` nil for
+  single-price products (`low == high`), so `Product.priceType` reaches its `.sale` branch and shows
+  the struck-through `was` price. Covered by 3 converter tests. (Range products still show `.range`;
+  the model can't express range + sale simultaneously — accepted.)
 - **Variant media dropped when a variant has no colour option** — `Product.Variant.media` reads
   `colour?.media`; a colourless variant with images shows an empty carousel. Model coupling; edge case
   (most PDP products have colour). (Important — confirm BFF contract or carry media without colour)
@@ -229,9 +236,10 @@ Field renames confirmed present: `brandName`, `descriptionHtml`. Dropped: `style
    per-product. Modelled as `BFFPlatform { shopify, bigCommerce }` with `BFFPlatform.predefined =
    .shopify`. (Earlier worry — that `OmniProduct` has no platform field to derive from — is moot now
    that the value is a fixed app constant rather than product-sourced.)
-1. **[BLOCKS deep-link path — deferred by user]** Does `productDetails.handle` == product `slug`? Does
-   the PDP deep-link URL expose a slug, or only the current 8-digit id? List-tap entry has `slug`;
-   deep-link does not. Revisit at Phase 3 deep-link step.
+1. **[Deep-link path — tracked in ALFMOB-386]** The deep-link parser extracts only the legacy 8-digit
+   id and routing forwards it as the handle, but the BFF resolves by slug. Spun off to **ALFMOB-386**
+   (Spike) to confirm the Shopify slug format (id-suffixed vs bare handle) and BigCommerce handle
+   semantics before rewiring the parser/routing. List-tap entry already works (carries real `slug`).
 3. Colour swatch image source — accept variant `media` best-effort, or wait for a BFF metafield?
 4. Description — strip to plaintext (this plan) vs render HTML (follow-up)?
 5. Are dropped fields (`styleNumber`, `shortDescription`, `labels`, `attributes`) still needed by
