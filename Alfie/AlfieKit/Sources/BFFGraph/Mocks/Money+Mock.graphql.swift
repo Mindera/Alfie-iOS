@@ -10,21 +10,18 @@ class Money: MockObject {
   typealias MockValueCollectionType = Array<Mock<Money>>
 
   struct MockFields {
-    @Field<Int>("amount") public var amount
-    @Field<String>("amountFormatted") public var amountFormatted
+    @Field<Double>("amount") public var amount
     @Field<String>("currencyCode") public var currencyCode
   }
 }
 
 extension Mock where O == Money {
   convenience init(
-    amount: Int? = nil,
-    amountFormatted: String? = nil,
+    amount: Double? = nil,
     currencyCode: String? = nil
   ) {
     self.init()
     _setScalar(amount, for: \.amount)
-    _setScalar(amountFormatted, for: \.amountFormatted)
     _setScalar(currencyCode, for: \.currencyCode)
   }
 }

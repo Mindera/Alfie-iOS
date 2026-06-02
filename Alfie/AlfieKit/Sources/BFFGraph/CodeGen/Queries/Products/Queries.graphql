@@ -1,17 +1,24 @@
-query GetProduct($productId: ID!) {
-    product(id: $productId) {
-        ...ProductFragment
-    }
-}
-
-query ProductListingQuery($offset: Int!, $limit: Int!, $categoryId: String, $query: String, $sort: ProductListingSort) {
-    productListing(offset: $offset, limit: $limit, categoryId: $categoryId, query: $query, sort: $sort) {
-        title
-        pagination {
-            ...PaginationFragment
+query ProductListQuery(
+    $collectionHandle: String!,
+    $after: String,
+    $limit: Int!,
+    $filters: ProductFilterInput,
+    $sort: ProductSortEnum = NEWEST
+) {
+    productList(
+        collectionHandle: $collectionHandle,
+        after: $after,
+        limit: $limit,
+        filters: $filters,
+        sort: $sort
+    ) {
+        totalCount
+        pageInfo {
+            endCursor
+            hasNextPage
         }
         products {
-            ...ProductFragment
+            ...ProductListItemFragment
         }
     }
 }

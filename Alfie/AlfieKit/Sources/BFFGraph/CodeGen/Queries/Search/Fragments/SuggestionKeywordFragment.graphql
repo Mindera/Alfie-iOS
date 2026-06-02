@@ -1,4 +1,0 @@
-fragment SuggestionKeywordFragment on SuggestionKeyword {
-    value
-    results
-}

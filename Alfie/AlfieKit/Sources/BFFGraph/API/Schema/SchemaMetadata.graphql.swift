@@ -29,27 +29,13 @@ public extension BFFGraphAPI {
 
     public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
-      case "Brand": return BFFGraphAPI.Objects.Brand
-      case "Colour": return BFFGraphAPI.Objects.Colour
       case "Image": return BFFGraphAPI.Objects.Image
-      case "KeyValuePair": return BFFGraphAPI.Objects.KeyValuePair
       case "Money": return BFFGraphAPI.Objects.Money
-      case "NavMenuItem": return BFFGraphAPI.Objects.NavMenuItem
-      case "Pagination": return BFFGraphAPI.Objects.Pagination
-      case "Price": return BFFGraphAPI.Objects.Price
-      case "PriceRange": return BFFGraphAPI.Objects.PriceRange
-      case "Product": return BFFGraphAPI.Objects.Product
-      case "ProductListing": return BFFGraphAPI.Objects.ProductListing
+      case "MoneyRange": return BFFGraphAPI.Objects.MoneyRange
+      case "OmniProduct": return BFFGraphAPI.Objects.OmniProduct
+      case "PageInfo": return BFFGraphAPI.Objects.PageInfo
+      case "ProductListResponse": return BFFGraphAPI.Objects.ProductListResponse
       case "Query": return BFFGraphAPI.Objects.Query
-      case "Size": return BFFGraphAPI.Objects.Size
-      case "SizeGuide": return BFFGraphAPI.Objects.SizeGuide
-      case "Suggestion": return BFFGraphAPI.Objects.Suggestion
-      case "SuggestionBrand": return BFFGraphAPI.Objects.SuggestionBrand
-      case "SuggestionKeyword": return BFFGraphAPI.Objects.SuggestionKeyword
-      case "SuggestionProduct": return BFFGraphAPI.Objects.SuggestionProduct
-      case "Variant": return BFFGraphAPI.Objects.Variant
-      case "Video": return BFFGraphAPI.Objects.Video
-      case "VideoSource": return BFFGraphAPI.Objects.VideoSource
       default: return nil
       }
     }

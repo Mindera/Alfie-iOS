@@ -1,38 +1,23 @@
 import Foundation
 
 public struct ProductListing {
+    /// Cursor-based pagination state returned by the BFF's `productList` query.
     public struct Pagination {
-        /// Start point
-        public let offset: Int
-        /// Records to return
-        public let limit: Int
-        /// The total number of results
-        public let total: Int
-        /// Number of pages based on offset
-        public let pages: Int
-        /// Current page
-        public let page: Int
-        /// Offset of next page if page exists
-        public let nextPage: Int?
-        /// Offset of previous page if page exists
-        public let previousPage: Int?
+        /// Total number of records available for the query, as reported by the BFF's
+        /// `ProductListResponse.totalCount`. `nil` when the BFF doesn't return a total —
+        /// callers should treat this as "unknown" rather than zero, so the UI can render
+        /// an indeterminate state instead of an inaccurate count.
+        public let totalCount: Int?
+        /// Opaque cursor pointing at the last record returned by this response — pass back
+        /// as `after` to fetch the next page. `nil` when there is no further page.
+        public let endCursor: String?
+        /// Whether the BFF has more records after this page.
+        public let hasNextPage: Bool
 
-        public init(
-            offset: Int,
-            limit: Int,
-            total: Int,
-            pages: Int,
-            page: Int,
-            nextPage: Int? = nil,
-            previousPage: Int? = nil
-        ) {
-            self.offset = offset
-            self.limit = limit
-            self.total = total
-            self.pages = pages
-            self.page = page
-            self.nextPage = nextPage
-            self.previousPage = previousPage
+        public init(totalCount: Int?, endCursor: String?, hasNextPage: Bool) {
+            self.totalCount = totalCount
+            self.endCursor = endCursor
+            self.hasNextPage = hasNextPage
         }
     }
 

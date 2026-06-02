@@ -10,27 +10,15 @@ class Query: MockObject {
   typealias MockValueCollectionType = Array<Mock<Query>>
 
   struct MockFields {
-    @Field<[Brand]>("brands") public var brands
-    @Field<[NavMenuItem]>("navigation") public var navigation
-    @Field<Product>("product") public var product
-    @Field<ProductListing>("productListing") public var productListing
-    @Field<Suggestion>("suggestion") public var suggestion
+    @Field<ProductListResponse>("productList") public var productList
   }
 }
 
 extension Mock where O == Query {
   convenience init(
-    brands: [Mock<Brand>]? = nil,
-    navigation: [Mock<NavMenuItem>]? = nil,
-    product: Mock<Product>? = nil,
-    productListing: Mock<ProductListing>? = nil,
-    suggestion: Mock<Suggestion>? = nil
+    productList: Mock<ProductListResponse>? = nil
   ) {
     self.init()
-    _setList(brands, for: \.brands)
-    _setList(navigation, for: \.navigation)
-    _setEntity(product, for: \.product)
-    _setEntity(productListing, for: \.productListing)
-    _setEntity(suggestion, for: \.suggestion)
+    _setEntity(productList, for: \.productList)
   }
 }

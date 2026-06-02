@@ -4,8 +4,8 @@
 import ApolloAPI
 
 public extension BFFGraphAPI.Objects {
-  static let Image = ApolloAPI.Object(
-    typename: "Image",
+  static let MoneyRange = ApolloAPI.Object(
+    typename: "MoneyRange",
     implementedInterfaces: [],
     keyFields: nil
   )

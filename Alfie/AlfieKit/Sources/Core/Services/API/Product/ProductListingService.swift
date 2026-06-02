@@ -1,72 +1,35 @@
 import Foundation
 import Model
 
-/// Product pagination service
-/// - internally manages the following pages to fetch based on the pagination information provided by the BFF API
-/// - each use case/screen must create an instance
+/// Stateless paginated product fetcher. Owns no cursor state — callers (the ViewModel,
+/// in practice) are responsible for tracking `pagination.endCursor` / `hasNextPage` from
+/// the previous response and passing the cursor back in as `after`.
 public final class ProductListingService: ProductListingServiceProtocol {
     private let productService: ProductServiceProtocol
     private let configuration: PaginationConfiguration
 
-    private var pagination: ProductListing.Pagination?
-
     // MARK: - Public
 
-    /// Initialise a product listing instance.
-    /// - Parameters:
-    ///   - productService: service to fetch products from BFF client
-    ///   - configuration: internal pagination details
     public init(productService: ProductServiceProtocol, configuration: PaginationConfiguration) {
         self.productService = productService
         self.configuration = configuration
     }
 
-    /// Total number of items available
-    public var totalOfRecords: Int? {
-        pagination?.total
-    }
-
-    /// Fetch the initial page (offset) and update local pagination information
-    /// Offset starts at 0
-    public func paged(
+    public func page(
+        after: String?,
         categoryId: String? = nil,
         query: String? = nil,
-        sort: String? = nil
+        sort: String? = nil,
+        filters: ProductFilterInput? = nil
     ) async throws -> ProductListing {
-        let result = try await productService.productListing(
-            offset: configuration.initialPage,
+        try await productService.productListing(
+            after: after,
             limit: configuration.pageSize,
             categoryId: categoryId,
             query: query,
-            sort: sort
+            sort: sort,
+            filters: filters
         )
-        pagination = result.pagination
-        return result
-    }
-
-    /// Check offset of next page if page exists based on `pageSize`
-    public func hasNext() -> Bool {
-        pagination?.nextPage != nil
-    }
-
-    /// Fetch following page while there is a next page and update local pagination information
-    public func next(
-        categoryId: String? = nil,
-        query: String? = nil,
-        sort: String? = nil
-    ) async throws -> ProductListing {
-        guard let nextPage = pagination?.nextPage else {
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
-        }
-        let result = try await productService.productListing(
-            offset: nextPage,
-            limit: configuration.pageSize,
-            categoryId: categoryId,
-            query: query,
-            sort: sort
-        )
-        pagination = result.pagination
-        return result
     }
 }
 
@@ -83,11 +46,9 @@ extension ProductListingService {
         }
 
         private let type: ListingType
-        let initialPage: Int
 
-        public init(type: ListingType, initialPage: Int = 0) {
+        public init(type: ListingType) {
             self.type = type
-            self.initialPage = initialPage
         }
 
         var pageSize: Int {

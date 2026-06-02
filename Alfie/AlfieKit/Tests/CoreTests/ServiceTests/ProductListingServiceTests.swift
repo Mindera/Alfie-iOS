@@ -1,22 +1,20 @@
-import Combine
-import TestUtils
 import Mocks
 import Model
+import TestUtils
 import XCTest
 @testable import Core
 
 final class ProductListingServiceTests: XCTestCase {
     private var sut: ProductListingService!
     private var mockClientService: MockBFFClientService!
-    private var paginationConfiguration: ProductListingService.PaginationConfiguration!
+    private let pageSize = ProductListingService.PaginationConfiguration(type: .plp).pageSize
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockClientService = MockBFFClientService()
-        paginationConfiguration = .init(type: .plp, initialPage: 0)
         sut = .init(
             productService: ProductService(bffClient: mockClientService),
-            configuration: paginationConfiguration
+            configuration: .init(type: .plp)
         )
     }
 
@@ -26,114 +24,76 @@ final class ProductListingServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_first_page_calls_bff_service_with_params() {
-        let expectation = expectation(description: "Wait for service call")
-        mockClientService.onProductListingCalled = { offset, limit, categoryId, query, sort in
-            XCTAssertEqual(offset, self.paginationConfiguration.initialPage)
-            XCTAssertEqual(limit, self.paginationConfiguration.pageSize)
-            XCTAssertEqual(categoryId, "category id")
-            XCTAssertEqual(query, "query")
-            XCTAssertEqual(sort, "sort")
-            expectation.fulfill()
+    func test_page_forwards_args_to_bff() async throws {
+        var captured: ProductListingCall?
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
+            return ProductListing.fixture()
+        }
+        let filters = ProductFilterInput(brandNames: ["Acme"])
+
+        _ = try await sut.page(after: "cursor-1", categoryId: "category", query: "q", sort: "s", filters: filters)
+
+        let call = try XCTUnwrap(captured)
+        XCTAssertEqual(call.after, "cursor-1")
+        XCTAssertEqual(call.limit, pageSize)
+        XCTAssertEqual(call.categoryId, "category")
+        XCTAssertEqual(call.query, "q")
+        XCTAssertEqual(call.sort, "s")
+        XCTAssertEqual(call.filters, filters)
+    }
+
+    func test_page_with_nil_cursor_loads_first_page() async throws {
+        var captured: ProductListingCall?
+        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
+            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
             return ProductListing.fixture()
         }
 
-        Task {
-            _ = try await sut.paged(categoryId: "category id", query: "query", sort: "sort")
-        }
+        _ = try await sut.page(after: nil, categoryId: "category", query: nil, sort: nil, filters: nil)
 
-        wait(for: [expectation], timeout: .default)
+        XCTAssertNil(try XCTUnwrap(captured).after)
     }
 
-    func test_pagination_info_provides_next_page() {
-        let expectation = expectation(description: "Wait for service call")
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
-            expectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(nextPage: 1))
-        }
+    func test_page_returns_the_full_listing_unchanged() async throws {
+        let expected = ProductListing.fixture(
+            pagination: .fixture(totalCount: 7, endCursor: "abc", hasNextPage: true),
+            products: [Product.fixture(), Product.fixture(), Product.fixture()]
+        )
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in expected }
 
-        Task {
-            _ = try await sut.paged()
-        }
+        let listing = try await sut.page(after: nil, categoryId: "c", query: nil, sort: nil, filters: nil)
 
-        wait(for: [expectation], timeout: .default)
-        XCTAssertTrue(sut.hasNext())
+        XCTAssertEqual(listing.products.count, expected.products.count)
+        XCTAssertEqual(listing.pagination.totalCount, 7)
+        XCTAssertEqual(listing.pagination.endCursor, "abc")
+        XCTAssertTrue(listing.pagination.hasNextPage)
     }
 
-    func test_pagination_info_provides_total_records() {
-        let expectation = expectation(description: "Wait for service call")
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
-            expectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(total: 101))
-        }
-
-        Task {
-            _ = try await sut.paged()
-        }
-
-        wait(for: [expectation], timeout: .default)
-        XCTAssertEqual(sut.totalOfRecords, 101)
-    }
-
-    func test_doesnt_call_next_page_when_no_next_page() {
-        let calledExpectation = expectation(description: "Wait for service call")
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
-            calledExpectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(nextPage: nil))
-        }
-
-        Task {
-            _ = try await sut.paged()
-        }
-
-        wait(for: [calledExpectation], timeout: .default)
-
-        XCTAssertFalse(sut.hasNext())
-
-        let notCalledExpectation = expectation(description: "Wait for no service call")
-        notCalledExpectation.isInverted = true
-        mockClientService.onProductListingCalled = { _, _, _, _, _ in
-            notCalledExpectation.fulfill()
-            return ProductListing.fixture()
-        }
-
-        Task {
-            _ = try await sut.next()
-        }
-
-        wait(for: [notCalledExpectation], timeout: .inverted)
-    }
-
-    func test_next_page_calls_bff_service_while_has_next_pages() async {
-        let expectation = expectation(description: "Wait for service call for 2 pages")
-        expectation.expectedFulfillmentCount = 2
-        mockClientService.onProductListingCalled = { offset, _, _, _, _ in
-            expectation.fulfill()
-            return ProductListing.fixture(pagination: .fixture(nextPage: offset < 1 ? offset + 1 : nil))
+    func test_page_propagates_bff_errors() async {
+        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
+            throw BFFRequestError(type: .generic)
         }
 
         do {
-            // first page successfully
-            _ = try await sut.paged(categoryId: "try 1", query: "query 1", sort: "sort 1")
-            XCTAssertTrue(sut.hasNext())
-            // second page successfully but no next page
-            _ = try await sut.next(categoryId: "try 2", query: "query 2", sort: "sort 2")
-            XCTAssertFalse(sut.hasNext())
-            // third page failure
-            _ = try await sut.next(categoryId: "try 3", query: "query 3", sort: "sort 3")
+            _ = try await sut.page(after: nil, categoryId: "c", query: nil, sort: nil, filters: nil)
+            XCTFail("Expected page() to throw")
+        } catch let error as BFFRequestError {
+            // ProductService maps non-emptyResponse BFF errors to .product(.generic)
+            XCTAssertEqual(error.type, .product(.generic))
         } catch {
-            guard case let bffError = error as? BFFRequestError,
-                  case .product(let productError) = bffError?.type,
-                  case .noProducts(let category, let query, let sort) = productError
-            else {
-                XCTFail("Unexpected error thrown")
-                return
-            }
-            XCTAssertEqual(category, "try 3")
-            XCTAssertEqual(query, "query 3")
-            XCTAssertEqual(sort, "sort 3")
+            XCTFail("Unexpected error: \(error)")
         }
-
-        await fulfillment(of: [expectation], timeout: .default)
     }
+}
+
+// MARK: - Helpers
+
+private struct ProductListingCall {
+    let after: String?
+    let limit: Int
+    let categoryId: String?
+    let query: String?
+    let sort: String?
+    let filters: ProductFilterInput?
 }

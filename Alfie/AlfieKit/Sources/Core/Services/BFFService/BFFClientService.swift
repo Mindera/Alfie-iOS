@@ -13,6 +13,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
     private let apolloClient: ApolloClient
     private let dependencies: BFFClientDependencyContainer
     private let baseUrl: Foundation.URL
+    private let log: Logger
 
     public init(
         url: Foundation.URL,
@@ -23,6 +24,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) {
         self.dependencies = dependencies
         self.baseUrl = url
+        self.log = log
 
         let client = URLSessionClient(sessionConfiguration: sessionConfiguration)
         let cache = InMemoryNormalizedCache()
@@ -48,53 +50,67 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        let navigation = try await executeFetch(
-            BFFGraphAPI.GetHeaderNavQuery(
-                handle: handle.rawValue,
-                fetchMedia: includeMedia,
-                fetchSubItems: includeSubItems
-            )
-        ).navigation
-
-        return navigation.convertToNavigationItems()
+        // ALFMOB-331: BFF schema migration in progress. Header nav query is gone from the
+        // new schema; this stub keeps the build green until a follow-up ticket rewires it.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getProduct(id: String) async throws -> Product {
-        guard let product = try await executeFetch(BFFGraphAPI.GetProductQuery(productId: id)).product else {
-            throw BFFRequestError(type: .emptyResponse)
-        }
-        return product.convertToProduct()
+        // ALFMOB-331: BFF schema migration. PDP migration is tracked by ALFMOB-332.
+        throw BFFRequestError(type: .generic)
     }
 
     public func productListing(
-        offset: Int,
+        after: String?,
         limit: Int,
         categoryId: String?,
         query: String?,
-        sort: String?
+        sort: String?,
+        filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        guard let productList = try await executeFetch(
-            BFFGraphAPI.ProductListingQuery(
-                offset: offset,
-                limit: limit,
-                categoryId: categoryId.map { .some($0) } ?? .none,
-                query: query.map { .some($0) } ?? .none,
-                sort: sort.map { .some(.case(.init(rawValue: $0) ?? .aZ )) } ?? .none
-            )
-        ).productListing
-        else {
-            throw BFFRequestError(type: .emptyResponse)
+        // `productList` requires a `collectionHandle`. The PLP screen can be entered in
+        // `.searchResults` mode with `categoryId == nil` — that path needs to call the
+        // BFF's `searchProducts` query instead, which is owned by ALFMOB-333. Until that
+        // lands we surface a typed "no products" error rather than firing a request the
+        // BFF will reject.
+        guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
+            log.error("productList called without a collectionHandle (search-mode wiring pending ALFMOB-333); returning noProducts.")
+            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
         }
-        return productList.convertToProductListing()
+
+        let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
+        let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
+        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+
+        do {
+            let response = try await executeFetch(
+                BFFGraphAPI.ProductListQuery(
+                    collectionHandle: collectionHandle,
+                    after: after.map { .some($0) } ?? .none,
+                    limit: limit,
+                    filters: resolvedFilters,
+                    sort: .some(.case(resolvedSort))
+                )
+            ).productList
+
+            log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+
+            return response.convertToProductListing()
+        } catch {
+            log.error("productList failed: \(error)")
+            throw error
+        }
     }
 
     public func getBrands() async throws -> [Brand] {
-        let brands = try await executeFetch(BFFGraphAPI.BrandsQuery()).brands
-        return brands.convertToBrands()
+        // ALFMOB-331: BFF schema migration. The new schema removed the brands query;
+        // a follow-up will reintroduce/replace it.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getSearchSuggestion(term: String) async throws -> SearchSuggestion {
-        try await executeFetch(BFFGraphAPI.GetSuggestionsQuery(term: term)).suggestion.convertToSearchSuggestion()
+        // ALFMOB-331: BFF schema migration. Search migration is tracked by ALFMOB-333.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getWebViewConfig() async throws -> WebViewConfiguration {
@@ -109,25 +125,30 @@ public final class BFFClientService: BFFClientServiceProtocol {
     // MARK: - Private
 
     private func executeFetch<Query: GraphQLQuery>(_ query: Query) async throws -> Query.Data {
-        try await withCheckedThrowingContinuation { [weak self] continuation in
-            guard let self else {
-                continuation.resume(with: .failure(BFFRequestError(type: .generic)))
-                return
-            }
+        try Task.checkCancellation()
 
-            self.apolloClient.fetch(query: query, queue: DispatchQueue.main) { result in
-                if let failure = Self.resultAsFailure(result) {
-                    continuation.resume(with: .failure(failure))
-                    return
+        // Capture Apollo's `Cancellable` in a thread-safe box so the cancellation
+        // handler can abort the in-flight request if the caller's task is cancelled
+        // (e.g. user backs out of PLP mid-fetch). Without this we'd leak a network
+        // round-trip and silently drop the response.
+        let box = CancellableBox()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
+                let cancellable = apolloClient.fetch(query: query) { result in
+                    if let failure = Self.resultAsFailure(result) {
+                        continuation.resume(throwing: failure)
+                        return
+                    }
+                    guard let data = Self.resultAsSuccess(result)?.data else {
+                        continuation.resume(throwing: BFFRequestError(type: .generic))
+                        return
+                    }
+                    continuation.resume(returning: data)
                 }
-
-                guard let data = Self.resultAsSuccess(result)?.data else {
-                    continuation.resume(with: .failure(BFFRequestError(type: .generic)))
-                    return
-                }
-
-                continuation.resume(returning: data)
+                box.set(cancellable)
             }
+        } onCancel: {
+            box.cancel()
         }
     }
 
@@ -160,3 +181,4 @@ public final class BFFClientService: BFFClientServiceProtocol {
         return success
     }
 }
+

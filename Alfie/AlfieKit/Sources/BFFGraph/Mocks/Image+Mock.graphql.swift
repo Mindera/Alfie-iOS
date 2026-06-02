@@ -10,21 +10,18 @@ class Image: MockObject {
   typealias MockValueCollectionType = Array<Mock<Image>>
 
   struct MockFields {
-    @Field<String>("alt") public var alt
-    @Field<GraphQLEnum<BFFGraphAPI.MediaContentType>>("mediaContentType") public var mediaContentType
-    @Field<BFFGraphAPI.URL>("url") public var url
+    @Field<String>("altText") public var altText
+    @Field<String>("url") public var url
   }
 }
 
 extension Mock where O == Image {
   convenience init(
-    alt: String? = nil,
-    mediaContentType: GraphQLEnum<BFFGraphAPI.MediaContentType>? = nil,
-    url: BFFGraphAPI.URL? = nil
+    altText: String? = nil,
+    url: String? = nil
   ) {
     self.init()
-    _setScalar(alt, for: \.alt)
-    _setScalar(mediaContentType, for: \.mediaContentType)
+    _setScalar(altText, for: \.altText)
     _setScalar(url, for: \.url)
   }
 }
