@@ -62,7 +62,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
         throw BFFRequestError(type: .generic)
     }
 
-    public func getProduct(handle: String, platform: BFFPlatform) async throws -> Product {
+    public func getProduct(handle: String) async throws -> Product {
+        // `platform` is a predefined, app-level choice (see `BFFPlatform`) — not a per-request
+        // argument — so it's resolved here rather than threaded through the call chain.
+        let platform = BFFPlatform.predefined
         log.info("productDetails → handle=\(handle) platform=\(platform.rawValue)")
 
         do {

@@ -26,9 +26,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
     /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
     private let productHandle: String
-    /// The BFF `productDetails(platform:)` argument. Predefined app-level choice (see `BFFPlatform`) —
-    /// not derived per-product.
-    private let platform: BFFPlatform = .predefined
     private let initialSelectedProduct: SelectedProduct?
 
     private var product: Product? {
@@ -246,7 +243,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         let product: Product
 
         do {
-            product = try await dependencies.productService.getProduct(handle: productHandle, platform: platform)
+            product = try await dependencies.productService.getProduct(handle: productHandle)
         } catch {
             dependencies.log.error("Error fetching product \(productId): \(error)")
             state = .error(ProductDetailsViewErrorType.from(error: error))

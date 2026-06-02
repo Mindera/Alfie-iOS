@@ -10,9 +10,9 @@ public final class ProductService: ProductServiceProtocol {
         self.bffClient = bffClient
     }
 
-    public func getProduct(handle: String, platform: BFFPlatform) async throws -> Product {
+    public func getProduct(handle: String) async throws -> Product {
         do {
-            return try await bffClient.getProduct(handle: handle, platform: platform)
+            return try await bffClient.getProduct(handle: handle)
         } catch let error as BFFRequestError where error.isNotFound {
             throw BFFRequestError(type: .product(.noProduct))
         } catch {

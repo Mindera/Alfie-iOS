@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol ProductServiceProtocol {
-    func getProduct(handle: String, platform: BFFPlatform) async throws -> Product
+    func getProduct(handle: String) async throws -> Product
     func productListing(
         after: String?,
         limit: Int,

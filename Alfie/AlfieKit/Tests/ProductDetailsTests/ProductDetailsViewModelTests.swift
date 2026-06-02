@@ -85,7 +85,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
         let variant = Product.Variant.fixture(size: size, colour: color)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
-        mockProductService.onGetProductCalled = { _, _ in product }
+        mockProductService.onGetProductCalled = { _ in product }
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
@@ -340,7 +340,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel(configuration: .id(productId))
 
         let expectation = expectation(description: "Wait for service call")
-        mockProductService.onGetProductCalled = { handle, _ in
+        mockProductService.onGetProductCalled = { handle in
             XCTAssertEqual(handle, productId)
             expectation.fulfill()
             return .fixture()
@@ -350,14 +350,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: .default)
     }
 
-    func test_product_entry_fetches_using_slug_handle_and_predefined_platform() {
+    func test_product_entry_fetches_using_slug_as_handle() {
         let product = Product.fixture(slug: "nice-shirt-26146503")
         initViewModel(configuration: .product(product))
 
         let expectation = expectation(description: "Wait for service call")
-        mockProductService.onGetProductCalled = { handle, platform in
+        mockProductService.onGetProductCalled = { handle in
             XCTAssertEqual(handle, "nice-shirt-26146503")
-            XCTAssertEqual(platform, .predefined)
             expectation.fulfill()
             return .fixture()
         }
@@ -372,7 +371,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         let firstExpectation = expectation(description: "Wait for service call")
         let secondExpectation = expectation(description: "Wait for success state")
-        mockProductService.onGetProductCalled = { handle, _ in
+        mockProductService.onGetProductCalled = { handle in
             XCTAssertEqual(handle, productId)
             firstExpectation.fulfill()
             return .fixture()
@@ -390,7 +389,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         let thirdExpectation = expectation(description: "Wait for no service call")
         thirdExpectation.isInverted = true
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             thirdExpectation.fulfill()
             return .fixture()
         }
@@ -403,7 +402,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_state_is_success_after_product_fetch_succeeds() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -415,7 +414,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_state_is_failure_after_product_fetch_fails() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             throw BFFRequestError(type: .generic)
         }
 
@@ -428,7 +427,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_state_is_failure_if_product_is_not_found_after_fetch() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             throw BFFRequestError(type: .emptyResponse)
         }
 
@@ -451,7 +450,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       brand: .fixture(name: "Product Brand"),
                                       defaultVariant: variant1,
                                       variants: [variant1, variant2])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -499,7 +498,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_does_not_report_title_section_loading_when_not_loading() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -519,7 +518,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_does_not_report_color_section_loading_when_not_loading() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -539,7 +538,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_does_not_report_size_section_loading_when_not_loading() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -559,7 +558,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_does_not_report_media_carousel_section_loading_when_not_loading() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -579,7 +578,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_does_not_report_complementary_info_section_loading_when_not_loading() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -599,7 +598,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_does_not_report_description_section_loading_when_not_loading() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
 
@@ -619,7 +618,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
                                       variants: [.fixture(colour: color)])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -644,7 +643,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
                                       variants: [.fixture(colour: color)])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -665,7 +664,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       brand: .fixture(name: "Product Brand"),
                                       defaultVariant: variant1,
                                       variants: [variant1, variant2])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -695,7 +694,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       brand: .fixture(name: "Product Brand"),
                                       defaultVariant: variant1,
                                       variants: [variant1, variant2])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -716,7 +715,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       brand: .fixture(name: "Product Brand"),
                                       defaultVariant: variant1,
                                       variants: [variant1, variant2])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -745,7 +744,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       variants: [variant1, variant2])
         initViewModel(configuration: .product(product))
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -822,7 +821,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name",
                                       defaultVariant: variant,
                                       variants: [variant])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -838,7 +837,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(name: "Product Name",
                                       defaultVariant: variant,
                                       variants: [variant])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -851,7 +850,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
 
         let product = Product.fixture(longDescription: "Product Description")
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -864,7 +863,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
 
         let product = Product.fixture()
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -877,7 +876,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
 
         let product = Product.fixture()
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
@@ -889,7 +888,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_reports_add_to_bag_section_as_not_visible_if_state_is_failure() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             throw BFFRequestError(type: .generic)
         }
 
@@ -915,7 +914,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_share_configuration_is_unavailable_if_fetch_fails() {
         initViewModel()
 
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             throw BFFRequestError(type: .generic)
         }
 
@@ -935,7 +934,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
                                       slug: slug,
                                       defaultVariant: variant,
                                       variants: [variant])
-        mockProductService.onGetProductCalled = { _, _ in
+        mockProductService.onGetProductCalled = { _ in
             product
         }
 
