@@ -29,6 +29,34 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertTrue(listing.pagination.hasNextPage)
     }
 
+    func test_search_products_response_converts_to_product_listing() throws {
+        let low = Mock<Money>(amount: 19.99, currencyCode: "AUD")
+        let priceRange = Mock<MoneyRange>(maxVariantPrice: low, minVariantPrice: low)
+        let product = Mock<OmniProduct>(
+            brandName: "Acme",
+            id: "prod-1",
+            name: "Test Product",
+            priceRange: priceRange,
+            slug: "test-product"
+        )
+        let pageInfo = Mock<PageInfo>(endCursor: "cursor-1", hasNextPage: true)
+        let response = Mock<ProductListResponse>(
+            pageInfo: pageInfo,
+            products: [product],
+            totalCount: 42
+        )
+
+        let listing = BFFGraphAPI.SearchProductsQuery.Data.SearchProducts.from(response).convertToProductListing()
+
+        XCTAssertEqual(listing.products.count, 1)
+        XCTAssertEqual(listing.products.first?.id, "prod-1")
+        XCTAssertEqual(listing.products.first?.name, "Test Product")
+        XCTAssertEqual(listing.products.first?.brand.name, "Acme")
+        XCTAssertEqual(listing.pagination.totalCount, 42)
+        XCTAssertEqual(listing.pagination.endCursor, "cursor-1")
+        XCTAssertTrue(listing.pagination.hasNextPage)
+    }
+
     func test_empty_products_yields_empty_listing() {
         let listing = makeResponse(products: [], totalCount: 0, endCursor: nil, hasNextPage: false)
             .convertToProductListing()
