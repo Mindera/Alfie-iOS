@@ -32,14 +32,6 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return brands
     }
 
-    public var onGetSearchSuggestionCalled: ((String) throws -> SearchSuggestion)?
-    public func getSearchSuggestion(term: String) async throws -> SearchSuggestion {
-        guard let suggestion = try onGetSearchSuggestionCalled?(term) else {
-            throw BFFRequestError(type: .emptyResponse)
-        }
-        return suggestion
-    }
-
     public var onGetWebViewConfigCalled: (() throws -> WebViewConfiguration)?
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         guard let config = try onGetWebViewConfigCalled?() else {

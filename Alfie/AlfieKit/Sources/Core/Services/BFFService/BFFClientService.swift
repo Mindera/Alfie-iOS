@@ -116,48 +116,65 @@ public final class BFFClientService: BFFClientServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        // `productList` requires a `collectionHandle`. The PLP screen can be entered in
-        // `.searchResults` mode with `categoryId == nil` — that path needs to call the
-        // BFF's `searchProducts` query instead, which is owned by ALFMOB-333. Until that
-        // lands we surface a typed "no products" error rather than firing a request the
-        // BFF will reject.
-        guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
-            log.error("productList called without a collectionHandle (search-mode wiring pending ALFMOB-333); returning noProducts.")
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
-        }
-
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
-        do {
-            let response = try await executeFetch(
-                BFFGraphAPI.ProductListQuery(
-                    collectionHandle: collectionHandle,
-                    after: after.map { .some($0) } ?? .none,
-                    limit: limit,
-                    filters: resolvedFilters,
-                    sort: .some(.case(resolvedSort))
-                )
-            ).productList
+        // The screen can be entered as a category listing (`productList`, keyed by
+        // `collectionHandle`) or as search results (`searchProducts`, keyed by
+        // `searchTerm`). Route on whichever identifier is present.
+        if let collectionHandle = categoryId, !collectionHandle.isEmpty {
+            log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
-            log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+            do {
+                let response = try await executeFetch(
+                    BFFGraphAPI.ProductListQuery(
+                        collectionHandle: collectionHandle,
+                        after: after.map { .some($0) } ?? .none,
+                        limit: limit,
+                        filters: resolvedFilters,
+                        sort: .some(.case(resolvedSort))
+                    )
+                ).productList
 
-            return response.convertToProductListing()
-        } catch {
-            log.error("productList failed: \(error)")
-            throw error
+                log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+
+                return response.convertToProductListing()
+            } catch {
+                log.error("productList failed: \(error)")
+                throw error
+            }
         }
+
+        if let searchTerm = query, !searchTerm.isEmpty {
+            log.info("searchProducts → searchTerm=\(searchTerm) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+
+            do {
+                let response = try await executeFetch(
+                    BFFGraphAPI.SearchProductsQuery(
+                        searchTerm: searchTerm,
+                        after: after.map { .some($0) } ?? .none,
+                        limit: limit,
+                        filters: resolvedFilters,
+                        sort: .some(.case(resolvedSort))
+                    )
+                ).searchProducts
+
+                log.info("searchProducts ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+
+                return response.convertToProductListing()
+            } catch {
+                log.error("searchProducts failed: \(error)")
+                throw error
+            }
+        }
+
+        log.error("productListing called without a collectionHandle or searchTerm; returning noProducts.")
+        throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
     }
 
     public func getBrands() async throws -> [Brand] {
         // ALFMOB-331: BFF schema migration. The new schema removed the brands query;
         // a follow-up will reintroduce/replace it.
-        throw BFFRequestError(type: .generic)
-    }
-
-    public func getSearchSuggestion(term: String) async throws -> SearchSuggestion {
-        // ALFMOB-331: BFF schema migration. Search migration is tracked by ALFMOB-333.
         throw BFFRequestError(type: .generic)
     }
 
