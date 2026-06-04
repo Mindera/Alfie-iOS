@@ -7,11 +7,9 @@ import Utils
 public final class SearchViewModel: SearchViewModelProtocol {
     // MARK: - Private Properties
 
-    private var currentTask: Task<Void, Never>?
     private let dependencies: SearchDependencyContainer
     private let didUpdateSearchTermPassthrough: PassthroughSubject<String, Never> = .init()
     private var subscriptions: Set<AnyCancellable> = .init()
-    private var lastSearchedText: String = ""
     @Published public var state: SearchViewState = .empty
     @Published public var searchText: String {
         didSet {
@@ -24,30 +22,6 @@ public final class SearchViewModel: SearchViewModelProtocol {
 
     private var canShowRecentSearches: Bool {
         searchText.isEmpty && dependencies.recentsService?.recentSearches.isEmpty == false
-    }
-
-    public var suggestionTerms: [SearchSuggestionKeyword] {
-        guard case .success(let suggestion) = state else {
-            return []
-        }
-
-        return Array(suggestion.keywords.prefix(Constants.maxTermsToShow))
-    }
-
-    public var suggestionBrands: [SearchSuggestionBrand] {
-        guard case .success(let suggestion) = state else {
-            return []
-        }
-
-        return Array(suggestion.brands.prefix(Constants.maxBrandsToShow))
-    }
-
-    public var suggestionProducts: [Product] {
-        guard case .success(let suggestion) = state else {
-            return []
-        }
-
-        return suggestion.products.prefix(Constants.maxProductsToShow).map { $0.convertToProduct() }
     }
 
     public var recentSearchesViewModel: RecentSearchesViewModel {
@@ -86,15 +60,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
 
 extension SearchViewModel {
     private func configureSubscriptions() {
-        // swiftlint:disable:next trailing_closure
-        $searchText
-            .handleEvents(receiveOutput: { [weak self] _ in
-                if self?.state == .noResults {
-                    // To avoid the UI updating before the debounce in the subscription below, otherwise we will see the "no results for <term>" even before the search takes place
-                    self?.state = .loading
-                }
-            })
-            .debounce(for: dependencies.searchService.suggestionsDebounceInterval, scheduler: dependencies.scheduler)
+        didUpdateSearchTermPassthrough
             .sink { [weak self] searchText in
                 self?.handleChange(on: searchText)
             }
@@ -112,38 +78,16 @@ extension SearchViewModel {
 
 extension SearchViewModel {
     public func onSubmitSearch() {
-        guard isSearchSubmissionAllowed else {
+        let term = searchText.trim()
+        guard !term.isEmpty else {
             return
         }
-        dependencies.recentsService?.add(.text(value: searchText))
-        dependencies.analytics.trackSearch(term: searchText)
-        navigate(.searchIntent(.productListing(searchTerm: searchText, category: nil)))
-    }
-
-    public func onTapSearchBrand(_ brand: SearchSuggestionBrand) {
-        navigate(.searchIntent(.productListing(searchTerm: nil, category: brand.slug)))
-    }
-
-    public func onTapSearchSuggestion(_ suggestion: SearchSuggestionKeyword) {
-        guard !suggestion.term.isEmpty else {
-            return
-        }
-        dependencies.recentsService?.add(.text(value: suggestion.term))
-        navigate(.searchIntent(.productListing(searchTerm: suggestion.term, category: nil)))
-    }
-
-    public func onTapProduct(_ product: Product) {
-        navigate(.searchIntent(.productDetails(productID: product.id, product: product)))
-    }
-
-    public func onTapOpenBrands() {
-        guard let url = ThemedURL.brands.internalUrl else { return }
-        ExternalAppLauncher.open(url: url)
+        dependencies.recentsService?.add(.text(value: term))
+        dependencies.analytics.trackSearch(term: term)
+        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
     }
 
     public func viewDidAppear() {
-        lastSearchedText = ""
-
         guard canShowRecentSearches else {
             return
         }
@@ -163,48 +107,11 @@ extension SearchViewModel {
 
 extension SearchViewModel {
     private func handleChange(on searchText: String) {
-        guard !searchText.isEmpty else {
-            handleEmptyText()
+        guard searchText.isEmpty else {
+            state = .empty
             return
         }
-
-        guard isSearchSubmissionAllowed else {
-            return
-        }
-
-        guard searchText != lastSearchedText else {
-            return
-        }
-
-        currentTask?.cancel()
-        let handleSearchTermTask = Task {
-            await handleSearchTermRequest(with: searchText)
-        }
-        self.currentTask = handleSearchTermTask
-        Task { handleSearchTermTask }
-    }
-
-    @MainActor
-    private func handleSearchTermRequest(with newSearchTerm: String) async {
-        state = .loading
-
-        let suggestion: SearchSuggestion
-
-        do {
-            suggestion = try await dependencies.searchService.getSuggestion(term: newSearchTerm)
-            lastSearchedText = newSearchTerm
-        } catch {
-            dependencies.log.error("Error fetching suggestion for search term \(newSearchTerm): \(error)")
-            state = .noResults
-            return
-        }
-
-        guard !suggestion.isEmpty else {
-            state = .noResults
-            return
-        }
-
-        state = .success(suggestion: suggestion)
+        handleEmptyText()
     }
 
     private func handleEmptyText() {
@@ -213,16 +120,5 @@ extension SearchViewModel {
         } else {
             state = .empty
         }
-    }
-}
-
-// MARK: - Constants
-
-extension SearchViewModel {
-    private enum Constants {
-        static let searchDebounceIntervalInSeconds: Double = 0.5
-        static let maxTermsToShow = 6
-        static let maxBrandsToShow = 6
-        static let maxProductsToShow = 8
     }
 }

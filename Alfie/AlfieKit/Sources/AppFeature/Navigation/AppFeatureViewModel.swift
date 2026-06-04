@@ -101,7 +101,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         )
         let searchDependencyContainer = SearchDependencyContainer(
             recentsService: serviceProvider.recentsService,
-            searchService: serviceProvider.searchService,
             analytics: serviceProvider.analytics,
             log: log
         )

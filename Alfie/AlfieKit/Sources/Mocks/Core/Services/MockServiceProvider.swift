@@ -19,7 +19,6 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var brandsService: BrandsServiceProtocol
     public var webUrlProvider: WebURLProviderProtocol
     public var notificationsService: NotificationsServiceProtocol
-    public var searchService: SearchServiceProtocol
     public var webViewConfigurationService: WebViewConfigurationServiceProtocol
     public var bagService: BagServiceProtocol
     public var wishlistService: WishlistServiceProtocol
@@ -41,7 +40,6 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         brandsService: BrandsServiceProtocol = MockBrandsService(),
         webUrlProvider: WebURLProviderProtocol = MockWebUrlProvider(),
         notificationsService: NotificationsServiceProtocol = MockNotificationsServiceProtocol(),
-        searchService: SearchServiceProtocol = MockSearchService(),
         webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService(),
         bagService: BagServiceProtocol = MockBagService(),
         wishlistService: WishlistServiceProtocol = MockWishlistService(),
@@ -62,7 +60,6 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         self.brandsService = brandsService
         self.webUrlProvider = webUrlProvider
         self.notificationsService = notificationsService
-        self.searchService = searchService
         self.webViewConfigurationService = webViewConfigurationService
         self.bagService = bagService
         self.wishlistService = wishlistService
