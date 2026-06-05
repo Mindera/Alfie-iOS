@@ -17,6 +17,23 @@ final class PersistedProductDTOTests: XCTestCase {
         XCTAssertEqual(dto.variantSku, "sku-abc")
     }
 
+    func test_initFromSelectedProduct_mapsSlug() {
+        let product = Product.fixture(slug: "cashmere-coat-26146503")
+
+        let dto = PersistedProductDTO(from: SelectedProduct(product: product))
+
+        XCTAssertEqual(dto.slug, "cashmere-coat-26146503")
+    }
+
+    func test_restoredSelectedProduct_preservesSlug_soPdpCanRefetch() {
+        // Bag/Wishlist → PDP re-fetches via `productDetails(handle:)`; the slug must survive the
+        // round-trip, otherwise the handle is empty and the PDP shows "not found".
+        let product = Product.fixture(slug: "cashmere-coat-26146503")
+        let dto = PersistedProductDTO(from: SelectedProduct(product: product))
+
+        XCTAssertEqual(dto.selectedProduct.product.slug, "cashmere-coat-26146503")
+    }
+
     func test_initFromSelectedProduct_mapsNameAndBrand() {
         let product = Product.fixture(name: "Cashmere Coat", brand: .fixture(name: "Acme"))
 
@@ -234,6 +251,7 @@ final class PersistedProductDTOTests: XCTestCase {
     func test_dto_codableRoundTrip() throws {
         let original = PersistedProductDTO(
             productId: "p-1",
+            slug: "tee-12345678",
             variantSku: "v-1",
             name: "Tee",
             brandName: "Acme",
@@ -379,6 +397,7 @@ private extension PersistedProductDTO {
     /// mapping (`selectedProduct`) without constructing a full domain `SelectedProduct`.
     static func testFixture(
         productId: String = "p",
+        slug: String = "",
         variantSku: String = "v",
         name: String = "",
         brandName: String = "",
@@ -390,6 +409,7 @@ private extension PersistedProductDTO {
     ) -> PersistedProductDTO {
         .init(
             productId: productId,
+            slug: slug,
             variantSku: variantSku,
             name: name,
             brandName: brandName,

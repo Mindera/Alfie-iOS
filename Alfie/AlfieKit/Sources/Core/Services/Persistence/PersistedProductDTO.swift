@@ -7,6 +7,9 @@ import Model
 /// stores expose `SelectedProduct` and translate to/from this DTO internally.
 struct PersistedProductDTO: Codable, Hashable {
     let productId: String
+    /// The BFF product handle. Persisted so Bag/Wishlist → PDP can re-fetch the full product via
+    /// `productDetails(handle:)` (an empty handle resolves to nothing → "not found").
+    let slug: String
     let variantSku: String
     let name: String
     let brandName: String
@@ -41,6 +44,7 @@ extension PersistedProductDTO {
     init(from selectedProduct: SelectedProduct) {
         self.init(
             productId: selectedProduct.product.id,
+            slug: selectedProduct.product.slug,
             variantSku: selectedProduct.selectedVariant.sku,
             name: selectedProduct.name,
             brandName: selectedProduct.brand.name,
@@ -77,9 +81,9 @@ extension PersistedMoneyDTO {
 extension PersistedProductDTO {
     /// Rebuilds a `SelectedProduct` from the persisted snapshot.
     ///
-    /// Fields captured by the DTO are restored faithfully (including full `Price` fidelity).
-    /// Anything not captured (e.g. `variants`, `colours`, `longDescription`, `slug`) is a stub —
-    /// sufficient for rendering Wishlist/Bag rows. PDP navigation re-fetches the full product.
+    /// Fields captured by the DTO are restored faithfully (including full `Price` fidelity and the
+    /// `slug`/handle). Anything not captured (e.g. `variants`, `colours`, `longDescription`) is a stub —
+    /// sufficient for rendering Wishlist/Bag rows; PDP navigation re-fetches the full product by `slug`.
     var selectedProduct: SelectedProduct {
         let mediaList: [Media]? = imageURL.map { url in
             [.image(MediaImage(alt: nil, mediaContentType: .image, url: url))]
@@ -107,7 +111,7 @@ extension PersistedProductDTO {
             name: name,
             brand: Brand(id: "", name: brandName, slug: ""),
             shortDescription: "",
-            slug: "",
+            slug: slug,
             defaultVariant: variant,
             variants: [variant],
             colours: nil
