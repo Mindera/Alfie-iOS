@@ -25,6 +25,7 @@ query ProductListQuery(
 
 query SearchProductsQuery(
     $searchTerm: String!,
+    $platform: String!,
     $after: String,
     $limit: Int!,
     $filters: ProductFilterInput,
@@ -32,6 +33,7 @@ query SearchProductsQuery(
 ) {
     searchProducts(
         searchTerm: $searchTerm,
+        platform: $platform,
         after: $after,
         limit: $limit,
         filters: $filters,

@@ -146,12 +146,16 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
 
         if let searchTerm = query, !searchTerm.isEmpty {
-            log.info("searchProducts → searchTerm=\(searchTerm) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+            // Unlike `productList` (which the BFF defaults to Shopify when no platform is sent),
+            // `searchProducts` rejects a request with no platform — so send the predefined one.
+            let platform = BFFPlatform.predefined
+            log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
             do {
                 let response = try await executeFetch(
                     BFFGraphAPI.SearchProductsQuery(
                         searchTerm: searchTerm,
+                        platform: platform.rawValue,
                         after: after.map { .some($0) } ?? .none,
                         limit: limit,
                         filters: resolvedFilters,
