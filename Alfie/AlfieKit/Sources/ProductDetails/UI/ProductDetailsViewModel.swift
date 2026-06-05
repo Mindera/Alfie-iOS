@@ -250,9 +250,20 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        let selectedVariant = initialSelectedProduct?.selectedVariant ?? product.defaultVariant
+        let selectedVariant = resolvedSelectedVariant(for: product)
         buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: selectedVariant)
         state = .success(.init(product: product, selectedVariant: selectedVariant))
+    }
+
+    /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
+    /// snapshot (e.g. out-of-date stock), so map the selection onto the freshly fetched product by
+    /// `sku` — keeping the user's choice while reflecting current stock/price. Fall back to the
+    /// product's default variant when there is no persisted selection or no match.
+    private func resolvedSelectedVariant(for product: Product) -> Product.Variant {
+        guard let persistedSku = initialSelectedProduct?.selectedVariant.sku else {
+            return product.defaultVariant
+        }
+        return product.variants.first { $0.sku == persistedSku } ?? product.defaultVariant
     }
 
     private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {

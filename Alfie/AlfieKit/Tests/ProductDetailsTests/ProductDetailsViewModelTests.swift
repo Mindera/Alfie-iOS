@@ -202,6 +202,24 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isAddToBagEnabled)
     }
 
+    func test_isAddToBagEnabled_usesFreshStock_whenEnteringFromBagWithStaleVariant() {
+        // Re-entering from Bag/Wishlist carries a persisted (stale) variant that was out of stock when
+        // saved; after the re-fetch the gating must reflect the fresh product's stock, not the snapshot.
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let staleVariant = Product.Variant.fixture(sku: "v1", colour: color, stock: 0)
+        let staleProduct = Product.fixture(defaultVariant: staleVariant, variants: [staleVariant])
+        let freshVariant = Product.Variant.fixture(sku: "v1", colour: color, stock: 5)
+        let freshProduct = Product.fixture(defaultVariant: freshVariant, variants: [freshVariant])
+        mockProductService.onGetProductCalled = { _ in freshProduct }
+
+        initViewModel(
+            configuration: .selectedProduct(SelectedProduct(product: staleProduct, selectedVariant: staleVariant))
+        )
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertTrue(sut.isAddToBagEnabled)
+    }
+
     func test_isAddToBagEnabled_isTrueOnInit_forSingleSizeProduct_withStock() {
         // Product has sizes, but only one size variant exists (e.g. only available in M).
         // The View renders a non-interactive singleSizeView, so the user can't tap a swatch —
