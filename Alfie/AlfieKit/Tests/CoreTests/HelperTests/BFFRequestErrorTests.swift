@@ -82,4 +82,14 @@ final class BFFRequestErrorTests: XCTestCase {
         let sut = BFFRequestError(type: .serverError(status: 503), retryCount: 3)
         XCTAssertEqual(sut.retryCount, 3)
     }
+
+    func test_bffrequesterror_default_graphql_error_code_is_nil() {
+        let sut = BFFRequestError(type: .generic)
+        XCTAssertNil(sut.graphqlErrorCode)
+    }
+
+    func test_bffrequesterror_carries_graphql_error_code() {
+        let sut = BFFRequestError(type: .rateLimited(retryAfter: nil), graphqlErrorCode: "RATE_LIMITED")
+        XCTAssertEqual(sut.graphqlErrorCode, "RATE_LIMITED")
+    }
 }

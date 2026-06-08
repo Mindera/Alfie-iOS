@@ -176,7 +176,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             error: error,
             operationName: operationName,
             httpStatus: httpStatus,
-            graphqlErrorCode: nil
+            graphqlErrorCode: error.graphqlErrorCode
         )
     }
 
@@ -190,7 +190,19 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 return nil
             }
 
-            return BFFRequestError(type: .generic, message: errors.first?.message)
+            let code = errors.first?.extensions?["code"] as? String
+            let message = errors.first?.message
+            let type: BFFRequestError.BFFRequestErrorType = {
+                // BFF may surface throttling as HTTP 200 + a GraphQL error with
+                // extensions.code == "RATE_LIMITED" / "THROTTLED" instead of an HTTP
+                // 429. Map to the typed rate-limit case so UI and telemetry handle
+                // it the same way as the HTTP-status path.
+                if let code, code == "RATE_LIMITED" || code == "THROTTLED" {
+                    return .rateLimited(retryAfter: nil)
+                }
+                return .generic
+            }()
+            return BFFRequestError(type: type, message: message, graphqlErrorCode: code)
 
         case .failure(let error):
             if let bffError = error as? BFFRequestError { return bffError }

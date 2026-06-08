@@ -21,12 +21,23 @@ public struct BFFRequestError: Error {
     public let error: Error?
     public let errorMessage: String?
     public let retryCount: Int
+    /// GraphQL error `extensions.code` captured at the source. Surfaces to telemetry
+    /// so we can observe what codes the BFF emits in production. `nil` for non-GraphQL
+    /// failure paths (HTTP transport errors, timeouts, etc.).
+    public let graphqlErrorCode: String?
 
-    public init(type: BFFRequestErrorType, error: Error? = nil, message: String? = nil, retryCount: Int = 0) {
+    public init(
+        type: BFFRequestErrorType,
+        error: Error? = nil,
+        message: String? = nil,
+        retryCount: Int = 0,
+        graphqlErrorCode: String? = nil
+    ) {
         self.type = type
         self.error = error
         self.errorMessage = message ?? error?.localizedDescription
         self.retryCount = retryCount
+        self.graphqlErrorCode = graphqlErrorCode
     }
 
     public var isNotFound: Bool {
