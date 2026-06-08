@@ -1,0 +1,8 @@
+query ProductDetailsQuery(
+    $handle: String!,
+    $platform: String!
+) {
+    productDetails(handle: $handle, platform: $platform) {
+        ...ProductDetailsFragment
+    }
+}

@@ -1,0 +1,184 @@
+import BFFGraph
+import Foundation
+import Model
+import Utils
+
+extension BFFGraphAPI.ProductDetailsFragment {
+    func convertToProduct() -> Product {
+        let fragmentVariants = (variants ?? []).compactMap { $0 }
+        // Product-level image used as a media fallback for variants that carry none of their own.
+        let fallbackMedia: [Media] = primaryImage
+            .flatMap { image in URL(string: image.url).map { ($0, image.altText) } }
+            .map { [.image(MediaImage(alt: $0.1, mediaContentType: .image, url: $0.0))] } ?? []
+        let domainVariants = fragmentVariants.map { $0.convertToVariant(fallbackMedia: fallbackMedia) }
+
+        // `defaultVariantId` is matched against the BFF variant `id`, which the domain
+        // `Product.Variant` does not carry — so resolve the default by index here, while we
+        // still have the fragment variants, then map to the converted domain variant.
+        let defaultVariant: Product.Variant
+        if let index = defaultVariantIndex(in: fragmentVariants) {
+            defaultVariant = domainVariants[index]
+        } else {
+            defaultVariant = syntheticDefaultVariant()
+        }
+
+        let lowMoney = priceRange.minVariantPrice.fragments.moneyFragment.toDomainMoney()
+        let highMoneyRaw = priceRange.maxVariantPrice.fragments.moneyFragment.toDomainMoney()
+        // Only expose a price range when the variants actually span different prices. For a single
+        // effective price, leave `priceRange` nil so `Product.priceType` falls through to its `.sale`
+        // branch (struck-through `was` price) instead of being forced to `.default`/`.range`.
+        let domainPriceRange: Model.PriceRange? = highMoneyRaw == lowMoney
+            ? nil
+            : Model.PriceRange(low: lowMoney, high: highMoneyRaw)
+
+        let colours = aggregateColours(from: domainVariants)
+
+        return Product(
+            id: id,
+            styleNumber: "",
+            name: name,
+            brand: Brand(name: brandName ?? "", slug: ""),
+            shortDescription: "",
+            longDescription: descriptionHtml?.strippingHTML(),
+            slug: slug,
+            priceRange: domainPriceRange,
+            attributes: nil,
+            defaultVariant: defaultVariant,
+            variants: domainVariants,
+            colours: colours.isEmpty ? nil : colours
+        )
+    }
+
+    // MARK: - Default variant
+
+    /// Resolution rule: the variant whose `id` matches `defaultVariantId`; else the first
+    /// in-stock variant; else the first variant. Returns nil only when there are no variants.
+    private func defaultVariantIndex(in variants: [BFFGraphAPI.ProductDetailsFragment.Variant]) -> Int? {
+        if
+            let defaultVariantId,
+            let index = variants.firstIndex(where: { $0.id == defaultVariantId })
+        {
+            return index
+        }
+        if let index = variants.firstIndex(where: { ($0.inventory?.available ?? 0) > 0 }) {
+            return index
+        }
+        return variants.isEmpty ? nil : 0
+    }
+
+    /// Fallback when the BFF returns no variants: synthesise one from product-level fields so
+    /// `Product.defaultVariant` (non-optional) is always satisfiable.
+    private func syntheticDefaultVariant() -> Product.Variant {
+        let colour: Product.Colour? = primaryImage.flatMap { image in
+            URL(string: image.url).map { url in
+                Product.Colour(
+                    swatch: nil,
+                    name: "",
+                    media: [.image(MediaImage(alt: image.altText, mediaContentType: .image, url: url))]
+                )
+            }
+        }
+
+        return Product.Variant(
+            sku: "",
+            size: nil,
+            colour: colour,
+            attributes: nil,
+            stock: inventoryTotal ?? 0,
+            price: Price(amount: priceRange.minVariantPrice.fragments.moneyFragment.toDomainMoney(), was: nil)
+        )
+    }
+
+    // MARK: - Colours
+
+    /// Distinct colours across variants, preserving the order the BFF returned them in.
+    private func aggregateColours(from variants: [Product.Variant]) -> [Product.Colour] {
+        var result: [Product.Colour] = []
+        variants.forEach { variant in
+            guard
+                let colour = variant.colour,
+                !result.contains(where: { $0.id == colour.id })
+            else {
+                return
+            }
+            result.append(colour)
+        }
+        return result
+    }
+}
+
+extension BFFGraphAPI.ProductDetailsFragment.Variant {
+    func convertToVariant(fallbackMedia: [Media]) -> Product.Variant {
+        let variantMedia: [Media] = (media ?? []).compactMap { $0?.toDomainMedia() }
+        // The PDP carousel reads `Product.Variant.media`, which is derived from the variant's
+        // colour. Use the variant's own media, falling back to the product image when it has none.
+        let resolvedMedia = variantMedia.isEmpty ? fallbackMedia : variantMedia
+
+        // Reconstruct typed colour/size from the generic `optionValues[]` by matching the option
+        // name case-insensitively. When there is no colour dimension (e.g. Shopify single-option
+        // "Title" products) we still wrap the media in a nameless colour so it isn't lost — without
+        // it `Product.Variant.media` (== `colour?.media`) would be empty and the carousel blank.
+        let colour: Product.Colour?
+        if let colourOption = optionValues.first(where: { $0.name.isColourOptionName }) {
+            colour = Product.Colour(
+                id: colourOption.value,
+                swatch: resolvedMedia.first?.asImage,
+                name: colourOption.value,
+                media: resolvedMedia
+            )
+        } else if !resolvedMedia.isEmpty {
+            colour = Product.Colour(id: "", swatch: resolvedMedia.first?.asImage, name: "", media: resolvedMedia)
+        } else {
+            colour = nil
+        }
+
+        let size: Product.ProductSize? = optionValues
+            .first { $0.name.isSizeOptionName }
+            .map { option in
+                Product.ProductSize(
+                    id: option.value,
+                    value: option.value,
+                    scale: nil,
+                    description: nil,
+                    sizeGuide: nil
+                )
+            }
+
+        let amount = price.fragments.moneyFragment.toDomainMoney()
+        // Only treat `compareAtPrice` as a genuine markdown ("was") when it is strictly higher than
+        // the current price. A BFF value equal to or below `price` would otherwise render a bogus
+        // sale (was ≤ now / a price increase).
+        let compareAt = compareAtPrice?.fragments.moneyFragment.toDomainMoney()
+        let was: Money? = (compareAt?.amount ?? 0) > amount.amount ? compareAt : nil
+
+        return Product.Variant(
+            sku: sku,
+            size: size,
+            colour: colour,
+            attributes: nil,
+            stock: inventory?.available ?? 0,
+            price: Model.Price(amount: amount, was: was)
+        )
+    }
+}
+
+extension BFFGraphAPI.ProductDetailsFragment.Variant.Medium {
+    func toDomainMedia() -> Media? {
+        guard let url = URL(string: url) else { return nil }
+        return .image(MediaImage(alt: altText, mediaContentType: .image, url: url))
+    }
+}
+
+private extension String {
+    private var normalisedOptionName: String {
+        trimmingCharacters(in: .whitespaces).lowercased()
+    }
+
+    var isColourOptionName: Bool {
+        normalisedOptionName == "color" || normalisedOptionName == "colour"
+    }
+
+    var isSizeOptionName: Bool {
+        normalisedOptionName == "size"
+    }
+}

@@ -23,6 +23,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         items: []
     )
     public let productId: String
+    /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
+    /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
+    private let productHandle: String
     private let initialSelectedProduct: SelectedProduct?
 
     private var product: Product? {
@@ -87,11 +90,15 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         switch configuration {
         case .id(let productId):
             self.productId = productId
+            // TODO: ALFMOB-386 — deep-link entry only has the numeric id, not the BFF handle (slug).
+            // Using the id as the handle until the handle/slug source is confirmed.
+            self.productHandle = productId
             self.initialSelectedProduct = nil
             self.baseProduct = nil
 
         case .product(let product):
             self.productId = product.id
+            self.productHandle = product.slug
             self.initialSelectedProduct = nil
             self.baseProduct = product
 
@@ -102,6 +109,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         case .selectedProduct(let selectedProduct):
             self.productId = selectedProduct.product.id
+            self.productHandle = selectedProduct.product.slug
             self.initialSelectedProduct = selectedProduct
             baseProduct = selectedProduct.product
 
@@ -235,16 +243,27 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         let product: Product
 
         do {
-            product = try await dependencies.productService.getProduct(id: productId)
+            product = try await dependencies.productService.getProduct(handle: productHandle)
         } catch {
             dependencies.log.error("Error fetching product \(productId): \(error)")
             state = .error(ProductDetailsViewErrorType.from(error: error))
             return
         }
 
-        let selectedVariant = initialSelectedProduct?.selectedVariant ?? product.defaultVariant
+        let selectedVariant = resolvedSelectedVariant(for: product)
         buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: selectedVariant)
         state = .success(.init(product: product, selectedVariant: selectedVariant))
+    }
+
+    /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
+    /// snapshot (e.g. out-of-date stock), so map the selection onto the freshly fetched product by
+    /// `sku` — keeping the user's choice while reflecting current stock/price. Fall back to the
+    /// product's default variant when there is no persisted selection or no match.
+    private func resolvedSelectedVariant(for product: Product) -> Product.Variant {
+        guard let persistedSku = initialSelectedProduct?.selectedVariant.sku else {
+            return product.defaultVariant
+        }
+        return product.variants.first { $0.sku == persistedSku } ?? product.defaultVariant
     }
 
     private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {

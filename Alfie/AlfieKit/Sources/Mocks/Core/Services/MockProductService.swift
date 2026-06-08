@@ -5,8 +5,8 @@ public final class MockProductService: ProductServiceProtocol {
     public init() { }
 
     public var onGetProductCalled: ((String) throws -> Product)?
-    public func getProduct(id: String) async throws -> Product {
-        guard let product = try onGetProductCalled?(id) else {
+    public func getProduct(handle: String) async throws -> Product {
+        guard let product = try onGetProductCalled?(handle) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return product

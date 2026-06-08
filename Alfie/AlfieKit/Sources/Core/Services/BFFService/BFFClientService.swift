@@ -57,14 +57,55 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        // ALFMOB-331: BFF schema migration in progress. Header nav query is gone from the
-        // new schema; this stub keeps the build green until a follow-up ticket rewires it.
-        throw BFFRequestError(type: .generic)
+        // TEMPORARY: the header-nav query was removed from the new BFF schema, so the Shop Categories
+        // screen has no BFF data source yet. Until the BFF exposes a real categories/navigation query
+        // we return a static, in-memory tree so the Categories → PLP → PDP flow works. Each leaf is a
+        // `.listing` whose url is a real Shopify collection handle, so `productList` resolves it.
+        // Tracked for replacement/removal by ALFMOB-387.
+        let categories: [(title: String, handle: String)] = [
+            ("Women", "women"),
+            ("Men", "men"),
+            ("Featured", "frontpage"),
+            ("Tops", "womens-tops"),
+            ("Beauty", "spring-summer"),
+            ("Bags", "womens-bags"),
+            ("Dresses", "dresses"),
+            ("Jackets", "womens-jackets"),
+            ("Jeans", "womens-jeans"),
+        ]
+        return categories.map { category in
+            NavigationItem(
+                type: .listing,
+                title: category.title,
+                url: "/\(category.handle)",
+                media: nil,
+                items: nil,
+                attributes: nil
+            )
+        }
     }
 
-    public func getProduct(id: String) async throws -> Product {
-        // ALFMOB-331: BFF schema migration. PDP migration is tracked by ALFMOB-332.
-        throw BFFRequestError(type: .generic)
+    public func getProduct(handle: String) async throws -> Product {
+        // `platform` is a predefined, app-level choice (see `BFFPlatform`) — not a per-request
+        // argument — so it's resolved here rather than threaded through the call chain.
+        let platform = BFFPlatform.predefined
+        log.info("productDetails → handle=\(handle) platform=\(platform.rawValue)")
+
+        do {
+            let product = try await executeFetch(
+                BFFGraphAPI.ProductDetailsQuery(handle: handle, platform: platform.rawValue)
+            ).productDetails
+
+            guard let product else {
+                log.error("productDetails ← null for handle=\(handle)")
+                throw BFFRequestError(type: .product(.noProduct))
+            }
+
+            return product.fragments.productDetailsFragment.convertToProduct()
+        } catch {
+            log.error("productDetails failed: \(error)")
+            throw error
+        }
     }
 
     public func productListing(

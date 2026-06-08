@@ -22,15 +22,15 @@ final class ProductServiceTests: XCTestCase {
     // MARK: - Get Product
 
     func test_get_product_calls_bff_service() async throws {
-        var capturedId: String?
-        mockClientService.onGetProductCalled = { productId in
-            capturedId = productId
+        var capturedHandle: String?
+        mockClientService.onGetProductCalled = { handle in
+            capturedHandle = handle
             return Product.fixture()
         }
 
-        _ = try await sut.getProduct(id: "id")
+        _ = try await sut.getProduct(handle: "the-handle")
 
-        XCTAssertEqual(capturedId, "id")
+        XCTAssertEqual(capturedHandle, "the-handle")
     }
 
     func test_get_product_throws_no_product_error_when_not_found() async {
@@ -39,7 +39,7 @@ final class ProductServiceTests: XCTestCase {
         }
 
         do {
-            _ = try await sut.getProduct(id: "id")
+            _ = try await sut.getProduct(handle: "the-handle")
             XCTFail("Expected getProduct to throw")
         } catch let error as BFFRequestError {
             XCTAssertEqual(error.type, .product(.noProduct))
@@ -54,7 +54,7 @@ final class ProductServiceTests: XCTestCase {
         }
 
         do {
-            _ = try await sut.getProduct(id: "id")
+            _ = try await sut.getProduct(handle: "the-handle")
             XCTFail("Expected getProduct to throw")
         } catch let error as BFFRequestError {
             XCTAssertEqual(error.type, .product(.generic))

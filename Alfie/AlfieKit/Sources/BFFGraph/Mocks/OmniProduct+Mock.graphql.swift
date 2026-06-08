@@ -11,6 +11,7 @@ class OmniProduct: MockObject {
 
   struct MockFields {
     @Field<String>("brandName") public var brandName
+    @Field<String>("defaultVariantId") public var defaultVariantId
     @Field<String>("descriptionHtml") public var descriptionHtml
     @Field<BFFGraphAPI.ID>("id") public var id
     @Field<Int>("inventoryTotal") public var inventoryTotal
@@ -19,12 +20,14 @@ class OmniProduct: MockObject {
     @Field<Image>("primaryImage") public var primaryImage
     @Field<String>("productType") public var productType
     @Field<String>("slug") public var slug
+    @Field<[ProductVariant?]>("variants") public var variants
   }
 }
 
 extension Mock where O == OmniProduct {
   convenience init(
     brandName: String? = nil,
+    defaultVariantId: String? = nil,
     descriptionHtml: String? = nil,
     id: BFFGraphAPI.ID? = nil,
     inventoryTotal: Int? = nil,
@@ -32,10 +35,12 @@ extension Mock where O == OmniProduct {
     priceRange: Mock<MoneyRange>? = nil,
     primaryImage: Mock<Image>? = nil,
     productType: String? = nil,
-    slug: String? = nil
+    slug: String? = nil,
+    variants: [Mock<ProductVariant>?]? = nil
   ) {
     self.init()
     _setScalar(brandName, for: \.brandName)
+    _setScalar(defaultVariantId, for: \.defaultVariantId)
     _setScalar(descriptionHtml, for: \.descriptionHtml)
     _setScalar(id, for: \.id)
     _setScalar(inventoryTotal, for: \.inventoryTotal)
@@ -44,5 +49,6 @@ extension Mock where O == OmniProduct {
     _setEntity(primaryImage, for: \.primaryImage)
     _setScalar(productType, for: \.productType)
     _setScalar(slug, for: \.slug)
+    _setList(variants, for: \.variants)
   }
 }
