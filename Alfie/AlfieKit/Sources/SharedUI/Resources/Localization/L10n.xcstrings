@@ -221,6 +221,50 @@
         }
       }
     },
+    "pdp.error_view.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "pdp.error_view.rate_limited.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Too many requests"
+          }
+        }
+      }
+    },
+    "pdp.error_view.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble reaching our servers. Please try again."
+          }
+        }
+      }
+    },
+    "pdp.error_view.server_error.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Service unavailable"
+          }
+        }
+      }
+    },
     "pdp.error_view.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -272,6 +316,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please try again later"
+          }
+        }
+      }
+    },
+    "plp.error_view.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "plp.error_view.rate_limited.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Too many requests"
+          }
+        }
+      }
+    },
+    "plp.error_view.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble reaching our servers. Please try again."
+          }
+        }
+      }
+    },
+    "plp.error_view.server_error.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Service unavailable"
           }
         }
       }
@@ -596,6 +684,50 @@
         }
       }
     },
+    "shop.brands.error_view.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "shop.brands.error_view.rate_limited.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Too many requests"
+          }
+        }
+      }
+    },
+    "shop.brands.error_view.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble reaching our servers. Please try again."
+          }
+        }
+      }
+    },
+    "shop.brands.error_view.server_error.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Service unavailable"
+          }
+        }
+      }
+    },
     "shop.brands.error_view.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -647,6 +779,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please try again later"
+          }
+        }
+      }
+    },
+    "shop.categories.error_view.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "shop.categories.error_view.rate_limited.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Too many requests"
+          }
+        }
+      }
+    },
+    "shop.categories.error_view.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble reaching our servers. Please try again."
+          }
+        }
+      }
+    },
+    "shop.categories.error_view.server_error.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Service unavailable"
           }
         }
       }

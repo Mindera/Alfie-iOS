@@ -4,4 +4,5 @@ public enum AnalyticsAction: String {
     case removeFromBag = "remove_from_bag"
     case removeFromWishlist = "remove_from_wishlist"
     case search = "search"
+    case bffError = "bff_error"
 }

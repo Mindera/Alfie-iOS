@@ -10,6 +10,8 @@ private enum BFFEndpoint: String {
 }
 
 public final class BFFClientService: BFFClientServiceProtocol {
+    private static let graphqlRateLimitedCodes: Set<String> = ["RATE_LIMITED", "THROTTLED"]
+
     private let apolloClient: ApolloClient
     private let dependencies: BFFClientDependencyContainer
     private let baseUrl: Foundation.URL
@@ -25,6 +27,11 @@ public final class BFFClientService: BFFClientServiceProtocol {
         self.dependencies = dependencies
         self.baseUrl = url
         self.log = log
+
+        // Enforce explicit timeouts so BFF calls can't hang the UI. `.default` inherits
+        // a 60s request / 7-day resource budget, which is far too lax for mobile.
+        sessionConfiguration.timeoutIntervalForRequest = 30
+        sessionConfiguration.timeoutIntervalForResource = 60
 
         let client = URLSessionClient(sessionConfiguration: sessionConfiguration)
         let cache = InMemoryNormalizedCache()
@@ -132,24 +139,47 @@ public final class BFFClientService: BFFClientServiceProtocol {
         // (e.g. user backs out of PLP mid-fetch). Without this we'd leak a network
         // round-trip and silently drop the response.
         let box = CancellableBox()
-        return try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
-                let cancellable = apolloClient.fetch(query: query) { result in
-                    if let failure = Self.resultAsFailure(result) {
-                        continuation.resume(throwing: failure)
-                        return
+        do {
+            return try await withTaskCancellationHandler {
+                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
+                    let cancellable = apolloClient.fetch(query: query) { result in
+                        if let failure = Self.resultAsFailure(result) {
+                            continuation.resume(throwing: failure)
+                            return
+                        }
+                        guard let data = Self.resultAsSuccess(result)?.data else {
+                            continuation.resume(throwing: BFFRequestError(type: .generic))
+                            return
+                        }
+                        continuation.resume(returning: data)
                     }
-                    guard let data = Self.resultAsSuccess(result)?.data else {
-                        continuation.resume(throwing: BFFRequestError(type: .generic))
-                        return
-                    }
-                    continuation.resume(returning: data)
+                    box.set(cancellable)
                 }
-                box.set(cancellable)
+            } onCancel: {
+                box.cancel()
             }
-        } onCancel: {
-            box.cancel()
+        } catch let error as BFFRequestError {
+            reportError(error, operationName: Query.operationName)
+            throw error
+        } catch {
+            throw error
         }
+    }
+
+    private func reportError(_ error: BFFRequestError, operationName: String) {
+        guard let reporter = dependencies.errorReporter else { return }
+        let httpStatus: Int? = {
+            switch error.type {
+            case .serverError(let status): return status
+            default: return nil
+            }
+        }()
+        reporter.report(
+            error: error,
+            operationName: operationName,
+            httpStatus: httpStatus,
+            graphqlErrorCode: error.graphqlErrorCode
+        )
     }
 
     private static func resultAsFailure<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> BFFRequestError? {
@@ -162,11 +192,22 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 return nil
             }
 
-            return BFFRequestError(type: .generic, message: errors.first?.message)
+            let code = errors.first?.extensions?["code"] as? String
+            let message = errors.first?.message
+            let type: BFFRequestError.BFFRequestErrorType = {
+                if let code, graphqlRateLimitedCodes.contains(code) {
+                    return .rateLimited(retryAfter: nil)
+                }
+                return .generic
+            }()
+            return BFFRequestError(type: type, message: message, graphqlErrorCode: code)
 
         case .failure(let error):
-            guard let bffError = error as? BFFRequestError else { return BFFRequestError(type: .generic, error: error) }
-            return bffError
+            if let bffError = error as? BFFRequestError { return bffError }
+            if let urlError = error as? URLError, urlError.code == .timedOut {
+                return BFFRequestError(type: .timeout, error: error)
+            }
+            return BFFRequestError(type: .generic, error: error)
         }
     }
 

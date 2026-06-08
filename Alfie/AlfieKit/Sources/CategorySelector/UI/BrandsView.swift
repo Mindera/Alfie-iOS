@@ -158,10 +158,17 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     // MARK: Error View
 
     private var errorView: some View {
-        ErrorView(
-            title: L10n.Shop.Brands.ErrorView.title,
-            message: L10n.Shop.Brands.ErrorView.message
-        )
+        let (title, message): (String, String) = {
+            switch viewModel.state.failure {
+            case .rateLimited:
+                return (L10n.Shop.Brands.ErrorView.RateLimited.title, L10n.Shop.Brands.ErrorView.RateLimited.message)
+            case .serverError:
+                return (L10n.Shop.Brands.ErrorView.ServerError.title, L10n.Shop.Brands.ErrorView.ServerError.message)
+            default:
+                return (L10n.Shop.Brands.ErrorView.title, L10n.Shop.Brands.ErrorView.message)
+            }
+        }()
+        return ErrorView(title: title, message: message)
     }
 
     private var emptySearchResults: some View {

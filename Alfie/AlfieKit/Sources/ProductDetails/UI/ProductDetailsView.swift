@@ -228,8 +228,23 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
             return L10n.Pdp.ErrorView.Generic.message
         case .notFound:
             return L10n.Pdp.ErrorView.NotFound.message
+        case .rateLimited:
+            return L10n.Pdp.ErrorView.RateLimited.message
+        case .serverError:
+            return L10n.Pdp.ErrorView.ServerError.message
         }
         // swiftlint:enable vertical_whitespace_between_cases
+    }
+
+    private var errorTitle: String {
+        switch viewModel.state.failure {
+        case .rateLimited:
+            return L10n.Pdp.ErrorView.RateLimited.title
+        case .serverError:
+            return L10n.Pdp.ErrorView.ServerError.title
+        default:
+            return L10n.Pdp.ErrorView.title
+        }
     }
 }
 
@@ -516,7 +531,7 @@ extension ProductDetailsView {
         ErrorView(
             spacing: Spacing.space500,
             iconSize: Constants.errorViewIconSize,
-            title: theme.font.header.h2(L10n.Pdp.ErrorView.title),
+            title: theme.font.header.h2(errorTitle),
             message: theme.font.paragraph.normal(errorMessage),
             messageColor: Colors.primary.mono600,
             buttons: [

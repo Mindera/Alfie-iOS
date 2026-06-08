@@ -139,10 +139,19 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     private var errorView: some View {
-        ErrorView(
-            title: L10n.Plp.ErrorView.title,
-            message: L10n.Plp.ErrorView.message
-        )
+        let (title, message) = errorCopy(for: viewModel.state.failure)
+        return ErrorView(title: title, message: message)
+    }
+
+    private func errorCopy(for error: ProductListingViewErrorType?) -> (String, String) {
+        switch error {
+        case .rateLimited:
+            return (L10n.Plp.ErrorView.RateLimited.title, L10n.Plp.ErrorView.RateLimited.message)
+        case .serverError:
+            return (L10n.Plp.ErrorView.ServerError.title, L10n.Plp.ErrorView.ServerError.message)
+        case .generic, .noInternet, .noResults, .none:
+            return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
+        }
     }
 }
 

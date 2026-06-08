@@ -236,13 +236,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         do {
             product = try await dependencies.productService.getProduct(id: productId)
-        } catch let error as BFFRequestError where error.isNotFound {
-            dependencies.log.error("Product \(productId) not found.")
-            state = .error(.notFound)
-            return
         } catch {
             dependencies.log.error("Error fetching product \(productId): \(error)")
-            state = .error(.generic)
+            state = .error(ProductDetailsViewErrorType.from(error: error))
             return
         }
 

@@ -107,6 +107,18 @@ public enum L10n {
         /// The page you are looking for doesn’t exist.
         public static let message = L10n.tr("L10n", "pdp.error_view.not_found.message")
       }
+      public enum RateLimited {
+        /// Please wait a moment and try again.
+        public static let message = L10n.tr("L10n", "pdp.error_view.rate_limited.message")
+        /// Too many requests
+        public static let title = L10n.tr("L10n", "pdp.error_view.rate_limited.title")
+      }
+      public enum ServerError {
+        /// We're having trouble reaching our servers. Please try again.
+        public static let message = L10n.tr("L10n", "pdp.error_view.server_error.message")
+        /// Service unavailable
+        public static let title = L10n.tr("L10n", "pdp.error_view.server_error.title")
+      }
     }
     public enum SearchColors {
       /// Search Colours
@@ -131,6 +143,18 @@ public enum L10n {
       public static let message = L10n.tr("L10n", "plp.error_view.message")
       /// Cannot load products
       public static let title = L10n.tr("L10n", "plp.error_view.title")
+      public enum RateLimited {
+        /// Please wait a moment and try again.
+        public static let message = L10n.tr("L10n", "plp.error_view.rate_limited.message")
+        /// Too many requests
+        public static let title = L10n.tr("L10n", "plp.error_view.rate_limited.title")
+      }
+      public enum ServerError {
+        /// We're having trouble reaching our servers. Please try again.
+        public static let message = L10n.tr("L10n", "plp.error_view.server_error.message")
+        /// Service unavailable
+        public static let title = L10n.tr("L10n", "plp.error_view.server_error.title")
+      }
     }
     public enum ListStyle {
       public enum Option {
@@ -276,6 +300,18 @@ public enum L10n {
         public static let message = L10n.tr("L10n", "shop.brands.error_view.message")
         /// Cannot load Brands list
         public static let title = L10n.tr("L10n", "shop.brands.error_view.title")
+        public enum RateLimited {
+          /// Please wait a moment and try again.
+          public static let message = L10n.tr("L10n", "shop.brands.error_view.rate_limited.message")
+          /// Too many requests
+          public static let title = L10n.tr("L10n", "shop.brands.error_view.rate_limited.title")
+        }
+        public enum ServerError {
+          /// We're having trouble reaching our servers. Please try again.
+          public static let message = L10n.tr("L10n", "shop.brands.error_view.server_error.message")
+          /// Service unavailable
+          public static let title = L10n.tr("L10n", "shop.brands.error_view.server_error.title")
+        }
       }
       public enum SearchBar {
         /// Sorry, no results were found for
@@ -294,6 +330,18 @@ public enum L10n {
         public static let message = L10n.tr("L10n", "shop.categories.error_view.message")
         /// Cannot load categories
         public static let title = L10n.tr("L10n", "shop.categories.error_view.title")
+        public enum RateLimited {
+          /// Please wait a moment and try again.
+          public static let message = L10n.tr("L10n", "shop.categories.error_view.rate_limited.message")
+          /// Too many requests
+          public static let title = L10n.tr("L10n", "shop.categories.error_view.rate_limited.title")
+        }
+        public enum ServerError {
+          /// We're having trouble reaching our servers. Please try again.
+          public static let message = L10n.tr("L10n", "shop.categories.error_view.server_error.message")
+          /// Service unavailable
+          public static let title = L10n.tr("L10n", "shop.categories.error_view.server_error.title")
+        }
       }
       public enum Segment {
         /// Categories
@@ -450,11 +498,19 @@ public extension L10n {
       case pdpErrorViewGenericMessage = "pdp.error_view.generic.message"
       case pdpErrorViewGoBackButtonCta = "pdp.error_view.go_back.button.cta"
       case pdpErrorViewNotFoundMessage = "pdp.error_view.not_found.message"
+      case pdpErrorViewRateLimitedMessage = "pdp.error_view.rate_limited.message"
+      case pdpErrorViewRateLimitedTitle = "pdp.error_view.rate_limited.title"
+      case pdpErrorViewServerErrorMessage = "pdp.error_view.server_error.message"
+      case pdpErrorViewServerErrorTitle = "pdp.error_view.server_error.title"
       case pdpSearchColorsPlaceholder = "pdp.search_colors.placeholder"
       case pdpShareProductFromSubject = "pdp.share_product.from.subject"
       case pdpTabControlDescriptionOptionTitle = "pdp.tab_control.description_option.title"
       case plpErrorViewMessage = "plp.error_view.message"
       case plpErrorViewTitle = "plp.error_view.title"
+      case plpErrorViewRateLimitedMessage = "plp.error_view.rate_limited.message"
+      case plpErrorViewRateLimitedTitle = "plp.error_view.rate_limited.title"
+      case plpErrorViewServerErrorMessage = "plp.error_view.server_error.message"
+      case plpErrorViewServerErrorTitle = "plp.error_view.server_error.title"
       case plpListStyleOptionTitle = "plp.list_style.option.title"
       case plpNumberOfResultsMessage = "plp.number_of_results.message"
       case plpRefineButtonCta = "plp.refine.button.cta"
@@ -484,11 +540,19 @@ public extension L10n {
       case shopTitle = "shop.title"
       case shopBrandsErrorViewMessage = "shop.brands.error_view.message"
       case shopBrandsErrorViewTitle = "shop.brands.error_view.title"
+      case shopBrandsErrorViewRateLimitedMessage = "shop.brands.error_view.rate_limited.message"
+      case shopBrandsErrorViewRateLimitedTitle = "shop.brands.error_view.rate_limited.title"
+      case shopBrandsErrorViewServerErrorMessage = "shop.brands.error_view.server_error.message"
+      case shopBrandsErrorViewServerErrorTitle = "shop.brands.error_view.server_error.title"
       case shopBrandsSearchBarNoResultsMessage = "shop.brands.search_bar.no_results_message"
       case shopBrandsSearchBarPlaceholder = "shop.brands.search_bar.placeholder"
       case shopBrandsSegmentTitle = "shop.brands.segment.title"
       case shopCategoriesErrorViewMessage = "shop.categories.error_view.message"
       case shopCategoriesErrorViewTitle = "shop.categories.error_view.title"
+      case shopCategoriesErrorViewRateLimitedMessage = "shop.categories.error_view.rate_limited.message"
+      case shopCategoriesErrorViewRateLimitedTitle = "shop.categories.error_view.rate_limited.title"
+      case shopCategoriesErrorViewServerErrorMessage = "shop.categories.error_view.server_error.message"
+      case shopCategoriesErrorViewServerErrorTitle = "shop.categories.error_view.server_error.title"
       case shopCategoriesSegmentTitle = "shop.categories.segment.title"
       case shopServicesSegmentTitle = "shop.services.segment.title"
       case sortByAlphaAscTitle = "sort_by.alpha_asc.title"
