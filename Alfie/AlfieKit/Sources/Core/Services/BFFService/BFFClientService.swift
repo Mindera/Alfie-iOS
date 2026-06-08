@@ -10,6 +10,8 @@ private enum BFFEndpoint: String {
 }
 
 public final class BFFClientService: BFFClientServiceProtocol {
+    private static let graphqlRateLimitedCodes: Set<String> = ["RATE_LIMITED", "THROTTLED"]
+
     private let apolloClient: ApolloClient
     private let dependencies: BFFClientDependencyContainer
     private let baseUrl: Foundation.URL
@@ -193,11 +195,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             let code = errors.first?.extensions?["code"] as? String
             let message = errors.first?.message
             let type: BFFRequestError.BFFRequestErrorType = {
-                // BFF may surface throttling as HTTP 200 + a GraphQL error with
-                // extensions.code == "RATE_LIMITED" / "THROTTLED" instead of an HTTP
-                // 429. Map to the typed rate-limit case so UI and telemetry handle
-                // it the same way as the HTTP-status path.
-                if let code, code == "RATE_LIMITED" || code == "THROTTLED" {
+                if let code, graphqlRateLimitedCodes.contains(code) {
                     return .rateLimited(retryAfter: nil)
                 }
                 return .generic
