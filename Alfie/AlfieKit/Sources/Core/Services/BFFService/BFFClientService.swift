@@ -57,33 +57,9 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        // TODO: [TEMPORARY MOCK — REMOVE BEFORE MERGE] Replace with the real header-nav once it is
-        // rewired against the new BFF schema (the previous nav query was removed). Until then this
-        // static, in-memory category tree keeps the full UI flow (Categories → PLP → PDP) testable.
-        // Each leaf is a `.listing` whose url is a REAL Shopify collection handle, so the unmodified
-        // BFF `productList` resolves it directly. Do NOT ship — the Categories screen must use the BFF.
-        let categories: [(title: String, handle: String)] = [
-            ("Women", "women"),
-            ("Men", "men"),
-            ("Featured", "frontpage"),
-            ("Tops", "womens-tops"),
-            ("Beauty", "spring-summer"),
-            ("Bags", "womens-bags"),
-            ("Dresses", "dresses"),
-            ("Jackets", "womens-jackets"),
-            ("Jeans", "womens-jeans"),
-        ]
-        return categories.map { category in
-            NavigationItem(
-                type: .listing,
-                title: category.title,
-                url: "/\(category.handle)",
-                media: nil,
-                items: nil,
-                attributes: nil
-            )
-        }
-        // === END LOCAL DEV MOCK ===
+        // The header-nav query was removed from the new BFF schema; this stub keeps the build green
+        // until the Shop Categories screen is rewired against the new BFF — tracked by ALFMOB-387.
+        throw BFFRequestError(type: .generic)
     }
 
     public func getProduct(handle: String) async throws -> Product {
