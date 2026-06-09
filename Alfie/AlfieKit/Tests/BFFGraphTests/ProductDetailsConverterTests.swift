@@ -209,8 +209,10 @@ final class ProductDetailsConverterTests: XCTestCase {
         guard case let .sale(fullPrice, finalPrice) = product.priceType else {
             return XCTFail("Expected .sale, got \(product.priceType)")
         }
-        XCTAssertEqual(fullPrice, "50.00 GBP")
-        XCTAssertEqual(finalPrice, "30.00 GBP")
+        // Locale-aware currency formatting (exact glyph/locale asserted in CurrencyFormatterTests with a
+        // pinned locale; here we mirror the converter's output, host-locale-safe).
+        XCTAssertEqual(fullPrice, Decimal(50).formatted(.currency(code: "GBP").locale(.current)))
+        XCTAssertEqual(finalPrice, Decimal(30).formatted(.currency(code: "GBP").locale(.current)))
     }
 
     func test_compare_at_price_not_above_price_is_not_treated_as_sale() {
