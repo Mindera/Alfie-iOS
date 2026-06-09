@@ -7,31 +7,54 @@ final class CurrencyFormatterTests: XCTestCase {
     // MARK: - minorUnitDigits (ISO-4217 exponent)
 
     func test_minorUnitDigits_perCurrency() {
-        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "GBP"), 2)
-        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "USD"), 2)
-        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "AUD"), 2)
-        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "JPY"), 0)
-        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "KWD"), 3)
-        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "BHD"), 3)
+        let cases: [(code: String, digits: Int)] = [
+            ("GBP", 2), ("USD", 2), ("AUD", 2), ("EUR", 2),
+            ("JPY", 0), ("KWD", 3), ("BHD", 3),
+        ]
+        for entry in cases {
+            XCTAssertEqual(
+                CurrencyFormatter.minorUnitDigits(for: entry.code), entry.digits,
+                "Expected \(entry.digits) minor-unit digits for \(entry.code)"
+            )
+        }
     }
 
     // MARK: - minorUnits (major → integer minor units, per-currency scale)
 
     func test_minorUnits_scalesByCurrencyExponent() {
-        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "10.23")!, currencyCode: "GBP"), 1023)
-        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "25.00")!, currencyCode: "AUD"), 2500)
-        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(5000), currencyCode: "JPY"), 5000)
-        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "19.999")!, currencyCode: "KWD"), 19_999)
+        let cases: [(amount: String, code: String, expected: Int)] = [
+            ("10.23", "GBP", 1023),   // 2dp
+            ("25.00", "AUD", 2500),   // 2dp, whole
+            ("5000", "JPY", 5000),    // 0dp — no ×100
+            ("19.999", "KWD", 19_999), // 3dp
+        ]
+        for entry in cases {
+            let amount = try? XCTUnwrap(Decimal(string: entry.amount))
+            XCTAssertEqual(
+                CurrencyFormatter.minorUnits(of: amount ?? .zero, currencyCode: entry.code), entry.expected,
+                "\(entry.amount) \(entry.code) should scale to \(entry.expected) minor units"
+            )
+        }
     }
 
-    func test_minorUnits_rounds() {
-        // 10.235 GBP → 1023.5 minor → rounds to 1024 (plain/half-up).
+    func test_minorUnits_zeroAndNegative() {
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: .zero, currencyCode: "GBP"), 0)
+        // Negative (e.g. a markdown/credit) must scale and keep sign.
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "-10.50")!, currencyCode: "GBP"), -1050)
+    }
+
+    func test_minorUnits_roundsHalfAwayFromZero() {
+        // x.xx5 at the minor-unit boundary rounds away from zero (.plain), symmetrically.
         XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "10.235")!, currencyCode: "GBP"), 1024)
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "-10.235")!, currencyCode: "GBP"), -1024)
     }
 
     func test_minorUnits_doesNotTruncateBeyondInt32() {
         // £30,000,000 → 3,000,000,000 minor units (> Int32.max) must not overflow/truncate.
-        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "30000000.00")!, currencyCode: "GBP"), 3_000_000_000)
+        XCTAssertEqual(
+            CurrencyFormatter.minorUnits(of: Decimal(string: "30000000.00")!, currencyCode: "GBP"),
+            3_000_000_000
+        )
     }
 
     // MARK: - string (locale/currency-symbol aware)
@@ -56,5 +79,13 @@ final class CurrencyFormatterTests: XCTestCase {
         let result = CurrencyFormatter.string(amount: Decimal(string: "10.23")!, currencyCode: "USD", locale: enGB)
         XCTAssertTrue(result.contains("$"), "Expected a dollar symbol in \(result)")
         XCTAssertTrue(result.contains("10.23"), "Expected two-decimal value in \(result)")
+    }
+
+    func test_string_isLocaleAware_separatorsFollowLocale() {
+        // Same currency, different locale → different grouping/decimal separators.
+        let gb = CurrencyFormatter.string(amount: Decimal(1234.5), currencyCode: "GBP", locale: Locale(identifier: "en_GB"))
+        let de = CurrencyFormatter.string(amount: Decimal(1234.5), currencyCode: "GBP", locale: Locale(identifier: "de_DE"))
+        XCTAssertNotEqual(gb, de, "Formatting should reflect the supplied locale")
+        XCTAssertTrue(gb.contains("1,234.50"), "en_GB groups with ',' and decimals with '.': \(gb)")
     }
 }
