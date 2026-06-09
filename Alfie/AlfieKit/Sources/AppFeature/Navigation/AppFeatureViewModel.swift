@@ -91,6 +91,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let productListingDependencyContainer = ProductListingDependencyContainer(
             productListingService: ProductListingService(
                 productService: serviceProvider.productService,
+                searchService: serviceProvider.searchService,
                 configuration: .init(type: .plp)
             ),
             plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),

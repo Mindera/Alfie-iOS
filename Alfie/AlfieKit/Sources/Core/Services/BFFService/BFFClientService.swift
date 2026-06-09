@@ -108,72 +108,70 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
-    public func productListing(
+    public func productList(
+        collectionHandle: String,
         after: String?,
         limit: Int,
-        categoryId: String?,
-        query: String?,
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
+        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
-        // The screen can be entered as a category listing (`productList`, keyed by
-        // `collectionHandle`) or as search results (`searchProducts`, keyed by
-        // `searchTerm`). Route on whichever identifier is present.
-        if let collectionHandle = categoryId, !collectionHandle.isEmpty {
-            log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+        do {
+            let response = try await executeFetch(
+                BFFGraphAPI.ProductListQuery(
+                    collectionHandle: collectionHandle,
+                    after: after.map { .some($0) } ?? .none,
+                    limit: limit,
+                    filters: resolvedFilters,
+                    sort: .some(.case(resolvedSort))
+                )
+            ).productList
 
-            do {
-                let response = try await executeFetch(
-                    BFFGraphAPI.ProductListQuery(
-                        collectionHandle: collectionHandle,
-                        after: after.map { .some($0) } ?? .none,
-                        limit: limit,
-                        filters: resolvedFilters,
-                        sort: .some(.case(resolvedSort))
-                    )
-                ).productList
+            log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
 
-                log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
-
-                return response.convertToProductListing()
-            } catch {
-                log.error("productList failed: \(error)")
-                throw error
-            }
+            return response.convertToProductListing()
+        } catch {
+            log.error("productList failed: \(error)")
+            throw error
         }
+    }
 
-        if let searchTerm = query, !searchTerm.isEmpty {
-            // Unlike `productList` (which the BFF defaults to Shopify when no platform is sent),
-            // `searchProducts` rejects a request with no platform — so send the predefined one.
-            let platform = BFFPlatform.predefined
-            log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+    public func searchProducts(
+        searchTerm: String,
+        after: String?,
+        limit: Int,
+        sort: String?,
+        filters: ProductFilterInput?
+    ) async throws -> ProductListing {
+        let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
+        let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
+        // Unlike `productList` (which the BFF defaults to Shopify when no platform is sent),
+        // `searchProducts` rejects a request with no platform — so send the predefined one.
+        let platform = BFFPlatform.predefined
+        log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
-            do {
-                let response = try await executeFetch(
-                    BFFGraphAPI.SearchProductsQuery(
-                        searchTerm: searchTerm,
-                        platform: platform.rawValue,
-                        after: after.map { .some($0) } ?? .none,
-                        limit: limit,
-                        filters: resolvedFilters,
-                        sort: .some(.case(resolvedSort))
-                    )
-                ).searchProducts
+        do {
+            let response = try await executeFetch(
+                BFFGraphAPI.SearchProductsQuery(
+                    searchTerm: searchTerm,
+                    platform: platform.rawValue,
+                    after: after.map { .some($0) } ?? .none,
+                    limit: limit,
+                    filters: resolvedFilters,
+                    sort: .some(.case(resolvedSort))
+                )
+            ).searchProducts
 
-                log.info("searchProducts ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+            log.info("searchProducts ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
 
-                return response.convertToProductListing()
-            } catch {
-                log.error("searchProducts failed: \(error)")
-                throw error
-            }
+            return response.convertToProductListing()
+        } catch {
+            log.error("searchProducts failed: \(error)")
+            throw error
         }
-
-        log.error("productListing called without a collectionHandle or searchTerm; returning noProducts.")
-        throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
     }
 
     public func getBrands() async throws -> [Brand] {

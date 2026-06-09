@@ -143,8 +143,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         let productListing: ProductListing?
 
         do {
-            productListing = try await dependencies.productListingService
-                .page(after: nil, categoryId: category, query: query, sort: sortOption, filters: filters)
+            productListing = try await fetchPage(after: nil)
         } catch {
             dependencies.log.error("Error fetching product listing (first page): \(error)")
             state = .error(ProductListingViewErrorType.from(error: error))
@@ -173,8 +172,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         let productListing: ProductListing?
 
         do {
-            productListing = try await dependencies.productListingService
-                .page(after: pagination?.endCursor, categoryId: category, query: query, sort: sortOption, filters: filters)
+            productListing = try await fetchPage(after: pagination?.endCursor)
         } catch {
             dependencies.log.error("Error fetching product listing (following page): \(error)")
             state = .error(ProductListingViewErrorType.from(error: error))
@@ -188,6 +186,30 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         pagination = productListing.pagination
         state = .success(.init(title: title, products: model.products + productListing.products))
+    }
+
+    /// Routes a page request to the right operation for the screen's mode: category
+    /// browsing hits `productList`, search results hit `searchProducts`. Returns nil when
+    /// the key required for the current mode is missing, which callers surface as no-results.
+    private func fetchPage(after: String?) async throws -> ProductListing? {
+        switch mode {
+        case .listing:
+            guard let collectionHandle = category else { return nil }
+            return try await dependencies.productListingService.productListPage(
+                collectionHandle: collectionHandle,
+                after: after,
+                sort: sortOption,
+                filters: filters
+            )
+        case .searchResults:
+            guard let searchTerm = query else { return nil }
+            return try await dependencies.productListingService.searchPage(
+                searchTerm: searchTerm,
+                after: after,
+                sort: sortOption,
+                filters: filters
+            )
+        }
     }
 }
 

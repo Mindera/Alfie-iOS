@@ -1,7 +1,7 @@
 import Foundation
 import Model
 
-public final class ProductService: ProductServiceProtocol {
+public final class SearchService: SearchServiceProtocol {
     private let bffClient: BFFClientServiceProtocol
 
     // MARK: - Public
@@ -10,26 +10,16 @@ public final class ProductService: ProductServiceProtocol {
         self.bffClient = bffClient
     }
 
-    public func getProduct(handle: String) async throws -> Product {
-        do {
-            return try await bffClient.getProduct(handle: handle)
-        } catch let error as BFFRequestError where error.isNotFound {
-            throw BFFRequestError(type: .product(.noProduct))
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
-    }
-
-    public func productList(
-        collectionHandle: String,
+    public func searchProducts(
+        searchTerm: String,
         after: String?,
         limit: Int,
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
         do {
-            return try await bffClient.productList(
-                collectionHandle: collectionHandle,
+            return try await bffClient.searchProducts(
+                searchTerm: searchTerm,
                 after: after,
                 limit: limit,
                 sort: sort,
@@ -41,7 +31,7 @@ public final class ProductService: ProductServiceProtocol {
             // the UI can render an error state rather than a misleading empty list.
             switch error.type {
             case .emptyResponse, .product(.noProducts):
-                throw BFFRequestError(type: .product(.noProducts(category: collectionHandle, query: nil, sort: sort)))
+                throw BFFRequestError(type: .product(.noProducts(category: nil, query: searchTerm, sort: sort)))
             default:
                 throw BFFRequestError(type: .product(.generic))
             }

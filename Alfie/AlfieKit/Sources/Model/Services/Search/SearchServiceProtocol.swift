@@ -1,9 +1,8 @@
 import Foundation
 
-public protocol ProductServiceProtocol {
-    func getProduct(handle: String) async throws -> Product
-    func productList(
-        collectionHandle: String,
+public protocol SearchServiceProtocol {
+    func searchProducts(
+        searchTerm: String,
         after: String?,
         limit: Int,
         sort: String?,

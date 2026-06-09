@@ -17,6 +17,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var userDefaults: UserDefaultsProtocol
     public var productService: ProductServiceProtocol
     public var brandsService: BrandsServiceProtocol
+    public var searchService: SearchServiceProtocol
     public var webUrlProvider: WebURLProviderProtocol
     public var notificationsService: NotificationsServiceProtocol
     public var webViewConfigurationService: WebViewConfigurationServiceProtocol
@@ -38,6 +39,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         userDefaults: UserDefaultsProtocol = MockUserDefaults(),
         productService: ProductServiceProtocol = MockProductService(),
         brandsService: BrandsServiceProtocol = MockBrandsService(),
+        searchService: SearchServiceProtocol = MockSearchService(),
         webUrlProvider: WebURLProviderProtocol = MockWebUrlProvider(),
         notificationsService: NotificationsServiceProtocol = MockNotificationsServiceProtocol(),
         webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService(),
@@ -58,6 +60,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         self.userDefaults = userDefaults
         self.productService = productService
         self.brandsService = brandsService
+        self.searchService = searchService
         self.webUrlProvider = webUrlProvider
         self.notificationsService = notificationsService
         self.webViewConfigurationService = webViewConfigurationService
