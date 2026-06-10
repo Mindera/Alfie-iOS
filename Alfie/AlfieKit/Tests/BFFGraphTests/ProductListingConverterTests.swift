@@ -112,7 +112,7 @@ final class ProductListingConverterTests: XCTestCase {
         XCTAssertEqual(kwd.amount, 19_999, "KWD is 3-decimal — must ×1000")
     }
 
-    func test_money_nonFinite_amount_does_not_crash_and_yields_zero() throws {
+    func test_money_non_finite_amount_does_not_crash_and_yields_zero() throws {
         // Malformed/non-finite BFF amount must be guarded (Decimal(inf) traps, Decimal(nan) overflows).
         let mapped = try XCTUnwrap(makeResponse(amount: .nan)
             .convertToProductListing().products.first?.priceRange?.low.amount)
