@@ -22,3 +22,30 @@ query ProductListQuery(
         }
     }
 }
+
+query SearchProductsQuery(
+    $searchTerm: String!,
+    $platform: String!,
+    $after: String,
+    $limit: Int!,
+    $filters: ProductFilterInput,
+    $sort: ProductSortEnum = NEWEST
+) {
+    searchProducts(
+        searchTerm: $searchTerm,
+        platform: $platform,
+        after: $after,
+        limit: $limit,
+        filters: $filters,
+        sort: $sort
+    ) {
+        totalCount
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+        products {
+            ...ProductListItemFragment
+        }
+    }
+}

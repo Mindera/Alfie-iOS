@@ -1,7 +1,11 @@
 import Foundation
 
 public protocol SearchServiceProtocol {
-    var suggestionsDebounceInterval: DispatchQueue.SchedulerTimeType.Stride { get }
-
-    func getSuggestion(term: String) async throws -> SearchSuggestion
+    func searchProducts(
+        searchTerm: String,
+        after: String?,
+        limit: Int,
+        sort: String?,
+        filters: ProductFilterInput?
+    ) async throws -> ProductListing
 }

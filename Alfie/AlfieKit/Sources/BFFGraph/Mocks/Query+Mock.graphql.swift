@@ -12,16 +12,19 @@ class Query: MockObject {
   struct MockFields {
     @Field<OmniProduct>("productDetails") public var productDetails
     @Field<ProductListResponse>("productList") public var productList
+    @Field<ProductListResponse>("searchProducts") public var searchProducts
   }
 }
 
 extension Mock where O == Query {
   convenience init(
     productDetails: Mock<OmniProduct>? = nil,
-    productList: Mock<ProductListResponse>? = nil
+    productList: Mock<ProductListResponse>? = nil,
+    searchProducts: Mock<ProductListResponse>? = nil
   ) {
     self.init()
     _setEntity(productDetails, for: \.productDetails)
     _setEntity(productList, for: \.productList)
+    _setEntity(searchProducts, for: \.searchProducts)
   }
 }

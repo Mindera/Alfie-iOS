@@ -12,9 +12,15 @@ public final class MockProductService: ProductServiceProtocol {
         return product
     }
 
-    public var onProductListingCalled: ((String?, Int, String?, String?, String?, ProductFilterInput?) throws -> ProductListing)?
-    public func productListing(after: String?, limit: Int, categoryId: String?, query: String?, sort: String?, filters: ProductFilterInput?) async throws -> ProductListing {
-        guard let productListing = try onProductListingCalled?(after, limit, categoryId, query, sort, filters) else {
+    public var onProductListCalled: ((String, String?, Int, String?, ProductFilterInput?) throws -> ProductListing)?
+    public func productList(
+        collectionHandle: String,
+        after: String?,
+        limit: Int,
+        sort: String?,
+        filters: ProductFilterInput?
+    ) async throws -> ProductListing {
+        guard let productListing = try onProductListCalled?(collectionHandle, after, limit, sort, filters) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return productListing

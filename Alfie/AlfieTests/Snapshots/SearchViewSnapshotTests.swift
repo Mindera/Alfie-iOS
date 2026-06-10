@@ -30,57 +30,8 @@ final class SearchViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    func test_searchView_loadingState() {
-        mockSearchViewModel.state = .loading
-        assertSnapshot(of: sut.embededInContainer(),
-                       as: .defaultImage(),
-                       record: isRecording)
-    }
-
-    func test_searchView_noResultsState() {
-        mockSearchViewModel.searchText = "polo"
-        mockSearchViewModel.state = .noResults
-        assertSnapshot(of: sut.embededInContainer(),
-                       as: .defaultImage(),
-                       record: isRecording)
-    }
-
-    func test_search_view_success_state() {
-        mockSearchViewModel.state = .success(suggestion: .fixture())
-        mockSearchViewModel.searchText = "polo"
-        mockSearchViewModel.suggestionTerms = [.fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")]
-        mockSearchViewModel.suggestionBrands = [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")]
-        mockSearchViewModel.suggestionProducts = Product.fixtures(includeMedia: false)
-        assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
-                       record: isRecording)
-    }
-
-    func test_search_view_success_state_no_terms() {
-        mockSearchViewModel.state = .success(suggestion: .fixture())
-        mockSearchViewModel.searchText = "polo"
-        mockSearchViewModel.suggestionBrands = [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")]
-        mockSearchViewModel.suggestionProducts = Product.fixtures(includeMedia: false)
-        assertSnapshot(of: sut.embededInContainer(),
-                       as: .defaultImage(),
-                       record: isRecording)
-    }
-
-    func test_search_view_success_state_no_brands() {
-        mockSearchViewModel.state = .success(suggestion: .fixture())
-        mockSearchViewModel.searchText = "polo"
-        mockSearchViewModel.suggestionTerms = [.fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")]
-        mockSearchViewModel.suggestionProducts = Product.fixtures(includeMedia: false)
-        assertSnapshot(of: sut.embededInContainer(),
-                       as: .defaultImage(),
-                       record: isRecording)
-    }
-
-    func test_search_view_success_state_no_products() {
-        mockSearchViewModel.state = .success(suggestion: .fixture())
-        mockSearchViewModel.searchText = "polo"
-        mockSearchViewModel.suggestionTerms = [.fixture(term: "Polo shirt"), .fixture(term: "Apolo Denim"), .fixture(term: "Casual polos")]
-        mockSearchViewModel.suggestionBrands = [.fixture(name: "Polo by Ralph Lauren"), .fixture(name: "Apolo Denim")]
+    func test_searchView_recentSearchesState() {
+        mockSearchViewModel.state = .recentSearches
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)

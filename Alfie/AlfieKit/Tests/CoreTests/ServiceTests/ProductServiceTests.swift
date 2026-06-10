@@ -63,16 +63,16 @@ final class ProductServiceTests: XCTestCase {
         }
     }
 
-    // MARK: - Get Product List
+    // MARK: - Product List
 
-    func test_productListing_maps_emptyResponse_to_noProducts() async {
-        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
+    func test_productList_maps_emptyResponse_to_noProducts() async {
+        mockClientService.onProductListCalled = { _, _, _, _, _ in
             throw BFFRequestError(type: .emptyResponse)
         }
 
         do {
-            _ = try await sut.productListing(after: nil, limit: 1, categoryId: "c", query: nil, sort: nil, filters: nil)
-            XCTFail("Expected productListing to throw")
+            _ = try await sut.productList(collectionHandle: "c", after: nil, limit: 1, sort: nil, filters: nil)
+            XCTFail("Expected productList to throw")
         } catch let error as BFFRequestError {
             guard case .product(.noProducts) = error.type else {
                 XCTFail("Expected .product(.noProducts), got \(error.type)")
@@ -83,14 +83,14 @@ final class ProductServiceTests: XCTestCase {
         }
     }
 
-    func test_productListing_maps_other_bff_errors_to_generic_product_error() async {
-        mockClientService.onProductListingCalled = { _, _, _, _, _, _ in
+    func test_productList_maps_other_bff_errors_to_generic_product_error() async {
+        mockClientService.onProductListCalled = { _, _, _, _, _ in
             throw BFFRequestError(type: .generic)
         }
 
         do {
-            _ = try await sut.productListing(after: nil, limit: 1, categoryId: "c", query: nil, sort: nil, filters: nil)
-            XCTFail("Expected productListing to throw")
+            _ = try await sut.productList(collectionHandle: "c", after: nil, limit: 1, sort: nil, filters: nil)
+            XCTFail("Expected productList to throw")
         } catch let error as BFFRequestError {
             XCTAssertEqual(error.type, .product(.generic))
         } catch {
@@ -98,28 +98,26 @@ final class ProductServiceTests: XCTestCase {
         }
     }
 
-    func test_get_productList_calls_bff_service() async throws {
-        var captured: ProductListingCall?
-        mockClientService.onProductListingCalled = { after, limit, categoryId, query, sort, filters in
-            captured = ProductListingCall(after: after, limit: limit, categoryId: categoryId, query: query, sort: sort, filters: filters)
+    func test_productList_calls_bff_service() async throws {
+        var captured: ProductListCall?
+        mockClientService.onProductListCalled = { collectionHandle, after, limit, sort, filters in
+            captured = ProductListCall(collectionHandle: collectionHandle, after: after, limit: limit, sort: sort, filters: filters)
             return ProductListing.fixture()
         }
         let filters = ProductFilterInput(brandNames: ["Acme"])
 
-        _ = try await sut.productListing(
+        _ = try await sut.productList(
+            collectionHandle: "category id",
             after: "cursor-1",
             limit: 2,
-            categoryId: "category id",
-            query: "query",
             sort: "sort",
             filters: filters
         )
 
         let call = try XCTUnwrap(captured)
+        XCTAssertEqual(call.collectionHandle, "category id")
         XCTAssertEqual(call.after, "cursor-1")
         XCTAssertEqual(call.limit, 2)
-        XCTAssertEqual(call.categoryId, "category id")
-        XCTAssertEqual(call.query, "query")
         XCTAssertEqual(call.sort, "sort")
         XCTAssertEqual(call.filters, filters)
     }
@@ -127,11 +125,10 @@ final class ProductServiceTests: XCTestCase {
 
 // MARK: - Helpers
 
-private struct ProductListingCall {
+private struct ProductListCall {
+    let collectionHandle: String
     let after: String?
     let limit: Int
-    let categoryId: String?
-    let query: String?
     let sort: String?
     let filters: ProductFilterInput?
 }

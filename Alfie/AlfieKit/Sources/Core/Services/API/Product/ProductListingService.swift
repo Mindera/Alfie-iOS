@@ -6,27 +6,46 @@ import Model
 /// the previous response and passing the cursor back in as `after`.
 public final class ProductListingService: ProductListingServiceProtocol {
     private let productService: ProductServiceProtocol
+    private let searchService: SearchServiceProtocol
     private let configuration: PaginationConfiguration
 
     // MARK: - Public
 
-    public init(productService: ProductServiceProtocol, configuration: PaginationConfiguration) {
+    public init(
+        productService: ProductServiceProtocol,
+        searchService: SearchServiceProtocol,
+        configuration: PaginationConfiguration
+    ) {
         self.productService = productService
+        self.searchService = searchService
         self.configuration = configuration
     }
 
-    public func page(
+    public func productListPage(
+        collectionHandle: String,
         after: String?,
-        categoryId: String? = nil,
-        query: String? = nil,
-        sort: String? = nil,
-        filters: ProductFilterInput? = nil
+        sort: String?,
+        filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        try await productService.productListing(
+        try await productService.productList(
+            collectionHandle: collectionHandle,
             after: after,
             limit: configuration.pageSize,
-            categoryId: categoryId,
-            query: query,
+            sort: sort,
+            filters: filters
+        )
+    }
+
+    public func searchPage(
+        searchTerm: String,
+        after: String?,
+        sort: String?,
+        filters: ProductFilterInput?
+    ) async throws -> ProductListing {
+        try await searchService.searchProducts(
+            searchTerm: searchTerm,
+            after: after,
+            limit: configuration.pageSize,
             sort: sort,
             filters: filters
         )

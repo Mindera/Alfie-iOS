@@ -19,6 +19,22 @@ extension BFFGraphAPI.ProductListQuery.Data.ProductList {
     }
 }
 
+extension BFFGraphAPI.SearchProductsQuery.Data.SearchProducts {
+    public func convertToProductListing() -> ProductListing {
+        let mappedProducts = products.map { $0.fragments.productListItemFragment.convertToProduct() }
+        let pagination = ProductListing.Pagination(
+            totalCount: totalCount,
+            endCursor: pageInfo?.endCursor,
+            hasNextPage: pageInfo?.hasNextPage ?? false
+        )
+        return ProductListing(
+            title: "",
+            pagination: pagination,
+            products: mappedProducts
+        )
+    }
+}
+
 extension BFFGraphAPI.ProductListItemFragment {
     func convertToProduct() -> Product {
         let lowMoney = priceRange.minVariantPrice.fragments.moneyFragment.toDomainMoney()

@@ -108,24 +108,13 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
-    public func productListing(
+    public func productList(
+        collectionHandle: String,
         after: String?,
         limit: Int,
-        categoryId: String?,
-        query: String?,
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        // `productList` requires a `collectionHandle`. The PLP screen can be entered in
-        // `.searchResults` mode with `categoryId == nil` — that path needs to call the
-        // BFF's `searchProducts` query instead, which is owned by ALFMOB-333. Until that
-        // lands we surface a typed "no products" error rather than firing a request the
-        // BFF will reject.
-        guard let collectionHandle = categoryId, !collectionHandle.isEmpty else {
-            log.error("productList called without a collectionHandle (search-mode wiring pending ALFMOB-333); returning noProducts.")
-            throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
-        }
-
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
         log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
@@ -150,14 +139,44 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func searchProducts(
+        searchTerm: String,
+        after: String?,
+        limit: Int,
+        sort: String?,
+        filters: ProductFilterInput?
+    ) async throws -> ProductListing {
+        let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
+        let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
+        // Unlike `productList` (which the BFF defaults to Shopify when no platform is sent),
+        // `searchProducts` rejects a request with no platform — so send the predefined one.
+        let platform = BFFPlatform.predefined
+        log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+
+        do {
+            let response = try await executeFetch(
+                BFFGraphAPI.SearchProductsQuery(
+                    searchTerm: searchTerm,
+                    platform: platform.rawValue,
+                    after: after.map { .some($0) } ?? .none,
+                    limit: limit,
+                    filters: resolvedFilters,
+                    sort: .some(.case(resolvedSort))
+                )
+            ).searchProducts
+
+            log.info("searchProducts ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+
+            return response.convertToProductListing()
+        } catch {
+            log.error("searchProducts failed: \(error)")
+            throw error
+        }
+    }
+
     public func getBrands() async throws -> [Brand] {
         // ALFMOB-331: BFF schema migration. The new schema removed the brands query;
         // a follow-up will reintroduce/replace it.
-        throw BFFRequestError(type: .generic)
-    }
-
-    public func getSearchSuggestion(term: String) async throws -> SearchSuggestion {
-        // ALFMOB-331: BFF schema migration. Search migration is tracked by ALFMOB-333.
         throw BFFRequestError(type: .generic)
     }
 
