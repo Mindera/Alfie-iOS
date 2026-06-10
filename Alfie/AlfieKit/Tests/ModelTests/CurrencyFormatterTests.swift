@@ -22,7 +22,7 @@ final class CurrencyFormatterTests: XCTestCase {
 
     // MARK: - minorUnits (major → integer minor units, per-currency scale)
 
-    func test_minor_units_scales_by_currency_exponent() {
+    func test_minor_units_scales_by_currency_exponent() throws {
         let cases: [(amount: String, code: String, expected: Int)] = [
             ("10.23", "GBP", 1023),    // 2dp
             ("25.00", "AUD", 2500),    // 2dp, whole
@@ -30,9 +30,9 @@ final class CurrencyFormatterTests: XCTestCase {
             ("19.999", "KWD", 19_999), // 3dp
         ]
         for entry in cases {
-            let amount = try? XCTUnwrap(Decimal(string: entry.amount))
+            let amount = try XCTUnwrap(Decimal(string: entry.amount), "Unparseable test literal: \(entry.amount)")
             XCTAssertEqual(
-                CurrencyFormatter.minorUnits(of: amount ?? .zero, currencyCode: entry.code), entry.expected,
+                CurrencyFormatter.minorUnits(of: amount, currencyCode: entry.code), entry.expected,
                 "\(entry.amount) \(entry.code) should scale to \(entry.expected) minor units"
             )
         }

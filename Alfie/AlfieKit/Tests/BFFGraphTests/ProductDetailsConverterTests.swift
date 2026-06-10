@@ -209,11 +209,14 @@ final class ProductDetailsConverterTests: XCTestCase {
         guard case let .sale(fullPrice, finalPrice) = product.priceType else {
             return XCTFail("Expected .sale, got \(product.priceType)")
         }
-        // Locale-independent: this test owns "is it a sale with was > now", not glyph formatting
-        // (exact symbol/separators are covered in CurrencyFormatterTests with pinned locales).
-        XCTAssertTrue(fullPrice.contains("50"), "was-price should reflect 50, got \(fullPrice)")
-        XCTAssertTrue(finalPrice.contains("30"), "now-price should reflect 30, got \(finalPrice)")
-        XCTAssertNotEqual(fullPrice, finalPrice)
+        // Precise + locale-independent: assert exact minor-unit values, and that the sale maps
+        // was→fullPrice / now→finalPrice using each Money's own formatted string. (Glyph/separator
+        // formatting per locale is covered in CurrencyFormatterTests with pinned locales.)
+        let price = product.defaultVariant.price
+        XCTAssertEqual(price.was?.amount, 5000)
+        XCTAssertEqual(price.amount.amount, 3000)
+        XCTAssertEqual(fullPrice, price.was?.amountFormatted)
+        XCTAssertEqual(finalPrice, price.amount.amountFormatted)
     }
 
     func test_compare_at_price_not_above_price_is_not_treated_as_sale() {
