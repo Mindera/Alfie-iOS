@@ -34,7 +34,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     // MARK: - Internal Properties
 
     public var isSearchSubmissionAllowed: Bool {
-        !searchText.isEmpty
+        !searchText.trim().isEmpty
     }
 
     private let navigate: (SearchRoute) -> Void

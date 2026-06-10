@@ -89,6 +89,14 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertTrue(sut.isSearchSubmissionAllowed)
     }
 
+    func test_isSearchSubmissionAllowed_isFalseForWhitespaceOnlyText() {
+        let sut = makeSUT()
+
+        sut.searchText = "   "
+
+        XCTAssertFalse(sut.isSearchSubmissionAllowed)
+    }
+
     func test_onSubmitSearch_withTerm_navigatesToProductListingWithSearchTerm() {
         var capturedRoute: SearchRoute?
         let sut = makeSUT(navigate: { capturedRoute = $0 })
@@ -150,6 +158,24 @@ final class SearchViewModelTests: XCTestCase {
     }
 
     // MARK: - Lifecycle
+
+    func test_viewDidAppear_withRecentSearches_setsRecentSearchesState() {
+        mockRecentsService.recentSearches = [.text(value: "polo")]
+        let sut = makeSUT()
+        sut.state = .empty
+
+        sut.viewDidAppear()
+
+        XCTAssertEqual(sut.state, .recentSearches)
+    }
+
+    func test_viewDidAppear_withoutRecentSearches_doesNotChangeState() {
+        let sut = makeSUT()
+
+        sut.viewDidAppear()
+
+        XCTAssertEqual(sut.state, .empty)
+    }
 
     func test_viewDidDisappear_savesRecentSearches() {
         var saved = false
