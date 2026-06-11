@@ -107,7 +107,7 @@ final class ProductListingConverterTests: XCTestCase {
     }
 
     func test_money_rounding_edge_cases() throws {
-        // Float→Int via `Int((amount * 100).rounded())` — boundary cases prove the
+        // BFF Double → Decimal → minor units (×10^exponent). For GBP (2dp) these prove the
         // rounding behaviour we depend on for currency representation.
         let cases: [(amount: Double, expectedMinorUnits: Int)] = [
             (0.00, 0),
@@ -126,6 +126,25 @@ final class ProductListingConverterTests: XCTestCase {
                 "amount \(amount) should round to \(expectedMinorUnits) minor units, got \(mapped)"
             )
         }
+    }
+
+    func test_money_scales_minor_units_by_currency_exponent() throws {
+        // Minor-unit scaling must follow the currency's exponent, not a hardcoded ×100.
+        let jpy = try XCTUnwrap(makeResponse(amount: 5000, currencyCode: "JPY")
+            .convertToProductListing().products.first?.priceRange?.low)
+        XCTAssertEqual(jpy.amount, 5000, "JPY is 0-decimal — must not ×100")
+        XCTAssertEqual(jpy.currencyCode, "JPY")
+
+        let kwd = try XCTUnwrap(makeResponse(amount: 19.999, currencyCode: "KWD")
+            .convertToProductListing().products.first?.priceRange?.low)
+        XCTAssertEqual(kwd.amount, 19_999, "KWD is 3-decimal — must ×1000")
+    }
+
+    func test_money_non_finite_amount_does_not_crash_and_yields_zero() throws {
+        // Malformed/non-finite BFF amount must be guarded (Decimal(inf) traps, Decimal(nan) overflows).
+        let mapped = try XCTUnwrap(makeResponse(amount: .nan)
+            .convertToProductListing().products.first?.priceRange?.low.amount)
+        XCTAssertEqual(mapped, 0)
     }
 
     func test_invalid_primary_image_url_yields_no_media() throws {
