@@ -2,11 +2,10 @@ import Foundation
 
 public protocol ProductServiceProtocol {
     func getProduct(handle: String) async throws -> Product
-    func productListing(
+    func productList(
+        collectionHandle: String,
         after: String?,
         limit: Int,
-        categoryId: String?,
-        query: String?,
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing

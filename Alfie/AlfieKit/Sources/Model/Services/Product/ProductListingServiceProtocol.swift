@@ -4,10 +4,16 @@ import Foundation
 /// `@MainActor` ViewModel): pass `after: nil` for the first page, then thread
 /// `response.pagination.endCursor` back in as long as `pagination.hasNextPage` is true.
 public protocol ProductListingServiceProtocol {
-    func page(
+    func productListPage(
+        collectionHandle: String,
         after: String?,
-        categoryId: String?,
-        query: String?,
+        sort: String?,
+        filters: ProductFilterInput?
+    ) async throws -> ProductListing
+
+    func searchPage(
+        searchTerm: String,
+        after: String?,
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing

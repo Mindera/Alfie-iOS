@@ -20,20 +20,18 @@ public final class ProductService: ProductServiceProtocol {
         }
     }
 
-    public func productListing(
+    public func productList(
+        collectionHandle: String,
         after: String?,
         limit: Int,
-        categoryId: String?,
-        query: String?,
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
         do {
-            return try await bffClient.productListing(
+            return try await bffClient.productList(
+                collectionHandle: collectionHandle,
                 after: after,
                 limit: limit,
-                categoryId: categoryId,
-                query: query,
                 sort: sort,
                 filters: filters
             )
@@ -43,7 +41,7 @@ public final class ProductService: ProductServiceProtocol {
             // the UI can render an error state rather than a misleading empty list.
             switch error.type {
             case .emptyResponse, .product(.noProducts):
-                throw BFFRequestError(type: .product(.noProducts(category: categoryId, query: query, sort: sort)))
+                throw BFFRequestError(type: .product(.noProducts(category: collectionHandle, query: nil, sort: sort)))
             default:
                 throw BFFRequestError(type: .product(.generic))
             }
