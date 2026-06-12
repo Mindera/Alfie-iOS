@@ -383,6 +383,20 @@ final class ProductDetailsViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: .default)
     }
 
+    func test_deep_link_entry_fetches_using_slug_handle() {
+        initViewModel(configuration: .deepLink(handle: "nice-shirt-26146503"))
+
+        let expectation = expectation(description: "Wait for service call")
+        mockProductService.onGetProductCalled = { handle in
+            XCTAssertEqual(handle, "nice-shirt-26146503")
+            expectation.fulfill()
+            return .fixture()
+        }
+
+        sut.viewDidAppear()
+        wait(for: [expectation], timeout: .default)
+    }
+
     func test_product_is_not_fetched_when_view_appears_if_already_fetched() {
         let productId = "1"
         initViewModel(configuration: .id(productId))
