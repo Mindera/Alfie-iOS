@@ -1,4 +1,3 @@
-import AlicerceLogging
 import Model
 import XCTest
 @testable import DeepLink
@@ -14,7 +13,7 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         linkConfig = .init()
-        sut = .init(configuration: linkConfig, log: Log.DummyLogger())
+        sut = .init(configuration: linkConfig)
     }
 
     override func tearDownWithError() throws {
