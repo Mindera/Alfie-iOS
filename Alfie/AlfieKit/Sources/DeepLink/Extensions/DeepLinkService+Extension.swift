@@ -8,7 +8,7 @@ public extension DeepLinkService {
         let parsers: [DeepLinkParserProtocol] = [
             InternalDeepLinkParser(configuration: configuration),
             ProductListingDeepLinkParser(configuration: configuration),
-            ProductDetailsDeepLinkParser(configuration: configuration),
+            ProductDetailsDeepLinkParser(configuration: configuration, log: log),
             DefaultDeepLinkParser(configuration: configuration),
         ] // Order is important!
         self.init(parsers: parsers, configuration: configuration, log: log)

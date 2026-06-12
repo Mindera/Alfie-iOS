@@ -1,3 +1,4 @@
+import AlicerceLogging
 import Model
 import XCTest
 @testable import DeepLink
@@ -13,7 +14,7 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         linkConfig = .init()
-        sut = .init(configuration: linkConfig)
+        sut = .init(configuration: linkConfig, log: Log.DummyLogger())
     }
 
     override func tearDownWithError() throws {
@@ -44,9 +45,7 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
         let testLinks = [
             "\(Self.httpUrl)/products",
             "\(Self.httpUrl)/products/polo-26146503?nav=885035/",
-            "\(Self.httpUrl)/product/polo-26146503-suffix-not-expected",
-            "\(Self.httpUrl)/product/polo-short-product-id-12345",
-            "\(Self.httpUrl)/product/polo-long-product-id-1234567",
+            "\(Self.httpUrl)/product/",
         ]
 
         try assertNoParse(testLinks)
@@ -55,24 +54,15 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
 
     // MARK: - Product Links
 
-    func test_parses_product_links_with_id_only_as_pdp() throws {
+    func test_parses_product_links_with_numeric_slug_as_pdp() throws {
         let testLinks = [
             "\(Self.httpUrl)/product/26146503",
             "\(Self.httpUrl)/product/24449925?something=test",
             "\(Self.httpUrl)/product/25562382?#ins_sr=eyJwcm9kdWN0SWQiOiIyNTU2MjM4MiJ9",
         ]
-        try assertParse(testLinks[0],
-                        id: "26146503",
-                        description: "",
-                        route: nil)
-        try assertParse(testLinks[1],
-                        id: "24449925",
-                        description: "",
-                        route: nil)
-        try assertParse(testLinks[2],
-                        id: "25562382",
-                        description: "",
-                        route: nil)
+        try assertParse(testLinks[0], slug: "26146503", route: nil)
+        try assertParse(testLinks[1], slug: "24449925", route: nil)
+        try assertParse(testLinks[2], slug: "25562382", route: nil)
     }
 
     func test_ignores_casing_when_parsing_product_links() throws {
@@ -81,41 +71,23 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
             "\(Self.httpUrl)/PRODUCT/24449925",
             "\(Self.httpUrl)/pRoDuCt/25562382",
         ]
-        try assertParse(testLinks[0],
-                        id: "26146503",
-                        description: "",
-                        route: nil)
-        try assertParse(testLinks[1],
-                        id: "24449925",
-                        description: "",
-                        route: nil)
-        try assertParse(testLinks[2],
-                        id: "25562382",
-                        description: "",
-                        route: nil)
+        try assertParse(testLinks[0], slug: "26146503", route: nil)
+        try assertParse(testLinks[1], slug: "24449925", route: nil)
+        try assertParse(testLinks[2], slug: "25562382", route: nil)
     }
 
-    func test_parses_product_links_with_id_and_route_only_as_pdp() throws {
+    func test_parses_product_links_with_numeric_slug_and_route_as_pdp() throws {
         let testLinks = [
             "\(Self.httpUrl)/product/26146503?nav=885035",
             "\(Self.httpUrl)/product/24449925?something=test&nav=885035",
             "\(Self.httpUrl)/product/25562382?nav=927986#ins_sr=eyJwcm9kdWN0SWQiOiIyNTU2MjM4MiJ9",
         ]
-        try assertParse(testLinks[0],
-                        id: "26146503",
-                        description: "",
-                        route: "885035")
-        try assertParse(testLinks[1],
-                        id: "24449925",
-                        description: "",
-                        route: "885035")
-        try assertParse(testLinks[2],
-                        id: "25562382",
-                        description: "",
-                        route: "927986")
+        try assertParse(testLinks[0], slug: "26146503", route: "885035")
+        try assertParse(testLinks[1], slug: "24449925", route: "885035")
+        try assertParse(testLinks[2], slug: "25562382", route: "927986")
     }
 
-    func test_parses_product_links_with_description_and_route_as_pdp() throws {
+    func test_parses_product_links_with_slug_and_route_as_pdp() throws {
         let testLinks = [
             "\(Self.httpUrl)/product/polo-ralph-lauren-ao-short-sleeve-t-shirt-26146503?nav=885035",
             "\(Self.httpUrl)/product/lanc%C3%B4me-absolue-the-serum-30ml-24449925?nav=927986",
@@ -124,39 +96,47 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
         ]
 
         try assertParse(testLinks[0],
-                        id: "26146503",
-                        description: "polo-ralph-lauren-ao-short-sleeve-t-shirt-",
+                        slug: "polo-ralph-lauren-ao-short-sleeve-t-shirt-26146503",
                         route: "885035")
         try assertParse(testLinks[1],
-                        id: "24449925",
-                        description: "lanc%C3%B4me-absolue-the-serum-30ml-",
+                        slug: "lanc%C3%B4me-absolue-the-serum-30ml-24449925",
                         route: "927986")
         try assertParse(testLinks[2],
-                        id: "22859726",
-                        description: "lanc%C3%B4me-advanced-g%C3%A9nifique-youth-activating-concentrate-serum-115ml-",
+                        slug: "lanc%C3%B4me-advanced-g%C3%A9nifique-youth-activating-concentrate-serum-115ml-22859726",
                         route: "927986")
         try assertParse(testLinks[3],
-                        id: "25642827",
-                        description: "bally-bomber%7Cblouson-",
+                        slug: "bally-bomber%7Cblouson-25642827",
                         route: "881496")
+    }
+
+    func test_parses_bare_handle_links_as_pdp() throws {
+        // Real BFF slugs are bare handles with no trailing numeric id: the whole `/product/<slug>`
+        // segment is the slug, used as-is as the BFF handle.
+        try assertParse("\(Self.httpUrl)/product/t-shirt",
+                        slug: "t-shirt",
+                        route: nil)
+        try assertParse("\(Self.httpUrl)/product/la-mer-creme-de-la-mer-moisturizing-cream",
+                        slug: "la-mer-creme-de-la-mer-moisturizing-cream",
+                        route: nil)
+        try assertParse("\(Self.httpUrl)/product/polo-short-product-id-12345",
+                        slug: "polo-short-product-id-12345",
+                        route: nil)
     }
 
     // MARK: - Helpers
 
     private func assertParse(_ link: String,
-                             id expectedId: String,
-                             description expectedDescription: String,
+                             slug expectedSlug: String,
                              route expectedRoute: String?) throws {
         let testUrl = try XCTUnwrap(URL(string: link))
         let queryParameters = testUrl.queryParameters
         let result = sut.parseUrl(testUrl)
-        guard case .productDetail(let id, let description, let route, let query) = result?.type else {
+        guard case .productDetail(let slug, let route, let query) = result?.type else {
             XCTFail()
             return
         }
 
-        XCTAssertEqual(id, expectedId)
-        XCTAssertEqual(description, expectedDescription)
+        XCTAssertEqual(slug, expectedSlug)
         XCTAssertEqual(route, expectedRoute)
         XCTAssertEqual(query, queryParameters)
     }
