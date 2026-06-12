@@ -45,6 +45,8 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
             "\(Self.httpUrl)/products",
             "\(Self.httpUrl)/products/polo-26146503?nav=885035/",
             "\(Self.httpUrl)/product/",
+            // A deeper path under /product/ is not a PDP link — the slug is a single path segment.
+            "\(Self.httpUrl)/product/t-shirt/reviews",
         ]
 
         try assertNoParse(testLinks)

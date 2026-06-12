@@ -14,12 +14,13 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
 
     // MARK: Regex Components
 
-    /// Captures the whole `/product/<slug>` path segment as the BFF handle. The slug is used as-is — the
-    /// BFF resolves a product by its slug, so there is nothing else to extract.
+    /// Captures the single `/product/<slug>` path segment as the BFF handle. The slug is used as-is — the
+    /// BFF resolves a product by its slug, so there is nothing else to extract. `/` is excluded so deeper
+    /// paths (e.g. `/product/<slug>/reviews`) are not mistaken for a PDP link and fall through to the web view.
     private let urlRegex = Regex {
         Constants.urlPrefixRegex
         Capture {
-            OneOrMore(.any)
+            OneOrMore(.anyNonNewline.subtracting(.anyOf("/")))
         } transform: {
             String($0)
         }
