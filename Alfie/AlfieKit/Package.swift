@@ -33,10 +33,6 @@ let package = Package(
             targets: ["Core"]
         ),
         .library(
-            name: "DebugMenu",
-            targets: ["DebugMenu"]
-        ),
-        .library(
             name: "DeepLink",
             targets: ["DeepLink"]
         ),
@@ -179,16 +175,6 @@ let package = Package(
         ),
 
         .target(
-            name: "DebugMenu",
-            dependencies: [
-                "Core",
-                "Mocks",
-                "Model",
-                "SharedUI",
-            ]
-        ),
-
-        .target(
             name: "DeepLink",
             dependencies: [
                 "Core",
@@ -203,8 +189,8 @@ let package = Package(
             name: "Home",
             dependencies: [
                 "Core",
-                "DebugMenu",
                 "Model",
+                "Mocks",
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
@@ -366,14 +352,6 @@ let package = Package(
             dependencies: [
                 "Core",
                 "Mocks",
-                "TestUtils",
-            ]
-        ),
-
-        .testTarget(
-            name: "DebugMenuTests",
-            dependencies: [
-                "DebugMenu",
                 "TestUtils",
             ]
         ),

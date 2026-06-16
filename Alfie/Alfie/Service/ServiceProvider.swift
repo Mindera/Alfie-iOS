@@ -3,9 +3,6 @@ import DeepLink
 import Firebase
 import Foundation
 import Model
-#if DEBUG
-import Mocks
-#endif
 import Network
 import Utils
 
@@ -34,7 +31,8 @@ final class ServiceProvider: ServiceProviderProtocol {
 
     init() {
         self.userDefaults = UserDefaults.standard
-        self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
+        let sharedDefaults = AppGroupUserDefaults(suiteName: "group.com.mindera.alfie.shared")
+        self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: sharedDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 
         // Assuming Australia for now, to be revised later
@@ -49,11 +47,12 @@ final class ServiceProvider: ServiceProviderProtocol {
         )
         let localProvider = LocalConfigurationProvider()
 
-        var providers: [ConfigurationProviderProtocol] = [firebaseProvider, localProvider] // Order matters!
-
-        #if DEBUG
-        providers.insert(DebugConfigurationProvider.shared, at: 0)
-        #endif
+        let debugAppConfigurationProvider = DebugAppConfigurationProvider()
+        let providers: [ConfigurationProviderProtocol] = [
+            debugAppConfigurationProvider, // position 0 — companion overrides win
+            firebaseProvider,
+            localProvider,
+        ] // Order matters!
 
         configurationService = ConfigurationService(
             providers: providers,
