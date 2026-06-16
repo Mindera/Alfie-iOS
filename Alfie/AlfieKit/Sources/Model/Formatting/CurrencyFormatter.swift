@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Locale-aware currency formatting. Stateless — the single source of truth for price strings.
 public enum CurrencyFormatter {
@@ -14,12 +15,25 @@ public enum CurrencyFormatter {
 
     /// Minor-unit exponent for a currency (GBP=2, JPY=0, KWD=3), as reported by `NumberFormatter`
     /// for the given code. Unrecognised codes fall back to 2 (NumberFormatter's default).
+    ///
+    /// Memoised by currency code: `NumberFormatter` is expensive to build (loads ICU data) and a
+    /// single PLP triggers dozens of calls for the same code. The cache is lock-protected because
+    /// converters run off-main on the cooperative pool, so concurrent fetches can call this in parallel.
     public static func minorUnitDigits(for currencyCode: String) -> Int {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = currencyCode
-        return formatter.maximumFractionDigits
+        minorUnitDigitsCache.withLock { cache in
+            if let cached = cache[currencyCode] {
+                return cached
+            }
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.currencyCode = currencyCode
+            let digits = formatter.maximumFractionDigits
+            cache[currencyCode] = digits
+            return digits
+        }
     }
+
+    private static let minorUnitDigitsCache = OSAllocatedUnfairLock<[String: Int]>(initialState: [:])
 
     /// Scales a major-unit amount to its integer minor-unit value using the currency's
     /// exponent (GBP £10.23 → 1023, JPY ¥5000 → 5000, KWD 19.999 → 19999).

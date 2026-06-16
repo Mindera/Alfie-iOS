@@ -20,6 +20,22 @@ final class CurrencyFormatterTests: XCTestCase {
         }
     }
 
+    func test_minor_unit_digits_is_consistent_across_repeated_calls() {
+        // Memoised — repeated calls must still return the correct, stable value.
+        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "GBP"), 2)
+        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "GBP"), 2)
+    }
+
+    func test_minor_unit_digits_is_concurrency_safe() {
+        // Converters run off-main on the cooperative pool; hammering the memoised cache
+        // concurrently must not crash or corrupt (guards against dropping the lock).
+        let codes = ["GBP", "USD", "JPY", "KWD", "EUR", "AUD"]
+        DispatchQueue.concurrentPerform(iterations: 1_000) { i in
+            _ = CurrencyFormatter.minorUnitDigits(for: codes[i % codes.count])
+        }
+        XCTAssertEqual(CurrencyFormatter.minorUnitDigits(for: "JPY"), 0)
+    }
+
     // MARK: - minorUnits (major → integer minor units, per-currency scale)
 
     func test_minor_units_scales_by_currency_exponent() throws {
