@@ -225,8 +225,6 @@ final class ViewFactory: ViewFactoryProtocol {
                 AccountView()
             case .search:
                 SearchView()
-            case .debugMenu:
-                DebugMenuView()
         }
     }
 }

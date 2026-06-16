@@ -15,7 +15,6 @@
   - **BagTests**: Bag tests
   - **SharedUITests**: Localization and UI tests
   - **DeepLinkTests**: Deep link tests
-  - **DebugMenuTests**: Debug menu tests
   - **WebTests**: Web view tests
   - **MyAccountTests**: Account tests
   - **BFFGraphTests**: GraphQL tests
