@@ -8,31 +8,19 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
 
     private enum Constants {
         static let urlPrefixRegex = /\/product\//.ignoresCase()
-        static let productDescriptionRegex = ZeroOrMore(.any)
-        static let productIdLength = 8
         static let routePrefixRegex = "nav="
         static let routeRegex = ZeroOrMore(.digit)
     }
 
     // MARK: Regex Components
 
+    /// Captures the single `/product/<slug>` path segment as the BFF handle. The slug is used as-is — the
+    /// BFF resolves a product by its slug, so there is nothing else to extract. `/` is excluded so deeper
+    /// paths (e.g. `/product/<slug>/reviews`) are not mistaken for a PDP link and fall through to the web view.
     private let urlRegex = Regex {
         Constants.urlPrefixRegex
-        productRegex
-    }
-
-    private static let productRegex = Regex {
-        /// product description
         Capture {
-            Constants.productDescriptionRegex
-        } transform: {
-            String($0)
-        }
-        /// product id
-        TryCapture {
-            Repeat(Constants.productIdLength...Constants.productIdLength) {
-                .digit
-            }
+            OneOrMore(.anyNonNewline.subtracting(.anyOf("/")))
         } transform: {
             String($0)
         }
@@ -60,14 +48,12 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
         guard let productMatch = url.path().wholeMatch(of: urlRegex) else {
             return nil
         }
-        let productDescription = productMatch.output.1
-        let productId = productMatch.output.2
+        let slug = productMatch.output.1
         let navigationRoute = url.query().flatMap { extractRoute(from: $0) }
         let normalisedWebUrl = url.httpSecureUrl(using: configuration)
         return .init(
             type: .productDetail(
-                id: productId,
-                description: productDescription,
+                slug: slug,
                 route: navigationRoute,
                 query: url.queryParameters
             ),

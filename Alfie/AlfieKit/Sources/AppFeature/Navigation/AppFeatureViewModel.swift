@@ -225,9 +225,9 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 )
             )
 
-        case .productDetail(let productId, _, _, _):
-            // TODO: currently the API does not support fetching a product by the StyleNumber (that is parsed from the URL), just by ProductID, so all requests will return "not found"
-            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.id(productId)))))
+        case .productDetail(let slug, _, _):
+            // The BFF resolves a product by its slug, which is exactly the `/product/<slug>` path segment.
+            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.deepLink(handle: slug)))))
 
         case .webView(let url):
             rootTabViewModel.navigate(.shop(.web(url: url, title: "")))
