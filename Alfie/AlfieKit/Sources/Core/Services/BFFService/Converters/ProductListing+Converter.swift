@@ -83,10 +83,10 @@ extension BFFGraphAPI.ProductListItemFragment {
 
 extension BFFGraphAPI.MoneyFragment {
     func toDomainMoney() -> Money {
-        // BFF amount is a major-unit Double; parse once to a clean Decimal to avoid binary-float
-        // noise, then derive both the integer minor-unit amount and the locale-formatted string.
-        // Guard non-finite input (NaN/±inf) — Decimal(inf) traps and Decimal(nan) overflows on scaling.
-        let decimal = amount.isFinite ? (Decimal(string: String(amount)) ?? Decimal(amount)) : .zero
+        // BFF amount is a major-unit Double; parse once to a clean Decimal (via its string form, to
+        // avoid binary-float noise), then derive both the minor-unit amount and the formatted string.
+        // Non-finite input (NaN/±inf) falls back to zero — Decimal(inf) traps and Decimal(nan) overflows.
+        let decimal = amount.isFinite ? (Decimal(string: String(amount)) ?? .zero) : .zero
         return Money(
             currencyCode: currencyCode,
             amount: CurrencyFormatter.minorUnits(of: decimal, currencyCode: currencyCode),
