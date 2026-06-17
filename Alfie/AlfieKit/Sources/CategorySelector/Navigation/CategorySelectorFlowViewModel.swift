@@ -205,7 +205,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
                     switch productDetailsRoute {
                     case .productDetails(let configuration):
                         switch configuration {
-                        case .id(let configurationProductID):
+                        case .id(let configurationProductID), .deepLink(let configurationProductID):
                             productID = configurationProductID
                             product = nil
 

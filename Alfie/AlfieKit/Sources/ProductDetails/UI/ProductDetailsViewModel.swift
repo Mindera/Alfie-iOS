@@ -90,9 +90,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         switch configuration {
         case .id(let productId):
             self.productId = productId
-            // TODO: ALFMOB-386 — deep-link entry only has the numeric id, not the BFF handle (slug).
-            // Using the id as the handle until the handle/slug source is confirmed.
             self.productHandle = productId
+            self.initialSelectedProduct = nil
+            self.baseProduct = nil
+
+        case .deepLink(let handle):
+            self.productId = handle
+            self.productHandle = handle
             self.initialSelectedProduct = nil
             self.baseProduct = nil
 
