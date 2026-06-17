@@ -16,6 +16,8 @@
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
+		DED590B82FE287A20081E3CF /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = DED590B72FE287A20081E3CF /* Core */; };
+		DED590BA2FE287A20081E3CF /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = DED590B92FE287A20081E3CF /* Model */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,12 +78,19 @@
 			);
 			target = BE8B02232B616976007AE489 /* Alfie */;
 		};
+		DED590B62FE287610081E3CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Configuration/local_config.json,
+			);
+			target = DED590822FE283070081E3CF /* Alfie Companion */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		615E06B92CF633FC00065ECF /* AlfieTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E06D72CF633FC00065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AlfieTests; sourceTree = "<group>"; };
 		615E06DA2CF633FE00065ECF /* AlfieUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AlfieUITests; sourceTree = "<group>"; };
-		615E07D42CF6369900065ECF /* Alfie */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Alfie; sourceTree = "<group>"; };
+		615E07D42CF6369900065ECF /* Alfie */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, DED590B62FE287610081E3CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Alfie; sourceTree = "<group>"; };
 		DED590842FE283070081E3CF /* Alfie Companion */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Alfie Companion"; sourceTree = "<group>"; };
 		DED590922FE283090081E3CF /* Alfie CompanionTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Alfie CompanionTests"; sourceTree = "<group>"; };
 		DED5909C2FE283090081E3CF /* Alfie CompanionUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Alfie CompanionUITests"; sourceTree = "<group>"; };
@@ -122,6 +131,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DED590BA2FE287A20081E3CF /* Model in Frameworks */,
+				DED590B82FE287A20081E3CF /* Core in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +295,8 @@
 			);
 			name = "Alfie Companion";
 			packageProductDependencies = (
+				DED590B72FE287A20081E3CF /* Core */,
+				DED590B92FE287A20081E3CF /* Model */,
 			);
 			productName = "Alfie Companion";
 			productReference = DED590832FE283070081E3CF /* Alfie Companion.app */;
@@ -998,6 +1011,14 @@
 		C54DA59C2D369927005142F4 /* TestUtils */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TestUtils;
+		};
+		DED590B72FE287A20081E3CF /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
+		};
+		DED590B92FE287A20081E3CF /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Model;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

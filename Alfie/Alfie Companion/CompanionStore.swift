@@ -1,8 +1,9 @@
 import Foundation
 import Model
+import Combine
 
 private let appGroupSuiteName = "group.com.mindera.alfie.shared"
-let endpointKey = "com.alfie.config.api.endpoint"
+private let endpointKey = "com.alfie.config.api.endpoint"
 
 final class CompanionStore: ObservableObject {
     @Published private(set) var flagOverrides: [String: Bool] = [:]
