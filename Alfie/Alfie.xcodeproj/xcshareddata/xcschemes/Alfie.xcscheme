@@ -32,6 +32,9 @@
             reference = "container:Alfie/Alfie.xctestplan"
             default = "YES">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Alfie/AlfieIntegration.xctestplan">
+         </TestPlanReference>
       </TestPlans>
       <Testables>
          <TestableReference
