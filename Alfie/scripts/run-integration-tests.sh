@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Boots a local BFF, runs the BFFIntegrationTests target against it, and tears the BFF down on exit.
-# See Docs/Plans/260617-1348-ALFMOB-335-bff-integration-tests/ and Docs/Testing.md.
+# ALFMOB-335.
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree

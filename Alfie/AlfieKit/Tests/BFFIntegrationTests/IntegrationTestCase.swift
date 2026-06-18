@@ -5,7 +5,7 @@ import Model
 import XCTest
 
 /// Base case for integration tests that exercise the **real** `BFFClientService` over HTTP against
-/// a locally running BFF. See `Docs/Plans/260617-1348-ALFMOB-335-bff-integration-tests/`.
+/// a locally running BFF (ALFMOB-335).
 ///
 /// `ALFIE_BFF_BASE_URL` (default `http://localhost:3000`) is the BFF **origin** — it must NOT include
 /// `/graphql`, because `BFFClientService` appends that path itself. When the BFF isn't answering as a
