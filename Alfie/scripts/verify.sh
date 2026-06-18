@@ -4,23 +4,23 @@
 # Runs both build and test verification after code changes
 # This ensures code compiles AND business logic is preserved
 #
-# Scope (default): build + UNIT tests (BFF responses are mocked; no local server needed).
-# Pass --with-integration to ALSO run the integration suite against a real local BFF
-# (delegates to run-integration-tests.sh; needs Node + the Alfie-BFF repo). Off by default
-# so the after-every-change gate stays fast and server-free.
+# Scope (default): build + UNIT tests (mocked BFF) + INTEGRATION tests against a real local BFF
+# (delegates to run-integration-tests.sh; needs Node + the Alfie-BFF repo).
+# Pass --skip-integration to run only build + unit tests (fast, server-free) — use this when the
+# local BFF / Node toolchain isn't available.
 #
-# Usage: verify.sh [--with-integration] [args passed through to test-for-verification.sh, e.g. --filter X]
+# Usage: verify.sh [--skip-integration] [args passed through to test-for-verification.sh, e.g. --filter X]
 
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Parse our own flags; pass everything else through to the unit-test runner.
-RUN_INTEGRATION=false
+RUN_INTEGRATION=true
 TEST_ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --with-integration) RUN_INTEGRATION=true; shift ;;
+        --skip-integration) RUN_INTEGRATION=false; shift ;;
         *) TEST_ARGS+=("$1"); shift ;;
     esac
 done
@@ -28,7 +28,7 @@ done
 if [ "$RUN_INTEGRATION" = true ]; then
     echo "🔄 Running full verification (build + unit tests + integration tests)..."
 else
-    echo "🔄 Running verification (build + unit tests)..."
+    echo "🔄 Running verification (build + unit tests, integration skipped)..."
 fi
 echo "================================================"
 echo ""
@@ -62,7 +62,7 @@ if [ $TEST_RESULT -ne 0 ]; then
     exit 1
 fi
 
-# Step 3 (optional): integration tests against a real local BFF
+# Step 3: Integration tests against a real local BFF (unless skipped)
 if [ "$RUN_INTEGRATION" = true ]; then
     echo ""
     echo ""
@@ -74,6 +74,7 @@ if [ "$RUN_INTEGRATION" = true ]; then
     if [ $INTEGRATION_RESULT -ne 0 ]; then
         echo ""
         echo "❌ VERIFICATION FAILED at integration test step"
+        echo "(Re-run with --skip-integration if the local BFF is unavailable.)"
         exit 1
     fi
 fi
@@ -83,7 +84,7 @@ echo "================================================"
 if [ "$RUN_INTEGRATION" = true ]; then
     echo "✅ FULL VERIFICATION PASSED (build + unit + integration)"
 else
-    echo "✅ FULL VERIFICATION PASSED (build + unit tests)"
+    echo "✅ VERIFICATION PASSED (build + unit tests; integration skipped)"
 fi
 echo "================================================"
 exit 0
