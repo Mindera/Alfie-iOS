@@ -18,7 +18,13 @@ BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 BFF_START_CMD="${ALFIE_BFF_START_CMD:-npm run start:dev}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
 ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL%/}"  # drop any trailing slash so we never build `//graphql`
-BFF_PORT="${ALFIE_BFF_BASE_URL##*:}"
+# Port for the stale-server preflight: explicit :port if present, else the scheme default.
+_hostport="${ALFIE_BFF_BASE_URL#*://}"  # strip scheme
+_hostport="${_hostport%%/*}"            # strip any path
+case "$_hostport" in
+    *:*) BFF_PORT="${_hostport##*:}" ;;
+    *)   case "$ALFIE_BFF_BASE_URL" in https://*) BFF_PORT=443 ;; *) BFF_PORT=80 ;; esac ;;
+esac
 GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
 
@@ -41,7 +47,9 @@ fi
 
 # --- Boot the BFF in its own process group -----------------------------------
 echo "🚀 Booting BFF: $BFF_START_CMD (cwd: $BFF_PATH)"
-( cd "$BFF_PATH" && exec $BFF_START_CMD ) &
+# Run via `bash -c` so ALFIE_BFF_START_CMD overrides with quoting/compound commands work; for a
+# single command bash execs it directly, so it still becomes the process-group leader.
+( cd "$BFF_PATH" && exec bash -c "$BFF_START_CMD" ) &
 BFF_PGID=$!
 # Kill the whole process group (npm spawns child node procs that a plain `kill $PID` would orphan).
 trap 'echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT INT TERM
