@@ -91,7 +91,16 @@ if [ $TEST_RESULT -ne 0 ] && grep -q "Unable to find a device matching the provi
 fi
 
 if [ $TEST_RESULT -eq 0 ]; then
-    echo "✅ INTEGRATION TESTS PASSED"
+    # Guard against a false green: xcodebuild exits 0 when every test XCTSkips (e.g. the BFF was
+    # reachable for the readiness probe but the per-test seed-data/env guards all skipped). Count
+    # test cases that actually ran (passed or failed); zero executed means nothing exercised the BFF.
+    EXECUTED=$(grep -cE "Test Case '.*' (passed|failed)" "$TEST_LOG" || true)
+    if [ "$EXECUTED" -eq 0 ]; then
+        echo "❌ INTEGRATION TESTS DID NOT RUN — 0 tests executed (all skipped)."
+        echo "   BFF was reachable but tests skipped; check seed data and ALFIE_BFF_BASE_URL."
+        exit 1
+    fi
+    echo "✅ INTEGRATION TESTS PASSED ($EXECUTED executed)"
 else
     echo "❌ INTEGRATION TESTS FAILED (log: $TEST_LOG)"
 fi
