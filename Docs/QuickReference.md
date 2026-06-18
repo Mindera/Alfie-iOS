@@ -37,8 +37,14 @@ Alfie/
 ## Common Commands
 
 ```bash
-# Full verification (build + tests) - ALWAYS RUN AFTER CODE CHANGES
+# Full verification (build + unit + integration) - ALWAYS RUN AFTER CODE CHANGES
 ./Alfie/scripts/verify.sh
+
+# Fast unit-only run (no local BFF / Node needed)
+./Alfie/scripts/verify.sh --skip-integration
+
+# Integration tests only (boots a local BFF, runs them, tears it down)
+./Alfie/scripts/run-integration-tests.sh
 
 # Decrypt sensitive files (requires GPG keys)
 git secret reveal
