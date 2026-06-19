@@ -388,6 +388,13 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "ModelTests",
+            dependencies: [
+                "Model",
+            ]
+        ),
+
+        .testTarget(
             name: "ProductDetailsTests",
             dependencies: [
                 "ProductDetails",
