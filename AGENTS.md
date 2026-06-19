@@ -66,7 +66,7 @@ implement the Product Details feature following the spec in Docs/Specs/Features/
 - Access `ServiceProvider` directly from ViewModels
 - Hardcode user-facing strings
 - Bypass `FlowViewModel` for navigation
-- Edit auto-generated files (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`)
+- Edit auto-generated files (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`)
 - Use `fatalError` (use `queuedFatalError` instead)
 - Edit `Alfie.xcodeproj/project.pbxproj` directly
 - Skip build verification

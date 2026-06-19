@@ -1,7 +1,7 @@
 ---
 title: Design System — Token Integration & Component Refactoring
 ticket: ALFMOB-264
-status: pending
+status: in-progress   # P1 generator pipeline done (ALFMOB-272); P2 color / P3a typography integration next
 complexity: HIGH
 mode: hard
 blockedBy: []

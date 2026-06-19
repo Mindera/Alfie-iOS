@@ -1,0 +1,20 @@
+{
+  "edges": [
+    {
+      "file": "screen-size.small-(s).tokens.json",
+      "token": "typography-font-family-brand"
+    },
+    {
+      "file": "screen-size.large-(l).tokens.json",
+      "token": "typography-font-family-brand"
+    },
+    {
+      "file": "system.ios.tokens.json",
+      "token": "typography-font-family-system-brand"
+    },
+    {
+      "file": "system.android.tokens.json",
+      "token": "typography-font-family-system-brand"
+    }
+  ]
+}

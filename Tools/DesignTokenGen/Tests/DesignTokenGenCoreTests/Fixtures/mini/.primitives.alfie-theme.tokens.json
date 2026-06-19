@@ -1,0 +1,78 @@
+{
+  "colours-neutrals-0": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "colours-neutrals-800": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.0667,
+        0.0667,
+        0.0667
+      ]
+    }
+  },
+  "spacing-spacing-4": {
+    "$type": "dimension",
+    "$value": {
+      "value": 4,
+      "unit": "px"
+    }
+  },
+  "spacing-spacing-12": {
+    "$type": "dimension",
+    "$value": {
+      "value": 12,
+      "unit": "px"
+    }
+  },
+  "spacing-spacing-16": {
+    "$type": "dimension",
+    "$value": {
+      "value": 16,
+      "unit": "px"
+    }
+  },
+  "typography-font-size-font-size-40": {
+    "$type": "dimension",
+    "$value": {
+      "value": 40,
+      "unit": "px"
+    }
+  },
+  "typography-font-size-font-size-12": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-12}"
+  },
+  "typography-line-height-line-height-48": {
+    "$type": "dimension",
+    "$value": {
+      "value": 48,
+      "unit": "px"
+    }
+  },
+  "typography-letter-spacing-kerning-0": {
+    "$type": "dimension",
+    "$value": {
+      "value": 0,
+      "unit": "px"
+    }
+  },
+  "typography-font-family-brand": {
+    "$type": "fontFamily",
+    "$value": "Libre Test"
+  },
+  "border-border-weight-default": {
+    "$type": "fontWeight",
+    "$value": 1
+  }
+}

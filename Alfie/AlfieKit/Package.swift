@@ -283,6 +283,9 @@ let package = Package(
                 "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
             ],
+            // Committed DTCG JSON (input to Tools/DesignTokenGen) is not compiled/bundled —
+            // only the generated Swift under GeneratedTokens/ is a normal source.
+            exclude: ["DesignTokens"],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
                 .copy("Theme/Components/Loader/spin.gif"),
