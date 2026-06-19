@@ -84,3 +84,67 @@ reference graph. No theme types consume it yet (that's P2–P4). Gates the whole
 **Spike first** (pull + inspect JSON + resolve Q1/Q2/Q5 auth) = S–M, **blocked on private-repo creds**.
 Emitters + wiring + lint/drift + tests = L–XL once the JSON shape is known. Do NOT write emitters
 against an assumed contract (red-team M3).
+
+---
+
+### Red-team additions — pipeline hardening (2026-06-19)
+_Source: `red-team-272-pipeline.md`. These are accepted and MUST be folded into the steps above._
+
+**Spike: ✅ DONE (2026-06-19) — see `spike-findings-272.md`.** The token repo ships a full contract
+(`DESIGN_TOKENS_FORMAT.md` + `PLAN.md`); the unknowns are resolved. Net contract facts that change P1:
+- **color** = sRGB float `components:[r,g,b(,a)]` (NOT hex; no alpha in current export) → `Color(.sRGB,
+  red:green:blue:opacity:)`, default opacity 1 (corrects J4).
+- **dimension** = `{value, unit:"px"}` **px-only** → `CGFloat(value)`, error on non-px (J5 downgraded).
+- **typography** = composite `{fontFamily, fontWeight, fontSize, lineHeight, letterSpacing}`, subfields
+  are refs; `fontWeight` inlined as `"Regular"`/`"Medium"` → 400/500 (confirms J2).
+- **manifest-driven, mode-selected load** (resolves J1): read `manifest.json`; build ONE name→token map
+  from the **iOS load list** — `.primitives`, `theme`, `sizing`, `typography.alfie-theme`,
+  `typography.styles`, `system.ios`, `screen-size.small-(s)`; **skip** `system.{android,web}`,
+  `screen-size.{m,l,xl}`, `.documentation`, and any `~~doc-*` token. Mode-selection de-collides names.
+- **NEW — allowlist handling (not in the original plan):** the resolver must honor
+  `.cycle-allowlist.json` (7 known `(file,token)` cycle edges → resolve to primitive + warn; fail on
+  any other cycle) and `.broken-ref-allowlist.json` (2 FONT_STYLE font-weight targets). Both are
+  **exhaustive** — stale entries must fail. Replaces the plan's blunt "error on cycles/missing refs."
+- **Fonts NOT blocked** (overturns epic): brand = Libre Baskerville (free OFL), primary-ios = SF Pro
+  (system). The "licensed freightBook/circular" blocker was wrong → P3b font-swap is effectively
+  unblocked (just bundle Libre Baskerville `.otf`).
+
+Still to verify against real data when implementing: exact `toSwiftIdentifier()` collisions across the
+loaded set (J3), and that `screen-size.small` actually supplies the responsive sub-tokens the
+composites reference.
+
+**Generator contract (extend step 2):**
+- `DTCG.swift` models `$value` as a **tagged union on `$type`** (color/dimension/fontWeight/typography/
+  shadow…), not a single scalar — a single composite token otherwise fails decode → no output (J2).
+- **Merge all input files into ONE path-keyed graph BEFORE resolving aliases** (cross-file refs are the
+  norm); detect duplicate-path collisions, decide last-write-wins vs error, test it (J1).
+- Add `toSwiftIdentifier()`: leading-digit prefix (Figma `050`/`2xl`), separator→camelCase
+  (`display/large`), Swift-keyword backtick-escape (`default`/`case`/`static`/`repeat`/`operator`);
+  plus a **collision check** (two distinct paths must not map to one identifier). The team already
+  hand-hacks this (`Spacing.space025`, `CornerRadius` swiftlint header) — bake it in (J3).
+- **Deterministic output**: sort every emitted collection by token path; **no timestamp/version/`Date()`
+  in the generated header** (C3).
+- **Clean before emit**: `rm` all `*+Generated.swift` (or `git clean -fdx GeneratedTokens/`) before
+  writing, so a removed token category can't leave an orphaned stale file (C2).
+
+**Wiring & gating:**
+- `generate-design-tokens.sh` runs `swift test --package-path Tools/DesignTokenGen` **fail-fast before
+  emitting** — gated here (the dev's "tokens/generator changed" task), **NOT in `verify.sh` and NOT in
+  CI** (validation-272 decision 3: regeneration is rare; CI out of scope this stage). `verify.sh`/CI
+  only `xcodebuild` the Alfie scheme and never touch the generator package, so document in
+  `Docs/DesignTokens.md` that the generator's tests are the developer's responsibility on token change (C1).
+- `pull-design-tokens.sh`: use SSH or `gh` auth (no token in the command line); wrap any auth-bearing
+  line in `set +x`; copy **only** `*.json` by explicit glob (never `cp -R` the clone); `rm -rf` temp
+  clone in a `trap` (n2).
+- Path-exact `exclude:`; assert `swift build` of SharedUI emits **zero** "unhandled files" warnings (n1).
+
+**Verification additions (extend the Verification section):**
+- Generator tests also assert: **byte-identical output on two runs** (C3), a token category removed →
+  its generated file is deleted (C2), cross-file alias resolves (J1), composite token decodes (J2),
+  `toSwiftIdentifier` handles leading-digit/keyword/separator + collision (J3), 8-digit hex preserves
+  alpha (J4), `rem`/`px` dimension converts to the right point value (J5).
+
+**Open process item (J6 — NOT a code change):** ALFMOB-272's own ticket ACs (conform to existing
+protocols, replace `Colors.xcassets`, Figma names verbatim) are met by **P2–P4**, not P1-as-scoped.
+Reconcile in Jira before anyone marks ALFMOB-272 Done — re-scope the ticket to "pipeline only" or move
+those ACs to ALFMOB-274/266. Confirm with PM.
