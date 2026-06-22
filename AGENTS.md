@@ -59,7 +59,7 @@ implement the Product Details feature following the spec in Docs/Specs/Features/
 - Define protocols for all ViewModels (for mockability)
 - Pass navigation closures from `FlowViewModel` to `ViewModel`
 - Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier — never hardcode strings (see `Docs/Accessibility.md`)
-- Run `./Alfie/scripts/verify.sh` after every code change
+- Run `./Alfie/scripts/verify.sh` after every code change (build + unit + integration). Add `--skip-integration` for the fast, server-free unit-only run when the local BFF/Node isn't available
 
 ### ❌ NEVER
 
@@ -79,10 +79,14 @@ implement the Product Details feature following the spec in Docs/Specs/Features/
 **Every code change MUST be verified:**
 
 ```bash
-./Alfie/scripts/verify.sh
+./Alfie/scripts/verify.sh                     # build + unit + integration (boots a local BFF)
+./Alfie/scripts/verify.sh --skip-integration  # build + unit only (fast, no BFF/Node needed)
 ```
 
-This runs build + tests. Only mark work complete after **"✅ FULL VERIFICATION PASSED"**.
+By default this runs build + unit tests (mocked BFF) + integration tests against a real local BFF
+(see `run-integration-tests.sh`, needs Node + the `Alfie-BFF` repo). Use `--skip-integration` for
+the fast unit-only loop. Only mark work complete after **"✅ FULL VERIFICATION PASSED"** (or
+**"✅ VERIFICATION PASSED (... integration skipped)"** when skipped).
 
 ---
 
