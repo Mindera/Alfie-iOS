@@ -16,7 +16,6 @@ Alfie/
 │   │   ├── Bag/                    # Bag feature module
 │   │   ├── CategorySelector/       # Shop tab feature module
 │   │   ├── Core/                   # Core services layer
-│   │   ├── DebugMenu/              # Debug menu (DEBUG only)
 │   │   ├── DeepLink/               # Deep linking
 │   │   ├── Home/                   # Home feature module
 │   │   ├── Mocks/                  # Test mocks

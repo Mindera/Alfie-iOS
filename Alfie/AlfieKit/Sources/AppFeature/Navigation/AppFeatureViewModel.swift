@@ -106,8 +106,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             log: log
         )
         let homeDependencyContainer = HomeDependencyContainer(
-            configurationService: serviceProvider.configurationService,
-            apiEndpointService: serviceProvider.apiEndpointService,
             sessionService: serviceProvider.sessionService
         )
 

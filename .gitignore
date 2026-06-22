@@ -127,3 +127,4 @@ Alfie/AlfieKit/apollo-ios-cli
 !*.secret
 Alfie/Alfie/Configuration/Debug/GoogleService-Info.plist
 Alfie/Alfie/Configuration/Release/GoogleService-Info.plist
+Alfie/Alfie Companion/GoogleService-Info.plist

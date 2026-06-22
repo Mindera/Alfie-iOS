@@ -76,15 +76,6 @@ public enum ToolbarItemProvider {
         }
     }
 
-    public static func debugMenuItem(
-        size: ToolBarButtonSize = .normal,
-        openDebugMenuAction: @escaping () -> Void
-    ) -> some View {
-        ThemedToolbarButton(icon: .settings, accessibilityId: AccessibilityId.settingsBtn, toolBarButtonSize: size) {
-            openDebugMenuAction()
-        }
-    }
-
     private static func backButton(backButtonAction: @escaping () -> Void) -> some View {
         ThemedToolbarButton(icon: .arrowLeft, accessibilityId: AccessibilityId.backBtn) {
             backButtonAction()
@@ -106,7 +97,6 @@ public enum ToolbarItemProvider {
 // MARK: - AccessibilityId
 
 private enum AccessibilityId {
-    static let settingsBtn = "settings-btn"
     static let searchBtn = "search-btn"
     static let rewardsBtn = "rewards-btn"
     static let wishlistBtn = "wishlist-btn"

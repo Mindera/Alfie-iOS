@@ -16,6 +16,8 @@
 		C54DA2B72D368A40005142F4 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B62D368A40005142F4 /* Core */; };
 		C54DA2B92D368A40005142F4 /* Mocks in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA2B82D368A40005142F4 /* Mocks */; };
 		C54DA59D2D369927005142F4 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = C54DA59C2D369927005142F4 /* TestUtils */; };
+		DED590B82FE287A20081E3CF /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = DED590B72FE287A20081E3CF /* Core */; };
+		DED590BA2FE287A20081E3CF /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = DED590B92FE287A20081E3CF /* Model */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,13 @@
 			remoteGlobalIDString = BE8B02232B616976007AE489;
 			remoteInfo = Alfie;
 		};
+		DED590902FE283090081E3CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE8B021C2B616976007AE489 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DED590822FE283070081E3CF;
+			remoteInfo = "Alfie Companion";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +50,8 @@
 		BE8B02342B616979007AE489 /* AlfieTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8B023E2B616979007AE489 /* AlfieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlfieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5C9C4C92D3571D800D5D70E /* AlfieKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AlfieKit; sourceTree = "<group>"; };
+		DED590832FE283070081E3CF /* Alfie Companion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Alfie Companion.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DED5908F2FE283090081E3CF /* Alfie CompanionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Alfie CompanionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -61,20 +72,28 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Alfie.xctestplan,
-				"Configuration/Debug/GoogleService-Info.plist",
-				"Configuration/Debug/GoogleService-Info.plist.secret",
 				"Configuration/Release/GoogleService-Info.plist",
 				"Configuration/Release/GoogleService-Info.plist.secret",
 				Info.plist,
 			);
 			target = BE8B02232B616976007AE489 /* Alfie */;
 		};
+		DED590B62FE287610081E3CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Configuration/local_config.json,
+			);
+			target = DED590822FE283070081E3CF /* Alfie Companion */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		615E06B92CF633FC00065ECF /* AlfieTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E06D72CF633FC00065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AlfieTests; sourceTree = "<group>"; };
 		615E06DA2CF633FE00065ECF /* AlfieUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AlfieUITests; sourceTree = "<group>"; };
-		615E07D42CF6369900065ECF /* Alfie */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Alfie; sourceTree = "<group>"; };
+		615E07D42CF6369900065ECF /* Alfie */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, DED590B62FE287610081E3CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Alfie; sourceTree = "<group>"; };
+		DED590842FE283070081E3CF /* Alfie Companion */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Alfie Companion"; sourceTree = "<group>"; };
+		DED590922FE283090081E3CF /* Alfie CompanionTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Alfie CompanionTests"; sourceTree = "<group>"; };
+		DED5909C2FE283090081E3CF /* Alfie CompanionUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "Alfie CompanionUITests"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +124,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				96CF08BE2FACB3B200BF1224 /* AccessibilityIdentifiers in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED590802FE283070081E3CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DED590BA2FE287A20081E3CF /* Model in Frameworks */,
+				DED590B82FE287A20081E3CF /* Core in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED5908C2FE283090081E3CF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +178,9 @@
 				615E07D42CF6369900065ECF /* Alfie */,
 				615E06B92CF633FC00065ECF /* AlfieTests */,
 				615E06DA2CF633FE00065ECF /* AlfieUITests */,
+				DED590842FE283070081E3CF /* Alfie Companion */,
+				DED590922FE283090081E3CF /* Alfie CompanionTests */,
+				DED5909C2FE283090081E3CF /* Alfie CompanionUITests */,
 				BE8B02252B616976007AE489 /* Products */,
 				BAB78AEE2B6C00B90038C650 /* Frameworks */,
 			);
@@ -154,6 +192,8 @@
 				BE8B02242B616976007AE489 /* Alfie.app */,
 				BE8B02342B616979007AE489 /* AlfieTests.xctest */,
 				BE8B023E2B616979007AE489 /* AlfieUITests.xctest */,
+				DED590832FE283070081E3CF /* Alfie Companion.app */,
+				DED5908F2FE283090081E3CF /* Alfie CompanionTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -238,6 +278,53 @@
 			productReference = BE8B023E2B616979007AE489 /* AlfieUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		DED590822FE283070081E3CF /* Alfie Companion */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DED590A12FE283090081E3CF /* Build configuration list for PBXNativeTarget "Alfie Companion" */;
+			buildPhases = (
+				DED5907F2FE283070081E3CF /* Sources */,
+				DED590802FE283070081E3CF /* Frameworks */,
+				DED590812FE283070081E3CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DED590842FE283070081E3CF /* Alfie Companion */,
+			);
+			name = "Alfie Companion";
+			packageProductDependencies = (
+				DED590B72FE287A20081E3CF /* Core */,
+				DED590B92FE287A20081E3CF /* Model */,
+			);
+			productName = "Alfie Companion";
+			productReference = DED590832FE283070081E3CF /* Alfie Companion.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DED5908E2FE283090081E3CF /* Alfie CompanionTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DED590A42FE283090081E3CF /* Build configuration list for PBXNativeTarget "Alfie CompanionTests" */;
+			buildPhases = (
+				DED5908B2FE283090081E3CF /* Sources */,
+				DED5908C2FE283090081E3CF /* Frameworks */,
+				DED5908D2FE283090081E3CF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DED590912FE283090081E3CF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DED590922FE283090081E3CF /* Alfie CompanionTests */,
+			);
+			name = "Alfie CompanionTests";
+			packageProductDependencies = (
+			);
+			productName = "Alfie CompanionTests";
+			productReference = DED5908F2FE283090081E3CF /* Alfie CompanionTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -245,7 +332,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1520;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					BE8B02232B616976007AE489 = {
@@ -258,6 +345,13 @@
 					BE8B023D2B616979007AE489 = {
 						CreatedOnToolsVersion = 15.2;
 						TestTargetID = BE8B02232B616976007AE489;
+					};
+					DED590822FE283070081E3CF = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					DED5908E2FE283090081E3CF = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = DED590822FE283070081E3CF;
 					};
 				};
 			};
@@ -279,6 +373,8 @@
 				BE8B02232B616976007AE489 /* Alfie */,
 				BE8B02332B616979007AE489 /* AlfieTests */,
 				BE8B023D2B616979007AE489 /* AlfieUITests */,
+				DED590822FE283070081E3CF /* Alfie Companion */,
+				DED5908E2FE283090081E3CF /* Alfie CompanionTests */,
 			);
 		};
 /* End PBXProject section */
@@ -299,6 +395,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BE8B023C2B616979007AE489 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED590812FE283070081E3CF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED5908D2FE283090081E3CF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -366,7 +476,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    SOURCE_CONFIG_PATH=\"${SRCROOT}/Alfie/Configuration/Release/GoogleService-Info.plist\"\nelse \n    SOURCE_CONFIG_PATH=\"${SRCROOT}/Alfie/Configuration/Debug/GoogleService-Info.plist\"\nfi\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp \"${SOURCE_CONFIG_PATH}\" \"${DESTINATION_CONFIG_PATH}\"\n";
+			shellScript = "if [ \"${ENABLE_PREVIEWS}\" = \"YES\" ]; then\n  echo \"Building for Previews, ignore copy to avoid build loop issues.\"\n  exit 0;\nfi\n\nSOURCE_CONFIG_PATH=\"${SRCROOT}/Alfie/Configuration/Release/GoogleService-Info.plist\"\n\nDESTINATION_CONFIG_PATH=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\necho \"Will copy ${SOURCE_CONFIG_PATH} to ${DESTINATION_CONFIG_PATH}\"\ncp \"${SOURCE_CONFIG_PATH}\" \"${DESTINATION_CONFIG_PATH}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -393,6 +503,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DED5907F2FE283070081E3CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED5908B2FE283090081E3CF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -405,6 +529,11 @@
 			isa = PBXTargetDependency;
 			target = BE8B02232B616976007AE489 /* Alfie */;
 			targetProxy = BE8B023F2B616979007AE489 /* PBXContainerItemProxy */;
+		};
+		DED590912FE283090081E3CF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DED590822FE283070081E3CF /* Alfie Companion */;
+			targetProxy = DED590902FE283090081E3CF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -541,6 +670,7 @@
 				CURRENT_PROJECT_VERSION = 0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"Alfie/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -558,7 +688,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie.debug;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -579,6 +709,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 0;
 				DEVELOPMENT_ASSET_PATHS = "\"Alfie/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = "Mocks*";
@@ -675,6 +806,116 @@
 			};
 			name = Release;
 		};
+		DED590A22FE283090081E3CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Alfie Companion/Alfie Companion.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie.companion;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DED590A32FE283090081E3CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Alfie Companion/Alfie Companion.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie.companion;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DED590A52FE283090081E3CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie.companionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Alfie Companion.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Alfie Companion";
+			};
+			name = Debug;
+		};
+		DED590A62FE283090081E3CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindera.alfie.companionTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Alfie Companion.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Alfie Companion";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -710,6 +951,24 @@
 			buildConfigurations = (
 				BE8B024F2B616979007AE489 /* Debug */,
 				BE8B02502B616979007AE489 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DED590A12FE283090081E3CF /* Build configuration list for PBXNativeTarget "Alfie Companion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DED590A22FE283090081E3CF /* Debug */,
+				DED590A32FE283090081E3CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DED590A42FE283090081E3CF /* Build configuration list for PBXNativeTarget "Alfie CompanionTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DED590A52FE283090081E3CF /* Debug */,
+				DED590A62FE283090081E3CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -752,6 +1011,14 @@
 		C54DA59C2D369927005142F4 /* TestUtils */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TestUtils;
+		};
+		DED590B72FE287A20081E3CF /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
+		};
+		DED590B92FE287A20081E3CF /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Model;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

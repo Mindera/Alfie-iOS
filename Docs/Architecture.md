@@ -242,7 +242,6 @@ Each feature is a self-contained module with its own navigation, views, and view
 - **Bag**: Shopping bag feature
 - **MyAccount**: User account screens
 - **Web**: WebView wrapper for web-based features
-- **DebugMenu**: Debug/developer menu (DEBUG builds only)
 
 ### Feature Module Structure
 
