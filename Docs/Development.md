@@ -74,7 +74,7 @@ Use this checklist for systematic feature implementation:
 11. ✅ **Add to Package.swift**: Add new target and product in `AlfieKit/Package.swift`
 12. ✅ **Integrate with Navigation**: Add route to parent feature's Route enum
 13. ✅ **Add Localization Strings** in `L10n.xcstrings` (all keys from spec)
-14. ✅ **Verify** - Execute `./Alfie/scripts/verify.sh` (runs build + tests)
+14. ✅ **Verify** - Execute `./Alfie/scripts/verify.sh` (build + unit + integration; add `--skip-integration` for the fast unit-only run when no local BFF is available)
 15. ✅ **Verify Against Spec** - Check all acceptance criteria met
 16. ✅ **Update Spec Status** - Mark as "Implemented" with PR link and date
 
