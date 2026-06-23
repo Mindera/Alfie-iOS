@@ -108,11 +108,11 @@ public struct Emitter {
                 guard case .typography(let typo) = token.value else { continue }
                 let id = SwiftIdentifier.make(stripFirstSegment(token.name))
                 body += "        public static let \(id) = TypographyStyle(\n"
-                body += "            fontFamily: \(try fieldRef(typo.fontFamily, kind: .string)),\n"
-                body += "            fontWeight: \(try fieldRef(typo.fontWeight, kind: .weight)),\n"
-                body += "            fontSize: \(try fieldRef(typo.fontSize, kind: .dimension)),\n"
-                body += "            lineHeight: \(try fieldRef(typo.lineHeight, kind: .dimension)),\n"
-                body += "            letterSpacing: \(try fieldRef(typo.letterSpacing, kind: .dimension))\n"
+                body += "            fontFamily: \(try fieldRef(typo.fontFamily)),\n"
+                body += "            fontWeight: \(try fieldRef(typo.fontWeight)),\n"
+                body += "            fontSize: \(try fieldRef(typo.fontSize)),\n"
+                body += "            lineHeight: \(try fieldRef(typo.lineHeight)),\n"
+                body += "            letterSpacing: \(try fieldRef(typo.letterSpacing))\n"
                 body += "        )\n"
             }
             body += "    }\n"
@@ -144,9 +144,7 @@ public struct Emitter {
         return try primitiveRefOrLiteral(target)
     }
 
-    private enum FieldKind { case string, weight, dimension }
-
-    private func fieldRef(_ value: TokenValue, kind: FieldKind) throws -> String {
+    private func fieldRef(_ value: TokenValue) throws -> String {
         switch value {
         case .reference(let target):
             return try primitiveRefOrLiteral(target)
@@ -161,7 +159,9 @@ public struct Emitter {
     /// primitive, else inline the concrete literal (keeps the reference graph where one exists).
     private func primitiveRefOrLiteral(_ target: String) throws -> String {
         guard let terminal = try resolver.resolvedConcrete(target) else {
-            throw DesignTokenError.missingReference(token: target, target: target)
+            // resolvedConcrete returns nil only for an allow-listed broken ref — which an *emitted*
+            // surface should never reach (broken refs live in the non-emitted intermediate tokens).
+            throw DesignTokenError.brokenReferenceInOutput(target: target)
         }
         if resolver.isPrimitive(terminal.name) {
             let group = upperCamel(firstSegment(terminal.name))
@@ -180,11 +180,11 @@ public struct Emitter {
         case .dimension(let v, _):
             return "CGFloat(\(num(v)))"
         case .fontFamily(let family):
-            return "\"\(family)\""
+            return String(reflecting: family)   // properly escaped Swift string literal
         case .fontWeight(let weight):
             return "\(weight.cssValue)"
         case .string(let s):
-            return "\"\(s)\""
+            return String(reflecting: s)         // properly escaped Swift string literal
         case .typography:
             throw DesignTokenError.malformedToken(name: name, reason: "typography literal unsupported in this position")
         case .reference(let target):

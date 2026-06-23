@@ -34,7 +34,7 @@ public enum Primitives {
         public static let semanticSuccess600 = Color(.sRGB, red: 0.2831125855445862, green: 0.5699999928474426, blue: 0.12079471349716187, opacity: 1.0)
         public static let semanticSuccess700 = Color(.sRGB, red: 0.21176470816135406, green: 0.5137255191802979, blue: 0.08627451211214066, opacity: 1.0)
         public static let semanticSuccess800 = Color(.sRGB, red: 0.0, green: 0.3843137323856354, blue: 0.003921568859368564, opacity: 1.0)
-        public static let transparentTransparent = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)
+        public static let transparentTransparent = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 0.0)
     }
     public enum Spacing {
         public static let spacing0: CGFloat = CGFloat(0.0)

@@ -56,6 +56,31 @@ struct ValueParsingTests {
         }
     }
 
+    @Test("color alpha key folds into a 4th opacity component")
+    func colorAlphaKey() throws {
+        let raw: [String: Any] = ["colorSpace": "srgb", "components": [1, 1, 1], "alpha": 0]
+        #expect(try TokenLoader.parseValue(type: "color", raw: raw, name: "x") == .color(components: [1, 1, 1, 0]))
+    }
+
+    @Test("string $value that isn't a String throws (no silent empty string)")
+    func stringNonStringThrows() {
+        #expect(throws: DesignTokenError.self) {
+            _ = try TokenLoader.parseValue(type: "string", raw: 5, name: "x")
+        }
+    }
+
+    @Test("a configured collection missing its expected mode fails fast")
+    func missingManifestModeThrows() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        // `system` is configured to require the `ios` mode, but only `android` is present.
+        let manifest = #"{"collections":{"system":{"modes":{"android":["system.android.tokens.json"]}}}}"#
+        let url = dir.appendingPathComponent("manifest.json")
+        try manifest.write(to: url, atomically: true, encoding: .utf8)
+        #expect(throws: DesignTokenError.self) { _ = try TokenLoader.selectedFiles(manifestURL: url) }
+    }
+
     @Test("fontFamily array takes the first family; empty array throws")
     func fontFamilyArray() throws {
         #expect(try TokenLoader.parseValue(type: "fontFamily", raw: ["Libre", "Arial"], name: "x") == .fontFamily("Libre"))

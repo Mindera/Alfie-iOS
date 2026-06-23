@@ -58,7 +58,12 @@ public enum TokenLoader {
                 guard let modes = (value as? [String: Any])?["modes"] as? [String: Any] else { continue }
                 let chosen: [Any]
                 if let mode = modeForCollection[collection] {
-                    chosen = (modes[mode] as? [Any]) ?? []
+                    // A configured collection MUST expose its expected mode — falling back to an empty
+                    // list would silently emit an incomplete token set.
+                    guard let list = modes[mode] as? [Any] else {
+                        throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' is missing expected mode '\(mode)'")
+                    }
+                    chosen = list
                 } else {
                     chosen = modes.values.compactMap { $0 as? [Any] }.flatMap { $0 }
                 }
@@ -105,10 +110,16 @@ public enum TokenLoader {
         }
         switch type {
         case "color":
-            guard let dict = raw as? [String: Any], let comps = dict["components"] as? [Any] else {
+            guard let dict = raw as? [String: Any], let rawComponents = dict["components"] as? [Any] else {
                 throw DesignTokenError.malformedToken(name: name, reason: "color missing components")
             }
-            return .color(components: comps.compactMap { ($0 as? NSNumber)?.doubleValue })
+            var components = rawComponents.compactMap { ($0 as? NSNumber)?.doubleValue }
+            // Alpha arrives either as a 4th component or a separate `alpha` key — the Figma export
+            // uses the latter (e.g. transparent = components [1,1,1] + alpha 0). Fold it in as opacity.
+            if components.count == 3, let alpha = (dict["alpha"] as? NSNumber)?.doubleValue {
+                components.append(alpha)
+            }
+            return .color(components: components)
         case "dimension":
             guard let dict = raw as? [String: Any],
                   let value = (dict["value"] as? NSNumber)?.doubleValue,
@@ -126,7 +137,10 @@ public enum TokenLoader {
             if let s = raw as? String { return .fontWeight(.named(s)) }
             throw DesignTokenError.malformedToken(name: name, reason: "fontWeight not number/string")
         case "string":
-            return .string(raw as? String ?? "")
+            guard let s = raw as? String else {
+                throw DesignTokenError.malformedToken(name: name, reason: "string $value is not a String")
+            }
+            return .string(s)
         case "typography":
             guard let dict = raw as? [String: Any] else {
                 throw DesignTokenError.malformedToken(name: name, reason: "typography not an object")
