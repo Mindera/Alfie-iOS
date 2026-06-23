@@ -25,9 +25,9 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                 label: {
                     HStack(spacing: Spacing.space050) {
                         Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
-                            .foregroundStyle(Colors.primary.mono400)
+                            .foregroundStyle(Primitives.Colours.neutrals500)
                         Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
-                            .foregroundStyle(Colors.primary.mono900)
+                            .foregroundStyle(Primitives.Colours.neutrals800)
 
                         if isExpandable {
                             Icon.chevronDown.image
@@ -39,7 +39,7 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                 }
             )
             .allowsHitTesting(isExpandable)
-            .tint(Colors.primary.mono900)
+            .tint(Primitives.Colours.neutrals800)
         }
     }
 }

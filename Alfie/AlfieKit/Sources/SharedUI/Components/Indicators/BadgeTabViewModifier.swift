@@ -17,12 +17,12 @@ public struct BadgeTabViewModifier: ViewModifier {
     }
 
     private func setAppearance() {
-        UITabBarItem.appearance().badgeColor = Colors.secondary.red700.ui
+        UITabBarItem.appearance().badgeColor = Primitives.Colours.semanticError600.ui
 
         let font = theme.font.tiny.normal
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: Colors.primary.white.ui,
+            .foregroundColor: Primitives.Colours.neutrals0.ui,
         ]
         UITabBarItem.appearance().setBadgeTextAttributes(attributes, for: .normal)
         UITabBarItem.appearance().setBadgeTextAttributes(attributes, for: .selected)

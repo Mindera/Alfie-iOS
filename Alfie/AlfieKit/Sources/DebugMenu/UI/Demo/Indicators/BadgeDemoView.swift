@@ -133,7 +133,7 @@ struct BadgeDemoView: View {
                 .fill(.black)
             Text.build(theme.font.small.bold(label))
                 .padding()
-                .foregroundStyle(Colors.primary.white)
+                .foregroundStyle(Primitives.Colours.neutrals0)
         }
         .frame(width: 110, height: 44)
     }

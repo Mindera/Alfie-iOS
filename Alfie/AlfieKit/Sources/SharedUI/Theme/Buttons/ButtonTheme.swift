@@ -30,41 +30,41 @@ public enum ButtonTheme: String, CaseIterable {
         switch self {
         case .primary:
             return .init(
-                backgroundColor: Colors.primary.mono900,
-                backgroundDisabledColor: Colors.primary.mono050,
-                backgroundPressedColor: Colors.primary.mono500,
+                backgroundColor: Primitives.Colours.neutrals800,
+                backgroundDisabledColor: Primitives.Colours.neutrals100,
+                backgroundPressedColor: Primitives.Colours.neutrals500,
                 textColor: .white,
-                textDisabledColor: Colors.primary.mono300,
+                textDisabledColor: Primitives.Colours.neutrals400,
                 textPressedColor: .white,
-                borderColor: Colors.primary.mono900,
-                borderDisabledColor: Colors.primary.mono050,
-                borderPressedColor: Colors.primary.mono500
+                borderColor: Primitives.Colours.neutrals800,
+                borderDisabledColor: Primitives.Colours.neutrals100,
+                borderPressedColor: Primitives.Colours.neutrals500
             )
 
         case .secondary:
             return .init(
                 backgroundColor: .white,
                 backgroundDisabledColor: .white,
-                backgroundPressedColor: Colors.primary.mono100,
-                textColor: Colors.primary.mono900,
-                textDisabledColor: Colors.primary.mono300,
-                textPressedColor: Colors.primary.mono500,
-                borderColor: Colors.primary.mono900,
-                borderDisabledColor: Colors.primary.mono300,
-                borderPressedColor: Colors.primary.mono500
+                backgroundPressedColor: Primitives.Colours.neutrals100,
+                textColor: Primitives.Colours.neutrals800,
+                textDisabledColor: Primitives.Colours.neutrals400,
+                textPressedColor: Primitives.Colours.neutrals500,
+                borderColor: Primitives.Colours.neutrals800,
+                borderDisabledColor: Primitives.Colours.neutrals400,
+                borderPressedColor: Primitives.Colours.neutrals500
             )
 
         case .tertiary:
             return .init(
                 backgroundColor: .white,
                 backgroundDisabledColor: .white,
-                backgroundPressedColor: Colors.primary.mono100,
-                textColor: Colors.primary.mono900,
-                textDisabledColor: Colors.primary.mono300,
-                textPressedColor: Colors.primary.mono500,
+                backgroundPressedColor: Primitives.Colours.neutrals100,
+                textColor: Primitives.Colours.neutrals800,
+                textDisabledColor: Primitives.Colours.neutrals400,
+                textPressedColor: Primitives.Colours.neutrals500,
                 borderColor: .white,
                 borderDisabledColor: .white,
-                borderPressedColor: Colors.primary.mono100
+                borderPressedColor: Primitives.Colours.neutrals100
             )
 
         case .underline:
@@ -72,9 +72,9 @@ public enum ButtonTheme: String, CaseIterable {
                 backgroundColor: .white,
                 backgroundDisabledColor: .white,
                 backgroundPressedColor: .white,
-                textColor: Colors.primary.mono900,
-                textDisabledColor: Colors.primary.mono300,
-                textPressedColor: Colors.primary.mono500,
+                textColor: Primitives.Colours.neutrals800,
+                textDisabledColor: Primitives.Colours.neutrals400,
+                textPressedColor: Primitives.Colours.neutrals500,
                 borderColor: .white,
                 borderDisabledColor: .white,
                 borderPressedColor: .white

@@ -2,10 +2,10 @@ import SwiftUI
 
 public extension Color {
     static var black: Color {
-        Colors.primary.black
+        Primitives.Colours.neutrals900
     }
 
     static var white: Color {
-        Colors.primary.white
+        Primitives.Colours.neutrals0
     }
 }

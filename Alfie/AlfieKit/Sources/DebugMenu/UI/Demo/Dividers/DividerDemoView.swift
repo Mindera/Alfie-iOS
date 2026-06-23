@@ -10,22 +10,22 @@ struct DividerDemoView: View {
                 Text.build(theme.font.paragraph.bold("Horizontal Thin"))
                 VStack(spacing: Spacing.space0) {
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(height: 20)
                     ThemedDivider.horizontalThin
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(height: 20)
                 }
                 .padding(.horizontal, -Spacing.space200)
                 Text.build(theme.font.paragraph.bold("Horizontal Thick"))
                 VStack(spacing: Spacing.space0) {
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(height: 20)
                     ThemedDivider.horizontalThick
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(height: 20)
                 }
                 .padding(.horizontal, -Spacing.space200)
@@ -33,12 +33,12 @@ struct DividerDemoView: View {
                 HStack(spacing: Spacing.space0) {
                     Spacer()
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(width: 20, height: 80)
                     ThemedDivider.verticalThin
                         .frame(height: 80)
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(width: 20, height: 80)
                     Spacer()
                 }
@@ -46,12 +46,12 @@ struct DividerDemoView: View {
                 HStack(spacing: Spacing.space0) {
                     Spacer()
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(width: 20, height: 80)
                     ThemedDivider.verticalThick
                         .frame(height: 80)
                     Rectangle()
-                        .fill(Colors.primary.mono400)
+                        .fill(Primitives.Colours.neutrals500)
                         .frame(width: 20, height: 80)
                     Spacer()
                 }

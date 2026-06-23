@@ -35,7 +35,7 @@ struct CustomTabBarView: View {
                 }
             }
         }
-        .background(Colors.primary.white)
+        .background(Primitives.Colours.neutrals0)
         .frame(width: UIScreen.main.bounds.width)
     }
 

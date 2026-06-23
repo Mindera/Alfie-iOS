@@ -40,12 +40,12 @@ public struct ErrorView: View {
     public init(
         spacing: CGFloat = Spacing.space200,
         icon: Image? = Icon.warning.image,
-        iconColor: Color = Colors.primary.black,
+        iconColor: Color = Primitives.Colours.neutrals900,
         iconSize: CGFloat = Constants.iconSize,
         title: AttributedString? = nil,
-        titleColor: Color = Colors.primary.black,
+        titleColor: Color = Primitives.Colours.neutrals900,
         message: AttributedString? = nil,
-        messageColor: Color = Colors.primary.black,
+        messageColor: Color = Primitives.Colours.neutrals900,
         buttons: [ButtonConfiguration] = []
     ) {
         self.spacing = spacing
@@ -62,12 +62,12 @@ public struct ErrorView: View {
     public init(
         spacing: CGFloat = Spacing.space200,
         icon: Image? = Icon.warning.image,
-        iconColor: Color = Colors.primary.black,
+        iconColor: Color = Primitives.Colours.neutrals900,
         iconSize: CGFloat = Constants.iconSize,
         title: String? = nil,
-        titleColor: Color = Colors.primary.black,
+        titleColor: Color = Primitives.Colours.neutrals900,
         message: String? = nil,
-        messageColor: Color = Colors.primary.black,
+        messageColor: Color = Primitives.Colours.neutrals900,
         buttons: [ButtonConfiguration] = []
     ) {
         self.init(
@@ -98,12 +98,12 @@ public struct ErrorView: View {
 
             if let title {
                 Text.build(title)
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Primitives.Colours.neutrals900)
             }
 
             if let message {
                 Text.build(message)
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Primitives.Colours.neutrals900)
             }
 
             VStack(spacing: Spacing.space100) {

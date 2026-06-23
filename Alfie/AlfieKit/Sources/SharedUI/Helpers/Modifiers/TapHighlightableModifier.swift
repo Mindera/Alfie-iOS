@@ -27,6 +27,6 @@ public struct TapHighlightableModifier: ViewModifier {
 private struct HighlightButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .background(configuration.isPressed ? Colors.primary.mono100 : .clear)
+            .background(configuration.isPressed ? Primitives.Colours.neutrals100 : .clear)
     }
 }

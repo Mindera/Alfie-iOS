@@ -4,10 +4,10 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct PageControlCarouselDemoView: View {
     private let smallColors: [Color] = [
-        Colors.primary.mono200,
-        Colors.primary.mono300,
-        Colors.primary.mono400,
-        Colors.primary.mono500,
+        Primitives.Colours.neutrals200,
+        Primitives.Colours.neutrals400,
+        Primitives.Colours.neutrals500,
+        Primitives.Colours.neutrals500,
     ]
     private let mediumColors: [Color] = [
         Colors.secondary.orange200,
@@ -22,10 +22,10 @@ struct PageControlCarouselDemoView: View {
         Colors.secondary.blue500,
     ]
     private let customColors: [Color] = [
-        Colors.secondary.green200,
-        Colors.secondary.green300,
-        Colors.secondary.green400,
-        Colors.secondary.green500,
+        Primitives.Colours.semanticSuccess200,
+        Primitives.Colours.semanticSuccess400,
+        Primitives.Colours.semanticSuccess500,
+        Primitives.Colours.semanticSuccess600,
     ]
 
     @State private var smallSelectedIndex: Int? = 0

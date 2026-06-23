@@ -33,14 +33,14 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
             pullToSearchConfig: .disabled,
             theme: .softLarge,
             dismissConfiguration: .init(type: .back),
-            contentOverlayColorWhenFocused: Colors.primary.white,
+            contentOverlayColorWhenFocused: Primitives.Colours.neutrals0,
             showDivider: true,
             autoFocus: true,
             transition: transition,
             onCancel: { onCancel() },
             onSubmit: { _ in onSubmit() }
         )
-        .background(Colors.primary.white)
+        .background(Primitives.Colours.neutrals0)
     }
 }
 
@@ -61,9 +61,9 @@ extension SearchView {
             Spacer()
             imageForIcon(Icon.search)
             Text.build(theme.font.paragraph.bold(L10n.Search.Screen.EmptyView.title))
-                .foregroundStyle(Colors.primary.black)
+                .foregroundStyle(Primitives.Colours.neutrals900)
             Text.build(theme.font.small.normal(L10n.Search.Screen.EmptyView.message))
-                .foregroundStyle(Colors.primary.black)
+                .foregroundStyle(Primitives.Colours.neutrals900)
             Spacer()
         }
         .accessibilityElement(children: .combine)
@@ -78,7 +78,7 @@ extension SearchView {
         icon.image
             .renderingMode(.template)
             .resizable()
-            .foregroundStyle(Colors.primary.black)
+            .foregroundStyle(Primitives.Colours.neutrals900)
             .scaledToFit()
             .frame(width: Constants.iconSize, height: Constants.iconSize)
     }

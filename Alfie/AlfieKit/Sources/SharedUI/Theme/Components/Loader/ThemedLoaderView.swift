@@ -28,7 +28,7 @@ public struct ThemedLoaderView: View {
 
 			if !labelHidden {
 				Text.build(theme.font.paragraph.normal(labelTitle))
-					.foregroundStyle(Colors.primary.black)
+					.foregroundStyle(Primitives.Colours.neutrals900)
 			}
 		}
 	}

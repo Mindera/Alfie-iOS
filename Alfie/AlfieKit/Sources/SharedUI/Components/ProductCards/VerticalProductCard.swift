@@ -74,8 +74,8 @@ public struct VerticalProductCard: View {
                     .resizable()
                     .aspectRatio(Constants.imageAspectRatio, contentMode: .fit)
             },
-            placeholder: { Colors.primary.mono050 },
-            failure: { _ in Colors.primary.mono050 }
+            placeholder: { Primitives.Colours.neutrals100 },
+            failure: { _ in Primitives.Colours.neutrals100 }
         )
         .aspectRatio(Constants.imageAspectRatio, contentMode: .fill)
     }
@@ -83,7 +83,7 @@ public struct VerticalProductCard: View {
     private var productDesignerView: some View {
         Text(viewModel.designer)
             .font(Font(viewModel.configuration.textFont))
-            .foregroundStyle(Colors.primary.mono900)
+            .foregroundStyle(Primitives.Colours.neutrals800)
             .lineLimit(Constants.productDesignerLineLimit)
             .shimmeringMultiline(
                 while: $isSkeleton,
@@ -96,7 +96,7 @@ public struct VerticalProductCard: View {
     @ViewBuilder private var productNameView: some View {
         Text(viewModel.name)
             .font(Font(viewModel.configuration.textFont))
-            .foregroundStyle(Colors.primary.mono500)
+            .foregroundStyle(Primitives.Colours.neutrals500)
             .frame(
                 height: (viewModel.configuration.textFont.lineHeight * CGFloat(Constants.productNameLineLimit)),
                 alignment: .top
@@ -115,12 +115,12 @@ public struct VerticalProductCard: View {
             if let colorTitle = viewModel.colorTitle {
                 Text(colorTitle)
                     .font(Font(viewModel.configuration.smallTextFont))
-                    .foregroundStyle(Colors.primary.mono500)
+                    .foregroundStyle(Primitives.Colours.neutrals500)
             }
             if let color = viewModel.color {
                 Text(color)
                     .font(Font(viewModel.configuration.smallTextFont))
-                    .foregroundStyle(Colors.primary.mono700)
+                    .foregroundStyle(Primitives.Colours.neutrals600)
             }
         }
         .lineLimit(Constants.productColorLineLimit)
@@ -178,7 +178,7 @@ public struct VerticalProductCard: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(Colors.primary.black, Colors.primary.white)
+                    .foregroundStyle(Primitives.Colours.neutrals900, Primitives.Colours.neutrals0)
             })
             .padding([.top, .trailing], topTrailingEdgePadding)
             .accessibilityIdentifier(actionViewAccessibilityIdentifier)

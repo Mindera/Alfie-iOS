@@ -312,8 +312,8 @@ extension ProductDetailsView {
                                 .resizable()
                                 .onTapGesture { isMediaFullScreen = true }
                         },
-                        placeholder: { Colors.primary.mono050 },
-                        failure: { _ in Colors.primary.black }
+                        placeholder: { Primitives.Colours.neutrals100 },
+                        failure: { _ in Primitives.Colours.neutrals900 }
                     )
                     .cornerRadius(CornerRadius.s)
                 }
@@ -338,8 +338,8 @@ extension ProductDetailsView {
                             .resizable()
                             .scaledToFit()
                     },
-                    placeholder: { Colors.primary.mono050 },
-                    failure: { _ in Colors.primary.black }
+                    placeholder: { Primitives.Colours.neutrals100 },
+                    failure: { _ in Primitives.Colours.neutrals900 }
                 )
             }
         }
@@ -349,7 +349,7 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .titleHeader) {
             HStack(spacing: Spacing.space0) {
                 Text.build(theme.font.paragraph.normal(viewModel.productName))
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Primitives.Colours.neutrals900)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productTitle)
@@ -417,7 +417,7 @@ extension ProductDetailsView {
                         HStack(spacing: Spacing.space100) {
                             ColorSwatchView(item: selectedColor, swatchSize: .normal, isSelected: false)
                             Text.build(theme.font.small.normal(selectedColor.name.capitalized))
-                                .foregroundStyle(Colors.primary.mono900)
+                                .foregroundStyle(Primitives.Colours.neutrals800)
                         }
                     }
                     .id(selectedColor.id)
@@ -458,9 +458,9 @@ extension ProductDetailsView {
             : L10n.Product.OneSize.title
         HStack {
             Text.build(theme.font.small.bold(L10n.Product.Size.title + ":"))
-                .foregroundStyle(Colors.primary.mono900)
+                .foregroundStyle(Primitives.Colours.neutrals800)
             Text.build(theme.font.small.normal(sizeText))
-                .foregroundStyle(Colors.primary.mono900)
+                .foregroundStyle(Primitives.Colours.neutrals800)
         }
     }
 
@@ -485,7 +485,7 @@ extension ProductDetailsView {
                 )
 
                 Text.build(theme.font.paragraph.normal(viewModel.productDescription))
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Primitives.Colours.neutrals900)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
             }
         }
@@ -533,7 +533,7 @@ extension ProductDetailsView {
             iconSize: Constants.errorViewIconSize,
             title: theme.font.header.h2(errorTitle),
             message: theme.font.paragraph.normal(errorMessage),
-            messageColor: Colors.primary.mono600,
+            messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(cta: L10n.Pdp.ErrorView.GoBack.Button.cta) {
                     viewModel.didTapBackButton()
@@ -551,7 +551,7 @@ extension ProductDetailsView {
             HStack(spacing: Spacing.space0) {
                 HStack(spacing: Spacing.space0) {
                     Text.build(theme.font.paragraph.normal(complementaryInfoTitle(for: type)))
-                        .foregroundStyle(Colors.primary.black)
+                        .foregroundStyle(Primitives.Colours.neutrals900)
                         .padding(.leading, Spacing.space100)
                     Spacer()
                     Icon.chevronRight.image
@@ -559,7 +559,7 @@ extension ProductDetailsView {
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .foregroundStyle(Colors.primary.black)
+                        .foregroundStyle(Primitives.Colours.neutrals900)
                         .padding(.trailing, Spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)

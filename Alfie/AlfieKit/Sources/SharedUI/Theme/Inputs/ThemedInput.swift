@@ -83,17 +83,17 @@ private struct ThemedTextStyle: TextFieldStyle {
                     if let title {
                         Text.build(theme.font.paragraph.normal(title))
                             .lineLimit(1)
-                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
+                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
                     }
                     if isRequired {
                         Text.build(theme.font.paragraph.normal("*"))
-                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.secondary.red800)
+                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.semanticError700)
                             .padding(.leading, Spacing.space025)
                     }
                     if let limit {
                         Spacer()
                         Text.build(theme.font.paragraph.normal("\(count)/\(limit)"))
-                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
+                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
                     }
                 }
                 .padding(.bottom, Spacing.space100)
@@ -101,15 +101,15 @@ private struct ThemedTextStyle: TextFieldStyle {
             ZStack(alignment: .bottom) {
                 RoundedRectangle(cornerRadius: Constants.cornerRadius, style: RoundedCornerStyle.continuous)
                     .stroke(barColor, lineWidth: 1.5)
-                    .background(Colors.primary.white)
+                    .background(Primitives.Colours.neutrals0)
                     .frame(height: Constants.inputHeight)
                 HStack(spacing: Spacing.space0) {
                     configuration.body
                         .font(Font(theme.font.paragraph.normal))
-                        .accentColor(Colors.primary.mono900)
+                        .accentColor(Primitives.Colours.neutrals800)
                         .focused($isFocused)
                         .disabled(isDisabled)
-                        .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono900)
+                        .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals800)
                         .padding(.leading, Constants.inputPadding)
                         .padding(.trailing, icon != nil ? Constants.inputIconPadding : Constants.inputPadding)
                         .frame(height: Constants.inputHeight)
@@ -120,7 +120,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                             .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
                             .padding(.trailing, Constants.inputPadding)
-                            .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono900)
+                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals800)
                     }
                 }
             }
@@ -140,7 +140,7 @@ private struct ThemedTextStyle: TextFieldStyle {
 
         case .info(let string):
             Text.build(theme.font.small.normal(string))
-                .foregroundStyle(shouldApplyDisabledColor(for: Colors.primary.mono500))
+                .foregroundStyle(shouldApplyDisabledColor(for: Primitives.Colours.neutrals500))
                 .lineLimit(2)
 
         case .success(let string):
@@ -150,9 +150,9 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
-                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.green800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Primitives.Colours.semanticSuccess800))
                 Text.build(theme.font.small.normal(string))
-                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.green800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Primitives.Colours.semanticSuccess800))
                     .lineLimit(2)
             }
 
@@ -163,9 +163,9 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
-                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.red800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Primitives.Colours.semanticError700))
                 Text.build(theme.font.small.normal(string))
-                    .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.red800))
+                    .foregroundStyle(shouldApplyDisabledColor(for: Primitives.Colours.semanticError700))
                     .lineLimit(2)
             }
         }
@@ -179,17 +179,17 @@ private struct ThemedTextStyle: TextFieldStyle {
         switch status {
         case .empty,
              .info: // swiftlint:disable:this indentation_width
-            let primaryMono200Color = Colors.primary.mono200
-            let primaryMono300Color = Colors.primary.mono300
-            let primaryMono900Color = Colors.primary.mono900
+            let primaryMono200Color = Primitives.Colours.neutrals200
+            let primaryMono300Color = Primitives.Colours.neutrals400
+            let primaryMono900Color = Primitives.Colours.neutrals800
 
             return isDisabled ? primaryMono200Color : !isFocused ? primaryMono300Color : primaryMono900Color
 
         case .success:
-            return shouldApplyDisabledColor(for: Colors.secondary.green800)
+            return shouldApplyDisabledColor(for: Primitives.Colours.semanticSuccess800)
 
         case .error:
-            return shouldApplyDisabledColor(for: Colors.secondary.red800)
+            return shouldApplyDisabledColor(for: Primitives.Colours.semanticError700)
         }
     }
 }

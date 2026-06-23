@@ -6,7 +6,7 @@ struct ColorBannerDemoView: View {
     private static let selectedTitle: String = "Color:"
     private static let selectedImageTitle: String = "Pattern:"
     private static let items: [ColorSwatch] = [
-        .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+        .init(id: "1", name: "Black", type: .color(Primitives.Colours.neutrals900)),
         .init(id: "2", name: "Gray", type: .color(.gray)),
         .init(id: "3", name: "Red", type: .color(.red), isDisabled: true),
         .init(id: "4", name: "Green", type: .color(.green)),
@@ -18,7 +18,7 @@ struct ColorBannerDemoView: View {
     ]
 
     private static let itemsSmall: [ColorSwatch] = [
-        .init(id: "1", name: "Black", type: .color(Colors.primary.black)),
+        .init(id: "1", name: "Black", type: .color(Primitives.Colours.neutrals900)),
         .init(id: "2", name: "Gray", type: .color(.gray)),
         .init(id: "3", name: "Red", type: .color(.red), isDisabled: true),
         .init(id: "4", name: "Green", type: .color(.green)),

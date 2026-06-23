@@ -27,7 +27,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                         GeometryReader { gp in
                             ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
                                 Rectangle()
-                                    .fill(Colors.primary.black.opacity(Constants.opacityBackground))
+                                    .fill(Primitives.Colours.neutrals900.opacity(Constants.opacityBackground))
                                     .onTapGesture {
                                         onDismiss()
                                     }
@@ -48,7 +48,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                     VStack {
                                         HStack {
                                             Text.build(theme.font.header.h3(title))
-                                                .foregroundStyle(Colors.primary.black)
+                                                .foregroundStyle(Primitives.Colours.neutrals900)
                                             Spacer()
                                             Button {
                                                 onDismiss()
@@ -61,7 +61,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                         width: Constants.iconCloseSize,
                                                         height: Constants.iconCloseSize
                                                     )
-                                                    .tint(Colors.primary.black)
+                                                    .tint(Primitives.Colours.neutrals900)
                                             }
                                         }
                                         .padding(.vertical, Spacing.space100)
@@ -109,7 +109,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                     .edgesIgnoringSafeArea(.bottom)
                                     .background {
                                         RoundedRectangle(cornerRadius: CornerRadius.m)
-                                            .fill(Colors.primary.white)
+                                            .fill(Primitives.Colours.neutrals0)
                                             .edgesIgnoringSafeArea(.bottom)
                                             .padding(
                                                 .horizontal,

@@ -31,7 +31,7 @@ public struct ThemedSegmentedView<Content: View>: View {
         .padding(type == .compact ? Spacing.space050 : Spacing.space100)
         .background {
             RoundedRectangle(cornerRadius: CornerRadius.s)
-                .fill(Colors.primary.mono100)
+                .fill(Primitives.Colours.neutrals100)
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.segmentedControl)
@@ -57,7 +57,7 @@ public struct ThemedSegmentView: View {
         ZStack {
             if currectSelected == segment {
                 RoundedRectangle(cornerRadius: CornerRadius.xs)
-                    .fill(Colors.primary.white)
+                    .fill(Primitives.Colours.neutrals0)
                     .matchedGeometryEffect(id: "segmentBackground", in: animation, properties: .frame)
             } else {
                 RoundedRectangle(cornerRadius: CornerRadius.xs)
@@ -72,10 +72,10 @@ public struct ThemedSegmentView: View {
                         .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                         .padding(.trailing, type == .compact ? Spacing.space050 : Spacing.space100)
-                        .foregroundStyle(currectSelected == segment ? Colors.primary.black : Colors.primary.mono500)
+                        .foregroundStyle(currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500)
                 }
                 Text.build(theme.font.paragraph.normal(segment.title))
-                    .foregroundStyle(currectSelected == segment ? Colors.primary.black : Colors.primary.mono500)
+                    .foregroundStyle(currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500)
                     .padding(.vertical, type == .compact ? Spacing.space100 : Spacing.space200)
                     .lineLimit(1)
                 Spacer()

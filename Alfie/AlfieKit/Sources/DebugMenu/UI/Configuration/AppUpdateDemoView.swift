@@ -83,7 +83,7 @@ struct AppUpdateDemoView: View {
         VStack(alignment: .leading) {
             if isActive {
                 Text.build(theme.font.small.bold("Prompt enabled"))
-                    .foregroundStyle(Colors.secondary.red800)
+                    .foregroundStyle(Primitives.Colours.semanticError700)
                     .padding(.bottom, Spacing.space100)
             }
 
@@ -106,13 +106,13 @@ struct AppUpdateDemoView: View {
     private func row(label: String, value: String?) -> some View {
         VStack(alignment: .leading) {
             Text.build(theme.font.paragraph.normal(label))
-                .foregroundStyle(Colors.primary.mono500)
+                .foregroundStyle(Primitives.Colours.neutrals500)
             if let value {
                 Text.build(theme.font.paragraph.bold(value))
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
             } else {
                 Text.build(theme.font.paragraph.normal("Undefinied"))
-                    .foregroundStyle(Colors.primary.mono300)
+                    .foregroundStyle(Primitives.Colours.neutrals400)
             }
         }
         .padding(.bottom, Spacing.space025)
