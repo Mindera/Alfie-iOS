@@ -24,8 +24,12 @@ export lacks blue/yellow/orange and the 10-shade brand green/red — production 
 - [x] 4. Plan (plan.md + 4 phase files)
 - [x] 4.5 Grill (harden plan → grill.md, mapping.md)
 - [x] PLAN APPROVAL GATE — APPROVED (mechanism: **adopt design-token names** at call sites)
-- [ ] 5. Implement (ios-execute, solo) — verify + review gates
-- [ ] 6. Commit
-- [ ] 7. PR
+- [x] 5. Implement (ios-execute, solo) — verify ✅ FULL VERIFICATION PASSED · review ✅ APPROVED (0 crit)
+- [x] 6. Commit (8b8fc0b impl · 48298bf docs)
+- [ ] 7. PR  ← awaiting user go-ahead (outward-facing; ticket is partial)
 - [ ] 8. Ticket transition
 - [ ] 9. Report
+
+## Follow-up (deferred per decision)
+- blue/yellow/orange families: no design-token equivalent → review one-by-one (see mapping.md §B). Production shipping usage = none (DebugMenu demos + 1 SwiftUI #Preview only). Needs new upstream tokens in Mindera/Alfie-Mobile-Design-Tokens.
+- Design sign-off on the wire-now shade mappings (mapping.md §A) via snapshots on the PR.

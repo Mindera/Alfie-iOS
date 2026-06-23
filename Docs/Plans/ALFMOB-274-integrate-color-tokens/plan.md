@@ -1,7 +1,7 @@
 ---
 title: Integrate color tokens from design token JSON
 ticket: ALFMOB-274
-status: pending
+status: completed
 complexity: MEDIUM
 mode: auto
 blockedBy: []
