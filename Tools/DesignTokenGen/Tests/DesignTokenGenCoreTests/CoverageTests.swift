@@ -129,3 +129,28 @@ struct ColorLiteralTests {
         #expect(throws: DesignTokenError.self) { _ = try emitPrimitives([0, 0]) }
     }
 }
+
+@Suite("Emit edge cases")
+struct EmitEdgeTests {
+    private func emit(_ loaded: LoadedTokens, broken: Set<String> = []) throws -> [String: String] {
+        let resolver = Resolver(loaded: loaded, cycleAllowlist: .init(edges: []), brokenRefAllowlist: .init(missingTargets: broken))
+        return try Emitter(loaded: loaded, resolver: resolver).emit()
+    }
+
+    @Test("string-valued literals are escaped so special characters can't break the Swift")
+    func escapesStringLiterals() throws {
+        let weird = "Wei\"rd\\Font"
+        let t = tok("typography-font-family-weird", .fontFamily(weird), file: ".primitives.x")
+        let loaded = LoadedTokens(map: ["typography-font-family-weird": t], primitiveValues: ["typography-font-family-weird": t], loadedFiles: [".primitives.x"])
+        let primitives = try emit(loaded)["Primitives+Generated.swift"]!
+        #expect(primitives.contains(String(reflecting: weird)))   // properly escaped Swift literal
+    }
+
+    @Test("an emitted token resolving to an allow-listed broken ref throws a clear error")
+    func brokenRefReachingOutputThrows() {
+        // theme token → {ghost}; ghost is missing but allow-listed → no concrete value to emit.
+        let theme = tok("surface-x", .reference("ghost"), file: "theme.x")
+        let loaded = LoadedTokens(map: ["surface-x": theme], primitiveValues: [:], loadedFiles: ["theme.x"])
+        #expect(throws: DesignTokenError.self) { _ = try emit(loaded, broken: ["ghost"]) }
+    }
+}
