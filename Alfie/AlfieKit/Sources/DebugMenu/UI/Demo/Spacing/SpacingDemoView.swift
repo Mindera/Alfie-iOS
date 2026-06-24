@@ -20,7 +20,6 @@ struct SpacingDemoView: View {
                 spacingView(token: "space.600", multiplier: "6", Spacing.space600)
                 spacingView(token: "space.700", multiplier: "7", Spacing.space700)
                 spacingView(token: "space.800", multiplier: "8", Spacing.space800)
-                spacingView(token: "space.900", multiplier: "9", Spacing.space900)
                 spacingView(token: "space.1000", multiplier: "10", Spacing.space1000)
             }
             .padding(.horizontal, Spacing.space200)
