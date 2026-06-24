@@ -65,5 +65,9 @@ public enum SwiftIdentifier {
         "for", "guard", "if", "in", "repeat", "return", "switch", "where", "while", "as",
         "catch", "false", "is", "nil", "self", "super", "throw", "throws", "true", "try",
         "Any", "Protocol", "Type",
+        // Contextual keywords (concurrency / ownership / macros). Usable as identifiers in most
+        // positions, but back-ticking is always valid and honors the keyword-escape contract.
+        "actor", "async", "await", "some", "any", "macro", "package",
+        "consuming", "borrowing", "isolated", "nonisolated", "distributed", "each", "sending",
     ]
 }

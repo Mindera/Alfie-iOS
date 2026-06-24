@@ -20,10 +20,13 @@ struct SwiftIdentifierTests {
         #expect(SwiftIdentifier.make("2xl") == "_2xl")
     }
 
-    @Test("Swift keywords are back-tick escaped")
-    func keywordEscape() {
-        #expect(SwiftIdentifier.make("default") == "`default`")
-        #expect(SwiftIdentifier.make("repeat") == "`repeat`")
+    @Test("Swift keywords are back-tick escaped", arguments: [
+        "default", "repeat", "class", "static", "return",
+        "actor", "async", "await", "some", "any", "macro", "package",
+        "consuming", "borrowing", "isolated", "nonisolated", "distributed", "each", "sending",
+    ])
+    func keywordEscape(keyword: String) {
+        #expect(SwiftIdentifier.make(keyword) == "`\(keyword)`")
     }
 
     @Test("distinct names colliding to one identifier throws")

@@ -157,6 +157,7 @@ struct EmitterTests {
         let t = try emit()["Typography+Generated.swift"]!
         #expect(t.contains("public enum Display"))
         #expect(t.contains("public enum Heading"))
+        #expect(t.contains("public init("))   // public memberwise init so the type is usable cross-module
         #expect(t.contains("public static let large = TypographyStyle("))
         #expect(t.contains("fontFamily: Primitives.Typography.fontFamilyBrand"))  // resolved through the allow-listed cycle
         #expect(t.contains("fontSize: Primitives.Typography.fontSizeFontSize40"))

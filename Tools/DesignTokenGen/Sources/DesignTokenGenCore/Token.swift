@@ -62,6 +62,7 @@ public enum DesignTokenError: Error, CustomStringConvertible, Equatable {
     case malformedToken(name: String, reason: String)
     case unknownDimensionUnit(token: String, unit: String)
     case missingReference(token: String, target: String)         // not on broken-ref allowlist
+    case brokenReferenceInOutput(target: String)                 // allow-listed broken ref reached an emitted surface
     case unexpectedCycle(file: String, token: String)            // not on cycle allowlist
     case staleCycleAllowlistEntry(file: String, token: String)   // allow-listed but no such cycle
     case staleBrokenRefAllowlistEntry(target: String)
@@ -75,6 +76,7 @@ public enum DesignTokenError: Error, CustomStringConvertible, Equatable {
         case .malformedToken(let n, let r): return "malformed token '\(n)': \(r)"
         case .unknownDimensionUnit(let t, let u): return "token '\(t)': unsupported dimension unit '\(u)' (only 'px')"
         case .missingReference(let t, let g): return "token '\(t)' references missing target '{\(g)}' (not on broken-ref allowlist)"
+        case .brokenReferenceInOutput(let g): return "an emitted token resolves to allow-listed broken ref '{\(g)}' — it has no concrete value to emit"
         case .unexpectedCycle(let f, let t): return "unexpected reference cycle at (\(f), \(t)) — not on cycle allowlist"
         case .staleCycleAllowlistEntry(let f, let t): return "stale cycle-allowlist entry (\(f), \(t)) — no such cycle in export"
         case .staleBrokenRefAllowlistEntry(let t): return "stale broken-ref-allowlist entry '\(t)' — target resolves or is unreferenced"

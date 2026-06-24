@@ -28,10 +28,12 @@ duplicate names across the other platform/breakpoint files. Also skip `.document
 
 ## Value shapes (confirmed) — corrects red-team J4 / J5
 
-- **color**: `{ "colorSpace": "srgb", "components": [r,g,b] | [r,g,b,a] }`, floats `0.0–1.0`.
-  **NOT hex.** Current export: all 27 are 3-component (no alpha present today). → emit
-  `Color(.sRGB, red:, green:, blue:, opacity:)`, default opacity `1` when only 3 components; still
-  read an optional 4th defensively. **No hex parser needed** (J4 was wrong about the format).
+- **color**: `{ "colorSpace": "srgb", "components": [r,g,b] }`, floats `0.0–1.0`, **NOT hex**. Alpha
+  arrives as a **separate `alpha` key** (e.g. transparent = `components [1,1,1]` + `alpha 0`), *not* a
+  4th component as the format doc implies — the generator folds `alpha` in as the opacity. → emit
+  `Color(.sRGB, red:, green:, blue:, opacity:)`, default opacity `1` when no alpha. **No hex parser
+  needed** (J4 was wrong about the format). _(Corrected post-PR: the alpha-key shape was caught by a
+  PR review comment — the transparent token had been emitting opaque white.)_
 - **dimension**: `{ "value": <number>, "unit": "px" }`. **Only `px`** in the whole export; contract
   says iOS points = px @1×. → emit `CGFloat(value)`; **error on any non-`px` unit** defensively
   (J5's rem concern does not occur today, keep the guard).

@@ -56,6 +56,42 @@ struct ValueParsingTests {
         }
     }
 
+    @Test("color alpha key folds into a 4th opacity component")
+    func colorAlphaKey() throws {
+        let raw: [String: Any] = ["colorSpace": "srgb", "components": [1, 1, 1], "alpha": 0]
+        #expect(try TokenLoader.parseValue(type: "color", raw: raw, name: "x") == .color(components: [1, 1, 1, 0]))
+    }
+
+    @Test("string $value that isn't a String throws (no silent empty string)")
+    func stringNonStringThrows() {
+        #expect(throws: DesignTokenError.self) {
+            _ = try TokenLoader.parseValue(type: "string", raw: 5, name: "x")
+        }
+    }
+
+    @Test("a configured collection missing its expected mode fails fast")
+    func missingManifestModeThrows() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        // `system` is configured to require the `ios` mode, but only `android` is present.
+        let manifest = #"{"collections":{"system":{"modes":{"android":["system.android.tokens.json"]}}}}"#
+        let url = dir.appendingPathComponent("manifest.json")
+        try manifest.write(to: url, atomically: true, encoding: .utf8)
+        #expect(throws: DesignTokenError.self) { _ = try TokenLoader.selectedFiles(manifestURL: url) }
+    }
+
+    @Test("a collection missing its `modes` dictionary fails fast")
+    func missingModesDictionaryThrows() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let manifest = #"{"collections":{"theme":{"notModes":{}}}}"#
+        let url = dir.appendingPathComponent("manifest.json")
+        try manifest.write(to: url, atomically: true, encoding: .utf8)
+        #expect(throws: DesignTokenError.self) { _ = try TokenLoader.selectedFiles(manifestURL: url) }
+    }
+
     @Test("fontFamily array takes the first family; empty array throws")
     func fontFamilyArray() throws {
         #expect(try TokenLoader.parseValue(type: "fontFamily", raw: ["Libre", "Arial"], name: "x") == .fontFamily("Libre"))
@@ -102,5 +138,30 @@ struct ColorLiteralTests {
     @Test("color with fewer than 3 components is rejected")
     func tooFewComponents() {
         #expect(throws: DesignTokenError.self) { _ = try emitPrimitives([0, 0]) }
+    }
+}
+
+@Suite("Emit edge cases")
+struct EmitEdgeTests {
+    private func emit(_ loaded: LoadedTokens, broken: Set<String> = []) throws -> [String: String] {
+        let resolver = Resolver(loaded: loaded, cycleAllowlist: .init(edges: []), brokenRefAllowlist: .init(missingTargets: broken))
+        return try Emitter(loaded: loaded, resolver: resolver).emit()
+    }
+
+    @Test("string-valued literals are escaped so special characters can't break the Swift")
+    func escapesStringLiterals() throws {
+        let weird = "Wei\"rd\\Font"
+        let t = tok("typography-font-family-weird", .fontFamily(weird), file: ".primitives.x")
+        let loaded = LoadedTokens(map: ["typography-font-family-weird": t], primitiveValues: ["typography-font-family-weird": t], loadedFiles: [".primitives.x"])
+        let primitives = try emit(loaded)["Primitives+Generated.swift"]!
+        #expect(primitives.contains(String(reflecting: weird)))   // properly escaped Swift literal
+    }
+
+    @Test("an emitted token resolving to an allow-listed broken ref throws a clear error")
+    func brokenRefReachingOutputThrows() {
+        // theme token → {ghost}; ghost is missing but allow-listed → no concrete value to emit.
+        let theme = tok("surface-x", .reference("ghost"), file: "theme.x")
+        let loaded = LoadedTokens(map: ["surface-x": theme], primitiveValues: [:], loadedFiles: ["theme.x"])
+        #expect(throws: DesignTokenError.self) { _ = try emit(loaded, broken: ["ghost"]) }
     }
 }

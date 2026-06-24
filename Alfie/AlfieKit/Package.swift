@@ -390,6 +390,23 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "BFFIntegrationTests",
+            dependencies: [
+                "Core",
+                "Model",
+                "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "ModelTests",
+            dependencies: [
+                "Model",
+            ]
+        ),
+
+        .testTarget(
             name: "ProductDetailsTests",
             dependencies: [
                 "ProductDetails",

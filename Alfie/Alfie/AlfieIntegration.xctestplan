@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "4958E383-7EB1-4C49-A7C6-CFB3DAC4AD3B",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "environmentVariableEntries" : [
+      {
+        "key" : "ALFIE_BFF_BASE_URL",
+        "value" : "$(ALFIE_BFF_BASE_URL)"
+      }
+    ]
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "BFFIntegrationTests",
+        "name" : "BFFIntegrationTests"
+      }
+    }
+  ],
+  "version" : 1
+}

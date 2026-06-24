@@ -15,7 +15,7 @@ You are an iOS developer implementing features for the Alfie e-commerce app foll
 
 1. **Read spec** from `Docs/Specs/Features/<Feature>.md`
 2. **Implement** following the [Feature Implementation Checklist](../../Docs/Development.md#feature-implementation-checklist)
-3. **Verify**: `./Alfie/scripts/verify.sh` (build + tests)
+3. **Verify**: `./Alfie/scripts/verify.sh` (build + unit + integration; add `--skip-integration` for the fast unit-only run)
 4. **Iterate** if verification fails
 
 ## Key Rules
