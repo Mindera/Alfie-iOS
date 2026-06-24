@@ -179,11 +179,9 @@ private struct ThemedTextStyle: TextFieldStyle {
         switch status {
         case .empty,
              .info: // swiftlint:disable:this indentation_width
-            let primaryMono200Color = Primitives.Colours.neutrals200
-            let primaryMono300Color = Primitives.Colours.neutrals400
-            let primaryMono900Color = Primitives.Colours.neutrals800
-
-            return isDisabled ? primaryMono200Color : !isFocused ? primaryMono300Color : primaryMono900Color
+            return isDisabled
+                ? Primitives.Colours.neutrals200
+                : !isFocused ? Primitives.Colours.neutrals400 : Primitives.Colours.neutrals800
 
         case .success:
             return shouldApplyDisabledColor(for: Primitives.Colours.semanticSuccess800)

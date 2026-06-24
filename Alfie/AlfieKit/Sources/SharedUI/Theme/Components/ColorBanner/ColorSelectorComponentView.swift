@@ -85,7 +85,7 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: "1", name: "Black", type: .color(Primitives.Colours.neutrals900)),
+                .init(id: "1", name: "Black", type: .color(.black)),
                 .init(id: "2", name: "Gray", type: .color(.gray)),
                 .init(id: "3", name: "Red", type: .color(.red)),
                 .init(id: "4", name: "Green", type: .color(.green)),
@@ -102,7 +102,7 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: "1", name: "Black", type: .color(Primitives.Colours.neutrals900)),
+                .init(id: "1", name: "Black", type: .color(.black)),
                 .init(id: "2", name: "Gray", type: .color(.gray)),
                 .init(id: "3", name: "Red", type: .color(.red)),
                 .init(id: "4", name: "Green", type: .color(.green)),
@@ -119,7 +119,7 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: "1", name: "Black", type: .color(Primitives.Colours.neutrals900)),
+                .init(id: "1", name: "Black", type: .color(.black)),
                 .init(id: "2", name: "Gray", type: .color(.gray)),
                 .init(id: "3", name: "Red", type: .color(.red)),
                 .init(id: "4", name: "Green", type: .color(.green)),
@@ -138,7 +138,7 @@ public struct ColorSelectorComponentView: View {
         configuration: .init(
             selectedTitle: "Color:",
             items: [
-                .init(id: "1", name: "Black", type: .color(Primitives.Colours.neutrals900)),
+                .init(id: "1", name: "Black", type: .color(.black)),
                 .init(id: "2", name: "Gray", type: .color(.gray)),
                 .init(id: "3", name: "Red", type: .color(.red)),
                 .init(id: "4", name: "Green", type: .color(.green)),
