@@ -5,8 +5,8 @@ import SwiftUI
 struct PageControlCarouselDemoView: View {
     private let smallColors: [Color] = [
         Primitives.Colours.neutrals200,
+        Primitives.Colours.neutrals300,
         Primitives.Colours.neutrals400,
-        Primitives.Colours.neutrals500,
         Primitives.Colours.neutrals500,
     ]
     private let mediumColors: [Color] = [
@@ -16,10 +16,10 @@ struct PageControlCarouselDemoView: View {
         Primitives.Colours.semanticError500,
     ]
     private let largeColors: [Color] = [
-        Primitives.Colours.neutrals200,
-        Primitives.Colours.neutrals300,
-        Primitives.Colours.neutrals400,
-        Primitives.Colours.neutrals400,
+        Primitives.Colours.neutrals600,
+        Primitives.Colours.neutrals700,
+        Primitives.Colours.neutrals800,
+        Primitives.Colours.neutrals900,
     ]
     private let customColors: [Color] = [
         Primitives.Colours.semanticSuccess200,

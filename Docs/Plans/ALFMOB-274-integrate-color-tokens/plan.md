@@ -12,23 +12,23 @@ created: 2026-06-23
 ## Overview
 Make the ALFMOB-272 generated design tokens the source of truth for Alfie's colors. Per the grilled
 decisions, the generated **`Primitives.Colours.*` names are adopted directly** (not hidden behind the old
-`mono`/`green`/`red` names). Colors that have a token family are migrated **now**; colors with **no**
-token family (`blue`, `yellow`, `orange`) go on a **review list** (`mapping.md §B`) to be resolved
-one-by-one later. The asset catalog is therefore only *partially* retired this ticket.
+`mono`/`green`/`red` names). Colors that have a token family are migrated to the token; colors with **no**
+token family (`blue`, `yellow`, `orange`) were **deleted entirely** (follow-up decision — see below).
+The `Colors` facade, `Primary`/`SecondaryColors`, and `Colors.xcassets` are **fully retired**.
 
-## Scope split (from grill — see `mapping.md`)
-- **Wire now (has a token family):** `mono*`→`neutrals*`, `green*`→`semanticSuccess*`, `red*`→`semanticError*`, `white`=`neutrals0` (exact), `black`≈`neutrals900`. ~32 colors / ~335 call sites. Exact shade table in `mapping.md §A` (engineering best-fit, **design confirms via snapshots**).
-- **Review list (no token family):** `blue` (10), `yellow` (6), `orange` (6) = 22 colors. Production use: `blue` → only `ThemedDivider`; `yellow`/`orange` → only DebugMenu demos. Stay on `Colors.xcassets` until design provides replacements (likely new upstream tokens). `mapping.md §B`.
+## Scope split (from grill + follow-up — see `mapping.md`)
+- **Migrated (has a token family):** `mono*`→`neutrals*`, `green*`→`semanticSuccess*`, `red*`→`semanticError*`, `white`=`neutrals0` (exact), `black`≈`neutrals900`. ~32 colors / ~335 call sites. Exact shade table in `mapping.md §A` (engineering best-fit, **design confirms via snapshots**).
+- **Deleted (no token family):** `blue` (10), `yellow` (6), `orange` (6) = 22 colors. **Follow-up decision: deleted, not deferred** — no token equivalent and no production shipping usage (only DebugMenu demos + 1 `#Preview`). Members + colorsets removed; demo/preview refs re-pointed to nearest token. `mapping.md §B`.
 
 ## Acceptance Criteria
-- [ ] `mono*`, `white`, `black`, `green*`, `red*` sourced from `Primitives.Colours.*` — no asset lookups for these families.
-- [ ] Call sites reference the design-token names (per Decision 1) — `Colors.primary.mono*`/`secondary.green*`/`red*` no longer used.
-- [ ] `blue`/`yellow`/`orange` left intact on xcassets + recorded in `mapping.md §B` review list (NOT force-mapped).
-- [ ] `ThemeProvider` UIKit appearance still resolves after the migrated colorsets are removed.
-- [ ] Migrated colorsets (`Mono*`,`Black`,`White`,`Green*`,`Red*`) deleted from `Colors.xcassets`; `Package.swift` resource entry kept (catalog still holds blue/yellow/orange).
-- [ ] Snapshot tests pass (rebaselined where token hex ≠ old asset hex — flagged, not auto-passed).
-- [ ] `./Alfie/scripts/verify.sh` → ✅ FULL VERIFICATION PASSED.
-- [ ] (Deferred, tracked) "no hardcoded hex remains" for blue/yellow/orange — follow-up ticket once review list resolved.
+- [x] `mono*`, `white`, `black`, `green*`, `red*` sourced from `Primitives.Colours.*` — no asset lookups.
+- [x] Call sites reference the design-token names (per Decision 1) — `Colors.primary/secondary.*` no longer used.
+- [x] `blue`/`yellow`/`orange` **deleted** (no force-map); demo/preview refs re-pointed to nearest token (`mapping.md §B`).
+- [x] `ThemeProvider` UIKit appearance still resolves after the colorsets are removed.
+- [x] `Colors.xcassets` **fully deleted** + `.process(...)` removed from `Package.swift`; `Colors`/`Primary`/`SecondaryColors` types deleted.
+- [x] Snapshot suites: not in the AlfieTests target → none run / nothing to rebaseline (recorded in `phase-4`).
+- [x] `./Alfie/scripts/verify.sh` → ✅ FULL VERIFICATION PASSED.
+- [x] "No hardcoded hex remains" — fully met (no deferral; whole palette is tokens now).
 
 ## Approach
 **Adopt design-token names; migrate family-by-family; defer the no-token families.** For each wire-now

@@ -1,6 +1,7 @@
 import AlicerceLogging
 import Mocks
 import Model
+import SharedUI
 import TestUtils
 import XCTest
 @testable import ProductDetails
@@ -682,7 +683,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(.black))
+        XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(Primitives.Colours.neutrals900))
     }
 
     func test_state_has_selected_variant_when_color_is_selected() {
