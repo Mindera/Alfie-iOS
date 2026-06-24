@@ -86,11 +86,11 @@ public struct ThemedDivider: View {
         Spacer()
         HStack {
             ThemedDivider(
-                configuration: .init(orientation: .horizontal, thickness: 5.0, color: Colors.secondary.orange400)
+                configuration: .init(orientation: .horizontal, thickness: 5.0, color: Primitives.Colours.semanticError400)
             )
             Spacer()
             ThemedDivider(
-                configuration: .init(orientation: .vertical, thickness: 5.0, color: Colors.secondary.orange400)
+                configuration: .init(orientation: .vertical, thickness: 5.0, color: Primitives.Colours.semanticError400)
             )
         }
         .frame(height: 50)

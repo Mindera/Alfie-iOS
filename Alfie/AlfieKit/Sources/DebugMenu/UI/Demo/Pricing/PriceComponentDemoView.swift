@@ -93,7 +93,7 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.small.normal(priceSize.title))
-                    .tint(Colors.secondary.blue500)
+                    .tint(Primitives.Colours.neutrals400)
             }
         }
         .padding(.top, Spacing.space200)
@@ -112,7 +112,7 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.small.normal(priceType.rawValue))
-                    .tint(Colors.secondary.blue500)
+                    .tint(Primitives.Colours.neutrals400)
             }
         }
         .padding(.top, Spacing.space200)
@@ -131,7 +131,7 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.small.normal(priceDistribution.title))
-                    .tint(Colors.secondary.blue500)
+                    .tint(Primitives.Colours.neutrals400)
             }
         }
         .padding(.top, Spacing.space200)
@@ -150,7 +150,7 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.small.normal(textAlignment.title))
-                    .tint(Colors.secondary.blue500)
+                    .tint(Primitives.Colours.neutrals400)
             }
         }
         .padding(.top, Spacing.space200)
@@ -169,7 +169,7 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.small.normal(currencyCode))
-                    .tint(Colors.secondary.blue500)
+                    .tint(Primitives.Colours.neutrals400)
             }
         }
         .padding(.top, Spacing.space200)

@@ -70,37 +70,6 @@ struct ColorsDemoView: View {
                 Primitives.Colours.semanticError100,
                 Primitives.Colours.semanticError100,
             ])
-
-            paletteView(with: "Yellow", colors: [
-                Colors.secondary.yellow500,
-                Colors.secondary.yellow400,
-                Colors.secondary.yellow300,
-                Colors.secondary.yellow200,
-                Colors.secondary.yellow100,
-                Colors.secondary.yellow050,
-            ])
-
-            paletteView(with: "Blue", colors: [
-                Colors.secondary.blue900,
-                Colors.secondary.blue800,
-                Colors.secondary.blue700,
-                Colors.secondary.blue600,
-                Colors.secondary.blue500,
-                Colors.secondary.blue400,
-                Colors.secondary.blue300,
-                Colors.secondary.blue200,
-                Colors.secondary.blue100,
-                Colors.secondary.blue050,
-            ])
-
-            paletteView(with: "Orange", colors: [
-                Colors.secondary.orange500,
-                Colors.secondary.orange400,
-                Colors.secondary.orange300,
-                Colors.secondary.orange200,
-                Colors.secondary.orange100,
-                Colors.secondary.orange050,
-            ])
         }
     }
 

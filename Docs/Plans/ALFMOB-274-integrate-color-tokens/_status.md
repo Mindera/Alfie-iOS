@@ -30,6 +30,6 @@ export lacks blue/yellow/orange and the 10-shade brand green/red — production 
 - [ ] 8. Ticket transition
 - [ ] 9. Report
 
-## Follow-up (deferred per decision)
-- blue/yellow/orange families: no design-token equivalent → review one-by-one (see mapping.md §B). Production shipping usage = none (DebugMenu demos + 1 SwiftUI #Preview only). Needs new upstream tokens in Mindera/Alfie-Mobile-Design-Tokens.
+## Follow-up
+- ~~blue/yellow/orange deferred~~ → **DELETED** (user follow-up): no token equivalent + no production usage → removed entirely; `Colors.xcassets` fully retired; demo/preview refs re-pointed to nearest token. `Colors` enum + `Secondary/PrimaryColors` gone. verify.sh ✅ re-passed.
 - Design sign-off on the wire-now shade mappings (mapping.md §A) via snapshots on the PR.

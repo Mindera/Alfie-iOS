@@ -10,16 +10,16 @@ struct PageControlCarouselDemoView: View {
         Primitives.Colours.neutrals500,
     ]
     private let mediumColors: [Color] = [
-        Colors.secondary.orange200,
-        Colors.secondary.orange300,
-        Colors.secondary.orange400,
-        Colors.secondary.orange500,
+        Primitives.Colours.semanticError200,
+        Primitives.Colours.semanticError300,
+        Primitives.Colours.semanticError400,
+        Primitives.Colours.semanticError500,
     ]
     private let largeColors: [Color] = [
-        Colors.secondary.blue200,
-        Colors.secondary.blue300,
-        Colors.secondary.blue400,
-        Colors.secondary.blue500,
+        Primitives.Colours.neutrals200,
+        Primitives.Colours.neutrals300,
+        Primitives.Colours.neutrals400,
+        Primitives.Colours.neutrals400,
     ]
     private let customColors: [Color] = [
         Primitives.Colours.semanticSuccess200,
