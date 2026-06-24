@@ -55,7 +55,11 @@ public enum TokenLoader {
         if let collections = root["collections"] as? [String: Any] {
             for (collection, value) in collections {
                 if collection == ".documentation" { continue }
-                guard let modes = (value as? [String: Any])?["modes"] as? [String: Any] else { continue }
+                // A collection without a `modes` dictionary is contract drift — fail fast rather than
+                // silently dropping its tokens from the generated set.
+                guard let modes = (value as? [String: Any])?["modes"] as? [String: Any] else {
+                    throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' has no 'modes' dictionary")
+                }
                 let chosen: [Any]
                 if let mode = modeForCollection[collection] {
                     // A configured collection MUST expose its expected mode — falling back to an empty

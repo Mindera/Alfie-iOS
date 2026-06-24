@@ -81,6 +81,17 @@ struct ValueParsingTests {
         #expect(throws: DesignTokenError.self) { _ = try TokenLoader.selectedFiles(manifestURL: url) }
     }
 
+    @Test("a collection missing its `modes` dictionary fails fast")
+    func missingModesDictionaryThrows() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let manifest = #"{"collections":{"theme":{"notModes":{}}}}"#
+        let url = dir.appendingPathComponent("manifest.json")
+        try manifest.write(to: url, atomically: true, encoding: .utf8)
+        #expect(throws: DesignTokenError.self) { _ = try TokenLoader.selectedFiles(manifestURL: url) }
+    }
+
     @Test("fontFamily array takes the first family; empty array throws")
     func fontFamilyArray() throws {
         #expect(try TokenLoader.parseValue(type: "fontFamily", raw: ["Libre", "Arial"], name: "x") == .fontFamily("Libre"))

@@ -47,6 +47,9 @@ else
 fi
 
 mkdir -p "$DEST"
+# Clear any previously-pulled JSON first, so a changed file set can't leave stale tokens behind
+# (`-name '*.json'` matches dot-prefixed names like .primitives.* / .cycle-allowlist.json too).
+find "$DEST" -maxdepth 1 -type f -name '*.json' -delete
 for f in "${TOKEN_FILES[@]}"; do
   cp "$SRC/design-tokens/$f" "$DEST/$f"
 done

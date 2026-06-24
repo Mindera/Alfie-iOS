@@ -127,6 +127,14 @@ public struct Emitter {
             public let fontSize: CGFloat
             public let lineHeight: CGFloat
             public let letterSpacing: CGFloat
+
+            public init(fontFamily: String, fontWeight: Int, fontSize: CGFloat, lineHeight: CGFloat, letterSpacing: CGFloat) {
+                self.fontFamily = fontFamily
+                self.fontWeight = fontWeight
+                self.fontSize = fontSize
+                self.lineHeight = lineHeight
+                self.letterSpacing = letterSpacing
+            }
         }
 
         public enum Typography {
