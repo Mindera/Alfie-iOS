@@ -32,12 +32,10 @@ struct ColorsDemoView: View {
                 Primitives.Colours.neutrals800,
                 Primitives.Colours.neutrals700,
                 Primitives.Colours.neutrals600,
-                Primitives.Colours.neutrals600,
-                Primitives.Colours.neutrals500,
                 Primitives.Colours.neutrals500,
                 Primitives.Colours.neutrals400,
+                Primitives.Colours.neutrals300,
                 Primitives.Colours.neutrals200,
-                Primitives.Colours.neutrals100,
                 Primitives.Colours.neutrals100,
             ])
         }
@@ -47,27 +45,23 @@ struct ColorsDemoView: View {
         VStack {
             paletteView(with: "Green", colors: [
                 Primitives.Colours.semanticSuccess800,
-                Primitives.Colours.semanticSuccess800,
-                Primitives.Colours.semanticSuccess800,
                 Primitives.Colours.semanticSuccess700,
                 Primitives.Colours.semanticSuccess600,
                 Primitives.Colours.semanticSuccess500,
                 Primitives.Colours.semanticSuccess400,
+                Primitives.Colours.semanticSuccess300,
                 Primitives.Colours.semanticSuccess200,
-                Primitives.Colours.semanticSuccess100,
                 Primitives.Colours.semanticSuccess100,
             ])
 
             paletteView(with: "Red", colors: [
-                Primitives.Colours.semanticError700,
+                Primitives.Colours.semanticError800,
                 Primitives.Colours.semanticError700,
                 Primitives.Colours.semanticError600,
-                Primitives.Colours.semanticError500,
                 Primitives.Colours.semanticError500,
                 Primitives.Colours.semanticError400,
                 Primitives.Colours.semanticError300,
                 Primitives.Colours.semanticError200,
-                Primitives.Colours.semanticError100,
                 Primitives.Colours.semanticError100,
             ])
         }
@@ -79,7 +73,7 @@ struct ColorsDemoView: View {
                 .foregroundStyle(colors.first ?? Primitives.Colours.neutrals900)
             ScrollView(.horizontal) {
                 HStack(spacing: Spacing.space0) {
-                    ForEach(colors, id: \.self) { color in
+                    ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
                         colorView(with: color)
                     }
                 }
