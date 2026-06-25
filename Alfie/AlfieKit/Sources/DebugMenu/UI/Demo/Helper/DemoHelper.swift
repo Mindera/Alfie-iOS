@@ -7,13 +7,13 @@ public enum DemoHelper {
     }
 
     public static func demoSectionHeader(title: String) -> some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             HStack {
                 Text.build(ThemeProvider.shared.font.paragraph.bold(title))
                 Spacer()
             }
             ThemedDivider.horizontalThick
-                .padding(.top, Spacing.space075)
+                .padding(.top, Primitives.Spacing.spacing8)
         }
     }
 }

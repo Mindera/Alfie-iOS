@@ -29,7 +29,7 @@ public struct SnapCarousel<Content: View>: View {
         areItemsLoading: Binding<Bool>? = nil,
         itemAspectRatio: CGFloat = 0.77,
         itemIndex: Binding<Int>,
-        itemSpacing: CGFloat = Spacing.space100,
+        itemSpacing: CGFloat = Primitives.Spacing.spacing8,
         minimumScrollVelocity: CGFloat = 40,
         shouldAnimateRealIndexUpdate: Binding<Bool> = .constant(true),
         items: @escaping () -> [Content]
@@ -50,7 +50,7 @@ public struct SnapCarousel<Content: View>: View {
 
     public var body: some View {
         GeometryReader { proxy in
-            let sideCutWidth = isSingleItem ? 0 : proxy.size.width / Spacing.space250
+            let sideCutWidth = isSingleItem ? 0 : proxy.size.width / Primitives.Spacing.spacing20
             let itemWidth = proxy.size.width - (2 * itemSpacing + 2 * sideCutWidth)
             let itemHeight = itemWidth / itemAspectRatio
             // Adjustment that keeps the images centered on each swipe

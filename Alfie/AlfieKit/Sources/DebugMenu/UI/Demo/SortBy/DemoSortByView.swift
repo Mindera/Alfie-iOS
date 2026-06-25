@@ -13,8 +13,8 @@ struct DemoSortByView: View {
     var body: some View {
         VStack {
             DemoHelper.demoSectionHeader(title: "Sort By")
-                .padding(.vertical, Spacing.space400)
-                .padding(.horizontal, Spacing.space200)
+                .padding(.vertical, Primitives.Spacing.spacing32)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
             SortByView(sortBy: $sortBy, title: "Sort By", options: list)
         }
     }

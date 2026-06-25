@@ -21,10 +21,10 @@ public struct SortByView: View {
                     .foregroundStyle(Primitives.Colours.neutrals800)
                 Spacer()
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
             ScrollViewReader { reader in
                 ScrollView(.horizontal) {
-                    HStack(spacing: Spacing.space075) {
+                    HStack(spacing: Primitives.Spacing.spacing8) {
                         ForEach(options, id: \.value) { option in
                             Button {
                                 sortBy = option.value
@@ -32,7 +32,7 @@ public struct SortByView: View {
                                     reader.scrollTo(option.value, anchor: .center)
                                 }
                             } label: {
-                                HStack(spacing: Spacing.space100) {
+                                HStack(spacing: Primitives.Spacing.spacing8) {
                                     if let icon = option.icon {
                                         icon.image
                                             .renderingMode(.template)
@@ -40,14 +40,14 @@ public struct SortByView: View {
                                             .scaledToFit()
                                             .frame(size: Constants.iconSize)
                                             .tint(Primitives.Colours.neutrals800)
-                                            .padding(.vertical, Spacing.space150)
-                                            .padding(.leading, Spacing.space150)
+                                            .padding(.vertical, Primitives.Spacing.spacing12)
+                                            .padding(.leading, Primitives.Spacing.spacing12)
                                     }
                                     Text.build(theme.font.small.bold(option.title))
                                         .foregroundStyle(Primitives.Colours.neutrals800)
-                                        .padding(.trailing, Spacing.space150)
-                                        .padding(.vertical, Spacing.space150)
-                                        .padding(.leading, option.icon == nil ? Spacing.space150 : 0)
+                                        .padding(.trailing, Primitives.Spacing.spacing12)
+                                        .padding(.vertical, Primitives.Spacing.spacing12)
+                                        .padding(.leading, option.icon == nil ? Primitives.Spacing.spacing12 : 0)
                                 }
                                 .overlay {
                                     RoundedRectangle(cornerRadius: Sizing.radiusSoft)
@@ -61,7 +61,7 @@ public struct SortByView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, Spacing.space200)
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
                 }
                 .scrollIndicators(.hidden)
             }

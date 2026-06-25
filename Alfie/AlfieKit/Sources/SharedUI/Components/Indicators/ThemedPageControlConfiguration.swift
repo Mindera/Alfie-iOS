@@ -23,5 +23,5 @@ public struct ThemedPageControlConfiguration {
 }
 
 extension ThemedPageControlConfiguration {
-    static let `default` = ThemedPageControlConfiguration(size: 8, spacing: Spacing.space050)
+    static let `default` = ThemedPageControlConfiguration(size: 8, spacing: Primitives.Spacing.spacing4)
 }

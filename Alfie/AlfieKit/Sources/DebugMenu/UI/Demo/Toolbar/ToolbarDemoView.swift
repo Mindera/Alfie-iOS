@@ -48,12 +48,12 @@ struct ToolbarDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoHeader(title: "Catalogue App")
-                    .padding(.vertical, Spacing.space050)
+                    .padding(.vertical, Primitives.Spacing.spacing4)
 
                 DemoHelper.demoSectionHeader(title: "Title Header")
-                    .padding(.bottom, Spacing.space250)
+                    .padding(.bottom, Primitives.Spacing.spacing20)
 
                 DemoHelper.demoSectionHeader(title: "Title")
 
@@ -68,14 +68,14 @@ struct ToolbarDemoView: View {
                 ThemedToggleView(isOn: $darkMode) { Text.build(theme.font.small.bold("Dark mode")) }
 
                 DemoHelper.demoSectionHeader(title: "Controls (Left / Right)")
-                    .padding(.top, Spacing.space250)
+                    .padding(.top, Primitives.Spacing.spacing20)
 
-                HStack(alignment: .top, spacing: Spacing.space0) {
+                HStack(alignment: .top, spacing: Primitives.Spacing.spacing0) {
                     RadioButtonList(
                         values: ToolbarLeftButtonMode.allCases,
                         disabledValues: .constant([]),
                         selectedValue: $leftMode,
-                        verticalSpacing: Spacing.space300
+                        verticalSpacing: Primitives.Spacing.spacing24
                     )
 
                     Spacer()
@@ -84,13 +84,13 @@ struct ToolbarDemoView: View {
                         values: ToolbarRightButtonMode.allCases,
                         disabledValues: .constant([]),
                         selectedValue: $rightMode,
-                        verticalSpacing: Spacing.space300
+                        verticalSpacing: Primitives.Spacing.spacing24
                     )
                 }
 
                 Spacer()
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .toolbar {
             leadingToolbarContent

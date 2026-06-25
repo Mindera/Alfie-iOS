@@ -17,22 +17,22 @@ public struct ProductCarouselView<Header: View, Content: View, DataType: Identif
     }
 
     public var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             header()
-                .padding(.horizontal, Spacing.space200)
-                .padding(.bottom, Spacing.space200)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.bottom, Primitives.Spacing.spacing16)
             ProgressableHorizontalScrollView(
-                scrollViewConfiguration: .init(horizontalPadding: Spacing.space200),
-                progressBarConfiguration: .init(horizontalPadding: Spacing.space200)
+                scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
+                progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16)
             ) {
-                HStack(alignment: .top, spacing: Spacing.space150) {
+                HStack(alignment: .top, spacing: Primitives.Spacing.spacing12) {
                     ForEach(data, id: \.id) { item in
                         content(item)
                     }
                 }
             }
         }
-        .padding(.vertical, Spacing.space200)
+        .padding(.vertical, Primitives.Spacing.spacing16)
     }
 }
 

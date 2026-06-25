@@ -11,7 +11,7 @@ struct ProductListingListStyleSelector: View {
     }
 
     var body: some View {
-        HStack(spacing: Spacing.space200) {
+        HStack(spacing: Primitives.Spacing.spacing16) {
             Button {
                 selectedStyle = .grid
             } label: {

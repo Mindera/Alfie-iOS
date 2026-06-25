@@ -12,8 +12,8 @@ struct CarouselDemoView: View {
     var body: some View {
         VStack(spacing: 0) {
             DemoHelper.demoSectionHeader(title: "PDP Image Gallery")
-                .padding(.horizontal, Spacing.space200)
-                .padding(.bottom, Spacing.space0)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.bottom, Primitives.Spacing.spacing0)
 
             Carousel(currentIndex: $currentIndex, aspectRatio: 487 / 634) {
                 (0...Constants.imageCount - 1).map {
@@ -26,12 +26,12 @@ struct CarouselDemoView: View {
                 }
             }
             .disabled(isFullScreen)
-            VStack(alignment: .leading, spacing: Spacing.space100) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
                 Text.build(theme.font.header.h2("BOSS"))
                 Text.build(theme.font.paragraph.normal("RAY COMPUTER BAG"))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
 
             Spacer()
         }

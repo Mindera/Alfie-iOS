@@ -24,7 +24,7 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
                 }
             } else {
                 errorView
-                    .padding(.horizontal, Spacing.space200)
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
             }
         }
         .onAppear {
@@ -44,7 +44,7 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
 
     private var errorView: some View {
         ErrorView(
-            spacing: Spacing.space500,
+            spacing: Primitives.Spacing.spacing40,
             iconSize: Constants.errorViewIconSize,
             title: theme.font.header.h2(L10n.WebView.ErrorView.title),
             message: theme.font.paragraph.normal(L10n.WebView.ErrorView.Generic.message),

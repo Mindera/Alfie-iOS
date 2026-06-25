@@ -13,7 +13,7 @@ struct AccountSectionView: View {
     }
 
     var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             if !hiddenDividerTop {
                 ThemedDivider.horizontalThin
             }
@@ -42,7 +42,7 @@ struct AccountSectionView: View {
     }
 
     private enum AccountConstants {
-        static let iconSize: CGFloat = Spacing.space200
+        static let iconSize: CGFloat = Primitives.Spacing.spacing16
         static let sectionHeight: CGFloat = 60
     }
 }

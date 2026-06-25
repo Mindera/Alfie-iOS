@@ -15,7 +15,7 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
     }
 
     public var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             ThemedDivider.horizontalThin
             Spacer()
             searchContentView
@@ -57,7 +57,7 @@ extension SearchView {
     }
 
     private var emptyView: some View {
-        VStack(spacing: Spacing.space200) {
+        VStack(spacing: Primitives.Spacing.spacing16) {
             Spacer()
             imageForIcon(Icon.search)
             Text.build(theme.font.paragraph.bold(L10n.Search.Screen.EmptyView.title))

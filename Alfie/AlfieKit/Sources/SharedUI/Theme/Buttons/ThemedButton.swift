@@ -134,7 +134,7 @@ public enum ButtonType {
 
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
-    static let verticalPadding: CGFloat = -Spacing.space100
+    static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
     static let cornerRadius: CGFloat = Sizing.radiusSoft
     static let iconSize: CGFloat = 16
     static let smallHeight: CGFloat = 36
@@ -163,7 +163,7 @@ private struct ThemedButtonStyle: ButtonStyle {
                     .foregroundStyle(textColor(configuration))
             }
             configuration.label
-                .padding(.vertical, Spacing.space200)
+                .padding(.vertical, Primitives.Spacing.spacing16)
             if let trailingAsset {
                 trailingAsset.image
                     .renderingMode(.template)
@@ -174,7 +174,7 @@ private struct ThemedButtonStyle: ButtonStyle {
             }
         }
         .frame(height: type.height)
-        .padding(.horizontal, Spacing.space100)
+        .padding(.horizontal, Primitives.Spacing.spacing8)
         .foregroundStyle(textColor(configuration))
         .background(background(configuration))
         .cornerRadius(Constants.cornerRadius)
