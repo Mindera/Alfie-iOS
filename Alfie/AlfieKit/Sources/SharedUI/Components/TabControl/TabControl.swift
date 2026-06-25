@@ -152,7 +152,7 @@ public struct TabControl: View {
                                         color: theme.outerLineColor
                                     )
                                 )
-                                .cornerRadius(CornerRadius.soft)
+                                .cornerRadius(Sizing.radiusSoft)
                                 ThemedDivider(
                                     configuration: .init(
                                         orientation: .horizontal,

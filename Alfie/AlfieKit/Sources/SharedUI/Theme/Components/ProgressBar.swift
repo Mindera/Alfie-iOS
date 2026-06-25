@@ -24,11 +24,11 @@ public struct ProgressBar: View {
             ZStack(alignment: .leading) {
                 Rectangle()
                     .fill(Primitives.Colours.neutrals200)
-                    .cornerRadius(CornerRadius.strong)
+                    .cornerRadius(Sizing.radiusStrong)
                     .frame(height: Constants.height)
                 Rectangle()
                     .fill(Primitives.Colours.neutrals600)
-                    .cornerRadius(CornerRadius.strong)
+                    .cornerRadius(Sizing.radiusStrong)
                     .frame(width: Constants.indicatorWidth, height: Constants.height)
                     .offset(x: xOffset(for: progress), y: 0)
                     .animation(.easeOut, value: progress)

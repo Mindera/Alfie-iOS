@@ -20,8 +20,8 @@ radius sites keep `Spacing.space200` / `CornerRadius.s` verbatim). One deliberat
 
 ## Acceptance Criteria
 - [ ] Every spacing value sourced from a generated token (`Primitives.Spacing.*`) — **no numeric literals remain**.
-- [ ] Every corner-radius value sourced from a generated token (`Sizing.radius*` where a radius token exists; `Primitives.Spacing.*` otherwise) — no numeric literals remain.
-- [ ] `Spacing.*` and `CornerRadius.*` access patterns unchanged (same names except the deleted `space900`, same `CGFloat` type, doc-comments + swiftlint pragma preserved) → sibling P5 stories (ALFMOB-271/268/273…) keep compiling.
+- [ ] Every corner-radius value sourced from a generated radius token — call sites use `Sizing.radiusSoft/Strong/Rounded` directly; the `CornerRadius` alias type is removed.
+- [ ] `Spacing.*` access patterns unchanged (same names except the deleted `space900`, same `CGFloat` type). Corner-radius consumers migrated to `Sizing.radius*`; sibling P5 stories (ALFMOB-271/268/273…) adopt the same when they land.
 - [ ] `space075` conformed to the nearest token: `Primitives.Spacing.spacing8` (6→8pt) — a deliberate +2pt shift in `HorizontalProductCard`/`SortByView`, design sign-off on PR.
 - [ ] `space900` (72pt, no token, demo-only) deleted, incl. its `SpacingDemoView` row.
 - [ ] New value-pinning unit tests assert each public constant resolves to its expected CGFloat and equals its generated source.
@@ -59,14 +59,14 @@ AC with no generator risk; the generator's separate test suite stays untouched.
 space100→spacing8 · space150→spacing12 · space200→spacing16 · space250→spacing20 · space300→spacing24 ·
 space400→spacing32 · space500→spacing40 · space600→spacing48 · space700→spacing56 · space800→spacing64 ·
 space1000→spacing80` · **`space900` (72) → DELETED**
-### CornerRadius → 3-radius API (consolidated to the design system's vocabulary)
-The 8 t-shirt cases collapsed onto the design system's actual radii — `soft` (`Sizing.radiusSoft`=4),
-`strong` (`Sizing.radiusStrong`=16), `rounded` (`Sizing.radiusRounded`=1000, pending team confirm).
-Call sites migrated (~55 across 25 files): `xxs/xs/s→.soft`, `m/l/xl→.strong`, `full→.rounded`. The
-earlier `<10→soft, ≥10→strong` rule produced this grouping; the rename is value-preserving. **`none`
-was dropped** — it was 0 (no radius token, demo-only); "no radius" is expressed by not applying a
-corner radius. This also retires the `discouraged_none_name` swiftlint pragma → CornerRadius is now
-100% token-sourced.
+### CornerRadius → DELETED; use `Sizing.radius*` directly
+The hand-written `CornerRadius` type was a pure alias over the generated radius tokens, so it was
+**deleted entirely** and call sites now use `Sizing.radiusSoft` / `radiusStrong` / `radiusRounded`
+directly — consistent with how colours are consumed (ALFMOB-274 uses `Primitives.Colours.*` directly,
+no facade). Final call-site mapping (~34 sites, value-preserving): `xxs/xs/s → Sizing.radiusSoft`,
+`m/l/xl → Sizing.radiusStrong`, `full → Sizing.radiusRounded`, `none → removed` (no radius = no
+modifier). `CornerRadiusTokenTests` was removed with the type (nothing hand-written left to pin; the
+generator's own tests cover token values). `radiusRounded` is **pending team confirmation** (~9 sites).
 
 ## Phases
 One file per vertical slice; each leaves the app building & green.
@@ -78,9 +78,10 @@ One file per vertical slice; each leaves the app building & green.
 |---|---|---|---|---|
 | `Theme/Spacing/Spacing.swift` | SharedUI | edit | Each `space*` = `Primitives.Spacing.*`; `space075`→spacing8; remove `space900` | - |
 | `DebugMenu/UI/Demo/Spacing/SpacingDemoView.swift` | DebugMenu | edit | Delete the `space900` demo row | - |
-| `Theme/CornerRadius/CornerRadius.swift` | SharedUI | edit | Collapse 8 cases → 4 (`none/soft/strong/rounded`) sourced from radius tokens; pragma → `discouraged_none_name` only | - |
-| ~55 `CornerRadius.*` call sites across 25 files | SharedUI + features | edit | Rename `xxs/xs/s→.soft`, `m/l/xl→.strong`, `full→.rounded` (value-preserving) | - |
-| `DebugMenu/UI/Demo/CornerRadius/CornerRadiusDemoView.swift` | DebugMenu | edit | Show the 4 radii + a soft/strong nested example | - |
+| `Theme/CornerRadius/CornerRadius.swift` | SharedUI | **delete** | Pure alias over radius tokens — removed; consumers use `Sizing.radius*` directly | - |
+| `Tests/SharedUITests/CornerRadiusTokenTests.swift` | SharedUITests | **delete** | No hand-written radius type left to pin (generator tests cover token values) | - |
+| ~34 `CornerRadius.*` call sites across 23 files | SharedUI + features | edit | `xxs/xs/s→Sizing.radiusSoft`, `m/l/xl→Sizing.radiusStrong`, `full→Sizing.radiusRounded` (value-preserving) | - |
+| `DebugMenu/UI/Demo/CornerRadius/CornerRadiusDemoView.swift` | DebugMenu | edit | Demo the 3 radii via `Sizing.radius*` + a soft/strong nested example | - |
 | `Tests/SharedUITests/SpacingTokenTests.swift` | SharedUITests | add | Pin every `Spacing.space*` to expected CGFloat (`space075==8`) + equal generated source; assert `space900` gone | - |
 | `Tests/SharedUITests/CornerRadiusTokenTests.swift` | SharedUITests | add | Pin every `CornerRadius.*` to expected CGFloat + equal generated source | - |
 

@@ -8,16 +8,16 @@ struct CornerRadiusDemoView: View {
                 DemoHelper.demoSectionHeader(title: "Rounded Corners")
 
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
-                    cornerRadiusView(label: "Soft", radius: CornerRadius.soft)
-                    cornerRadiusView(label: "Strong", radius: CornerRadius.strong)
-                    cornerRadiusView(label: "Rounded", radius: CornerRadius.rounded)
+                    cornerRadiusView(label: "Soft", radius: Sizing.radiusSoft)
+                    cornerRadiusView(label: "Strong", radius: Sizing.radiusStrong)
+                    cornerRadiusView(label: "Rounded", radius: Sizing.radiusRounded)
                 }
                 .padding(.bottom, Spacing.space400)
 
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
-                    cornerRadiusView(label: "Soft", radius: CornerRadius.soft, isSquare: true)
-                    cornerRadiusView(label: "Strong", radius: CornerRadius.strong, isSquare: true)
-                    cornerRadiusView(label: "Rounded", radius: CornerRadius.rounded, isSquare: true)
+                    cornerRadiusView(label: "Soft", radius: Sizing.radiusSoft, isSquare: true)
+                    cornerRadiusView(label: "Strong", radius: Sizing.radiusStrong, isSquare: true)
+                    cornerRadiusView(label: "Rounded", radius: Sizing.radiusRounded, isSquare: true)
                 }
                 .padding(.bottom, Spacing.space400)
 
@@ -26,12 +26,12 @@ struct CornerRadiusDemoView: View {
                 Text.build(theme.font.small.normal("Inner: Soft, Outer: Strong"))
                     .padding()
                     .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.soft)
+                        RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                             .stroke(.black, lineWidth: 2)
                             .frame(width: 200, height: 40)
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.strong)
+                        RoundedRectangle(cornerRadius: Sizing.radiusStrong)
                             .stroke(.black, lineWidth: 2)
                             .frame(width: 220, height: 60)
                     )

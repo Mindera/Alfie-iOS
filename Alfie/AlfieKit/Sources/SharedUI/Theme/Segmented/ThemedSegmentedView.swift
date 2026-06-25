@@ -30,7 +30,7 @@ public struct ThemedSegmentedView<Content: View>: View {
         }
         .padding(type == .compact ? Spacing.space050 : Spacing.space100)
         .background {
-            RoundedRectangle(cornerRadius: CornerRadius.soft)
+            RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                 .fill(Primitives.Colours.neutrals100)
         }
         .accessibilityElement(children: .contain)
@@ -56,11 +56,11 @@ public struct ThemedSegmentView: View {
     public var body: some View {
         ZStack {
             if currectSelected == segment {
-                RoundedRectangle(cornerRadius: CornerRadius.soft)
+                RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                     .fill(Primitives.Colours.neutrals0)
                     .matchedGeometryEffect(id: "segmentBackground", in: animation, properties: .frame)
             } else {
-                RoundedRectangle(cornerRadius: CornerRadius.soft)
+                RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                     .fill(.clear)
             }
             HStack(spacing: Spacing.space0) {

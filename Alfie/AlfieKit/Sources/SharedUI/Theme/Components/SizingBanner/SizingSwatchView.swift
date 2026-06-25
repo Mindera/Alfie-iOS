@@ -19,10 +19,10 @@ public struct SizingSwatchView: View {
             .foregroundStyle(textColor)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: CornerRadius.soft)
+                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                         .fill(isSelected ? Primitives.Colours.neutrals900 : .clear)
 
-                    RoundedRectangle(cornerRadius: CornerRadius.soft)
+                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                         .inset(by: Constants.borderLineWidth)
                         .stroke(
                             item.state == .available ? Primitives.Colours.neutrals900 : Constants.disabledStateColor,

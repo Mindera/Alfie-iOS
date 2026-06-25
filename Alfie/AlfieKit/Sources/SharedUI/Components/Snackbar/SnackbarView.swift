@@ -88,7 +88,7 @@ public struct SnackbarView: View {
         ZStack {
             Rectangle()
                 .fill(backgroundColor)
-                .cornerRadius(CornerRadius.soft)
+                .cornerRadius(Sizing.radiusSoft)
             HStack(spacing: Spacing.space100) {
                 if let icon = configuration.icon {
                     icon

@@ -60,9 +60,9 @@ public struct Chip: View {
 
     public var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: CornerRadius.rounded)
+            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                 .stroke(borderColor, lineWidth: borderWidth)
-                .background(RoundedRectangle(cornerRadius: CornerRadius.rounded).fill(backgroundColor))
+                .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(backgroundColor))
             HStack(spacing: Spacing.space100) {
                 Text.build(theme.font.small.normal(configuration.label))
                     .foregroundStyle(textColor)

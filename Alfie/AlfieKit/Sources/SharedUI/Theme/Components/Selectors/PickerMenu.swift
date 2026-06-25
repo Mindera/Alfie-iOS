@@ -16,7 +16,7 @@ public struct PickerMenu<Content: View>: View {
 
     public var body: some View {
         Button { isModalPresented = true } label: {
-            RoundedRectangle(cornerRadius: CornerRadius.soft)
+            RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                 .stroke(Primitives.Colours.neutrals400, lineWidth: 1)
                 .frame(minHeight: Constants.frameMinHeight)
                 .overlay {
@@ -33,7 +33,7 @@ public struct PickerMenu<Content: View>: View {
                     .padding(.horizontal, Spacing.space200)
                 }
                 .background(Primitives.Colours.neutrals0)
-                .cornerRadius(CornerRadius.soft)
+                .cornerRadius(Sizing.radiusSoft)
         }
     }
 }
