@@ -301,7 +301,7 @@ extension BrandsView {
                 .foregroundStyle(isSelected ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals500)
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
-                    RoundedRectangle(cornerRadius: CornerRadius.xxs)
+                    RoundedRectangle(cornerRadius: CornerRadius.soft)
                         .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Color.clear)
                 }
         }

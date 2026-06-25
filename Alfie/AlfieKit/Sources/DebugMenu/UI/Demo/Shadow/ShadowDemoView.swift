@@ -58,7 +58,7 @@ struct ShadowDemoView: View {
             Rectangle()
                 .fill(Primitives.Colours.neutrals0)
                 .frame(width: 50, height: 50)
-                .cornerRadius(CornerRadius.s)
+                .cornerRadius(CornerRadius.soft)
                 .shadow(type)
             Text.build(theme.font.small.normal(label))
                 .foregroundStyle(Primitives.Colours.neutrals500)

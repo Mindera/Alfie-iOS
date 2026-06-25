@@ -17,7 +17,7 @@ public struct SnapCarouselDemoView: View {
                     Image(name, bundle: .module)
                         .resizable()
                         .scaledToFit()
-                        .cornerRadius(CornerRadius.s)
+                        .cornerRadius(CornerRadius.soft)
                 }
             }
 

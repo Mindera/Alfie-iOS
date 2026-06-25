@@ -196,7 +196,7 @@ private struct ThemedTextStyle: TextFieldStyle {
 
 private enum Constants {
     static var barHeight: CGFloat = 2
-    static var cornerRadius: CGFloat = CornerRadius.xs
+    static var cornerRadius: CGFloat = CornerRadius.soft
     static var isDisableOpacity: CGFloat = 0.3
     static var inputPadding: CGFloat = Spacing.space100
     static var inputIconPadding: CGFloat = Spacing.space025

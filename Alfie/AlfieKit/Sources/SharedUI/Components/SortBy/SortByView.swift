@@ -50,7 +50,7 @@ public struct SortByView: View {
                                         .padding(.leading, option.icon == nil ? Spacing.space150 : 0)
                                 }
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: CornerRadius.s)
+                                    RoundedRectangle(cornerRadius: CornerRadius.soft)
                                         .stroke(
                                             colorForOptionBorder(option.value),
                                             lineWidth: Constants.borderLineWidth
