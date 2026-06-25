@@ -59,12 +59,14 @@ AC with no generator risk; the generator's separate test suite stays untouched.
 space100→spacing8 · space150→spacing12 · space200→spacing16 · space250→spacing20 · space300→spacing24 ·
 space400→spacing32 · space500→spacing40 · space600→spacing48 · space700→spacing56 · space800→spacing64 ·
 space1000→spacing80` · **`space900` (72) → DELETED**
-### CornerRadius → 4-radius API (consolidated to the design system's vocabulary)
-The 8 t-shirt cases collapsed onto the design system's actual radii — `none` (0), `soft`
-(`Sizing.radiusSoft`=4), `strong` (`Sizing.radiusStrong`=16), `rounded` (`Sizing.radiusRounded`=1000,
-pending team confirm). Call sites migrated (~55 across 25 files): `xxs/xs/s→.soft`, `m/l/xl→.strong`,
-`full→.rounded`, `none→.none`. The earlier `<10→soft, ≥10→strong` rule is what produced this grouping;
-the rename itself is value-preserving (no pixel change beyond the prior radius-token commit).
+### CornerRadius → 3-radius API (consolidated to the design system's vocabulary)
+The 8 t-shirt cases collapsed onto the design system's actual radii — `soft` (`Sizing.radiusSoft`=4),
+`strong` (`Sizing.radiusStrong`=16), `rounded` (`Sizing.radiusRounded`=1000, pending team confirm).
+Call sites migrated (~55 across 25 files): `xxs/xs/s→.soft`, `m/l/xl→.strong`, `full→.rounded`. The
+earlier `<10→soft, ≥10→strong` rule produced this grouping; the rename is value-preserving. **`none`
+was dropped** — it was 0 (no radius token, demo-only); "no radius" is expressed by not applying a
+corner radius. This also retires the `discouraged_none_name` swiftlint pragma → CornerRadius is now
+100% token-sourced.
 
 ## Phases
 One file per vertical slice; each leaves the app building & green.

@@ -8,7 +8,6 @@ struct CornerRadiusDemoView: View {
                 DemoHelper.demoSectionHeader(title: "Rounded Corners")
 
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
-                    cornerRadiusView(label: "None", radius: CornerRadius.none)
                     cornerRadiusView(label: "Soft", radius: CornerRadius.soft)
                     cornerRadiusView(label: "Strong", radius: CornerRadius.strong)
                     cornerRadiusView(label: "Rounded", radius: CornerRadius.rounded)
@@ -16,7 +15,6 @@ struct CornerRadiusDemoView: View {
                 .padding(.bottom, Spacing.space400)
 
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
-                    cornerRadiusView(label: "None", radius: CornerRadius.none, isSquare: true)
                     cornerRadiusView(label: "Soft", radius: CornerRadius.soft, isSquare: true)
                     cornerRadiusView(label: "Strong", radius: CornerRadius.strong, isSquare: true)
                     cornerRadiusView(label: "Rounded", radius: CornerRadius.rounded, isSquare: true)
