@@ -10,7 +10,6 @@ public protocol DesignSystemProtocol {
     var spacing: SpacingProviderProtocol { get }
     var radius: RadiusProviderProtocol { get }
     var font: TypographyProviderProtocol { get }
-    var shape: ShapeProviderProtocol { get }
 
     func setupAppearance()
 }
@@ -24,20 +23,17 @@ public class DesignSystem: DesignSystemProtocol {
     public var spacing: SpacingProviderProtocol
     public var radius: RadiusProviderProtocol
     public var font: TypographyProviderProtocol
-    public var shape: ShapeProviderProtocol
 
     public init(
         color: ColorProviderProtocol = DefaultColorProvider(),
         spacing: SpacingProviderProtocol = DefaultSpacingProvider(),
         radius: RadiusProviderProtocol = DefaultRadiusProvider(),
-        font: TypographyProviderProtocol = TypographyProvider(),
-        shape: ShapeProviderProtocol = DefaultShapeProvider()
+        font: TypographyProviderProtocol = TypographyProvider()
     ) {
         self.color = color
         self.spacing = spacing
         self.radius = radius
         self.font = font
-        self.shape = shape
         setupAppearance()
     }
 
