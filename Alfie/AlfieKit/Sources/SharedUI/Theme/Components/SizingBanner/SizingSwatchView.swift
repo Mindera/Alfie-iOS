@@ -43,7 +43,7 @@ public struct SizingSwatchView: View {
 
     @ViewBuilder private var outOfStockSlashView: some View {
         if item.state == .outOfStock {
-            theme.shape.unavailableCrossedOutShape()
+            UnavailableCrossedOutShape()
                 .stroke(Constants.disabledStateColor, style: StrokeStyle(lineWidth: Constants.borderLineWidth))
                 .padding(Constants.borderLineWidth)
         }
