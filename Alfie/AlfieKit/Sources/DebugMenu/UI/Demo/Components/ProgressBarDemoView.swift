@@ -16,7 +16,7 @@ struct ProgressBarDemoView: View {
                     ForEach(0..<40) { _ in
                         Rectangle()
                             .foregroundStyle(Primitives.Colours.neutrals400)
-                            .cornerRadius(CornerRadius.m)
+                            .cornerRadius(CornerRadius.strong)
                             .frame(width: 120, height: 120)
                     }
                 }

@@ -9,52 +9,31 @@ struct CornerRadiusDemoView: View {
 
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
                     cornerRadiusView(label: "None", radius: CornerRadius.none)
-                    cornerRadiusView(label: "XXS", radius: CornerRadius.xxs)
-                    cornerRadiusView(label: "XS", radius: CornerRadius.xs)
-                    cornerRadiusView(label: "S", radius: CornerRadius.s)
-                    cornerRadiusView(label: "M", radius: CornerRadius.m)
-                    cornerRadiusView(label: "L", radius: CornerRadius.l)
-                    cornerRadiusView(label: "XL", radius: CornerRadius.xl)
-                    cornerRadiusView(label: "Full", radius: CornerRadius.full)
+                    cornerRadiusView(label: "Soft", radius: CornerRadius.soft)
+                    cornerRadiusView(label: "Strong", radius: CornerRadius.strong)
+                    cornerRadiusView(label: "Rounded", radius: CornerRadius.rounded)
                 }
                 .padding(.bottom, Spacing.space400)
 
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
                     cornerRadiusView(label: "None", radius: CornerRadius.none, isSquare: true)
-                    cornerRadiusView(label: "XXS", radius: CornerRadius.xxs, isSquare: true)
-                    cornerRadiusView(label: "XS", radius: CornerRadius.xs, isSquare: true)
-                    cornerRadiusView(label: "S", radius: CornerRadius.s, isSquare: true)
-                    cornerRadiusView(label: "M", radius: CornerRadius.m, isSquare: true)
-                    cornerRadiusView(label: "L", radius: CornerRadius.l, isSquare: true)
-                    cornerRadiusView(label: "XL", radius: CornerRadius.xl, isSquare: true)
-                    cornerRadiusView(label: "Full", radius: CornerRadius.full, isSquare: true)
+                    cornerRadiusView(label: "Soft", radius: CornerRadius.soft, isSquare: true)
+                    cornerRadiusView(label: "Strong", radius: CornerRadius.strong, isSquare: true)
+                    cornerRadiusView(label: "Rounded", radius: CornerRadius.rounded, isSquare: true)
                 }
                 .padding(.bottom, Spacing.space400)
 
                 DemoHelper.demoSectionHeader(title: "Nested Corners")
 
-                Text.build(theme.font.small.normal("Inner: M, Outer: L"))
+                Text.build(theme.font.small.normal("Inner: Soft, Outer: Strong"))
                     .padding()
                     .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.m)
+                        RoundedRectangle(cornerRadius: CornerRadius.soft)
                             .stroke(.black, lineWidth: 2)
                             .frame(width: 200, height: 40)
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.l)
-                            .stroke(.black, lineWidth: 2)
-                            .frame(width: 220, height: 60)
-                    )
-
-                Text.build(theme.font.small.normal("Inner: XS, Outer: S"))
-                    .padding()
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.xs)
-                            .stroke(.black, lineWidth: 2)
-                            .frame(width: 200, height: 40)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.s)
+                        RoundedRectangle(cornerRadius: CornerRadius.strong)
                             .stroke(.black, lineWidth: 2)
                             .frame(width: 220, height: 60)
                     )

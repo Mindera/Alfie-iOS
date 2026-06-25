@@ -63,7 +63,7 @@ public struct SnapCarousel<Content: View>: View {
                         .shimmering(
                             while: areItemsLoading ?? .constant(false),
                             animateOnStateTransition: true,
-                            cornerRadius: CornerRadius.m
+                            cornerRadius: CornerRadius.strong
                         )
                         .scaledToFit()
                 }

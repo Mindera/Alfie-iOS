@@ -63,7 +63,7 @@ public struct ZoomableCarousel<Content: View>: View {
                     )
                     .padding(Spacing.space200)
                     .background(Primitives.Colours.neutrals0.opacity(Constants.backgroundOpacity))
-                    .cornerRadius(CornerRadius.s)
+                    .cornerRadius(CornerRadius.soft)
                 }
             }
         }

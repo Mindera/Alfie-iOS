@@ -129,7 +129,7 @@ struct BadgeDemoView: View {
 
     private func button(label: String) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: CornerRadius.m)
+            RoundedRectangle(cornerRadius: CornerRadius.strong)
                 .fill(.black)
             Text.build(theme.font.small.bold(label))
                 .padding()
