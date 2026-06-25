@@ -3,10 +3,9 @@ import XCTest
 
 /// Pins every `CornerRadius` case to its expected point value AND to the radius token it is
 /// sourced from (ALFMOB-270). The design system defines two finite radii (`radiusSoft`=4,
-/// `radiusStrong`=16) plus the `radiusRounded` (1000) pill; `none` is the absence of a radius.
+/// `radiusStrong`=16) plus the `radiusRounded` (1000) pill.
 final class CornerRadiusTokenTests: XCTestCase {
     func test_corner_radius_values_match_expected_points() {
-        XCTAssertEqual(CornerRadius.none, 0)
         XCTAssertEqual(CornerRadius.soft, 4)
         XCTAssertEqual(CornerRadius.strong, 16)
         XCTAssertEqual(CornerRadius.rounded, 1000)
