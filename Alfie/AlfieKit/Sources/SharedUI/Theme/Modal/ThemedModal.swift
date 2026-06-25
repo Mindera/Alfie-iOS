@@ -108,7 +108,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                     )
                                     .edgesIgnoringSafeArea(.bottom)
                                     .background {
-                                        RoundedRectangle(cornerRadius: CornerRadius.strong)
+                                        RoundedRectangle(cornerRadius: Sizing.radiusStrong)
                                             .fill(Primitives.Colours.neutrals0)
                                             .edgesIgnoringSafeArea(.bottom)
                                             .padding(

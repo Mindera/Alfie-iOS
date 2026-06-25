@@ -67,7 +67,7 @@ struct SnackbarDemoView: View {
 
     private func button(label: String) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: CornerRadius.strong)
+            RoundedRectangle(cornerRadius: Sizing.radiusStrong)
                 .fill(.black)
             Text.build(theme.font.paragraph.bold(label))
                 .padding()

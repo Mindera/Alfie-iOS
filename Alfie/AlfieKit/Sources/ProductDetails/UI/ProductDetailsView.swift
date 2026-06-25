@@ -121,7 +121,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
             .shimmering(
                 while: shimmeringBinding(for: .mediaCarousel),
                 animateOnStateTransition: false,
-                cornerRadius: CornerRadius.strong
+                cornerRadius: Sizing.radiusStrong
             )
         }
     }
@@ -315,7 +315,7 @@ extension ProductDetailsView {
                         placeholder: { Primitives.Colours.neutrals100 },
                         failure: { _ in Primitives.Colours.neutrals900 }
                     )
-                    .cornerRadius(CornerRadius.soft)
+                    .cornerRadius(Sizing.radiusSoft)
                 }
             }
             .padding(.top, Spacing.space200)

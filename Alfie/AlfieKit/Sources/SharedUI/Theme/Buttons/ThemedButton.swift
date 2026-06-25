@@ -135,7 +135,7 @@ public enum ButtonType {
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
     static let verticalPadding: CGFloat = -Spacing.space100
-    static let cornerRadius: CGFloat = CornerRadius.soft
+    static let cornerRadius: CGFloat = Sizing.radiusSoft
     static let iconSize: CGFloat = 16
     static let smallHeight: CGFloat = 36
     static let mediumHeight: CGFloat = 44
