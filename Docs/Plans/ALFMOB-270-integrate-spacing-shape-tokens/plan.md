@@ -59,9 +59,12 @@ AC with no generator risk; the generator's separate test suite stays untouched.
 space100→spacing8 · space150→spacing12 · space200→spacing16 · space250→spacing20 · space300→spacing24 ·
 space400→spacing32 · space500→spacing40 · space600→spacing48 · space700→spacing56 · space800→spacing64 ·
 space1000→spacing80` · **`space900` (72) → DELETED**
-### CornerRadius → radius tokens (<10→soft, ≥10→strong)
-`none→0 (no token) · xxs→radiusSoft(2→4) · xs→radiusSoft(4) · s→radiusSoft(8→4) · m→radiusStrong(12→16) ·
-l→radiusStrong(16) · xl→radiusStrong(24→16) · full→radiusRounded(1000, pending team confirm)`
+### CornerRadius → 4-radius API (consolidated to the design system's vocabulary)
+The 8 t-shirt cases collapsed onto the design system's actual radii — `none` (0), `soft`
+(`Sizing.radiusSoft`=4), `strong` (`Sizing.radiusStrong`=16), `rounded` (`Sizing.radiusRounded`=1000,
+pending team confirm). Call sites migrated (~55 across 25 files): `xxs/xs/s→.soft`, `m/l/xl→.strong`,
+`full→.rounded`, `none→.none`. The earlier `<10→soft, ≥10→strong` rule is what produced this grouping;
+the rename itself is value-preserving (no pixel change beyond the prior radius-token commit).
 
 ## Phases
 One file per vertical slice; each leaves the app building & green.
@@ -73,7 +76,9 @@ One file per vertical slice; each leaves the app building & green.
 |---|---|---|---|---|
 | `Theme/Spacing/Spacing.swift` | SharedUI | edit | Each `space*` = `Primitives.Spacing.*`; `space075`→spacing8; remove `space900` | - |
 | `DebugMenu/UI/Demo/Spacing/SpacingDemoView.swift` | DebugMenu | edit | Delete the `space900` demo row | - |
-| `Theme/CornerRadius/CornerRadius.swift` | SharedUI | edit | Each case = `Sizing.radius*` / `Primitives.Spacing.*` per mapping; keep swiftlint pragma | - |
+| `Theme/CornerRadius/CornerRadius.swift` | SharedUI | edit | Collapse 8 cases → 4 (`none/soft/strong/rounded`) sourced from radius tokens; pragma → `discouraged_none_name` only | - |
+| ~55 `CornerRadius.*` call sites across 25 files | SharedUI + features | edit | Rename `xxs/xs/s→.soft`, `m/l/xl→.strong`, `full→.rounded` (value-preserving) | - |
+| `DebugMenu/UI/Demo/CornerRadius/CornerRadiusDemoView.swift` | DebugMenu | edit | Show the 4 radii + a soft/strong nested example | - |
 | `Tests/SharedUITests/SpacingTokenTests.swift` | SharedUITests | add | Pin every `Spacing.space*` to expected CGFloat (`space075==8`) + equal generated source; assert `space900` gone | - |
 | `Tests/SharedUITests/CornerRadiusTokenTests.swift` | SharedUITests | add | Pin every `CornerRadius.*` to expected CGFloat + equal generated source | - |
 
