@@ -25,6 +25,15 @@
 - "No hardcoded numeric remains" is now **fully** achievable (not partial) because the user chose to conform the 2 off-token values rather than defer them.
 - This ticket is **no longer a zero-pixel-change refactor** — `space075` 6→8 is a real (small) production change requiring design sign-off; snapshots don't auto-catch it.
 
+## Post-review revision (user, 2026-06-25)
+- **Decision 1 superseded.** Corner radii must be sourced from the design system's **radius tokens**
+  (`Sizing.radiusSoft`/`radiusStrong`/`radiusRounded`), not from spacing primitives. Rule: **<10pt →
+  radiusSoft, ≥10pt → radiusStrong**. → `xxs/xs/s = radiusSoft (4)`, `m/l/xl = radiusStrong (16)`,
+  `full = radiusRounded` (**pending team confirm**), `none = 0` (no radius token, demo-only).
+- Consequence: corner radii now shift — `xxs 2→4`, `s 8→4`, `m 12→16`, `xl 24→16` (Snackbar, ThemedButton,
+  ProgressBar, …). Design signs off on PR. CornerRadius is no longer zero-pixel-change.
+
 ## Still open (owner)
+- **`full`/`radiusRounded`** — user to confirm with the team whether the pill radius should stay on `radiusRounded`.
 - **Design sign-off** on the `space075` 6→8pt shift — at PR review (design). Tracked as a Risk.
 - **Upstream (design-token repo)**: whether to add `spacing-6` / `spacing-72`, and whether to collapse CornerRadius to the 3 sanctioned radii — both out of scope for ALFMOB-270.
