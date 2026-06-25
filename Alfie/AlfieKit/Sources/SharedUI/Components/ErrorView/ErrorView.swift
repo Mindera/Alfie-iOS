@@ -75,9 +75,9 @@ public struct ErrorView: View {
             icon: icon,
             iconColor: iconColor,
             iconSize: iconSize,
-            title: title.flatMap(ThemeProvider.shared.font.paragraph.bold),
+            title: title.flatMap(DesignSystem.shared.font.paragraph.bold),
             titleColor: titleColor,
-            message: message.flatMap(ThemeProvider.shared.font.small.normal),
+            message: message.flatMap(DesignSystem.shared.font.small.normal),
             messageColor: messageColor,
             buttons: buttons
         )

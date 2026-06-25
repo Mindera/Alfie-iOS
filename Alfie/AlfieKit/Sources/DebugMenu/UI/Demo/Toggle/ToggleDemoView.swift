@@ -2,7 +2,7 @@ import SharedUI
 import SwiftUI
 
 struct ToggleDemoView: View {
-    private var theme: ThemeProviderProtocol = ThemeProvider()
+    private var theme: DesignSystemProtocol = DesignSystem()
     @State private var isOn = false
     @State private var isDisabled = false
 

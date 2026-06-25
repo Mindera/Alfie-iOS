@@ -63,7 +63,7 @@ private struct ThemedTextStyle: TextFieldStyle {
     var limit: Int?
     var icon: Icon?
     @Binding var count: Int
-    private let theme: ThemeProviderProtocol = ThemeProvider.shared
+    private let theme: DesignSystemProtocol = DesignSystem.shared
 
     init(title: String? = nil, status: InputStatus, isDisabled: Bool, isRequired: Bool, limit: Int? = nil, count: Binding<Int> = .constant(0), icon: Icon? = nil) {
         self.title = title

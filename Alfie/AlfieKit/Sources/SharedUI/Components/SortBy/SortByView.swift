@@ -76,7 +76,7 @@ public struct SortByView: View {
         static let titleFontSize: CGFloat = 18
         static let borderLineWidth: CGFloat = 1
         static let iconSize: CGSize = .init(width: 16, height: 16)
-        static let fontTitle: Font = ThemeProvider.shared.font.paragraph.normal.withSize(Constants.titleFontSize).font
+        static let fontTitle: Font = DesignSystem.shared.font.paragraph.normal.withSize(Constants.titleFontSize).font
         static let scrollBuffer: CGFloat = 1
     }
 }

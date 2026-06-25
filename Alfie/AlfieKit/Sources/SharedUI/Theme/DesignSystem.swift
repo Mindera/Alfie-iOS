@@ -1,24 +1,43 @@
 import SwiftUI
 
-// MARK: - ThemeProviderProtocol
+// MARK: - DesignSystemProtocol
 
-public protocol ThemeProviderProtocol {
+/// Single entry point for every design-token category (colours, spacing, radius, typography,
+/// shape). Each category is a protocol-backed provider forwarding to the generated tokens, so the
+/// whole system can be swapped — and later injected via `EnvironmentValues.theme` — as one unit.
+public protocol DesignSystemProtocol {
+    var color: ColorProviderProtocol { get }
+    var spacing: SpacingProviderProtocol { get }
+    var radius: RadiusProviderProtocol { get }
     var font: TypographyProviderProtocol { get }
     var shape: ShapeProviderProtocol { get }
 
     func setupAppearance()
 }
 
-// MARK: - ThemeProvider
+// MARK: - DesignSystem
 
-public class ThemeProvider: ThemeProviderProtocol {
-    public static var shared = ThemeProvider()
+public class DesignSystem: DesignSystemProtocol {
+    public static var shared = DesignSystem()
 
+    public var color: ColorProviderProtocol
+    public var spacing: SpacingProviderProtocol
+    public var radius: RadiusProviderProtocol
     public var font: TypographyProviderProtocol
-    public var shape: ShapeProviderProtocol = DefaultShapeProvider()
+    public var shape: ShapeProviderProtocol
 
-    public init(font: TypographyProviderProtocol = TypographyProvider()) {
+    public init(
+        color: ColorProviderProtocol = DefaultColorProvider(),
+        spacing: SpacingProviderProtocol = DefaultSpacingProvider(),
+        radius: RadiusProviderProtocol = DefaultRadiusProvider(),
+        font: TypographyProviderProtocol = TypographyProvider(),
+        shape: ShapeProviderProtocol = DefaultShapeProvider()
+    ) {
+        self.color = color
+        self.spacing = spacing
+        self.radius = radius
         self.font = font
+        self.shape = shape
         setupAppearance()
     }
 
@@ -76,5 +95,20 @@ public class ThemeProvider: ThemeProviderProtocol {
         tabBarAppearance.backgroundColor = backgroundColor
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+    }
+}
+
+// MARK: - Environment injection seam
+
+// Ready for `@Environment(\.theme)` injection. Unused for now — `DesignSystem.shared` remains the
+// default — so views can opt in (and previews/tests can inject a mock) without any call-site churn.
+private struct DesignSystemKey: EnvironmentKey {
+    static let defaultValue: DesignSystemProtocol = DesignSystem.shared
+}
+
+public extension EnvironmentValues {
+    var theme: DesignSystemProtocol {
+        get { self[DesignSystemKey.self] }
+        set { self[DesignSystemKey.self] = newValue }
     }
 }

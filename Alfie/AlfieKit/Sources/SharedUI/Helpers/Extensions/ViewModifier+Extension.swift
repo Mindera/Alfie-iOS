@@ -1,5 +1,5 @@
 import SwiftUI
 
 public extension ViewModifier {
-    var theme: ThemeProviderProtocol { ThemeProvider.shared }
+    var theme: DesignSystemProtocol { DesignSystem.shared }
 }

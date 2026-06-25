@@ -1,7 +1,7 @@
 import SwiftUI
 
 public extension View {
-    var theme: ThemeProviderProtocol { ThemeProvider.shared }
+    var theme: DesignSystemProtocol { DesignSystem.shared }
 
     @ViewBuilder
     func `if`<TrueContent: View, FalseContent: View>(
