@@ -14,7 +14,7 @@
 - [x] 4.5 Grill → harden plan (grill.md)
 - [x] APPROVAL GATE (approved)
 - [x] 5. Implement (ios-execute) — verify ✅ (536 tests), review ✅ APPROVED
-- [ ] 6. Commit
-- [ ] 7. PR
-- [ ] 8. Ticket transition → In Review
-- [ ] 9. Report
+- [x] 6. Commit (2 commits: impl+tests, plan docs)
+- [x] 7. PR → https://github.com/Mindera/Alfie-iOS/pull/86
+- [x] 8. Ticket transition → Review
+- [x] 9. Report

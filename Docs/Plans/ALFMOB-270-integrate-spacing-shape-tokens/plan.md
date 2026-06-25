@@ -41,10 +41,13 @@ that don't exist, for zero functional gain (YAGNI/DRY). Reusing the existing pri
 AC with no generator risk; the generator's separate test suite stays untouched.
 
 ### Decisions (grilled — see `grill.md`)
-1. **Radius source = semantic-where-available** (JSON defines only `radius-soft`=4, `radius-strong`=16,
-   `radius-rounded`=1000): `xs→Sizing.radiusSoft`, `l→Sizing.radiusStrong`, `full→Sizing.radiusRounded`;
-   the other five (`none/xxs/s/m/xl` = 0/2/8/12/24, all present as spacing primitives) → `Primitives.Spacing.*`.
-   Every value traces to a JSON token; **zero pixel change**.
+1. **Radius source = radius tokens only** (post-review user decision, supersedes the original
+   semantic-where-available mapping): corner radii must come from the design system's radius tokens,
+   not spacing primitives. The JSON defines only `radiusSoft`=4 and `radiusStrong`=16 for finite radii,
+   so each case maps by size — **<10pt → `Sizing.radiusSoft`, ≥10pt → `Sizing.radiusStrong`**:
+   `xxs/xs/s → radiusSoft`, `m/l/xl → radiusStrong`. `full → Sizing.radiusRounded` (**pending design/team
+   confirmation**). `none → 0` (absence of a radius; no token). **This shifts pixels:** `xxs 2→4`, `s 8→4`,
+   `m 12→16`, `xl 24→16` (affects Snackbar, ThemedButton, ProgressBar, …) — design signs off on PR.
 2. **Off-token spacing conformed in-ticket** (JSON has no `spacing-6`/`spacing-72`): `space075`→`spacing8`
    (6→8pt, nearest-up, safer tap targets; **design sign-off on PR**); `space900` **deleted** (demo-only)
    incl. its demo row. No off-token literals remain.
@@ -56,9 +59,9 @@ AC with no generator risk; the generator's separate test suite stays untouched.
 space100→spacing8 · space150→spacing12 · space200→spacing16 · space250→spacing20 · space300→spacing24 ·
 space400→spacing32 · space500→spacing40 · space600→spacing48 · space700→spacing56 · space800→spacing64 ·
 space1000→spacing80` · **`space900` (72) → DELETED**
-### CornerRadius → generated
-`none→Primitives.Spacing.spacing0 · xxs→spacing2 · xs→Sizing.radiusSoft · s→spacing8 · m→spacing12 ·
-l→Sizing.radiusStrong · xl→spacing24 · full→Sizing.radiusRounded`
+### CornerRadius → radius tokens (<10→soft, ≥10→strong)
+`none→0 (no token) · xxs→radiusSoft(2→4) · xs→radiusSoft(4) · s→radiusSoft(8→4) · m→radiusStrong(12→16) ·
+l→radiusStrong(16) · xl→radiusStrong(24→16) · full→radiusRounded(1000, pending team confirm)`
 
 ## Phases
 One file per vertical slice; each leaves the app building & green.
