@@ -4,22 +4,22 @@ import SwiftUI
 struct CornerRadiusDemoView: View {
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Rounded Corners")
 
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Primitives.Spacing.spacing32) {
                     cornerRadiusView(label: "Soft", radius: Sizing.radiusSoft)
                     cornerRadiusView(label: "Strong", radius: Sizing.radiusStrong)
                     cornerRadiusView(label: "Rounded", radius: Sizing.radiusRounded)
                 }
-                .padding(.bottom, Spacing.space400)
+                .padding(.bottom, Primitives.Spacing.spacing32)
 
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space400) {
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Primitives.Spacing.spacing32) {
                     cornerRadiusView(label: "Soft", radius: Sizing.radiusSoft, isSquare: true)
                     cornerRadiusView(label: "Strong", radius: Sizing.radiusStrong, isSquare: true)
                     cornerRadiusView(label: "Rounded", radius: Sizing.radiusRounded, isSquare: true)
                 }
-                .padding(.bottom, Spacing.space400)
+                .padding(.bottom, Primitives.Spacing.spacing32)
 
                 DemoHelper.demoSectionHeader(title: "Nested Corners")
 
@@ -38,7 +38,7 @@ struct CornerRadiusDemoView: View {
 
                 Spacer()
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
     }
 

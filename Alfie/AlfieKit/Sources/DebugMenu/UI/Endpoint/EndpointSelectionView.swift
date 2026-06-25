@@ -13,14 +13,14 @@ struct EndpointSelectionView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.space250) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoSectionHeader(title: "Choose Environment")
 
             RadioButtonList(
                 values: viewModel.availableEndpointOptions,
                 disabledValues: .constant(viewModel.disabledEndpointOptions),
                 selectedValue: $viewModel.selectedEndpointOption,
-                verticalSpacing: Spacing.space300
+                verticalSpacing: Primitives.Spacing.spacing24
             )
 
             ThemedInput($viewModel.customEndpointUrl, isDisabled: .constant(viewModel.isInputDisabled))
@@ -36,7 +36,7 @@ struct EndpointSelectionView: View {
 
             Spacer()
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .snackbarView(configuration: $snackbarConfig)
         .onChange(of: viewModel.shouldShowUrlError) { shouldShowUrlError in
             if shouldShowUrlError {

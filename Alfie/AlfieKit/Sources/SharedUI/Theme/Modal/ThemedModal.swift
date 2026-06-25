@@ -64,8 +64,8 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                     .tint(Primitives.Colours.neutrals900)
                                             }
                                         }
-                                        .padding(.vertical, Spacing.space100)
-                                        .padding(.horizontal, Spacing.space200)
+                                        .padding(.vertical, Primitives.Spacing.spacing8)
+                                        .padding(.horizontal, Primitives.Spacing.spacing16)
                                         if self.modalFitsScreen {
                                             modal()
                                                 .simultaneousGesture(
@@ -83,8 +83,8 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                             )
                                                     }
                                                 )
-                                                .padding(.bottom, Spacing.space400)
-                                                .padding(.horizontal, Spacing.space200)
+                                                .padding(.bottom, Primitives.Spacing.spacing32)
+                                                .padding(.horizontal, Primitives.Spacing.spacing16)
                                                 .onPreferenceChange(ViewHeightKey.self) {
                                                     self.modalFitsScreen = $0 < (gp.size.height - topMargin * 2)
                                                 }
@@ -97,14 +97,14 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                                 offset = .zero
                                                             }
                                                     )
-                                                    .padding(.bottom, Spacing.space400)
-                                                    .padding(.horizontal, Spacing.space200)
+                                                    .padding(.bottom, Primitives.Spacing.spacing32)
+                                                    .padding(.horizontal, Primitives.Spacing.spacing16)
                                             }
                                         }
                                     }
                                     .padding(
                                         .horizontal,
-                                        horizontalSizeClass == .regular ? Spacing.space1000 : Spacing.space0
+                                        horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
                                     )
                                     .edgesIgnoringSafeArea(.bottom)
                                     .background {
@@ -113,7 +113,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                             .edgesIgnoringSafeArea(.bottom)
                                             .padding(
                                                 .horizontal,
-                                                horizontalSizeClass == .regular ? Spacing.space1000 : Spacing.space0
+                                                horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
                                             )
                                     }
                                     .offset(y: offset.height)

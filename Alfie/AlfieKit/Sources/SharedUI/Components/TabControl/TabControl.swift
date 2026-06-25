@@ -35,9 +35,9 @@ public struct TabControl: View {
 
     public enum Configuration {
         /// Left aligned, scrollable
-        case intrisicSize(itemSpacing: CGFloat = Spacing.space200)
+        case intrisicSize(itemSpacing: CGFloat = Primitives.Spacing.spacing16)
         /// Center aligned, non-scrollable
-        case fixedSize(horizontalMargins: CGFloat = Spacing.space0)
+        case fixedSize(horizontalMargins: CGFloat = Primitives.Spacing.spacing0)
 
         // swiftlint:disable vertical_whitespace_between_cases
         var itemSpacing: CGFloat {
@@ -45,7 +45,7 @@ public struct TabControl: View {
             case .intrisicSize(let itemSpacing):
                 itemSpacing
             case .fixedSize:
-                Spacing.space0
+                Primitives.Spacing.spacing0
             }
         }
 
@@ -120,7 +120,7 @@ public struct TabControl: View {
     private var tabControlItemsView: some View {
         HStack(alignment: .center, spacing: configuration.itemSpacing) {
             if !configuration.isIntrisicSize {
-                Spacer(minLength: Spacing.space0)
+                Spacer(minLength: Primitives.Spacing.spacing0)
             }
             ForEach(Array(options.enumerated()), id: \.0) { index, value in
                 Button {
@@ -143,7 +143,7 @@ public struct TabControl: View {
                     )
                     .overlay {
                         if currentIndex == index {
-                            VStack(spacing: Spacing.space0) {
+                            VStack(spacing: Primitives.Spacing.spacing0) {
                                 Spacer()
                                 ThemedDivider(
                                     configuration: .init(
@@ -179,9 +179,9 @@ public struct TabControl: View {
                 )
             }
 
-            Spacer(minLength: Spacing.space0)
+            Spacer(minLength: Primitives.Spacing.spacing0)
         }
-        .padding(.vertical, Spacing.space200)
+        .padding(.vertical, Primitives.Spacing.spacing16)
         .padding(.horizontal, configuration.itemSpacing)
         .background {
             VStack {
@@ -223,7 +223,7 @@ private enum AccessibilityId {
 #Preview("Intrinsic Size") {
     TabControl(
         theme: .light,
-        configuration: .intrisicSize(itemSpacing: Spacing.space200),
+        configuration: .intrisicSize(itemSpacing: Primitives.Spacing.spacing16),
         options: ["Option1", "Option2", "Option3"],
         currentIndex: .constant(0)
     )
@@ -232,7 +232,7 @@ private enum AccessibilityId {
 #Preview("Fixed Size") {
     TabControl(
         theme: .dark,
-        configuration: .fixedSize(horizontalMargins: Spacing.space100),
+        configuration: .fixedSize(horizontalMargins: Primitives.Spacing.spacing8),
         options: ["Option1", "Option2", "Option3"],
         currentIndex: .constant(0)
     )

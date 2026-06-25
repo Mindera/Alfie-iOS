@@ -20,9 +20,9 @@ struct CustomTabBarView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.space0) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
             Divider()
-            HStack(spacing: Spacing.space0) {
+            HStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(tabs, id: \.self) { tab in
                     TabBarItemView(
                         tab: tab,

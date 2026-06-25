@@ -4,11 +4,11 @@ import SwiftUI
 struct TabControlIntrinsicWidthDemoView: View {
     @State private var theme = TabControl.Theme.light
     @State private var numberOfOptions = 3
-    @State private var spacing = Spacing.space200
+    @State private var spacing = Primitives.Spacing.spacing16
     @State private var currentIndex: Int = 0
     @State private var showIcons = false
     private let options = ["Product Description", "Reviews", "Online Promotion", "Offers", "Delivery"]
-    private var spacingOptions = [Spacing.space100, Spacing.space200]
+    private var spacingOptions = [Primitives.Spacing.spacing8, Primitives.Spacing.spacing16]
     private var themeOptions = TabControl.Theme.allCases
     private var currentOptions: [String] {
         Array(options.prefix(numberOfOptions))
@@ -70,7 +70,7 @@ struct TabControlIntrinsicWidthDemoView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal, Spacing.space300)
+            .padding(.horizontal, Primitives.Spacing.spacing24)
         }
     }
 }

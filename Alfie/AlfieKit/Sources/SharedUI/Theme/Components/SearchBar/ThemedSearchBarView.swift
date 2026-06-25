@@ -250,7 +250,7 @@ public struct ThemedSearchBarView: View {
                     onSubmitTap?()
                 }
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
             .frame(height: theme.searchBarHeight)
             .background(
                 ZStack {

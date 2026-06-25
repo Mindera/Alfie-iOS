@@ -41,7 +41,7 @@ public struct SizingSelectorComponentView: View {
             HStack(spacing: itemSpacing) {
                 swatches()
             }
-            .padding(.bottom, Spacing.space150)
+            .padding(.bottom, Primitives.Spacing.spacing12)
         }
         .scrollDisabled(!scrollable)
     }
@@ -95,7 +95,7 @@ public struct SizingSelectorComponentView: View {
             ]
         ),
         layoutConfiguration: .init(
-            arrangement: .chips(itemHorizontalSpacing: Spacing.space200, itemVerticalSpacing: Spacing.space200)
+            arrangement: .chips(itemHorizontalSpacing: Primitives.Spacing.spacing16, itemVerticalSpacing: Primitives.Spacing.spacing16)
         )
     )
 }
@@ -115,6 +115,6 @@ public struct SizingSelectorComponentView: View {
                 .init(id: "8", name: "XXXXL", state: .available),
             ]
         ),
-        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))
+        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16))
     )
 }

@@ -6,7 +6,7 @@ struct TagDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Tag")
 
                 HStack {
@@ -41,7 +41,7 @@ struct TagDemoView: View {
                     tags.append(newTag)
                 }
 
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Spacing.space150) {
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], spacing: Primitives.Spacing.spacing12) {
                     ForEach(tags, id: \.self) { tag in
                         Tag(configuration: .init(label: tag, showCloseButton: true) { tags.removeAll { $0 == tag } })
                     }
@@ -49,7 +49,7 @@ struct TagDemoView: View {
 
                 Spacer()
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
     }
 

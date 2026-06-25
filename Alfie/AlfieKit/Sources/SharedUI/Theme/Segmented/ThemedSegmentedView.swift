@@ -23,12 +23,12 @@ public struct ThemedSegmentedView<Content: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: Spacing.space0) {
+        HStack(spacing: Primitives.Spacing.spacing0) {
             ForEach(list, id: \.id) { segment in
                 itemBuilder(segment, animation, type)
             }
         }
-        .padding(type == .compact ? Spacing.space050 : Spacing.space100)
+        .padding(type == .compact ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8)
         .background {
             RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                 .fill(Primitives.Colours.neutrals100)
@@ -63,7 +63,7 @@ public struct ThemedSegmentView: View {
                 RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                     .fill(.clear)
             }
-            HStack(spacing: Spacing.space0) {
+            HStack(spacing: Primitives.Spacing.spacing0) {
                 Spacer()
                 if let icon = segment.icon {
                     icon
@@ -71,12 +71,12 @@ public struct ThemedSegmentView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
-                        .padding(.trailing, type == .compact ? Spacing.space050 : Spacing.space100)
+                        .padding(.trailing, type == .compact ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8)
                         .foregroundStyle(currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500)
                 }
                 Text.build(theme.font.paragraph.normal(segment.title))
                     .foregroundStyle(currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500)
-                    .padding(.vertical, type == .compact ? Spacing.space100 : Spacing.space200)
+                    .padding(.vertical, type == .compact ? Primitives.Spacing.spacing8 : Primitives.Spacing.spacing16)
                     .lineLimit(1)
                 Spacer()
             }

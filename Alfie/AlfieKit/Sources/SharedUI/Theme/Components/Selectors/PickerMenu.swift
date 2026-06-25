@@ -30,7 +30,7 @@ public struct PickerMenu<Content: View>: View {
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
                             .tint(Primitives.Colours.neutrals800)
                     }
-                    .padding(.horizontal, Spacing.space200)
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
                 }
                 .background(Primitives.Colours.neutrals0)
                 .cornerRadius(Sizing.radiusSoft)

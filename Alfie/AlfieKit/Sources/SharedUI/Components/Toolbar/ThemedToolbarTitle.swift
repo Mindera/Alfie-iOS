@@ -47,14 +47,14 @@ public struct ThemedToolbarTitle: View {
                         .foregroundStyle(Primitives.Colours.neutrals500)
                 }
             }
-            .padding(.vertical, Spacing.space200)
+            .padding(.vertical, Primitives.Spacing.spacing16)
 
         case .text(let text):
             Text(text)
                 .font(Font(theme.font.paragraph.normal.withSize(18)))
                 .foregroundStyle(tint)
                 .accessibilityIdentifier(accessibilityId)
-                .padding(.vertical, Spacing.space200)
+                .padding(.vertical, Primitives.Spacing.spacing16)
         }
     }
 }

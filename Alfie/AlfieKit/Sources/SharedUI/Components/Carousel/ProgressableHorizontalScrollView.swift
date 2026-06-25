@@ -13,7 +13,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         let horizontalPadding: CGFloat
         let verticalPadding: CGFloat
 
-        public init(horizontalPadding: CGFloat, verticalPadding: CGFloat = Spacing.space250) {
+        public init(horizontalPadding: CGFloat, verticalPadding: CGFloat = Primitives.Spacing.spacing20) {
             self.horizontalPadding = horizontalPadding
             self.verticalPadding = verticalPadding
         }
@@ -39,7 +39,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 content()
                     .padding(.horizontal, scrollViewConfiguration.horizontalPadding)
@@ -94,8 +94,8 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         Text("No scrollable area - hidden ProgressBar")
 
         ProgressableHorizontalScrollView(
-            scrollViewConfiguration: .init(horizontalPadding: Spacing.space200),
-            progressBarConfiguration: .init(horizontalPadding: Spacing.space1000, verticalPadding: Spacing.space400)
+            scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
+            progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing80, verticalPadding: Primitives.Spacing.spacing32)
         ) {
             HStack {
                 ForEach(1...3, id: \.self) { index in
@@ -113,8 +113,8 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         Text("Scrollable area - visible ProgressBar")
 
         ProgressableHorizontalScrollView(
-            scrollViewConfiguration: .init(horizontalPadding: Spacing.space200),
-            progressBarConfiguration: .init(horizontalPadding: Spacing.space1000, verticalPadding: Spacing.space400)
+            scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
+            progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing80, verticalPadding: Primitives.Spacing.spacing32)
         ) {
             HStack {
                 ForEach(1...10, id: \.self) { index in

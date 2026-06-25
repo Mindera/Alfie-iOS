@@ -16,10 +16,10 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
         ScrollView {
             LazyVGrid(
                 columns: Array(
-                    repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
+                    repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
                     count: 2
                 ),
-                spacing: Spacing.space200
+                spacing: Primitives.Spacing.spacing16
             ) {
                 ForEach(viewModel.products) { product in
                     Button(
@@ -36,9 +36,9 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                     .listRowInsets(EdgeInsets())
                 }
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
-        .padding(.vertical, Spacing.space200)
+        .padding(.vertical, Primitives.Spacing.spacing16)
         .toolbarView(hasDivider: viewModel.hasNavigationSeparator) {
             viewModel.didTapMyAccount()
         }

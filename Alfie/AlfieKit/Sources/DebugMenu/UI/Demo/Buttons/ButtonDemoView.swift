@@ -13,7 +13,7 @@ struct ButtonDemoView: View {
     @State private var isFullWidth = false
 
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoSectionHeader(title: "Button")
 
             ThemedButton(
@@ -26,7 +26,7 @@ struct ButtonDemoView: View {
                 isLoading: $isLoading,
                 isFullWidth: isFullWidth
             ) {}
-            .padding(.vertical, Spacing.space100)
+            .padding(.vertical, Primitives.Spacing.spacing8)
 
             ThemedButton(
                 text: text,
@@ -38,7 +38,7 @@ struct ButtonDemoView: View {
                 isLoading: $isLoading,
                 isFullWidth: isFullWidth
             ) {}
-            .padding(.vertical, Spacing.space100)
+            .padding(.vertical, Primitives.Spacing.spacing8)
 
             ThemedButton(
                 text: text,
@@ -50,7 +50,7 @@ struct ButtonDemoView: View {
                 isLoading: $isLoading,
                 isFullWidth: isFullWidth
             ) {}
-            .padding(.vertical, Spacing.space100)
+            .padding(.vertical, Primitives.Spacing.spacing8)
 
             DemoHelper.demoSectionHeader(title: "Options")
 
@@ -58,7 +58,7 @@ struct ButtonDemoView: View {
                 Text.build(theme.font.small.bold("Caption"))
                 Spacer()
                 ThemedInput($text)
-                    .padding(.leading, Spacing.space800)
+                    .padding(.leading, Primitives.Spacing.spacing64)
             }
 
             HStack {
@@ -136,7 +136,7 @@ struct ButtonDemoView: View {
 
             Spacer()
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 }
 

@@ -18,7 +18,7 @@ struct BrazeDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space200) {
+            VStack(spacing: Primitives.Spacing.spacing16) {
                 DemoHelper.demoSectionHeader(title: "Push Notification ID")
                 Button(action: {
                     UIPasteboard.general.string = brazeUserId
@@ -34,7 +34,7 @@ struct BrazeDemoView: View {
                     }
                 }
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .alert("Push Notification ID copied to clipboard", isPresented: $showPushIDAlert) {}
         .alert(notificationTriggerAlertMessage, isPresented: $showNotificationTriggeredAlert) {

@@ -10,116 +10,84 @@ created: 2026-06-24
 ---
 
 ## Overview
-Make the ALFMOB-272 generated design tokens the source of truth for Alfie's spacing and corner-radius
-values. Per the epic blueprint (`260618-1552-ALFMOB-264-design-system-tokens/phase-4-spacing-shape.md`)
-use **option (a)**: keep the hand-written `enum Spacing` / `enum CornerRadius`, but set each
-`public static let` = the corresponding generated symbol. **Design-token JSON is the source of truth;
-on conflict, the JSON wins** (user decision). Near-zero call-site churn (108 files / ~494 spacing + ~54
-radius sites keep `Spacing.space200` / `CornerRadius.s` verbatim). One deliberate production change:
-`space075` 6→8pt (no `spacing-6` token), confirmed at the gate, design signs off on the PR.
+Make the ALFMOB-272 generated design tokens the **single source of truth** for Alfie's spacing and
+corner-radius. The hand-written `enum Spacing` and `enum CornerRadius` were thin layers over the
+generated tokens, so — per the user's decision that the design-token JSON is authoritative and the app's
+spacing/shape system is being replaced by it — **both are deleted** and call sites use the generated
+tokens directly (`Primitives.Spacing.spacingN`, `Sizing.radius*`). This mirrors how colours are consumed
+(ALFMOB-274 uses `Primitives.Colours.*` directly, no facade). On conflict, the JSON wins.
+
+> Evolution: this started as "forward the enums to tokens (option a, zero churn)" per the epic
+> blueprint, then — at the user's direction — moved to full token adoption (delete the facades). The
+> per-phase files (`phase-1-spacing.md`, `phase-2-corner-radius.md`) and `grill.md` capture that history.
 
 ## Acceptance Criteria
-- [ ] Every spacing value sourced from a generated token (`Primitives.Spacing.*`) — **no numeric literals remain**.
-- [ ] Every corner-radius value sourced from a generated radius token — call sites use `Sizing.radiusSoft/Strong/Rounded` directly; the `CornerRadius` alias type is removed.
-- [ ] `Spacing.*` access patterns unchanged (same names except the deleted `space900`, same `CGFloat` type). Corner-radius consumers migrated to `Sizing.radius*`; sibling P5 stories (ALFMOB-271/268/273…) adopt the same when they land.
-- [ ] `space075` conformed to the nearest token: `Primitives.Spacing.spacing8` (6→8pt) — a deliberate +2pt shift in `HorizontalProductCard`/`SortByView`, design sign-off on PR.
-- [ ] `space900` (72pt, no token, demo-only) deleted, incl. its `SpacingDemoView` row.
-- [ ] New value-pinning unit tests assert each public constant resolves to its expected CGFloat and equals its generated source.
-- [ ] `./Alfie/scripts/verify.sh` → ✅ FULL VERIFICATION PASSED.
+- [x] Every spacing value comes from a generated token — call sites use `Primitives.Spacing.spacingN` directly; `enum Spacing` deleted; no numeric spacing literals in theme.
+- [x] Every corner-radius value comes from a generated token — call sites use `Sizing.radiusSoft/Strong/Rounded` directly; `enum CornerRadius` deleted.
+- [x] `space075` conformed 6→8pt (`spacing8`; no `spacing-6` token); `space900` (72pt) removed (no token). Both pixel/structure changes flagged for design.
+- [x] Corner radii collapsed onto the 2 finite radius tokens (`<10→radiusSoft`, `≥10→radiusStrong`) + `radiusRounded` pill; `none` removed (no radius = no modifier).
+- [x] Hand-written pin tests removed with their types (nothing hand-written left to pin; generator tests cover token values).
+- [x] `./Alfie/scripts/verify.sh --skip-integration` → ✅ build + unit pass.
 
 ## Approach
-**Forward the existing enums to generated symbols (option a).** Smallest diff, preserves the public
-API + doc-comments + `swiftlint:disable` pragma, keeps sibling P5 component refactors compiling. The
-literal numbers move out of the theme files into the generated files (the design source of truth), so
-"no hardcoded numeric" is met for every constant.
+**Adopt the generated tokens directly; delete the hand-written facades.** Same mechanism colours used.
+Spacing is a 1:1-by-value inline (`Spacing.space200` → `Primitives.Spacing.spacing16`); corner radius
+required a collapse (8 t-shirt names → the 3 radii the design system actually defines) because the JSON
+has only `radiusSoft`/`radiusStrong`/`radiusRounded`. The generator is **not** extended — the needed
+tokens already exist; we just consume them.
 
-**Deliberate divergence from epic phase-4 step 1** (which suggested emitting new
-`Spacing+Generated.swift` / `Radius+Generated.swift`): we do **NOT** extend the generator. The needed
-spacing scale already exists as `Primitives.Spacing.spacingN`; radius as `Sizing.radius*`. Adding
-dedicated emit files would mean changing `Tools/DesignTokenGen/Emitter.swift` + inventing token inputs
-that don't exist, for zero functional gain (YAGNI/DRY). Reusing the existing primitives satisfies every
-AC with no generator risk; the generator's separate test suite stays untouched.
-
-### Decisions (grilled — see `grill.md`)
-1. **Radius source = radius tokens only** (post-review user decision, supersedes the original
-   semantic-where-available mapping): corner radii must come from the design system's radius tokens,
-   not spacing primitives. The JSON defines only `radiusSoft`=4 and `radiusStrong`=16 for finite radii,
-   so each case maps by size — **<10pt → `Sizing.radiusSoft`, ≥10pt → `Sizing.radiusStrong`**:
-   `xxs/xs/s → radiusSoft`, `m/l/xl → radiusStrong`. `full → Sizing.radiusRounded` (**pending design/team
-   confirmation**). `none → 0` (absence of a radius; no token). **This shifts pixels:** `xxs 2→4`, `s 8→4`,
-   `m 12→16`, `xl 24→16` (affects Snackbar, ThemedButton, ProgressBar, …) — design signs off on PR.
-2. **Off-token spacing conformed in-ticket** (JSON has no `spacing-6`/`spacing-72`): `space075`→`spacing8`
-   (6→8pt, nearest-up, safer tap targets; **design sign-off on PR**); `space900` **deleted** (demo-only)
-   incl. its demo row. No off-token literals remain.
-3. **PR base = `ALFMOB-274-integrate-color-tokens`** (stacked; `main` lacks the generated tokens). Confirmed by user.
+### Decisions (see `grill.md` for the trail)
+1. **Design-token JSON is the source of truth** (user). The app's spacing/shape system is being replaced
+   by it, so the hand-written `Spacing`/`CornerRadius` layers are removed rather than kept as aliases.
+2. **Corner radius collapses to `radiusSoft`(4)/`radiusStrong`(16)/`radiusRounded`(1000)** — `<10→soft`,
+   `≥10→strong`. Pixel shifts: `xxs 2→4`, `s 8→4`, `m 12→16`, `xl 24→16`. `none` removed. **`radiusRounded`
+   pending team confirmation.**
+3. **Spacing `space075` conformed 6→8** (no `spacing-6` token; now equals `space100`→`spacing8`);
+   **`space900` (72pt) removed** (no `spacing-72` token). All other spacing values map 1:1 by value.
+4. **PR base = `ALFMOB-274-integrate-color-tokens`** (stacked; `main` lacks the generated tokens).
 
 ## Value mapping
-### Spacing → `Primitives.Spacing.*`
-`space0→spacing0 · space025→spacing2 · space050→spacing4 · space075→spacing8 (6→8, conformed) ·
-space100→spacing8 · space150→spacing12 · space200→spacing16 · space250→spacing20 · space300→spacing24 ·
-space400→spacing32 · space500→spacing40 · space600→spacing48 · space700→spacing56 · space800→spacing64 ·
-space1000→spacing80` · **`space900` (72) → DELETED**
-### CornerRadius → DELETED; use `Sizing.radius*` directly
-The hand-written `CornerRadius` type was a pure alias over the generated radius tokens, so it was
-**deleted entirely** and call sites now use `Sizing.radiusSoft` / `radiusStrong` / `radiusRounded`
-directly — consistent with how colours are consumed (ALFMOB-274 uses `Primitives.Colours.*` directly,
-no facade). Final call-site mapping (~34 sites, value-preserving): `xxs/xs/s → Sizing.radiusSoft`,
-`m/l/xl → Sizing.radiusStrong`, `full → Sizing.radiusRounded`, `none → removed` (no radius = no
-modifier). `CornerRadiusTokenTests` was removed with the type (nothing hand-written left to pin; the
-generator's own tests cover token values). `radiusRounded` is **pending team confirmation** (~9 sites).
+### Spacing → `Primitives.Spacing.*` (enum deleted, ~540 sites inlined across ~108 files)
+`space0→spacing0 · space025→spacing2 · space050→spacing4 · space075→spacing8 (6→8) · space100→spacing8 ·
+space150→spacing12 · space200→spacing16 · space250→spacing20 · space300→spacing24 · space400→spacing32 ·
+space500→spacing40 · space600→spacing48 · space700→spacing56 · space800→spacing64 · space1000→spacing80`
+· `space900` removed.
+### CornerRadius → `Sizing.radius*` (enum deleted, ~34 sites across 23 files)
+`xxs/xs/s → radiusSoft (4)` · `m/l/xl → radiusStrong (16)` · `full → radiusRounded (1000, pending)` ·
+`none → removed`.
 
-## Phases
-One file per vertical slice; each leaves the app building & green.
-1. **Spacing** — forward `Spacing.swift` (incl. `space075`→spacing8, delete `space900`), update `SpacingDemoView`, pin tests. `phase-1-spacing.md`
-2. **CornerRadius** — forward `CornerRadius.swift` to `Sizing.radius*`/`Primitives.Spacing.*`, pin tests. `phase-2-corner-radius.md`
+## File Changes (Summary)
+| File | Module | Type | Change |
+|---|---|---|---|
+| `Theme/Spacing/Spacing.swift` | SharedUI | **delete** | Enum facade removed; consumers use `Primitives.Spacing.*` |
+| `Theme/CornerRadius/CornerRadius.swift` | SharedUI | **delete** | Enum facade removed; consumers use `Sizing.radius*` |
+| `Tests/SharedUITests/SpacingTokenTests.swift` | SharedUITests | **delete** | No hand-written spacing type left to pin |
+| `Tests/SharedUITests/CornerRadiusTokenTests.swift` | SharedUITests | **delete** | No hand-written radius type left to pin |
+| ~540 spacing + ~34 radius call sites (~110 files) | SharedUI + features | edit | Inline `Primitives.Spacing.spacingN` / `Sizing.radius*` |
+| `Demo/Spacing/SpacingDemoView.swift`, `Demo/CornerRadius/CornerRadiusDemoView.swift` | DebugMenu | edit | Repointed to generated tokens |
 
-## File Changes (Summary Table)
-| File | Module | Type | Change | Owner |
-|---|---|---|---|---|
-| `Theme/Spacing/Spacing.swift` | SharedUI | edit | Each `space*` = `Primitives.Spacing.*`; `space075`→spacing8; remove `space900` | - |
-| `DebugMenu/UI/Demo/Spacing/SpacingDemoView.swift` | DebugMenu | edit | Delete the `space900` demo row | - |
-| `Theme/CornerRadius/CornerRadius.swift` | SharedUI | **delete** | Pure alias over radius tokens — removed; consumers use `Sizing.radius*` directly | - |
-| `Tests/SharedUITests/CornerRadiusTokenTests.swift` | SharedUITests | **delete** | No hand-written radius type left to pin (generator tests cover token values) | - |
-| ~34 `CornerRadius.*` call sites across 23 files | SharedUI + features | edit | `xxs/xs/s→Sizing.radiusSoft`, `m/l/xl→Sizing.radiusStrong`, `full→Sizing.radiusRounded` (value-preserving) | - |
-| `DebugMenu/UI/Demo/CornerRadius/CornerRadiusDemoView.swift` | DebugMenu | edit | Demo the 3 radii via `Sizing.radius*` + a soft/strong nested example | - |
-| `Tests/SharedUITests/SpacingTokenTests.swift` | SharedUITests | add | Pin every `Spacing.space*` to expected CGFloat (`space075==8`) + equal generated source; assert `space900` gone | - |
-| `Tests/SharedUITests/CornerRadiusTokenTests.swift` | SharedUITests | add | Pin every `CornerRadius.*` to expected CGFloat + equal generated source | - |
-
-**No change:** `Shape/DefaultShapeProvider.swift`, `Shape/ShapeProviderProtocol.swift` (pure geometry),
-`Shadow/ShadowViewModifier.swift` (no shadow/elevation tokens upstream), all 108 spacing/radius call-site
-files (names/values stable), `CornerRadiusDemoView` (unchanged), the generator.
-
-## Feature Flag
-n/a — static theme-value refactor.
+**No change:** `Shape/*` (pure geometry), `Shadow/ShadowViewModifier.swift` (no shadow tokens upstream), the generator.
 
 ## Testing Strategy
-- **Build/unit:** `./Alfie/scripts/verify.sh` per phase. SwiftLint runs as a build phase (opt-in all) — hand-edited theme files must lint clean; preserve `CornerRadius.swift`'s pragma.
-- **New unit tests:** value-pin every public `Spacing.*` / `CornerRadius.*` constant to its expected
-  CGFloat AND assert it equals its generated source — catches a wrong-token wiring (`space200 = spacing18`)
-  and pins the contract callers rely on. (`StyleGuideTests.swift` is an empty stub; no value tests exist.)
-- **Snapshot:** N/A — `Alfie/AlfieTests/Snapshots/*` are not wired into the target and zero reference PNGs
-  are committed; nothing runs / nothing to rebaseline. The only visual delta (`space075` 6→8) is therefore
-  **not auto-covered** → flagged for design sign-off + manual check.
-- **Generator:** untouched → `generate-design-tokens.sh` not needed.
-- **Manual:** DebugMenu → StyleGuide → Spacing demo (space075 row now 8pt; space900 gone) + CornerRadius demo (unchanged). Spot-check HorizontalProductCard / SortBy spacing.
+- **Build/unit:** `./Alfie/scripts/verify.sh --skip-integration` → ✅ (build + unit; SharedUI change has no BFF surface).
+- **Pin tests:** removed — there is no hand-written spacing/radius type to pin anymore; the generator's
+  own suite (run via `generate-design-tokens.sh`) covers token values. Consistent with colours (no facade, no pin test).
+- **Snapshot:** N/A — `Alfie/AlfieTests/Snapshots/*` not wired into the target, no reference PNGs. Visual deltas (radius collapse, `space075` 6→8) flagged for design.
+- **Manual:** DebugMenu → StyleGuide → Spacing + CornerRadius demos; spot-check radius-heavy components.
 
 ## Risks & Mitigations
 | Risk | Likelihood | Mitigation |
 |---|---|---|
-| `space075` 6→8 visibly shifts HorizontalProductCard/SortBy and no snapshot catches it | Med | Explicit AC + `// 6→8` comment; manual check; **design sign-off on PR** before merge |
-| Wrong-token wiring silently shifts a value | Low | Value-pin unit tests assert exact CGFloat per constant |
-| Deleting `space900` breaks a non-demo usage | Low | Scout found only `SpacingDemoView`; executor re-greps before deleting |
-| Reviewer wants the 5 non-token radii collapsed to the 3 sanctioned tokens | Low | Out of scope (design-led redesign, ~54 call sites); noted below |
-| Stacked base (274 not in main) complicates PR | Low | PR targets the 274 branch; noted in PR body |
+| Radius collapse (xxs/s/m/xl) + `space075` 6→8 shift pixels, no snapshot catches it | Med | Flagged in PR for **design sign-off**; manual check |
+| `radiusRounded` not the right pill token | Med | **Pending team confirm**; ~9 sites if changed |
+| ~540-site spacing inline conflicts with in-flight sibling P5 branches (ALFMOB-271/268/273) | Med | Mechanical; siblings rebase onto direct token usage |
+| Lossy `space075`/`space100` collision (both `spacing8`) | Low | Accepted — a future upstream `spacing-6` re-separates at those call sites |
+| Stacked base (274 not in main) | Low | PR targets the 274 branch |
 
 ## Out of Scope
-- Adding `spacing-6` / `spacing-72` (and dedicated `Spacing+/Radius+Generated.swift`) to the upstream
-  `Mindera/Alfie-Mobile-Design-Tokens` repo — design/upstream deliverable. (`space075` is conformed to
-  `spacing8` here instead of waiting for an upstream `spacing-6`.)
-- Collapsing `CornerRadius` to only the 3 JSON-sanctioned radii (soft/strong/rounded) — a design-led
-  redesign across ~54 call sites; out of scope. We source the other five from their spacing primitives.
+- Adding `spacing-6` / `spacing-72` upstream (`Mindera/Alfie-Mobile-Design-Tokens`) — would let `space075`/`space900` values exist as tokens.
 - Shadow/elevation tokens (none exist upstream) — `ShadowViewModifier` literals stay.
-- Migrating call sites to new names — option (a) keeps existing names.
+- Relabeling the Spacing demo's "Base Unit Multiplier" copy (debug-only, cosmetic).
 
 ## Open Questions
-- None outstanding. Design sign-off on the `space075` 6→8 shift happens at PR review (tracked as a Risk).
+- **`radiusRounded`** — team to confirm the pill radius token. Design sign-off on the radius/`space075` pixel shifts at PR review.

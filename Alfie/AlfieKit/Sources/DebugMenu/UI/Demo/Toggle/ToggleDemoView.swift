@@ -7,7 +7,7 @@ struct ToggleDemoView: View {
     @State private var isDisabled = false
 
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoSectionHeader(title: "Toggle")
 
             ThemedToggleView(isOn: $isOn, isDisabled: $isDisabled) {
@@ -15,13 +15,13 @@ struct ToggleDemoView: View {
             }
 
             DemoHelper.demoSectionHeader(title: "Options")
-                .padding(.top, Spacing.space400)
+                .padding(.top, Primitives.Spacing.spacing32)
 
             ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disable")) }
 
             Spacer()
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 }
 

@@ -42,15 +42,15 @@ public struct ZoomableCarousel<Content: View>: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.closeIconSize, height: Constants.closeIconSize)
-                        .padding(Spacing.space050)
+                        .padding(Primitives.Spacing.spacing4)
                         .foregroundStyle(Primitives.Colours.neutrals800)
                         .background(Primitives.Colours.neutrals0.opacity(Constants.closeIconBackgroundOpacity))
                         .clipShape(Circle())
                 })
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .edgesIgnoringSafeArea(.bottom)
-                .padding(.bottom, Spacing.space200)
-                .padding(.leading, Spacing.space200)
+                .padding(.bottom, Primitives.Spacing.spacing16)
+                .padding(.leading, Primitives.Spacing.spacing16)
 
                 Spacer()
 
@@ -61,7 +61,7 @@ public struct ZoomableCarousel<Content: View>: View {
                         selectedIndex: $currentIndex,
                         slideSubject: slideSubject
                     )
-                    .padding(Spacing.space200)
+                    .padding(Primitives.Spacing.spacing16)
                     .background(Primitives.Colours.neutrals0.opacity(Constants.backgroundOpacity))
                     .cornerRadius(Sizing.radiusSoft)
                 }

@@ -15,7 +15,7 @@ struct InputDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.space250) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Input Fields")
 
                 ThemedInput($textA, isDisabled: $isDisabled)
@@ -56,7 +56,7 @@ struct InputDemoView: View {
                 )
 
                 DemoHelper.demoSectionHeader(title: "Options")
-                    .padding(.top, Spacing.space400)
+                    .padding(.top, Primitives.Spacing.spacing32)
 
                 ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disabled")) }
                 ThemedToggleView(isOn: $isRequired) { Text.build(theme.font.small.bold("Required")) }
@@ -79,9 +79,9 @@ struct InputDemoView: View {
                     }
                 }
                 .disabled(!hasIcon)
-                .padding(.bottom, Spacing.space700)
+                .padding(.bottom, Primitives.Spacing.spacing56)
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .onChange(of: hasLimit) { newValue in
             guard newValue, let textLimit else {

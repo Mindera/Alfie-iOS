@@ -17,11 +17,11 @@ extension VerticalProductCardConfiguration {
     var verticalInterSpacing: CGFloat {
         switch size {
         case .small:
-            Spacing.space100
+            Primitives.Spacing.spacing8
         case .medium:
-            Spacing.space150
+            Primitives.Spacing.spacing12
         case .large:
-            Spacing.space200
+            Primitives.Spacing.spacing16
         }
     }
 
