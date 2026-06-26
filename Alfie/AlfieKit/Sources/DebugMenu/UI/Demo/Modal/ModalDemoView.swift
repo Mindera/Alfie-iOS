@@ -25,12 +25,12 @@ struct ModalDemoView: View {
 
     private var smallBody: some View {
         VStack(alignment: .leading) {
-            Text("How to Mesure")
+            Text("How to Measure")
                 .font(theme.font.header.h3.withSize(18).font)
                 .padding(.bottom, Primitives.Spacing.spacing16)
             Text.build(theme.font.paragraph.boldItalic("• Bust"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
-            Text.build(theme.font.paragraph.normal("Mesure around the fullest part of your chest."))
+            Text.build(theme.font.paragraph.normal("Measure around the fullest part of your chest."))
                 .padding(.bottom, Primitives.Spacing.spacing8)
             Text.build(theme.font.paragraph.boldItalic("• Waist"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
@@ -51,13 +51,13 @@ struct ModalDemoView: View {
 
     private var bigBody: some View {
         VStack(alignment: .leading) {
-            Text("How to Mesure")
+            Text("How to Measure")
                 .font(theme.font.header.h3.withSize(18).font)
                 .padding(.bottom, Primitives.Spacing.spacing16)
             Spacer().frame(height: 400)
             Text.build(theme.font.paragraph.boldItalic("• Bust"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
-            Text.build(theme.font.small.normal("Mesure around the fullest part of your chest."))
+            Text.build(theme.font.small.normal("Measure around the fullest part of your chest."))
                 .padding(.bottom, Primitives.Spacing.spacing8)
             Spacer().frame(height: 400)
             Text.build(theme.font.paragraph.boldItalic("• Waist"))
