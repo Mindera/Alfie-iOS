@@ -33,9 +33,9 @@ public enum ButtonTheme: String, CaseIterable {
                 backgroundColor: Primitives.Colours.neutrals800,
                 backgroundDisabledColor: Primitives.Colours.neutrals100,
                 backgroundPressedColor: Primitives.Colours.neutrals500,
-                textColor: .white,
+                textColor: Primitives.Colours.neutrals0,
                 textDisabledColor: Primitives.Colours.neutrals400,
-                textPressedColor: .white,
+                textPressedColor: Primitives.Colours.neutrals0,
                 borderColor: Primitives.Colours.neutrals800,
                 borderDisabledColor: Primitives.Colours.neutrals100,
                 borderPressedColor: Primitives.Colours.neutrals500
@@ -43,8 +43,8 @@ public enum ButtonTheme: String, CaseIterable {
 
         case .secondary:
             return .init(
-                backgroundColor: .white,
-                backgroundDisabledColor: .white,
+                backgroundColor: Primitives.Colours.neutrals0,
+                backgroundDisabledColor: Primitives.Colours.neutrals0,
                 backgroundPressedColor: Primitives.Colours.neutrals100,
                 textColor: Primitives.Colours.neutrals800,
                 textDisabledColor: Primitives.Colours.neutrals400,
@@ -56,28 +56,28 @@ public enum ButtonTheme: String, CaseIterable {
 
         case .tertiary:
             return .init(
-                backgroundColor: .white,
-                backgroundDisabledColor: .white,
+                backgroundColor: Primitives.Colours.neutrals0,
+                backgroundDisabledColor: Primitives.Colours.neutrals0,
                 backgroundPressedColor: Primitives.Colours.neutrals100,
                 textColor: Primitives.Colours.neutrals800,
                 textDisabledColor: Primitives.Colours.neutrals400,
                 textPressedColor: Primitives.Colours.neutrals500,
-                borderColor: .white,
-                borderDisabledColor: .white,
+                borderColor: Primitives.Colours.neutrals0,
+                borderDisabledColor: Primitives.Colours.neutrals0,
                 borderPressedColor: Primitives.Colours.neutrals100
             )
 
         case .underline:
             return .init(
-                backgroundColor: .white,
-                backgroundDisabledColor: .white,
-                backgroundPressedColor: .white,
+                backgroundColor: Primitives.Colours.neutrals0,
+                backgroundDisabledColor: Primitives.Colours.neutrals0,
+                backgroundPressedColor: Primitives.Colours.neutrals0,
                 textColor: Primitives.Colours.neutrals800,
                 textDisabledColor: Primitives.Colours.neutrals400,
                 textPressedColor: Primitives.Colours.neutrals500,
-                borderColor: .white,
-                borderDisabledColor: .white,
-                borderPressedColor: .white
+                borderColor: Primitives.Colours.neutrals0,
+                borderDisabledColor: Primitives.Colours.neutrals0,
+                borderPressedColor: Primitives.Colours.neutrals0
             )
         }
     }

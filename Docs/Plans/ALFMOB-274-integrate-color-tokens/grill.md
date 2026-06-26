@@ -17,7 +17,7 @@
 ## Assumptions surfaced (now explicit)
 - The two palettes are **different ramps**, not a rename: `mono900 #101010 ≈ neutrals800`, app `black #000 ≈ neutrals900`. A swap shifts mid-ramp grays (mono300/400/700 drift Δ24-28) and several green/red shades. Exact shade correspondence in `mapping.md` is **engineering's best-fit, pending design confirmation** on the PR.
 - The token export has **fewer** green/red shades (8 semantic) than the brand scale (10) → 2 shades per family collapse onto a neighbour.
-- ALFMOB-274 will land **partial**: blue/yellow/orange stay on `Colors.xcassets` until the review list is resolved, so the asset catalog is only *partially* retired this ticket. The "no hardcoded hex remains" AC is therefore deferred for those families.
+- ~~ALFMOB-274 will land partial (blue/yellow/orange deferred on xcassets)~~ → **superseded by follow-up decision:** blue/yellow/orange were **deleted** (no token equivalent, no production usage), so `Colors.xcassets` is **fully** retired and the "no hardcoded hex remains" AC is fully met. See `mapping.md §B`.
 
 ## Still open (owner)
 - **Exact shade correspondence for the wire-now families** — owner: **Design**. `mapping.md §A` is the proposed table; confirm/adjust via snapshot review on the PR.

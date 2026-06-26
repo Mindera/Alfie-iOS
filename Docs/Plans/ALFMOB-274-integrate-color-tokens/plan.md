@@ -31,40 +31,38 @@ The `Colors` facade, `Primary`/`SecondaryColors`, and `Colors.xcassets` are **fu
 - [x] "No hardcoded hex remains" — fully met (no deferral; whole palette is tokens now).
 
 ## Approach
-**Adopt design-token names; migrate family-by-family; defer the no-token families.** For each wire-now
+**Adopt design-token names; migrate family-by-family; delete the no-token families.** For each wire-now
 family, replace `Colors.primary.*` / `Colors.secondary.*` call sites with the corresponding
-`Primitives.Colours.*` token (table in `mapping.md §A`), remove the migrated members from
-`PrimaryColors`/`SecondaryColors`, and delete the now-dead colorsets. `blue`/`yellow`/`orange` members,
-their colorsets, and `ThemedDivider`'s blue usage are left untouched and logged for review.
+`Primitives.Colours.*` token (table in `mapping.md §A`). `blue`/`yellow`/`orange` had no token
+equivalent and no production shipping usage, so — per the follow-up decision — they were **deleted**, not
+deferred; their few demo/preview references were re-pointed to the nearest token (or to a platform color
+in throwaway sample data). With every family migrated or deleted, `PrimaryColors`, `SecondaryColors`, the
+`Colors` facade, and the entire `Colors.xcassets` were **removed**.
 
-**Migration mechanism (confirm at approval gate):** recommended = adopt token names at call sites
-(Decision 1, "design names are source of truth"). Lower-churn fallback if preferred: keep the
-`Colors.primary/secondary` facade but re-point member *values* to the tokens (values-from-tokens, names
-unchanged) — satisfies "sourced from tokens / no hardcoded hex" with zero call-site churn but keeps the
-old names. **The exact shade correspondence is engineering best-fit pending design sign-off** regardless
-of mechanism.
+**Migration mechanism:** adopt token names at call sites (Decision 1, "design names are source of truth").
+**The exact shade correspondence is engineering best-fit pending design sign-off.**
 
-Sliced by family so the app stays green after every phase; xcassets is only partially deleted (blue/
-yellow/orange remain) in the final phase.
+Sliced by family so the app stays green after every phase; the asset catalog is **fully retired** at the end.
 
 ## Phases
 1. **Neutrals (mono/black/white)** — the bulk (~300 call sites). `phase-1-primary-neutrals.md`
 2. **Semantic green/red** — `semanticSuccess`/`semanticError`, mostly validation UI. `phase-2-secondary-semantic.md`
-3. **Review-list isolation (blue/yellow/orange)** — confirm these are self-contained; record list; no migration. `phase-3-no-token-families.md`
-4. **Partial xcassets retirement + snapshot rebaseline** — delete migrated colorsets only. `phase-4-retire-assets.md`
+3. **Delete no-token families (blue/yellow/orange)** — remove members; re-point demo/preview refs. `phase-3-no-token-families.md`
+4. **Full xcassets retirement** — delete the whole catalog + `Package.swift` resource; delete `Colors`/`Primary`/`SecondaryColors`. `phase-4-retire-assets.md`
 
 ## File Changes (Summary Table)
 | File | Module | Type | Change | Owner |
 |---|---|---|---|---|
 | ~300 call sites under `Alfie/Alfie` + `AlfieKit/Sources` | both | edit | `Colors.primary.mono*`→`Primitives.Colours.neutrals*` per `mapping.md §A` (mechanism per gate) | - |
 | green/red call sites (badges, snackbar, price, input) | SharedUI | edit | →`semanticSuccess*`/`semanticError*` | - |
-| `Theme/Color/PrimaryColors.swift` | SharedUI | edit | Remove mono/black/white members (migrated) | - |
-| `Theme/Color/SecondaryColors.swift` | SharedUI | edit | Remove green/red members; **keep** blue/yellow/orange | - |
-| `Theme/Color/Color.swift` | SharedUI | edit | Shrink/adjust `Colors` facade to surviving members | - |
-| `Theme/Color/Colors.xcassets` | SharedUI | partial delete | Remove `Mono*`,`Black`,`White`,`Green*`,`Red*` colorsets; keep Blue/Yellow/Orange | - |
-| `Components/Dividers/ThemedDivider.swift` | SharedUI | keep | blue stays (review list) — no change | - |
-| `DebugMenu/UI/Demo/Colors/ColorsDemoView.swift` (+ other demos) | DebugMenu | edit | Update swatches to surviving palette where they referenced migrated members | - |
-| `Alfie/AlfieTests/Snapshots/*` | AlfieTests | rebaseline | Re-record where token hex ≠ asset hex | - |
+| `Theme/Color/PrimaryColors.swift` | SharedUI | delete | All members migrated → file removed | - |
+| `Theme/Color/SecondaryColors.swift` | SharedUI | delete | green/red migrated, blue/yellow/orange deleted → file removed | - |
+| `Theme/Color/Color.swift` | SharedUI | delete | `Colors` facade no longer needed → file removed | - |
+| `Theme/Color/Colors.xcassets` | SharedUI | delete | **Entire** catalog removed + `.process(...)` dropped from `Package.swift` | - |
+| `Helpers/Extensions/Color+Extension.swift` | SharedUI | delete | `Color.black/.white` override removed (Copilot review) | - |
+| `Components/Dividers/ThemedDivider.swift` | SharedUI | edit | mono→neutrals; preview orange→token | - |
+| `DebugMenu/UI/Demo/Colors/ColorsDemoView.swift` (+ PageControl/Button/Motion/… demos) | DebugMenu | edit | Migrated swatches/accents; dropped blue/yellow/orange showcase rows | - |
+| `ProductDetailsTests/ProductDetailsViewModelTests.swift` | tests | edit | Assert swatch default `neutrals900` (was `.black`) | - |
 
 ## Feature Flag
 n/a — static palette refactor.

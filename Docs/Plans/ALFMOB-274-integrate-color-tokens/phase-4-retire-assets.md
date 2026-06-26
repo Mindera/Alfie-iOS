@@ -1,25 +1,32 @@
-## Phase 4: Partial xcassets retirement + snapshot rebaseline
+## Phase 4: Full xcassets retirement
 
 ### Goal
-Delete only the **migrated** colorsets (Mono/Black/White/Green/Red); keep Blue/Yellow/Orange until the
-review list is resolved. Prove no migrated-color asset access remains, then rebaseline shifted snapshots.
+With every family migrated (mono/green/red) or deleted (blue/yellow/orange), nothing reads the asset
+catalog. Delete `Colors.xcassets` **entirely**, drop its `Package.swift` resource entry, and remove the
+now-unused `Colors` facade + `PrimaryColors`/`SecondaryColors` types. Prove no asset color access remains.
 
 ### Acceptance criteria
-- [ ] `Mono*`, `Black`, `White`, `Green*`, `Red*` colorsets deleted from `Colors.xcassets`; Blue/Yellow/Orange retained.
-- [ ] `Package.swift` resource entry kept (catalog still holds review-list families).
-- [ ] Repo-wide grep confirms no `Color("Mono*|Black|White|Green*|Red*")` / `UIColor(named:)` for migrated families remain.
-- [ ] Snapshot suites updated where token hex ≠ old asset hex; intentional diffs recorded, unexpected ones investigated.
-- [ ] Dead `Bundle.module` lets removed only if both structs no longer need them (blue/yellow/orange still do → likely retained).
+- [x] `Colors.xcassets` **fully deleted** (all colorsets) and `.process("Theme/Color/Colors.xcassets")` removed from `Package.swift`.
+- [x] `Color.swift` (`Colors` enum), `PrimaryColors.swift`, `SecondaryColors.swift` deleted — the whole `Theme/Color/` folder is gone.
+- [x] Repo-wide grep confirms no `Color("…")` / `UIColor(named:)` color-asset access remains.
+- [x] No `Colors.` / `Primary`/`SecondaryColors` references remain anywhere.
+- [x] Snapshot suites: not in the AlfieTests target → none run / nothing to rebaseline (see note below).
 
 ### Steps
-1. **Grep-verify migrated families gone** (size: S) — `Grep 'Color("(Mono|Black|White|Green|Red)'` + `UIColor(named:` across `Alfie/Alfie` + `AlfieKit/Sources`; re-point stragglers. Why: safe deletion.
-2. **Delete migrated colorsets** (file: `Theme/Color/Colors.xcassets/*`, size: S) — remove only the migrated `.colorset` dirs; do NOT touch Blue/Yellow/Orange; do NOT hand-edit `project.pbxproj`. Why: partial retirement.
-3. **Rebaseline snapshots** — **N/A this ticket.** The snapshot suites are **not in the AlfieTests target membership** (each file has only a pbxproj file-reference, no build-phase entry — matches the `ProductDetailsColorSheetSnapshotTests` "Re-add Target Membership" TODO) and have **zero committed baselines**. So they do not run in `verify.sh` and there is nothing to rebaseline. When they are re-enabled later, fresh baselines will capture the new token colors. Recorded here so it isn't a silent gap.
+1. **Grep-verify no asset/facade refs** (size: S) — `Grep 'Color("'`, `'UIColor(named:'`, `'\bColors\.'` across `Alfie/Alfie` + `AlfieKit/Sources`; re-point stragglers first. Why: safe deletion.
+2. **Delete catalog + facade + types** (files: `Theme/Color/*`, `AlfieKit/Package.swift`, size: S) — remove the whole `Colors.xcassets`, `Color.swift`, `PrimaryColors.swift`, `SecondaryColors.swift`, and the `.process(...)` line. Do NOT hand-edit `project.pbxproj`. Why: full retirement.
+
+### Note — snapshots
+Rebaseline is **N/A this ticket.** The snapshot suites are **not in the AlfieTests target membership**
+(each file has only a pbxproj file-reference, no build-phase entry — matches the
+`ProductDetailsColorSheetSnapshotTests` "Re-add Target Membership" TODO) and have **zero committed
+baselines**, so they don't run in `verify.sh`. When re-enabled later, fresh baselines will capture the
+new token colors. Recorded here so it isn't a silent gap.
 
 ### Checkpoint
-- [ ] `./Alfie/scripts/verify.sh` passes (✅ FULL VERIFICATION PASSED)
-- [ ] Acceptance criteria above all met
-- [ ] Manual: full-app visual spot-check; dark mode unaffected
+- [x] `./Alfie/scripts/verify.sh` passes (✅ FULL VERIFICATION PASSED)
+- [x] Acceptance criteria above all met
+- [x] Manual: full-app visual spot-check; dark mode unaffected
 
 ### Depends on
 Phase 1, Phase 2, Phase 3
