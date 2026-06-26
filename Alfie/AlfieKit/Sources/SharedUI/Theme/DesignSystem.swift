@@ -90,8 +90,13 @@ public class DesignSystem: DesignSystemProtocol {
 
 // MARK: - Environment injection seam
 
-// Ready for `@Environment(\.theme)` injection. Unused for now — `DesignSystem.shared` remains the
-// default — so views can opt in (and previews/tests can inject a mock) without any call-site churn.
+// Injectable theme: the default is `DesignSystem.shared`; `.environment(\.theme, custom)` overrides
+// it for a subtree (e.g. a brand theme, or a mock in previews/tests).
+//
+// IMPORTANT: a view only receives the injected theme if it reads `@Environment(\.theme)`. The
+// `View.theme` / `ViewModifier.theme` convenience (Helpers/Extensions) always returns
+// `DesignSystem.shared` and shadows this value, so the ~all-current `theme.*` call sites ignore any
+// injection. Adopting injection in a view is therefore an explicit, per-view change — not automatic.
 private struct DesignSystemKey: EnvironmentKey {
     static let defaultValue: DesignSystemProtocol = DesignSystem.shared
 }
