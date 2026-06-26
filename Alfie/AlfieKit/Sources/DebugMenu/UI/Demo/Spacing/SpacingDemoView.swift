@@ -9,7 +9,6 @@ struct SpacingDemoView: View {
                 spacingView(token: "space.0", multiplier: "0.00", Primitives.Spacing.spacing0)
                 spacingView(token: "space.025", multiplier: "0.25", Primitives.Spacing.spacing2)
                 spacingView(token: "space.050", multiplier: "0.50", Primitives.Spacing.spacing4)
-                spacingView(token: "space.075", multiplier: "0.75", Primitives.Spacing.spacing8)
                 spacingView(token: "space.100", multiplier: "1", Primitives.Spacing.spacing8)
                 spacingView(token: "space.150", multiplier: "1.5", Primitives.Spacing.spacing12)
                 spacingView(token: "space.200", multiplier: "2", Primitives.Spacing.spacing16)
