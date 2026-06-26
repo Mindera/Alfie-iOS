@@ -2,9 +2,9 @@ import SwiftUI
 
 // MARK: - DesignSystemProtocol
 
-/// Single entry point for every design-token category (colours, spacing, radius, typography,
-/// shape). Each category is a protocol-backed provider forwarding to the generated tokens, so the
-/// whole system can be swapped — and later injected via `EnvironmentValues.theme` — as one unit.
+/// Single entry point for every design-token category (colour, spacing, radius, typography).
+/// Each category is a protocol-backed provider forwarding to the generated tokens, so the whole
+/// system can be swapped — and later injected via `EnvironmentValues.theme` — as one unit.
 public protocol DesignSystemProtocol {
     var color: ColorProviderProtocol { get }
     var spacing: SpacingProviderProtocol { get }
