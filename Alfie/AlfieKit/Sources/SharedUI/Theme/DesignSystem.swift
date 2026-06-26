@@ -3,12 +3,12 @@ import SwiftUI
 // MARK: - DesignSystemProtocol
 
 /// Single entry point for every design-token category (colour, spacing, radius, typography).
-/// Each category is a protocol-backed provider forwarding to the generated tokens, so the whole
-/// system can be swapped — and later injected via `EnvironmentValues.theme` — as one unit.
+/// Each category forwards to the generated tokens, vended as one unit so the whole theme can be
+/// injected via `EnvironmentValues.theme`.
 public protocol DesignSystemProtocol {
-    var color: ColorProviderProtocol { get }
-    var spacing: SpacingProviderProtocol { get }
-    var radius: RadiusProviderProtocol { get }
+    var color: ColorProvider { get }
+    var spacing: SpacingProvider { get }
+    var radius: RadiusProvider { get }
     var font: TypographyProviderProtocol { get }
 
     func setupAppearance()
@@ -19,20 +19,14 @@ public protocol DesignSystemProtocol {
 public class DesignSystem: DesignSystemProtocol {
     public static var shared = DesignSystem()
 
-    public var color: ColorProviderProtocol
-    public var spacing: SpacingProviderProtocol
-    public var radius: RadiusProviderProtocol
-    public var font: TypographyProviderProtocol
+    // Token-backed categories are fixed forwarders to the generated tokens (no variation, so
+    // concrete). Only `font` is a swappable provider.
+    public let color = ColorProvider()
+    public let spacing = SpacingProvider()
+    public let radius = RadiusProvider()
+    public let font: TypographyProviderProtocol
 
-    public init(
-        color: ColorProviderProtocol = DefaultColorProvider(),
-        spacing: SpacingProviderProtocol = DefaultSpacingProvider(),
-        radius: RadiusProviderProtocol = DefaultRadiusProvider(),
-        font: TypographyProviderProtocol = TypographyProvider()
-    ) {
-        self.color = color
-        self.spacing = spacing
-        self.radius = radius
+    public init(font: TypographyProviderProtocol = TypographyProvider()) {
         self.font = font
         setupAppearance()
     }

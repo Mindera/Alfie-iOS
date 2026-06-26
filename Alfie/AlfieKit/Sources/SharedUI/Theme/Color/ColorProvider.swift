@@ -1,42 +1,7 @@
 import SwiftUI
 
-// MARK: - ColorProviderProtocol
-
-/// Colour palette, forwarded from the generated `Primitives.Colours` tokens. Vended through
-/// `DesignSystem` so the palette can be swapped/injected as part of the theme.
-public protocol ColorProviderProtocol {
-    var neutrals0: Color { get }
-    var neutrals100: Color { get }
-    var neutrals200: Color { get }
-    var neutrals300: Color { get }
-    var neutrals400: Color { get }
-    var neutrals500: Color { get }
-    var neutrals600: Color { get }
-    var neutrals700: Color { get }
-    var neutrals800: Color { get }
-    var neutrals900: Color { get }
-    var semanticSuccess100: Color { get }
-    var semanticSuccess200: Color { get }
-    var semanticSuccess300: Color { get }
-    var semanticSuccess400: Color { get }
-    var semanticSuccess500: Color { get }
-    var semanticSuccess600: Color { get }
-    var semanticSuccess700: Color { get }
-    var semanticSuccess800: Color { get }
-    var semanticError100: Color { get }
-    var semanticError200: Color { get }
-    var semanticError300: Color { get }
-    var semanticError400: Color { get }
-    var semanticError500: Color { get }
-    var semanticError600: Color { get }
-    var semanticError700: Color { get }
-    var semanticError800: Color { get }
-    var transparent: Color { get }
-}
-
-// MARK: - DefaultColorProvider
-
-public struct DefaultColorProvider: ColorProviderProtocol {
+/// Colour palette, forwarded from the generated `Primitives.Colours` tokens. Vended through `DesignSystem`.
+public struct ColorProvider {
     public init() {}
 
     public var neutrals0: Color { Primitives.Colours.neutrals0 }

@@ -1,31 +1,8 @@
 import CoreGraphics
 
-// MARK: - SpacingProviderProtocol
-
-/// Semantic spacing scale (base-unit multipliers), forwarded from the generated
-/// `Primitives.Spacing` tokens. Vended through `DesignSystem` so spacing is injectable as part of
-/// the theme rather than read as a raw primitive at call sites.
-public protocol SpacingProviderProtocol {
-    var space0: CGFloat { get }
-    var space025: CGFloat { get }
-    var space050: CGFloat { get }
-    var space075: CGFloat { get }
-    var space100: CGFloat { get }
-    var space150: CGFloat { get }
-    var space200: CGFloat { get }
-    var space250: CGFloat { get }
-    var space300: CGFloat { get }
-    var space400: CGFloat { get }
-    var space500: CGFloat { get }
-    var space600: CGFloat { get }
-    var space700: CGFloat { get }
-    var space800: CGFloat { get }
-    var space1000: CGFloat { get }
-}
-
-// MARK: - DefaultSpacingProvider
-
-public struct DefaultSpacingProvider: SpacingProviderProtocol {
+/// Semantic spacing scale (base-unit multipliers), forwarded from the generated `Primitives.Spacing`
+/// tokens. Vended through `DesignSystem`.
+public struct SpacingProvider {
     public init() {}
 
     public var space0: CGFloat { Primitives.Spacing.spacing0 }
