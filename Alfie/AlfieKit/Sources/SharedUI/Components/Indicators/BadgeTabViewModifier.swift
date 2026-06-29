@@ -19,7 +19,7 @@ public struct BadgeTabViewModifier: ViewModifier {
     private func setAppearance() {
         UITabBarItem.appearance().badgeColor = Colors.secondary.red700.ui
 
-        let font = theme.font.tiny.normal
+        let font = theme.font.body.small.uiFont
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: Colors.primary.white.ui,

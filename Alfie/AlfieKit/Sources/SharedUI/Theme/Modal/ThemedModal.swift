@@ -47,7 +47,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
 
                                     VStack {
                                         HStack {
-                                            Text.build(theme.font.header.h3(title))
+                                            Text.build(theme.font.heading.small(title))
                                                 .foregroundStyle(Colors.primary.black)
                                             Spacer()
                                             Button {

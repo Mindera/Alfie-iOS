@@ -42,7 +42,7 @@ public struct AccordionView<Content: View>: View {
             }
             DisclosureGroup(isExpanded: $isOpen, content: { content().padding(.vertical, marginsValue) }, label: {
                 HStack {
-                    Text.build(theme.font.paragraph.normal(text))
+                    Text.build(theme.font.body.medium(text))
                         .foregroundStyle(textColor)
                 }
                 .padding(.vertical, marginsValue)

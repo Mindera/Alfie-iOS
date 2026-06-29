@@ -74,7 +74,7 @@ public struct ThemedSegmentView: View {
                         .padding(.trailing, type == .compact ? Spacing.space050 : Spacing.space100)
                         .foregroundStyle(currectSelected == segment ? Colors.primary.black : Colors.primary.mono500)
                 }
-                Text.build(theme.font.paragraph.normal(segment.title))
+                Text.build(theme.font.body.medium(segment.title))
                     .foregroundStyle(currectSelected == segment ? Colors.primary.black : Colors.primary.mono500)
                     .padding(.vertical, type == .compact ? Spacing.space100 : Spacing.space200)
                     .lineLimit(1)

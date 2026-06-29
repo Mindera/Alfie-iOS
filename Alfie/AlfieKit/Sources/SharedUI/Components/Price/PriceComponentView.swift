@@ -155,7 +155,7 @@ public struct PriceComponentView: View {
 
     private func saleFullPrice(_ price: String) -> some View {
         Text(price)
-            .font(Font(theme.font.paragraph.normal.withSize(Constants.saleFullPriceTextSize(for: configuration.size))))
+            .font(Font(theme.font.body.medium.uiFont.withSize(Constants.saleFullPriceTextSize(for: configuration.size))))
             .foregroundStyle(Colors.primary.mono600)
             .strikethrough()
             .accessibilityIdentifier(AccessibilityId.priceHigher)
@@ -206,7 +206,7 @@ public struct PriceComponentView: View {
 
     private func priceText(_ price: String, textSize: CGFloat) -> Text {
         Text(price)
-            .font(Font(theme.font.paragraph.normal.withSize(textSize)))
+            .font(Font(theme.font.body.medium.uiFont.withSize(textSize)))
             .fontWeight(.semibold)
     }
 }

@@ -43,18 +43,18 @@ public struct PaginatedControl: View {
             HStack(spacing: Spacing.space0) {
                 VStack(alignment: .trailing, spacing: Spacing.space0) {
                     Text(String(selectedIndex + 1))
-                        .font(Font(theme.font.tiny.normal))
+                        .font(Font(theme.font.body.small.uiFont))
                         .foregroundStyle(configuration.textColor)
                         .animation(.emphasized, value: selectedIndex)
                         // safe width to avoid view self sizing for every change
                         .frame(minWidth: 16, alignment: .trailing)
                 }
 
-                Text.build(theme.font.tiny.normal(configuration.pageSeparator))
+                Text.build(theme.font.body.small(configuration.pageSeparator))
                     .foregroundStyle(configuration.textColor)
 
                 Text(String(itemsCount))
-                    .font(Font(theme.font.tiny.normal))
+                    .font(Font(theme.font.body.small.uiFont))
                     .foregroundStyle(configuration.textColor)
                     .padding(.trailing, Spacing.space100)
             }

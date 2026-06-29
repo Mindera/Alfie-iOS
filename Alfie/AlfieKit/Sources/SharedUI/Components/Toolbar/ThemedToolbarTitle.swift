@@ -38,12 +38,12 @@ public struct ThemedToolbarTitle: View {
         case .leftText(let text, let subtitle):
             VStack(alignment: .leading) {
                 Text(text)
-                    .font(Font(theme.font.header.h2))
+                    .font(Font(theme.font.heading.medium.uiFont))
                     .foregroundStyle(tint)
                     .accessibilityIdentifier(accessibilityId)
 
                 if let subtitle {
-                    Text.build(theme.font.tiny.normal(subtitle))
+                    Text.build(theme.font.body.small(subtitle))
                         .foregroundStyle(Colors.primary.mono500)
                 }
             }
@@ -51,7 +51,7 @@ public struct ThemedToolbarTitle: View {
 
         case .text(let text):
             Text(text)
-                .font(Font(theme.font.paragraph.normal.withSize(18)))
+                .font(Font(theme.font.body.medium.uiFont.withSize(18)))
                 .foregroundStyle(tint)
                 .accessibilityIdentifier(accessibilityId)
                 .padding(.vertical, Spacing.space200)

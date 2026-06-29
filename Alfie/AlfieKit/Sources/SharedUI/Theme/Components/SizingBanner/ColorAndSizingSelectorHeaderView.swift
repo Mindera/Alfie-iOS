@@ -24,9 +24,9 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                 },
                 label: {
                     HStack(spacing: Spacing.space050) {
-                        Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
+                        Text.build(theme.font.body.medium(configuration.selectedTitle))
                             .foregroundStyle(Colors.primary.mono400)
-                        Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
+                        Text.build(theme.font.body.medium(configuration.selectedItem?.name ?? ""))
                             .foregroundStyle(Colors.primary.mono900)
 
                         if isExpandable {

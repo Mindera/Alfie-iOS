@@ -81,18 +81,18 @@ private struct ThemedTextStyle: TextFieldStyle {
             if title != nil || limit != nil {
                 HStack(spacing: Spacing.space0) {
                     if let title {
-                        Text.build(theme.font.paragraph.normal(title))
+                        Text.build(theme.font.body.medium(title))
                             .lineLimit(1)
                             .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
                     }
                     if isRequired {
-                        Text.build(theme.font.paragraph.normal("*"))
+                        Text.build(theme.font.body.medium("*"))
                             .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.secondary.red800)
                             .padding(.leading, Spacing.space025)
                     }
                     if let limit {
                         Spacer()
-                        Text.build(theme.font.paragraph.normal("\(count)/\(limit)"))
+                        Text.build(theme.font.body.medium("\(count)/\(limit)"))
                             .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
                     }
                 }
@@ -105,7 +105,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .frame(height: Constants.inputHeight)
                 HStack(spacing: Spacing.space0) {
                     configuration.body
-                        .font(Font(theme.font.paragraph.normal))
+                        .font(Font(theme.font.body.medium.uiFont))
                         .accentColor(Colors.primary.mono900)
                         .focused($isFocused)
                         .disabled(isDisabled)
@@ -139,7 +139,7 @@ private struct ThemedTextStyle: TextFieldStyle {
             EmptyView()
 
         case .info(let string):
-            Text.build(theme.font.small.normal(string))
+            Text.build(theme.font.body.small(string))
                 .foregroundStyle(shouldApplyDisabledColor(for: Colors.primary.mono500))
                 .lineLimit(2)
 
@@ -151,7 +151,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
                     .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.green800))
-                Text.build(theme.font.small.normal(string))
+                Text.build(theme.font.body.small(string))
                     .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.green800))
                     .lineLimit(2)
             }
@@ -164,7 +164,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                     .scaledToFit()
                     .frame(width: Constants.iconSize, height: Constants.iconSize)
                     .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.red800))
-                Text.build(theme.font.small.normal(string))
+                Text.build(theme.font.body.small(string))
                     .foregroundStyle(shouldApplyDisabledColor(for: Colors.secondary.red800))
                     .lineLimit(2)
             }

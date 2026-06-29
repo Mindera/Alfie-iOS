@@ -40,9 +40,9 @@ extension VerticalProductCardConfiguration {
         switch size {
         case .small,
              .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.small.normal
+            ThemeProvider.shared.font.body.small.uiFont
         case .large:
-            ThemeProvider.shared.font.paragraph.normal
+            ThemeProvider.shared.font.body.medium.uiFont
         }
     }
 
@@ -50,9 +50,9 @@ extension VerticalProductCardConfiguration {
         switch size {
         case .small,
              .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.tiny.normal
+            ThemeProvider.shared.font.body.small.uiFont
         case .large:
-            ThemeProvider.shared.font.small.normal
+            ThemeProvider.shared.font.body.small.uiFont
         }
     }
     // swiftlint:enable vertical_whitespace_between_cases

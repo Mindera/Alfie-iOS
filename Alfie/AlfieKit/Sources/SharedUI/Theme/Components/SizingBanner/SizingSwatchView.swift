@@ -11,7 +11,7 @@ public struct SizingSwatchView: View {
     }
 
     public var body: some View {
-        Text.build(theme.font.paragraph.normal(item.name))
+        Text.build(theme.font.body.medium(item.name))
             .frame(maxWidth: .infinity)
             .lineLimit(1)
             .padding(.vertical, Constants.insetVertical)
