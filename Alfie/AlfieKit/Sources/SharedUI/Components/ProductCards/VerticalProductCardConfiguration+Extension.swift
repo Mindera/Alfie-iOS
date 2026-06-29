@@ -47,13 +47,8 @@ extension VerticalProductCardConfiguration {
     }
 
     var smallTextFont: UIFont {
-        switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.body.small.uiFont
-        case .large:
-            ThemeProvider.shared.font.body.small.uiFont
-        }
+        // All sizes map to the same token; no per-size distinction after token migration.
+        ThemeProvider.shared.font.body.small.uiFont
     }
     // swiftlint:enable vertical_whitespace_between_cases
 }

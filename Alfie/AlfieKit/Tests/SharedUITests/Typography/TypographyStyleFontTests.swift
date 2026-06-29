@@ -1,4 +1,5 @@
 import SharedUI
+import SwiftUI
 import UIKit
 import XCTest
 
@@ -55,8 +56,8 @@ final class TypographyStyleFontTests: XCTestCase {
         XCTAssertEqual(brand?.pointSize, 24)
     }
 
-    func test_brandStyle_usesBrandFont() throws {
-        try FontManager.registerAll()
+    func test_brandStyle_usesBrandFont() {
+        // setUp already registered the bundled faces.
         let style = Typography.Display.large
         XCTAssertEqual(style.fontFamily, Primitives.Typography.fontFamilyBrand)
         XCTAssertEqual(style.uiFont.pointSize, style.fontSize)
@@ -64,11 +65,28 @@ final class TypographyStyleFontTests: XCTestCase {
         XCTAssertEqual(style.uiFont.familyName, Primitives.Typography.fontFamilyBrand)
     }
 
-    func test_everyToken_lineHeightGreaterThanFontSize() {
-        // Bridge passes lineHeight into the lineSpacing slot; build(...) lineSpacing - pointSize must be >= 0.
+    func test_build_forwardsTokenLineHeightAndLetterSpacing() {
+        // Exercises the actual build(style:) path: token letterSpacing lands on .kern (read the
+        // same way Text.format does) and token lineHeight lands on the paragraph's lineSpacing.
         for style in allStyles {
-            XCTAssertGreaterThan(style.lineHeight, style.fontSize, "lineHeight must exceed fontSize so lineSpacing stays >= 0")
+            let attributed = AttributedString("Sample").build(style: style)
+
+            XCTAssertEqual(attributed.kern ?? 0, style.letterSpacing, accuracy: 0.001, "kern must equal token letterSpacing")
+
+            let paragraph = NSAttributedString(attributed).attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle
+            XCTAssertEqual(paragraph?.lineSpacing ?? -1, style.lineHeight, accuracy: 0.001, "lineSpacing must equal token lineHeight")
+
+            // Text.build later computes (lineSpacing - pointSize); keep it non-negative.
+            XCTAssertGreaterThanOrEqual(style.lineHeight, style.fontSize, "lineHeight must be >= fontSize")
         }
+    }
+
+    func test_build_appliesKerningTightVsNone() {
+        // Heading carries kerningTight (-0.5); Body carries kerningNone (0).
+        let heading = AttributedString("x").build(style: Typography.Heading.large)
+        let body = AttributedString("x").build(style: Typography.Body.medium)
+        XCTAssertEqual(heading.kern ?? .nan, Primitives.Typography.kerningTight, accuracy: 0.001)
+        XCTAssertEqual(body.kern ?? .nan, Primitives.Typography.kerningNone, accuracy: 0.001)
     }
 
     // MARK: - Helpers

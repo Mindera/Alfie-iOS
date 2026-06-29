@@ -1,14 +1,11 @@
 import Foundation
 
+// Concrete sub-providers (no per-group protocol): mockability lives on the top-level
+// `TypographyProviderProtocol`, matching the concrete-`let` design used for shape/spacing.
+
 // MARK: - Display
 
-public protocol TypographyDisplayProtocol {
-    var large: ThemedTypographyStyle { get }
-    var medium: ThemedTypographyStyle { get }
-    var small: ThemedTypographyStyle { get }
-}
-
-public struct TypographyDisplay: TypographyDisplayProtocol {
+public struct TypographyDisplay {
     public init() {}
     public var large: ThemedTypographyStyle { .init(style: Typography.Display.large) }
     public var medium: ThemedTypographyStyle { .init(style: Typography.Display.medium) }
@@ -17,14 +14,7 @@ public struct TypographyDisplay: TypographyDisplayProtocol {
 
 // MARK: - Heading
 
-public protocol TypographyHeadingProtocol {
-    var large: ThemedTypographyStyle { get }
-    var medium: ThemedTypographyStyle { get }
-    var small: ThemedTypographyStyle { get }
-    var xSmall: ThemedTypographyStyle { get }
-}
-
-public struct TypographyHeading: TypographyHeadingProtocol {
+public struct TypographyHeading {
     public init() {}
     public var large: ThemedTypographyStyle { .init(style: Typography.Heading.large) }
     public var medium: ThemedTypographyStyle { .init(style: Typography.Heading.medium) }
@@ -34,14 +24,7 @@ public struct TypographyHeading: TypographyHeadingProtocol {
 
 // MARK: - Body
 
-public protocol TypographyBodyProtocol {
-    var large: ThemedTypographyStyle { get }
-    var medium: ThemedTypographyStyle { get }
-    var mediumStrikethrough: ThemedTypographyStyle { get }
-    var small: ThemedTypographyStyle { get }
-}
-
-public struct TypographyBody: TypographyBodyProtocol {
+public struct TypographyBody {
     public init() {}
     public var large: ThemedTypographyStyle { .init(style: Typography.Body.large) }
     public var medium: ThemedTypographyStyle { .init(style: Typography.Body.medium) }
@@ -51,12 +34,7 @@ public struct TypographyBody: TypographyBodyProtocol {
 
 // MARK: - Label
 
-public protocol TypographyLabelProtocol {
-    var small: ThemedTypographyStyle { get }
-    var smallBold: ThemedTypographyStyle { get }
-}
-
-public struct TypographyLabel: TypographyLabelProtocol {
+public struct TypographyLabel {
     public init() {}
     public var small: ThemedTypographyStyle { .init(style: Typography.Label.small) }
     public var smallBold: ThemedTypographyStyle { .init(style: Typography.Label.smallBold) }
@@ -64,12 +42,7 @@ public struct TypographyLabel: TypographyLabelProtocol {
 
 // MARK: - Link
 
-public protocol TypographyLinkProtocol {
-    var medium: ThemedTypographyStyle { get }
-    var small: ThemedTypographyStyle { get }
-}
-
-public struct TypographyLink: TypographyLinkProtocol {
+public struct TypographyLink {
     public init() {}
     public var medium: ThemedTypographyStyle { .init(style: Typography.Link.medium) }
     public var small: ThemedTypographyStyle { .init(style: Typography.Link.small) }
