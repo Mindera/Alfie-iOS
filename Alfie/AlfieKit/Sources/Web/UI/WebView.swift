@@ -46,8 +46,8 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
         ErrorView(
             spacing: Spacing.space500,
             iconSize: Constants.errorViewIconSize,
-            title: theme.font.header.h2(L10n.WebView.ErrorView.title),
-            message: theme.font.paragraph.normal(L10n.WebView.ErrorView.Generic.message),
+            title: theme.font.heading.medium(L10n.WebView.ErrorView.title),
+            message: theme.font.body.medium(L10n.WebView.ErrorView.Generic.message),
             messageColor: Colors.primary.mono600,
             buttons: [
                 .init(cta: L10n.WebView.ErrorView.Button.cta) {

@@ -44,7 +44,7 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
         VStack {
             HStack {
                 Text(title)
-                    .font(Font(theme.font.paragraph.normal.withSize(18)))
+                    .font(Font(theme.font.body.medium.uiFont.withSize(18)))
                     .foregroundStyle(Colors.primary.mono900)
 
                 Spacer()
@@ -98,7 +98,7 @@ private extension ProductDetailsColorAndSizeSheet {
                                 isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
                             )
 
-                            Text.build(theme.font.paragraph.normal(item.name.capitalized))
+                            Text.build(theme.font.body.medium(item.name.capitalized))
 
                             Spacer()
 
@@ -134,7 +134,7 @@ private extension ProductDetailsColorAndSizeSheet {
                         isPresented = false
                     } label: {
                         HStack(spacing: Spacing.space200) {
-                            Text.build(theme.font.paragraph.normal(item.name.capitalized))
+                            Text.build(theme.font.body.medium(item.name.capitalized))
 
                             Spacer()
 

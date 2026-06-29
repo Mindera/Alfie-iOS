@@ -41,10 +41,10 @@ struct TabBarItemView: View {
                 .foregroundStyle(tab == currentTab ? Colors.primary.black : Colors.primary.mono300)
                 .badgeView(badgeValue: $badgeValue)
             if tab == currentTab {
-                Text.build(theme.font.small.bold(tab.title))
+                Text.build(theme.font.body.small(tab.title))
                     .foregroundStyle(Colors.primary.mono900)
             } else {
-                Text.build(theme.font.small.normal(tab.title))
+                Text.build(theme.font.body.small(tab.title))
                     .foregroundStyle(Colors.primary.mono500)
             }
         }

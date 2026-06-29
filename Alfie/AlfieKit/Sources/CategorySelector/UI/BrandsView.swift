@@ -174,8 +174,8 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     private var emptySearchResults: some View {
         ErrorView(
             icon: Icon.search.image,
-            message: theme.font.small.normal(L10n.Shop.Brands.SearchBar.noResultsMessage) +
-                theme.font.small.bold(" '\(viewModel.searchText)'")
+            message: theme.font.body.small(L10n.Shop.Brands.SearchBar.noResultsMessage) +
+                theme.font.body.small(" '\(viewModel.searchText)'")
         )
     }
 }
@@ -191,7 +191,7 @@ extension BrandsView {
         var body: some View {
             HStack(alignment: .center, spacing: Spacing.space0) {
                 Text(title)
-                    .font(Font(theme.font.paragraph.bold))
+                    .font(Font(theme.font.body.medium.uiFont))
                     .foregroundStyle(Colors.primary.mono900)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -217,7 +217,7 @@ extension BrandsView {
         var body: some View {
             VStack(spacing: Spacing.space0) {
                 HStack(spacing: Spacing.space0) {
-                    Text.build(theme.font.paragraph.normal(brand.name))
+                    Text.build(theme.font.body.medium(brand.name))
                         .foregroundStyle(foregroundColor())
                         .shimmering(while: $isLoading)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -297,7 +297,7 @@ extension BrandsView {
 
         var body: some View {
             Text(text)
-                .font(Font(theme.font.tiny.normal))
+                .font(Font(theme.font.body.small.uiFont))
                 .foregroundStyle(isSelected ? Colors.primary.white : Colors.primary.mono500)
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
