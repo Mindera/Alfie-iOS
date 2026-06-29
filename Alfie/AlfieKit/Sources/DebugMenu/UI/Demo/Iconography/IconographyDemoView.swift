@@ -20,7 +20,7 @@ struct IconographyDemoView: View {
                             .scaledToFit()
                             .foregroundStyle(Colors.primary.mono900)
                             .frame(width: 40, height: 40)
-                        Text.build(theme.font.tiny.normal(icon.literalName))
+                        Text.build(theme.font.body.small(icon.literalName))
                             .foregroundStyle(Colors.primary.mono900)
                             .font(.caption2)
                     }

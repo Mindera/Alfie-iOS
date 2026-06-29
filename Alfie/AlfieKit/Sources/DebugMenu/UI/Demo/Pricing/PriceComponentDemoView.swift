@@ -82,7 +82,7 @@ struct PriceComponentDemoView: View {
 
     private var priceSizeOption: some View {
         HStack {
-            Text.build(theme.font.small.bold("Size"))
+            Text.build(theme.font.body.small("Size"))
             Spacer()
             Menu {
                 Picker(selection: $priceSize) {
@@ -92,7 +92,7 @@ struct PriceComponentDemoView: View {
                 } label: {
                 }
             } label: {
-                Text.build(theme.font.small.normal(priceSize.title))
+                Text.build(theme.font.body.small(priceSize.title))
                     .tint(Colors.secondary.blue500)
             }
         }
@@ -101,7 +101,7 @@ struct PriceComponentDemoView: View {
 
     private var priceTypeOption: some View {
         HStack {
-            Text.build(theme.font.small.bold("Type"))
+            Text.build(theme.font.body.small("Type"))
             Spacer()
             Menu {
                 Picker(selection: $priceType) {
@@ -111,7 +111,7 @@ struct PriceComponentDemoView: View {
                 } label: {
                 }
             } label: {
-                Text.build(theme.font.small.normal(priceType.rawValue))
+                Text.build(theme.font.body.small(priceType.rawValue))
                     .tint(Colors.secondary.blue500)
             }
         }
@@ -120,7 +120,7 @@ struct PriceComponentDemoView: View {
 
     private var priceLayoutOption: some View {
         HStack {
-            Text.build(theme.font.small.bold("Layout"))
+            Text.build(theme.font.body.small("Layout"))
             Spacer()
             Menu {
                 Picker(selection: $priceDistribution) {
@@ -130,7 +130,7 @@ struct PriceComponentDemoView: View {
                 } label: {
                 }
             } label: {
-                Text.build(theme.font.small.normal(priceDistribution.title))
+                Text.build(theme.font.body.small(priceDistribution.title))
                     .tint(Colors.secondary.blue500)
             }
         }
@@ -139,7 +139,7 @@ struct PriceComponentDemoView: View {
 
     private var priceAlignmentOption: some View {
         HStack {
-            Text.build(theme.font.small.bold("Alignment"))
+            Text.build(theme.font.body.small("Alignment"))
             Spacer()
             Menu {
                 Picker(selection: $textAlignment) {
@@ -149,7 +149,7 @@ struct PriceComponentDemoView: View {
                 } label: {
                 }
             } label: {
-                Text.build(theme.font.small.normal(textAlignment.title))
+                Text.build(theme.font.body.small(textAlignment.title))
                     .tint(Colors.secondary.blue500)
             }
         }
@@ -158,7 +158,7 @@ struct PriceComponentDemoView: View {
 
     private var currencyOption: some View {
         HStack {
-            Text.build(theme.font.small.bold("Currency"))
+            Text.build(theme.font.body.small("Currency"))
             Spacer()
             Menu {
                 Picker(selection: $currencyCode) {
@@ -168,7 +168,7 @@ struct PriceComponentDemoView: View {
                 } label: {
                 }
             } label: {
-                Text.build(theme.font.small.normal(currencyCode))
+                Text.build(theme.font.body.small(currencyCode))
                     .tint(Colors.secondary.blue500)
             }
         }

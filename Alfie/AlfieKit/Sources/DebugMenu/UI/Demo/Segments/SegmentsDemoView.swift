@@ -166,7 +166,7 @@ struct SegmentsDemoView: View {
         ZStack {
             Rectangle()
                 .fill(color)
-            Text.build(theme.font.paragraph.normal(title))
+            Text.build(theme.font.body.medium(title))
         }
         .frame(height: 150)
     }

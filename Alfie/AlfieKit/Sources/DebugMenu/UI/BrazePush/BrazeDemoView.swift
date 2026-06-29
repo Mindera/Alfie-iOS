@@ -24,7 +24,7 @@ struct BrazeDemoView: View {
                     UIPasteboard.general.string = brazeUserId
                     showPushIDAlert = true
                 }, label: {
-                    Text.build(theme.font.paragraph.italic(brazeUserId))
+                    Text.build(theme.font.body.medium(brazeUserId))
                 })
                 .buttonStyle(.plain)
 

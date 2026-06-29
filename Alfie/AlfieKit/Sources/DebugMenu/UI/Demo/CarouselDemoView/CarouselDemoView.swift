@@ -27,8 +27,8 @@ struct CarouselDemoView: View {
             }
             .disabled(isFullScreen)
             VStack(alignment: .leading, spacing: Spacing.space100) {
-                Text.build(theme.font.header.h2("BOSS"))
-                Text.build(theme.font.paragraph.normal("RAY COMPUTER BAG"))
+                Text.build(theme.font.heading.medium("BOSS"))
+                Text.build(theme.font.body.medium("RAY COMPUTER BAG"))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Spacing.space200)

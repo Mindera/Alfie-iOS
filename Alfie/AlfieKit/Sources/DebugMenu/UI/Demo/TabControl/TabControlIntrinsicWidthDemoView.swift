@@ -31,7 +31,7 @@ struct TabControlIntrinsicWidthDemoView: View {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(Colors.primary.mono300)
                         .overlay {
-                            Text.build(theme.font.paragraph.bold(value))
+                            Text.build(theme.font.body.medium(value))
                                 .foregroundStyle(.white)
                         }
                         .frame(width: 300, height: 350)
@@ -42,29 +42,29 @@ struct TabControlIntrinsicWidthDemoView: View {
 
             VStack {
                 ThemedToggleView(isOn: $showIcons) {
-                    Text.build(theme.font.paragraph.normal("Show Icons"))
+                    Text.build(theme.font.body.medium("Show Icons"))
                 }
 
-                Text.build(theme.font.paragraph.normal("Spacing:"))
+                Text.build(theme.font.body.medium("Spacing:"))
                 Picker(selection: $spacing) {
                     ForEach(spacingOptions, id: \.self) { padding in
-                        Text.build(theme.font.small.normal("\(padding)"))
+                        Text.build(theme.font.body.small("\(padding)"))
                     }
                 } label: {
                 }
 
-                Text.build(theme.font.paragraph.normal("Theme:"))
+                Text.build(theme.font.body.medium("Theme:"))
                 Picker(selection: $theme) {
                     ForEach(themeOptions, id: \.self) { tabTheme in
-                        Text.build(theme.font.small.normal("\(tabTheme)".capitalized))
+                        Text.build(theme.font.body.small("\(tabTheme)".capitalized))
                     }
                 } label: {
                 }
 
-                Text.build(theme.font.paragraph.normal("Number Of Options:"))
+                Text.build(theme.font.body.medium("Number Of Options:"))
                 Picker(selection: $numberOfOptions) {
                     ForEach(2...options.count, id: \.self) { optionCount in
-                        Text.build(theme.font.small.normal("\(optionCount)"))
+                        Text.build(theme.font.body.small("\(optionCount)"))
                     }
                 } label: {
                 }

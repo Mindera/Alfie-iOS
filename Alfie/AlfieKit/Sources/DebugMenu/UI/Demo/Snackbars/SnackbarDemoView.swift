@@ -21,11 +21,11 @@ struct SnackbarDemoView: View {
                 VStack(spacing: Spacing.space250) {
                     DemoHelper.demoSectionHeader(title: "Snackbars")
 
-                    ThemedToggleView(isOn: $showIcon) { Text.build(theme.font.small.bold("Show icon")) }
-                    ThemedToggleView(isOn: $showAction) { Text.build(theme.font.small.bold("Show action button")) }
-                    ThemedToggleView(isOn: $showClose) { Text.build(theme.font.small.bold("Show close button")) }
-                    ThemedToggleView(isOn: $autoDismiss) { Text.build(theme.font.small.bold("Auto dismiss")) }
-                    ThemedToggleView(isOn: $showFromTop) { Text.build(theme.font.small.bold("Show on top")) }
+                    ThemedToggleView(isOn: $showIcon) { Text.build(theme.font.body.small("Show icon")) }
+                    ThemedToggleView(isOn: $showAction) { Text.build(theme.font.body.small("Show action button")) }
+                    ThemedToggleView(isOn: $showClose) { Text.build(theme.font.body.small("Show close button")) }
+                    ThemedToggleView(isOn: $autoDismiss) { Text.build(theme.font.body.small("Auto dismiss")) }
+                    ThemedToggleView(isOn: $showFromTop) { Text.build(theme.font.body.small("Show on top")) }
 
                     Button(action: {
                         buildConfig(type: .info, text: "Text messsage")
@@ -69,7 +69,7 @@ struct SnackbarDemoView: View {
         ZStack {
             RoundedRectangle(cornerRadius: CornerRadius.m)
                 .fill(.black)
-            Text.build(theme.font.paragraph.bold(label))
+            Text.build(theme.font.body.medium(label))
                 .padding()
                 .foregroundStyle(Colors.primary.white)
         }

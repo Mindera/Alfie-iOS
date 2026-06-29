@@ -106,7 +106,7 @@ struct ColorsDemoView: View {
 
     func paletteView(with name: String, colors: [Color]) -> some View {
         VStack(alignment: .leading) {
-            Text.build(theme.font.small.bold(name))
+            Text.build(theme.font.body.small(name))
                 .foregroundStyle(colors.first ?? Colors.primary.black)
             ScrollView(.horizontal) {
                 HStack(spacing: Spacing.space0) {
@@ -124,7 +124,7 @@ struct ColorsDemoView: View {
             Rectangle()
                 .fill(color)
                 .frame(width: 64, height: 64)
-            Text.build(theme.font.tiny.normal(color.name ?? "-"))
+            Text.build(theme.font.body.small(color.name ?? "-"))
                 .foregroundStyle(Colors.primary.mono400)
         }
     }

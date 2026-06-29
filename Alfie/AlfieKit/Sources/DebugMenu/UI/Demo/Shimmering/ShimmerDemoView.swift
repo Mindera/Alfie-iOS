@@ -19,14 +19,14 @@ struct SkeletonDemoView: View {
                         .shimmering(while: $isImageLoading)
                 } second: {
                     VStack(alignment: .leading, spacing: Spacing.space100) {
-                        Text.build(theme.font.header.h2("TOMMY HILFIGER"))
+                        Text.build(theme.font.heading.medium("TOMMY HILFIGER"))
                             .shimmering(while: $isContentLoading)
 
-                        Text.build(theme.font.paragraph.normal("TH CITY TOTE"))
+                        Text.build(theme.font.body.medium("TH CITY TOTE"))
                             .shimmering(while: $isContentLoading)
 
                         Text.build(
-                            theme.font.small.normal(
+                            theme.font.body.small(
                             """
                             For busy days on the move, choose this timeless tote \
                             featuring a handy removable coin purse to store your on-the-go cash.
@@ -51,7 +51,7 @@ struct SkeletonDemoView: View {
                             """
                             )
                         )
-                        .shimmeringMultiline(while: $isContentLoading, lines: 14, font: theme.font.small.normal)
+                        .shimmeringMultiline(while: $isContentLoading, lines: 14, font: theme.font.body.small.uiFont)
                         .padding(.top, Spacing.space100)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

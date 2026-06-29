@@ -55,14 +55,14 @@ struct ButtonDemoView: View {
             DemoHelper.demoSectionHeader(title: "Options")
 
             HStack {
-                Text.build(theme.font.small.bold("Caption"))
+                Text.build(theme.font.body.small("Caption"))
                 Spacer()
                 ThemedInput($text)
                     .padding(.leading, Spacing.space800)
             }
 
             HStack {
-                Text.build(theme.font.small.bold("Style"))
+                Text.build(theme.font.body.small("Style"))
                 Spacer()
                 Menu {
                     Picker(selection: $style) {
@@ -73,17 +73,17 @@ struct ButtonDemoView: View {
                     } label: {
                     }
                 } label: {
-                    Text.build(theme.font.small.normal(style.rawValue))
+                    Text.build(theme.font.body.small(style.rawValue))
                         .tint(Colors.secondary.blue500)
                 }
             }
 
             ThemedToggleView(isOn: $showIconLeft) {
-                Text.build(theme.font.small.bold("Icon on the left"))
+                Text.build(theme.font.body.small("Icon on the left"))
             }
 
             HStack {
-                Text.build(theme.font.small.bold("Icon"))
+                Text.build(theme.font.body.small("Icon"))
                 Spacer()
                 Menu {
                     Picker(selection: $iconLeft) {
@@ -94,18 +94,18 @@ struct ButtonDemoView: View {
                     } label: {
                     }
                 } label: {
-                    Text.build(theme.font.small.normal(iconLeft.rawValue))
+                    Text.build(theme.font.body.small(iconLeft.rawValue))
                         .tint(Colors.secondary.blue500)
                 }
             }
             .disabled(!showIconLeft)
 
             ThemedToggleView(isOn: $showIconRight) {
-                Text.build(theme.font.small.bold("Icon on the right"))
+                Text.build(theme.font.body.small("Icon on the right"))
             }
 
             HStack {
-                Text.build(theme.font.small.bold("Icon"))
+                Text.build(theme.font.body.small("Icon"))
                 Spacer()
                 Menu {
                     Picker(selection: $iconRight) {
@@ -116,22 +116,22 @@ struct ButtonDemoView: View {
                     } label: {
                     }
                 } label: {
-                    Text.build(theme.font.small.normal(iconRight.rawValue))
+                    Text.build(theme.font.body.small(iconRight.rawValue))
                         .tint(Colors.secondary.blue500)
                 }
             }
             .disabled(!showIconRight)
 
             ThemedToggleView(isOn: $isDisabled) {
-                Text.build(theme.font.small.bold("Disabled"))
+                Text.build(theme.font.body.small("Disabled"))
             }
 
             ThemedToggleView(isOn: $isLoading) {
-                Text.build(theme.font.small.bold("Loading"))
+                Text.build(theme.font.body.small("Loading"))
             }
 
             ThemedToggleView(isOn: $isFullWidth) {
-                Text.build(theme.font.small.bold("Full width"))
+                Text.build(theme.font.body.small("Full width"))
             }
 
             Spacer()

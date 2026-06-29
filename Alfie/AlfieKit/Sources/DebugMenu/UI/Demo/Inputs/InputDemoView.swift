@@ -58,12 +58,12 @@ struct InputDemoView: View {
                 DemoHelper.demoSectionHeader(title: "Options")
                     .padding(.top, Spacing.space400)
 
-                ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disabled")) }
-                ThemedToggleView(isOn: $isRequired) { Text.build(theme.font.small.bold("Required")) }
-                ThemedToggleView(isOn: $hasLimit) { Text.build(theme.font.small.bold("Counter")) }
-                ThemedToggleView(isOn: $hasIcon) { Text.build(theme.font.small.bold("Show Icon")) }
+                ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.body.small("Disabled")) }
+                ThemedToggleView(isOn: $isRequired) { Text.build(theme.font.body.small("Required")) }
+                ThemedToggleView(isOn: $hasLimit) { Text.build(theme.font.body.small("Counter")) }
+                ThemedToggleView(isOn: $hasIcon) { Text.build(theme.font.body.small("Show Icon")) }
                 HStack {
-                    Text.build(theme.font.small.bold("Icon"))
+                    Text.build(theme.font.body.small("Icon"))
                     Spacer()
                     Menu {
                         Picker(selection: $icon) {
@@ -74,7 +74,7 @@ struct InputDemoView: View {
                         } label: {
                         }
                     } label: {
-                        Text.build(theme.font.small.normal(icon.rawValue))
+                        Text.build(theme.font.body.small(icon.rawValue))
                             .tint(Colors.secondary.blue500)
                     }
                 }

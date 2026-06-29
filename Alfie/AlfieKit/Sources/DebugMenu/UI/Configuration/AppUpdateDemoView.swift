@@ -53,7 +53,7 @@ struct AppUpdateDemoView: View {
 
             appUpdateInfoView(softUpdate, isActive: configurationService.isSoftAppUpdateAvailable)
         } else {
-            Text.build(theme.font.small.normal("Undefinied"))
+            Text.build(theme.font.body.small("Undefinied"))
         }
     }
 
@@ -74,7 +74,7 @@ struct AppUpdateDemoView: View {
 
             appUpdateInfoView(forceUpdate, isActive: configurationService.isForceAppUpdateAvailable)
         } else {
-            Text.build(theme.font.small.normal("Undefinied"))
+            Text.build(theme.font.body.small("Undefinied"))
         }
     }
 
@@ -82,7 +82,7 @@ struct AppUpdateDemoView: View {
     private func appUpdateInfoView(_ info: AppUpdateInfo, isActive: Bool) -> some View {
         VStack(alignment: .leading) {
             if isActive {
-                Text.build(theme.font.small.bold("Prompt enabled"))
+                Text.build(theme.font.body.small("Prompt enabled"))
                     .foregroundStyle(Colors.secondary.red800)
                     .padding(.bottom, Spacing.space100)
             }
@@ -105,13 +105,13 @@ struct AppUpdateDemoView: View {
 
     private func row(label: String, value: String?) -> some View {
         VStack(alignment: .leading) {
-            Text.build(theme.font.paragraph.normal(label))
+            Text.build(theme.font.body.medium(label))
                 .foregroundStyle(Colors.primary.mono500)
             if let value {
-                Text.build(theme.font.paragraph.bold(value))
+                Text.build(theme.font.body.medium(value))
                     .foregroundStyle(Colors.primary.mono900)
             } else {
-                Text.build(theme.font.paragraph.normal("Undefinied"))
+                Text.build(theme.font.body.medium("Undefinied"))
                     .foregroundStyle(Colors.primary.mono300)
             }
         }

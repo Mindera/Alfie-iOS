@@ -11,13 +11,13 @@ struct ToggleDemoView: View {
             DemoHelper.demoSectionHeader(title: "Toggle")
 
             ThemedToggleView(isOn: $isOn, isDisabled: $isDisabled) {
-                Text.build(theme.font.small.bold("This is a toggle"))
+                Text.build(theme.font.body.small("This is a toggle"))
             }
 
             DemoHelper.demoSectionHeader(title: "Options")
                 .padding(.top, Spacing.space400)
 
-            ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disable")) }
+            ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.body.small("Disable")) }
 
             Spacer()
         }

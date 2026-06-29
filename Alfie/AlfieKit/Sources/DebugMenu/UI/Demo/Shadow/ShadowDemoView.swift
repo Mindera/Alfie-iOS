@@ -60,7 +60,7 @@ struct ShadowDemoView: View {
                 .frame(width: 50, height: 50)
                 .cornerRadius(CornerRadius.s)
                 .shadow(type)
-            Text.build(theme.font.small.normal(label))
+            Text.build(theme.font.body.small(label))
                 .foregroundStyle(Colors.primary.mono400)
         }
     }
