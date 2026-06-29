@@ -26,7 +26,9 @@
       - [x] Phase 1 foundation committed (4a2516c) — verify green
       - [x] Phase 2/3/4 migration (dev-1 SharedUI / dev-2 DebugMenu / dev-3 features) merged, no conflicts, grep-gate clean
       - [x] Phase 5 legacy removal applied (specs deleted, provider trimmed, ThemeProvider updated)
-      - [ ] final verify.sh (build+unit) running → then code-review gate → commit Phase 5
+      - [x] final verify.sh (build+unit) PASSED; Phase 5 committed (d59947a)
+      - [x] code-review gate PASSED (2 parallel lenses; clean, 1 nit fixed)
+- [ ] 6/7. Commit + PR  ← in progress
 - [ ] 6. Commit
 - [ ] 7. PR
 - [ ] 8. Ticket transition

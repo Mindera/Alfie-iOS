@@ -1,7 +1,7 @@
 ---
 title: Token-driven typography provider (Figma names) + full call-site migration
 ticket: ALFMOB-266
-status: pending
+status: completed
 complexity: HIGH
 mode: hard
 blockedBy: []

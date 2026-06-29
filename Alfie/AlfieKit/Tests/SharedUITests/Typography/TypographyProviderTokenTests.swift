@@ -7,7 +7,7 @@ final class TypographyProviderTokenTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // Brand (Display) and legacy faces resolve through UIFont(name:), so they must be registered.
+        // The brand (Display) face resolves through UIFont(name:), so it must be registered.
         try? FontManager.registerAll()
     }
 
