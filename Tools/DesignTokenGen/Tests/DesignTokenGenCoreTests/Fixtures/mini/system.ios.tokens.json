@@ -1,0 +1,6 @@
+{
+  "typography-font-family-system-brand": {
+    "$type": "fontFamily",
+    "$value": "{typography-font-family-brand}"
+  }
+}

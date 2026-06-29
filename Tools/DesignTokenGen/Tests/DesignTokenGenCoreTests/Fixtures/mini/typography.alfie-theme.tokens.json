@@ -1,0 +1,22 @@
+{
+  "display-large-font-family": {
+    "$type": "fontFamily",
+    "$value": "{typography-font-family-brand}"
+  },
+  "display-large-font-size": {
+    "$type": "dimension",
+    "$value": "{typography-font-size-font-size-40}"
+  },
+  "display-large-line-height": {
+    "$type": "dimension",
+    "$value": "{typography-line-height-line-height-48}"
+  },
+  "display-large-kerning": {
+    "$type": "dimension",
+    "$value": "{typography-letter-spacing-kerning-0}"
+  },
+  "typography-font-weight-regular-token": {
+    "$type": "fontWeight",
+    "$value": "{typography-font-weight-regular}"
+  }
+}

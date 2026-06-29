@@ -1,0 +1,32 @@
+{
+  "display-large": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "{display-large-font-family}",
+      "fontWeight": "Regular",
+      "fontSize": "{display-large-font-size}",
+      "lineHeight": "{display-large-line-height}",
+      "letterSpacing": "{display-large-kerning}"
+    }
+  },
+  "heading-medium": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "{typography-font-family-brand}",
+      "fontWeight": "Medium",
+      "fontSize": "{typography-font-size-font-size-40}",
+      "lineHeight": "{typography-line-height-line-height-48}",
+      "letterSpacing": "{typography-letter-spacing-kerning-0}"
+    }
+  },
+  "~~doc-others-token": {
+    "$type": "typography",
+    "$value": {
+      "fontFamily": "{typography-font-family-brand}",
+      "fontWeight": "Regular",
+      "fontSize": "{typography-font-size-font-size-40}",
+      "lineHeight": "{typography-line-height-line-height-48}",
+      "letterSpacing": "{typography-letter-spacing-kerning-0}"
+    }
+  }
+}

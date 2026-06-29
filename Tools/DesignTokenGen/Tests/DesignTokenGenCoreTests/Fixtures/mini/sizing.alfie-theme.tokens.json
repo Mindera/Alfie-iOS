@@ -1,0 +1,13 @@
+{
+  "radius-soft": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-4}"
+  },
+  "radius-rounded": {
+    "$type": "dimension",
+    "$value": {
+      "value": 1000,
+      "unit": "px"
+    }
+  }
+}

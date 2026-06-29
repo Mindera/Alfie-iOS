@@ -1,0 +1,10 @@
+{
+  "surface-background-primary": {
+    "$type": "color",
+    "$value": "{colours-neutrals-0}"
+  },
+  "content-content-primary": {
+    "$type": "color",
+    "$value": "{colours-neutrals-800}"
+  }
+}
