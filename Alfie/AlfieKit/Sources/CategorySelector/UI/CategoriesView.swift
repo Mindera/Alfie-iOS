@@ -79,7 +79,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color) -> some View {
         VStack(spacing: Spacing.space0) {
             HStack {
-                Text.build(theme.font.paragraph.normal(text))
+                Text.build(theme.font.body.medium(text))
                     .foregroundStyle(foregroundColor)
                     .shimmering(while: .constant(isShimmering))
                 Spacer()

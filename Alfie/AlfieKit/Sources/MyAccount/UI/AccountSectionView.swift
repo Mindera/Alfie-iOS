@@ -19,7 +19,7 @@ struct AccountSectionView: View {
             }
             HStack(alignment: .center) {
                 iconForImage(section.icon.image)
-                Text.build(theme.font.paragraph.normal(section.title))
+                Text.build(theme.font.body.medium(section.title))
                 Spacer()
                 Icon.chevronRight.image
                     .resizable()
