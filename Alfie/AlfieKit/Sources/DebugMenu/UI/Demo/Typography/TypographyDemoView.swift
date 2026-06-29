@@ -7,64 +7,67 @@ struct TypographyDemoView: View {
             VStack(alignment: .leading, spacing: Spacing.space250) {
                 DemoHelper.demoSectionHeader(title: "Typography")
                 Spacer()
-                headers
-                paragraphs
-                small
-                tiny
+                display
+                heading
+                body
+                label
+                link
             }
             .padding(.horizontal, Spacing.space200)
         }
     }
 
-    private var headers: some View {
+    private var display: some View {
+        VStack(alignment: .leading) {
+            DemoHelper.demoSectionHeader(title: "Display")
+
+            Text.build(theme.font.display.large("Display Large"))
+            Text.build(theme.font.display.medium("Display Medium"))
+            Text.build(theme.font.display.small("Display Small"))
+        }
+    }
+
+    private var heading: some View {
         VStack(alignment: .leading) {
             DemoHelper.demoSectionHeader(title: "Heading")
 
-            Text.build(theme.font.header.h1("Heading 1"))
-            Text.build(theme.font.header.h2("Heading 2"))
-            Text.build(theme.font.header.h3("Heading 3"))
+            Text.build(theme.font.heading.large("Heading Large"))
+            Text.build(theme.font.heading.medium("Heading Medium"))
+            Text.build(theme.font.heading.small("Heading Small"))
+            Text.build(theme.font.heading.xSmall("Heading XSmall"))
         }
     }
 
-    private var paragraphs: some View {
+    private var body: some View {
         VStack(alignment: .leading) {
-            DemoHelper.demoSectionHeader(title: "Paragraph")
+            DemoHelper.demoSectionHeader(title: "Body")
 
-            Text.build(theme.font.paragraph.normal("Paragraph"))
-            Text.build(theme.font.paragraph.italic("Paragraph Italic"))
-            Text.build(theme.font.paragraph.normalUnderline("Paragraph Underline"))
-            Text.build(theme.font.paragraph.normalStrike("Paragraph Strikethrough"))
-            Text.build(theme.font.paragraph.bold("Paragraph Bold"))
-            Text.build(theme.font.paragraph.boldItalic("Paragraph Bold Italic"))
-            Text.build(theme.font.paragraph.boldUnderline("Paragraph Bold Underline"))
-            Text.build(theme.font.paragraph.boldStrike("Paragraph Bold Strikethrough"))
+            Text.build(theme.font.body.large("Body Large"))
+            Text.build(theme.font.body.medium("Body Medium"))
+            Text.build(theme.font.body.medium("Body Medium Underline", underline: true))
+            Text.build(theme.font.body.medium("Body Medium Strikethrough", strike: true))
+            Text.build(theme.font.body.mediumStrikethrough("Body Medium Strikethrough Token"))
+            Text.build(theme.font.body.small("Body Small"))
+            Text.build(theme.font.body.small("Body Small Underline", underline: true))
+            Text.build(theme.font.body.small("Body Small Strikethrough", strike: true))
         }
     }
 
-    private var small: some View {
+    private var label: some View {
         VStack(alignment: .leading) {
-            DemoHelper.demoSectionHeader(title: "Small")
+            DemoHelper.demoSectionHeader(title: "Label")
 
-            Text.build(theme.font.small.normal("Small"))
-            Text.build(theme.font.small.italic("Small Italic"))
-            Text.build(theme.font.small.normalUnderline("Small Underline"))
-            Text.build(theme.font.small.normalStrike("Small Strikethrough"))
-            Text.build(theme.font.small.bold("Small Bold"))
-            Text.build(theme.font.small.boldItalic("Small Bold Italic"))
-            Text.build(theme.font.small.boldUnderline("Small Bold Underline"))
-            Text.build(theme.font.small.boldStrike("Small Bold Strikethrough"))
+            Text.build(theme.font.label.small("Label Small"))
+            Text.build(theme.font.label.smallBold("Label Small Bold"))
         }
     }
 
-    private var tiny: some View {
+    private var link: some View {
         VStack(alignment: .leading) {
-            DemoHelper.demoSectionHeader(title: "Tiny")
+            DemoHelper.demoSectionHeader(title: "Link")
 
-            Text.build(theme.font.tiny.normal("Tiny"))
-            Text.build(theme.font.tiny.italic("Tiny Italic"))
-            Text.build(theme.font.tiny.bold("Tiny Bold"))
-            Text.build(theme.font.tiny.boldItalic("Tiny Bold Italic"))
-            Text.build(theme.font.tiny.boldUnderline("Tiny Bold Underline"))
+            Text.build(theme.font.link.medium("Link Medium"))
+            Text.build(theme.font.link.small("Link Small"))
         }
     }
 }

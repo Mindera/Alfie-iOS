@@ -226,9 +226,9 @@ struct DeepLinkDemoView: View {
                     .textInputAutocapitalization(.never)
 
                 HStack(spacing: Spacing.space050) {
-                    Text.build(theme.font.small.normal("URL:"))
+                    Text.build(theme.font.body.small("URL:"))
                         .foregroundStyle(Colors.primary.mono400)
-                    Text.build(theme.font.small.normal(webViewUrl.absoluteString))
+                    Text.build(theme.font.body.small(webViewUrl.absoluteString))
                         .foregroundStyle(Colors.primary.mono900)
                 }
             }

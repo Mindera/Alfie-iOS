@@ -57,15 +57,15 @@ struct ToolbarDemoView: View {
 
                 DemoHelper.demoSectionHeader(title: "Title")
 
-                ThemedToggleView(isOn: $showLogo) { Text.build(theme.font.small.bold("Show logo")) }
+                ThemedToggleView(isOn: $showLogo) { Text.build(theme.font.body.small("Show logo")) }
 
-                ThemedToggleView(isOn: $leftAlign) { Text.build(theme.font.small.bold("Show nav title")) }
+                ThemedToggleView(isOn: $leftAlign) { Text.build(theme.font.body.small("Show nav title")) }
 
                 ThemedToggleView(isOn: $alwaysShowDivider, isDisabled: $darkMode) {
-                    Text.build(theme.font.small.bold("Always show divider"))
+                    Text.build(theme.font.body.small("Always show divider"))
                 }
 
-                ThemedToggleView(isOn: $darkMode) { Text.build(theme.font.small.bold("Dark mode")) }
+                ThemedToggleView(isOn: $darkMode) { Text.build(theme.font.body.small("Dark mode")) }
 
                 DemoHelper.demoSectionHeader(title: "Controls (Left / Right)")
                     .padding(.top, Spacing.space250)

@@ -10,22 +10,22 @@ struct TagDemoView: View {
                 DemoHelper.demoSectionHeader(title: "Tag")
 
                 HStack {
-                    Text.build(theme.font.small.bold("Simple"))
+                    Text.build(theme.font.body.small("Simple"))
                     Spacer()
                     Tag(configuration: .init(label: "Label"))
                 }
                 HStack {
-                    Text.build(theme.font.small.bold("With close"))
+                    Text.build(theme.font.body.small("With close"))
                     Spacer()
                     Tag(configuration: .init(label: "Label", showCloseButton: true))
                 }
                 HStack {
-                    Text.build(theme.font.small.bold("With icon"))
+                    Text.build(theme.font.body.small("With icon"))
                     Spacer()
                     Tag(configuration: .init(label: "Label", showCloseButton: false, icon: Icon.info.image))
                 }
                 HStack {
-                    Text.build(theme.font.small.bold("Full"))
+                    Text.build(theme.font.body.small("Full"))
                     Spacer()
                     Tag(configuration: .init(label: "Label", showCloseButton: true, icon: Icon.info.image))
                 }
