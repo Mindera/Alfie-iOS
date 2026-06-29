@@ -53,7 +53,7 @@ struct AppUpdateDemoView: View {
 
             appUpdateInfoView(softUpdate, isActive: configurationService.isSoftAppUpdateAvailable)
         } else {
-            Text.build(theme.font.body.small("Undefinied"))
+            Text.build(theme.font.body.small("Undefined"))
         }
     }
 
@@ -74,7 +74,7 @@ struct AppUpdateDemoView: View {
 
             appUpdateInfoView(forceUpdate, isActive: configurationService.isForceAppUpdateAvailable)
         } else {
-            Text.build(theme.font.body.small("Undefinied"))
+            Text.build(theme.font.body.small("Undefined"))
         }
     }
 
@@ -111,7 +111,7 @@ struct AppUpdateDemoView: View {
                 Text.build(theme.font.body.medium(value))
                     .foregroundStyle(Colors.primary.mono900)
             } else {
-                Text.build(theme.font.body.medium("Undefinied"))
+                Text.build(theme.font.body.medium("Undefined"))
                     .foregroundStyle(Colors.primary.mono300)
             }
         }

@@ -25,12 +25,12 @@ struct ModalDemoView: View {
 
     private var smallBody: some View {
         VStack(alignment: .leading) {
-            Text("How to Mesure")
+            Text("How to Measure")
                 .font(theme.font.heading.small.uiFont.withSize(18).font)
                 .padding(.bottom, Spacing.space200)
             Text.build(theme.font.body.medium("• Bust"))
                 .padding(.bottom, Spacing.space050)
-            Text.build(theme.font.body.medium("Mesure around the fullest part of your chest."))
+            Text.build(theme.font.body.medium("Measure around the fullest part of your chest."))
                 .padding(.bottom, Spacing.space100)
             Text.build(theme.font.body.medium("• Waist"))
                 .padding(.bottom, Spacing.space050)
@@ -51,13 +51,13 @@ struct ModalDemoView: View {
 
     private var bigBody: some View {
         VStack(alignment: .leading) {
-            Text("How to Mesure")
+            Text("How to Measure")
                 .font(theme.font.heading.small.uiFont.withSize(18).font)
                 .padding(.bottom, Spacing.space200)
             Spacer().frame(height: 400)
             Text.build(theme.font.body.medium("• Bust"))
                 .padding(.bottom, Spacing.space050)
-            Text.build(theme.font.body.small("Mesure around the fullest part of your chest."))
+            Text.build(theme.font.body.small("Measure around the fullest part of your chest."))
                 .padding(.bottom, Spacing.space100)
             Spacer().frame(height: 400)
             Text.build(theme.font.body.medium("• Waist"))
