@@ -7,6 +7,13 @@ public protocol TypographyProviderProtocol {
     var paragraph: TypographyParagraphProtocol { get }
     var small: TypographySmallProtocol { get }
     var tiny: TypographyTinyProtocol { get }
+
+    // Token-driven Figma groups (additive; legacy members above removed in a later phase).
+    var display: TypographyDisplayProtocol { get }
+    var heading: TypographyHeadingProtocol { get }
+    var body: TypographyBodyProtocol { get }
+    var label: TypographyLabelProtocol { get }
+    var link: TypographyLinkProtocol { get }
 }
 
 // MARK: - TypographyProvider
@@ -16,6 +23,12 @@ public class TypographyProvider: TypographyProviderProtocol {
     public var paragraph: TypographyParagraphProtocol
     public var small: TypographySmallProtocol
     public var tiny: TypographyTinyProtocol
+
+    public let display: TypographyDisplayProtocol = TypographyDisplay()
+    public let heading: TypographyHeadingProtocol = TypographyHeading()
+    public let body: TypographyBodyProtocol = TypographyBody()
+    public let label: TypographyLabelProtocol = TypographyLabel()
+    public let link: TypographyLinkProtocol = TypographyLink()
 
     public init(
         header: TypographyHeaderProtocol = TypographyHeader(),

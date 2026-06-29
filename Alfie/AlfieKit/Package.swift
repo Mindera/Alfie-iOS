@@ -288,6 +288,7 @@ let package = Package(
             exclude: ["DesignTokens"],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
+                .copy("Theme/Typography/Resources/LibreBaskerville-OFL.txt"),
                 .copy("Theme/Components/Loader/spin.gif"),
                 .process("Theme/Color/Colors.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
