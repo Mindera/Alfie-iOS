@@ -17,7 +17,6 @@ public struct TypographyDisplay: TypographyDisplayProtocol {
 
 // MARK: - Heading
 
-// Named `TypographyHeading` to avoid clashing with the legacy `TypographyHeader`.
 public protocol TypographyHeadingProtocol {
     var large: ThemedTypographyStyle { get }
     var medium: ThemedTypographyStyle { get }

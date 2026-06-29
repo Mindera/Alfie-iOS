@@ -22,7 +22,11 @@
 - [x] 4. Plan → plan.md
 - [x] 4.5 Grill (harden plan) — scope changed to full Figma-name migration; re-planned (5 phases) + red-teamed (red-team.md), fixes folded
 - [x] APPROVAL GATE — approved 2026-06-29 (team, 3 devs)
-- [ ] 5. Implement (ios-execute --team 3)  ← in progress
+- [~] 5. Implement (ios-execute --team 3)  ← in progress
+      - [x] Phase 1 foundation committed (4a2516c) — verify green
+      - [x] Phase 2/3/4 migration (dev-1 SharedUI / dev-2 DebugMenu / dev-3 features) merged, no conflicts, grep-gate clean
+      - [x] Phase 5 legacy removal applied (specs deleted, provider trimmed, ThemeProvider updated)
+      - [ ] final verify.sh (build+unit) running → then code-review gate → commit Phase 5
 - [ ] 6. Commit
 - [ ] 7. PR
 - [ ] 8. Ticket transition

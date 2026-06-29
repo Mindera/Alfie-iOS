@@ -41,14 +41,6 @@ final class TypographyProviderTokenTests: XCTestCase {
         assertMatches(provider.link.small, Typography.Link.small)
     }
 
-    func test_legacyAccessorsStillPresent() {
-        // Additive phase: legacy surface must remain so existing call sites compile.
-        XCTAssertEqual(provider.header.h3.pointSize, 20)
-        XCTAssertNotNil(provider.paragraph)
-        XCTAssertNotNil(provider.small)
-        XCTAssertNotNil(provider.tiny)
-    }
-
     // MARK: - Helpers
 
     private func assertMatches(

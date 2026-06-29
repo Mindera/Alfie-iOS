@@ -9,7 +9,7 @@ struct TypographyDemoView: View {
                 Spacer()
                 display
                 heading
-                body
+                bodySection
                 label
                 link
             }
@@ -38,7 +38,7 @@ struct TypographyDemoView: View {
         }
     }
 
-    private var body: some View {
+    private var bodySection: some View {
         VStack(alignment: .leading) {
             DemoHelper.demoSectionHeader(title: "Body")
 

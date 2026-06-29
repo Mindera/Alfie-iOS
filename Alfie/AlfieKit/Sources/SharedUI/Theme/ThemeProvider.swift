@@ -24,13 +24,13 @@ public class ThemeProvider: ThemeProviderProtocol {
 
     public func setupAppearance() {
         let attributesNormal: [NSAttributedString.Key: Any] = [
-            .font: font.header.h3,
+            .font: font.heading.small.uiFont,
             .foregroundColor: Colors.primary.black.ui,
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesNormal, for: .normal)
 
         let attributesSelected: [NSAttributedString.Key: Any] = [
-            .font: font.header.h3,
+            .font: font.heading.small.uiFont,
             .foregroundColor: Colors.primary.mono700.ui,
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesSelected, for: .highlighted)
