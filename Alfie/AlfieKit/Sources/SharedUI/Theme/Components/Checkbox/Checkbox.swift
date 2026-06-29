@@ -80,7 +80,7 @@ public struct Checkbox: View {
                 .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
 
-            Text.build(theme.font.paragraph.normal(text))
+            Text.build(theme.font.body.medium(text))
         }
         .foregroundStyle(state.isDisabled ? Colors.primary.mono400 : Colors.primary.mono900)
         .onTapGesture {

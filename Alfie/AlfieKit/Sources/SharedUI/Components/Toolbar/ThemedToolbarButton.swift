@@ -69,7 +69,7 @@ public struct ThemedToolbarButton: View {
                     .badgeView(badgeValue: $badgeValue)
             } else if let text {
                 Text(text)
-                    .font(Font(theme.font.paragraph.normal.withSize(Constants.titleFontSize)))
+                    .font(Font(theme.font.body.medium.uiFont.withSize(Constants.titleFontSize)))
                     .foregroundStyle(tint)
                     .badgeView(badgeValue: $badgeValue)
             } else {

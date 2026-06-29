@@ -52,7 +52,7 @@ public struct Tag: View {
                         .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                 }
-                Text.build(theme.font.paragraph.normal(configuration.label))
+                Text.build(theme.font.body.medium(configuration.label))
                 if configuration.showCloseButton {
                     Button(action: {
                         configuration.onCloseTap?()

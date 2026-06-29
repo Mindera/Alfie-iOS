@@ -25,8 +25,8 @@ public struct ForceAppUpdateView: View {
             .frame(width: Constants.logoWidth)
 
             VStack(spacing: Spacing.space400) {
-                Text.build(theme.font.header.h1(configuration.title))
-                Text.build(theme.font.paragraph.bold(configuration.message))
+                Text.build(theme.font.heading.large(configuration.title))
+                Text.build(theme.font.body.medium(configuration.message))
                     .multilineTextAlignment(.center)
 
                 ThemedButton(
