@@ -23,11 +23,11 @@ public struct ProgressBar: View {
         HStack {
             ZStack(alignment: .leading) {
                 Rectangle()
-                    .fill(Colors.primary.mono200)
+                    .fill(Primitives.Colours.neutrals200)
                     .cornerRadius(CornerRadius.xl)
                     .frame(height: Constants.height)
                 Rectangle()
-                    .fill(Colors.primary.mono700)
+                    .fill(Primitives.Colours.neutrals600)
                     .cornerRadius(CornerRadius.xl)
                     .frame(width: Constants.indicatorWidth, height: Constants.height)
                     .offset(x: xOffset(for: progress), y: 0)

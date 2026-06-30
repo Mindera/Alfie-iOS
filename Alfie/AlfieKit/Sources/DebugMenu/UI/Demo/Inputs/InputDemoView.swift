@@ -75,7 +75,7 @@ struct InputDemoView: View {
                         }
                     } label: {
                         Text.build(theme.font.body.small(icon.rawValue))
-                            .tint(Colors.secondary.blue500)
+                            .tint(Primitives.Colours.neutrals400)
                     }
                 }
                 .disabled(!hasIcon)

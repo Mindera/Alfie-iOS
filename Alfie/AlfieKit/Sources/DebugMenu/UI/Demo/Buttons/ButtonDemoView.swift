@@ -74,7 +74,7 @@ struct ButtonDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(style.rawValue))
-                        .tint(Colors.secondary.blue500)
+                        .tint(Primitives.Colours.neutrals400)
                 }
             }
 
@@ -95,7 +95,7 @@ struct ButtonDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(iconLeft.rawValue))
-                        .tint(Colors.secondary.blue500)
+                        .tint(Primitives.Colours.neutrals400)
                 }
             }
             .disabled(!showIconLeft)
@@ -117,7 +117,7 @@ struct ButtonDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(iconRight.rawValue))
-                        .tint(Colors.secondary.blue500)
+                        .tint(Primitives.Colours.neutrals400)
                 }
             }
             .disabled(!showIconRight)

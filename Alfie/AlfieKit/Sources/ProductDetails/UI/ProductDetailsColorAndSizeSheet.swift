@@ -45,7 +45,7 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
             HStack {
                 Text(title)
                     .font(Font(theme.font.body.medium.uiFont.withSize(18)))
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
 
                 Spacer()
 
@@ -56,7 +56,7 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
                         .resizable()
                         .scaledToFit()
                         .frame(size: Constants.sheetCloseIconSize)
-                        .foregroundStyle(Colors.primary.mono900)
+                        .foregroundStyle(Primitives.Colours.neutrals800)
                 }
             }
             .padding([.top, .horizontal], Spacing.space200)
@@ -107,7 +107,7 @@ private extension ProductDetailsColorAndSizeSheet {
                             }
                         }
                     }
-                    .tint(Colors.primary.black)
+                    .tint(Primitives.Colours.neutrals900)
 
                     ThemedDivider.horizontalThin
                 }
@@ -144,7 +144,7 @@ private extension ProductDetailsColorAndSizeSheet {
                         }
                     }
                     .padding(.vertical, Spacing.space100)
-                    .tint(Colors.primary.black)
+                    .tint(Primitives.Colours.neutrals900)
 
                     ThemedDivider.horizontalThin
                 }

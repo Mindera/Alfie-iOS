@@ -55,12 +55,12 @@ struct ProductListingFilterBar: View {
                     .resizable()
                     .scaledToFit()
                     .frame(size: Constants.filterIcon)
-                    .tint(Colors.primary.mono900)
+                    .tint(Primitives.Colours.neutrals800)
                 Text
                     .build(
                         theme.font.body.medium(L10n.Plp.Refine.Button.cta)
                     )
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
             }
         }
         .buttonStyle(.plain)
@@ -69,7 +69,7 @@ struct ProductListingFilterBar: View {
 
     private var resultInfoView: some View {
         Text.build(theme.font.body.small(L10n.Plp.NumberOfResults.message(total)))
-            .foregroundStyle(Colors.primary.mono500)
+            .foregroundStyle(Primitives.Colours.neutrals500)
             .accessibilityIdentifier(AccessibilityID.ProductListing.resultsLabel)
     }
 

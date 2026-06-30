@@ -68,11 +68,11 @@ public struct AccordionView<Content: View>: View {
     }
 
     private var textColor: Color {
-        isDisabled ? Colors.primary.mono700 : Colors.primary.mono900
+        isDisabled ? Primitives.Colours.neutrals600 : Primitives.Colours.neutrals800
     }
 
     private var accordianColor: Color {
-        isDisabled ? Colors.primary.mono200 : Colors.primary.mono500
+        isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500
     }
 }
 
@@ -96,7 +96,7 @@ public struct MyDisclosureStyle: DisclosureGroupStyle {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)
-                        .foregroundStyle(isDisabled ? Colors.primary.mono200 : Colors.primary.mono500)
+                        .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
                         .rotationEffect(.degrees(configuration.isExpanded ? 0 : -90))
                         .animation(.easeInOut(duration: 0.3), value: configuration.isExpanded)
                 }

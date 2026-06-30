@@ -12,7 +12,7 @@ public struct TagConfiguration {
         label: String,
         showCloseButton: Bool = false,
         icon: Image? = nil,
-        color: Color = Colors.primary.mono800,
+        color: Color = Primitives.Colours.neutrals700,
         onCloseTap: (() -> Void)? = nil
     ) {
         self.label = label
@@ -61,16 +61,16 @@ public struct Tag: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: Constants.closeWidth, height: Constants.closeHeight)
-                            .foregroundStyle(Colors.primary.black)
+                            .foregroundStyle(Primitives.Colours.neutrals900)
                     })
                 }
             }
             .padding(.horizontal, Spacing.space150)
         }
-        .background(Colors.primary.mono100)
+        .background(Primitives.Colours.neutrals100)
         .cornerRadius(Constants.cornerRadius)
         .frame(height: Constants.height)
-        .shadow(color: Colors.primary.black.opacity(0.1), radius: 4, x: 2, y: 2)
+        .shadow(color: Primitives.Colours.neutrals900.opacity(0.1), radius: 4, x: 2, y: 2)
     }
 }
 

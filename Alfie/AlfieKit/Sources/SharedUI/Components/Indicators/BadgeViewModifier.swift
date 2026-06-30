@@ -34,13 +34,13 @@ public struct BadgeViewModifier: ViewModifier {
                         let badgeLabelsOffsetX = CGFloat(helper.badgeLabel.count * Constants.capsuleOffsetXFactor)
                         ZStack(alignment: .center) {
                             RoundedRectangle(cornerRadius: CornerRadius.full)
-                                .fill(Colors.secondary.red700)
+                                .fill(Primitives.Colours.semanticError600)
                                 .frame(height: Constants.badgeHeight)
                             RoundedRectangle(cornerRadius: CornerRadius.full)
-                                .stroke(Colors.primary.white, lineWidth: Constants.borderLineWidth)
+                                .stroke(Primitives.Colours.neutrals0, lineWidth: Constants.borderLineWidth)
                                 .frame(height: Constants.badgeHeight)
                             Text.build(theme.font.body.small(helper.badgeLabel))
-                                .foregroundStyle(Colors.primary.white)
+                                .foregroundStyle(Primitives.Colours.neutrals0)
                                 .padding(.all, Constants.textPadding)
                         }
                         .frame(height: Constants.badgeHeight)
@@ -50,10 +50,10 @@ public struct BadgeViewModifier: ViewModifier {
                     } else {
                         ZStack(alignment: .center) {
                             Circle()
-                                .fill(Colors.secondary.red700)
+                                .fill(Primitives.Colours.semanticError600)
                                 .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
                             RoundedRectangle(cornerRadius: CornerRadius.full)
-                                .stroke(Colors.primary.white, lineWidth: Constants.borderLineWidth)
+                                .stroke(Primitives.Colours.neutrals0, lineWidth: Constants.borderLineWidth)
                                 .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
                         }
                         .offset(x: (Constants.indicatorWidth / 2), y: -((Constants.indicatorHeight / 2)))

@@ -151,11 +151,11 @@ struct SegmentsDemoView: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch segment.object as? CategoryPages {
         case .categories:
-            segmentContentView(title: "Categories", color: Colors.secondary.green300)
+            segmentContentView(title: "Categories", color: Primitives.Colours.semanticSuccess400)
         case .brands:
-            segmentContentView(title: "Brands", color: Colors.secondary.blue300)
+            segmentContentView(title: "Brands", color: Primitives.Colours.neutrals300)
         case .services:
-            segmentContentView(title: "Services", color: Colors.secondary.red300)
+            segmentContentView(title: "Services", color: Primitives.Colours.semanticError300)
         case .none:
             EmptyView()
         }

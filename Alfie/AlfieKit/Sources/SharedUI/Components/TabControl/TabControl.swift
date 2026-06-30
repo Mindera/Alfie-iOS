@@ -25,9 +25,9 @@ public struct TabControl: View {
         var outerLineColor: Color {
             switch self {
             case .light:
-                return Colors.primary.mono200
+                return Primitives.Colours.neutrals200
             case .dark:
-                return Colors.primary.mono900
+                return Primitives.Colours.neutrals800
             }
         }
         // swiftlint:enable vertical_whitespace_between_cases
@@ -65,9 +65,9 @@ public struct TabControl: View {
         static let innerLineHeight: CGFloat = 2
         static let itemHeight: CGFloat = 44
         static let imageSize: CGFloat = 16
-        static let innerLineColor = Colors.primary.mono050
-        static let selectedItemFontColor = Colors.primary.mono900
-        static let unselectedItemFontColor = Colors.primary.mono500
+        static let innerLineColor = Primitives.Colours.neutrals100
+        static let selectedItemFontColor = Primitives.Colours.neutrals800
+        static let unselectedItemFontColor = Primitives.Colours.neutrals500
         static let matchedGeometryEffectID = "tabControl_underline"
     }
 

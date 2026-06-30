@@ -26,7 +26,7 @@ struct TabBarItemView: View {
     var body: some View {
         VStack(spacing: Spacing.space100) {
             if tab == currentTab {
-                Colors.primary.mono900
+                Primitives.Colours.neutrals800
                     .frame(height: Constants.lineHeight)
                     .offset(y: Constants.offsetLineSelected)
                     .matchedGeometryEffect(id: Constants.effectID, in: namespace)
@@ -38,14 +38,14 @@ struct TabBarItemView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(size: Constants.iconSize)
-                .foregroundStyle(tab == currentTab ? Colors.primary.black : Colors.primary.mono300)
+                .foregroundStyle(tab == currentTab ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals400)
                 .badgeView(badgeValue: $badgeValue)
             if tab == currentTab {
                 Text.build(theme.font.body.small(tab.title))
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
             } else {
                 Text.build(theme.font.body.small(tab.title))
-                    .foregroundStyle(Colors.primary.mono500)
+                    .foregroundStyle(Primitives.Colours.neutrals500)
             }
         }
         .accessibilityElement()

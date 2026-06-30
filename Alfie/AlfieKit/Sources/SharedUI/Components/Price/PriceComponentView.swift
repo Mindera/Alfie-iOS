@@ -120,7 +120,7 @@ public struct PriceComponentView: View {
 
     private func defaultPrice(_ price: String, textSize: CGFloat) -> some View {
         priceText(price, textSize: textSize)
-            .foregroundStyle(Colors.primary.mono900)
+            .foregroundStyle(Primitives.Colours.neutrals800)
     }
 
     // MARK: - Sale
@@ -156,14 +156,14 @@ public struct PriceComponentView: View {
     private func saleFullPrice(_ price: String) -> some View {
         Text(price)
             .font(Font(theme.font.body.medium.uiFont.withSize(Constants.saleFullPriceTextSize(for: configuration.size))))
-            .foregroundStyle(Colors.primary.mono600)
+            .foregroundStyle(Primitives.Colours.neutrals600)
             .strikethrough()
             .accessibilityIdentifier(AccessibilityId.priceHigher)
     }
 
     private func saleFinalPrice(_ price: String) -> some View {
         priceText(price, textSize: Constants.saleFinalPriceTextSize(for: configuration.size))
-            .foregroundStyle(Colors.secondary.red800)
+            .foregroundStyle(Primitives.Colours.semanticError700)
             .accessibilityIdentifier(AccessibilityId.priceLower)
     }
 

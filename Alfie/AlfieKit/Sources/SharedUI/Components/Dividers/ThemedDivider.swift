@@ -31,21 +31,21 @@ public struct ThemedDivider: View {
         configuration: .init(
             orientation: .horizontal,
             thickness: Constants.thinThickness,
-            color: Colors.primary.mono100
+            color: Primitives.Colours.neutrals100
         )
     )
     public static var verticalThin = ThemedDivider(
-        configuration: .init(orientation: .vertical, thickness: Constants.thinThickness, color: Colors.primary.mono100)
+        configuration: .init(orientation: .vertical, thickness: Constants.thinThickness, color: Primitives.Colours.neutrals100)
     )
     public static var horizontalThick = ThemedDivider(
         configuration: .init(
             orientation: .horizontal,
             thickness: Constants.thickThickness,
-            color: Colors.primary.mono100
+            color: Primitives.Colours.neutrals100
         )
     )
     public static var verticalThick = ThemedDivider(
-        configuration: .init(orientation: .vertical, thickness: Constants.thickThickness, color: Colors.primary.mono100)
+        configuration: .init(orientation: .vertical, thickness: Constants.thickThickness, color: Primitives.Colours.neutrals100)
     )
     private let configuration: ThemedDividerConfiguration
 
@@ -86,11 +86,11 @@ public struct ThemedDivider: View {
         Spacer()
         HStack {
             ThemedDivider(
-                configuration: .init(orientation: .horizontal, thickness: 5.0, color: Colors.secondary.orange400)
+                configuration: .init(orientation: .horizontal, thickness: 5.0, color: Primitives.Colours.semanticError400)
             )
             Spacer()
             ThemedDivider(
-                configuration: .init(orientation: .vertical, thickness: 5.0, color: Colors.secondary.orange400)
+                configuration: .init(orientation: .vertical, thickness: 5.0, color: Primitives.Colours.semanticError400)
             )
         }
         .frame(height: 50)

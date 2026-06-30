@@ -24,21 +24,19 @@ struct ColorsDemoView: View {
     var primaryColorView: some View {
         VStack {
             paletteView(with: "B&W", colors: [
-                Colors.primary.black,
-                Colors.primary.white,
+                Primitives.Colours.neutrals900,
+                Primitives.Colours.neutrals0,
             ])
 
             paletteView(with: "Mono", colors: [
-                Colors.primary.mono900,
-                Colors.primary.mono800,
-                Colors.primary.mono700,
-                Colors.primary.mono600,
-                Colors.primary.mono500,
-                Colors.primary.mono400,
-                Colors.primary.mono300,
-                Colors.primary.mono200,
-                Colors.primary.mono100,
-                Colors.primary.mono050,
+                Primitives.Colours.neutrals800,
+                Primitives.Colours.neutrals700,
+                Primitives.Colours.neutrals600,
+                Primitives.Colours.neutrals500,
+                Primitives.Colours.neutrals400,
+                Primitives.Colours.neutrals300,
+                Primitives.Colours.neutrals200,
+                Primitives.Colours.neutrals100,
             ])
         }
     }
@@ -46,60 +44,25 @@ struct ColorsDemoView: View {
     var secondaryColorView: some View {
         VStack {
             paletteView(with: "Green", colors: [
-                Colors.secondary.green900,
-                Colors.secondary.green800,
-                Colors.secondary.green700,
-                Colors.secondary.green600,
-                Colors.secondary.green500,
-                Colors.secondary.green400,
-                Colors.secondary.green300,
-                Colors.secondary.green200,
-                Colors.secondary.green100,
-                Colors.secondary.green050,
+                Primitives.Colours.semanticSuccess800,
+                Primitives.Colours.semanticSuccess700,
+                Primitives.Colours.semanticSuccess600,
+                Primitives.Colours.semanticSuccess500,
+                Primitives.Colours.semanticSuccess400,
+                Primitives.Colours.semanticSuccess300,
+                Primitives.Colours.semanticSuccess200,
+                Primitives.Colours.semanticSuccess100,
             ])
 
             paletteView(with: "Red", colors: [
-                Colors.secondary.red900,
-                Colors.secondary.red800,
-                Colors.secondary.red700,
-                Colors.secondary.red600,
-                Colors.secondary.red500,
-                Colors.secondary.red400,
-                Colors.secondary.red300,
-                Colors.secondary.red200,
-                Colors.secondary.red100,
-                Colors.secondary.red050,
-            ])
-
-            paletteView(with: "Yellow", colors: [
-                Colors.secondary.yellow500,
-                Colors.secondary.yellow400,
-                Colors.secondary.yellow300,
-                Colors.secondary.yellow200,
-                Colors.secondary.yellow100,
-                Colors.secondary.yellow050,
-            ])
-
-            paletteView(with: "Blue", colors: [
-                Colors.secondary.blue900,
-                Colors.secondary.blue800,
-                Colors.secondary.blue700,
-                Colors.secondary.blue600,
-                Colors.secondary.blue500,
-                Colors.secondary.blue400,
-                Colors.secondary.blue300,
-                Colors.secondary.blue200,
-                Colors.secondary.blue100,
-                Colors.secondary.blue050,
-            ])
-
-            paletteView(with: "Orange", colors: [
-                Colors.secondary.orange500,
-                Colors.secondary.orange400,
-                Colors.secondary.orange300,
-                Colors.secondary.orange200,
-                Colors.secondary.orange100,
-                Colors.secondary.orange050,
+                Primitives.Colours.semanticError800,
+                Primitives.Colours.semanticError700,
+                Primitives.Colours.semanticError600,
+                Primitives.Colours.semanticError500,
+                Primitives.Colours.semanticError400,
+                Primitives.Colours.semanticError300,
+                Primitives.Colours.semanticError200,
+                Primitives.Colours.semanticError100,
             ])
         }
     }
@@ -107,10 +70,10 @@ struct ColorsDemoView: View {
     func paletteView(with name: String, colors: [Color]) -> some View {
         VStack(alignment: .leading) {
             Text.build(theme.font.body.small(name))
-                .foregroundStyle(colors.first ?? Colors.primary.black)
+                .foregroundStyle(colors.first ?? Primitives.Colours.neutrals900)
             ScrollView(.horizontal) {
                 HStack(spacing: Spacing.space0) {
-                    ForEach(colors, id: \.self) { color in
+                    ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
                         colorView(with: color)
                     }
                 }
@@ -125,7 +88,7 @@ struct ColorsDemoView: View {
                 .fill(color)
                 .frame(width: 64, height: 64)
             Text.build(theme.font.body.small(color.name ?? "-"))
-                .foregroundStyle(Colors.primary.mono400)
+                .foregroundStyle(Primitives.Colours.neutrals500)
         }
     }
 }

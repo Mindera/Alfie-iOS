@@ -227,9 +227,9 @@ struct DeepLinkDemoView: View {
 
                 HStack(spacing: Spacing.space050) {
                     Text.build(theme.font.body.small("URL:"))
-                        .foregroundStyle(Colors.primary.mono400)
+                        .foregroundStyle(Primitives.Colours.neutrals500)
                     Text.build(theme.font.body.small(webViewUrl.absoluteString))
-                        .foregroundStyle(Colors.primary.mono900)
+                        .foregroundStyle(Primitives.Colours.neutrals800)
                 }
             }
 

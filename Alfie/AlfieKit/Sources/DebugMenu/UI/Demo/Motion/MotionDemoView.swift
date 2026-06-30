@@ -50,7 +50,7 @@ struct MotionDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(motionType.rawValue))
-                        .tint(Colors.secondary.blue500)
+                        .tint(Primitives.Colours.neutrals400)
                 }
             }
 
@@ -69,17 +69,17 @@ struct MotionDemoView: View {
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .leading))
-                        .foregroundStyle(Colors.secondary.blue300)
+                        .foregroundStyle(Primitives.Colours.neutrals300)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .bottom))
-                        .foregroundStyle(Colors.secondary.blue500)
+                        .foregroundStyle(Primitives.Colours.neutrals400)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .trailing))
-                        .foregroundStyle(Colors.secondary.blue700)
+                        .foregroundStyle(Primitives.Colours.neutrals500)
                 }
             }
             .padding(Spacing.space200)

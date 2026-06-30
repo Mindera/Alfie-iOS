@@ -51,7 +51,7 @@ struct ProductListingFilter: View {
                 isVisible.toggle()
             }, label: {
                 Icon.close.image
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Primitives.Colours.neutrals900)
             })
             Spacer()
             ThemedToolbarTitle(style: .text(L10n.Plp.RefineAndSort.title))
@@ -72,7 +72,7 @@ struct ProductListingFilter: View {
         HStack {
             Text(L10n.Plp.ListStyle.Option.title)
                 .font(Constants.listStyleFont)
-                .foregroundStyle(Colors.primary.mono900)
+                .foregroundStyle(Primitives.Colours.neutrals800)
             Spacer()
             ProductListingListStyleSelector(selectedStyle: $listStyle)
         }

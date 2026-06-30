@@ -18,10 +18,10 @@ struct IconographyDemoView: View {
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .foregroundStyle(Colors.primary.mono900)
+                            .foregroundStyle(Primitives.Colours.neutrals800)
                             .frame(width: 40, height: 40)
                         Text.build(theme.font.body.small(icon.literalName))
-                            .foregroundStyle(Colors.primary.mono900)
+                            .foregroundStyle(Primitives.Colours.neutrals800)
                             .font(.caption2)
                     }
                 }

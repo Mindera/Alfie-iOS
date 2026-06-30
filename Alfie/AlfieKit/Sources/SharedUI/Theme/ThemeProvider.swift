@@ -25,24 +25,24 @@ public class ThemeProvider: ThemeProviderProtocol {
     public func setupAppearance() {
         let attributesNormal: [NSAttributedString.Key: Any] = [
             .font: font.heading.small.uiFont,
-            .foregroundColor: Colors.primary.black.ui,
+            .foregroundColor: Primitives.Colours.neutrals900.ui,
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesNormal, for: .normal)
 
         let attributesSelected: [NSAttributedString.Key: Any] = [
             .font: font.heading.small.uiFont,
-            .foregroundColor: Colors.primary.mono700.ui,
+            .foregroundColor: Primitives.Colours.neutrals600.ui,
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesSelected, for: .highlighted)
 
-        UIBarButtonItem.appearance().tintColor = Colors.primary.black.ui
+        UIBarButtonItem.appearance().tintColor = Primitives.Colours.neutrals900.ui
 
         setNavigationBarAppearance()
         setTabBarAppearance()
     }
 
     private func setNavigationBarAppearance() {
-        let backgroundColor = Colors.primary.white.ui
+        let backgroundColor = Primitives.Colours.neutrals0.ui
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = backgroundColor
@@ -70,7 +70,7 @@ public class ThemeProvider: ThemeProviderProtocol {
     }
 
     private func setTabBarAppearance() {
-        let backgroundColor = Colors.primary.white.ui
+        let backgroundColor = Primitives.Colours.neutrals0.ui
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithTransparentBackground()
         tabBarAppearance.backgroundColor = backgroundColor

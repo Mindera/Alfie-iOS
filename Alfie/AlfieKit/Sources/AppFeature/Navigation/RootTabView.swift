@@ -41,7 +41,7 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
                 }
                 .toolbar(.hidden, for: .tabBar)
             }
-            .accentColor(Colors.primary.black)
+            .accentColor(Primitives.Colours.neutrals900)
             .padding(.bottom, Spacing.space150)
 
             if !viewModel.isOverlayVisible {

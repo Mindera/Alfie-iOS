@@ -96,27 +96,27 @@ public struct Chip: View {
 
     private var borderColor: Color {
         if configuration.isDisabled {
-            return Colors.primary.mono100
+            return Primitives.Colours.neutrals100
         } else if configuration.isSelected {
-            return Colors.primary.mono900
+            return Primitives.Colours.neutrals800
         } else {
-            return Colors.primary.mono200
+            return Primitives.Colours.neutrals200
         }
     }
 
     private var textColor: Color {
         if configuration.isDisabled {
-            return Colors.primary.mono300
+            return Primitives.Colours.neutrals400
         } else {
-            return Colors.primary.mono700
+            return Primitives.Colours.neutrals600
         }
     }
 
     private var backgroundColor: Color {
         if configuration.isDisabled {
-            return Colors.primary.mono050
+            return Primitives.Colours.neutrals100
         } else {
-            return Colors.primary.white
+            return Primitives.Colours.neutrals0
         }
     }
 

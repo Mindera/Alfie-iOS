@@ -48,7 +48,7 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(L10n.WebView.ErrorView.title),
             message: theme.font.body.medium(L10n.WebView.ErrorView.Generic.message),
-            messageColor: Colors.primary.mono600,
+            messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(cta: L10n.WebView.ErrorView.Button.cta) {
                     viewModel.tryAgain()
@@ -81,7 +81,7 @@ private struct WebViewRepresentable<ViewModel: WebViewModelProtocol>: UIViewRepr
         config.allowsInlineMediaPlayback = true
 
         let webView = CustomWebViewNoAccessory(frame: .zero, configuration: config)
-        webView.backgroundColor = Colors.primary.white.ui
+        webView.backgroundColor = Primitives.Colours.neutrals0.ui
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
 

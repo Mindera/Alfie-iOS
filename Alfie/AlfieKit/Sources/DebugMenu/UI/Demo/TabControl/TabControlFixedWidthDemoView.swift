@@ -26,7 +26,7 @@ struct TabControlFixedWidthDemoView: View {
             TabView(selection: $currentIndex) {
                 ForEach(Array(currentOptions.enumerated()), id: \.0) { _, value in
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(Colors.primary.mono300)
+                        .fill(Primitives.Colours.neutrals400)
                         .overlay {
                             Text.build(theme.font.body.medium(value))
                                 .foregroundStyle(.white)

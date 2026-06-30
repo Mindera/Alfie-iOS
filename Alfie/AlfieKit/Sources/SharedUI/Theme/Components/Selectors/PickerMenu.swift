@@ -17,7 +17,7 @@ public struct PickerMenu<Content: View>: View {
     public var body: some View {
         Button { isModalPresented = true } label: {
             RoundedRectangle(cornerRadius: CornerRadius.xs)
-                .stroke(Colors.primary.mono300, lineWidth: 1)
+                .stroke(Primitives.Colours.neutrals400, lineWidth: 1)
                 .frame(minHeight: Constants.frameMinHeight)
                 .overlay {
                     HStack {
@@ -28,11 +28,11 @@ public struct PickerMenu<Content: View>: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
-                            .tint(Colors.primary.mono900)
+                            .tint(Primitives.Colours.neutrals800)
                     }
                     .padding(.horizontal, Spacing.space200)
                 }
-                .background(Colors.primary.white)
+                .background(Primitives.Colours.neutrals0)
                 .cornerRadius(CornerRadius.xs)
         }
     }

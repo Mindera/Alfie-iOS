@@ -46,7 +46,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
         VStack {
             HStack {
                 Text.build(theme.font.body.medium(recentSearch.value))
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
                     .lineLimit(1)
                 Spacer()
                 recentSearchRemoveButton(for: recentSearch)
@@ -69,7 +69,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: Spacing.space200, height: Spacing.space200)
-                .foregroundStyle(Colors.primary.mono900)
+                .foregroundStyle(Primitives.Colours.neutrals800)
         })
         .accessibilityIdentifier(AccessibilityId.removeRecentSearchButton)
     }
@@ -81,7 +81,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
             }
         }, label: {
             Text.build(theme.font.body.small(L10n.Search.Screen.RecentSearches.ClearAll.Button.cta, underline: true))
-                .foregroundStyle(Colors.primary.mono900)
+                .foregroundStyle(Primitives.Colours.neutrals800)
         })
         .accessibilityIdentifier(AccessibilityId.clearRecentSearchesButton)
     }

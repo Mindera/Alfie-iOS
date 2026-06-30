@@ -32,8 +32,8 @@ struct MultilineShimmerEffectModifier: ViewModifier {
         self.shouldShowShimmer = isLoading.wrappedValue
         self.cornerRadius = cornerRadius
         self.blurRadius = blurRadius
-        self.lighterShimmerColor = customLighterShimmerColor ?? Colors.primary.mono200
-        self.darkerShimmerColor = customDarkerShimmerColor ?? Colors.primary.mono300
+        self.lighterShimmerColor = customLighterShimmerColor ?? Primitives.Colours.neutrals200
+        self.darkerShimmerColor = customDarkerShimmerColor ?? Primitives.Colours.neutrals400
         self.lines = lines > 0 ? Array(0..<lines) : []
         self.font = font
         self.lineSpacing = lineSpacing

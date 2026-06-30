@@ -18,7 +18,7 @@ public struct ThemedToolbarTitle: View {
     private let tint: Color
     private let accessibilityId: String
 
-    public init(style: TitleStyle, tint: Color = Colors.primary.mono900, accessibilityId: String = "") {
+    public init(style: TitleStyle, tint: Color = Primitives.Colours.neutrals800, accessibilityId: String = "") {
         self.style = style
         self.tint = tint
         self.accessibilityId = accessibilityId
@@ -44,7 +44,7 @@ public struct ThemedToolbarTitle: View {
 
                 if let subtitle {
                     Text.build(theme.font.body.small(subtitle))
-                        .foregroundStyle(Colors.primary.mono500)
+                        .foregroundStyle(Primitives.Colours.neutrals500)
                 }
             }
             .padding(.vertical, Spacing.space200)

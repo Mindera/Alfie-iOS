@@ -308,7 +308,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             if let url = color.swatch?.url {
                 type = .url(url)
             } else {
-                type = .color(Colors.primary.black)
+                type = .color(Primitives.Colours.neutrals900)
             }
 
             let isAvailable = product.variants.contains { $0.colour?.id == color.id && $0.stock > 0 }

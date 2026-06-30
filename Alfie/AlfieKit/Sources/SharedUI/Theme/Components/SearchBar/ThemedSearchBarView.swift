@@ -15,9 +15,9 @@ public struct ThemedSearchBarView: View {
             case .soft,
                 .softLarge,
                 .light:
-                Colors.primary.mono050
+                Primitives.Colours.neutrals100
             case .dark:
-                Colors.primary.mono800
+                Primitives.Colours.neutrals700
             }
         }
 
@@ -28,7 +28,7 @@ public struct ThemedSearchBarView: View {
                 .dark:
                 focusedBackgroundColor
             case .light:
-                Colors.primary.white
+                Primitives.Colours.neutrals0
             }
         }
 
@@ -36,11 +36,11 @@ public struct ThemedSearchBarView: View {
             switch self {
             case .soft,
                 .softLarge:
-                Colors.primary.mono200
+                Primitives.Colours.neutrals200
             case .light:
-                Colors.primary.mono900
+                Primitives.Colours.neutrals800
             case .dark:
-                Colors.primary.mono300
+                Primitives.Colours.neutrals400
             }
         }
 
@@ -51,7 +51,7 @@ public struct ThemedSearchBarView: View {
                     .dark:
                     .clear
             case .light:
-                Colors.primary.mono900
+                Primitives.Colours.neutrals800
             }
         }
 
@@ -60,9 +60,9 @@ public struct ThemedSearchBarView: View {
             case .soft,
                 .softLarge,
                 .light:
-                Colors.primary.mono900
+                Primitives.Colours.neutrals800
             case .dark:
-                Colors.primary.mono050
+                Primitives.Colours.neutrals100
             }
         }
 
@@ -71,9 +71,9 @@ public struct ThemedSearchBarView: View {
             case .soft,
                 .softLarge,
                 .light:
-                Colors.primary.mono500
+                Primitives.Colours.neutrals500
             case .dark:
-                Colors.primary.mono200
+                Primitives.Colours.neutrals200
             }
         }
 
@@ -86,9 +86,9 @@ public struct ThemedSearchBarView: View {
             case .soft,
                 .softLarge,
                 .light:
-                Colors.primary.mono900
+                Primitives.Colours.neutrals800
             case .dark:
-                Colors.primary.mono200
+                Primitives.Colours.neutrals200
             }
         }
 
@@ -327,7 +327,7 @@ public struct ThemedSearchBarView: View {
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .tint(Colors.primary.mono900)
+                    .tint(Primitives.Colours.neutrals800)
                     .frame(size: Constants.cancelIconSize)
             }
             .accessibilityIdentifier(dismissConfiguration.accessibilityId)
@@ -337,7 +337,7 @@ public struct ThemedSearchBarView: View {
                 dismissBlock()
             } label: {
                 Text.build(theme.font.body.small(title))
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
                     .accessibilityIdentifier(dismissConfiguration.accessibilityId)
             }
 

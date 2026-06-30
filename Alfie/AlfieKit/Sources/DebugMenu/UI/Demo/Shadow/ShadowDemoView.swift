@@ -56,12 +56,12 @@ struct ShadowDemoView: View {
     private func shadowView(label: String, type: ShadowViewModifier.ShadowType) -> some View {
         VStack {
             Rectangle()
-                .fill(Colors.primary.white)
+                .fill(Primitives.Colours.neutrals0)
                 .frame(width: 50, height: 50)
                 .cornerRadius(CornerRadius.s)
                 .shadow(type)
             Text.build(theme.font.body.small(label))
-                .foregroundStyle(Colors.primary.mono400)
+                .foregroundStyle(Primitives.Colours.neutrals500)
         }
     }
 }

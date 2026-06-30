@@ -40,8 +40,8 @@ public struct HorizontalProductCard: View {
                         .resizable()
                         .scaledToFit()
                 },
-                placeholder: { Colors.primary.mono050 },
-                failure: { _ in Colors.primary.mono050 }
+                placeholder: { Primitives.Colours.neutrals100 },
+                failure: { _ in Primitives.Colours.neutrals100 }
             )
         }
         .frame(width: Constants.productImageWidth, height: Constants.productImageHeight)
@@ -56,7 +56,7 @@ public struct HorizontalProductCard: View {
     private var productNameView: some View {
         Text.build(theme.font.body.small(viewModel.name))
             .lineLimit(Constants.productNameLineLimit)
-            .foregroundStyle(Colors.primary.mono500)
+            .foregroundStyle(Primitives.Colours.neutrals500)
             .accessibilityIdentifier(AccessibilityId.productName)
     }
 
@@ -64,11 +64,11 @@ public struct HorizontalProductCard: View {
         HStack(spacing: Spacing.space100) {
             if let colorTitle = viewModel.colorTitle {
                 Text.build(theme.font.body.small(colorTitle))
-                    .foregroundStyle(Colors.primary.mono500)
+                    .foregroundStyle(Primitives.Colours.neutrals500)
             }
             if let color = viewModel.color {
                 Text.build(theme.font.body.small(color))
-                    .foregroundStyle(Colors.primary.mono700)
+                    .foregroundStyle(Primitives.Colours.neutrals600)
             }
         }
         .lineLimit(Constants.productColorLineLimit)
@@ -80,11 +80,11 @@ public struct HorizontalProductCard: View {
         HStack(spacing: Spacing.space100) {
             if let sizeTitle = viewModel.sizeTitle {
                 Text.build(theme.font.body.small(sizeTitle))
-                    .foregroundStyle(Colors.primary.mono500)
+                    .foregroundStyle(Primitives.Colours.neutrals500)
             }
             if let size = viewModel.size {
                 Text.build(theme.font.body.small(size))
-                    .foregroundStyle(Colors.primary.mono700)
+                    .foregroundStyle(Primitives.Colours.neutrals600)
             }
         }
         .lineLimit(Constants.productSizeLineLimit)

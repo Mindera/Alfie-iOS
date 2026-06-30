@@ -27,10 +27,10 @@ public struct ColorSwatchView: View {
     public var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: size / 2)
-                .stroke(isSelected ? Colors.primary.black : .clear, lineWidth: Constants.borderLineWidth)
+                .stroke(isSelected ? Primitives.Colours.neutrals900 : .clear, lineWidth: Constants.borderLineWidth)
             RoundedRectangle(cornerRadius: size - (Constants.borderLineWidth * 2) / 2)
                 .inset(by: Constants.borderLineWidth)
-                .stroke(isSelected ? Colors.primary.white : .clear, lineWidth: Constants.borderLineWidth)
+                .stroke(isSelected ? Primitives.Colours.neutrals0 : .clear, lineWidth: Constants.borderLineWidth)
         }
         .background {
             ZStack {
@@ -58,8 +58,8 @@ public struct ColorSwatchView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: size, height: size)
                         },
-                        placeholder: { Colors.primary.mono050 },
-                        failure: { _ in Colors.primary.black }
+                        placeholder: { Primitives.Colours.neutrals100 },
+                        failure: { _ in Primitives.Colours.neutrals900 }
                     )
                 }
 

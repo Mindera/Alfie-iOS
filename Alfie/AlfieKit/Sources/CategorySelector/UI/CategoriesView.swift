@@ -48,7 +48,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     // MARK: - Subviews
 
     private func categoryView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title, isShimmering: false, foregroundColor: Colors.primary.mono800)
+        categoriesListItem(for: category.title, isShimmering: false, foregroundColor: Primitives.Colours.neutrals700)
             .modifier(
                 TapHighlightableModifier {
                     withAnimation(.standard) {
@@ -59,7 +59,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private func placeholderView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title, isShimmering: true, foregroundColor: Colors.primary.mono300)
+        categoriesListItem(for: category.title, isShimmering: true, foregroundColor: Primitives.Colours.neutrals400)
     }
 
     private var errorView: some View {
