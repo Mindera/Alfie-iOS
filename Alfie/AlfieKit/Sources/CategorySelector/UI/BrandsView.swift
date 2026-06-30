@@ -272,7 +272,7 @@ extension BrandsView {
         }
 
         private func dragObserver(geometry: GeometryProxy, title: String) -> some View {
-            let emptyView = Rectangle().fill(Color.clear)
+            let emptyView = Rectangle().fill(Primitives.Colours.transparentTransparent)
 
             guard title != selectedIndexTitle else { return emptyView }
 
@@ -302,7 +302,7 @@ extension BrandsView {
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
                     RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                        .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Color.clear)
+                        .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Primitives.Colours.transparentTransparent)
                 }
         }
     }

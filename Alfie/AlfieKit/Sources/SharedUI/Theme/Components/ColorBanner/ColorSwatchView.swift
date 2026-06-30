@@ -65,10 +65,10 @@ public struct ColorSwatchView: View {
 
                 if item.isDisabled {
                     RoundedRectangle(cornerRadius: size / 2)
-                        .fill(Color.white)
+                        .fill(Primitives.Colours.neutrals0)
                         .opacity(Constants.disabledOpacity)
                     UnavailableCrossedOutShape()
-                        .stroke(Color.white, lineWidth: 1)
+                        .stroke(Primitives.Colours.neutrals0, lineWidth: 1)
                         .frame(width: size, height: size)
                 }
             }

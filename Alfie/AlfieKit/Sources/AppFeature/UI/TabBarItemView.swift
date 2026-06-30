@@ -31,7 +31,7 @@ struct TabBarItemView: View {
                     .offset(y: Constants.offsetLineSelected)
                     .matchedGeometryEffect(id: Constants.effectID, in: namespace)
             } else {
-                Color.clear.frame(height: Constants.lineHeight)
+                Primitives.Colours.transparentTransparent.frame(height: Constants.lineHeight)
             }
             tab.icon.image
                 .renderingMode(.template)

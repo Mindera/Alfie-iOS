@@ -57,10 +57,10 @@ public class DesignSystem: DesignSystemProtocol {
         appearance.backgroundColor = backgroundColor
 
         let backButtonAppearance = UIBarButtonItemAppearance(style: .plain)
-        backButtonAppearance.focused.titleTextAttributes = [.foregroundColor: UIColor.clear]
-        backButtonAppearance.disabled.titleTextAttributes = [.foregroundColor: UIColor.clear]
-        backButtonAppearance.highlighted.titleTextAttributes = [.foregroundColor: UIColor.clear]
-        backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+        backButtonAppearance.focused.titleTextAttributes = [.foregroundColor: Primitives.Colours.transparentTransparent.ui]
+        backButtonAppearance.disabled.titleTextAttributes = [.foregroundColor: Primitives.Colours.transparentTransparent.ui]
+        backButtonAppearance.highlighted.titleTextAttributes = [.foregroundColor: Primitives.Colours.transparentTransparent.ui]
+        backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: Primitives.Colours.transparentTransparent.ui]
 
         backButtonAppearance.focused.titlePositionAdjustment = .init(horizontal: -44, vertical: 0)
         backButtonAppearance.disabled.titlePositionAdjustment = .init(horizontal: -44, vertical: 0)
