@@ -10,18 +10,18 @@ public struct HorizontalProductCard: View {
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: Spacing.space200) {
+        HStack(alignment: .top, spacing: Primitives.Spacing.spacing16) {
             productImageView
                 .accessibilityIdentifier(AccessibilityId.productImage)
-            VStack(alignment: .leading, spacing: Spacing.space0) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
                 productDesignerView
-                    .padding(.bottom, Spacing.space075)
+                    .padding(.bottom, Primitives.Spacing.spacing8)
                 productNameView
-                    .padding(.bottom, Spacing.space075)
+                    .padding(.bottom, Primitives.Spacing.spacing8)
                 productColorView
-                    .padding(.bottom, Spacing.space075)
+                    .padding(.bottom, Primitives.Spacing.spacing8)
                 productSizeView
-                    .padding(.bottom, Spacing.space100)
+                    .padding(.bottom, Primitives.Spacing.spacing8)
                 productPriceView
             }
 
@@ -61,7 +61,7 @@ public struct HorizontalProductCard: View {
     }
 
     private var productColorView: some View {
-        HStack(spacing: Spacing.space100) {
+        HStack(spacing: Primitives.Spacing.spacing8) {
             if let colorTitle = viewModel.colorTitle {
                 Text.build(theme.font.body.small(colorTitle))
                     .foregroundStyle(Primitives.Colours.neutrals500)
@@ -77,7 +77,7 @@ public struct HorizontalProductCard: View {
     }
 
     private var productSizeView: some View {
-        HStack(spacing: Spacing.space100) {
+        HStack(spacing: Primitives.Spacing.spacing8) {
             if let sizeTitle = viewModel.sizeTitle {
                 Text.build(theme.font.body.small(sizeTitle))
                     .foregroundStyle(Primitives.Colours.neutrals500)

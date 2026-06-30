@@ -41,11 +41,11 @@ public struct Tag: View {
     }
 
     public var body: some View {
-        HStack(spacing: Spacing.space0) {
+        HStack(spacing: Primitives.Spacing.spacing0) {
             Rectangle()
                 .fill(configuration.color)
                 .frame(width: Constants.strokeWidth)
-            HStack(spacing: Spacing.space100) {
+            HStack(spacing: Primitives.Spacing.spacing8) {
                 if let icon = configuration.icon {
                     icon
                         .resizable()
@@ -65,7 +65,7 @@ public struct Tag: View {
                     })
                 }
             }
-            .padding(.horizontal, Spacing.space150)
+            .padding(.horizontal, Primitives.Spacing.spacing12)
         }
         .background(Primitives.Colours.neutrals100)
         .cornerRadius(Constants.cornerRadius)

@@ -5,12 +5,12 @@ struct IconographyDemoView: View {
     var body: some View {
         ScrollView {
             DemoHelper.demoSectionHeader(title: "Iconography")
-                .padding(.horizontal, Spacing.space200)
-                .padding(.bottom, Spacing.space400)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.bottom, Primitives.Spacing.spacing32)
 
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(), alignment: .top), count: 4),
-                spacing: Spacing.space400
+                spacing: Primitives.Spacing.spacing32
             ) {
                 ForEach(Icon.allCases, id: \.rawValue) { icon in
                     VStack {
@@ -26,7 +26,7 @@ struct IconographyDemoView: View {
                     }
                 }
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
 
             Spacer()
         }

@@ -14,11 +14,11 @@ struct SnackbarDemoView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoHeader(title: "Catalogue App")
-                .padding(.vertical, Spacing.space050)
+                .padding(.vertical, Primitives.Spacing.spacing4)
             ScrollView {
-                VStack(spacing: Spacing.space250) {
+                VStack(spacing: Primitives.Spacing.spacing20) {
                     DemoHelper.demoSectionHeader(title: "Snackbars")
 
                     ThemedToggleView(isOn: $showIcon) { Text.build(theme.font.body.small("Show icon")) }
@@ -53,7 +53,7 @@ struct SnackbarDemoView: View {
 
                     Spacer()
                 }
-                .padding(.horizontal, Spacing.space200)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
             }
         }
         .snackbarView(configuration: $snackbarConfig)
@@ -67,7 +67,7 @@ struct SnackbarDemoView: View {
 
     private func button(label: String) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: CornerRadius.m)
+            RoundedRectangle(cornerRadius: Sizing.radiusStrong)
                 .fill(.black)
             Text.build(theme.font.body.medium(label))
                 .padding()

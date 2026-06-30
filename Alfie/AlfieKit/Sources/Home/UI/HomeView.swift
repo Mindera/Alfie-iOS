@@ -28,8 +28,8 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
             .onTapGesture {
                 viewModel.didTapSearch()
             }
-            .padding(.horizontal, Spacing.space200)
-            .padding(.vertical, Spacing.space100)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.vertical, Primitives.Spacing.spacing8)
 
             Spacer()
 

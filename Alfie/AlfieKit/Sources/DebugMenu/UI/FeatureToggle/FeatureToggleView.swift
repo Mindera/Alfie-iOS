@@ -17,7 +17,7 @@ struct FeatureToggleView<ViewModel: FeatureToggleViewModelProtocol>: View {
             }
 
             Divider()
-            Spacer(minLength: Spacing.space200)
+            Spacer(minLength: Primitives.Spacing.spacing16)
 
             if viewModel.isDebugConfigurationEnabled {
                 ForEach(viewModel.features, id: \.feature) { feature, _ in
@@ -27,7 +27,7 @@ struct FeatureToggleView<ViewModel: FeatureToggleViewModelProtocol>: View {
                 }
             }
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .onAppear {
             viewModel.viewDidAppear()
         }

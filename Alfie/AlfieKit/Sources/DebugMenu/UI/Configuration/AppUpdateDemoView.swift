@@ -26,12 +26,12 @@ struct AppUpdateDemoView: View {
     var body: some View {
         VStack(alignment: .leading) {
             DemoHelper.demoSectionHeader(title: "Current App version: \(Bundle.main.appVersion)")
-                .padding(.bottom, Spacing.space200)
+                .padding(.bottom, Primitives.Spacing.spacing16)
             softAppUpdate
             forceAppUpdate
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .alert(
             softAppUpdateInfo?.title ?? "",
             isPresented: $isShowingAppUpdateAlert,
@@ -44,12 +44,12 @@ struct AppUpdateDemoView: View {
 
     @ViewBuilder private var softAppUpdate: some View {
         DemoHelper.demoSectionHeader(title: "Soft Update")
-            .padding(.top, Spacing.space200)
+            .padding(.top, Primitives.Spacing.spacing16)
 
         if let softUpdate = configurationService.softAppUpdateInfo {
             ThemedButton(text: "Open") { isShowingAppUpdateAlert = true }
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.top, -Spacing.space700)
+                .padding(.top, -Primitives.Spacing.spacing56)
 
             appUpdateInfoView(softUpdate, isActive: configurationService.isSoftAppUpdateAvailable)
         } else {
@@ -59,7 +59,7 @@ struct AppUpdateDemoView: View {
 
     @ViewBuilder private var forceAppUpdate: some View {
         DemoHelper.demoSectionHeader(title: "Force Update")
-            .padding(.top, Spacing.space400)
+            .padding(.top, Primitives.Spacing.spacing32)
 
         if let forceUpdate = configurationService.forceAppUpdateInfo {
             ThemedButton(text: "Open") {
@@ -70,7 +70,7 @@ struct AppUpdateDemoView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
-            .padding(.top, -Spacing.space700)
+            .padding(.top, -Primitives.Spacing.spacing56)
 
             appUpdateInfoView(forceUpdate, isActive: configurationService.isForceAppUpdateAvailable)
         } else {
@@ -84,7 +84,7 @@ struct AppUpdateDemoView: View {
             if isActive {
                 Text.build(theme.font.body.small("Prompt enabled"))
                     .foregroundStyle(Primitives.Colours.semanticError700)
-                    .padding(.bottom, Spacing.space100)
+                    .padding(.bottom, Primitives.Spacing.spacing8)
             }
 
             let rows: [(label: String, value: String?)] = [
@@ -115,7 +115,7 @@ struct AppUpdateDemoView: View {
                     .foregroundStyle(Primitives.Colours.neutrals400)
             }
         }
-        .padding(.bottom, Spacing.space025)
+        .padding(.bottom, Primitives.Spacing.spacing2)
     }
 }
 

@@ -29,13 +29,13 @@ struct ProductListingFilter: View {
     }
 
     var body: some View {
-        VStack(spacing: Spacing.space100) {
+        VStack(spacing: Primitives.Spacing.spacing8) {
             header
             ThemedDivider.horizontalThin
-            VStack(spacing: Spacing.space300) {
+            VStack(spacing: Primitives.Spacing.spacing24) {
                 listStyleView
                 sortView
-            }.padding(.vertical, Spacing.space200)
+            }.padding(.vertical, Primitives.Spacing.spacing16)
             Spacer()
             ThemedButton(text: L10n.Plp.ShowResults.Button.cta) {
                 onFilter()
@@ -57,7 +57,7 @@ struct ProductListingFilter: View {
             ThemedToolbarTitle(style: .text(L10n.Plp.RefineAndSort.title))
             Spacer()
         }
-        .padding(.horizontal, Spacing.space300)
+        .padding(.horizontal, Primitives.Spacing.spacing24)
     }
 
     var sortView: some View {
@@ -76,12 +76,12 @@ struct ProductListingFilter: View {
             Spacer()
             ProductListingListStyleSelector(selectedStyle: $listStyle)
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     private enum Constants {
         static let listStyleFontSize: CGFloat = 18
-        static let listStyleFont = ThemeProvider.shared.font.body.medium.uiFont.withSize(Constants.listStyleFontSize).font
+        static let listStyleFont = DesignSystem.shared.font.body.medium.uiFont.withSize(Constants.listStyleFontSize).font
     }
 }
 

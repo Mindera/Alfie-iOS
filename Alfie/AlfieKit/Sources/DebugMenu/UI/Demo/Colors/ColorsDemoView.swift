@@ -5,7 +5,7 @@ import SwiftUI
 struct ColorsDemoView: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.space250) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Color Palette - Primary")
 
                 primaryColorView
@@ -17,7 +17,7 @@ struct ColorsDemoView: View {
 
                 secondaryColorView
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
     }
 
@@ -72,7 +72,7 @@ struct ColorsDemoView: View {
             Text.build(theme.font.body.small(name))
                 .foregroundStyle(colors.first ?? Primitives.Colours.neutrals900)
             ScrollView(.horizontal) {
-                HStack(spacing: Spacing.space0) {
+                HStack(spacing: Primitives.Spacing.spacing0) {
                     ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
                         colorView(with: color)
                     }

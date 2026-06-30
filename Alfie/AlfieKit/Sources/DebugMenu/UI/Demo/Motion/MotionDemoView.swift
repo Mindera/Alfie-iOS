@@ -35,7 +35,7 @@ struct MotionDemoView: View {
     @State private var showRectangle = false
 
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoSectionHeader(title: "Motion")
 
             HStack {
@@ -82,11 +82,11 @@ struct MotionDemoView: View {
                         .foregroundStyle(Primitives.Colours.neutrals500)
                 }
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
             .frame(maxWidth: showRectangle ? .infinity : 0, maxHeight: showRectangle ? 300 : 0)
             Spacer()
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .edgesIgnoringSafeArea(.bottom)
     }
 

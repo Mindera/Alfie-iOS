@@ -17,7 +17,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     var body: some View {
         ScrollView {
             if !viewModel.state.didFail {
-                LazyVStack(spacing: Spacing.space0) {
+                LazyVStack(spacing: Primitives.Spacing.spacing0) {
                     ForEach(viewModel.categories, id: \.id) { category in
                         if viewModel.state.isLoading {
                             placeholderView(category)
@@ -77,7 +77,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color) -> some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             HStack {
                 Text.build(theme.font.body.medium(text))
                     .foregroundStyle(foregroundColor)
@@ -94,7 +94,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
 
             ThemedDivider.horizontalThin
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 }
 

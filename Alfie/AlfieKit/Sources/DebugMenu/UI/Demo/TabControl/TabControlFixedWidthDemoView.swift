@@ -5,7 +5,7 @@ struct TabControlFixedWidthDemoView: View {
     @State private var theme = TabControl.Theme.light
     @State private var currentIndex: Int = 0
     @State private var numberOfOptions = 3
-    @State private var padding: CGFloat = Spacing.space100
+    @State private var padding: CGFloat = Primitives.Spacing.spacing8
     @State private var showIcons = false
     private let options = ["Reviews", "Offers", "Delivery", "Promos"]
     private var themeOptions = TabControl.Theme.allCases
@@ -62,7 +62,7 @@ struct TabControlFixedWidthDemoView: View {
                 Slider(value: $padding, in: 0...32)
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal, Spacing.space300)
+            .padding(.horizontal, Primitives.Spacing.spacing24)
         }
     }
 }

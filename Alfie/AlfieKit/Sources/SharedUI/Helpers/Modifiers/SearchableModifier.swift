@@ -209,7 +209,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             if showSearchBar {
                 let isGrowFromTrailingIconAnimation = animatingTransition && transition?.isGrowFromTrailingIcon == true
                 ThemedSearchBarView(
@@ -227,7 +227,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
                 )
                 .optionalMatchedGeometryEffect(id: transition?.geometryEffectID, in: transition?.namespace)
                 .focused($searchBarFocused)
-                .padding(.horizontal, Spacing.space200)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
                 // verticalSpacing is not applied to the VStack because if you have many items on content, it will affect all of them
                 .padding(.bottom, verticalSpacing)
                 .scaleEffect(

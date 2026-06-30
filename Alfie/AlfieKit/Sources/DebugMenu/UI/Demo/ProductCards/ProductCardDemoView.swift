@@ -10,24 +10,24 @@ struct ProductCardDemoView: View {
         ScrollView {
             VStack {
                 DemoHelper.demoSectionHeader(title: "Product Card - XS")
-                    .padding(.bottom, Spacing.space400)
+                    .padding(.bottom, Primitives.Spacing.spacing32)
                 productCardListXS
-                    .padding(.trailing, -Spacing.space200)
+                    .padding(.trailing, -Primitives.Spacing.spacing16)
 
                 DemoHelper.demoSectionHeader(title: "Product Card - Small")
-                    .padding(.bottom, Spacing.space250)
-                    .padding(.top, Spacing.space100)
+                    .padding(.bottom, Primitives.Spacing.spacing20)
+                    .padding(.top, Primitives.Spacing.spacing8)
                 productCardListS
 
                 DemoHelper.demoSectionHeader(title: "Product Card - Medium")
-                    .padding(.vertical, Spacing.space250)
+                    .padding(.vertical, Primitives.Spacing.spacing20)
                 productCardListMedium
 
                 DemoHelper.demoSectionHeader(title: "Product Card - Large")
-                    .padding(.vertical, Spacing.space250)
+                    .padding(.vertical, Primitives.Spacing.spacing20)
                 productCardListLarge
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .onRotate { newOrientation in
             orientation = newOrientation
@@ -37,7 +37,7 @@ struct ProductCardDemoView: View {
 
 extension ProductCardDemoView {
     private var productCardListXS: some View {
-        VStack(alignment: .leading, spacing: Spacing.space200) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
             ForEach(Product.fixtures) { product in
                 HorizontalProductCard(viewModel: .init(product: product, colorTitle: "Color:", sizeTitle: "Size:"))
             }
@@ -46,10 +46,10 @@ extension ProductCardDemoView {
 
     @ViewBuilder private var productCardListS: some View {
         ProgressableHorizontalScrollView(
-            scrollViewConfiguration: .init(horizontalPadding: Spacing.space0),
-            progressBarConfiguration: .init(horizontalPadding: Spacing.space800)
+            scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing0),
+            progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing64)
         ) {
-            HStack(alignment: .top, spacing: Spacing.space150) {
+            HStack(alignment: .top, spacing: Primitives.Spacing.spacing12) {
                 ForEach(Product.fixtures) { product in
                     VerticalProductCard(
                         viewModel: .init(configuration: .init(size: .small), product: product)
@@ -70,10 +70,10 @@ extension ProductCardDemoView {
         // swiftlint:enable vertical_whitespace_between_cases
         LazyVGrid(
             columns: Array(
-                repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
+                repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
                 count: columns
             ),
-            spacing: Spacing.space200
+            spacing: Primitives.Spacing.spacing16
         ) {
             ForEach(Product.fixtures) { product in
                 VerticalProductCard(viewModel: .init(configuration: .init(size: .medium), product: product)) { _, _ in }
@@ -92,10 +92,10 @@ extension ProductCardDemoView {
         // swiftlint:enable vertical_whitespace_between_cases
         LazyVGrid(
             columns: Array(
-                repeating: GridItem(.flexible(), spacing: Spacing.space200, alignment: .top),
+                repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
                 count: columns
             ),
-            spacing: Spacing.space200
+            spacing: Primitives.Spacing.spacing16
         ) {
             ForEach(Product.fixtures) { product in
                 VerticalProductCard(viewModel: .init(configuration: .init(size: .large), product: product)) { _, _ in }

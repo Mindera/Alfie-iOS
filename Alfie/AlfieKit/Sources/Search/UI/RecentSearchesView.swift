@@ -13,12 +13,12 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             recentSearchesHeader
             recentSearchesList
             Spacer()
         }
-        .padding(.top, Spacing.space200)
+        .padding(.top, Primitives.Spacing.spacing16)
         .onDisappear {
             viewModel.viewDidDisappear()
         }
@@ -31,14 +31,14 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
             Spacer()
             clearAllButton
         }
-        .padding(.horizontal, Spacing.space200)
-        .padding(.bottom, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.bottom, Primitives.Spacing.spacing16)
     }
 
     private var recentSearchesList: some View {
         ForEach(viewModel.recentSearches, id: \.self) { recentSearch in
             recentSearchView(for: recentSearch)
-                .padding(.vertical, Spacing.space050)
+                .padding(.vertical, Primitives.Spacing.spacing4)
         }
     }
 
@@ -51,9 +51,9 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 Spacer()
                 recentSearchRemoveButton(for: recentSearch)
             }
-            .padding(.horizontal, Spacing.space300)
+            .padding(.horizontal, Primitives.Spacing.spacing24)
         }
-        .padding(.vertical, Spacing.space100)
+        .padding(.vertical, Primitives.Spacing.spacing8)
         .modifier(TapHighlightableModifier { viewModel.didTapRecentSearch(recentSearch) })
         .accessibilityIdentifier(AccessibilityId.recentSearchItem)
     }
@@ -68,7 +68,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(width: Spacing.space200, height: Spacing.space200)
+                .frame(width: Primitives.Spacing.spacing16, height: Primitives.Spacing.spacing16)
                 .foregroundStyle(Primitives.Colours.neutrals800)
         })
         .accessibilityIdentifier(AccessibilityId.removeRecentSearchButton)

@@ -59,10 +59,10 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
                         .foregroundStyle(Primitives.Colours.neutrals800)
                 }
             }
-            .padding([.top, .horizontal], Spacing.space200)
+            .padding([.top, .horizontal], Primitives.Spacing.spacing16)
 
             ThemedDivider.horizontalThin
-                .padding(.bottom, Spacing.space100)
+                .padding(.bottom, Primitives.Spacing.spacing8)
 
             itemsView
         }
@@ -91,7 +91,7 @@ private extension ProductDetailsColorAndSizeSheet {
                         viewModel.colorSelectionConfiguration.selectedItem = item
                         isPresented = false
                     } label: {
-                        HStack(spacing: Spacing.space200) {
+                        HStack(spacing: Primitives.Spacing.spacing16) {
                             ColorSwatchView(
                                 item: item,
                                 swatchSize: .normal,
@@ -112,8 +112,8 @@ private extension ProductDetailsColorAndSizeSheet {
                     ThemedDivider.horizontalThin
                 }
             }
-            .padding(.horizontal, Spacing.space200)
-            .padding(.vertical, Spacing.space100)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.vertical, Primitives.Spacing.spacing8)
         }
         .searchable(
             placeholder: L10n.Pdp.SearchColors.placeholder,
@@ -121,7 +121,7 @@ private extension ProductDetailsColorAndSizeSheet {
             searchText: $searchText,
             theme: .soft,
             dismissConfiguration: .init(type: .cancel(title: L10n.SearchBar.cancel)),
-            verticalSpacing: Spacing.space200
+            verticalSpacing: Primitives.Spacing.spacing16
         )
     }
 
@@ -133,7 +133,7 @@ private extension ProductDetailsColorAndSizeSheet {
                         viewModel.sizingSelectionConfiguration.selectedItem = item
                         isPresented = false
                     } label: {
-                        HStack(spacing: Spacing.space200) {
+                        HStack(spacing: Primitives.Spacing.spacing16) {
                             Text.build(theme.font.body.medium(item.name.capitalized))
 
                             Spacer()
@@ -143,14 +143,14 @@ private extension ProductDetailsColorAndSizeSheet {
                             }
                         }
                     }
-                    .padding(.vertical, Spacing.space100)
+                    .padding(.vertical, Primitives.Spacing.spacing8)
                     .tint(Primitives.Colours.neutrals900)
 
                     ThemedDivider.horizontalThin
                 }
             }
-            .padding(.horizontal, Spacing.space200)
-            .padding(.vertical, Spacing.space100)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.vertical, Primitives.Spacing.spacing8)
         }
     }
 

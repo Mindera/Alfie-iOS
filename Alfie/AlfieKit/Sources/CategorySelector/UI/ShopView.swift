@@ -54,9 +54,9 @@ struct ShopView<
     }
 
     var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             segmentedView
-                .padding(Spacing.space200)
+                .padding(Primitives.Spacing.spacing16)
                 .onChange(of: selectedSegment) { newValue in
                     activeTab = newValue.object as? ShopViewTab ?? .categories
                 }

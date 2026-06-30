@@ -33,7 +33,7 @@ struct SegmentsDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.space250) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
                 // Section 1
                 DemoHelper.demoSectionHeader(title: "3 segments with standard padding")
 
@@ -143,7 +143,7 @@ struct SegmentsDemoView: View {
                 Segment(title: "Brands", icon: Icon.heart.image, CategoryPages.brands),
             ]
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     @ViewBuilder

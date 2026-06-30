@@ -161,7 +161,7 @@ struct DeepLinkDemoView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.space200) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
             mainTabsOptions
             categoriesOptions
             shopOptions
@@ -169,14 +169,14 @@ struct DeepLinkDemoView: View {
             customDeeplinkOption
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     // MARK: - Private
 
     @ViewBuilder private var mainTabsOptions: some View {
         DemoHelper.demoSectionHeader(title: "Main Tabs")
-            .padding(.bottom, Spacing.space200)
+            .padding(.bottom, Primitives.Spacing.spacing16)
 
         ForEach(TabLinks.allCases, id: \.self) { link in
             ThemedButton(text: link.label, style: .underline) {
@@ -187,7 +187,7 @@ struct DeepLinkDemoView: View {
 
     @ViewBuilder private var categoriesOptions: some View {
         DemoHelper.demoSectionHeader(title: "Categories")
-            .padding(.vertical, Spacing.space200)
+            .padding(.vertical, Primitives.Spacing.spacing16)
 
         ForEach(CategoriesLinks.allCases, id: \.self) { category in
             categoryView(category)
@@ -196,7 +196,7 @@ struct DeepLinkDemoView: View {
 
     @ViewBuilder private var shopOptions: some View {
         DemoHelper.demoSectionHeader(title: "Shop")
-            .padding(.vertical, Spacing.space200)
+            .padding(.vertical, Primitives.Spacing.spacing16)
 
         ForEach(ShopLinks.allCases, id: \.self) { shopLink in
             ThemedButton(text: shopLink.label, style: .underline) {
@@ -207,7 +207,7 @@ struct DeepLinkDemoView: View {
 
     @ViewBuilder private var productOptions: some View {
         DemoHelper.demoSectionHeader(title: "Product Details")
-            .padding(.vertical, Spacing.space200)
+            .padding(.vertical, Primitives.Spacing.spacing16)
 
         ForEach(ProductLinks.allCases, id: \.self) { product in
             ThemedButton(text: product.label, style: .underline) {
@@ -218,14 +218,14 @@ struct DeepLinkDemoView: View {
 
     @ViewBuilder private var customDeeplinkOption: some View {
         DemoHelper.demoSectionHeader(title: "Custom")
-            .padding(.vertical, Spacing.space200)
+            .padding(.vertical, Primitives.Spacing.spacing16)
 
-        HStack(alignment: .center, spacing: Spacing.space200) {
+        HStack(alignment: .center, spacing: Primitives.Spacing.spacing16) {
             VStack(alignment: .leading) {
                 ThemedInput($customWebPath, title: "Path")
                     .textInputAutocapitalization(.never)
 
-                HStack(spacing: Spacing.space050) {
+                HStack(spacing: Primitives.Spacing.spacing4) {
                     Text.build(theme.font.body.small("URL:"))
                         .foregroundStyle(Primitives.Colours.neutrals500)
                     Text.build(theme.font.body.small(webViewUrl.absoluteString))
@@ -243,7 +243,7 @@ struct DeepLinkDemoView: View {
 
     @ViewBuilder
     private func categoryView(_ category: CategoriesLinks) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space200) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
             ThemedButton(text: category.label, style: .underline) {
                 open(url: buildUrl(category: category))
             }
@@ -259,7 +259,7 @@ struct DeepLinkDemoView: View {
         _ subCategory: SubCategoriesLinks,
         parentCategory: CategoriesLinks
     ) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space200) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
             ThemedButton(text: subCategory.label, style: .underline) {
                 open(url: buildUrl(category: parentCategory, subCategory: subCategory))
             }
@@ -268,7 +268,7 @@ struct DeepLinkDemoView: View {
                 subSubCategoryView(subSubCategory, parentSubCategory: subCategory, parentCategory: parentCategory)
             }
         }
-        .padding(.leading, Spacing.space300)
+        .padding(.leading, Primitives.Spacing.spacing24)
     }
 
     @ViewBuilder
@@ -277,7 +277,7 @@ struct DeepLinkDemoView: View {
         parentSubCategory: SubCategoriesLinks,
         parentCategory: CategoriesLinks
     ) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space200) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
             ThemedButton(text: subSubCategory.label, style: .underline) {
                 open(
                     url: buildUrl(
@@ -288,7 +288,7 @@ struct DeepLinkDemoView: View {
                 )
             }
         }
-        .padding(.leading, Spacing.space300)
+        .padding(.leading, Primitives.Spacing.spacing24)
     }
 
     private func buildUrl(

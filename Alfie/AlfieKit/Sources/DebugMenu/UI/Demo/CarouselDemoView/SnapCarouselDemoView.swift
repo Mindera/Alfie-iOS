@@ -6,10 +6,10 @@ public struct SnapCarouselDemoView: View {
     @State private var index: Int = 0
 
     public var body: some View {
-        VStack(spacing: Spacing.space200) {
+        VStack(spacing: Primitives.Spacing.spacing16) {
             DemoHelper.demoSectionHeader(title: "PDP Image Gallery")
-                .padding(.horizontal, Spacing.space200)
-                .padding(.bottom, Spacing.space0)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.bottom, Primitives.Spacing.spacing0)
             SnapCarousel(
                 itemIndex: $index
             ) {
@@ -17,12 +17,12 @@ public struct SnapCarouselDemoView: View {
                     Image(name, bundle: .module)
                         .resizable()
                         .scaledToFit()
-                        .cornerRadius(CornerRadius.s)
+                        .cornerRadius(Sizing.radiusSoft)
                 }
             }
 
             PaginatedControl(configuration: .init(), itemsCount: 4, selectedIndex: $index)
-                .frame(maxHeight: Spacing.space200)
+                .frame(maxHeight: Primitives.Spacing.spacing16)
         }
         Spacer()
     }

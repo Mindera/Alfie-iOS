@@ -33,10 +33,10 @@ public struct BadgeViewModifier: ViewModifier {
                     if !helper.isIndicator {
                         let badgeLabelsOffsetX = CGFloat(helper.badgeLabel.count * Constants.capsuleOffsetXFactor)
                         ZStack(alignment: .center) {
-                            RoundedRectangle(cornerRadius: CornerRadius.full)
+                            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                                 .fill(Primitives.Colours.semanticError600)
                                 .frame(height: Constants.badgeHeight)
-                            RoundedRectangle(cornerRadius: CornerRadius.full)
+                            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                                 .stroke(Primitives.Colours.neutrals0, lineWidth: Constants.borderLineWidth)
                                 .frame(height: Constants.badgeHeight)
                             Text.build(theme.font.body.small(helper.badgeLabel))
@@ -52,7 +52,7 @@ public struct BadgeViewModifier: ViewModifier {
                             Circle()
                                 .fill(Primitives.Colours.semanticError600)
                                 .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
-                            RoundedRectangle(cornerRadius: CornerRadius.full)
+                            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                                 .stroke(Primitives.Colours.neutrals0, lineWidth: Constants.borderLineWidth)
                                 .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
                         }

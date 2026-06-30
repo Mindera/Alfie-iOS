@@ -14,9 +14,9 @@ public struct ContainerDemoViewModifier: ViewModifier {
 
     @ViewBuilder
     public func body(content: Content) -> some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoHeader(title: headerTitle)
-                .padding(.vertical, Spacing.space050)
+                .padding(.vertical, Primitives.Spacing.spacing4)
             if embedInScrollView {
                 ScrollView {
                     content

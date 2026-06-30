@@ -22,7 +22,7 @@ public struct ScrollViewWithOffsetReader<Content: View>: View {
 
     public var body: some View {
         ScrollView(scrollViewAxis) {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 GeometryReader { proxy in
                     Color.clear.preference(
                         key: ScrollViewOffsetPreferenceKey.self,

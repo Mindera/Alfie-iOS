@@ -6,10 +6,10 @@ struct AccordionDemoView: View {
     @State private var isDisabled = false
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Accordion - Small")
 
-                VStack(spacing: Spacing.space0) {
+                VStack(spacing: Primitives.Spacing.spacing0) {
                     AccordionView(text: "Section One", isDisabled: $isDisabled) {
                         Text.build(theme.font.body.small("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet."))
                     }
@@ -19,9 +19,9 @@ struct AccordionDemoView: View {
                 }
 
                 DemoHelper.demoSectionHeader(title: "Accordion - Large")
-                    .padding(.top, Spacing.space400)
+                    .padding(.top, Primitives.Spacing.spacing32)
 
-                VStack(spacing: Spacing.space0) {
+                VStack(spacing: Primitives.Spacing.spacing0) {
                     AccordionView(text: "Section One", type: .large, isDisabled: $isDisabled) {
                         Text.build(theme.font.body.small("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet."))
                     }
@@ -31,12 +31,12 @@ struct AccordionDemoView: View {
                 }
 
                 DemoHelper.demoSectionHeader(title: "Options")
-                    .padding(.top, Spacing.space400)
+                    .padding(.top, Primitives.Spacing.spacing32)
                 ThemedToggleView(isOn: $isDisabled) {
                     Text.build(theme.font.body.medium("Disabled"))
                 }
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
     }
 }

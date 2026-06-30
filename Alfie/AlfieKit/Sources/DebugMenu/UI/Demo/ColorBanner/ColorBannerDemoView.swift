@@ -43,16 +43,16 @@ struct ColorBannerDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 Spacer()
                 section(title: "Color Swatches - Scrollable") {
                     ColorSelectorComponentView(
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
+                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8))
                     )
                     ColorSelectorComponentView(
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
+                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8))
                     )
                 }
 
@@ -63,7 +63,7 @@ struct ColorBannerDemoView: View {
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(
                             arrangement: .chips(
-                                itemHorizontalSpacing: Spacing.space100, itemVerticalSpacing: Spacing.space100
+                                itemHorizontalSpacing: Primitives.Spacing.spacing8, itemVerticalSpacing: Primitives.Spacing.spacing8
                             )
                         )
                     )
@@ -71,7 +71,7 @@ struct ColorBannerDemoView: View {
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
                         layoutConfiguration: .init(
                             arrangement: .chips(
-                                itemHorizontalSpacing: Spacing.space100, itemVerticalSpacing: Spacing.space100
+                                itemHorizontalSpacing: Primitives.Spacing.spacing8, itemVerticalSpacing: Primitives.Spacing.spacing8
                             )
                         )
                     )
@@ -101,12 +101,12 @@ struct ColorBannerDemoView: View {
 
                 Spacer()
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
     }
 
     private func section(title: String, @ViewBuilder content: () -> any View) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space400) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing32) {
             DemoHelper.demoSectionHeader(title: title)
             AnyView(content())
         }

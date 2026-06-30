@@ -250,14 +250,14 @@ public struct ThemedSearchBarView: View {
                     onSubmitTap?()
                 }
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
             .frame(height: theme.searchBarHeight)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: CornerRadius.full)
+                    RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                         .fill(isFocused ? theme.focusedBackgroundColor : theme.unfocusedBackgroundColor)
 
-                    RoundedRectangle(cornerRadius: CornerRadius.full)
+                    RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                         .inset(by: Constants.borderLineWidth)
                         .stroke(
                             isFocused ? theme.focusedBorderColor : theme.unfocusedBorderColor,

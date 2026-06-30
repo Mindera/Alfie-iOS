@@ -140,14 +140,14 @@ public struct PriceComponentView: View {
     }
 
     private func verticalSalePrice(fullPrice: String, finalPrice: String) -> some View {
-        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: Spacing.space050) {
+        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: Primitives.Spacing.spacing4) {
             saleFullPrice(fullPrice)
             saleFinalPrice(finalPrice)
         }
     }
 
     private func horizontalSalePrice(fullPrice: String, finalPrice: String) -> some View {
-        HStack(spacing: Spacing.space050) {
+        HStack(spacing: Primitives.Spacing.spacing4) {
             saleFinalPrice(finalPrice)
             saleFullPrice(fullPrice)
         }
@@ -184,7 +184,7 @@ public struct PriceComponentView: View {
     }
 
     private func verticalRangePrice(lowerBound: String, upperBound: String, separator: String) -> some View {
-        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: Spacing.space0) {
+        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: Primitives.Spacing.spacing0) {
             defaultPrice(lowerBound, textSize: Constants.verticalRangeTextSize(for: configuration.size))
                 .accessibilityIdentifier(AccessibilityId.priceLower)
             defaultPrice(separator, textSize: Constants.verticalRangeTextSize(for: configuration.size))
@@ -195,7 +195,7 @@ public struct PriceComponentView: View {
     }
 
     private func horizontalRangePrice(lowerBound: String, upperBound: String, separator: String) -> some View {
-        HStack(spacing: Spacing.space050) {
+        HStack(spacing: Primitives.Spacing.spacing4) {
             defaultPrice(lowerBound, textSize: Constants.horizontalRangeTextSize(for: configuration.size))
                 .accessibilityIdentifier(AccessibilityId.priceLower)
             defaultPrice(separator, textSize: Constants.horizontalRangeTextSize(for: configuration.size))

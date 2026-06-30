@@ -9,10 +9,10 @@ struct ChipsDemoView: View {
     @State private var counterValue: Int? = 1
 
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoSectionHeader(title: "Chips")
-                .padding(.bottom, Spacing.space400)
-            VStack(spacing: Spacing.space0) {
+                .padding(.bottom, Primitives.Spacing.spacing32)
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 Spacer()
                 Chip(
                     configuration: .init(
@@ -27,7 +27,7 @@ struct ChipsDemoView: View {
                 Spacer()
             }
             .frame(height: 50)
-            .padding(.bottom, Spacing.space400)
+            .padding(.bottom, Primitives.Spacing.spacing32)
             DemoHelper.demoSectionHeader(title: "Options")
             ThemedToggleView(isOn: $isLarge) { Text.build(theme.font.body.small("Large")) }
             ThemedToggleView(isOn: $isCloseable) { Text.build(theme.font.body.small("Closeable")) }
@@ -75,7 +75,7 @@ struct ChipsDemoView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .onChange(of: isSelected) { newValue in
             if newValue {
                 isDisabled = false

@@ -24,7 +24,7 @@ struct TabBarItemView: View {
     }
 
     var body: some View {
-        VStack(spacing: Spacing.space100) {
+        VStack(spacing: Primitives.Spacing.spacing8) {
             if tab == currentTab {
                 Primitives.Colours.neutrals800
                     .frame(height: Constants.lineHeight)

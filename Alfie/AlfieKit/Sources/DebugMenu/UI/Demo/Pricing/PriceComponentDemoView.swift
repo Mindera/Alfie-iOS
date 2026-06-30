@@ -66,7 +66,7 @@ struct PriceComponentDemoView: View {
                 )
             }
             .frame(height: 60)
-            .padding(.vertical, Spacing.space400)
+            .padding(.vertical, Primitives.Spacing.spacing32)
 
             DemoHelper.demoSectionHeader(title: "Options")
             priceTypeOption
@@ -77,7 +77,7 @@ struct PriceComponentDemoView: View {
                 .disabled(!isTextAlignmentAvailable)
             currencyOption
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     private var priceSizeOption: some View {
@@ -96,7 +96,7 @@ struct PriceComponentDemoView: View {
                     .tint(Primitives.Colours.neutrals400)
             }
         }
-        .padding(.top, Spacing.space200)
+        .padding(.top, Primitives.Spacing.spacing16)
     }
 
     private var priceTypeOption: some View {
@@ -115,7 +115,7 @@ struct PriceComponentDemoView: View {
                     .tint(Primitives.Colours.neutrals400)
             }
         }
-        .padding(.top, Spacing.space200)
+        .padding(.top, Primitives.Spacing.spacing16)
     }
 
     private var priceLayoutOption: some View {
@@ -134,7 +134,7 @@ struct PriceComponentDemoView: View {
                     .tint(Primitives.Colours.neutrals400)
             }
         }
-        .padding(.top, Spacing.space200)
+        .padding(.top, Primitives.Spacing.spacing16)
     }
 
     private var priceAlignmentOption: some View {
@@ -153,7 +153,7 @@ struct PriceComponentDemoView: View {
                     .tint(Primitives.Colours.neutrals400)
             }
         }
-        .padding(.top, Spacing.space200)
+        .padding(.top, Primitives.Spacing.spacing16)
     }
 
     private var currencyOption: some View {
@@ -172,7 +172,7 @@ struct PriceComponentDemoView: View {
                     .tint(Primitives.Colours.neutrals400)
             }
         }
-        .padding(.top, Spacing.space200)
+        .padding(.top, Primitives.Spacing.spacing16)
     }
 }
 

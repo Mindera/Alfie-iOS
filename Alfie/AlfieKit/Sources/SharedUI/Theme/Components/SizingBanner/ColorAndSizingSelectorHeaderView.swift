@@ -23,7 +23,7 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                     action?()
                 },
                 label: {
-                    HStack(spacing: Spacing.space050) {
+                    HStack(spacing: Primitives.Spacing.spacing4) {
                         Text.build(theme.font.body.medium(configuration.selectedTitle))
                             .foregroundStyle(Primitives.Colours.neutrals500)
                         Text.build(theme.font.body.medium(configuration.selectedItem?.name ?? ""))

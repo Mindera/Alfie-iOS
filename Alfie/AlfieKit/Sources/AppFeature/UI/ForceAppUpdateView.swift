@@ -19,13 +19,13 @@ struct ForceAppUpdateView: View {
 
     var body: some View {
         HStack {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 ThemedImage.logoBackground.image
                     .resizable(resizingMode: .tile)
             }
             .frame(width: Constants.logoWidth)
 
-            VStack(spacing: Spacing.space400) {
+            VStack(spacing: Primitives.Spacing.spacing32) {
                 Text.build(theme.font.heading.large(configuration.title))
                 Text.build(theme.font.body.medium(configuration.message))
                     .multilineTextAlignment(.center)
@@ -39,9 +39,9 @@ struct ForceAppUpdateView: View {
                         UIApplication.shared.open(url)
                     }
                 }
-                .padding(.top, Spacing.space200)
+                .padding(.top, Primitives.Spacing.spacing16)
             }
-            .padding(.horizontal, Spacing.space400)
+            .padding(.horizontal, Primitives.Spacing.spacing32)
 
             Spacer()
         }

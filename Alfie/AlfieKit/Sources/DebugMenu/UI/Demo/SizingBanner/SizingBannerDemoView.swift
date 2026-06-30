@@ -17,11 +17,11 @@ struct SizingBannerDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 section(title: "Sizing Swatches - Scrollable") {
                     SizingSelectorComponentView(
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space100))
+                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8))
                     )
                 }
 
@@ -32,8 +32,8 @@ struct SizingBannerDemoView: View {
                         configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
                         layoutConfiguration: .init(
                             arrangement: .chips(
-                                itemHorizontalSpacing: Spacing.space100,
-                                itemVerticalSpacing: Spacing.space100
+                                itemHorizontalSpacing: Primitives.Spacing.spacing8,
+                                itemVerticalSpacing: Primitives.Spacing.spacing8
                             )
                         )
                     )
@@ -50,14 +50,14 @@ struct SizingBannerDemoView: View {
 
                 Spacer()
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
     }
 
     private func section(title: String, @ViewBuilder content: () -> any View) -> some View {
         VStack(alignment: .leading) {
             DemoHelper.demoSectionHeader(title: title)
-                .padding(.bottom, Spacing.space400)
+                .padding(.bottom, Primitives.Spacing.spacing32)
 
             AnyView(content())
         }

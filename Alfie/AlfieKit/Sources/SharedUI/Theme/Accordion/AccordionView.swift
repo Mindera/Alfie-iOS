@@ -34,7 +34,7 @@ public struct AccordionView<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             if !notFirst {
                 Rectangle()
                     .fill(accordianColor)
@@ -60,9 +60,9 @@ public struct AccordionView<Content: View>: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .small:
-            return Spacing.space150
+            return Primitives.Spacing.spacing12
         case .large:
-            return Spacing.space200
+            return Primitives.Spacing.spacing16
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -117,22 +117,22 @@ public struct MyDisclosureStyle: DisclosureGroupStyle {
             AccordionView(text: "Accordian component") {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
 
             AccordionView(text: "Accordian component", isDisabled: .constant(true)) {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
 
             AccordionView(text: "Accordian component", type: .large) {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
 
             AccordionView(text: "Accordian component", type: .large, isDisabled: .constant(true)) {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
         }
     }
 }

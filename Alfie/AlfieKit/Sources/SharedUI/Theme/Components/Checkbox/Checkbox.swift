@@ -74,7 +74,7 @@ public struct Checkbox: View {
     }
 
     public var body: some View {
-        HStack(spacing: Spacing.space150) {
+        HStack(spacing: Primitives.Spacing.spacing12) {
             state.correspondingIcon.image
                 .resizable()
                 .scaledToFit()

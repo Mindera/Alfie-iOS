@@ -35,8 +35,8 @@ public struct VerticalProductCard: View {
                 .shimmering(while: $isSkeleton)
                 .accessibilityIdentifier(AccessibilityId.productImage)
 
-            HStack(alignment: .lastTextBaseline, spacing: Spacing.space0) {
-                VStack(alignment: .leading, spacing: Spacing.space050) {
+            HStack(alignment: .lastTextBaseline, spacing: Primitives.Spacing.spacing0) {
+                VStack(alignment: .leading, spacing: Primitives.Spacing.spacing4) {
                     productDesignerView
                     productNameView
                     if !viewModel.configuration.hideDetails {
@@ -111,7 +111,7 @@ public struct VerticalProductCard: View {
     }
 
     private var productColorView: some View {
-        HStack(spacing: Spacing.space100) {
+        HStack(spacing: Primitives.Spacing.spacing8) {
             if let colorTitle = viewModel.colorTitle {
                 Text(colorTitle)
                     .font(Font(viewModel.configuration.smallTextFont))
@@ -161,7 +161,7 @@ public struct VerticalProductCard: View {
             EmptyView()
         case .medium,
              .large: // swiftlint:disable:this indentation_width
-            let topTrailingEdgePadding = viewModel.configuration.size == .medium ? Spacing.space050 : Spacing.space100
+            let topTrailingEdgePadding = viewModel.configuration.size == .medium ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8
             let iconSize = viewModel.configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
