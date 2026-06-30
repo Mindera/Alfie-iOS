@@ -83,16 +83,16 @@ struct ThemedToggleStyle: ToggleStyle {
 // MARK: - ColorToggle
 
 private enum ColorToggle {
-    static var toggleCircle = Color("toggleCircle", bundle: Bundle.module)
-    static var toggleCircleDisabled = Color("toggleCircleDisabled", bundle: Bundle.module)
-    static var toggleBorderOn = Color("toggleBorderOn", bundle: Bundle.module)
-    static var toggleBorderOff = Color("toggleBorderOff", bundle: Bundle.module)
-    static var toggleBorderOnDisabled = Color("toggleBorderOnDisabled", bundle: Bundle.module)
-    static var toggleBorderOffDisabled = Color("toggleBorderOffDisabled", bundle: Bundle.module)
-    static var toggleBackgroundOn = Color("toggleBackgroundOn", bundle: Bundle.module)
-    static var toggleBackgroundOff = Color("toggleBackgroundOff", bundle: Bundle.module)
-    static var toggleBackgroundOnDisabled = Color("toggleBackgroundOnDisabled", bundle: Bundle.module)
-    static var toggleBackgroundOffDisabled = Color("toggleBackgroundOffDisabled", bundle: Bundle.module)
+    static let toggleCircle = Primitives.Colours.neutrals600
+    static let toggleCircleDisabled = Primitives.Colours.neutrals300
+    static let toggleBorderOn = Primitives.Colours.semanticSuccess700
+    static let toggleBorderOff = Primitives.Colours.neutrals300
+    static let toggleBorderOnDisabled = Primitives.Colours.semanticSuccess200
+    static let toggleBorderOffDisabled = Primitives.Colours.neutrals100
+    static let toggleBackgroundOn = Primitives.Colours.semanticSuccess100
+    static let toggleBackgroundOff = Primitives.Colours.neutrals300
+    static let toggleBackgroundOnDisabled = Primitives.Colours.neutrals0
+    static let toggleBackgroundOffDisabled = Primitives.Colours.neutrals100
 }
 
 #Preview {
