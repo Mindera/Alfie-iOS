@@ -40,6 +40,19 @@ struct TokenLoaderTests {
         #expect(loaded.map["~~doc-others-token"] == nil)
     }
 
+    @Test("loads multiple .primitives theme modes into separate colour palettes; base drives the map")
+    func loadsMultipleThemeModes() throws {
+        let loaded = try TokenLoader.load(inputDirectory: miniURL())
+        #expect(loaded.colourThemes.keys.sorted() == ["alfie-theme", "selffridge-theme"])
+        #expect(loaded.baseTheme == "alfie-theme")
+        // Base (alfie) still drives the resolver map — the second theme must NOT clobber it.
+        #expect(loaded.map["colours-neutrals-0"]?.value == .color(components: [1, 1, 1]))
+        // The second theme's colours are parsed (from hex on disk) into their own palette, distinct from base.
+        let selffridge = loaded.colourThemes["selffridge-theme"]
+        #expect(selffridge?.count == 2)
+        #expect(selffridge?["colours-neutrals-0"]?.value != loaded.colourThemes["alfie-theme"]?["colours-neutrals-0"]?.value)
+    }
+
     @Test("parses hex colour strings (6- and 8-digit), case-insensitive")
     func parsesHexColours() throws {
         #expect(try TokenLoader.parseValue(type: "color", raw: "#FFFFFF", name: "x") == .color(components: [1, 1, 1]))
@@ -157,7 +170,8 @@ struct EmitterTests {
     @Test("semantic theme tokens reference primitives, never inline a color literal")
     func themeReferenceGraph() throws {
         let t = try emit()["Theme+Generated.swift"]!
-        #expect(t.contains("public static let surfaceBackgroundPrimary = Primitives.Colours.neutrals0"))
+        // Computed var so semantic colours track the active theme (not frozen at launch).
+        #expect(t.contains("public static var surfaceBackgroundPrimary: Color { Primitives.Colours.neutrals0 }"))
         #expect(!t.contains("Color(.sRGB"))  // reference-graph AC: no hardcoded hex/components in semantic layer
     }
 
@@ -244,6 +258,37 @@ struct EmitterTests {
         #expect(throws: DesignTokenError.self) {
             _ = try emit(twoThemeLoaded(slateComplete: false))
         }
+    }
+
+    @Test("emit (from disk): both primitive theme modes become distinct palettes + AppTheme cases")
+    func emitsDiskThemes() throws {
+        let tc = try Generator.emitInMemory(inputDirectory: miniURL())["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("public static let alfie = ColourPalette("))
+        #expect(tc.contains("public static let selffridge = ColourPalette("))
+        #expect(tc.contains("case alfie = \"alfie-theme\""))
+        #expect(tc.contains("case selffridge = \"selffridge-theme\""))
+    }
+
+    @Test("theme ids colliding to one identifier fail the build")
+    func themeNameCollisionThrows() {
+        let alfie = ["colours-neutrals-0": colourToken("colours-neutrals-0", [1, 1, 1], file: "a")]
+        let loaded = LoadedTokens(
+            map: alfie, primitiveValues: alfie, loadedFiles: ["a"],
+            colourThemes: ["alfie-theme": alfie, "alfie": alfie], baseTheme: "alfie-theme"
+        )
+        #expect(throws: DesignTokenError.self) { _ = try emit(loaded) }
+    }
+
+    @Test("theme id without a -theme suffix keeps its identifier (custom → custom)")
+    func themeVarNameNoSuffix() throws {
+        let alfie = ["colours-neutrals-0": colourToken("colours-neutrals-0", [1, 1, 1], file: "a")]
+        let loaded = LoadedTokens(
+            map: alfie, primitiveValues: alfie, loadedFiles: ["a"],
+            colourThemes: ["alfie-theme": alfie, "custom": alfie], baseTheme: "alfie-theme"
+        )
+        let tc = try emit(loaded)["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("case custom = \"custom\""))
+        #expect(tc.contains("public static let custom = ColourPalette("))
     }
 
     @Test("colour-free input emits a compilable empty ThemeColours (case-less enum, no raw type)")

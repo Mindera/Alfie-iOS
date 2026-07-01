@@ -377,6 +377,8 @@ let package = Package(
             name: "DebugMenuTests",
             dependencies: [
                 "DebugMenu",
+                "Mocks",
+                "SharedUI",
                 "TestUtils",
             ]
         ),

@@ -71,7 +71,9 @@ public struct Emitter {
         var body = ""
         for token in theme {
             let id = SwiftIdentifier.make(token.name)
-            body += "    public static let \(id) = \(try valueOrPrimitiveRef(token))\n"
+            // Computed (not `static let`): semantic colours forward to `Primitives.Colours` which is
+            // theme-swappable, so a `let` would cache the launch theme and go stale after a switch.
+            body += "    public static var \(id): Color { \(try valueOrPrimitiveRef(token)) }\n"
         }
         return """
         \(Self.header)

@@ -120,7 +120,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         viewModel: .init(
             configurationService: MockConfigurationService(),
             apiEndpointService: MockApiEndpointService(),
-            themeService: ThemeService(appDelegate: MockAppDelegate(), userDefaults: MockUserDefaults()),
+            themeService: MockThemeService(),
             closeMenuAction: {},
             openForceAppUpdate: {},
             closeEndpointSelection: {}
