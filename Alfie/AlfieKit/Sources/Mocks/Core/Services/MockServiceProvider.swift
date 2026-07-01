@@ -47,7 +47,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         bagService: BagServiceProtocol = MockBagService(),
         wishlistService: WishlistServiceProtocol = MockWishlistService(),
         sessionService: SessionServiceProtocol = MockSessionService(),
-        themeService: ThemeServiceProtocol = ThemeService(userDefaults: MockUserDefaults())
+        themeService: ThemeServiceProtocol = ThemeService(appDelegate: MockAppDelegate(), userDefaults: MockUserDefaults())
     ) {
         self.analytics = analytics
         self.authenticationService = authenticationService

@@ -35,7 +35,7 @@ final class ServiceProvider: ServiceProviderProtocol {
 
     init() {
         self.userDefaults = UserDefaults.standard
-        self.themeService = ThemeService(userDefaults: userDefaults)
+        self.themeService = ThemeService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 
