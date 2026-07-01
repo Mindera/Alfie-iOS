@@ -1,7 +1,7 @@
 ---
 title: Theme switching — second design-token colour theme (selfFridge) + runtime switch
 ticket: n/a
-status: pending
+status: completed
 complexity: MEDIUM
 mode: auto
 blockedBy: []
