@@ -83,16 +83,18 @@ struct ThemedToggleStyle: ToggleStyle {
 // MARK: - ColorToggle
 
 private enum ColorToggle {
-    static let toggleCircle = Primitives.Colours.neutrals600
-    static let toggleCircleDisabled = Primitives.Colours.neutrals300
-    static let toggleBorderOn = Primitives.Colours.semanticSuccess700
-    static let toggleBorderOff = Primitives.Colours.neutrals300
-    static let toggleBorderOnDisabled = Primitives.Colours.semanticSuccess200
-    static let toggleBorderOffDisabled = Primitives.Colours.neutrals100
-    static let toggleBackgroundOn = Primitives.Colours.semanticSuccess100
-    static let toggleBackgroundOff = Primitives.Colours.neutrals300
-    static let toggleBackgroundOnDisabled = Primitives.Colours.neutrals0
-    static let toggleBackgroundOffDisabled = Primitives.Colours.neutrals100
+    // Computed so a runtime theme switch (+ soft-reboot) is reflected — a `static let` would cache
+    // the launch theme's colour for the process lifetime.
+    static var toggleCircle: Color { Primitives.Colours.neutrals600 }
+    static var toggleCircleDisabled: Color { Primitives.Colours.neutrals300 }
+    static var toggleBorderOn: Color { Primitives.Colours.semanticSuccess700 }
+    static var toggleBorderOff: Color { Primitives.Colours.neutrals300 }
+    static var toggleBorderOnDisabled: Color { Primitives.Colours.semanticSuccess200 }
+    static var toggleBorderOffDisabled: Color { Primitives.Colours.neutrals100 }
+    static var toggleBackgroundOn: Color { Primitives.Colours.semanticSuccess100 }
+    static var toggleBackgroundOff: Color { Primitives.Colours.neutrals300 }
+    static var toggleBackgroundOnDisabled: Color { Primitives.Colours.neutrals0 }
+    static var toggleBackgroundOffDisabled: Color { Primitives.Colours.neutrals100 }
 }
 
 #Preview {

@@ -11,6 +11,11 @@ public enum TokenValue: Equatable {
     indirect case typography(Typography)      // indirect: Typography stores TokenValue (recursive)
     case reference(String)                    // "{token-name}", target name only
 
+    public var isColour: Bool {
+        if case .color = self { return true }
+        return false
+    }
+
     /// Composite typography value; each sub-field is itself a `TokenValue`
     /// (usually `.reference`, except `fontWeight` which the export inlines).
     public struct Typography: Equatable {
