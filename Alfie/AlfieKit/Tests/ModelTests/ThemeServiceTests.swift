@@ -6,14 +6,17 @@ final class ThemeServiceTests: XCTestCase {
 
     private var sut: ThemeService!
     private var userDefaults: UserDefaults!
+    private var appDelegate: SpyAppDelegate!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         userDefaults = UserDefaults(suiteName: Self.suiteName)
+        appDelegate = SpyAppDelegate()
     }
 
     override func tearDownWithError() throws {
         sut = nil
+        appDelegate = nil
         userDefaults.removeSuite(named: Self.suiteName)
         userDefaults.removePersistentDomain(forName: Self.suiteName)
         userDefaults = nil
@@ -21,24 +24,33 @@ final class ThemeServiceTests: XCTestCase {
     }
 
     func test_selectedThemeID_isNilByDefault() {
-        sut = ThemeService(userDefaults: userDefaults)
+        sut = ThemeService(appDelegate: appDelegate, userDefaults: userDefaults)
         XCTAssertNil(sut.selectedThemeID)
     }
 
-    func test_set_persistsAcrossInstances() {
-        sut = ThemeService(userDefaults: userDefaults)
-        sut.set("selffridge-theme")
+    func test_updateThemeAndReboot_persistsAndReboots() {
+        sut = ThemeService(appDelegate: appDelegate, userDefaults: userDefaults)
+        sut.updateThemeAndReboot("selffridge-theme")
+
         XCTAssertEqual(sut.selectedThemeID, "selffridge-theme")
+        XCTAssertEqual(appDelegate.rebootCount, 1)
 
         // A fresh instance reads the persisted value.
-        sut = ThemeService(userDefaults: userDefaults)
-        XCTAssertEqual(sut.selectedThemeID, "selffridge-theme")
+        let reloaded = ThemeService(appDelegate: appDelegate, userDefaults: userDefaults)
+        XCTAssertEqual(reloaded.selectedThemeID, "selffridge-theme")
     }
 
-    func test_set_overwritesPreviousSelection() {
-        sut = ThemeService(userDefaults: userDefaults)
-        sut.set("selffridge-theme")
-        sut.set("alfie-theme")
+    func test_updateThemeAndReboot_overwritesPreviousSelection() {
+        sut = ThemeService(appDelegate: appDelegate, userDefaults: userDefaults)
+        sut.updateThemeAndReboot("selffridge-theme")
+        sut.updateThemeAndReboot("alfie-theme")
+
         XCTAssertEqual(sut.selectedThemeID, "alfie-theme")
+        XCTAssertEqual(appDelegate.rebootCount, 2)
     }
+}
+
+private final class SpyAppDelegate: NSObject, AppDelegateProtocol {
+    private(set) var rebootCount = 0
+    func rebootApp() { rebootCount += 1 }
 }

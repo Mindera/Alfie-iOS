@@ -52,13 +52,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         AppState.shared.sessionID = UUID()
     }
 
-    public func applyTheme(id: String) {
-        // Persist first; the soft-reboot recreates services + re-reads the selection in bootstrap(),
-        // which re-applies the palette and UIKit appearance before the fresh UI is built.
-        serviceProvider.themeService.set(id)
-        rebootApp()
-    }
-
     // MARK: - Private
 
     private func bootstrap(application: UIApplication?) {
