@@ -29,7 +29,7 @@ public struct PaginatedControl: View {
     }
 
     public var body: some View {
-        HStack(spacing: Spacing.space200) {
+        HStack(spacing: Primitives.Spacing.spacing16) {
             Button {
                 decrementIndex()
             } label: {
@@ -40,8 +40,8 @@ public struct PaginatedControl: View {
                     .tint(configuration.tintColor)
             }
 
-            HStack(spacing: Spacing.space0) {
-                VStack(alignment: .trailing, spacing: Spacing.space0) {
+            HStack(spacing: Primitives.Spacing.spacing0) {
+                VStack(alignment: .trailing, spacing: Primitives.Spacing.spacing0) {
                     Text(String(selectedIndex + 1))
                         .font(Font(theme.font.tiny.normal))
                         .foregroundStyle(configuration.textColor)
@@ -56,7 +56,7 @@ public struct PaginatedControl: View {
                 Text(String(itemsCount))
                     .font(Font(theme.font.tiny.normal))
                     .foregroundStyle(configuration.textColor)
-                    .padding(.trailing, Spacing.space100)
+                    .padding(.trailing, Primitives.Spacing.spacing8)
             }
             Button {
                 incrementIndex()

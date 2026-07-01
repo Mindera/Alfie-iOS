@@ -16,7 +16,7 @@ public struct ThemedLoaderView: View {
 	}
 
 	public var body: some View {
-		VStack(spacing: Spacing.space150) {
+		VStack(spacing: Primitives.Spacing.spacing12) {
 			if let url = Bundle.module.url(forResource: Constants.logoFileName, withExtension: "gif") {
                 AnimatedGifImage(
                     url: url,

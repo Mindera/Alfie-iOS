@@ -17,11 +17,11 @@ extension VerticalProductCardConfiguration {
     var verticalInterSpacing: CGFloat {
         switch size {
         case .small:
-            Spacing.space100
+            Primitives.Spacing.spacing8
         case .medium:
-            Spacing.space150
+            Primitives.Spacing.spacing12
         case .large:
-            Spacing.space200
+            Primitives.Spacing.spacing16
         }
     }
 
@@ -40,9 +40,9 @@ extension VerticalProductCardConfiguration {
         switch size {
         case .small,
              .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.small.normal
+            DesignSystem.shared.font.small.normal
         case .large:
-            ThemeProvider.shared.font.paragraph.normal
+            DesignSystem.shared.font.paragraph.normal
         }
     }
 
@@ -50,9 +50,9 @@ extension VerticalProductCardConfiguration {
         switch size {
         case .small,
              .medium: // swiftlint:disable:this indentation_width
-            ThemeProvider.shared.font.tiny.normal
+            DesignSystem.shared.font.tiny.normal
         case .large:
-            ThemeProvider.shared.font.small.normal
+            DesignSystem.shared.font.small.normal
         }
     }
     // swiftlint:enable vertical_whitespace_between_cases

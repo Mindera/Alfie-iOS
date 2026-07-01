@@ -19,10 +19,10 @@ public struct SizingSwatchView: View {
             .foregroundStyle(textColor)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: CornerRadius.xs)
+                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                         .fill(isSelected ? Primitives.Colours.neutrals900 : .clear)
 
-                    RoundedRectangle(cornerRadius: CornerRadius.xs)
+                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                         .inset(by: Constants.borderLineWidth)
                         .stroke(
                             item.state == .available ? Primitives.Colours.neutrals900 : Constants.disabledStateColor,
@@ -43,7 +43,7 @@ public struct SizingSwatchView: View {
 
     @ViewBuilder private var outOfStockSlashView: some View {
         if item.state == .outOfStock {
-            theme.shape.unavailableCrossedOutShape()
+            UnavailableCrossedOutShape()
                 .stroke(Constants.disabledStateColor, style: StrokeStyle(lineWidth: Constants.borderLineWidth))
                 .padding(Constants.borderLineWidth)
         }
@@ -52,8 +52,8 @@ public struct SizingSwatchView: View {
 
 private enum Constants {
     static let disabledStateColor: Color = Primitives.Colours.neutrals500
-    static let insetVertical: CGFloat = Spacing.space100
-    static let insetHorizontal: CGFloat = Spacing.space300
+    static let insetVertical: CGFloat = Primitives.Spacing.spacing8
+    static let insetHorizontal: CGFloat = Primitives.Spacing.spacing24
     static let borderLineWidth: CGFloat = 1
 }
 

@@ -15,7 +15,7 @@ struct DatePickerDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Date Picker")
 
                 Picker("Date Picker Style", selection: $datePickerType) {
@@ -24,7 +24,7 @@ struct DatePickerDemoView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(.bottom, Spacing.space200)
+                .padding(.bottom, Primitives.Spacing.spacing16)
 
                 if datePickerType == .wheel {
                     if datePickerType == .wheel {
@@ -60,9 +60,9 @@ struct DatePickerDemoView: View {
                     .labelsHidden()
                     .modifier(DatePickerModifier(type: datePickerType))
                     .tint(Primitives.Colours.neutrals900)
-                    .padding(.horizontal, Spacing.space200)
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .environment(\.locale, Locale(identifier: "en_AU"))
     }

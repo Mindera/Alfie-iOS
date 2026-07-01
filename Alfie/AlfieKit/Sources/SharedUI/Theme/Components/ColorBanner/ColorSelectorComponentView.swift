@@ -22,7 +22,7 @@ public struct ColorSelectorComponentView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.space150) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
             if !layoutConfiguration.hideOnSingleColor || configuration.items.count > 1 {
                 container
             }
@@ -62,7 +62,7 @@ public struct ColorSelectorComponentView: View {
             HStack(spacing: itemSpacing) {
                 swatches()
             }
-            .padding(Spacing.space025)
+            .padding(Primitives.Spacing.spacing2)
             .writingSize(to: frameSize ?? .constant(.zero))
         }
         .scrollIndicators(.hidden)
@@ -128,7 +128,7 @@ public struct ColorSelectorComponentView: View {
             ]
         ),
         layoutConfiguration: .init(
-            arrangement: .chips(itemHorizontalSpacing: Spacing.space200, itemVerticalSpacing: Spacing.space200)
+            arrangement: .chips(itemHorizontalSpacing: Primitives.Spacing.spacing16, itemVerticalSpacing: Primitives.Spacing.spacing16)
         )
     )
 }
@@ -146,6 +146,6 @@ public struct ColorSelectorComponentView: View {
                 .init(id: "6", name: "Yellow", type: .color(.yellow)),
             ]
         ),
-        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Spacing.space200))
+        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16))
     )
 }

@@ -46,10 +46,10 @@ public struct TabbedView<Content>: View where Content: View {
         if #available(iOS 17.0, *) {
             ScrollView(.horizontal, showsIndicators: false) {
                 if lazyLoading {
-                    LazyHStack(spacing: Spacing.space0) { stackContent }
+                    LazyHStack(spacing: Primitives.Spacing.spacing0) { stackContent }
                         .scrollTargetLayout()
                 } else {
-                    HStack(spacing: Spacing.space0) { stackContent }
+                    HStack(spacing: Primitives.Spacing.spacing0) { stackContent }
                         .scrollTargetLayout()
                 }
             }

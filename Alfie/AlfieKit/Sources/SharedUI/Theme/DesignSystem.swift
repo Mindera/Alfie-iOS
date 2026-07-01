@@ -1,21 +1,30 @@
 import SwiftUI
 
-// MARK: - ThemeProviderProtocol
+// MARK: - DesignSystemProtocol
 
-public protocol ThemeProviderProtocol {
+/// Single entry point for every design-token category (colour, spacing, radius, typography).
+/// Each category forwards to the generated tokens, vended as one unit so the whole theme can be
+/// injected via `EnvironmentValues.theme`.
+public protocol DesignSystemProtocol {
+    var color: ColorProvider { get }
+    var spacing: SpacingProvider { get }
+    var radius: RadiusProvider { get }
     var font: TypographyProviderProtocol { get }
-    var shape: ShapeProviderProtocol { get }
 
     func setupAppearance()
 }
 
-// MARK: - ThemeProvider
+// MARK: - DesignSystem
 
-public class ThemeProvider: ThemeProviderProtocol {
-    public static var shared = ThemeProvider()
+public class DesignSystem: DesignSystemProtocol {
+    public static var shared = DesignSystem()
 
-    public var font: TypographyProviderProtocol
-    public var shape: ShapeProviderProtocol = DefaultShapeProvider()
+    // Token-backed categories are fixed forwarders to the generated tokens (no variation, so
+    // concrete). Only `font` is a swappable provider.
+    public let color = ColorProvider()
+    public let spacing = SpacingProvider()
+    public let radius = RadiusProvider()
+    public let font: TypographyProviderProtocol
 
     public init(font: TypographyProviderProtocol = TypographyProvider()) {
         self.font = font
@@ -76,5 +85,25 @@ public class ThemeProvider: ThemeProviderProtocol {
         tabBarAppearance.backgroundColor = backgroundColor
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+    }
+}
+
+// MARK: - Environment injection seam
+
+// Injectable theme: the default is `DesignSystem.shared`; `.environment(\.theme, custom)` overrides
+// it for a subtree (e.g. a brand theme, or a mock in previews/tests).
+//
+// IMPORTANT: a view only receives the injected theme if it reads `@Environment(\.theme)`. The
+// `View.theme` / `ViewModifier.theme` convenience (Helpers/Extensions) always returns
+// `DesignSystem.shared` and shadows this value, so the ~all-current `theme.*` call sites ignore any
+// injection. Adopting injection in a view is therefore an explicit, per-view change — not automatic.
+private struct DesignSystemKey: EnvironmentKey {
+    static let defaultValue: DesignSystemProtocol = DesignSystem.shared
+}
+
+public extension EnvironmentValues {
+    var theme: DesignSystemProtocol {
+        get { self[DesignSystemKey.self] }
+        set { self[DesignSystemKey.self] = newValue }
     }
 }

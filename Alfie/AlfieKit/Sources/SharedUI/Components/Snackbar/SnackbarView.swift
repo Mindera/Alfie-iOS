@@ -88,8 +88,8 @@ public struct SnackbarView: View {
         ZStack {
             Rectangle()
                 .fill(backgroundColor)
-                .cornerRadius(CornerRadius.s)
-            HStack(spacing: Spacing.space100) {
+                .cornerRadius(Sizing.radiusSoft)
+            HStack(spacing: Primitives.Spacing.spacing8) {
                 if let icon = configuration.icon {
                     icon
                         .renderingMode(.template)
@@ -100,7 +100,7 @@ public struct SnackbarView: View {
                 }
                 Text.build(theme.font.paragraph.normal(configuration.text))
                     .foregroundStyle(foregroundColor)
-                    .padding(Spacing.space200)
+                    .padding(Primitives.Spacing.spacing16)
                     .lineLimit(configuration.lineLimit)
                 Spacer()
                 if let actionButtonLabel = configuration.actionButtonLabel {
@@ -109,7 +109,7 @@ public struct SnackbarView: View {
                     }, label: {
                         Text.build(theme.font.paragraph.bold(actionButtonLabel))
                             .foregroundStyle(foregroundColor)
-                            .padding(Spacing.space200)
+                            .padding(Primitives.Spacing.spacing16)
                     })
                 }
                 if configuration.showCloseButton {
@@ -125,7 +125,7 @@ public struct SnackbarView: View {
                     })
                 }
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
             .frame(minHeight: Constants.minHeight)
         }
         .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
@@ -208,5 +208,5 @@ public struct SnackbarView: View {
             )
         )
     }
-    .padding(.horizontal, Spacing.space100)
+    .padding(.horizontal, Primitives.Spacing.spacing8)
 }

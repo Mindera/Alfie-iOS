@@ -117,11 +117,11 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 itemsCount: viewModel.productImageUrls.count,
                 selectedIndex: $currentMediaIndex
             )
-            .frame(maxHeight: Spacing.space200)
+            .frame(maxHeight: Primitives.Spacing.spacing16)
             .shimmering(
                 while: shimmeringBinding(for: .mediaCarousel),
                 animateOnStateTransition: false,
-                cornerRadius: CornerRadius.m
+                cornerRadius: Sizing.radiusStrong
             )
         }
     }
@@ -200,7 +200,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     }
 
     private var horizontalPadding: CGFloat {
-        isIpad ? Spacing.space500 : Spacing.space200
+        isIpad ? Primitives.Spacing.spacing40 : Primitives.Spacing.spacing16
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
@@ -256,15 +256,15 @@ extension ProductDetailsView {
         VStack {
             ScrollView(showsIndicators: false) {
                 complementaryViews
-                    .padding([.horizontal, .top], Spacing.space200)
+                    .padding([.horizontal, .top], Primitives.Spacing.spacing16)
             }
 
             VStack {
                 addToBag
                 addToWishlist
             }
-            .padding(.vertical, Spacing.space100)
-            .padding(.horizontal, Spacing.space200)
+            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .presentationDetents(Set(bottomSheetDetents), selection: $bottomSheetCurrentDetent)
         .presentationDragIndicator(.hidden)
@@ -275,7 +275,7 @@ extension ProductDetailsView {
 
     /// contains every view except the media carousel
     private var complementaryViews: some View {
-        VStack(alignment: .leading, spacing: Spacing.space100) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
             titleHeader
 
             Spacer()
@@ -289,7 +289,7 @@ extension ProductDetailsView {
             }
 
             descriptionTab
-                .padding(.vertical, Spacing.space200)
+                .padding(.vertical, Primitives.Spacing.spacing16)
 
             complementaryInfo
 
@@ -298,7 +298,7 @@ extension ProductDetailsView {
     }
 
     var mediaCarousel: some View {
-        VStack(spacing: Spacing.space200) {
+        VStack(spacing: Primitives.Spacing.spacing16) {
             SnapCarousel(
                 areItemsLoading: shimmeringBinding(for: .mediaCarousel),
                 itemIndex: $currentMediaIndex,
@@ -315,14 +315,14 @@ extension ProductDetailsView {
                         placeholder: { Primitives.Colours.neutrals100 },
                         failure: { _ in Primitives.Colours.neutrals900 }
                     )
-                    .cornerRadius(CornerRadius.s)
+                    .cornerRadius(Sizing.radiusSoft)
                 }
             }
-            .padding(.top, Spacing.space200)
-            .padding(.bottom, viewModel.hasSingleImage ? Spacing.space200 : Spacing.space0)
+            .padding(.top, Primitives.Spacing.spacing16)
+            .padding(.bottom, viewModel.hasSingleImage ? Primitives.Spacing.spacing16 : Primitives.Spacing.spacing0)
             .disabled(isMediaFullScreen)
             paginatedControl
-                .padding(.bottom, Spacing.space200)
+                .padding(.bottom, Primitives.Spacing.spacing16)
         }
         .writingSize(to: $carouselSize)
         .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
@@ -347,7 +347,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var titleHeader: some View {
         if viewModel.shouldShow(section: .titleHeader) {
-            HStack(spacing: Spacing.space0) {
+            HStack(spacing: Primitives.Spacing.spacing0) {
                 Text.build(theme.font.paragraph.normal(viewModel.productName))
                     .foregroundStyle(Primitives.Colours.neutrals900)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
@@ -382,7 +382,7 @@ extension ProductDetailsView {
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             if hasSpaceForSizeSelector {
-                VStack(alignment: .leading, spacing: Spacing.space150) {
+                VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.colorSelectionConfiguration,
                         isExpandable: canShowColorPickers
@@ -394,7 +394,7 @@ extension ProductDetailsView {
                         ColorSelectorComponentView(
                             configuration: viewModel.colorSelectionConfiguration,
                             layoutConfiguration: .init(
-                                arrangement: .horizontal(itemSpacing: Spacing.space100, scrollable: false),
+                                arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8, scrollable: false),
                                 hideSelectionTitle: true,
                                 hideOnSingleColor: false
                             ),
@@ -414,7 +414,7 @@ extension ProductDetailsView {
             } else if canShowColorPickers {
                 if let selectedColor = viewModel.colorSelectionConfiguration.selectedItem {
                     PickerMenu(isModalPresented: $showColorSheet) {
-                        HStack(spacing: Spacing.space100) {
+                        HStack(spacing: Primitives.Spacing.spacing8) {
                             ColorSwatchView(item: selectedColor, swatchSize: .normal, isSelected: false)
                             Text.build(theme.font.small.normal(selectedColor.name.capitalized))
                                 .foregroundStyle(Primitives.Colours.neutrals800)
@@ -428,7 +428,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
-            VStack(alignment: .leading, spacing: Spacing.space150) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
                 if viewModel.canShowSizeSelector {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.sizingSelectionConfiguration,
@@ -466,7 +466,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var complementaryInfo: some View {
         if viewModel.shouldShow(section: .complementaryInfo) {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(Array(viewModel.complementaryInfoToShow.enumerated()), id: \.0) { index, type in
                     complementaryInfoCell(type: type, showTopDivider: index == 0)
                 }
@@ -476,10 +476,10 @@ extension ProductDetailsView {
 
     @ViewBuilder private var descriptionTab: some View {
         if viewModel.shouldShow(section: .productDescription) {
-            VStack(alignment: .leading, spacing: Spacing.space200) {
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
                 TabControl(
                     theme: .dark,
-                    configuration: .fixedSize(horizontalMargins: Spacing.space200),
+                    configuration: .fixedSize(horizontalMargins: Primitives.Spacing.spacing16),
                     options: [TabControl.TabOption(title: L10n.Pdp.TabControl.DescriptionOption.title)],
                     currentIndex: $currentDescriptionTabIndex
                 )
@@ -493,7 +493,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 let addToBagText = L10n.Product.AddToBag.Button.cta
                 let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
@@ -514,7 +514,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToWishlist: some View {
         if viewModel.shouldShow(section: .addToWishlist) {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 ThemedButton(
                     text: L10n.Product.AddToWishlist.Button.cta,
                     style: .secondary,
@@ -529,7 +529,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var errorView: some View {
         ErrorView(
-            spacing: Spacing.space500,
+            spacing: Primitives.Spacing.spacing40,
             iconSize: Constants.errorViewIconSize,
             title: theme.font.header.h2(errorTitle),
             message: theme.font.paragraph.normal(errorMessage),
@@ -543,16 +543,16 @@ extension ProductDetailsView {
     }
 
     private func complementaryInfoCell(type: ProductDetailsComplementaryInfoType, showTopDivider: Bool) -> some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             if showTopDivider {
                 ThemedDivider.horizontalThin
             }
 
-            HStack(spacing: Spacing.space0) {
-                HStack(spacing: Spacing.space0) {
+            HStack(spacing: Primitives.Spacing.spacing0) {
+                HStack(spacing: Primitives.Spacing.spacing0) {
                     Text.build(theme.font.paragraph.normal(complementaryInfoTitle(for: type)))
                         .foregroundStyle(Primitives.Colours.neutrals900)
-                        .padding(.leading, Spacing.space100)
+                        .padding(.leading, Primitives.Spacing.spacing8)
                     Spacer()
                     Icon.chevronRight.image
                         .renderingMode(.template)
@@ -560,7 +560,7 @@ extension ProductDetailsView {
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
                         .foregroundStyle(Primitives.Colours.neutrals900)
-                        .padding(.trailing, Spacing.space100)
+                        .padding(.trailing, Primitives.Spacing.spacing8)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }

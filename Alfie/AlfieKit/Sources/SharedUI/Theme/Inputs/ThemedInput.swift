@@ -63,7 +63,7 @@ private struct ThemedTextStyle: TextFieldStyle {
     var limit: Int?
     var icon: Icon?
     @Binding var count: Int
-    private let theme: ThemeProviderProtocol = ThemeProvider.shared
+    private let theme: DesignSystemProtocol = DesignSystem.shared
 
     init(title: String? = nil, status: InputStatus, isDisabled: Bool, isRequired: Bool, limit: Int? = nil, count: Binding<Int> = .constant(0), icon: Icon? = nil) {
         self.title = title
@@ -77,9 +77,9 @@ private struct ThemedTextStyle: TextFieldStyle {
 
     // swiftlint:disable:next identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space0) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
             if title != nil || limit != nil {
-                HStack(spacing: Spacing.space0) {
+                HStack(spacing: Primitives.Spacing.spacing0) {
                     if let title {
                         Text.build(theme.font.paragraph.normal(title))
                             .lineLimit(1)
@@ -88,7 +88,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                     if isRequired {
                         Text.build(theme.font.paragraph.normal("*"))
                             .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.semanticError700)
-                            .padding(.leading, Spacing.space025)
+                            .padding(.leading, Primitives.Spacing.spacing2)
                     }
                     if let limit {
                         Spacer()
@@ -96,14 +96,14 @@ private struct ThemedTextStyle: TextFieldStyle {
                             .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
                     }
                 }
-                .padding(.bottom, Spacing.space100)
+                .padding(.bottom, Primitives.Spacing.spacing8)
             }
             ZStack(alignment: .bottom) {
                 RoundedRectangle(cornerRadius: Constants.cornerRadius, style: RoundedCornerStyle.continuous)
                     .stroke(barColor, lineWidth: 1.5)
                     .background(Primitives.Colours.neutrals0)
                     .frame(height: Constants.inputHeight)
-                HStack(spacing: Spacing.space0) {
+                HStack(spacing: Primitives.Spacing.spacing0) {
                     configuration.body
                         .font(Font(theme.font.paragraph.normal))
                         .accentColor(Primitives.Colours.neutrals800)
@@ -128,7 +128,7 @@ private struct ThemedTextStyle: TextFieldStyle {
             if status.hasInfo {
                 statusLabel
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, Spacing.space050)
+                    .padding(.top, Primitives.Spacing.spacing4)
             }
         }
     }
@@ -144,7 +144,7 @@ private struct ThemedTextStyle: TextFieldStyle {
                 .lineLimit(2)
 
         case .success(let string):
-            HStack(alignment: .top, spacing: Spacing.space025) {
+            HStack(alignment: .top, spacing: Primitives.Spacing.spacing2) {
                 Icon.checkmark.image
                     .renderingMode(.template)
                     .resizable()
@@ -157,7 +157,7 @@ private struct ThemedTextStyle: TextFieldStyle {
             }
 
         case .error(let string):
-            HStack(alignment: .top, spacing: Spacing.space025) {
+            HStack(alignment: .top, spacing: Primitives.Spacing.spacing2) {
                 Icon.info.image
                     .renderingMode(.template)
                     .resizable()
@@ -196,10 +196,10 @@ private struct ThemedTextStyle: TextFieldStyle {
 
 private enum Constants {
     static var barHeight: CGFloat = 2
-    static var cornerRadius: CGFloat = CornerRadius.xs
+    static var cornerRadius: CGFloat = Sizing.radiusSoft
     static var isDisableOpacity: CGFloat = 0.3
-    static var inputPadding: CGFloat = Spacing.space100
-    static var inputIconPadding: CGFloat = Spacing.space025
+    static var inputPadding: CGFloat = Primitives.Spacing.spacing8
+    static var inputIconPadding: CGFloat = Primitives.Spacing.spacing2
     static var iconSize: CGFloat = 16
     static var inputHeight: CGFloat = 44
 }

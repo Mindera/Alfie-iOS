@@ -33,7 +33,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
 
     private var placeholdersView: some View {
         ScrollView(.vertical) {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(viewModel.brands(for: ""), id: \.id) { brand in
                     placeholderItemView(brand)
                 }
@@ -59,10 +59,10 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     }
 
     private var brandsView: some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             searchBar
-                .padding(.horizontal, Spacing.space200)
-                .padding(.vertical, Spacing.space025)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.vertical, Primitives.Spacing.spacing2)
             if viewModel.sectionTitles.isEmpty {
                 emptySearchResults
             } else {
@@ -87,7 +87,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
                                     [.init(item: section, anchor: $0)]
                                 }
                         ) {
-                            VStack(spacing: Spacing.space0) {
+                            VStack(spacing: Primitives.Spacing.spacing0) {
                                 ForEach(viewModel.brands(for: section)) { brand in
                                     brandItemView(brand)
                                 }
@@ -110,9 +110,9 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
                     }
                     .scrollIndicators(.hidden)
                     .listStyle(.plain)
-                    .padding(.trailing, showIndex ? Spacing.space200 : Spacing.space0)
+                    .padding(.trailing, showIndex ? Primitives.Spacing.spacing16 : Primitives.Spacing.spacing0)
 
-                    VStack(spacing: Spacing.space0) {
+                    VStack(spacing: Primitives.Spacing.spacing0) {
                         Spacer()
                         sectionIndexTitles(proxy: scrollProxy)
                         Spacer()
@@ -142,7 +142,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     }
 
     private func sectionIndexTitles(proxy: ScrollViewProxy) -> some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             if showIndex {
                 SectionIndexTitles(
                     scrollProxy: proxy,
@@ -189,13 +189,13 @@ extension BrandsView {
         let title: String
 
         var body: some View {
-            HStack(alignment: .center, spacing: Spacing.space0) {
+            HStack(alignment: .center, spacing: Primitives.Spacing.spacing0) {
                 Text(title)
                     .font(Font(theme.font.paragraph.bold))
                     .foregroundStyle(Primitives.Colours.neutrals800)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
             .frame(height: Constants.headerViewHeight)
             .background(Primitives.Colours.neutrals0)
         }
@@ -215,8 +215,8 @@ extension BrandsView {
         }
 
         var body: some View {
-            VStack(spacing: Spacing.space0) {
-                HStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
+                HStack(spacing: Primitives.Spacing.spacing0) {
                     Text.build(theme.font.paragraph.normal(brand.name))
                         .foregroundStyle(foregroundColor())
                         .shimmering(while: $isLoading)
@@ -226,7 +226,7 @@ extension BrandsView {
 
                 ThemedDivider.horizontalThin
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
 
         static func == (lhs: BrandsView<ViewModel>.BrandItemView, rhs: BrandsView<ViewModel>.BrandItemView) -> Bool {
@@ -249,10 +249,10 @@ extension BrandsView {
         }
 
         var body: some View {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(titles, id: \.self) { title in
                     SectionIndexTitle(text: title, isSelected: selectedIndexTitle == title)
-                        .padding(.horizontal, Spacing.space100)
+                        .padding(.horizontal, Primitives.Spacing.spacing8)
                         .background(dragObserver(title: title))
                 }
             }
@@ -301,7 +301,7 @@ extension BrandsView {
                 .foregroundStyle(isSelected ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals500)
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
-                    RoundedRectangle(cornerRadius: CornerRadius.xxs)
+                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
                         .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Color.clear)
                 }
         }

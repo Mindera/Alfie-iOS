@@ -38,7 +38,7 @@ public struct ErrorView: View {
     // MARK: Lifecycle
 
     public init(
-        spacing: CGFloat = Spacing.space200,
+        spacing: CGFloat = Primitives.Spacing.spacing16,
         icon: Image? = Icon.warning.image,
         iconColor: Color = Primitives.Colours.neutrals900,
         iconSize: CGFloat = Constants.iconSize,
@@ -60,7 +60,7 @@ public struct ErrorView: View {
     }
 
     public init(
-        spacing: CGFloat = Spacing.space200,
+        spacing: CGFloat = Primitives.Spacing.spacing16,
         icon: Image? = Icon.warning.image,
         iconColor: Color = Primitives.Colours.neutrals900,
         iconSize: CGFloat = Constants.iconSize,
@@ -75,9 +75,9 @@ public struct ErrorView: View {
             icon: icon,
             iconColor: iconColor,
             iconSize: iconSize,
-            title: title.flatMap(ThemeProvider.shared.font.paragraph.bold),
+            title: title.flatMap(DesignSystem.shared.font.paragraph.bold),
             titleColor: titleColor,
-            message: message.flatMap(ThemeProvider.shared.font.small.normal),
+            message: message.flatMap(DesignSystem.shared.font.small.normal),
             messageColor: messageColor,
             buttons: buttons
         )
@@ -106,7 +106,7 @@ public struct ErrorView: View {
                     .foregroundStyle(Primitives.Colours.neutrals900)
             }
 
-            VStack(spacing: Spacing.space100) {
+            VStack(spacing: Primitives.Spacing.spacing8) {
                 ForEach(buttons) {
                     ThemedButton(text: $0.cta, isFullWidth: true, action: $0.action)
                 }

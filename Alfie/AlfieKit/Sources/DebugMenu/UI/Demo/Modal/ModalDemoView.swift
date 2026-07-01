@@ -10,8 +10,8 @@ struct ModalDemoView: View {
     var body: some View {
         VStack(spacing: 32) {
             DemoHelper.demoSectionHeader(title: "Modal")
-                .padding(.horizontal, Spacing.space200)
-                .padding(.bottom, Spacing.space400)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.bottom, Primitives.Spacing.spacing32)
             ThemedButton(text: "Show Small Modal") {
                 isPresentedSmall = true
             }
@@ -25,58 +25,58 @@ struct ModalDemoView: View {
 
     private var smallBody: some View {
         VStack(alignment: .leading) {
-            Text("How to Mesure")
+            Text("How to Measure")
                 .font(theme.font.header.h3.withSize(18).font)
-                .padding(.bottom, Spacing.space200)
+                .padding(.bottom, Primitives.Spacing.spacing16)
             Text.build(theme.font.paragraph.boldItalic("• Bust"))
-                .padding(.bottom, Spacing.space050)
-            Text.build(theme.font.paragraph.normal("Mesure around the fullest part of your chest."))
-                .padding(.bottom, Spacing.space100)
+                .padding(.bottom, Primitives.Spacing.spacing4)
+            Text.build(theme.font.paragraph.normal("Measure around the fullest part of your chest."))
+                .padding(.bottom, Primitives.Spacing.spacing8)
             Text.build(theme.font.paragraph.boldItalic("• Waist"))
-                .padding(.bottom, Spacing.space050)
+                .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
                 theme.font.paragraph.normal(
                     "The slimmest part of your natural waistline, above your navel and below your ribcage."
                 )
             )
-            .padding(.bottom, Spacing.space100)
+            .padding(.bottom, Primitives.Spacing.spacing8)
             Text.build(theme.font.paragraph.boldItalic("• Hip"))
-                .padding(.bottom, Spacing.space050)
+                .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
                 theme.font.paragraph.normal("Measure around the widest point of your hips, at the top of your legs.")
             )
-            .padding(.bottom, Spacing.space100)
+            .padding(.bottom, Primitives.Spacing.spacing8)
         }
     }
 
     private var bigBody: some View {
         VStack(alignment: .leading) {
-            Text("How to Mesure")
+            Text("How to Measure")
                 .font(theme.font.header.h3.withSize(18).font)
-                .padding(.bottom, Spacing.space200)
+                .padding(.bottom, Primitives.Spacing.spacing16)
             Spacer().frame(height: 400)
             Text.build(theme.font.paragraph.boldItalic("• Bust"))
-                .padding(.bottom, Spacing.space050)
-            Text.build(theme.font.small.normal("Mesure around the fullest part of your chest."))
-                .padding(.bottom, Spacing.space100)
+                .padding(.bottom, Primitives.Spacing.spacing4)
+            Text.build(theme.font.small.normal("Measure around the fullest part of your chest."))
+                .padding(.bottom, Primitives.Spacing.spacing8)
             Spacer().frame(height: 400)
             Text.build(theme.font.paragraph.boldItalic("• Waist"))
-                .padding(.bottom, Spacing.space050)
+                .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
                 theme.font.small.normal(
                     "The slimmest part of your natural waistline, above your navel and below your ribcage."
                 )
             )
-            .padding(.bottom, Spacing.space100)
+            .padding(.bottom, Primitives.Spacing.spacing8)
             Spacer().frame(height: 400)
             Text.build(theme.font.paragraph.boldItalic("• Hip"))
-                .padding(.bottom, Spacing.space050)
+                .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
                 theme.font.small.normal(
                     "Measure around the widest point of your hips, at the top of your legs."
                 )
             )
-            .padding(.bottom, Spacing.space100)
+            .padding(.bottom, Primitives.Spacing.spacing8)
         }
     }
 }

@@ -67,7 +67,7 @@ public struct ColorSwatchView: View {
                     RoundedRectangle(cornerRadius: size / 2)
                         .fill(Color.white)
                         .opacity(Constants.disabledOpacity)
-                    theme.shape.unavailableCrossedOutShape()
+                    UnavailableCrossedOutShape()
                         .stroke(Color.white, lineWidth: 1)
                         .frame(width: size, height: size)
                 }

@@ -7,7 +7,7 @@ struct LoadingDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space250) {
+            VStack(spacing: Primitives.Spacing.spacing20) {
                 componentPreview(
                     LoaderView(circleDiameter: .defaultSmall, labelHidden: !showLabel),
                     title: "Loading - Default",
@@ -20,26 +20,26 @@ struct LoadingDemoView: View {
                     showStepper: true
                 )
 
-                VStack(spacing: Spacing.space200) {
+                VStack(spacing: Primitives.Spacing.spacing16) {
                     DemoHelper.demoSectionHeader(title: "Loading - Logo")
                     ThemedLoaderView(labelHidden: !showLabel)
                 }
 
                 DemoHelper.demoSectionHeader(title: "Options")
-                    .padding(.top, Spacing.space250)
+                    .padding(.top, Primitives.Spacing.spacing20)
                 ThemedToggleView(isOn: $showLabel) { Text.build(theme.font.paragraph.normal("Show loading label")) }
 
                 Stepper(value: $number, in: 1...100, step: 4) {
                     Text.build(theme.font.small.bold("Custom size"))
                 }
             }
-            .padding(Spacing.space200)
+            .padding(Primitives.Spacing.spacing16)
         }
         .navigationTitle("Loading")
     }
 
     private func componentPreview(_ component: some View, title: String, description: String = "", showStepper: Bool) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.space0) {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
             HStack {
                 Text.build(theme.font.paragraph.bold(title))
                 Spacer()
@@ -52,10 +52,10 @@ struct LoadingDemoView: View {
             }
 
             ThemedDivider.horizontalThick
-                .padding(.top, Spacing.space025)
+                .padding(.top, Primitives.Spacing.spacing2)
 
             component
-                .padding(.vertical, Spacing.space250)
+                .padding(.vertical, Primitives.Spacing.spacing20)
                 .frame(maxWidth: .infinity)
         }
     }

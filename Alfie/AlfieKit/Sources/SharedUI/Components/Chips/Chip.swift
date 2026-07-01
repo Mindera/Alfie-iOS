@@ -60,10 +60,10 @@ public struct Chip: View {
 
     public var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: CornerRadius.full)
+            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                 .stroke(borderColor, lineWidth: borderWidth)
-                .background(RoundedRectangle(cornerRadius: CornerRadius.full).fill(backgroundColor))
-            HStack(spacing: Spacing.space100) {
+                .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(backgroundColor))
+            HStack(spacing: Primitives.Spacing.spacing8) {
                 Text.build(theme.font.small.normal(configuration.label))
                     .foregroundStyle(textColor)
                 if let counterLabel {
@@ -74,7 +74,7 @@ public struct Chip: View {
                     Button(action: {
                         configuration.onCloseTap?()
                     }, label: {
-                        HStack(spacing: Spacing.space0) {
+                        HStack(spacing: Primitives.Spacing.spacing0) {
                             Icon.close.image
                                 .renderingMode(.template)
                                 .resizable()
@@ -87,10 +87,10 @@ public struct Chip: View {
                     .disabled(configuration.isDisabled)
                 }
             }
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .fixedSize(horizontal: true, vertical: false)
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .frame(height: chipHeight)
     }
 

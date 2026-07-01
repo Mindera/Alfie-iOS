@@ -10,15 +10,15 @@ struct SkeletonDemoView: View {
         VStack {
             ScrollView {
                 DemoHelper.demoSectionHeader(title: "Skeleton Animation")
-                    .padding(.horizontal, Spacing.space200)
-                    .padding(.bottom, Spacing.space0)
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .padding(.bottom, Primitives.Spacing.spacing0)
                 bodyType {
                     Image("DemoProductImage", bundle: .module)
                         .resizable()
                         .scaledToFit()
                         .shimmering(while: $isImageLoading)
                 } second: {
-                    VStack(alignment: .leading, spacing: Spacing.space100) {
+                    VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
                         Text.build(theme.font.header.h2("TOMMY HILFIGER"))
                             .shimmering(while: $isContentLoading)
 
@@ -52,22 +52,22 @@ struct SkeletonDemoView: View {
                             )
                         )
                         .shimmeringMultiline(while: $isContentLoading, lines: 14, font: theme.font.small.normal)
-                        .padding(.top, Spacing.space100)
+                        .padding(.top, Primitives.Spacing.spacing8)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal, Spacing.space200)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
             }
 
             ThemedDivider.horizontalThick
-            HStack(spacing: Spacing.space200) {
+            HStack(spacing: Primitives.Spacing.spacing16) {
                 ThemedButton(text: "Add To Bag", type: .big, style: .primary, trailingAsset: Icon.bag) {}
                     .shimmering(while: $isContentLoading)
 
                 ThemedButton(text: "Find in Store", type: .big, style: .secondary, trailingAsset: Icon.store) {}
                     .shimmering(while: $isContentLoading)
             }
-            .padding(Spacing.space100)
+            .padding(Primitives.Spacing.spacing8)
         }
         .edgesIgnoringSafeArea(.horizontal)
         .task {

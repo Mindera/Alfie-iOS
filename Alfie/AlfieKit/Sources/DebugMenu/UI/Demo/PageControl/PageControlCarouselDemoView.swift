@@ -34,7 +34,7 @@ struct PageControlCarouselDemoView: View {
     @State private var customSelectedIndex: Int? = 0
 
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             colorCarouselComponent(
                 title: "Progress Indicators - Small Dots",
                 colorIndex: $smallSelectedIndex,
@@ -53,9 +53,9 @@ struct PageControlCarouselDemoView: View {
                 size: 16,
                 colors: largeColors
             )
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 DemoHelper.demoSectionHeader(title: "Progress Indicators - Custom Dots")
-                    .padding(.bottom, Spacing.space400)
+                    .padding(.bottom, Primitives.Spacing.spacing32)
                 carousel(colorIndex: $customSelectedIndex, colors: customColors)
                 ThemedPageControl(
                     data: customColors,
@@ -74,12 +74,12 @@ struct PageControlCarouselDemoView: View {
             }
             Spacer()
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     private func carousel(colorIndex: Binding<Int?>, colors: [Color]) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: Spacing.space0) {
+            LazyHStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
                     color
                         .frame(height: 50)
@@ -100,9 +100,9 @@ struct PageControlCarouselDemoView: View {
     }
 
     private func colorCarouselComponent(title: String, colorIndex: Binding<Int?>, size: CGFloat, colors: [Color]) -> some View {
-        VStack(spacing: Spacing.space0) {
+        VStack(spacing: Primitives.Spacing.spacing0) {
             DemoHelper.demoSectionHeader(title: title)
-                .padding(.bottom, Spacing.space400)
+                .padding(.bottom, Primitives.Spacing.spacing32)
             carousel(colorIndex: colorIndex, colors: colors)
             ThemedPageControl(
                 data: colors,

@@ -31,11 +31,11 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 }
             }
             .listRowSeparator(.hidden)
-            .padding(.horizontal, Spacing.space200)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .listStyle(.plain)
-        .listRowSpacing(Spacing.space200)
-        .padding(.vertical, Spacing.space200)
+        .listRowSpacing(Primitives.Spacing.spacing16)
+        .padding(.vertical, Primitives.Spacing.spacing16)
         .toolbarView(
             isWishlistEnabled: viewModel.isWishlistEnabled,
             openWishlistAction: viewModel.didTapWishlist,

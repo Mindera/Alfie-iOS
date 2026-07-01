@@ -41,7 +41,7 @@ struct ProductListingFilterBar: View {
                 }
             }
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .frame(minHeight: Constants.barMinHeight)
     }
 
@@ -49,7 +49,7 @@ struct ProductListingFilterBar: View {
         Button {
             filterAction()
         } label: {
-            HStack(spacing: Spacing.space100) {
+            HStack(spacing: Primitives.Spacing.spacing8) {
                 Icon.filter.image
                     .renderingMode(.template)
                     .resizable()

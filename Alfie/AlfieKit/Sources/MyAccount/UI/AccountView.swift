@@ -13,7 +13,7 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: Spacing.space0) {
+            VStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(viewModel.sectionList, id: \.self) { section in
                     AccountSectionView(
                         for: section,
@@ -29,7 +29,7 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
                 }
             }
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .toolbarView()
     }
 

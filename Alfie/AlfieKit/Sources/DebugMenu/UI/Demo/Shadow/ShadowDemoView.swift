@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ShadowDemoView: View {
     var body: some View {
-        VStack(spacing: Spacing.space250) {
+        VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoSectionHeader(title: "Elevation")
             HStack {
                 Spacer()
@@ -18,7 +18,7 @@ struct ShadowDemoView: View {
                 shadowView(label: "5", type: .elevation5)
                 Spacer()
             }
-            .padding(.bottom, Spacing.space400)
+            .padding(.bottom, Primitives.Spacing.spacing32)
             DemoHelper.demoSectionHeader(title: "Shadow Medium Float")
             HStack {
                 Spacer()
@@ -33,7 +33,7 @@ struct ShadowDemoView: View {
                 shadowView(label: "5", type: .mediumFloat5)
                 Spacer()
             }
-            .padding(.bottom, Spacing.space400)
+            .padding(.bottom, Primitives.Spacing.spacing32)
             DemoHelper.demoSectionHeader(title: "Shadow Soft Float")
             HStack {
                 Spacer()
@@ -50,7 +50,7 @@ struct ShadowDemoView: View {
             }
             Spacer()
         }
-        .padding(.horizontal, Spacing.space200)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     private func shadowView(label: String, type: ShadowViewModifier.ShadowType) -> some View {
@@ -58,7 +58,7 @@ struct ShadowDemoView: View {
             Rectangle()
                 .fill(Primitives.Colours.neutrals0)
                 .frame(width: 50, height: 50)
-                .cornerRadius(CornerRadius.s)
+                .cornerRadius(Sizing.radiusSoft)
                 .shadow(type)
             Text.build(theme.font.small.normal(label))
                 .foregroundStyle(Primitives.Colours.neutrals500)

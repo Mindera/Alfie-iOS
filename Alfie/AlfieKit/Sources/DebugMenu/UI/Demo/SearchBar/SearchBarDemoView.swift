@@ -13,14 +13,14 @@ struct SearchBarDemoView: View {
     var body: some View {
         VStack {
             DemoHelper.demoSectionHeader(title: "Search Bar")
-                .padding(.horizontal, Spacing.space200)
+                .padding(.horizontal, Primitives.Spacing.spacing16)
 
             // swiftlint:disable:next trailing_closure
             ScrollViewWithOffsetReader(offset: $scrollOffset) {
                 LazyVGrid(columns: [
                     GridItem(.flexible(minimum: 200)),
                     GridItem(.flexible(minimum: 200)),
-                ], spacing: Spacing.space200) {
+                ], spacing: Primitives.Spacing.spacing16) {
                     ForEach(0..<10) { index in
                         VStack {
                             Image("DemoProductImage", bundle: .module)
@@ -49,13 +49,13 @@ struct SearchBarDemoView: View {
                 theme: searchBarTheme,
                 dismissConfiguration: .init(type: .back),
                 resultsView: {
-                    VStack(spacing: Spacing.space200) {
+                    VStack(spacing: Primitives.Spacing.spacing16) {
                         if searchText.isEmpty {
                             Text.build(theme.font.paragraph.normal("Type something to start searching"))
                         } else {
                             Text.build(theme.font.paragraph.normal("Searching for:"))
                             Text.build(theme.font.small.bold(searchText))
-                                .padding(.horizontal, Spacing.space250)
+                                .padding(.horizontal, Primitives.Spacing.spacing20)
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -75,7 +75,7 @@ struct SearchBarDemoView: View {
                 }
                 .pickerStyle(.segmented)
             }
-            .padding(Spacing.space150)
+            .padding(Primitives.Spacing.spacing12)
         }
     }
 }

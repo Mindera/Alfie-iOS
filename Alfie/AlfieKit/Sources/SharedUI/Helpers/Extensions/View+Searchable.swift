@@ -8,7 +8,7 @@ extension View {
         pullToSearchConfig: PullToSearchConfig = .disabled,
         theme: ThemedSearchBarView.Theme,
         dismissConfiguration: ThemedSearchBarView.DismissConfiguration,
-        verticalSpacing: CGFloat = Spacing.space100,
+        verticalSpacing: CGFloat = Primitives.Spacing.spacing8,
         showCancelButton: Bool = true,
         contentOverlayColorWhenFocused: Color? = .black.opacity(0.5),
         showDivider: Bool = false,
