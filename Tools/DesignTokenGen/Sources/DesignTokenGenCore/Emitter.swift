@@ -105,6 +105,8 @@ public struct Emitter {
         let baseColours = colourThemes[base]!
         let members = baseColours.keys.sorted().map { (name: $0, id: SwiftIdentifier.make($0, dropPrefix: coloursGroup)) }
         try SwiftIdentifier.assertNoCollisions(baseColours.keys.sorted(), dropPrefix: coloursGroup)
+        // Guard the one identifier surface that isn't a token name: theme ids → palette/case names.
+        try SwiftIdentifier.assertNoCollisions(themeIDs.map(themeVarName))
 
         // ColourPalette struct: one stored Color per colour id.
         let structFields = members.map { "    public let \($0.id): Color" }.joined(separator: "\n")
@@ -179,7 +181,9 @@ public struct Emitter {
             public init() {}
         }
 
-        public enum AppTheme: String, CaseIterable {
+        // No themes → a case-less enum. It must NOT declare a raw type or `CaseIterable`
+        // (a no-case enum can't synthesize `RawRepresentable`/`allCases`).
+        public enum AppTheme {
         }
 
         public enum ThemeColours {
