@@ -8,6 +8,24 @@ public struct LoadedTokens {
     public let map: [String: Token]              // working map, last-writer-wins across files
     public let primitiveValues: [String: Token]  // concrete values from .primitives (cycle fallback)
     public let loadedFiles: Set<String>          // filenames actually parsed (scopes allowlist checks)
+    // Per-theme colour palettes: each `.primitives` mode parsed into its own colour set (incl. base).
+    // Only colours vary across themes; the base theme drives `map`/`primitiveValues` for everything else.
+    public let colourThemes: [String: [String: Token]]
+    public let baseTheme: String                 // theme id (mode name) driving `map`/`primitiveValues`
+
+    public init(
+        map: [String: Token],
+        primitiveValues: [String: Token],
+        loadedFiles: Set<String>,
+        colourThemes: [String: [String: Token]] = [:],
+        baseTheme: String = TokenLoader.baseTheme
+    ) {
+        self.map = map
+        self.primitiveValues = primitiveValues
+        self.loadedFiles = loadedFiles
+        self.colourThemes = colourThemes
+        self.baseTheme = baseTheme
+    }
 }
 
 public enum TokenLoader {
@@ -17,6 +35,12 @@ public enum TokenLoader {
         "screen-size": "small-(s)",
     ]
     static let documentationPrefix = "~~doc-"
+    /// The `.primitives` collection can expose several theme modes that share one schema and differ
+    /// only in colour values. The BASE mode drives the resolver map / non-colour tokens; the others
+    /// are loaded separately as colour palettes (see `colourThemes`). Kept as a named constant so the
+    /// choice is explicit and the loader never merges two primitive themes into one map.
+    static let primitivesCollection = ".primitives"
+    public static let baseTheme = "alfie-theme"
 
     public static func load(inputDirectory dir: URL) throws -> LoadedTokens {
         let manifestURL = dir.appendingPathComponent("manifest.json")
@@ -41,7 +65,48 @@ public enum TokenLoader {
             }
             loaded.insert(file)
         }
-        return LoadedTokens(map: map, primitiveValues: primitiveValues, loadedFiles: loaded)
+
+        // Load every `.primitives` theme mode into its own colour palette (colours only). The base
+        // mode is also present in `map`/`primitiveValues` above; the extra modes never enter the map
+        // (which would clobber via last-writer-wins), so resolution stays anchored to the base theme.
+        let primitiveModes = try primitiveThemeModes(manifestURL: manifestURL)
+        var colourThemes: [String: [String: Token]] = [:]
+        for (themeId, themeFiles) in primitiveModes {
+            var colours: [String: Token] = [:]
+            for file in themeFiles {
+                let url = dir.appendingPathComponent(file)
+                guard FileManager.default.fileExists(atPath: url.path) else {
+                    throw DesignTokenError.fileNotFound(url.path)
+                }
+                for token in try parseFile(url: url, file: file) where token.value.isColour {
+                    colours[token.name] = token
+                }
+            }
+            colourThemes[themeId] = colours
+        }
+        let base = colourThemes[baseTheme] != nil ? baseTheme : (colourThemes.keys.sorted().first ?? baseTheme)
+        return LoadedTokens(
+            map: map,
+            primitiveValues: primitiveValues,
+            loadedFiles: loaded,
+            colourThemes: colourThemes,
+            baseTheme: base
+        )
+    }
+
+    /// All theme modes declared under the `.primitives` collection → `themeId : [file]`.
+    static func primitiveThemeModes(manifestURL: URL) throws -> [String: [String]] {
+        let data = try Data(contentsOf: manifestURL)
+        guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let collections = root["collections"] as? [String: Any],
+              let modes = (collections[primitivesCollection] as? [String: Any])?["modes"] as? [String: Any] else {
+            return [:]
+        }
+        var out: [String: [String]] = [:]
+        for (mode, list) in modes {
+            out[mode] = (list as? [Any])?.compactMap { $0 as? String } ?? []
+        }
+        return out
     }
 
     /// Filenames to load: skip `.documentation`; pick the iOS mode for multi-mode collections;
@@ -61,7 +126,15 @@ public enum TokenLoader {
                     throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' has no 'modes' dictionary")
                 }
                 let chosen: [Any]
-                if let mode = modeForCollection[collection] {
+                if collection == primitivesCollection {
+                    // Multiple primitive themes share one schema; only the BASE mode feeds the map.
+                    // The others are loaded as colour palettes in `load()` — merging them here would
+                    // clobber the base values via last-writer-wins.
+                    guard let list = (modes[baseTheme] ?? (modes.count == 1 ? modes.values.first : nil)) as? [Any] else {
+                        throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '.primitives' is missing base mode '\(baseTheme)'")
+                    }
+                    chosen = list
+                } else if let mode = modeForCollection[collection] {
                     // A configured collection MUST expose its expected mode — falling back to an empty
                     // list would silently emit an incomplete token set.
                     guard let list = modes[mode] as? [Any] else {
@@ -114,6 +187,12 @@ public enum TokenLoader {
         }
         switch type {
         case "color":
+            // Colours arrive either as a `{components}` object (Figma export) or a hex string
+            // (`"#RRGGBB"` / `"#RRGGBBAA"`, used by hand-authored theme files). Reference strings
+            // (`"{token}"`) are already short-circuited above.
+            if let hex = raw as? String {
+                return .color(components: try hexComponents(hex, name: name))
+            }
             guard let dict = raw as? [String: Any], let rawComponents = dict["components"] as? [Any] else {
                 throw DesignTokenError.malformedToken(name: name, reason: "color missing components")
             }
@@ -171,5 +250,23 @@ public enum TokenLoader {
     static func referenceTarget(_ raw: String) -> String? {
         guard raw.hasPrefix("{"), raw.hasSuffix("}"), raw.count >= 3 else { return nil }
         return String(raw.dropFirst().dropLast())
+    }
+
+    /// `"#RRGGBB"` / `"#RRGGBBAA"` → sRGB components in 0…1 (3 or 4). Case-insensitive.
+    static func hexComponents(_ raw: String, name: String) throws -> [Double] {
+        var hex = raw.trimmingCharacters(in: .whitespaces)
+        if hex.hasPrefix("#") { hex.removeFirst() }
+        guard (hex.count == 6 || hex.count == 8), hex.allSatisfy(\.isHexDigit) else {
+            throw DesignTokenError.malformedToken(name: name, reason: "invalid hex colour '\(raw)'")
+        }
+        let chars = Array(hex)
+        var comps: [Double] = []
+        var i = 0
+        while i < chars.count {
+            let byte = UInt8(String(chars[i]) + String(chars[i + 1]), radix: 16)!
+            comps.append(Double(byte) / 255.0)
+            i += 2
+        }
+        return comps  // [r, g, b] or [r, g, b, a]
     }
 }

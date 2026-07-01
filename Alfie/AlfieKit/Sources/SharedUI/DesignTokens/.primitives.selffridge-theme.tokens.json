@@ -1,0 +1,110 @@
+{
+  "colours-neutrals-0": {
+    "$type": "color",
+    "$value": "#FFFFFF"
+  },
+  "colours-neutrals-100": {
+    "$type": "color",
+    "$value": "#F5F6F8"
+  },
+  "colours-neutrals-200": {
+    "$type": "color",
+    "$value": "#E6E8EC"
+  },
+  "colours-neutrals-300": {
+    "$type": "color",
+    "$value": "#C9CDD4"
+  },
+  "colours-neutrals-400": {
+    "$type": "color",
+    "$value": "#9AA0AB"
+  },
+  "colours-neutrals-500": {
+    "$type": "color",
+    "$value": "#6E747F"
+  },
+  "colours-neutrals-600": {
+    "$type": "color",
+    "$value": "#474C56"
+  },
+  "colours-neutrals-700": {
+    "$type": "color",
+    "$value": "#2A2E36"
+  },
+  "colours-neutrals-800": {
+    "$type": "color",
+    "$value": "#14171C"
+  },
+  "colours-neutrals-900": {
+    "$type": "color",
+    "$value": "#080A0D"
+  },
+  "colours-semantic-error-100": {
+    "$type": "color",
+    "$value": "#FEF1F2"
+  },
+  "colours-semantic-error-200": {
+    "$type": "color",
+    "$value": "#FBD9DC"
+  },
+  "colours-semantic-error-300": {
+    "$type": "color",
+    "$value": "#F0A0A6"
+  },
+  "colours-semantic-error-400": {
+    "$type": "color",
+    "$value": "#EC6670"
+  },
+  "colours-semantic-error-500": {
+    "$type": "color",
+    "$value": "#E03B4A"
+  },
+  "colours-semantic-error-600": {
+    "$type": "color",
+    "$value": "#BC2230"
+  },
+  "colours-semantic-error-700": {
+    "$type": "color",
+    "$value": "#971E29"
+  },
+  "colours-semantic-error-800": {
+    "$type": "color",
+    "$value": "#6E0D16"
+  },
+  "colours-semantic-success-100": {
+    "$type": "color",
+    "$value": "#ECF8F1"
+  },
+  "colours-semantic-success-200": {
+    "$type": "color",
+    "$value": "#CDEBD9"
+  },
+  "colours-semantic-success-300": {
+    "$type": "color",
+    "$value": "#95D3AE"
+  },
+  "colours-semantic-success-400": {
+    "$type": "color",
+    "$value": "#5FC287"
+  },
+  "colours-semantic-success-500": {
+    "$type": "color",
+    "$value": "#2FA262"
+  },
+  "colours-semantic-success-600": {
+    "$type": "color",
+    "$value": "#1F8B50"
+  },
+  "colours-semantic-success-700": {
+    "$type": "color",
+    "$value": "#167742"
+  },
+  "colours-semantic-success-800": {
+    "$type": "color",
+    "$value": "#08542C"
+  },
+  "colours-transparent-transparent": {
+    "$type": "color",
+    "$value": "#FFFFFF00"
+  }
+}
