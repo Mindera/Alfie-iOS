@@ -2,24 +2,26 @@ import XCTest
 @testable import Model
 
 final class ThemeServiceTests: XCTestCase {
-    private static let suiteName = "com.alfie.test.theme.defaults"
-
     private var sut: ThemeService!
     private var userDefaults: UserDefaults!
     private var appDelegate: SpyAppDelegate!
+    // Unique per test run so parallel test classes can't cross-contaminate a shared suite.
+    private var suiteName: String!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        userDefaults = UserDefaults(suiteName: Self.suiteName)
+        suiteName = "com.alfie.test.theme.defaults.\(UUID().uuidString)"
+        userDefaults = UserDefaults(suiteName: suiteName)
         appDelegate = SpyAppDelegate()
     }
 
     override func tearDownWithError() throws {
         sut = nil
         appDelegate = nil
-        userDefaults.removeSuite(named: Self.suiteName)
-        userDefaults.removePersistentDomain(forName: Self.suiteName)
+        userDefaults.removePersistentDomain(forName: suiteName)
+        userDefaults.removeSuite(named: suiteName)
         userDefaults = nil
+        suiteName = nil
         try super.tearDownWithError()
     }
 
