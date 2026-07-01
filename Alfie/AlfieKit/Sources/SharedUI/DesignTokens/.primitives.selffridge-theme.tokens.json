@@ -1,15 +1,15 @@
 {
   "colours-neutrals-0": {
     "$type": "color",
-    "$value": "#FFFFFF"
+    "$value": "#FDEB7A"
   },
   "colours-neutrals-100": {
     "$type": "color",
-    "$value": "#F5F6F8"
+    "$value": "#FCE34F"
   },
   "colours-neutrals-200": {
     "$type": "color",
-    "$value": "#E6E8EC"
+    "$value": "#E9CE2C"
   },
   "colours-neutrals-300": {
     "$type": "color",
