@@ -99,7 +99,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
 
         case .theme:
             ThemePickerView(viewModel: ThemePickerViewModel(themeService: viewModel.themeService))
-                .modifier(ContainerDemoViewModifier(headerTitle: "Theme"))
+                .modifier(ContainerDemoViewModifier(headerTitle: "Theme", embedInScrollView: false))
         }
     }
 
