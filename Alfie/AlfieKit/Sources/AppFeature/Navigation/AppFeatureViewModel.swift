@@ -108,7 +108,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let homeDependencyContainer = HomeDependencyContainer(
             configurationService: serviceProvider.configurationService,
             apiEndpointService: serviceProvider.apiEndpointService,
-            sessionService: serviceProvider.sessionService
+            sessionService: serviceProvider.sessionService,
+            themeService: serviceProvider.themeService
         )
 
         let bagFlowViewModel = BagFlowViewModel(

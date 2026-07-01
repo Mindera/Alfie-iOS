@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Core
 import Model
 #if DEBUG
@@ -30,6 +31,8 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
                     link(for: .featureToggle, text: "Feature Toggle")
                     #endif
                     link(for: .endpoint, text: "Environment")
+                    link(for: .theme, text: "Theme")
+                        .accessibilityIdentifier(AccessibilityID.DebugMenu.themeRow)
                 }
                 .listStyle(.plain)
             }
@@ -93,6 +96,10 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
                 .modifier(
                     ContainerDemoViewModifier(headerTitle: L10n.FeatureToggle.title, embedInScrollView: true)
                 )
+
+        case .theme:
+            ThemePickerView(viewModel: ThemePickerViewModel(themeService: viewModel.themeService))
+                .modifier(ContainerDemoViewModifier(headerTitle: "Theme"))
         }
     }
 
@@ -103,6 +110,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         case brazeInfo
         case endpoint
         case featureToggle
+        case theme
     }
 }
 
@@ -112,6 +120,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         viewModel: .init(
             configurationService: MockConfigurationService(),
             apiEndpointService: MockApiEndpointService(),
+            themeService: ThemeService(appDelegate: MockAppDelegate(), userDefaults: MockUserDefaults()),
             closeMenuAction: {},
             openForceAppUpdate: {},
             closeEndpointSelection: {}
