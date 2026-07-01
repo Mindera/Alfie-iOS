@@ -245,4 +245,17 @@ struct EmitterTests {
             _ = try emit(twoThemeLoaded(slateComplete: false))
         }
     }
+
+    @Test("colour-free input emits a compilable empty ThemeColours (case-less enum, no raw type)")
+    func colourFreeInputEmitsValidEmptyThemeColours() throws {
+        let fontToken = Token(name: "typography-font-family-x", type: "fontFamily", value: .fontFamily("X"), file: ".primitives.x")
+        let loaded = LoadedTokens(
+            map: ["typography-font-family-x": fontToken],
+            primitiveValues: ["typography-font-family-x": fontToken],
+            loadedFiles: [".primitives.x"]
+        )
+        let tc = try emit(loaded)["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("public enum AppTheme {"))
+        #expect(!tc.contains("public enum AppTheme: String"))   // a no-case enum can't declare a raw type
+    }
 }
