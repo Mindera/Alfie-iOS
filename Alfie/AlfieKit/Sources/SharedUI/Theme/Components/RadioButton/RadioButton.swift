@@ -61,7 +61,7 @@ struct RadioButton: View {
 
             Text.build(theme.font.paragraph.normal(text))
         }
-        .foregroundStyle(state.isDisabled ? Colors.primary.mono400 : Colors.primary.mono900)
+        .foregroundStyle(state.isDisabled ? Primitives.Colours.neutrals500 : Primitives.Colours.neutrals800)
         .onTapGesture {
             guard !state.isDisabled else {
                 hapticsService.trigger(.notification(.error))

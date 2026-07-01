@@ -36,7 +36,7 @@ struct DatePickerDemoView: View {
                     DatePicker("", selection: $dateSelection, displayedComponents: .date)
                         .labelsHidden()
                         .modifier(DatePickerModifier(type: datePickerType))
-                        .tint(Colors.primary.black)
+                        .tint(Primitives.Colours.neutrals900)
 
                     if datePickerType == .wheel {
                         VStack(alignment: .leading) {
@@ -47,7 +47,7 @@ struct DatePickerDemoView: View {
                     DatePicker("", selection: $dateSelection, displayedComponents: .hourAndMinute)
                         .labelsHidden()
                         .modifier(DatePickerModifier(type: datePickerType))
-                        .tint(Colors.primary.black)
+                        .tint(Primitives.Colours.neutrals900)
                 }
 
                 if datePickerType == .wheel {
@@ -59,7 +59,7 @@ struct DatePickerDemoView: View {
                 DatePicker("", selection: $dateAndHourSelection, displayedComponents: [.date, .hourAndMinute])
                     .labelsHidden()
                     .modifier(DatePickerModifier(type: datePickerType))
-                    .tint(Colors.primary.black)
+                    .tint(Primitives.Colours.neutrals900)
                     .padding(.horizontal, Spacing.space200)
             }
             .padding(.horizontal, Spacing.space200)

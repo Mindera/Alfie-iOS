@@ -120,14 +120,14 @@ struct ToolbarDemoView: View {
             if leftAlign {
                 ThemedToolbarTitle(
                     style: .leftText("Alfie"),
-                    tint: !darkMode ? Colors.primary.mono900 : Colors.primary.white
+                    tint: !darkMode ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals0
                 )
             } else {
                 if let mode = leftMode, mode.isMulti {
                     ThemedToolbarButton(
                         icon: mode.isIcon && mode != .multiMixed ? .store : nil,
                         text: mode == .multiMixed ? "Shop" : nil,
-                        tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                        tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
                     ) {}
                 }
             }
@@ -141,7 +141,7 @@ struct ToolbarDemoView: View {
             } else {
                 ThemedToolbarTitle(
                     style: showLogo ? .logo : .text("Alfie"),
-                    tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                    tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
                 )
             }
         }
@@ -153,14 +153,14 @@ struct ToolbarDemoView: View {
                 ThemedToolbarButton(
                     icon: mode.isIcon ? .bag : nil,
                     text: mode.isText ? "Bag" : nil,
-                    tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                    tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
                 ) {}
 
                 if mode.isMulti {
                     ThemedToolbarButton(
                         icon: mode.isIcon && mode != .multiMixed ? .chat : nil,
                         text: mode.isText || mode == .multiMixed ? "Chat" : nil,
-                        tint: darkMode ? Colors.primary.white : Colors.primary.mono900
+                        tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
                     ) {}
                 }
             }

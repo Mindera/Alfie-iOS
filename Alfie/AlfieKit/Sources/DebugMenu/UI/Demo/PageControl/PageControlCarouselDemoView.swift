@@ -4,28 +4,28 @@ import SwiftUI
 @available(iOS 17.0, *)
 struct PageControlCarouselDemoView: View {
     private let smallColors: [Color] = [
-        Colors.primary.mono200,
-        Colors.primary.mono300,
-        Colors.primary.mono400,
-        Colors.primary.mono500,
+        Primitives.Colours.neutrals200,
+        Primitives.Colours.neutrals300,
+        Primitives.Colours.neutrals400,
+        Primitives.Colours.neutrals500,
     ]
     private let mediumColors: [Color] = [
-        Colors.secondary.orange200,
-        Colors.secondary.orange300,
-        Colors.secondary.orange400,
-        Colors.secondary.orange500,
+        Primitives.Colours.semanticError200,
+        Primitives.Colours.semanticError300,
+        Primitives.Colours.semanticError400,
+        Primitives.Colours.semanticError500,
     ]
     private let largeColors: [Color] = [
-        Colors.secondary.blue200,
-        Colors.secondary.blue300,
-        Colors.secondary.blue400,
-        Colors.secondary.blue500,
+        Primitives.Colours.neutrals600,
+        Primitives.Colours.neutrals700,
+        Primitives.Colours.neutrals800,
+        Primitives.Colours.neutrals900,
     ]
     private let customColors: [Color] = [
-        Colors.secondary.green200,
-        Colors.secondary.green300,
-        Colors.secondary.green400,
-        Colors.secondary.green500,
+        Primitives.Colours.semanticSuccess200,
+        Primitives.Colours.semanticSuccess400,
+        Primitives.Colours.semanticSuccess500,
+        Primitives.Colours.semanticSuccess600,
     ]
 
     @State private var smallSelectedIndex: Int? = 0

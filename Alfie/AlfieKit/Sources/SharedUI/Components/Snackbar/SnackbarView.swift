@@ -134,26 +134,26 @@ public struct SnackbarView: View {
     private var backgroundColor: Color {
         switch configuration.type {
         case .info:
-            return Colors.primary.black
+            return Primitives.Colours.neutrals900
 
         case .success:
-            return Colors.secondary.green100
+            return Primitives.Colours.semanticSuccess100
 
         case .error:
-            return Colors.secondary.red100
+            return Primitives.Colours.semanticError100
         }
     }
 
     private var foregroundColor: Color {
         switch configuration.type {
         case .info:
-            return Colors.primary.white
+            return Primitives.Colours.neutrals0
 
         case .success:
-            return Colors.secondary.green800
+            return Primitives.Colours.semanticSuccess800
 
         case .error:
-            return Colors.secondary.red800
+            return Primitives.Colours.semanticError700
         }
     }
 }

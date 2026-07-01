@@ -8,8 +8,8 @@ public struct ThemedPageControlConfiguration {
     public let spacing: CGFloat
 
     public init(
-        color: Color = Colors.primary.mono200,
-        selectedColor: Color = Colors.primary.mono600,
+        color: Color = Primitives.Colours.neutrals200,
+        selectedColor: Color = Primitives.Colours.neutrals600,
         animationDuration: CGFloat = 0.3,
         size: CGFloat = 10,
         spacing: CGFloat = 0

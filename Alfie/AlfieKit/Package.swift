@@ -289,7 +289,6 @@ let package = Package(
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
                 .copy("Theme/Components/Loader/spin.gif"),
-                .process("Theme/Color/Colors.xcassets"),
                 .process("Theme/Images/ThemedImages.xcassets"),
                 .process("Theme/Toggle/ToggleColor.xcassets"),
                 .process("Theme/Typography/Resources/Fonts.xcassets"),

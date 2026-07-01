@@ -36,7 +36,7 @@ struct SearchBarDemoView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 10)
                         }
-                        .background(Colors.primary.white)
+                        .background(Primitives.Colours.neutrals0)
                         .cornerRadius(10)
                     }
                 }
@@ -59,7 +59,7 @@ struct SearchBarDemoView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Colors.primary.white)
+                    .background(Primitives.Colours.neutrals0)
                 }
             )
             .animation(.standard, value: searchBarTheme)

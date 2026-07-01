@@ -14,9 +14,9 @@ public struct LoaderView: View {
             // swiftlint:disable vertical_whitespace_between_cases
             switch self {
             case .dark:
-                return Colors.primary.black
+                return Primitives.Colours.neutrals900
             case .light:
-                return Colors.primary.white
+                return Primitives.Colours.neutrals0
             }
             // swiftlint:enable vertical_whitespace_between_cases
         }
@@ -72,7 +72,7 @@ public struct LoaderView: View {
 
             if !labelHidden {
                 Text.build(theme.font.paragraph.normal(labelTitle))
-                    .foregroundStyle(Colors.primary.black)
+                    .foregroundStyle(Primitives.Colours.neutrals900)
             }
         }
     }

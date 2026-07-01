@@ -14,7 +14,7 @@ public struct ThemedToolbarModifier: ViewModifier {
         VStack {
             if showDivider {
                 Divider()
-                    .background(Colors.primary.mono200)
+                    .background(Primitives.Colours.neutrals200)
             }
             content
                 .navigationBarTitleDisplayMode(.inline)

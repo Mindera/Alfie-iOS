@@ -43,8 +43,8 @@ public struct ZoomableCarousel<Content: View>: View {
                         .scaledToFit()
                         .frame(width: Constants.closeIconSize, height: Constants.closeIconSize)
                         .padding(Spacing.space050)
-                        .foregroundStyle(Colors.primary.mono900)
-                        .background(Colors.primary.white.opacity(Constants.closeIconBackgroundOpacity))
+                        .foregroundStyle(Primitives.Colours.neutrals800)
+                        .background(Primitives.Colours.neutrals0.opacity(Constants.closeIconBackgroundOpacity))
                         .clipShape(Circle())
                 })
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,7 +62,7 @@ public struct ZoomableCarousel<Content: View>: View {
                         slideSubject: slideSubject
                     )
                     .padding(Spacing.space200)
-                    .background(Colors.primary.white.opacity(Constants.backgroundOpacity))
+                    .background(Primitives.Colours.neutrals0.opacity(Constants.backgroundOpacity))
                     .cornerRadius(CornerRadius.s)
                 }
             }

@@ -126,7 +126,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     private func brandItemView(_ brand: Brand) -> some View {
         BrandItemView(
             brand: brand,
-            foregroundColor: { Colors.primary.mono800 },
+            foregroundColor: { Primitives.Colours.neutrals700 },
             isLoading: .constant(false)
         )
         .modifier(
@@ -138,7 +138,7 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     }
 
     private func placeholderItemView(_ placeholder: Brand) -> some View {
-        BrandItemView(brand: placeholder, foregroundColor: { Colors.primary.mono300 }, isLoading: .constant(true))
+        BrandItemView(brand: placeholder, foregroundColor: { Primitives.Colours.neutrals400 }, isLoading: .constant(true))
     }
 
     private func sectionIndexTitles(proxy: ScrollViewProxy) -> some View {
@@ -192,12 +192,12 @@ extension BrandsView {
             HStack(alignment: .center, spacing: Spacing.space0) {
                 Text(title)
                     .font(Font(theme.font.paragraph.bold))
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, Spacing.space200)
             .frame(height: Constants.headerViewHeight)
-            .background(Colors.primary.white)
+            .background(Primitives.Colours.neutrals0)
         }
     }
 
@@ -298,11 +298,11 @@ extension BrandsView {
         var body: some View {
             Text(text)
                 .font(Font(theme.font.tiny.normal))
-                .foregroundStyle(isSelected ? Colors.primary.white : Colors.primary.mono500)
+                .foregroundStyle(isSelected ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals500)
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
                     RoundedRectangle(cornerRadius: CornerRadius.xxs)
-                        .foregroundStyle(isSelected ? Colors.primary.mono900 : Color.clear)
+                        .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Color.clear)
                 }
         }
     }

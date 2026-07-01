@@ -8,9 +8,9 @@ public struct PaginatedControlConfiguration {
     let infiniteScrollingEnabled: Bool
 
     public init(
-        backgroundColor: Color = Colors.primary.white,
-        tintColor: Color = Colors.primary.mono900,
-        textColor: Color = Colors.primary.mono900,
+        backgroundColor: Color = Primitives.Colours.neutrals0,
+        tintColor: Color = Primitives.Colours.neutrals800,
+        textColor: Color = Primitives.Colours.neutrals800,
         pageSeparator: String = "/",
         infiniteScrollingEnabled: Bool = true
     ) {

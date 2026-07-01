@@ -21,7 +21,7 @@ struct ProductListingListStyleSelector: View {
                     .scaledToFit()
                     .frame(width: Constants.filterIcon, height: Constants.filterIcon)
                     .foregroundStyle(
-                        selectedStyle == .grid ? Colors.primary.mono900 : Colors.primary.mono200
+                        selectedStyle == .grid ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200
                     )
             }
             .buttonStyle(.plain)
@@ -35,7 +35,7 @@ struct ProductListingListStyleSelector: View {
                     .scaledToFit()
                     .frame(width: Constants.filterIcon, height: Constants.filterIcon)
                     .foregroundStyle(
-                        selectedStyle == .list ? Colors.primary.mono900 : Colors.primary.mono200
+                        selectedStyle == .list ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200
                     )
             }
             .buttonStyle(.plain)

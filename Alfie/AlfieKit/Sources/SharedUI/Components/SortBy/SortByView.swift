@@ -18,7 +18,7 @@ public struct SortByView: View {
             HStack {
                 Text(title)
                     .font(Constants.fontTitle)
-                    .foregroundStyle(Colors.primary.mono900)
+                    .foregroundStyle(Primitives.Colours.neutrals800)
                 Spacer()
             }
             .padding(.horizontal, Spacing.space200)
@@ -39,12 +39,12 @@ public struct SortByView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(size: Constants.iconSize)
-                                            .tint(Colors.primary.mono900)
+                                            .tint(Primitives.Colours.neutrals800)
                                             .padding(.vertical, Spacing.space150)
                                             .padding(.leading, Spacing.space150)
                                     }
                                     Text.build(theme.font.small.bold(option.title))
-                                        .foregroundStyle(Colors.primary.mono900)
+                                        .foregroundStyle(Primitives.Colours.neutrals800)
                                         .padding(.trailing, Spacing.space150)
                                         .padding(.vertical, Spacing.space150)
                                         .padding(.leading, option.icon == nil ? Spacing.space150 : 0)
@@ -69,7 +69,7 @@ public struct SortByView: View {
     }
 
     private func colorForOptionBorder(_ option: SortByType) -> Color {
-        option == sortBy ? Colors.primary.mono900 : Colors.primary.mono100
+        option == sortBy ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals100
     }
 
     private enum Constants {

@@ -29,27 +29,27 @@ public struct ShadowViewModifier: ViewModifier {
                 .elevation3,
                 .elevation4,
                 .elevation5:
-                return Colors.primary.black.opacity(0.15)
+                return Primitives.Colours.neutrals900.opacity(0.15)
             case .mediumFloat1:
-                return Colors.primary.mono900.opacity(0.1)
+                return Primitives.Colours.neutrals800.opacity(0.1)
             case .mediumFloat2:
-                return Colors.primary.mono900.opacity(0.15)
+                return Primitives.Colours.neutrals800.opacity(0.15)
             case .mediumFloat3:
-                return Colors.primary.mono900.opacity(0.2)
+                return Primitives.Colours.neutrals800.opacity(0.2)
             case .mediumFloat4:
-                return Colors.primary.mono900.opacity(0.25)
+                return Primitives.Colours.neutrals800.opacity(0.25)
             case .mediumFloat5:
-                return Colors.primary.mono900.opacity(0.3)
+                return Primitives.Colours.neutrals800.opacity(0.3)
             case .softFloat1:
-                return Colors.primary.mono900.opacity(0.04)
+                return Primitives.Colours.neutrals800.opacity(0.04)
             case .softFloat2:
-                return Colors.primary.mono900.opacity(0.06)
+                return Primitives.Colours.neutrals800.opacity(0.06)
             case .softFloat3:
-                return Colors.primary.mono900.opacity(0.08)
+                return Primitives.Colours.neutrals800.opacity(0.08)
             case .softFloat4:
-                return Colors.primary.mono900.opacity(0.10)
+                return Primitives.Colours.neutrals800.opacity(0.10)
             case .softFloat5:
-                return Colors.primary.mono900.opacity(0.12)
+                return Primitives.Colours.neutrals800.opacity(0.12)
             }
         }
 
