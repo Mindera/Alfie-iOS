@@ -14,6 +14,7 @@ public protocol ServiceProviderProtocol: AnyObject {
     var webUrlProvider: WebURLProviderProtocol { get }
     var notificationsService: NotificationsServiceProtocol { get }
     var webViewConfigurationService: WebViewConfigurationServiceProtocol { get }
+    var themeService: ThemeServiceProtocol { get }
 
     // API
     var navigationService: NavigationServiceProtocol { get }

@@ -52,6 +52,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         AppState.shared.sessionID = UUID()
     }
 
+    public func applyTheme(id: String) {
+        // Persist first; the soft-reboot recreates services + re-reads the selection in bootstrap(),
+        // which re-applies the palette and UIKit appearance before the fresh UI is built.
+        serviceProvider.themeService.set(id)
+        rebootApp()
+    }
+
     // MARK: - Private
 
     private func bootstrap(application: UIApplication?) {
@@ -70,6 +77,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 serviceProvider.notificationsService.start()
             }
         }
+
+        // Apply the persisted colour theme before the UI (and the UIKit appearance proxies set in
+        // setupAppearance) are first built — and again on every reboot, since bootstrap() re-runs there.
+        ThemeColours.apply(id: serviceProvider.themeService.selectedThemeID ?? AppTheme.alfie.rawValue)
+        DesignSystem.shared.setupAppearance()
 
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
         isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
