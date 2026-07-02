@@ -18,13 +18,14 @@ public struct Emitter {
     // swiftlint:disable all
     """
 
-    /// filename → file contents. Stable set of four files.
+    /// filename → file contents. Stable set of five files.
     public func emit() throws -> [String: String] {
         [
             "Primitives+Generated.swift": try emitPrimitives(),
             "Theme+Generated.swift": try emitTheme(),
             "Sizing+Generated.swift": try emitSizing(),
             "Typography+Generated.swift": try emitTypography(),
+            "ThemeColours+Generated.swift": try emitThemeColours(),
         ]
     }
 
@@ -40,9 +41,16 @@ public struct Emitter {
             body += "    public enum \(upperCamel(group)) {\n"
             for token in members {
                 let id = SwiftIdentifier.make(token.name, dropPrefix: group)
-                // Most primitives are concrete; a few reference another primitive
-                // (e.g. a font-size aliased to a spacing value) — keep that as a symbol reference.
-                body += "        public static let \(id)\(annotation(token.value)) = \(try valueOrPrimitiveRef(token))\n"
+                if group == coloursGroup {
+                    // Colours are theme-swappable: forward to the active palette instead of a fixed
+                    // literal, so a runtime theme switch (+ soft-reboot) re-renders every call site
+                    // unchanged. The concrete literals live in `ThemeColours` (one per theme).
+                    body += "        public static var \(id): Color { ThemeColours.current.\(id) }\n"
+                } else {
+                    // Most primitives are concrete; a few reference another primitive
+                    // (e.g. a font-size aliased to a spacing value) — keep that as a symbol reference.
+                    body += "        public static let \(id)\(annotation(token.value)) = \(try valueOrPrimitiveRef(token))\n"
+                }
             }
             body += "    }\n"
         }
@@ -63,7 +71,9 @@ public struct Emitter {
         var body = ""
         for token in theme {
             let id = SwiftIdentifier.make(token.name)
-            body += "    public static let \(id) = \(try valueOrPrimitiveRef(token))\n"
+            // Computed (not `static let`): semantic colours forward to `Primitives.Colours` which is
+            // theme-swappable, so a `let` would cache the launch theme and go stale after a switch.
+            body += "    public static var \(id): Color { \(try valueOrPrimitiveRef(token)) }\n"
         }
         return """
         \(Self.header)
@@ -71,6 +81,120 @@ public struct Emitter {
 
         public enum Theme {
         \(body)}
+        """
+    }
+
+    // MARK: - ThemeColours (per-theme colour palettes + active holder)
+
+    /// Emits the swappable colour layer that `Primitives.Colours` forwards to:
+    /// - `ColourPalette`: one `Color` per colour primitive (schema = the base theme's colours).
+    /// - `ThemeColours`: a concrete palette per theme (literals) + the mutable `current` holder.
+    /// - `AppTheme`: `String`-backed, `CaseIterable` ids for pickers/persistence, mapped to palettes.
+    /// Every theme must define the full base colour schema — a gap fails the build (catches drift).
+    private func emitThemeColours() throws -> String {
+        // Colour source: explicit per-theme palettes when present, else a single base palette derived
+        // from the primitive colours (keeps `emit()` valid for minimal/hand-built inputs).
+        var colourThemes = loaded.colourThemes
+        if colourThemes.isEmpty {
+            let baseColours = loaded.primitiveValues.filter { $0.value.value.isColour }
+            if !baseColours.isEmpty { colourThemes = [loaded.baseTheme: baseColours] }
+        }
+        let themeIDs = colourThemes.keys.sorted()
+        // A token set with no colours at all → a valid, empty holder (nothing forwards to it).
+        guard !themeIDs.isEmpty else { return emptyThemeColoursFile() }
+
+        let base = colourThemes[loaded.baseTheme] != nil ? loaded.baseTheme : themeIDs[0]
+        let baseColours = colourThemes[base]!
+        let members = baseColours.keys.sorted().map { (name: $0, id: SwiftIdentifier.make($0, dropPrefix: coloursGroup)) }
+        try SwiftIdentifier.assertNoCollisions(baseColours.keys.sorted(), dropPrefix: coloursGroup)
+        // Guard the one identifier surface that isn't a token name: theme ids → palette/case names.
+        try SwiftIdentifier.assertNoCollisions(themeIDs.map(themeVarName))
+
+        // ColourPalette struct: one stored Color per colour id.
+        let structFields = members.map { "    public let \($0.id): Color" }.joined(separator: "\n")
+        let initParams = members.map { "\($0.id): Color" }.joined(separator: ", ")
+        let initBody = members.map { "        self.\($0.id) = \($0.id)" }.joined(separator: "\n")
+
+        // One concrete palette per theme (literal colours).
+        var instances = ""
+        for themeId in themeIDs {
+            let colours = colourThemes[themeId]!
+            let args = try members.map { member -> String in
+                guard let token = colours[member.name] else {
+                    throw DesignTokenError.malformedToken(
+                        name: "\(themeId)/\(member.name)",
+                        reason: "theme '\(themeId)' is missing colour '\(member.name)' defined in base '\(base)'"
+                    )
+                }
+                return "\(member.id): \(try literal(token.value, name: member.name))"
+            }.joined(separator: ", ")
+            instances += "    public static let \(themeVarName(themeId)) = ColourPalette(\(args))\n"
+        }
+
+        // AppTheme enum: ids for pickers/persistence, mapped to their palette.
+        let appCases = themeIDs.map { "    case \(themeVarName($0)) = \(String(reflecting: $0))" }.joined(separator: "\n")
+        let appPaletteCases = themeIDs.map { "        case .\(themeVarName($0)): return ThemeColours.\(themeVarName($0))" }.joined(separator: "\n")
+
+        return """
+        \(Self.header)
+        import SwiftUI
+
+        public struct ColourPalette {
+        \(structFields)
+
+            public init(\(initParams)) {
+        \(initBody)
+            }
+        }
+
+        public enum AppTheme: String, CaseIterable {
+        \(appCases)
+
+            public var palette: ColourPalette {
+                switch self {
+        \(appPaletteCases)
+                }
+            }
+        }
+
+        public enum ThemeColours {
+        \(instances)
+            /// The active palette. Set once at launch (and on each theme switch) before the UI builds.
+            public static var current: ColourPalette = \(themeVarName(base))
+
+            public static func apply(_ theme: AppTheme) { current = theme.palette }
+
+            /// Apply by persisted id; unknown ids leave the current palette unchanged.
+            public static func apply(id: String) {
+                if let theme = AppTheme(rawValue: id) { current = theme.palette }
+            }
+        }
+        """
+    }
+
+    /// Valid, empty colour layer for token sets that define no colours (keeps the emitted file set
+    /// stable). Nothing forwards to it, so an empty palette/holder is harmless.
+    private func emptyThemeColoursFile() -> String {
+        """
+        \(Self.header)
+        import SwiftUI
+
+        public struct ColourPalette {
+            public init() {}
+        }
+
+        // No themes → a case-less enum. It must NOT declare a raw type or `CaseIterable`
+        // (a no-case enum can't synthesize `RawRepresentable`/`allCases`).
+        public enum AppTheme {
+        }
+
+        public enum ThemeColours {
+            public static var current = ColourPalette()
+
+            public static func apply(_ theme: AppTheme) {}
+
+            public static func apply(id: String) {}
+        }
         """
     }
 
@@ -211,6 +335,17 @@ public struct Emitter {
     }
 
     // MARK: - Name helpers
+
+    /// The primitives group whose values are theme-swappable (emitted as forwarders, not literals).
+    private var coloursGroup: String { "colours" }
+
+    /// Theme id → Swift identifier for its palette/case, dropping a trailing `-theme`
+    /// (`alfie-theme` → `alfie`, `selffridge-theme` → `selffridge`).
+    private func themeVarName(_ themeId: String) -> String {
+        let suffix = "-theme"
+        let stripped = themeId.hasSuffix(suffix) ? String(themeId.dropLast(suffix.count)) : themeId
+        return SwiftIdentifier.make(stripped)
+    }
 
     private func firstSegment(_ name: String) -> String { String(name.split(separator: "-").first ?? "") }
     private func stripFirstSegment(_ name: String) -> String {

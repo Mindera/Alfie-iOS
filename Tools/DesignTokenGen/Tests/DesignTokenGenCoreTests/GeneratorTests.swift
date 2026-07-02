@@ -40,6 +40,33 @@ struct TokenLoaderTests {
         #expect(loaded.map["~~doc-others-token"] == nil)
     }
 
+    @Test("loads multiple .primitives theme modes into separate colour palettes; base drives the map")
+    func loadsMultipleThemeModes() throws {
+        let loaded = try TokenLoader.load(inputDirectory: miniURL())
+        #expect(loaded.colourThemes.keys.sorted() == ["alfie-theme", "selffridge-theme"])
+        #expect(loaded.baseTheme == "alfie-theme")
+        // Base (alfie) still drives the resolver map — the second theme must NOT clobber it.
+        #expect(loaded.map["colours-neutrals-0"]?.value == .color(components: [1, 1, 1]))
+        // The second theme's colours are parsed (from hex on disk) into their own palette, distinct from base.
+        let selffridge = loaded.colourThemes["selffridge-theme"]
+        #expect(selffridge?.count == 2)
+        #expect(selffridge?["colours-neutrals-0"]?.value != loaded.colourThemes["alfie-theme"]?["colours-neutrals-0"]?.value)
+    }
+
+    @Test("parses hex colour strings (6- and 8-digit), case-insensitive")
+    func parsesHexColours() throws {
+        #expect(try TokenLoader.parseValue(type: "color", raw: "#FFFFFF", name: "x") == .color(components: [1, 1, 1]))
+        #expect(try TokenLoader.parseValue(type: "color", raw: "#000000", name: "x") == .color(components: [0, 0, 0]))
+        #expect(try TokenLoader.parseValue(type: "color", raw: "#ffffff00", name: "x") == .color(components: [1, 1, 1, 0]))
+    }
+
+    @Test("invalid hex colour throws")
+    func rejectsBadHex() {
+        #expect(throws: DesignTokenError.self) {
+            _ = try TokenLoader.parseValue(type: "color", raw: "#12", name: "x")
+        }
+    }
+
     @Test("non-px dimension unit throws")
     func rejectsNonPxUnit() {
         #expect(throws: DesignTokenError.self) {
@@ -124,11 +151,13 @@ struct ResolverTests {
 struct EmitterTests {
     private func emit() throws -> [String: String] { try Generator.emitInMemory(inputDirectory: miniURL()) }
 
-    @Test("primitives emit concrete literals")
+    @Test("primitives emit concrete literals; colours forward to the active theme palette")
     func primitivesLiterals() throws {
         let p = try emit()["Primitives+Generated.swift"]!
         #expect(p.contains("public enum Colours"))
-        #expect(p.contains("public static let neutrals0 = Color(.sRGB"))
+        // Colours are now theme-swappable forwarders, not fixed literals.
+        #expect(p.contains("public static var neutrals0: Color { ThemeColours.current.neutrals0 }"))
+        #expect(!p.contains("Color(.sRGB"))  // colour literals moved to ThemeColours
         #expect(p.contains("public static let fontFamilyBrand: String = \"Libre Test\""))
     }
 
@@ -141,7 +170,8 @@ struct EmitterTests {
     @Test("semantic theme tokens reference primitives, never inline a color literal")
     func themeReferenceGraph() throws {
         let t = try emit()["Theme+Generated.swift"]!
-        #expect(t.contains("public static let surfaceBackgroundPrimary = Primitives.Colours.neutrals0"))
+        // Computed var so semantic colours track the active theme (not frozen at launch).
+        #expect(t.contains("public static var surfaceBackgroundPrimary: Color { Primitives.Colours.neutrals0 }"))
         #expect(!t.contains("Color(.sRGB"))  // reference-graph AC: no hardcoded hex/components in semantic layer
     }
 
@@ -177,5 +207,100 @@ struct EmitterTests {
     @Test("output is byte-identical across runs (deterministic)")
     func deterministic() throws {
         #expect(try emit() == emit())
+    }
+
+    // MARK: - Multi-theme colours
+
+    private func colourToken(_ name: String, _ comps: [Double], file: String) -> Token {
+        Token(name: name, type: "color", value: .color(components: comps), file: file)
+    }
+
+    private func twoThemeLoaded(slateComplete: Bool = true) -> LoadedTokens {
+        let alfie = [
+            "colours-neutrals-0": colourToken("colours-neutrals-0", [1, 1, 1], file: ".primitives.alfie-theme.tokens.json"),
+            "colours-neutrals-100": colourToken("colours-neutrals-100", [0.9, 0.9, 0.9], file: ".primitives.alfie-theme.tokens.json"),
+        ]
+        var slate = ["colours-neutrals-0": colourToken("colours-neutrals-0", [0, 0, 0], file: ".primitives.selffridge-theme.tokens.json")]
+        if slateComplete {
+            slate["colours-neutrals-100"] = colourToken("colours-neutrals-100", [0.1, 0.1, 0.1], file: ".primitives.selffridge-theme.tokens.json")
+        }
+        return LoadedTokens(
+            map: alfie, primitiveValues: alfie, loadedFiles: [".primitives.alfie-theme.tokens.json"],
+            colourThemes: ["alfie-theme": alfie, "selffridge-theme": slate], baseTheme: "alfie-theme"
+        )
+    }
+
+    private func emit(_ loaded: LoadedTokens) throws -> [String: String] {
+        let resolver = Resolver(loaded: loaded, cycleAllowlist: .init(edges: []), brokenRefAllowlist: .init(missingTargets: []))
+        return try Emitter(loaded: loaded, resolver: resolver).emit()
+    }
+
+    @Test("multi-theme: ThemeColours emits a palette + AppTheme case per theme; Primitives.Colours forwards")
+    func multiThemeColours() throws {
+        let files = try emit(twoThemeLoaded())
+        let tc = files["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("public struct ColourPalette"))
+        #expect(tc.contains("public static let alfie = ColourPalette("))
+        #expect(tc.contains("public static let selffridge = ColourPalette("))
+        #expect(tc.contains("public enum AppTheme: String, CaseIterable"))
+        #expect(tc.contains("case alfie = \"alfie-theme\""))
+        #expect(tc.contains("case selffridge = \"selffridge-theme\""))
+        #expect(tc.contains("public static var current: ColourPalette = alfie"))
+        // Distinct literals per theme.
+        #expect(tc.contains("Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)"))
+        #expect(tc.contains("Color(.sRGB, red: 0.0, green: 0.0, blue: 0.0, opacity: 1.0)"))
+        // Call sites keep reading Primitives.Colours, which now forwards to the active palette.
+        #expect(files["Primitives+Generated.swift"]!.contains("public static var neutrals0: Color { ThemeColours.current.neutrals0 }"))
+    }
+
+    @Test("multi-theme: a theme missing a base colour fails the build (schema drift guard)")
+    func multiThemeMissingColourThrows() {
+        #expect(throws: DesignTokenError.self) {
+            _ = try emit(twoThemeLoaded(slateComplete: false))
+        }
+    }
+
+    @Test("emit (from disk): both primitive theme modes become distinct palettes + AppTheme cases")
+    func emitsDiskThemes() throws {
+        let tc = try Generator.emitInMemory(inputDirectory: miniURL())["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("public static let alfie = ColourPalette("))
+        #expect(tc.contains("public static let selffridge = ColourPalette("))
+        #expect(tc.contains("case alfie = \"alfie-theme\""))
+        #expect(tc.contains("case selffridge = \"selffridge-theme\""))
+    }
+
+    @Test("theme ids colliding to one identifier fail the build")
+    func themeNameCollisionThrows() {
+        let alfie = ["colours-neutrals-0": colourToken("colours-neutrals-0", [1, 1, 1], file: "a")]
+        let loaded = LoadedTokens(
+            map: alfie, primitiveValues: alfie, loadedFiles: ["a"],
+            colourThemes: ["alfie-theme": alfie, "alfie": alfie], baseTheme: "alfie-theme"
+        )
+        #expect(throws: DesignTokenError.self) { _ = try emit(loaded) }
+    }
+
+    @Test("theme id without a -theme suffix keeps its identifier (custom → custom)")
+    func themeVarNameNoSuffix() throws {
+        let alfie = ["colours-neutrals-0": colourToken("colours-neutrals-0", [1, 1, 1], file: "a")]
+        let loaded = LoadedTokens(
+            map: alfie, primitiveValues: alfie, loadedFiles: ["a"],
+            colourThemes: ["alfie-theme": alfie, "custom": alfie], baseTheme: "alfie-theme"
+        )
+        let tc = try emit(loaded)["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("case custom = \"custom\""))
+        #expect(tc.contains("public static let custom = ColourPalette("))
+    }
+
+    @Test("colour-free input emits a compilable empty ThemeColours (case-less enum, no raw type)")
+    func colourFreeInputEmitsValidEmptyThemeColours() throws {
+        let fontToken = Token(name: "typography-font-family-x", type: "fontFamily", value: .fontFamily("X"), file: ".primitives.x")
+        let loaded = LoadedTokens(
+            map: ["typography-font-family-x": fontToken],
+            primitiveValues: ["typography-font-family-x": fontToken],
+            loadedFiles: [".primitives.x"]
+        )
+        let tc = try emit(loaded)["ThemeColours+Generated.swift"]!
+        #expect(tc.contains("public enum AppTheme {"))
+        #expect(!tc.contains("public enum AppTheme: String"))   // a no-case enum can't declare a raw type
     }
 }

@@ -1,0 +1,4 @@
+{
+  "colours-neutrals-0": { "$type": "color", "$value": "#FDEB7A" },
+  "colours-neutrals-800": { "$type": "color", "$value": "#111827" }
+}

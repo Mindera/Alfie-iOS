@@ -8,6 +8,7 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     private let sessionService: SessionServiceProtocol
     private let configurationService: ConfigurationServiceProtocol
     private let apiEndpointService: ApiEndpointServiceProtocol
+    private let themeService: ThemeServiceProtocol
     private let navigate: (HomeRoute) -> Void
     private let showSearch: () -> Void
     @Published private var isUserSignedIn = false
@@ -39,6 +40,7 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
         self.apiEndpointService = dependencies.apiEndpointService
+        self.themeService = dependencies.themeService
         self.navigate = navigate
         self.showSearch = showSearch
 
@@ -65,6 +67,7 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
                 viewModel: DebugMenuViewModel(
                     configurationService: configurationService,
                     apiEndpointService: apiEndpointService,
+                    themeService: themeService,
                     closeMenuAction: { [weak self] in self?.fullScreenCover = nil
                     },
                     openForceAppUpdate: { [weak self] in

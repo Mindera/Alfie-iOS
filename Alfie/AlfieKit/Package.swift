@@ -181,6 +181,7 @@ let package = Package(
         .target(
             name: "DebugMenu",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Mocks",
                 "Model",
@@ -376,6 +377,8 @@ let package = Package(
             name: "DebugMenuTests",
             dependencies: [
                 "DebugMenu",
+                "Mocks",
+                "SharedUI",
                 "TestUtils",
             ]
         ),

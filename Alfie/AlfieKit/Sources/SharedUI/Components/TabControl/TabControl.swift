@@ -65,9 +65,11 @@ public struct TabControl: View {
         static let innerLineHeight: CGFloat = 2
         static let itemHeight: CGFloat = 44
         static let imageSize: CGFloat = 16
-        static let innerLineColor = Primitives.Colours.neutrals100
-        static let selectedItemFontColor = Primitives.Colours.neutrals800
-        static let unselectedItemFontColor = Primitives.Colours.neutrals500
+        // Computed so a runtime theme switch (+ soft-reboot) is reflected — a `static let` would
+        // cache the launch theme's colour for the process lifetime.
+        static var innerLineColor: Color { Primitives.Colours.neutrals100 }
+        static var selectedItemFontColor: Color { Primitives.Colours.neutrals800 }
+        static var unselectedItemFontColor: Color { Primitives.Colours.neutrals500 }
         static let matchedGeometryEffectID = "tabControl_underline"
     }
 

@@ -51,7 +51,8 @@ public struct SizingSwatchView: View {
 }
 
 private enum Constants {
-    static let disabledStateColor: Color = Primitives.Colours.neutrals500
+    // Computed so a runtime theme switch (+ soft-reboot) is reflected (see other Constants notes).
+    static var disabledStateColor: Color { Primitives.Colours.neutrals500 }
     static let insetVertical: CGFloat = Primitives.Spacing.spacing8
     static let insetHorizontal: CGFloat = Primitives.Spacing.spacing24
     static let borderLineWidth: CGFloat = 1

@@ -71,6 +71,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
+        // Apply the persisted colour theme before the UI (and the UIKit appearance proxies set in
+        // setupAppearance) are first built — and again on every reboot, since bootstrap() re-runs there.
+        ThemeColours.apply(id: serviceProvider.themeService.selectedThemeID ?? AppTheme.alfie.rawValue)
+        DesignSystem.shared.setupAppearance()
+
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
         isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)
 
