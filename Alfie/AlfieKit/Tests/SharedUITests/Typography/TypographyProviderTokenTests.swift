@@ -49,6 +49,15 @@ final class TypographyProviderTokenTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
+        // Compare the wrapped token field-by-field so a wrong token that happens to share
+        // size/weight can't slip through, and lineHeight/letterSpacing are pinned too.
+        XCTAssertEqual(themed.style.fontFamily, token.fontFamily, "fontFamily", file: file, line: line)
+        XCTAssertEqual(themed.style.fontWeight, token.fontWeight, "fontWeight", file: file, line: line)
+        XCTAssertEqual(themed.style.fontSize, token.fontSize, "fontSize", file: file, line: line)
+        XCTAssertEqual(themed.style.lineHeight, token.lineHeight, "lineHeight", file: file, line: line)
+        XCTAssertEqual(themed.style.letterSpacing, token.letterSpacing, "letterSpacing", file: file, line: line)
+
+        // Bridge checks: the resolved UIFont reflects the token.
         XCTAssertEqual(themed.uiFont.pointSize, token.fontSize, "pointSize", file: file, line: line)
         // Weight traits are only meaningful for the system font (SF Pro); the custom brand
         // face carries its own descriptor weight, so we only assert the mapped weight there.
