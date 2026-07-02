@@ -37,7 +37,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 75)
-            Text.build(theme.font.header.h3(viewModel.homeTitle))
+            Text.build(theme.font.heading.small(viewModel.homeTitle))
             ThemedButton(text: viewModel.signInButtonText) {
                 viewModel.didTapSignInButton()
             }

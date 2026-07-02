@@ -23,7 +23,7 @@ struct CornerRadiusDemoView: View {
 
                 DemoHelper.demoSectionHeader(title: "Nested Corners")
 
-                Text.build(theme.font.small.normal("Inner: Soft, Outer: Strong"))
+                Text.build(theme.font.body.small("Inner: Soft, Outer: Strong"))
                     .padding()
                     .overlay(
                         RoundedRectangle(cornerRadius: Sizing.radiusSoft)
@@ -43,7 +43,7 @@ struct CornerRadiusDemoView: View {
     }
 
     private func cornerRadiusView(label: String, radius: CGFloat, isSquare: Bool = false) -> some View {
-        Text.build(theme.font.small.normal(label))
+        Text.build(theme.font.body.small(label))
             .padding()
             .overlay(
                 RoundedRectangle(cornerRadius: radius)

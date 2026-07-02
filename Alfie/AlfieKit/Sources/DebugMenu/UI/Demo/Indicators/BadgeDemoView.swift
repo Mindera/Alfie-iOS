@@ -131,7 +131,7 @@ struct BadgeDemoView: View {
         ZStack {
             RoundedRectangle(cornerRadius: Sizing.radiusStrong)
                 .fill(.black)
-            Text.build(theme.font.small.bold(label))
+            Text.build(theme.font.body.small(label))
                 .padding()
                 .foregroundStyle(Primitives.Colours.neutrals0)
         }

@@ -11,16 +11,16 @@ struct PageControlDemoView: View {
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text.build(theme.font.small.bold("Small Dots"))
+                        Text.build(theme.font.body.small("Small Dots"))
                             .frame(height: 30, alignment: .leading)
 
-                        Text.build(theme.font.small.bold("Medium Dots"))
+                        Text.build(theme.font.body.small("Medium Dots"))
                             .frame(height: 30, alignment: .leading)
 
-                        Text.build(theme.font.small.bold("Large Dots"))
+                        Text.build(theme.font.body.small("Large Dots"))
                             .frame(height: 30, alignment: .leading)
 
-                        Text.build(theme.font.small.bold("Custom Dots"))
+                        Text.build(theme.font.body.small("Custom Dots"))
                             .frame(height: 30, alignment: .leading)
                     }
                     Spacer()

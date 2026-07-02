@@ -43,7 +43,7 @@ public struct SortByView: View {
                                             .padding(.vertical, Primitives.Spacing.spacing12)
                                             .padding(.leading, Primitives.Spacing.spacing12)
                                     }
-                                    Text.build(theme.font.small.bold(option.title))
+                                    Text.build(theme.font.body.small(option.title))
                                         .foregroundStyle(Primitives.Colours.neutrals800)
                                         .padding(.trailing, Primitives.Spacing.spacing12)
                                         .padding(.vertical, Primitives.Spacing.spacing12)
@@ -76,7 +76,7 @@ public struct SortByView: View {
         static let titleFontSize: CGFloat = 18
         static let borderLineWidth: CGFloat = 1
         static let iconSize: CGSize = .init(width: 16, height: 16)
-        static let fontTitle: Font = DesignSystem.shared.font.paragraph.normal.withSize(Constants.titleFontSize).font
+        static let fontTitle: Font = DesignSystem.shared.font.body.medium.uiFont.withSize(Constants.titleFontSize).font
         static let scrollBuffer: CGFloat = 1
     }
 }

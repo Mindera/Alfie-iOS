@@ -51,10 +51,10 @@ struct SearchBarDemoView: View {
                 resultsView: {
                     VStack(spacing: Primitives.Spacing.spacing16) {
                         if searchText.isEmpty {
-                            Text.build(theme.font.paragraph.normal("Type something to start searching"))
+                            Text.build(theme.font.body.medium("Type something to start searching"))
                         } else {
-                            Text.build(theme.font.paragraph.normal("Searching for:"))
-                            Text.build(theme.font.small.bold(searchText))
+                            Text.build(theme.font.body.medium("Searching for:"))
+                            Text.build(theme.font.body.small(searchText))
                                 .padding(.horizontal, Primitives.Spacing.spacing20)
                         }
                     }
@@ -65,10 +65,10 @@ struct SearchBarDemoView: View {
             .animation(.standard, value: searchBarTheme)
 
             VStack(alignment: .leading) {
-                Text.build(theme.font.small.bold("Search Bar Theme:"))
+                Text.build(theme.font.body.small("Search Bar Theme:"))
                 Picker(selection: $searchBarTheme) {
                     ForEach(ThemedSearchBarView.Theme.allCases, id: \.self) { searchBarTheme in
-                        Text.build(theme.font.small.normal(searchBarTheme.name))
+                        Text.build(theme.font.body.small(searchBarTheme.name))
                             .tag(searchBarTheme)
                     }
                 } label: {

@@ -58,7 +58,7 @@ struct ProductListingFilterBar: View {
                     .tint(Primitives.Colours.neutrals800)
                 Text
                     .build(
-                        theme.font.paragraph.normal(L10n.Plp.Refine.Button.cta)
+                        theme.font.body.medium(L10n.Plp.Refine.Button.cta)
                     )
                     .foregroundStyle(Primitives.Colours.neutrals800)
             }
@@ -68,7 +68,7 @@ struct ProductListingFilterBar: View {
     }
 
     private var resultInfoView: some View {
-        Text.build(theme.font.tiny.normal(L10n.Plp.NumberOfResults.message(total)))
+        Text.build(theme.font.body.small(L10n.Plp.NumberOfResults.message(total)))
             .foregroundStyle(Primitives.Colours.neutrals500)
             .accessibilityIdentifier(AccessibilityID.ProductListing.resultsLabel)
     }

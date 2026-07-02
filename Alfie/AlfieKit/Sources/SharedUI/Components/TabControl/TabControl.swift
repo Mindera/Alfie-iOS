@@ -135,7 +135,7 @@ public struct TabControl: View {
                             .scaledToFit()
                             .frame(width: Constants.imageSize, height: Constants.imageSize)
 
-                        Text.build(theme.font.paragraph.bold(value.title))
+                        Text.build(theme.font.body.medium(value.title))
                             .lineLimit(1)
                     }
                     .foregroundStyle(

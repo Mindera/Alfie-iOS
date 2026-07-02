@@ -98,7 +98,7 @@ public struct SnackbarView: View {
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                         .foregroundStyle(foregroundColor)
                 }
-                Text.build(theme.font.paragraph.normal(configuration.text))
+                Text.build(theme.font.body.medium(configuration.text))
                     .foregroundStyle(foregroundColor)
                     .padding(Primitives.Spacing.spacing16)
                     .lineLimit(configuration.lineLimit)
@@ -107,7 +107,7 @@ public struct SnackbarView: View {
                     Button(action: {
                         configuration.onActionTap?()
                     }, label: {
-                        Text.build(theme.font.paragraph.bold(actionButtonLabel))
+                        Text.build(theme.font.body.medium(actionButtonLabel))
                             .foregroundStyle(foregroundColor)
                             .padding(Primitives.Spacing.spacing16)
                     })

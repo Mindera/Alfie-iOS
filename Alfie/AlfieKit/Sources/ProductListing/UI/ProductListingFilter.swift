@@ -81,7 +81,7 @@ struct ProductListingFilter: View {
 
     private enum Constants {
         static let listStyleFontSize: CGFloat = 18
-        static let listStyleFont = DesignSystem.shared.font.paragraph.normal.withSize(Constants.listStyleFontSize).font
+        static let listStyleFont = DesignSystem.shared.font.body.medium.uiFont.withSize(Constants.listStyleFontSize).font
     }
 }
 

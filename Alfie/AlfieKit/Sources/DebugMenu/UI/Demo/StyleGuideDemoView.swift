@@ -56,7 +56,7 @@ public struct StyleGuideDemoView: View {
 
     private func link(for link: DemoNavigation, text: String) -> some View {
         NavigationLink(value: link) {
-            Text.build(theme.font.small.normal(text))
+            Text.build(theme.font.body.small(text))
         }
     }
 

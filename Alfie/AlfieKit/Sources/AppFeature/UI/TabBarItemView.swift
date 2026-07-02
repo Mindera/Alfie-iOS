@@ -31,7 +31,7 @@ struct TabBarItemView: View {
                     .offset(y: Constants.offsetLineSelected)
                     .matchedGeometryEffect(id: Constants.effectID, in: namespace)
             } else {
-                Color.clear.frame(height: Constants.lineHeight)
+                Primitives.Colours.transparentTransparent.frame(height: Constants.lineHeight)
             }
             tab.icon.image
                 .renderingMode(.template)
@@ -41,10 +41,10 @@ struct TabBarItemView: View {
                 .foregroundStyle(tab == currentTab ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals400)
                 .badgeView(badgeValue: $badgeValue)
             if tab == currentTab {
-                Text.build(theme.font.small.bold(tab.title))
+                Text.build(theme.font.body.small(tab.title))
                     .foregroundStyle(Primitives.Colours.neutrals800)
             } else {
-                Text.build(theme.font.small.normal(tab.title))
+                Text.build(theme.font.body.small(tab.title))
                     .foregroundStyle(Primitives.Colours.neutrals500)
             }
         }
