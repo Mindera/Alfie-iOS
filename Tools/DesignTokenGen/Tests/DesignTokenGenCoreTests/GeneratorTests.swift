@@ -46,6 +46,35 @@ struct TokenLoaderTests {
             _ = try TokenLoader.parseValue(type: "dimension", raw: ["value": 1, "unit": "rem"], name: "x")
         }
     }
+
+    @Test("theme is pinned to alfie-theme, skipping the file-less selfridges mode (regression: dual-mode theme used to load every mode's file)")
+    func themeModeSelection() throws {
+        // The fixture's manifest lists a "selfridges" theme mode with no backing file. If theme
+        // ever stops being pinned, selectedFiles would include theme.selfridges.tokens.json and
+        // load() would throw fileNotFound.
+        let files = try TokenLoader.selectedFiles(manifestURL: miniURL().appendingPathComponent("manifest.json"))
+        #expect(files.contains("theme.alfie-theme.tokens.json"))
+        #expect(!files.contains("theme.selfridges.tokens.json"))
+        _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
+    }
+
+    @Test("an unpinned collection that gains a second mode fails fast with an actionable message")
+    func unpinnedMultiModeFailsFast() throws {
+        // A future collection gaining a second mode without a pin must be caught here, not crash
+        // later on a missing file. "brand-new" is deliberately absent from modeForCollection.
+        let manifest = """
+        { "collections": { "brand-new": { "modes": {
+            "alfie-theme": ["brand-new.alfie-theme.tokens.json"],
+            "selfridges": ["brand-new.selfridges.tokens.json"]
+        } } } }
+        """
+        let tmp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mm-\(UUID().uuidString).json")
+        try manifest.write(to: tmp, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        #expect(throws: DesignTokenError.self) {
+            _ = try TokenLoader.selectedFiles(manifestURL: tmp)
+        }
+    }
 }
 
 @Suite("Resolver")

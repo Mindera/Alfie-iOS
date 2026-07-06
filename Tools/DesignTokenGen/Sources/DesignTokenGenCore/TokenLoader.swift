@@ -11,10 +11,13 @@ public struct LoadedTokens {
 }
 
 public enum TokenLoader {
-    /// iOS mode choices for the two multi-mode collections (PLAN.md Q3: mobile uses Small at codegen).
+    /// iOS mode choices for multi-mode collections (PLAN.md Q3: mobile uses Small at codegen).
+    /// Every collection that has more than one mode MUST be pinned here so codegen knows which
+    /// single mode iOS ships — an unpinned multi-mode collection fails fast in `selectedFiles`.
     static let modeForCollection: [String: String] = [
         "system": "ios",
         "screen-size": "small-(s)",
+        "theme": "alfie-theme",
     ]
     static let documentationPrefix = "~~doc-"
 
@@ -68,8 +71,15 @@ public enum TokenLoader {
                         throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' is missing expected mode '\(mode)'")
                     }
                     chosen = list
-                } else {
+                } else if modes.count <= 1 {
+                    // Single-mode collection: load its only mode.
                     chosen = modes.values.compactMap { $0 as? [Any] }.flatMap { $0 }
+                } else {
+                    // A newly multi-mode collection with no pin would otherwise load every mode's file
+                    // — including ones pull-design-tokens.sh doesn't ship — and crash later with an
+                    // opaque fileNotFound. Fail here with an actionable message instead.
+                    let modeNames = modes.keys.sorted().joined(separator: ", ")
+                    throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' has multiple modes [\(modeNames)] but no pinned mode — add one to TokenLoader.modeForCollection to select the iOS mode")
                 }
                 files.append(contentsOf: chosen.compactMap { $0 as? String })
             }
