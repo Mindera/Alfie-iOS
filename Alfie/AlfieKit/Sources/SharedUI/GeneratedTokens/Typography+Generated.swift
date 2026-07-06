@@ -23,28 +23,28 @@ public enum Typography {
     public enum Body {
         public static let large = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing18,
             lineHeight: Primitives.Spacing.spacing28,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let medium = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing16,
             lineHeight: Primitives.Spacing.spacing24,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let mediumStrikethrough = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontFamilyPrimaryIos,
             fontSize: Primitives.Spacing.spacing16,
             lineHeight: Primitives.Spacing.spacing24,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let small = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing12,
             lineHeight: Primitives.Spacing.spacing16,
             letterSpacing: Primitives.Typography.kerningNone
@@ -53,21 +53,21 @@ public enum Typography {
     public enum Display {
         public static let large = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyBrand,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing24,
             lineHeight: Primitives.Spacing.spacing40,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let medium = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyBrand,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing20,
             lineHeight: Primitives.Spacing.spacing32,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let small = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyBrand,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing18,
             lineHeight: Primitives.Spacing.spacing28,
             letterSpacing: Primitives.Typography.kerningNone
@@ -76,28 +76,28 @@ public enum Typography {
     public enum Heading {
         public static let large = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing32,
             lineHeight: Primitives.Spacing.spacing40,
             letterSpacing: Primitives.Typography.kerningTight
         )
         public static let medium = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing24,
             lineHeight: Primitives.Spacing.spacing32,
             letterSpacing: Primitives.Typography.kerningTight
         )
         public static let small = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing20,
             lineHeight: Primitives.Spacing.spacing28,
             letterSpacing: Primitives.Typography.kerningTight
         )
         public static let xSmall = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing16,
             lineHeight: Primitives.Spacing.spacing20,
             letterSpacing: Primitives.Typography.kerningTight
@@ -106,14 +106,14 @@ public enum Typography {
     public enum Label {
         public static let small = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing12,
             lineHeight: Primitives.Spacing.spacing16,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let smallBold = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing12,
             lineHeight: Primitives.Spacing.spacing16,
             letterSpacing: Primitives.Typography.kerningNone
@@ -122,14 +122,14 @@ public enum Typography {
     public enum Link {
         public static let medium = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing16,
             lineHeight: Primitives.Spacing.spacing24,
             letterSpacing: Primitives.Typography.kerningNone
         )
         public static let small = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
+            fontWeight: Primitives.Typography.fontWeightMedium,
             fontSize: Primitives.Spacing.spacing12,
             lineHeight: Primitives.Spacing.spacing16,
             letterSpacing: Primitives.Typography.kerningNone
