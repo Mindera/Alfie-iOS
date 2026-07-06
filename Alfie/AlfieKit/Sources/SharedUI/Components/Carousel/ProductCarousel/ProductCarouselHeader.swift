@@ -25,11 +25,11 @@ public struct ProductCarouselHeader: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: Primitives.Spacing.spacing4) {
                 if let title {
-                    Text.build(theme.font.paragraph.bold(title))
+                    Text.build(theme.font.body.medium(title))
                         .foregroundStyle(Primitives.Colours.neutrals900)
                 }
                 if let subtitle {
-                    Text.build(theme.font.paragraph.normal(subtitle))
+                    Text.build(theme.font.body.medium(subtitle))
                         .foregroundStyle(Primitives.Colours.neutrals900)
                 }
             }

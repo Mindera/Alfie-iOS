@@ -3,32 +3,36 @@ import Foundation
 // MARK: - TypographyProviderProtocol
 
 public protocol TypographyProviderProtocol {
-    var header: TypographyHeaderProtocol { get }
-    var paragraph: TypographyParagraphProtocol { get }
-    var small: TypographySmallProtocol { get }
-    var tiny: TypographyTinyProtocol { get }
+    var display: TypographyDisplay { get }
+    var heading: TypographyHeading { get }
+    var body: TypographyBody { get }
+    var label: TypographyLabel { get }
+    var link: TypographyLink { get }
 }
 
 // MARK: - TypographyProvider
 
 public class TypographyProvider: TypographyProviderProtocol {
-    public var header: TypographyHeaderProtocol
-    public var paragraph: TypographyParagraphProtocol
-    public var small: TypographySmallProtocol
-    public var tiny: TypographyTinyProtocol
+    public let display: TypographyDisplay
+    public let heading: TypographyHeading
+    public let body: TypographyBody
+    public let label: TypographyLabel
+    public let link: TypographyLink
 
     public init(
-        header: TypographyHeaderProtocol = TypographyHeader(),
-        paragraph: TypographyParagraphProtocol = TypographyParagraph(),
-        small: TypographySmallProtocol = TypographySmall(),
-        tiny: TypographyTinyProtocol = TypographyTiny()
+        display: TypographyDisplay = TypographyDisplay(),
+        heading: TypographyHeading = TypographyHeading(),
+        body: TypographyBody = TypographyBody(),
+        label: TypographyLabel = TypographyLabel(),
+        link: TypographyLink = TypographyLink()
     ) {
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
             try? FontManager.registerAll()
         }
-        self.header = header
-        self.paragraph = paragraph
-        self.small = small
-        self.tiny = tiny
+        self.display = display
+        self.heading = heading
+        self.body = body
+        self.label = label
+        self.link = link
     }
 }

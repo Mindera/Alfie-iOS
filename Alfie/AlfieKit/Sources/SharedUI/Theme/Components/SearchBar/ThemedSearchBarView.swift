@@ -211,7 +211,7 @@ public struct ThemedSearchBarView: View {
                     "",
                     text: $text,
                     prompt: Text(currentPlaceholder)
-                        .font(Font(theme.font.paragraph.normal))
+                        .font(Font(theme.font.body.medium.uiFont))
                         .foregroundColor(theme.placeholderColor)
                 )
                 .focused($isFocused)
@@ -219,7 +219,7 @@ public struct ThemedSearchBarView: View {
                 .foregroundStyle(theme.searchTermColor)
                 .keyboardType(keyboardType)
                 .submitLabel(submitLabel)
-                .font(Font(theme.font.paragraph.normal))
+                .font(Font(theme.font.body.medium.uiFont))
                 .autocorrectionDisabled(autocorrectionDisabled)
                 .accessibilityRepresentation {
                     TextField(text: $text) {
@@ -336,7 +336,7 @@ public struct ThemedSearchBarView: View {
             Button {
                 dismissBlock()
             } label: {
-                Text.build(theme.font.small.normal(title))
+                Text.build(theme.font.body.small(title))
                     .foregroundStyle(Primitives.Colours.neutrals800)
                     .accessibilityIdentifier(dismissConfiguration.accessibilityId)
             }

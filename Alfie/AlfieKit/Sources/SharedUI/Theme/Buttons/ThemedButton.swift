@@ -76,9 +76,9 @@ public struct ThemedButton: View {
             case .primary,
                 .secondary,
                 .tertiary:
-                theme.font.small.bold(text)
+                theme.font.body.small(text)
             case .underline:
-                theme.font.small.boldUnderline(text)
+                theme.font.body.small(text, underline: true)
             }
             // swiftlint:enable vertical_whitespace_between_cases
 
@@ -88,9 +88,9 @@ public struct ThemedButton: View {
             case .primary,
                 .secondary,
                 .tertiary:
-                theme.font.paragraph.bold(text)
+                theme.font.body.medium(text)
             case .underline:
-                theme.font.paragraph.boldUnderline(text)
+                theme.font.body.medium(text, underline: true)
             }
             // swiftlint:enable vertical_whitespace_between_cases
 
@@ -100,9 +100,9 @@ public struct ThemedButton: View {
             case .primary,
                 .secondary,
                 .tertiary:
-                theme.font.header.h3(text)
+                theme.font.heading.small(text)
             case .underline:
-                theme.font.header.h3Underline(text)
+                theme.font.heading.small(text, underline: true)
             }
             // swiftlint:enable vertical_whitespace_between_cases
         }

@@ -19,7 +19,7 @@ public struct BadgeTabViewModifier: ViewModifier {
     private func setAppearance() {
         UITabBarItem.appearance().badgeColor = Primitives.Colours.semanticError600.ui
 
-        let font = theme.font.tiny.normal
+        let font = theme.font.body.small.uiFont
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: Primitives.Colours.neutrals0.ui,

@@ -64,10 +64,10 @@ public struct Chip: View {
                 .stroke(borderColor, lineWidth: borderWidth)
                 .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(backgroundColor))
             HStack(spacing: Primitives.Spacing.spacing8) {
-                Text.build(theme.font.small.normal(configuration.label))
+                Text.build(theme.font.body.small(configuration.label))
                     .foregroundStyle(textColor)
                 if let counterLabel {
-                    Text.build(theme.font.small.normal(counterLabel))
+                    Text.build(theme.font.body.small(counterLabel))
                         .foregroundStyle(textColor)
                 }
                 if configuration.showCloseButton {

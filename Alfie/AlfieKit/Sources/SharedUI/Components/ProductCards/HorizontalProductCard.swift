@@ -48,13 +48,13 @@ public struct HorizontalProductCard: View {
     }
 
     private var productDesignerView: some View {
-        Text.build(theme.font.small.normal(viewModel.designer))
+        Text.build(theme.font.body.small(viewModel.designer))
             .lineLimit(Constants.productDesignerLineLimit)
             .accessibilityIdentifier(AccessibilityId.productDesigner)
     }
 
     private var productNameView: some View {
-        Text.build(theme.font.small.normal(viewModel.name))
+        Text.build(theme.font.body.small(viewModel.name))
             .lineLimit(Constants.productNameLineLimit)
             .foregroundStyle(Primitives.Colours.neutrals500)
             .accessibilityIdentifier(AccessibilityId.productName)
@@ -63,11 +63,11 @@ public struct HorizontalProductCard: View {
     private var productColorView: some View {
         HStack(spacing: Primitives.Spacing.spacing8) {
             if let colorTitle = viewModel.colorTitle {
-                Text.build(theme.font.tiny.normal(colorTitle))
+                Text.build(theme.font.body.small(colorTitle))
                     .foregroundStyle(Primitives.Colours.neutrals500)
             }
             if let color = viewModel.color {
-                Text.build(theme.font.tiny.normal(color))
+                Text.build(theme.font.body.small(color))
                     .foregroundStyle(Primitives.Colours.neutrals600)
             }
         }
@@ -79,11 +79,11 @@ public struct HorizontalProductCard: View {
     private var productSizeView: some View {
         HStack(spacing: Primitives.Spacing.spacing8) {
             if let sizeTitle = viewModel.sizeTitle {
-                Text.build(theme.font.tiny.normal(sizeTitle))
+                Text.build(theme.font.body.small(sizeTitle))
                     .foregroundStyle(Primitives.Colours.neutrals500)
             }
             if let size = viewModel.size {
-                Text.build(theme.font.tiny.normal(size))
+                Text.build(theme.font.body.small(size))
                     .foregroundStyle(Primitives.Colours.neutrals600)
             }
         }

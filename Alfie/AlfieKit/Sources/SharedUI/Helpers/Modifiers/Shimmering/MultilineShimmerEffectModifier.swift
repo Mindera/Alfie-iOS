@@ -76,8 +76,8 @@ struct MultilineShimmerEffectModifier: ViewModifier {
 
 #Preview(body: {
     Text.build(
-        DesignSystem.shared.font.small.bold(Array(repeating: "Hello, world!", count: 24).joined(separator: " "))
+        DesignSystem.shared.font.body.small(Array(repeating: "Hello, world!", count: 24).joined(separator: " "))
     )
-    .shimmeringMultiline(while: .constant(true), lines: 8, font: DesignSystem.shared.font.small.bold)
+    .shimmeringMultiline(while: .constant(true), lines: 8, font: DesignSystem.shared.font.body.small.uiFont)
     .padding(.horizontal, Primitives.Spacing.spacing24)
 })

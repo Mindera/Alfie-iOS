@@ -26,7 +26,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
 
     private var recentSearchesHeader: some View {
         HStack(alignment: .lastTextBaseline) {
-            Text.build(theme.font.header.h3(L10n.Search.Screen.RecentSearches.Header.title))
+            Text.build(theme.font.heading.small(L10n.Search.Screen.RecentSearches.Header.title))
                 .accessibilityIdentifier(AccessibilityId.recentSearchHeaderTitle)
             Spacer()
             clearAllButton
@@ -45,7 +45,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
     private func recentSearchView(for recentSearch: RecentSearch) -> some View {
         VStack {
             HStack {
-                Text.build(theme.font.paragraph.normal(recentSearch.value))
+                Text.build(theme.font.body.medium(recentSearch.value))
                     .foregroundStyle(Primitives.Colours.neutrals800)
                     .lineLimit(1)
                 Spacer()
@@ -80,7 +80,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 viewModel.didTapClearAll()
             }
         }, label: {
-            Text.build(theme.font.small.boldUnderline(L10n.Search.Screen.RecentSearches.ClearAll.Button.cta))
+            Text.build(theme.font.body.small(L10n.Search.Screen.RecentSearches.ClearAll.Button.cta, underline: true))
                 .foregroundStyle(Primitives.Colours.neutrals800)
         })
         .accessibilityIdentifier(AccessibilityId.clearRecentSearchesButton)

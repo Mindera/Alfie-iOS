@@ -348,7 +348,7 @@ extension ProductDetailsView {
     @ViewBuilder private var titleHeader: some View {
         if viewModel.shouldShow(section: .titleHeader) {
             HStack(spacing: Primitives.Spacing.spacing0) {
-                Text.build(theme.font.paragraph.normal(viewModel.productName))
+                Text.build(theme.font.body.medium(viewModel.productName))
                     .foregroundStyle(Primitives.Colours.neutrals900)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
@@ -416,7 +416,7 @@ extension ProductDetailsView {
                     PickerMenu(isModalPresented: $showColorSheet) {
                         HStack(spacing: Primitives.Spacing.spacing8) {
                             ColorSwatchView(item: selectedColor, swatchSize: .normal, isSelected: false)
-                            Text.build(theme.font.small.normal(selectedColor.name.capitalized))
+                            Text.build(theme.font.body.small(selectedColor.name.capitalized))
                                 .foregroundStyle(Primitives.Colours.neutrals800)
                         }
                     }
@@ -457,9 +457,9 @@ extension ProductDetailsView {
             ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
             : L10n.Product.OneSize.title
         HStack {
-            Text.build(theme.font.small.bold(L10n.Product.Size.title + ":"))
+            Text.build(theme.font.body.small(L10n.Product.Size.title + ":"))
                 .foregroundStyle(Primitives.Colours.neutrals800)
-            Text.build(theme.font.small.normal(sizeText))
+            Text.build(theme.font.body.small(sizeText))
                 .foregroundStyle(Primitives.Colours.neutrals800)
         }
     }
@@ -484,7 +484,7 @@ extension ProductDetailsView {
                     currentIndex: $currentDescriptionTabIndex
                 )
 
-                Text.build(theme.font.paragraph.normal(viewModel.productDescription))
+                Text.build(theme.font.body.medium(viewModel.productDescription))
                     .foregroundStyle(Primitives.Colours.neutrals900)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
             }
@@ -531,8 +531,8 @@ extension ProductDetailsView {
         ErrorView(
             spacing: Primitives.Spacing.spacing40,
             iconSize: Constants.errorViewIconSize,
-            title: theme.font.header.h2(errorTitle),
-            message: theme.font.paragraph.normal(errorMessage),
+            title: theme.font.heading.medium(errorTitle),
+            message: theme.font.body.medium(errorMessage),
             messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(cta: L10n.Pdp.ErrorView.GoBack.Button.cta) {
@@ -550,7 +550,7 @@ extension ProductDetailsView {
 
             HStack(spacing: Primitives.Spacing.spacing0) {
                 HStack(spacing: Primitives.Spacing.spacing0) {
-                    Text.build(theme.font.paragraph.normal(complementaryInfoTitle(for: type)))
+                    Text.build(theme.font.body.medium(complementaryInfoTitle(for: type)))
                         .foregroundStyle(Primitives.Colours.neutrals900)
                         .padding(.leading, Primitives.Spacing.spacing8)
                     Spacer()

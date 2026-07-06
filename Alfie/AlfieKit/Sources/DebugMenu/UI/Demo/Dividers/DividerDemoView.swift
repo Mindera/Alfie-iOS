@@ -7,7 +7,7 @@ struct DividerDemoView: View {
             VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
                 DemoHelper.demoSectionHeader(title: "Divider")
                     .padding(.bottom, Primitives.Spacing.spacing32)
-                Text.build(theme.font.paragraph.bold("Horizontal Thin"))
+                Text.build(theme.font.body.medium("Horizontal Thin"))
                 VStack(spacing: Primitives.Spacing.spacing0) {
                     Rectangle()
                         .fill(Primitives.Colours.neutrals500)
@@ -18,7 +18,7 @@ struct DividerDemoView: View {
                         .frame(height: 20)
                 }
                 .padding(.horizontal, -Primitives.Spacing.spacing16)
-                Text.build(theme.font.paragraph.bold("Horizontal Thick"))
+                Text.build(theme.font.body.medium("Horizontal Thick"))
                 VStack(spacing: Primitives.Spacing.spacing0) {
                     Rectangle()
                         .fill(Primitives.Colours.neutrals500)
@@ -29,7 +29,7 @@ struct DividerDemoView: View {
                         .frame(height: 20)
                 }
                 .padding(.horizontal, -Primitives.Spacing.spacing16)
-                Text.build(theme.font.paragraph.bold("Vertical Thin"))
+                Text.build(theme.font.body.medium("Vertical Thin"))
                 HStack(spacing: Primitives.Spacing.spacing0) {
                     Spacer()
                     Rectangle()
@@ -42,7 +42,7 @@ struct DividerDemoView: View {
                         .frame(width: 20, height: 80)
                     Spacer()
                 }
-                Text.build(theme.font.paragraph.bold("Vertical Thick"))
+                Text.build(theme.font.body.medium("Vertical Thick"))
                 HStack(spacing: Primitives.Spacing.spacing0) {
                     Spacer()
                     Rectangle()
@@ -57,11 +57,11 @@ struct DividerDemoView: View {
                 }
                 Spacer()
                 VStack(alignment: .leading) {
-                    Text.build(theme.font.paragraph.bold("Header"))
+                    Text.build(theme.font.body.medium("Header"))
                     ThemedDivider.horizontalThick
                     HStack {
                         VStack {
-                            Text.build(theme.font.small.bold("Sub-header"))
+                            Text.build(theme.font.body.small("Sub-header"))
                             ThemedDivider.horizontalThin
                             HStack {
                                 Icon.home.image
@@ -73,7 +73,7 @@ struct DividerDemoView: View {
                         }
                         ThemedDivider.verticalThick
                         VStack {
-                            Text.build(theme.font.small.bold("Sub-header"))
+                            Text.build(theme.font.body.small("Sub-header"))
                             ThemedDivider.horizontalThin
                             HStack {
                                 Icon.bell.image

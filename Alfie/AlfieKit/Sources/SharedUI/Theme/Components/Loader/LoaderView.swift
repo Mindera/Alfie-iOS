@@ -71,7 +71,7 @@ public struct LoaderView: View {
             }
 
             if !labelHidden {
-                Text.build(theme.font.paragraph.normal(labelTitle))
+                Text.build(theme.font.body.medium(labelTitle))
                     .foregroundStyle(Primitives.Colours.neutrals900)
             }
         }

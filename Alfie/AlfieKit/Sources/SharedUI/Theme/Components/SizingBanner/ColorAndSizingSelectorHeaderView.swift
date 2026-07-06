@@ -24,9 +24,9 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                 },
                 label: {
                     HStack(spacing: Primitives.Spacing.spacing4) {
-                        Text.build(theme.font.paragraph.normal(configuration.selectedTitle))
+                        Text.build(theme.font.body.medium(configuration.selectedTitle))
                             .foregroundStyle(Primitives.Colours.neutrals500)
-                        Text.build(theme.font.paragraph.normal(configuration.selectedItem?.name ?? ""))
+                        Text.build(theme.font.body.medium(configuration.selectedItem?.name ?? ""))
                             .foregroundStyle(Primitives.Colours.neutrals800)
 
                         if isExpandable {

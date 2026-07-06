@@ -36,7 +36,7 @@ public struct ProgressBar: View {
         }
         .background {
             GeometryReader { geometry in
-                Color.clear
+                Primitives.Colours.transparentTransparent
                     .onAppear {
                         width = geometry.size.width
                     }

@@ -60,9 +60,9 @@ extension SearchView {
         VStack(spacing: Primitives.Spacing.spacing16) {
             Spacer()
             imageForIcon(Icon.search)
-            Text.build(theme.font.paragraph.bold(L10n.Search.Screen.EmptyView.title))
+            Text.build(theme.font.body.medium(L10n.Search.Screen.EmptyView.title))
                 .foregroundStyle(Primitives.Colours.neutrals900)
-            Text.build(theme.font.small.normal(L10n.Search.Screen.EmptyView.message))
+            Text.build(theme.font.body.small(L10n.Search.Screen.EmptyView.message))
                 .foregroundStyle(Primitives.Colours.neutrals900)
             Spacer()
         }

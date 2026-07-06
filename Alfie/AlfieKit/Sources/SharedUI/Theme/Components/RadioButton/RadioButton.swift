@@ -59,7 +59,7 @@ struct RadioButton: View {
                 .scaledToFit()
                 .frame(width: Constants.iconSize, height: Constants.iconSize)
 
-            Text.build(theme.font.paragraph.normal(text))
+            Text.build(theme.font.body.medium(text))
         }
         .foregroundStyle(state.isDisabled ? Primitives.Colours.neutrals500 : Primitives.Colours.neutrals800)
         .onTapGesture {
