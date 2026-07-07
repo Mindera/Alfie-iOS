@@ -26,9 +26,9 @@ struct RadioListDemoView: View {
 
             DemoHelper.demoSectionHeader(title: "Demo")
             HStack {
-                Text.build(theme.font.small.bold("Selected Value"))
+                Text.build(theme.font.body.small("Selected Value"))
                 Spacer()
-                Text.build(theme.font.small.normal("" + (selectedValue?.rawValue ?? "None")))
+                Text.build(theme.font.body.small("" + (selectedValue?.rawValue ?? "None")))
             }
             Spacer()
         }

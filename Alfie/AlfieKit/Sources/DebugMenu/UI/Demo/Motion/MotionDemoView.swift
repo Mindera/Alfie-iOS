@@ -39,7 +39,7 @@ struct MotionDemoView: View {
             DemoHelper.demoSectionHeader(title: "Motion")
 
             HStack {
-                Text.build(theme.font.small.bold("Type"))
+                Text.build(theme.font.body.small("Type"))
                 Spacer()
                 Menu {
                     Picker(selection: $motionType) {
@@ -49,7 +49,7 @@ struct MotionDemoView: View {
                     } label: {
                     }
                 } label: {
-                    Text.build(theme.font.small.normal(motionType.rawValue))
+                    Text.build(theme.font.body.small(motionType.rawValue))
                         .tint(Primitives.Colours.neutrals400)
                 }
             }

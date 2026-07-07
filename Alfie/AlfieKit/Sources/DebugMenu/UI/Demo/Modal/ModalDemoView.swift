@@ -26,24 +26,24 @@ struct ModalDemoView: View {
     private var smallBody: some View {
         VStack(alignment: .leading) {
             Text("How to Measure")
-                .font(theme.font.header.h3.withSize(18).font)
+                .font(theme.font.heading.small.uiFont.withSize(18).font)
                 .padding(.bottom, Primitives.Spacing.spacing16)
-            Text.build(theme.font.paragraph.boldItalic("• Bust"))
+            Text.build(theme.font.body.medium("• Bust"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
-            Text.build(theme.font.paragraph.normal("Measure around the fullest part of your chest."))
+            Text.build(theme.font.body.medium("Measure around the fullest part of your chest."))
                 .padding(.bottom, Primitives.Spacing.spacing8)
-            Text.build(theme.font.paragraph.boldItalic("• Waist"))
+            Text.build(theme.font.body.medium("• Waist"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
-                theme.font.paragraph.normal(
+                theme.font.body.medium(
                     "The slimmest part of your natural waistline, above your navel and below your ribcage."
                 )
             )
             .padding(.bottom, Primitives.Spacing.spacing8)
-            Text.build(theme.font.paragraph.boldItalic("• Hip"))
+            Text.build(theme.font.body.medium("• Hip"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
-                theme.font.paragraph.normal("Measure around the widest point of your hips, at the top of your legs.")
+                theme.font.body.medium("Measure around the widest point of your hips, at the top of your legs.")
             )
             .padding(.bottom, Primitives.Spacing.spacing8)
         }
@@ -52,27 +52,27 @@ struct ModalDemoView: View {
     private var bigBody: some View {
         VStack(alignment: .leading) {
             Text("How to Measure")
-                .font(theme.font.header.h3.withSize(18).font)
+                .font(theme.font.heading.small.uiFont.withSize(18).font)
                 .padding(.bottom, Primitives.Spacing.spacing16)
             Spacer().frame(height: 400)
-            Text.build(theme.font.paragraph.boldItalic("• Bust"))
+            Text.build(theme.font.body.medium("• Bust"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
-            Text.build(theme.font.small.normal("Measure around the fullest part of your chest."))
+            Text.build(theme.font.body.small("Measure around the fullest part of your chest."))
                 .padding(.bottom, Primitives.Spacing.spacing8)
             Spacer().frame(height: 400)
-            Text.build(theme.font.paragraph.boldItalic("• Waist"))
+            Text.build(theme.font.body.medium("• Waist"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
-                theme.font.small.normal(
+                theme.font.body.small(
                     "The slimmest part of your natural waistline, above your navel and below your ribcage."
                 )
             )
             .padding(.bottom, Primitives.Spacing.spacing8)
             Spacer().frame(height: 400)
-            Text.build(theme.font.paragraph.boldItalic("• Hip"))
+            Text.build(theme.font.body.medium("• Hip"))
                 .padding(.bottom, Primitives.Spacing.spacing4)
             Text.build(
-                theme.font.small.normal(
+                theme.font.body.small(
                     "Measure around the widest point of your hips, at the top of your legs."
                 )
             )

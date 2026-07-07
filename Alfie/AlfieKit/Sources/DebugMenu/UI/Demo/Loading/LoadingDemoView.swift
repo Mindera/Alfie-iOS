@@ -27,10 +27,10 @@ struct LoadingDemoView: View {
 
                 DemoHelper.demoSectionHeader(title: "Options")
                     .padding(.top, Primitives.Spacing.spacing20)
-                ThemedToggleView(isOn: $showLabel) { Text.build(theme.font.paragraph.normal("Show loading label")) }
+                ThemedToggleView(isOn: $showLabel) { Text.build(theme.font.body.medium("Show loading label")) }
 
                 Stepper(value: $number, in: 1...100, step: 4) {
-                    Text.build(theme.font.small.bold("Custom size"))
+                    Text.build(theme.font.body.small("Custom size"))
                 }
             }
             .padding(Primitives.Spacing.spacing16)
@@ -41,13 +41,13 @@ struct LoadingDemoView: View {
     private func componentPreview(_ component: some View, title: String, description: String = "", showStepper: Bool) -> some View {
         VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
             HStack {
-                Text.build(theme.font.paragraph.bold(title))
+                Text.build(theme.font.body.medium(title))
                 Spacer()
 
                 if showStepper {
-                    Text.build(theme.font.tiny.normal("Size: \(Int(number))"))
+                    Text.build(theme.font.body.small("Size: \(Int(number))"))
                 } else {
-                    Text.build(theme.font.tiny.normal(description))
+                    Text.build(theme.font.body.small(description))
                 }
             }
 

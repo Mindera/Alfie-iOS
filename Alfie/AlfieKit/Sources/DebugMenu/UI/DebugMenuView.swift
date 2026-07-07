@@ -50,7 +50,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
 
     private func link(for link: DebugNavigation, text: String) -> some View {
         NavigationLink(value: link) {
-            Text.build(theme.font.small.normal(text))
+            Text.build(theme.font.body.small(text))
         }
     }
 

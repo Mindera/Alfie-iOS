@@ -29,10 +29,10 @@ struct ChipsDemoView: View {
             .frame(height: 50)
             .padding(.bottom, Primitives.Spacing.spacing32)
             DemoHelper.demoSectionHeader(title: "Options")
-            ThemedToggleView(isOn: $isLarge) { Text.build(theme.font.small.bold("Large")) }
-            ThemedToggleView(isOn: $isCloseable) { Text.build(theme.font.small.bold("Closeable")) }
-            ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.small.bold("Disabled")) }
-            ThemedToggleView(isOn: $isSelected) { Text.build(theme.font.small.bold("Selected")) }
+            ThemedToggleView(isOn: $isLarge) { Text.build(theme.font.body.small("Large")) }
+            ThemedToggleView(isOn: $isCloseable) { Text.build(theme.font.body.small("Closeable")) }
+            ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.body.small("Disabled")) }
+            ThemedToggleView(isOn: $isSelected) { Text.build(theme.font.body.small("Selected")) }
 
             DemoHelper.demoSectionHeader(title: "Counter")
                 .padding(.top, 20)

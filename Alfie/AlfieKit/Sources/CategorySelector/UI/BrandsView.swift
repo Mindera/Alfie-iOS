@@ -174,8 +174,8 @@ struct BrandsView<ViewModel: BrandsViewModelProtocol>: View {
     private var emptySearchResults: some View {
         ErrorView(
             icon: Icon.search.image,
-            message: theme.font.small.normal(L10n.Shop.Brands.SearchBar.noResultsMessage) +
-                theme.font.small.bold(" '\(viewModel.searchText)'")
+            message: theme.font.body.small(L10n.Shop.Brands.SearchBar.noResultsMessage) +
+                theme.font.body.small(" '\(viewModel.searchText)'")
         )
     }
 }
@@ -191,7 +191,7 @@ extension BrandsView {
         var body: some View {
             HStack(alignment: .center, spacing: Primitives.Spacing.spacing0) {
                 Text(title)
-                    .font(Font(theme.font.paragraph.bold))
+                    .font(Font(theme.font.body.medium.uiFont))
                     .foregroundStyle(Primitives.Colours.neutrals800)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -217,7 +217,7 @@ extension BrandsView {
         var body: some View {
             VStack(spacing: Primitives.Spacing.spacing0) {
                 HStack(spacing: Primitives.Spacing.spacing0) {
-                    Text.build(theme.font.paragraph.normal(brand.name))
+                    Text.build(theme.font.body.medium(brand.name))
                         .foregroundStyle(foregroundColor())
                         .shimmering(while: $isLoading)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -272,7 +272,7 @@ extension BrandsView {
         }
 
         private func dragObserver(geometry: GeometryProxy, title: String) -> some View {
-            let emptyView = Rectangle().fill(Color.clear)
+            let emptyView = Rectangle().fill(Primitives.Colours.transparentTransparent)
 
             guard title != selectedIndexTitle else { return emptyView }
 
@@ -297,12 +297,12 @@ extension BrandsView {
 
         var body: some View {
             Text(text)
-                .font(Font(theme.font.tiny.normal))
+                .font(Font(theme.font.body.small.uiFont))
                 .foregroundStyle(isSelected ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals500)
                 .frame(minWidth: Constants.sectionIndexSize, minHeight: Constants.sectionIndexSize)
                 .background {
                     RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                        .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Color.clear)
+                        .foregroundStyle(isSelected ? Primitives.Colours.neutrals800 : Primitives.Colours.transparentTransparent)
                 }
         }
     }

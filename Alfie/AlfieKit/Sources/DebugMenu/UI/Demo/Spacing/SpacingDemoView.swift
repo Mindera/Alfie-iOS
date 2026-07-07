@@ -29,8 +29,8 @@ struct SpacingDemoView: View {
         Group {
             VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
                 HStack {
-                    Text.build(theme.font.paragraph.bold(token))
-                    Text.build(theme.font.tiny.normal("\(Int(spacing))pt (Base Unit Multiplier: \(multiplier))"))
+                    Text.build(theme.font.body.medium(token))
+                    Text.build(theme.font.body.small("\(Int(spacing))pt (Base Unit Multiplier: \(multiplier))"))
                     Spacer()
                 }
                 ThemedDivider.horizontalThick

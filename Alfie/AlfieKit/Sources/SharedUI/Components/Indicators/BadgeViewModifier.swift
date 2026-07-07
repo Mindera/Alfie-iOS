@@ -39,7 +39,7 @@ public struct BadgeViewModifier: ViewModifier {
                             RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                                 .stroke(Primitives.Colours.neutrals0, lineWidth: Constants.borderLineWidth)
                                 .frame(height: Constants.badgeHeight)
-                            Text.build(theme.font.tiny.normal(helper.badgeLabel))
+                            Text.build(theme.font.body.small(helper.badgeLabel))
                                 .foregroundStyle(Primitives.Colours.neutrals0)
                                 .padding(.all, Constants.textPadding)
                         }

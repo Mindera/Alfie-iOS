@@ -45,7 +45,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
                     .padding(.horizontal, scrollViewConfiguration.horizontalPadding)
                     .background(GeometryReader { proxy in
                         GeometryReader { proxy in
-                            Color.clear.preference(
+                            Primitives.Colours.transparentTransparent.preference(
                                 key: ScrollViewOffsetPreferenceKey.self,
                                 value: proxy.frame(in: .named(coordinateSpace)).origin
                             )

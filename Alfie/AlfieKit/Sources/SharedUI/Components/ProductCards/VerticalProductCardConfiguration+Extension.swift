@@ -40,20 +40,15 @@ extension VerticalProductCardConfiguration {
         switch size {
         case .small,
              .medium: // swiftlint:disable:this indentation_width
-            DesignSystem.shared.font.small.normal
+            DesignSystem.shared.font.body.small.uiFont
         case .large:
-            DesignSystem.shared.font.paragraph.normal
+            DesignSystem.shared.font.body.medium.uiFont
         }
     }
 
     var smallTextFont: UIFont {
-        switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
-            DesignSystem.shared.font.tiny.normal
-        case .large:
-            DesignSystem.shared.font.small.normal
-        }
+        // All sizes map to the same token; no per-size distinction after token migration.
+        DesignSystem.shared.font.body.small.uiFont
     }
     // swiftlint:enable vertical_whitespace_between_cases
 }

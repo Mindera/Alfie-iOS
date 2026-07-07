@@ -29,7 +29,7 @@ struct DatePickerDemoView: View {
                 if datePickerType == .wheel {
                     if datePickerType == .wheel {
                         VStack(alignment: .leading) {
-                            Text.build(theme.font.small.bold("Date Picker"))
+                            Text.build(theme.font.body.small("Date Picker"))
                             ThemedDivider.horizontalThin
                         }
                     }
@@ -40,7 +40,7 @@ struct DatePickerDemoView: View {
 
                     if datePickerType == .wheel {
                         VStack(alignment: .leading) {
-                            Text.build(theme.font.small.bold("Time Picker"))
+                            Text.build(theme.font.body.small("Time Picker"))
                             ThemedDivider.horizontalThin
                         }
                     }
@@ -52,7 +52,7 @@ struct DatePickerDemoView: View {
 
                 if datePickerType == .wheel {
                     VStack(alignment: .leading) {
-                        Text.build(theme.font.small.bold("Date & Time Picker"))
+                        Text.build(theme.font.body.small("Date & Time Picker"))
                         ThemedDivider.horizontalThin
                     }
                 }
