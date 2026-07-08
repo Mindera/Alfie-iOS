@@ -4,7 +4,7 @@
     "$value": {
       "fontFamily": "{body-large-font-family}",
       "fontSize": "{body-large-font-size}",
-      "fontWeight": "{display-medium-font-weight}",
+      "fontWeight": "{body-large-font-weight}",
       "letterSpacing": "{body-large-kerning}",
       "lineHeight": "{body-large-line-height}"
     }
@@ -24,7 +24,7 @@
     "$value": {
       "fontFamily": "{body-medium-strikethrough-font-family}",
       "fontSize": "{body-medium-strikethrough-font-size}",
-      "fontWeight": "{body-medium-strikethrough-font-family}",
+      "fontWeight": "{body-medium-strikethrough-font-weight}",
       "letterSpacing": "{body-medium-strikethrough-kerning}",
       "lineHeight": "{body-medium-strikethrough-line-height}"
     }
@@ -64,7 +64,7 @@
     "$value": {
       "fontFamily": "{display-small-font-family}",
       "fontSize": "{display-small-font-size}",
-      "fontWeight": "{display-medium-font-weight}",
+      "fontWeight": "{display-small-font-weight}",
       "letterSpacing": "{display-small-kerning}",
       "lineHeight": "{display-small-line-height}"
     }
@@ -104,7 +104,7 @@
     "$value": {
       "fontFamily": "{heading-x-small-font-family}",
       "fontSize": "{heading-x-small-font-size}",
-      "fontWeight": "{heading-small-font-weight}",
+      "fontWeight": "{heading-x-small-font-weight}",
       "letterSpacing": "{heading-x-small-kerning}",
       "lineHeight": "{heading-x-small-line-height}"
     }

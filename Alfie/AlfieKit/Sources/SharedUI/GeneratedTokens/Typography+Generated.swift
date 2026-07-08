@@ -37,7 +37,7 @@ public enum Typography {
         )
         public static let mediumStrikethrough = TypographyStyle(
             fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: Primitives.Typography.fontFamilyPrimaryIos,
+            fontWeight: Primitives.Typography.fontWeightRegular,
             fontSize: Primitives.Spacing.spacing16,
             lineHeight: Primitives.Spacing.spacing24,
             letterSpacing: Primitives.Typography.kerningNone
