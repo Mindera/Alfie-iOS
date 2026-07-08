@@ -71,8 +71,13 @@ struct TokenLoaderTests {
         let tmp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mm-\(UUID().uuidString).json")
         try manifest.write(to: tmp, atomically: true, encoding: .utf8)
         defer { try? FileManager.default.removeItem(at: tmp) }
-        #expect(throws: DesignTokenError.self) {
+        // Assert on the message, not just the error type — the whole point is that it's actionable
+        // (names the offending collection and tells the maintainer to add a pin).
+        #expect {
             _ = try TokenLoader.selectedFiles(manifestURL: tmp)
+        } throws: { error in
+            let message = String(describing: error)
+            return message.contains("brand-new") && message.contains("no pinned mode")
         }
     }
 }
