@@ -7,6 +7,9 @@
 #   DESIGN_TOKENS_SRC=/path/to/local/checkout  → copy from a local clone (no network)
 #   otherwise                                   → shallow-clone DESIGN_TOKENS_REMOTE (SSH by default)
 #
+# Branch (clone path only; ignored when DESIGN_TOKENS_SRC is set):
+#   defaults to `main`; override with DESIGN_TOKENS_REF=<branch-or-tag> for pre-merge testing.
+#
 # Credentials are never echoed (no `set -x` around the clone) and only *.json we need is copied
 # (never `cp -R` the clone, which could drag in .git/credentials).
 
@@ -42,8 +45,9 @@ if [[ -n "${DESIGN_TOKENS_SRC:-}" ]]; then
 else
   SRC="$(mktemp -d)"
   trap 'rm -rf "$SRC"' EXIT
-  echo "⬇️  Cloning $TOKENS_REMOTE (auth not echoed)…"
-  ( set +x; git clone --depth 1 "$TOKENS_REMOTE" "$SRC" >/dev/null )
+  REF="${DESIGN_TOKENS_REF:-main}"
+  echo "⬇️  Cloning $TOKENS_REMOTE @ $REF (auth not echoed)…"
+  ( set +x; git clone --depth 1 --branch "$REF" "$TOKENS_REMOTE" "$SRC" >/dev/null )
 fi
 
 mkdir -p "$DEST"
