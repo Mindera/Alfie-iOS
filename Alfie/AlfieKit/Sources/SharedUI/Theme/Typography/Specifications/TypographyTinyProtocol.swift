@@ -29,10 +29,10 @@ public protocol TypographyTinyProtocol {
 // MARK: - TypographyTiny
 
 public class TypographyTiny: TypographyTinyProtocol {
-    public var normal: UIFont { FontNames.sfProMedium.withSize(12) }
-    public var normalItalic: UIFont { FontNames.sfProMedium.withSize(12) }
-    public var bold: UIFont { FontNames.sfProMedium.withSize(12) }
-    public var boldItalic: UIFont { FontNames.sfProMedium.withSize(12) }
+    public var normal: UIFont { Typography.Body.small.uiFont }
+    public var normalItalic: UIFont { Typography.Body.small.uiFont }
+    public var bold: UIFont { Typography.Body.small.uiFont }
+    public var boldItalic: UIFont { Typography.Body.small.uiFont }
 
     public init() {}
 

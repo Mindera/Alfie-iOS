@@ -28,9 +28,9 @@ public protocol TypographyHeaderProtocol {
 // MARK: - TypographyHeader
 
 public final class TypographyHeader: TypographyHeaderProtocol {
-    public var h1: UIFont { FontNames.sfProMedium.withSize(36) }
-    public var h2: UIFont { FontNames.sfProMedium.withSize(24) }
-    public var h3: UIFont { FontNames.sfProMedium.withSize(20) }
+    public var h1: UIFont { Typography.Heading.large.uiFont }
+    public var h2: UIFont { Typography.Heading.medium.uiFont }
+    public var h3: UIFont { Typography.Heading.small.uiFont }
 
     public init() {}
 
@@ -61,7 +61,7 @@ public final class TypographyHeader: TypographyHeaderProtocol {
     }
 
     public func h3(_ res: LocalizedStringResource) -> AttributedString {
-        h2(String(localized: res))
+        h3(String(localized: res))
     }
 
     public func h3Underline(_ str: String) -> AttributedString {

@@ -38,10 +38,10 @@ public protocol TypographySmallProtocol {
 // MARK: - TypographySmall
 
 public class TypographySmall: TypographySmallProtocol {
-    public var normal: UIFont { FontNames.sfProMedium.withSize(14) }
-    public var normalItalic: UIFont { FontNames.sfProMedium.withSize(14) }
-    public var bold: UIFont { FontNames.sfProMedium.withSize(14) }
-    public var boldItalic: UIFont { FontNames.sfProMedium.withSize(14) }
+    public var normal: UIFont { Typography.Body.small.uiFont }
+    public var normalItalic: UIFont { Typography.Body.small.uiFont }
+    public var bold: UIFont { Typography.Body.small.uiFont }
+    public var boldItalic: UIFont { Typography.Body.small.uiFont }
 
     public init() {}
 

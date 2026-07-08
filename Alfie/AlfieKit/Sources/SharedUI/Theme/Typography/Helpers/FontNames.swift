@@ -14,14 +14,6 @@ public enum FontNames: String, CaseIterable {
             return "SF-Pro-Display-Medium"
         }
     }
-
-    public func withSize(_ size: CGFloat) -> UIFont {
-        guard let font = UIFont(name: rawValue, size: size) else {
-            assertionFailure("There is no font for this value \(rawValue)")
-            return UIFont()
-        }
-        return font
-    }
 }
 
 // MARK: - FontManager

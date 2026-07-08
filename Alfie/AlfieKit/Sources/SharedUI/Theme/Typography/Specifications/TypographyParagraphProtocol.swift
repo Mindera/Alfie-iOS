@@ -42,10 +42,10 @@ public protocol TypographyParagraphProtocol {
 // MARK: - TypographyParagraph
 
 public final class TypographyParagraph: TypographyParagraphProtocol {
-    public var normal: UIFont { FontNames.sfProMedium.withSize(16) }
-    public var normalItalic: UIFont { FontNames.sfProMedium.withSize(16) }
-    public var bold: UIFont { FontNames.sfProMedium.withSize(16) }
-    public var boldItalic: UIFont { FontNames.sfProMedium.withSize(16) }
+    public var normal: UIFont { Typography.Body.medium.uiFont }
+    public var normalItalic: UIFont { Typography.Body.medium.uiFont }
+    public var bold: UIFont { Typography.Body.medium.uiFont }
+    public var boldItalic: UIFont { Typography.Body.medium.uiFont }
 
     public init() {}
 
