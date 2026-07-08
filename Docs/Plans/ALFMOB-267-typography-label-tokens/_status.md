@@ -21,6 +21,6 @@
 - [x] GATE: approval
 - [x] 5. Implement (ios-execute)
 - [x] 6. Commit
-- [ ] 7. PR
-- [ ] 8. Ticket transition
-- [ ] 9. Report
+- [x] 7. PR → https://github.com/Mindera/Alfie-iOS/pull/90
+- [~] 8. Ticket transition — skipped (Atlassian MCP disconnected; needs re-auth)
+- [x] 9. Report
