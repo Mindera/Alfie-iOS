@@ -24,7 +24,7 @@
     "$value": {
       "fontFamily": "{body-medium-strikethrough-font-family}",
       "fontSize": "{body-medium-strikethrough-font-size}",
-      "fontWeight": "{body-medium-strikethrough-font-family}",
+      "fontWeight": "{body-medium-strikethrough-font-weight}",
       "letterSpacing": "{body-medium-strikethrough-kerning}",
       "lineHeight": "{body-medium-strikethrough-line-height}"
     }
