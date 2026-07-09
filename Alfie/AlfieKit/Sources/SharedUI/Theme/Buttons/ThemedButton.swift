@@ -182,8 +182,7 @@ private struct ThemedButtonStyle: ButtonStyle {
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                    // No design token exists for the 1pt stroke width — literal retained.
-                    .stroke(borderColor(configuration), lineWidth: 1)
+                    .stroke(borderColor(configuration), lineWidth: Primitives.Border.borderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
