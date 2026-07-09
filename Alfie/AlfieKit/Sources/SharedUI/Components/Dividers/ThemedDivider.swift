@@ -27,26 +27,37 @@ public struct ThemedDivider: View {
         static let thickThickness = 2.0
     }
 
-    public static var horizontalThin = ThemedDivider(
-        configuration: .init(
-            orientation: .horizontal,
-            thickness: Constants.thinThickness,
-            color: Primitives.Colours.neutrals100
+    // Computed (not stored) so the divider colour is re-read from the active theme palette on every
+    // access. A stored static would snapshot `Primitives.Colours.neutrals100` once at first access and
+    // keep that value across theme switches (the soft-reboot keeps the process — and its statics — alive).
+    public static var horizontalThin: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(
+                orientation: .horizontal,
+                thickness: Constants.thinThickness,
+                color: Primitives.Colours.neutrals100
+            )
         )
-    )
-    public static var verticalThin = ThemedDivider(
-        configuration: .init(orientation: .vertical, thickness: Constants.thinThickness, color: Primitives.Colours.neutrals100)
-    )
-    public static var horizontalThick = ThemedDivider(
-        configuration: .init(
-            orientation: .horizontal,
-            thickness: Constants.thickThickness,
-            color: Primitives.Colours.neutrals100
+    }
+    public static var verticalThin: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(orientation: .vertical, thickness: Constants.thinThickness, color: Primitives.Colours.neutrals100)
         )
-    )
-    public static var verticalThick = ThemedDivider(
-        configuration: .init(orientation: .vertical, thickness: Constants.thickThickness, color: Primitives.Colours.neutrals100)
-    )
+    }
+    public static var horizontalThick: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(
+                orientation: .horizontal,
+                thickness: Constants.thickThickness,
+                color: Primitives.Colours.neutrals100
+            )
+        )
+    }
+    public static var verticalThick: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(orientation: .vertical, thickness: Constants.thickThickness, color: Primitives.Colours.neutrals100)
+        )
+    }
     private let configuration: ThemedDividerConfiguration
 
     public init(configuration: ThemedDividerConfiguration) {
