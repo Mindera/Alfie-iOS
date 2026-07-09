@@ -276,6 +276,34 @@ struct EmitterTests {
         #expect(files["Primitives+Generated.swift"]!.contains("public static var fontFamilyBrand: String { ThemeFonts.current.fontFamilyBrand }"))
     }
 
+    @Test("resolved-theme JSON export: one file per theme, values resolved under that theme's palette")
+    func resolvedThemeJSON() throws {
+        let resolver = Resolver(
+            loaded: try TokenLoader.load(inputDirectory: miniURL()),
+            cycleAllowlist: try CycleAllowlist.load(from: miniURL().appendingPathComponent(".cycle-allowlist.json")),
+            brokenRefAllowlist: try BrokenRefAllowlist.load(from: miniURL().appendingPathComponent(".broken-ref-allowlist.json"))
+        )
+        let files = try Emitter(loaded: try TokenLoader.load(inputDirectory: miniURL()), resolver: resolver).emitResolvedThemes()
+        #expect(files.keys.sorted() == ["alfie-theme.resolved.tokens.json", "selffridge-theme.resolved.tokens.json"])
+
+        let json = try JSONSerialization.jsonObject(with: Data(files["selffridge-theme.resolved.tokens.json"]!.utf8)) as! [String: Any]
+        let primitives = json["primitives"] as! [String: Any]
+        let colours = primitives["colours"] as! [String: Any]
+        // Colour primitive resolved to the selffridge palette (hex), not alfie's white.
+        #expect(colours["neutrals0"] as? String == "#FDEB7A")
+        let typographyPrimitives = primitives["typography"] as! [String: Any]
+        #expect(typographyPrimitives["fontFamilyBrand"] as? String == "Selffridge Test")
+        // Composite style resolves its brand font to the selffridge value.
+        let typography = json["typography"] as! [String: Any]
+        let display = typography["display"] as! [String: Any]
+        let large = display["large"] as! [String: Any]
+        #expect(large["fontFamily"] as? String == "Selffridge Test")
+        // alfie export keeps the base font.
+        let alfie = try JSONSerialization.jsonObject(with: Data(files["alfie-theme.resolved.tokens.json"]!.utf8)) as! [String: Any]
+        let alfieBrand = ((alfie["primitives"] as! [String: Any])["typography"] as! [String: Any])["fontFamilyBrand"] as? String
+        #expect(alfieBrand == "Libre Test")
+    }
+
     @Test("font-free input emits a compilable empty ThemeFonts (empty palette, no-op apply)")
     func fontFreeInputEmitsValidEmptyThemeFonts() throws {
         let colour = colourToken("colours-neutrals-0", [1, 1, 1], file: ".primitives.alfie-theme.tokens.json")

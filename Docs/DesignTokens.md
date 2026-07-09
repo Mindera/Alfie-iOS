@@ -10,7 +10,8 @@ committed as type-safe Swift. **Never hand-edit the generated Swift.**
 | Path | What | Committed? | Compiled? |
 |---|---|---|---|
 | `AlfieKit/Sources/SharedUI/DesignTokens/` | DTCG JSON (iOS subset) pulled from the token repo | ✅ | ❌ (`exclude:` in `Package.swift`) |
-| `AlfieKit/Sources/SharedUI/GeneratedTokens/` | Generated Swift (`Primitives/Theme/Sizing/Typography +Generated.swift`) | ✅ | ✅ (normal SharedUI sources) |
+| `AlfieKit/Sources/SharedUI/GeneratedTokens/` | Generated Swift (`Primitives/Theme/Sizing/Typography/ThemeColours/ThemeFonts +Generated.swift`) | ✅ | ✅ (normal SharedUI sources) |
+| `AlfieKit/Sources/SharedUI/GeneratedTokens/ResolvedTokens/` | Generated per-theme JSON (`<theme>.resolved.tokens.json`) — every token resolved to a concrete value under that theme's palette; a language-neutral mirror of the Swift for non-Swift consumers | ✅ | ❌ (`exclude:` in `Package.swift`) |
 | `Tools/DesignTokenGen/` | The standalone Swift generator (SwiftPM, Foundation-only) | ✅ | ❌ (outside the AlfieKit graph) |
 | `Alfie/scripts/pull-design-tokens.sh` | Copies the iOS-subset JSON into `DesignTokens/` | ✅ | — |
 | `Alfie/scripts/generate-design-tokens.sh` | Tests the generator, then regenerates `GeneratedTokens/` | ✅ | — |

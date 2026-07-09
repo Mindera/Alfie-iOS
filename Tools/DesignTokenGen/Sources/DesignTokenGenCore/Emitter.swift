@@ -363,6 +363,100 @@ public struct Emitter {
         """
     }
 
+    // MARK: - Resolved per-theme JSON export (language-neutral mirror of the generated Swift)
+
+    /// One JSON file per theme (`<theme>.resolved.tokens.json`) with every token resolved to a
+    /// concrete value under that theme's colour + font palette — the same information the generated
+    /// Swift encodes (`Primitives` / `Theme` / `Typography` / `Sizing`), for non-Swift consumers.
+    /// Deterministic (sorted keys), so a clean regeneration is byte-identical.
+    public func emitResolvedThemes() throws -> [String: String] {
+        let themeIDs = loaded.colourThemes.isEmpty ? [loaded.baseTheme] : loaded.colourThemes.keys.sorted()
+        var out: [String: String] = [:]
+        for theme in themeIDs {
+            let data = try JSONSerialization.data(
+                withJSONObject: try resolvedTree(theme: theme),
+                options: [.prettyPrinted, .sortedKeys]
+            )
+            out["\(theme).resolved.tokens.json"] = String(decoding: data, as: UTF8.self)
+        }
+        return out
+    }
+
+    private func resolvedTree(theme: String) throws -> [String: Any] {
+        var primitives: [String: [String: Any]] = [:]
+        for token in loaded.primitiveValues.values {
+            let group = firstSegment(token.name)
+            primitives[group, default: [:]][SwiftIdentifier.make(token.name, dropPrefix: group)]
+                = try jsonValue(try resolvedThemeValue(token.name, theme: theme), name: token.name)
+        }
+        var semantic: [String: Any] = [:]
+        for token in loaded.map.values where token.file.hasPrefix("theme.") {
+            semantic[SwiftIdentifier.make(token.name)] = try jsonValue(try resolvedThemeValue(token.name, theme: theme), name: token.name)
+        }
+        var sizing: [String: Any] = [:]
+        for token in loaded.map.values where token.file.hasPrefix("sizing.") {
+            sizing[SwiftIdentifier.make(token.name)] = try jsonValue(try resolvedThemeValue(token.name, theme: theme), name: token.name)
+        }
+        var typography: [String: [String: Any]] = [:]
+        for token in loaded.map.values where token.file.hasPrefix("typography.styles") {
+            guard case .typography(let typo) = token.value else { continue }
+            let group = firstSegment(token.name)
+            typography[group, default: [:]][SwiftIdentifier.make(stripFirstSegment(token.name))] = [
+                "fontFamily": try jsonValue(try resolvedFieldValue(typo.fontFamily, theme: theme), name: token.name),
+                "fontWeight": try jsonValue(try resolvedFieldValue(typo.fontWeight, theme: theme), name: token.name),
+                "fontSize": try jsonValue(try resolvedFieldValue(typo.fontSize, theme: theme), name: token.name),
+                "lineHeight": try jsonValue(try resolvedFieldValue(typo.lineHeight, theme: theme), name: token.name),
+                "letterSpacing": try jsonValue(try resolvedFieldValue(typo.letterSpacing, theme: theme), name: token.name),
+            ]
+        }
+        return ["primitives": primitives, "theme": semantic, "typography": typography, "sizing": sizing]
+    }
+
+    /// Resolve `name` to its terminal concrete value, then swap in the theme's colour / font-family
+    /// value when the terminal is a theme-swappable primitive (mirrors the `Primitives` forwarders).
+    private func resolvedThemeValue(_ name: String, theme: String) throws -> TokenValue {
+        guard let terminal = try resolver.resolvedConcrete(name) else {
+            throw DesignTokenError.brokenReferenceInOutput(target: name)
+        }
+        if let colour = loaded.colourThemes[theme]?[terminal.name] { return colour.value }
+        if case .fontFamily = terminal.value {
+            if let font = loaded.fontThemes[theme]?[terminal.name] ?? loaded.fontThemes[loaded.baseTheme]?[terminal.name] {
+                return font.value
+            }
+        }
+        return terminal.value
+    }
+
+    private func resolvedFieldValue(_ value: TokenValue, theme: String) throws -> TokenValue {
+        switch value {
+        case .reference(let target): return try resolvedThemeValue(target, theme: theme)
+        default: return value
+        }
+    }
+
+    /// A concrete `TokenValue` → a JSON-serialisable scalar (colour as hex, dimension as number,
+    /// font family as string, weight as its CSS integer).
+    private func jsonValue(_ value: TokenValue, name: String) throws -> Any {
+        switch value {
+        case .color(let comps):
+            guard comps.count >= 3 else { throw DesignTokenError.malformedToken(name: name, reason: "color needs ≥3 components") }
+            return hexString(comps)
+        case .dimension(let v, _): return v
+        case .fontFamily(let family): return family
+        case .fontWeight(let weight): return weight.cssValue
+        case .string(let s): return s
+        case .typography, .reference:
+            throw DesignTokenError.malformedToken(name: name, reason: "non-scalar value in resolved JSON")
+        }
+    }
+
+    private func hexString(_ comps: [Double]) -> String {
+        func byte(_ d: Double) -> Int { max(0, min(255, Int((d * 255).rounded()))) }
+        let (r, g, b) = (byte(comps[0]), byte(comps[1]), byte(comps[2]))
+        if comps.count > 3 { return String(format: "#%02X%02X%02X%02X", r, g, b, byte(comps[3])) }
+        return String(format: "#%02X%02X%02X", r, g, b)
+    }
+
     // MARK: - Reference / literal helpers
 
     /// A token whose value is a reference → `Primitives.*` symbol; otherwise its concrete literal.

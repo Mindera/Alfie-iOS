@@ -30,7 +30,7 @@ struct GeneratorRunTests {
         let result = try Generator.run(inputDirectory: fixtureURL(), outputDirectory: out)
 
         #expect(!FileManager.default.fileExists(atPath: stale.path))
-        #expect(result.writtenFiles == ["Primitives+Generated.swift", "Sizing+Generated.swift", "Theme+Generated.swift", "ThemeColours+Generated.swift", "ThemeFonts+Generated.swift", "Typography+Generated.swift"])
+        #expect(result.writtenFiles == ["Primitives+Generated.swift", "Sizing+Generated.swift", "Theme+Generated.swift", "ThemeColours+Generated.swift", "ThemeFonts+Generated.swift", "Typography+Generated.swift", "ResolvedTokens/alfie-theme.resolved.tokens.json", "ResolvedTokens/selffridge-theme.resolved.tokens.json"])
         #expect(FileManager.default.fileExists(atPath: out.appendingPathComponent("Theme+Generated.swift").path))
     }
 }

@@ -1,0 +1,245 @@
+{
+  "primitives" : {
+    "border" : {
+      "borderWeightDefault" : 1
+    },
+    "colours" : {
+      "neutrals0" : "#FDEB7A",
+      "neutrals100" : "#FCE34F",
+      "neutrals200" : "#E9CE2C",
+      "neutrals300" : "#C9CDD4",
+      "neutrals400" : "#9AA0AB",
+      "neutrals500" : "#6E747F",
+      "neutrals600" : "#474C56",
+      "neutrals700" : "#2A2E36",
+      "neutrals800" : "#14171C",
+      "neutrals900" : "#080A0D",
+      "semanticError100" : "#FEF1F2",
+      "semanticError200" : "#FBD9DC",
+      "semanticError300" : "#F0A0A6",
+      "semanticError400" : "#EC6670",
+      "semanticError500" : "#E03B4A",
+      "semanticError600" : "#BC2230",
+      "semanticError700" : "#971E29",
+      "semanticError800" : "#6E0D16",
+      "semanticSuccess100" : "#ECF8F1",
+      "semanticSuccess200" : "#CDEBD9",
+      "semanticSuccess300" : "#95D3AE",
+      "semanticSuccess400" : "#5FC287",
+      "semanticSuccess500" : "#2FA262",
+      "semanticSuccess600" : "#1F8B50",
+      "semanticSuccess700" : "#167742",
+      "semanticSuccess800" : "#08542C",
+      "transparentTransparent" : "#FFFFFF00"
+    },
+    "spacing" : {
+      "spacing0" : 0,
+      "spacing2" : 2,
+      "spacing4" : 4,
+      "spacing8" : 8,
+      "spacing12" : 12,
+      "spacing14" : 14,
+      "spacing16" : 16,
+      "spacing18" : 18,
+      "spacing20" : 20,
+      "spacing24" : 24,
+      "spacing28" : 28,
+      "spacing32" : 32,
+      "spacing40" : 40,
+      "spacing48" : 48,
+      "spacing56" : 56,
+      "spacing64" : 64,
+      "spacing80" : 80,
+      "spacing96" : 96,
+      "spacing124" : 124,
+      "spacing220" : 220
+    },
+    "typography" : {
+      "fontFamilyBrand" : "Georgia",
+      "fontFamilyPrimaryAndroid" : "Roboto",
+      "fontFamilyPrimaryIos" : "Georgia",
+      "fontFamilyPrimaryWeb" : "Inter",
+      "fontSizeFontSize12" : 12,
+      "fontSizeFontSize14" : 14,
+      "fontSizeFontSize16" : 16,
+      "fontSizeFontSize18" : 18,
+      "fontSizeFontSize20" : 20,
+      "fontSizeFontSize24" : 24,
+      "fontSizeFontSize32" : 32,
+      "fontSizeFontSize40" : 40,
+      "fontSizeFontSize48" : 48,
+      "fontSizeFontSize56" : 56,
+      "kerningNone" : 0,
+      "kerningSpacious" : 1,
+      "kerningTight" : -0.5,
+      "lineHeightLineHeight16" : 16,
+      "lineHeightLineHeight20" : 20,
+      "lineHeightLineHeight24" : 24,
+      "lineHeightLineHeight28" : 28,
+      "lineHeightLineHeight32" : 32,
+      "lineHeightLineHeight40" : 40,
+      "lineHeightLineHeight48" : 48
+    }
+  },
+  "sizing" : {
+    "iconsIconLarge" : 32,
+    "iconsIconMedium" : 24,
+    "iconsIconSmall" : 16,
+    "iconsIconXlarge" : 40,
+    "interactiveSmallPaddingLeftRight" : 8,
+    "interactiveSmallPaddingTopBottom" : 8,
+    "radiusRounded" : 1000,
+    "radiusSoft" : 4,
+    "radiusStrong" : 16
+  },
+  "theme" : {
+    "borderSoft" : "#E9CE2C",
+    "buttonDestructiveBackgroundDestructiveDefault" : "#BC2230",
+    "buttonDestructiveStrokeDestructiveDefault" : "#BC2230",
+    "buttonPrimaryBackgroundPrimaryDefault" : "#14171C",
+    "buttonSecondaryBackgroundSecondaryDefault" : "#FFFFFF00",
+    "buttonSecondaryBackgroundSecondaryDisabled" : "#FFFFFF00",
+    "buttonTerciaryBackgroundTerciaryDefault" : "#FFFFFF00",
+    "buttonTerciaryBackgroundTerciaryDisabled" : "#FFFFFF00",
+    "buttonTerciaryStrokeTerciaryDefault" : "#FFFFFF00",
+    "buttonTerciaryStrokeTerciaryDisabled" : "#FFFFFF00",
+    "contentContentInvertedPrimary" : "#FDEB7A",
+    "contentContentInvertedPrimarydisabled" : "#6E747F",
+    "contentContentNegative" : "#E03B4A",
+    "contentContentPositive" : "#5FC287",
+    "contentContentPrimary" : "#14171C",
+    "contentContentPrimaryActive" : "#FDEB7A",
+    "contentContentPrimaryDisabled" : "#9AA0AB",
+    "contentContentTerciary" : "#6E747F",
+    "linkLinkPrimaryDefault" : "#14171C",
+    "linkLinkPrimaryDisabled" : "#9AA0AB",
+    "linkLinkPrimaryInvertedDefault" : "#FDEB7A",
+    "linkLinkPrimaryInvertedDisabled" : "#6E747F",
+    "surfaceBackgroundDestructive" : "#BC2230",
+    "surfaceBackgroundInvertedPrimary" : "#14171C",
+    "surfaceBackgroundNegative" : "#E03B4A",
+    "surfaceBackgroundPositive" : "#1F8B50",
+    "surfaceBackgroundPrimary" : "#FDEB7A",
+    "surfaceBackgroundPrimaryActive" : "#14171C",
+    "surfaceBackgroundTerciary" : "#C9CDD4",
+    "surfaceForegroundInvertedPrimary" : "#2A2E36",
+    "surfaceForegroundPrimary" : "#FCE34F"
+  },
+  "typography" : {
+    "body" : {
+      "large" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 18,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 28
+      },
+      "medium" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 16,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 24
+      },
+      "mediumStrikethrough" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 16,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 24
+      },
+      "small" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 12,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 16
+      }
+    },
+    "display" : {
+      "large" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 24,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 40
+      },
+      "medium" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 20,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 32
+      },
+      "small" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 18,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 28
+      }
+    },
+    "heading" : {
+      "large" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 32,
+        "fontWeight" : 500,
+        "letterSpacing" : -0.5,
+        "lineHeight" : 40
+      },
+      "medium" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 24,
+        "fontWeight" : 500,
+        "letterSpacing" : -0.5,
+        "lineHeight" : 32
+      },
+      "small" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 20,
+        "fontWeight" : 500,
+        "letterSpacing" : -0.5,
+        "lineHeight" : 28
+      },
+      "xSmall" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 16,
+        "fontWeight" : 500,
+        "letterSpacing" : -0.5,
+        "lineHeight" : 20
+      }
+    },
+    "label" : {
+      "small" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 12,
+        "fontWeight" : 400,
+        "letterSpacing" : 0,
+        "lineHeight" : 16
+      },
+      "smallBold" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 12,
+        "fontWeight" : 500,
+        "letterSpacing" : 0,
+        "lineHeight" : 16
+      }
+    },
+    "link" : {
+      "medium" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 16,
+        "fontWeight" : 500,
+        "letterSpacing" : 0,
+        "lineHeight" : 24
+      },
+      "small" : {
+        "fontFamily" : "Georgia",
+        "fontSize" : 12,
+        "fontWeight" : 500,
+        "letterSpacing" : 0,
+        "lineHeight" : 16
+      }
+    }
+  }
+}
