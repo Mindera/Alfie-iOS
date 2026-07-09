@@ -30,7 +30,7 @@ struct GeneratorRunTests {
         let result = try Generator.run(inputDirectory: fixtureURL(), outputDirectory: out)
 
         #expect(!FileManager.default.fileExists(atPath: stale.path))
-        #expect(result.writtenFiles == ["Primitives+Generated.swift", "Sizing+Generated.swift", "Theme+Generated.swift", "ThemeColours+Generated.swift", "Typography+Generated.swift"])
+        #expect(result.writtenFiles == ["Primitives+Generated.swift", "Sizing+Generated.swift", "Theme+Generated.swift", "ThemeColours+Generated.swift", "ThemeFonts+Generated.swift", "Typography+Generated.swift"])
         #expect(FileManager.default.fileExists(atPath: out.appendingPathComponent("Theme+Generated.swift").path))
     }
 }
@@ -154,8 +154,9 @@ struct EmitEdgeTests {
         let weird = "Wei\"rd\\Font"
         let t = tok("typography-font-family-weird", .fontFamily(weird), file: ".primitives.x")
         let loaded = LoadedTokens(map: ["typography-font-family-weird": t], primitiveValues: ["typography-font-family-weird": t], loadedFiles: [".primitives.x"])
-        let primitives = try emit(loaded)["Primitives+Generated.swift"]!
-        #expect(primitives.contains(String(reflecting: weird)))   // properly escaped Swift literal
+        // Font-family literals live in ThemeFonts now (Primitives forwards to the active palette).
+        let themeFonts = try emit(loaded)["ThemeFonts+Generated.swift"]!
+        #expect(themeFonts.contains(String(reflecting: weird)))   // properly escaped Swift literal
     }
 
     @Test("an emitted token resolving to an allow-listed broken ref throws a clear error")

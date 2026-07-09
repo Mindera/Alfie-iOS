@@ -158,7 +158,8 @@ struct EmitterTests {
         // Colours are now theme-swappable forwarders, not fixed literals.
         #expect(p.contains("public static var neutrals0: Color { ThemeColours.current.neutrals0 }"))
         #expect(!p.contains("Color(.sRGB"))  // colour literals moved to ThemeColours
-        #expect(p.contains("public static let fontFamilyBrand: String = \"Libre Test\""))
+        // Font families are theme-swappable forwarders too (literals moved to ThemeFonts).
+        #expect(p.contains("public static var fontFamilyBrand: String { ThemeFonts.current.fontFamilyBrand }"))
     }
 
     @Test("a primitive that aliases another primitive emits a symbol reference, not a literal")
@@ -188,7 +189,8 @@ struct EmitterTests {
         #expect(t.contains("public enum Display"))
         #expect(t.contains("public enum Heading"))
         #expect(t.contains("public init("))   // public memberwise init so the type is usable cross-module
-        #expect(t.contains("public static let large = TypographyStyle("))
+        // Computed var (not `static let`) so the theme-swappable fontFamily isn't frozen at launch.
+        #expect(t.contains("public static var large: TypographyStyle {"))
         #expect(t.contains("fontFamily: Primitives.Typography.fontFamilyBrand"))  // resolved through the allow-listed cycle
         #expect(t.contains("fontSize: Primitives.Typography.fontSizeFontSize40"))
         #expect(t.contains("fontWeight: 400"))   // "Regular"
@@ -258,6 +260,34 @@ struct EmitterTests {
         #expect(throws: DesignTokenError.self) {
             _ = try emit(twoThemeLoaded(slateComplete: false))
         }
+    }
+
+    @Test("multi-theme fonts: ThemeFonts emits a FontPalette per theme; Primitives.Typography forwards; override wins, undefined falls back to base")
+    func multiThemeFonts() throws {
+        let files = try Generator.emitInMemory(inputDirectory: miniURL())
+        let tf = files["ThemeFonts+Generated.swift"]!
+        #expect(tf.contains("public struct FontPalette"))
+        #expect(tf.contains("public static let alfie = FontPalette(fontFamilyBrand: \"Libre Test\")"))
+        // selffridge overrides the brand family; base fallback covers any it doesn't define.
+        #expect(tf.contains("public static let selffridge = FontPalette(fontFamilyBrand: \"Selffridge Test\")"))
+        #expect(tf.contains("public static var current: FontPalette = alfie"))
+        #expect(tf.contains("case \"selffridge-theme\": current = selffridge"))
+        // Call sites keep reading Primitives.Typography.*, which now forwards to the active font palette.
+        #expect(files["Primitives+Generated.swift"]!.contains("public static var fontFamilyBrand: String { ThemeFonts.current.fontFamilyBrand }"))
+    }
+
+    @Test("font-free input emits a compilable empty ThemeFonts (empty palette, no-op apply)")
+    func fontFreeInputEmitsValidEmptyThemeFonts() throws {
+        let colour = colourToken("colours-neutrals-0", [1, 1, 1], file: ".primitives.alfie-theme.tokens.json")
+        let loaded = LoadedTokens(
+            map: ["colours-neutrals-0": colour], primitiveValues: ["colours-neutrals-0": colour],
+            loadedFiles: [".primitives.alfie-theme.tokens.json"],
+            colourThemes: ["alfie-theme": ["colours-neutrals-0": colour]], baseTheme: "alfie-theme"
+        )
+        let tf = try emit(loaded)["ThemeFonts+Generated.swift"]!
+        #expect(tf.contains("public struct FontPalette {"))
+        #expect(tf.contains("public static var current = FontPalette()"))
+        #expect(!tf.contains("FontPalette(fontFamily"))   // no fields
     }
 
     @Test("emit (from disk): both primitive theme modes become distinct palettes + AppTheme cases")

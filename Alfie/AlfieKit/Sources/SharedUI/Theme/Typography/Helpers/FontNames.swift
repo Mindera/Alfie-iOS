@@ -26,6 +26,18 @@ public enum FontNames: String, CaseIterable {
         }
         return font
     }
+
+    /// Maps a design-token font-family name (e.g. `"Libre Baskerville"`) to the PostScript name a
+    /// bundled face is registered under (`UIFont(name:)` needs the PostScript name, not the family
+    /// name). Returns `nil` for families that aren't bundled — those load by their own name.
+    public static func postScriptName(forFamily family: String) -> String? {
+        switch family {
+        case "Libre Baskerville":
+            return FontNames.libreBaskerville.rawValue
+        default:
+            return nil
+        }
+    }
 }
 
 // MARK: - FontManager

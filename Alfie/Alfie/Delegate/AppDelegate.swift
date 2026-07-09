@@ -71,10 +71,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        // Apply the persisted colour theme before the UI (and the UIKit appearance proxies set in
-        // setupAppearance) are first built — and again on every reboot, since bootstrap() re-runs there.
-        ThemeColours.apply(id: serviceProvider.themeService.selectedThemeID ?? AppTheme.alfie.rawValue)
-        DesignSystem.shared.setupAppearance()
+        // Apply the persisted colour + font theme before the UI (and the UIKit appearance proxies set
+        // in setupAppearance) are first built — and again on every reboot, since bootstrap() re-runs
+        // there. Recreating DesignSystem makes the typography provider re-capture the active fonts (it
+        // snapshots Typography.* at init) and re-runs setupAppearance with the active theme.
+        let selectedThemeID = serviceProvider.themeService.selectedThemeID ?? AppTheme.alfie.rawValue
+        ThemeColours.apply(id: selectedThemeID)
+        ThemeFonts.apply(id: selectedThemeID)
+        DesignSystem.shared = DesignSystem()
 
         isWishlistEnabled = serviceProvider.configurationService.isFeatureEnabled(.wishlist)
         isStoreServicesEnabled = serviceProvider.configurationService.isFeatureEnabled(.storeServices)

@@ -1,4 +1,5 @@
 {
   "colours-neutrals-0": { "$type": "color", "$value": "#FDEB7A" },
-  "colours-neutrals-800": { "$type": "color", "$value": "#111827" }
+  "colours-neutrals-800": { "$type": "color", "$value": "#111827" },
+  "typography-font-family-brand": { "$type": "fontFamily", "$value": "Selffridge Test" }
 }

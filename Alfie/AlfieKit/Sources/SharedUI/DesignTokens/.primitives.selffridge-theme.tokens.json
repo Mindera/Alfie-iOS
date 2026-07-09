@@ -106,5 +106,13 @@
   "colours-transparent-transparent": {
     "$type": "color",
     "$value": "#FFFFFF00"
+  },
+  "typography-font-family-brand": {
+    "$type": "fontFamily",
+    "$value": "Georgia"
+  },
+  "typography-font-family-primary-ios": {
+    "$type": "fontFamily",
+    "$value": "Georgia"
   }
 }

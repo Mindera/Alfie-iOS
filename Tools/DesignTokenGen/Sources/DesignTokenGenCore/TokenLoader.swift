@@ -9,8 +9,12 @@ public struct LoadedTokens {
     public let primitiveValues: [String: Token]  // concrete values from .primitives (cycle fallback)
     public let loadedFiles: Set<String>          // filenames actually parsed (scopes allowlist checks)
     // Per-theme colour palettes: each `.primitives` mode parsed into its own colour set (incl. base).
-    // Only colours vary across themes; the base theme drives `map`/`primitiveValues` for everything else.
+    // Colours + font families vary across themes; the base theme drives `map`/`primitiveValues` for
+    // everything else.
     public let colourThemes: [String: [String: Token]]
+    // Per-theme font-family palettes: each `.primitives` mode's `fontFamily` primitives. A theme may
+    // override only some families; undefined ones fall back to the base theme at emit time.
+    public let fontThemes: [String: [String: Token]]
     public let baseTheme: String                 // theme id (mode name) driving `map`/`primitiveValues`
 
     public init(
@@ -18,12 +22,14 @@ public struct LoadedTokens {
         primitiveValues: [String: Token],
         loadedFiles: Set<String>,
         colourThemes: [String: [String: Token]] = [:],
+        fontThemes: [String: [String: Token]] = [:],
         baseTheme: String = TokenLoader.baseTheme
     ) {
         self.map = map
         self.primitiveValues = primitiveValues
         self.loadedFiles = loadedFiles
         self.colourThemes = colourThemes
+        self.fontThemes = fontThemes
         self.baseTheme = baseTheme
     }
 }
@@ -71,18 +77,22 @@ public enum TokenLoader {
         // (which would clobber via last-writer-wins), so resolution stays anchored to the base theme.
         let primitiveModes = try primitiveThemeModes(manifestURL: manifestURL)
         var colourThemes: [String: [String: Token]] = [:]
+        var fontThemes: [String: [String: Token]] = [:]
         for (themeId, themeFiles) in primitiveModes {
             var colours: [String: Token] = [:]
+            var fonts: [String: Token] = [:]
             for file in themeFiles {
                 let url = dir.appendingPathComponent(file)
                 guard FileManager.default.fileExists(atPath: url.path) else {
                     throw DesignTokenError.fileNotFound(url.path)
                 }
-                for token in try parseFile(url: url, file: file) where token.value.isColour {
-                    colours[token.name] = token
+                for token in try parseFile(url: url, file: file) {
+                    if token.value.isColour { colours[token.name] = token }
+                    else if case .fontFamily = token.value { fonts[token.name] = token }
                 }
             }
             colourThemes[themeId] = colours
+            fontThemes[themeId] = fonts
         }
         let base = colourThemes[baseTheme] != nil ? baseTheme : (colourThemes.keys.sorted().first ?? baseTheme)
         return LoadedTokens(
@@ -90,6 +100,7 @@ public enum TokenLoader {
             primitiveValues: primitiveValues,
             loadedFiles: loaded,
             colourThemes: colourThemes,
+            fontThemes: fontThemes,
             baseTheme: base
         )
     }

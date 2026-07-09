@@ -89,6 +89,30 @@ final class TypographyStyleFontTests: XCTestCase {
         XCTAssertEqual(body.kern ?? .nan, Primitives.Typography.kerningNone, accuracy: 0.001)
     }
 
+    // MARK: - Per-theme font families (theme-swappable primary/brand)
+
+    func test_uiFont_resolvesNamedFamily_forThemeOverride() {
+        // A theme that overrides a font family to a real named font (e.g. selfFridge → "Georgia")
+        // must render that font — regression: uiFont once hardcoded the bundled brand face and
+        // ignored the family string, so every theme rendered the same font.
+        let style = TypographyStyle(fontFamily: "Georgia", fontWeight: 400, fontSize: 20, lineHeight: 24, letterSpacing: 0)
+        XCTAssertEqual(style.uiFont.familyName, "Georgia")
+        XCTAssertEqual(style.uiFont.pointSize, 20)
+    }
+
+    func test_uiFont_systemFontSentinel_resolvesToSystemFont() {
+        // "SF Pro" is the design-system name for the iOS system font (no loadable named face): it must
+        // resolve to systemFont at the token size/weight, NOT fall through to UIFont(name:).
+        let style = TypographyStyle(fontFamily: "SF Pro", fontWeight: 500, fontSize: 16, lineHeight: 20, letterSpacing: 0)
+        XCTAssertEqual(style.uiFont.pointSize, 16)
+        XCTAssertEqual(style.uiFont.familyName, UIFont.systemFont(ofSize: 16, weight: .medium).familyName)
+    }
+
+    func test_uiFont_unresolvableFamily_fallsBackToSystemFont() {
+        let style = TypographyStyle(fontFamily: "No Such Font 1234", fontWeight: 400, fontSize: 12, lineHeight: 16, letterSpacing: 0)
+        XCTAssertEqual(style.uiFont.familyName, UIFont.systemFont(ofSize: 12, weight: .regular).familyName)
+    }
+
     // MARK: - Helpers
 
     private func weightTrait(of font: UIFont) -> CGFloat {

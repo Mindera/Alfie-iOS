@@ -59,10 +59,10 @@ public enum Primitives {
         public static let spacing96: CGFloat = CGFloat(96.0)
     }
     public enum Typography {
-        public static let fontFamilyBrand: String = "Libre Baskerville"
-        public static let fontFamilyPrimaryAndroid: String = "Roboto"
-        public static let fontFamilyPrimaryIos: String = "SF Pro"
-        public static let fontFamilyPrimaryWeb: String = "Inter"
+        public static var fontFamilyBrand: String { ThemeFonts.current.fontFamilyBrand }
+        public static var fontFamilyPrimaryAndroid: String { ThemeFonts.current.fontFamilyPrimaryAndroid }
+        public static var fontFamilyPrimaryIos: String { ThemeFonts.current.fontFamilyPrimaryIos }
+        public static var fontFamilyPrimaryWeb: String { ThemeFonts.current.fontFamilyPrimaryWeb }
         public static let fontSizeFontSize12 = Primitives.Spacing.spacing12
         public static let fontSizeFontSize14 = Primitives.Spacing.spacing14
         public static let fontSizeFontSize16 = Primitives.Spacing.spacing16

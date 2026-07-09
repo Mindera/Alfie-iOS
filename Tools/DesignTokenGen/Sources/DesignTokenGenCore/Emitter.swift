@@ -26,6 +26,7 @@ public struct Emitter {
             "Sizing+Generated.swift": try emitSizing(),
             "Typography+Generated.swift": try emitTypography(),
             "ThemeColours+Generated.swift": try emitThemeColours(),
+            "ThemeFonts+Generated.swift": try emitFonts(),
         ]
     }
 
@@ -46,6 +47,10 @@ public struct Emitter {
                     // literal, so a runtime theme switch (+ soft-reboot) re-renders every call site
                     // unchanged. The concrete literals live in `ThemeColours` (one per theme).
                     body += "        public static var \(id): Color { ThemeColours.current.\(id) }\n"
+                } else if case .fontFamily = token.value {
+                    // Font families are theme-swappable too: forward to the active font palette so a
+                    // theme switch re-renders text. The concrete literals live in `ThemeFonts`.
+                    body += "        public static var \(id): String { ThemeFonts.current.\(id) }\n"
                 } else {
                     // Most primitives are concrete; a few reference another primitive
                     // (e.g. a font-size aliased to a spacing value) — keep that as a symbol reference.
@@ -198,6 +203,93 @@ public struct Emitter {
         """
     }
 
+    // MARK: - ThemeFonts (per-theme font-family palettes + active holder)
+
+    /// Emits the swappable font layer that `Primitives.Typography` font families forward to, mirroring
+    /// `ThemeColours`. Unlike colours (strict full schema per theme), a theme may override only some
+    /// font families — undefined ones fall back to the base theme, since most families (platform
+    /// defaults) are theme-invariant and only the brand font typically changes.
+    private func emitFonts() throws -> String {
+        var fontThemes = loaded.fontThemes.filter { !$0.value.isEmpty }
+        if fontThemes.isEmpty {
+            let baseFonts = loaded.primitiveValues.filter { if case .fontFamily = $0.value.value { return true }; return false }
+            if !baseFonts.isEmpty { fontThemes = [loaded.baseTheme: baseFonts] }
+        }
+        let themeIDs = fontThemes.keys.sorted()
+        // A token set with no font families → a valid, empty holder (nothing forwards to it).
+        guard !themeIDs.isEmpty else { return emptyThemeFontsFile() }
+
+        let base = fontThemes[loaded.baseTheme] != nil ? loaded.baseTheme : themeIDs[0]
+        let baseFonts = fontThemes[base]!
+        let members = baseFonts.keys.sorted().map { (name: $0, id: SwiftIdentifier.make($0, dropPrefix: fontGroup)) }
+        try SwiftIdentifier.assertNoCollisions(baseFonts.keys.sorted(), dropPrefix: fontGroup)
+        try SwiftIdentifier.assertNoCollisions(themeIDs.map(themeVarName))
+
+        let structFields = members.map { "    public let \($0.id): String" }.joined(separator: "\n")
+        let initParams = members.map { "\($0.id): String" }.joined(separator: ", ")
+        let initBody = members.map { "        self.\($0.id) = \($0.id)" }.joined(separator: "\n")
+
+        // One concrete palette per theme; a family the theme doesn't override falls back to base.
+        var instances = ""
+        for themeId in themeIDs {
+            let fonts = fontThemes[themeId]!
+            let args = try members.map { member -> String in
+                let token = fonts[member.name] ?? baseFonts[member.name]!
+                return "\(member.id): \(try literal(token.value, name: member.name))"
+            }.joined(separator: ", ")
+            instances += "    public static let \(themeVarName(themeId)) = FontPalette(\(args))\n"
+        }
+        let applyCases = themeIDs
+            .map { "        case \(String(reflecting: $0)): current = \(themeVarName($0))" }
+            .joined(separator: "\n")
+
+        return """
+        \(Self.header)
+        import Foundation
+
+        public struct FontPalette {
+        \(structFields)
+
+            public init(\(initParams)) {
+        \(initBody)
+            }
+        }
+
+        public enum ThemeFonts {
+        \(instances)
+            /// The active font palette. Set at launch and on each theme switch, before the UI builds.
+            public static var current: FontPalette = \(themeVarName(base))
+
+            /// Apply by persisted id; unknown ids leave the current palette unchanged.
+            public static func apply(id: String) {
+                switch id {
+        \(applyCases)
+                default: break
+                }
+            }
+        }
+        """
+    }
+
+    /// Valid, empty font layer for token sets that define no font families (keeps the emitted file set
+    /// stable). Nothing forwards to it, so an empty palette/holder is harmless.
+    private func emptyThemeFontsFile() -> String {
+        """
+        \(Self.header)
+        import Foundation
+
+        public struct FontPalette {
+            public init() {}
+        }
+
+        public enum ThemeFonts {
+            public static var current = FontPalette()
+
+            public static func apply(id: String) {}
+        }
+        """
+    }
+
     // MARK: - Sizing (mix of primitive references and concrete literals)
 
     private func emitSizing() throws -> String {
@@ -231,13 +323,18 @@ public struct Emitter {
             for token in members {
                 guard case .typography(let typo) = token.value else { continue }
                 let id = SwiftIdentifier.make(stripFirstSegment(token.name))
-                body += "        public static let \(id) = TypographyStyle(\n"
-                body += "            fontFamily: \(try fieldRef(typo.fontFamily)),\n"
-                body += "            fontWeight: \(try fieldRef(typo.fontWeight)),\n"
-                body += "            fontSize: \(try fieldRef(typo.fontSize)),\n"
-                body += "            lineHeight: \(try fieldRef(typo.lineHeight)),\n"
-                body += "            letterSpacing: \(try fieldRef(typo.letterSpacing))\n"
-                body += "        )\n"
+                // Computed (not `static let`): `fontFamily` forwards to the theme-swappable
+                // `Primitives.Typography` / `ThemeFonts`, so a `let` would snapshot the launch font
+                // and go stale after a theme switch.
+                body += "        public static var \(id): TypographyStyle {\n"
+                body += "            TypographyStyle(\n"
+                body += "                fontFamily: \(try fieldRef(typo.fontFamily)),\n"
+                body += "                fontWeight: \(try fieldRef(typo.fontWeight)),\n"
+                body += "                fontSize: \(try fieldRef(typo.fontSize)),\n"
+                body += "                lineHeight: \(try fieldRef(typo.lineHeight)),\n"
+                body += "                letterSpacing: \(try fieldRef(typo.letterSpacing))\n"
+                body += "            )\n"
+                body += "        }\n"
             }
             body += "    }\n"
         }
@@ -338,6 +435,10 @@ public struct Emitter {
 
     /// The primitives group whose values are theme-swappable (emitted as forwarders, not literals).
     private var coloursGroup: String { "colours" }
+
+    /// The primitives group holding font families (the segment prefix dropped from `ThemeFonts`
+    /// palette identifiers). Every `fontFamily` primitive is named `typography-font-family-*`.
+    private var fontGroup: String { "typography" }
 
     /// Theme id → Swift identifier for its palette/case, dropping a trailing `-theme`
     /// (`alfie-theme` → `alfie`, `selffridge-theme` → `selffridge`).
