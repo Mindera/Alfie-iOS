@@ -50,9 +50,10 @@ public enum TokenLoader {
     /// Filenames to load: skip `.documentation`; pick the iOS mode for multi-mode collections;
     /// include single-mode collections and the typography styles.
     static func selectedFiles(manifestURL: URL) throws -> [String] {
+        let name = manifestURL.lastPathComponent
         let data = try Data(contentsOf: manifestURL)
         guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw DesignTokenError.malformedToken(name: "manifest.json", reason: "not an object")
+            throw DesignTokenError.malformedToken(name: name, reason: "not an object")
         }
         var files: [String] = []
         if let collections = root["collections"] as? [String: Any] {
@@ -61,14 +62,14 @@ public enum TokenLoader {
                 // A collection without a `modes` dictionary is contract drift — fail fast rather than
                 // silently dropping its tokens from the generated set.
                 guard let modes = (value as? [String: Any])?["modes"] as? [String: Any] else {
-                    throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' has no 'modes' dictionary")
+                    throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' has no 'modes' dictionary")
                 }
                 let chosen: [Any]
                 if let mode = modeForCollection[collection] {
                     // A configured collection MUST expose its expected mode — falling back to an empty
                     // list would silently emit an incomplete token set.
                     guard let list = modes[mode] as? [Any] else {
-                        throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' is missing expected mode '\(mode)'")
+                        throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' is missing expected mode '\(mode)'")
                     }
                     chosen = list
                 } else if modes.count <= 1 {
@@ -79,7 +80,7 @@ public enum TokenLoader {
                     // — including ones pull-design-tokens.sh doesn't ship — and crash later with an
                     // opaque fileNotFound. Fail here with an actionable message instead.
                     let modeNames = modes.keys.sorted().joined(separator: ", ")
-                    throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' has multiple modes [\(modeNames)] but no pinned mode — add one to TokenLoader.modeForCollection to select the iOS mode")
+                    throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' has multiple modes [\(modeNames)] but no pinned mode — add one to TokenLoader.modeForCollection to select the iOS mode")
                 }
                 files.append(contentsOf: chosen.compactMap { $0 as? String })
             }
