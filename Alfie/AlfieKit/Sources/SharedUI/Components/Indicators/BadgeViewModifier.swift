@@ -13,7 +13,7 @@ public struct BadgeViewModifier: ViewModifier {
         static let indicatorHeight = Primitives.Spacing.spacing12
         static let indicatorWidth = Primitives.Spacing.spacing12
         static let capsuleOffsetXFactor = 3 // layout multiplier, no design token
-        static let borderLineWidth = 1.0 // hairline, no design token (no spacing1)
+        static let borderLineWidth = CGFloat(Primitives.Border.borderWeightDefault)
     }
 
     private var helper: BadgeHelper
