@@ -30,7 +30,7 @@ struct GeneratorRunTests {
         let result = try Generator.run(inputDirectory: fixtureURL(), outputDirectory: out)
 
         #expect(!FileManager.default.fileExists(atPath: stale.path))
-        #expect(result.writtenFiles == ["Primitives+Generated.swift", "Sizing+Generated.swift", "Theme+Generated.swift", "Typography+Generated.swift"])
+        #expect(result.writtenFiles == ["Primitives+Generated.swift", "Sizing+Generated.swift", "Theme+Generated.swift", "ThemeColours+Generated.swift", "ThemeFonts+Generated.swift", "Typography+Generated.swift", "ResolvedTokens/alfie-theme.resolved.tokens.json", "ResolvedTokens/selffridge-theme.resolved.tokens.json"])
         #expect(FileManager.default.fileExists(atPath: out.appendingPathComponent("Theme+Generated.swift").path))
     }
 }
@@ -119,25 +119,26 @@ struct ValueParsingTests {
 
 @Suite("Color literal")
 struct ColorLiteralTests {
-    private func emitPrimitives(_ comps: [Double]) throws -> String {
+    // Colour literals live in the ThemeColours palette layer (Primitives.Colours forwards to it).
+    private func emitPalette(_ comps: [Double]) throws -> String {
         let token = tok("colours-x-1", .color(components: comps), file: ".primitives.x")
         let loaded = LoadedTokens(map: ["colours-x-1": token], primitiveValues: ["colours-x-1": token], loadedFiles: [".primitives.x"])
-        return try Emitter(loaded: loaded, resolver: emptyResolver(loaded)).emit()["Primitives+Generated.swift"]!
+        return try Emitter(loaded: loaded, resolver: emptyResolver(loaded)).emit()["ThemeColours+Generated.swift"]!
     }
 
     @Test("4-component color carries its alpha through to opacity")
     func alphaPreserved() throws {
-        #expect(try emitPrimitives([0.1, 0.2, 0.3, 0.5]).contains("opacity: 0.5"))
+        #expect(try emitPalette([0.1, 0.2, 0.3, 0.5]).contains("opacity: 0.5"))
     }
 
     @Test("3-component color defaults opacity to 1.0")
     func opacityDefault() throws {
-        #expect(try emitPrimitives([0.1, 0.2, 0.3]).contains("opacity: 1.0"))
+        #expect(try emitPalette([0.1, 0.2, 0.3]).contains("opacity: 1.0"))
     }
 
     @Test("color with fewer than 3 components is rejected")
     func tooFewComponents() {
-        #expect(throws: DesignTokenError.self) { _ = try emitPrimitives([0, 0]) }
+        #expect(throws: DesignTokenError.self) { _ = try emitPalette([0, 0]) }
     }
 }
 
@@ -153,8 +154,9 @@ struct EmitEdgeTests {
         let weird = "Wei\"rd\\Font"
         let t = tok("typography-font-family-weird", .fontFamily(weird), file: ".primitives.x")
         let loaded = LoadedTokens(map: ["typography-font-family-weird": t], primitiveValues: ["typography-font-family-weird": t], loadedFiles: [".primitives.x"])
-        let primitives = try emit(loaded)["Primitives+Generated.swift"]!
-        #expect(primitives.contains(String(reflecting: weird)))   // properly escaped Swift literal
+        // Font-family literals live in ThemeFonts now (Primitives forwards to the active palette).
+        let themeFonts = try emit(loaded)["ThemeFonts+Generated.swift"]!
+        #expect(themeFonts.contains(String(reflecting: weird)))   // properly escaped Swift literal
     }
 
     @Test("an emitted token resolving to an allow-listed broken ref throws a clear error")

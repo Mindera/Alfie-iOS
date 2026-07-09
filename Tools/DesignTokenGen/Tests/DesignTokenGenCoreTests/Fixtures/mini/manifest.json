@@ -39,6 +39,9 @@
       "modes": {
         "alfie-theme": [
           ".primitives.alfie-theme.tokens.json"
+        ],
+        "selffridge-theme": [
+          ".primitives.selffridge-theme.tokens.json"
         ]
       }
     },

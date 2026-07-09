@@ -29,11 +29,13 @@ final class ServiceProvider: ServiceProviderProtocol {
     let bagService: BagServiceProtocol
     let wishlistService: WishlistServiceProtocol
     let sessionService: SessionServiceProtocol
+    let themeService: ThemeServiceProtocol
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
     init() {
         self.userDefaults = UserDefaults.standard
+        self.themeService = ThemeService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 

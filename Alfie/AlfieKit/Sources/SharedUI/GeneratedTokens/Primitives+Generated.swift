@@ -8,33 +8,33 @@ public enum Primitives {
         public static let borderWeightDefault: Int = 1
     }
     public enum Colours {
-        public static let neutrals0 = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)
-        public static let neutrals100 = Color(.sRGB, red: 0.9700000286102295, green: 0.9700000286102295, blue: 0.9700000286102295, opacity: 1.0)
-        public static let neutrals200 = Color(.sRGB, red: 0.9137254953384399, green: 0.9137254953384399, blue: 0.9137254953384399, opacity: 1.0)
-        public static let neutrals300 = Color(.sRGB, red: 0.8039215803146362, green: 0.8039215803146362, blue: 0.8039215803146362, opacity: 1.0)
-        public static let neutrals400 = Color(.sRGB, red: 0.6299999952316284, green: 0.6299999952316284, blue: 0.6299999952316284, opacity: 1.0)
-        public static let neutrals500 = Color(.sRGB, red: 0.4627451002597809, green: 0.4627451002597809, blue: 0.4627451002597809, opacity: 1.0)
-        public static let neutrals600 = Color(.sRGB, red: 0.29019609093666077, green: 0.29019609093666077, blue: 0.29019609093666077, opacity: 1.0)
-        public static let neutrals700 = Color(.sRGB, red: 0.16862745583057404, green: 0.16862745583057404, blue: 0.16862745583057404, opacity: 1.0)
-        public static let neutrals800 = Color(.sRGB, red: 0.06666667014360428, green: 0.06666667014360428, blue: 0.06666667014360428, opacity: 1.0)
-        public static let neutrals900 = Color(.sRGB, red: 0.0235294122248888, green: 0.0313725508749485, blue: 0.03921568766236305, opacity: 1.0)
-        public static let semanticError100 = Color(.sRGB, red: 0.9960784316062927, green: 0.9490196108818054, blue: 0.9450980424880981, opacity: 1.0)
-        public static let semanticError200 = Color(.sRGB, red: 0.9764705896377563, green: 0.8705882430076599, blue: 0.8627451062202454, opacity: 1.0)
-        public static let semanticError300 = Color(.sRGB, red: 0.9176470637321472, green: 0.6078431606292725, blue: 0.6196078658103943, opacity: 1.0)
-        public static let semanticError400 = Color(.sRGB, red: 0.9200000166893005, green: 0.4047999978065491, blue: 0.42568641901016235, opacity: 1.0)
-        public static let semanticError500 = Color(.sRGB, red: 0.8784313797950745, green: 0.24313725531101227, blue: 0.250980406999588, opacity: 1.0)
-        public static let semanticError600 = Color(.sRGB, red: 0.6986979246139526, green: 0.14689259231090546, blue: 0.14689259231090546, opacity: 1.0)
-        public static let semanticError700 = Color(.sRGB, red: 0.583789050579071, green: 0.14404691755771637, blue: 0.14404691755771637, opacity: 1.0)
-        public static let semanticError800 = Color(.sRGB, red: 0.468505859375, green: 0.02152746543288231, blue: 3.812710565398446e-05, opacity: 1.0)
-        public static let semanticSuccess100 = Color(.sRGB, red: 0.929411768913269, green: 0.9686274528503418, blue: 0.9058823585510254, opacity: 1.0)
-        public static let semanticSuccess200 = Color(.sRGB, red: 0.8313725590705872, green: 0.9176470637321472, blue: 0.7647058963775635, opacity: 1.0)
-        public static let semanticSuccess300 = Color(.sRGB, red: 0.6406044363975525, green: 0.8100000023841858, blue: 0.5102999806404114, opacity: 1.0)
-        public static let semanticSuccess400 = Color(.sRGB, red: 0.5176470875740051, green: 0.772549033164978, blue: 0.32549020648002625, opacity: 1.0)
-        public static let semanticSuccess500 = Color(.sRGB, red: 0.37514281272888184, green: 0.6499999761581421, blue: 0.1671428382396698, opacity: 1.0)
-        public static let semanticSuccess600 = Color(.sRGB, red: 0.2831125855445862, green: 0.5699999928474426, blue: 0.12079471349716187, opacity: 1.0)
-        public static let semanticSuccess700 = Color(.sRGB, red: 0.21176470816135406, green: 0.5137255191802979, blue: 0.08627451211214066, opacity: 1.0)
-        public static let semanticSuccess800 = Color(.sRGB, red: 0.0, green: 0.3843137323856354, blue: 0.003921568859368564, opacity: 1.0)
-        public static let transparentTransparent = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 0.0)
+        public static var neutrals0: Color { ThemeColours.current.neutrals0 }
+        public static var neutrals100: Color { ThemeColours.current.neutrals100 }
+        public static var neutrals200: Color { ThemeColours.current.neutrals200 }
+        public static var neutrals300: Color { ThemeColours.current.neutrals300 }
+        public static var neutrals400: Color { ThemeColours.current.neutrals400 }
+        public static var neutrals500: Color { ThemeColours.current.neutrals500 }
+        public static var neutrals600: Color { ThemeColours.current.neutrals600 }
+        public static var neutrals700: Color { ThemeColours.current.neutrals700 }
+        public static var neutrals800: Color { ThemeColours.current.neutrals800 }
+        public static var neutrals900: Color { ThemeColours.current.neutrals900 }
+        public static var semanticError100: Color { ThemeColours.current.semanticError100 }
+        public static var semanticError200: Color { ThemeColours.current.semanticError200 }
+        public static var semanticError300: Color { ThemeColours.current.semanticError300 }
+        public static var semanticError400: Color { ThemeColours.current.semanticError400 }
+        public static var semanticError500: Color { ThemeColours.current.semanticError500 }
+        public static var semanticError600: Color { ThemeColours.current.semanticError600 }
+        public static var semanticError700: Color { ThemeColours.current.semanticError700 }
+        public static var semanticError800: Color { ThemeColours.current.semanticError800 }
+        public static var semanticSuccess100: Color { ThemeColours.current.semanticSuccess100 }
+        public static var semanticSuccess200: Color { ThemeColours.current.semanticSuccess200 }
+        public static var semanticSuccess300: Color { ThemeColours.current.semanticSuccess300 }
+        public static var semanticSuccess400: Color { ThemeColours.current.semanticSuccess400 }
+        public static var semanticSuccess500: Color { ThemeColours.current.semanticSuccess500 }
+        public static var semanticSuccess600: Color { ThemeColours.current.semanticSuccess600 }
+        public static var semanticSuccess700: Color { ThemeColours.current.semanticSuccess700 }
+        public static var semanticSuccess800: Color { ThemeColours.current.semanticSuccess800 }
+        public static var transparentTransparent: Color { ThemeColours.current.transparentTransparent }
     }
     public enum Spacing {
         public static let spacing0: CGFloat = CGFloat(0.0)
@@ -59,10 +59,10 @@ public enum Primitives {
         public static let spacing96: CGFloat = CGFloat(96.0)
     }
     public enum Typography {
-        public static let fontFamilyBrand: String = "Libre Baskerville"
-        public static let fontFamilyPrimaryAndroid: String = "Roboto"
-        public static let fontFamilyPrimaryIos: String = "SF Pro"
-        public static let fontFamilyPrimaryWeb: String = "Inter"
+        public static var fontFamilyBrand: String { ThemeFonts.current.fontFamilyBrand }
+        public static var fontFamilyPrimaryAndroid: String { ThemeFonts.current.fontFamilyPrimaryAndroid }
+        public static var fontFamilyPrimaryIos: String { ThemeFonts.current.fontFamilyPrimaryIos }
+        public static var fontFamilyPrimaryWeb: String { ThemeFonts.current.fontFamilyPrimaryWeb }
         public static let fontSizeFontSize12 = Primitives.Spacing.spacing12
         public static let fontSizeFontSize14 = Primitives.Spacing.spacing14
         public static let fontSizeFontSize16 = Primitives.Spacing.spacing16

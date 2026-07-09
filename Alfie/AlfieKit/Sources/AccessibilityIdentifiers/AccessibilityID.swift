@@ -41,4 +41,16 @@ public enum AccessibilityID {
             "productListing.row.\(id)"
         }
     }
+
+    // MARK: - DebugMenu
+
+    public enum DebugMenu {
+        public static let themeRow = "debugMenu.theme.button"
+        public static let themePicker = "debugMenu.themePicker"
+
+        /// Row for a specific theme, keyed by its stable theme id (never an array index).
+        public static func themeOption(id: String) -> String {
+            "debugMenu.themePicker.\(id).button"
+        }
+    }
 }

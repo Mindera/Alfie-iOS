@@ -24,6 +24,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var bagService: BagServiceProtocol
     public var wishlistService: WishlistServiceProtocol
     public var sessionService: SessionServiceProtocol
+    public var themeService: ThemeServiceProtocol
 
     public init(
         analytics: AlfieAnalyticsTracker = MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
@@ -45,7 +46,8 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService(),
         bagService: BagServiceProtocol = MockBagService(),
         wishlistService: WishlistServiceProtocol = MockWishlistService(),
-        sessionService: SessionServiceProtocol = MockSessionService()
+        sessionService: SessionServiceProtocol = MockSessionService(),
+        themeService: ThemeServiceProtocol = MockThemeService()
     ) {
         self.analytics = analytics
         self.authenticationService = authenticationService
@@ -67,6 +69,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         self.bagService = bagService
         self.wishlistService = wishlistService
         self.sessionService = sessionService
+        self.themeService = themeService
     }
 
     public var onResetServicesCalled: (() -> Void)?

@@ -16,15 +16,27 @@ public enum Generator {
         let resolver = Resolver(loaded: loaded, cycleAllowlist: cycleAllowlist, brokenRefAllowlist: brokenRefAllowlist)
         let warnings = try resolver.validate()
 
-        let files = try Emitter(loaded: loaded, resolver: resolver).emit()
+        let emitter = Emitter(loaded: loaded, resolver: resolver)
+        let files = try emitter.emit()
+        // Language-neutral resolved-token JSON per theme, written to a subdirectory that is EXCLUDED
+        // from the SharedUI SwiftPM target (only the sibling `*+Generated.swift` compile).
+        let resolved = try emitter.emitResolvedThemes()
 
         try cleanGeneratedFiles(in: outputDirectory)
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
         for name in files.keys.sorted() {
-            let url = outputDirectory.appendingPathComponent(name)
-            try (files[name]! + "\n").write(to: url, atomically: true, encoding: .utf8)
+            try (files[name]! + "\n").write(to: outputDirectory.appendingPathComponent(name), atomically: true, encoding: .utf8)
         }
-        return Result(writtenFiles: files.keys.sorted(), warnings: warnings)
+        var written = files.keys.sorted()
+        if !resolved.isEmpty {
+            let resolvedDir = outputDirectory.appendingPathComponent(resolvedSubdirectory, isDirectory: true)
+            try FileManager.default.createDirectory(at: resolvedDir, withIntermediateDirectories: true)
+            for name in resolved.keys.sorted() {
+                try (resolved[name]! + "\n").write(to: resolvedDir.appendingPathComponent(name), atomically: true, encoding: .utf8)
+                written.append("\(resolvedSubdirectory)/\(name)")
+            }
+        }
+        return Result(writtenFiles: written, warnings: warnings)
     }
 
     /// Generate into memory only — used by determinism tests.
@@ -37,11 +49,18 @@ public enum Generator {
         return try Emitter(loaded: loaded, resolver: resolver).emit()
     }
 
+    /// Subdirectory (under the output dir) for the resolved-token JSON export. Excluded from the
+    /// SharedUI SwiftPM target so the non-Swift files don't trip SPM's source handling.
+    static let resolvedSubdirectory = "ResolvedTokens"
+
     static func cleanGeneratedFiles(in directory: URL) throws {
         let fm = FileManager.default
         guard let contents = try? fm.contentsOfDirectory(atPath: directory.path) else { return }
         for file in contents where file.hasSuffix("+Generated.swift") {
             try fm.removeItem(at: directory.appendingPathComponent(file))
         }
+        // Wipe the resolved-JSON subdirectory wholesale so a removed theme leaves no orphan export.
+        let resolvedDir = directory.appendingPathComponent(resolvedSubdirectory, isDirectory: true)
+        if fm.fileExists(atPath: resolvedDir.path) { try fm.removeItem(at: resolvedDir) }
     }
 }

@@ -18,13 +18,15 @@ public struct Emitter {
     // swiftlint:disable all
     """
 
-    /// filename → file contents. Stable set of four files.
+    /// filename → file contents. Stable set of five files.
     public func emit() throws -> [String: String] {
         [
             "Primitives+Generated.swift": try emitPrimitives(),
             "Theme+Generated.swift": try emitTheme(),
             "Sizing+Generated.swift": try emitSizing(),
             "Typography+Generated.swift": try emitTypography(),
+            "ThemeColours+Generated.swift": try emitThemeColours(),
+            "ThemeFonts+Generated.swift": try emitFonts(),
         ]
     }
 
@@ -40,9 +42,20 @@ public struct Emitter {
             body += "    public enum \(upperCamel(group)) {\n"
             for token in members {
                 let id = SwiftIdentifier.make(token.name, dropPrefix: group)
-                // Most primitives are concrete; a few reference another primitive
-                // (e.g. a font-size aliased to a spacing value) — keep that as a symbol reference.
-                body += "        public static let \(id)\(annotation(token.value)) = \(try valueOrPrimitiveRef(token))\n"
+                if group == coloursGroup {
+                    // Colours are theme-swappable: forward to the active palette instead of a fixed
+                    // literal, so a runtime theme switch (+ soft-reboot) re-renders every call site
+                    // unchanged. The concrete literals live in `ThemeColours` (one per theme).
+                    body += "        public static var \(id): Color { ThemeColours.current.\(id) }\n"
+                } else if case .fontFamily = token.value {
+                    // Font families are theme-swappable too: forward to the active font palette so a
+                    // theme switch re-renders text. The concrete literals live in `ThemeFonts`.
+                    body += "        public static var \(id): String { ThemeFonts.current.\(id) }\n"
+                } else {
+                    // Most primitives are concrete; a few reference another primitive
+                    // (e.g. a font-size aliased to a spacing value) — keep that as a symbol reference.
+                    body += "        public static let \(id)\(annotation(token.value)) = \(try valueOrPrimitiveRef(token))\n"
+                }
             }
             body += "    }\n"
         }
@@ -63,7 +76,9 @@ public struct Emitter {
         var body = ""
         for token in theme {
             let id = SwiftIdentifier.make(token.name)
-            body += "    public static let \(id) = \(try valueOrPrimitiveRef(token))\n"
+            // Computed (not `static let`): semantic colours forward to `Primitives.Colours` which is
+            // theme-swappable, so a `let` would cache the launch theme and go stale after a switch.
+            body += "    public static var \(id): Color { \(try valueOrPrimitiveRef(token)) }\n"
         }
         return """
         \(Self.header)
@@ -71,6 +86,207 @@ public struct Emitter {
 
         public enum Theme {
         \(body)}
+        """
+    }
+
+    // MARK: - ThemeColours (per-theme colour palettes + active holder)
+
+    /// Emits the swappable colour layer that `Primitives.Colours` forwards to:
+    /// - `ColourPalette`: one `Color` per colour primitive (schema = the base theme's colours).
+    /// - `ThemeColours`: a concrete palette per theme (literals) + the mutable `current` holder.
+    /// - `AppTheme`: `String`-backed, `CaseIterable` ids for pickers/persistence, mapped to palettes.
+    /// Every theme must define the full base colour schema — a gap fails the build (catches drift).
+    private func emitThemeColours() throws -> String {
+        // Colour source: explicit per-theme palettes when present, else a single base palette derived
+        // from the primitive colours (keeps `emit()` valid for minimal/hand-built inputs).
+        var colourThemes = loaded.colourThemes
+        if colourThemes.isEmpty {
+            let baseColours = loaded.primitiveValues.filter { $0.value.value.isColour }
+            if !baseColours.isEmpty { colourThemes = [loaded.baseTheme: baseColours] }
+        }
+        let themeIDs = colourThemes.keys.sorted()
+        // A token set with no colours at all → a valid, empty holder (nothing forwards to it).
+        guard !themeIDs.isEmpty else { return emptyThemeColoursFile() }
+
+        let base = colourThemes[loaded.baseTheme] != nil ? loaded.baseTheme : themeIDs[0]
+        let baseColours = colourThemes[base]!
+        let members = baseColours.keys.sorted().map { (name: $0, id: SwiftIdentifier.make($0, dropPrefix: coloursGroup)) }
+        try SwiftIdentifier.assertNoCollisions(baseColours.keys.sorted(), dropPrefix: coloursGroup)
+        // Guard the one identifier surface that isn't a token name: theme ids → palette/case names.
+        try SwiftIdentifier.assertNoCollisions(themeIDs.map(themeVarName))
+
+        // ColourPalette struct: one stored Color per colour id.
+        let structFields = members.map { "    public let \($0.id): Color" }.joined(separator: "\n")
+        let initParams = members.map { "\($0.id): Color" }.joined(separator: ", ")
+        let initBody = members.map { "        self.\($0.id) = \($0.id)" }.joined(separator: "\n")
+
+        // One concrete palette per theme (literal colours).
+        var instances = ""
+        for themeId in themeIDs {
+            let colours = colourThemes[themeId]!
+            let args = try members.map { member -> String in
+                guard let token = colours[member.name] else {
+                    throw DesignTokenError.malformedToken(
+                        name: "\(themeId)/\(member.name)",
+                        reason: "theme '\(themeId)' is missing colour '\(member.name)' defined in base '\(base)'"
+                    )
+                }
+                return "\(member.id): \(try literal(token.value, name: member.name))"
+            }.joined(separator: ", ")
+            instances += "    public static let \(themeVarName(themeId)) = ColourPalette(\(args))\n"
+        }
+
+        // AppTheme enum: ids for pickers/persistence, mapped to their palette.
+        let appCases = themeIDs.map { "    case \(themeVarName($0)) = \(String(reflecting: $0))" }.joined(separator: "\n")
+        let appPaletteCases = themeIDs.map { "        case .\(themeVarName($0)): return ThemeColours.\(themeVarName($0))" }.joined(separator: "\n")
+
+        return """
+        \(Self.header)
+        import SwiftUI
+
+        public struct ColourPalette {
+        \(structFields)
+
+            public init(\(initParams)) {
+        \(initBody)
+            }
+        }
+
+        public enum AppTheme: String, CaseIterable {
+        \(appCases)
+
+            public var palette: ColourPalette {
+                switch self {
+        \(appPaletteCases)
+                }
+            }
+        }
+
+        public enum ThemeColours {
+        \(instances)
+            /// The active palette. Set once at launch (and on each theme switch) before the UI builds.
+            public static var current: ColourPalette = \(themeVarName(base))
+
+            public static func apply(_ theme: AppTheme) { current = theme.palette }
+
+            /// Apply by persisted id; unknown ids leave the current palette unchanged.
+            public static func apply(id: String) {
+                if let theme = AppTheme(rawValue: id) { current = theme.palette }
+            }
+        }
+        """
+    }
+
+    /// Valid, empty colour layer for token sets that define no colours (keeps the emitted file set
+    /// stable). Nothing forwards to it, so an empty palette/holder is harmless.
+    private func emptyThemeColoursFile() -> String {
+        """
+        \(Self.header)
+        import SwiftUI
+
+        public struct ColourPalette {
+            public init() {}
+        }
+
+        // No themes → a case-less enum. It must NOT declare a raw type or `CaseIterable`
+        // (a no-case enum can't synthesize `RawRepresentable`/`allCases`).
+        public enum AppTheme {
+        }
+
+        public enum ThemeColours {
+            public static var current = ColourPalette()
+
+            public static func apply(_ theme: AppTheme) {}
+
+            public static func apply(id: String) {}
+        }
+        """
+    }
+
+    // MARK: - ThemeFonts (per-theme font-family palettes + active holder)
+
+    /// Emits the swappable font layer that `Primitives.Typography` font families forward to, mirroring
+    /// `ThemeColours`. Unlike colours (strict full schema per theme), a theme may override only some
+    /// font families — undefined ones fall back to the base theme, since most families (platform
+    /// defaults) are theme-invariant and only the brand font typically changes.
+    private func emitFonts() throws -> String {
+        var fontThemes = loaded.fontThemes.filter { !$0.value.isEmpty }
+        if fontThemes.isEmpty {
+            let baseFonts = loaded.primitiveValues.filter { if case .fontFamily = $0.value.value { return true }; return false }
+            if !baseFonts.isEmpty { fontThemes = [loaded.baseTheme: baseFonts] }
+        }
+        let themeIDs = fontThemes.keys.sorted()
+        // A token set with no font families → a valid, empty holder (nothing forwards to it).
+        guard !themeIDs.isEmpty else { return emptyThemeFontsFile() }
+
+        let base = fontThemes[loaded.baseTheme] != nil ? loaded.baseTheme : themeIDs[0]
+        let baseFonts = fontThemes[base]!
+        let members = baseFonts.keys.sorted().map { (name: $0, id: SwiftIdentifier.make($0, dropPrefix: fontGroup)) }
+        try SwiftIdentifier.assertNoCollisions(baseFonts.keys.sorted(), dropPrefix: fontGroup)
+        try SwiftIdentifier.assertNoCollisions(themeIDs.map(themeVarName))
+
+        let structFields = members.map { "    public let \($0.id): String" }.joined(separator: "\n")
+        let initParams = members.map { "\($0.id): String" }.joined(separator: ", ")
+        let initBody = members.map { "        self.\($0.id) = \($0.id)" }.joined(separator: "\n")
+
+        // One concrete palette per theme; a family the theme doesn't override falls back to base.
+        var instances = ""
+        for themeId in themeIDs {
+            let fonts = fontThemes[themeId]!
+            let args = try members.map { member -> String in
+                let token = fonts[member.name] ?? baseFonts[member.name]!
+                return "\(member.id): \(try literal(token.value, name: member.name))"
+            }.joined(separator: ", ")
+            instances += "    public static let \(themeVarName(themeId)) = FontPalette(\(args))\n"
+        }
+        let applyCases = themeIDs
+            .map { "        case \(String(reflecting: $0)): current = \(themeVarName($0))" }
+            .joined(separator: "\n")
+
+        return """
+        \(Self.header)
+        import Foundation
+
+        public struct FontPalette {
+        \(structFields)
+
+            public init(\(initParams)) {
+        \(initBody)
+            }
+        }
+
+        public enum ThemeFonts {
+        \(instances)
+            /// The active font palette. Set at launch and on each theme switch, before the UI builds.
+            public static var current: FontPalette = \(themeVarName(base))
+
+            /// Apply by persisted id; unknown ids leave the current palette unchanged.
+            public static func apply(id: String) {
+                switch id {
+        \(applyCases)
+                default: break
+                }
+            }
+        }
+        """
+    }
+
+    /// Valid, empty font layer for token sets that define no font families (keeps the emitted file set
+    /// stable). Nothing forwards to it, so an empty palette/holder is harmless.
+    private func emptyThemeFontsFile() -> String {
+        """
+        \(Self.header)
+        import Foundation
+
+        public struct FontPalette {
+            public init() {}
+        }
+
+        public enum ThemeFonts {
+            public static var current = FontPalette()
+
+            public static func apply(id: String) {}
+        }
         """
     }
 
@@ -107,13 +323,18 @@ public struct Emitter {
             for token in members {
                 guard case .typography(let typo) = token.value else { continue }
                 let id = SwiftIdentifier.make(stripFirstSegment(token.name))
-                body += "        public static let \(id) = TypographyStyle(\n"
-                body += "            fontFamily: \(try fieldRef(typo.fontFamily)),\n"
-                body += "            fontWeight: \(try fieldRef(typo.fontWeight)),\n"
-                body += "            fontSize: \(try fieldRef(typo.fontSize)),\n"
-                body += "            lineHeight: \(try fieldRef(typo.lineHeight)),\n"
-                body += "            letterSpacing: \(try fieldRef(typo.letterSpacing))\n"
-                body += "        )\n"
+                // Computed (not `static let`): `fontFamily` forwards to the theme-swappable
+                // `Primitives.Typography` / `ThemeFonts`, so a `let` would snapshot the launch font
+                // and go stale after a theme switch.
+                body += "        public static var \(id): TypographyStyle {\n"
+                body += "            TypographyStyle(\n"
+                body += "                fontFamily: \(try fieldRef(typo.fontFamily)),\n"
+                body += "                fontWeight: \(try fieldRef(typo.fontWeight)),\n"
+                body += "                fontSize: \(try fieldRef(typo.fontSize)),\n"
+                body += "                lineHeight: \(try fieldRef(typo.lineHeight)),\n"
+                body += "                letterSpacing: \(try fieldRef(typo.letterSpacing))\n"
+                body += "            )\n"
+                body += "        }\n"
             }
             body += "    }\n"
         }
@@ -140,6 +361,100 @@ public struct Emitter {
         public enum Typography {
         \(body)}
         """
+    }
+
+    // MARK: - Resolved per-theme JSON export (language-neutral mirror of the generated Swift)
+
+    /// One JSON file per theme (`<theme>.resolved.tokens.json`) with every token resolved to a
+    /// concrete value under that theme's colour + font palette — the same information the generated
+    /// Swift encodes (`Primitives` / `Theme` / `Typography` / `Sizing`), for non-Swift consumers.
+    /// Deterministic (sorted keys), so a clean regeneration is byte-identical.
+    public func emitResolvedThemes() throws -> [String: String] {
+        let themeIDs = loaded.colourThemes.isEmpty ? [loaded.baseTheme] : loaded.colourThemes.keys.sorted()
+        var out: [String: String] = [:]
+        for theme in themeIDs {
+            let data = try JSONSerialization.data(
+                withJSONObject: try resolvedTree(theme: theme),
+                options: [.prettyPrinted, .sortedKeys]
+            )
+            out["\(theme).resolved.tokens.json"] = String(decoding: data, as: UTF8.self)
+        }
+        return out
+    }
+
+    private func resolvedTree(theme: String) throws -> [String: Any] {
+        var primitives: [String: [String: Any]] = [:]
+        for token in loaded.primitiveValues.values {
+            let group = firstSegment(token.name)
+            primitives[group, default: [:]][SwiftIdentifier.make(token.name, dropPrefix: group)]
+                = try jsonValue(try resolvedThemeValue(token.name, theme: theme), name: token.name)
+        }
+        var semantic: [String: Any] = [:]
+        for token in loaded.map.values where token.file.hasPrefix("theme.") {
+            semantic[SwiftIdentifier.make(token.name)] = try jsonValue(try resolvedThemeValue(token.name, theme: theme), name: token.name)
+        }
+        var sizing: [String: Any] = [:]
+        for token in loaded.map.values where token.file.hasPrefix("sizing.") {
+            sizing[SwiftIdentifier.make(token.name)] = try jsonValue(try resolvedThemeValue(token.name, theme: theme), name: token.name)
+        }
+        var typography: [String: [String: Any]] = [:]
+        for token in loaded.map.values where token.file.hasPrefix("typography.styles") {
+            guard case .typography(let typo) = token.value else { continue }
+            let group = firstSegment(token.name)
+            typography[group, default: [:]][SwiftIdentifier.make(stripFirstSegment(token.name))] = [
+                "fontFamily": try jsonValue(try resolvedFieldValue(typo.fontFamily, theme: theme), name: token.name),
+                "fontWeight": try jsonValue(try resolvedFieldValue(typo.fontWeight, theme: theme), name: token.name),
+                "fontSize": try jsonValue(try resolvedFieldValue(typo.fontSize, theme: theme), name: token.name),
+                "lineHeight": try jsonValue(try resolvedFieldValue(typo.lineHeight, theme: theme), name: token.name),
+                "letterSpacing": try jsonValue(try resolvedFieldValue(typo.letterSpacing, theme: theme), name: token.name),
+            ]
+        }
+        return ["primitives": primitives, "theme": semantic, "typography": typography, "sizing": sizing]
+    }
+
+    /// Resolve `name` to its terminal concrete value, then swap in the theme's colour / font-family
+    /// value when the terminal is a theme-swappable primitive (mirrors the `Primitives` forwarders).
+    private func resolvedThemeValue(_ name: String, theme: String) throws -> TokenValue {
+        guard let terminal = try resolver.resolvedConcrete(name) else {
+            throw DesignTokenError.brokenReferenceInOutput(target: name)
+        }
+        if let colour = loaded.colourThemes[theme]?[terminal.name] { return colour.value }
+        if case .fontFamily = terminal.value {
+            if let font = loaded.fontThemes[theme]?[terminal.name] ?? loaded.fontThemes[loaded.baseTheme]?[terminal.name] {
+                return font.value
+            }
+        }
+        return terminal.value
+    }
+
+    private func resolvedFieldValue(_ value: TokenValue, theme: String) throws -> TokenValue {
+        switch value {
+        case .reference(let target): return try resolvedThemeValue(target, theme: theme)
+        default: return value
+        }
+    }
+
+    /// A concrete `TokenValue` → a JSON-serialisable scalar (colour as hex, dimension as number,
+    /// font family as string, weight as its CSS integer).
+    private func jsonValue(_ value: TokenValue, name: String) throws -> Any {
+        switch value {
+        case .color(let comps):
+            guard comps.count >= 3 else { throw DesignTokenError.malformedToken(name: name, reason: "color needs ≥3 components") }
+            return hexString(comps)
+        case .dimension(let v, _): return v
+        case .fontFamily(let family): return family
+        case .fontWeight(let weight): return weight.cssValue
+        case .string(let s): return s
+        case .typography, .reference:
+            throw DesignTokenError.malformedToken(name: name, reason: "non-scalar value in resolved JSON")
+        }
+    }
+
+    private func hexString(_ comps: [Double]) -> String {
+        func byte(_ d: Double) -> Int { max(0, min(255, Int((d * 255).rounded()))) }
+        let (r, g, b) = (byte(comps[0]), byte(comps[1]), byte(comps[2]))
+        if comps.count > 3 { return String(format: "#%02X%02X%02X%02X", r, g, b, byte(comps[3])) }
+        return String(format: "#%02X%02X%02X", r, g, b)
     }
 
     // MARK: - Reference / literal helpers
@@ -211,6 +526,21 @@ public struct Emitter {
     }
 
     // MARK: - Name helpers
+
+    /// The primitives group whose values are theme-swappable (emitted as forwarders, not literals).
+    private var coloursGroup: String { "colours" }
+
+    /// The primitives group holding font families (the segment prefix dropped from `ThemeFonts`
+    /// palette identifiers). Every `fontFamily` primitive is named `typography-font-family-*`.
+    private var fontGroup: String { "typography" }
+
+    /// Theme id → Swift identifier for its palette/case, dropping a trailing `-theme`
+    /// (`alfie-theme` → `alfie`, `selffridge-theme` → `selffridge`).
+    private func themeVarName(_ themeId: String) -> String {
+        let suffix = "-theme"
+        let stripped = themeId.hasSuffix(suffix) ? String(themeId.dropLast(suffix.count)) : themeId
+        return SwiftIdentifier.make(stripped)
+    }
 
     private func firstSegment(_ name: String) -> String { String(name.split(separator: "-").first ?? "") }
     private func stripFirstSegment(_ name: String) -> String {

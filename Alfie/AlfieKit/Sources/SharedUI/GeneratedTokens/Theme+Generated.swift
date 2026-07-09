@@ -4,35 +4,35 @@
 import SwiftUI
 
 public enum Theme {
-    public static let borderSoft = Primitives.Colours.neutrals200
-    public static let buttonDestructiveBackgroundDestructiveDefault = Primitives.Colours.semanticError600
-    public static let buttonDestructiveStrokeDestructiveDefault = Primitives.Colours.semanticError600
-    public static let buttonPrimaryBackgroundPrimaryDefault = Primitives.Colours.neutrals800
-    public static let buttonSecondaryBackgroundSecondaryDefault = Primitives.Colours.transparentTransparent
-    public static let buttonSecondaryBackgroundSecondaryDisabled = Primitives.Colours.transparentTransparent
-    public static let buttonTerciaryBackgroundTerciaryDefault = Primitives.Colours.transparentTransparent
-    public static let buttonTerciaryBackgroundTerciaryDisabled = Primitives.Colours.transparentTransparent
-    public static let buttonTerciaryStrokeTerciaryDefault = Primitives.Colours.transparentTransparent
-    public static let buttonTerciaryStrokeTerciaryDisabled = Primitives.Colours.transparentTransparent
-    public static let contentContentInvertedPrimary = Primitives.Colours.neutrals0
-    public static let contentContentInvertedPrimarydisabled = Primitives.Colours.neutrals500
-    public static let contentContentNegative = Primitives.Colours.semanticError500
-    public static let contentContentPositive = Primitives.Colours.semanticSuccess400
-    public static let contentContentPrimary = Primitives.Colours.neutrals800
-    public static let contentContentPrimaryActive = Primitives.Colours.neutrals0
-    public static let contentContentPrimaryDisabled = Primitives.Colours.neutrals400
-    public static let contentContentTerciary = Primitives.Colours.neutrals500
-    public static let linkLinkPrimaryDefault = Primitives.Colours.neutrals800
-    public static let linkLinkPrimaryDisabled = Primitives.Colours.neutrals400
-    public static let linkLinkPrimaryInvertedDefault = Primitives.Colours.neutrals0
-    public static let linkLinkPrimaryInvertedDisabled = Primitives.Colours.neutrals500
-    public static let surfaceBackgroundDestructive = Primitives.Colours.semanticError600
-    public static let surfaceBackgroundInvertedPrimary = Primitives.Colours.neutrals800
-    public static let surfaceBackgroundNegative = Primitives.Colours.semanticError500
-    public static let surfaceBackgroundPositive = Primitives.Colours.semanticSuccess600
-    public static let surfaceBackgroundPrimary = Primitives.Colours.neutrals0
-    public static let surfaceBackgroundPrimaryActive = Primitives.Colours.neutrals800
-    public static let surfaceBackgroundTerciary = Primitives.Colours.neutrals300
-    public static let surfaceForegroundInvertedPrimary = Primitives.Colours.neutrals700
-    public static let surfaceForegroundPrimary = Primitives.Colours.neutrals100
+    public static var borderSoft: Color { Primitives.Colours.neutrals200 }
+    public static var buttonDestructiveBackgroundDestructiveDefault: Color { Primitives.Colours.semanticError600 }
+    public static var buttonDestructiveStrokeDestructiveDefault: Color { Primitives.Colours.semanticError600 }
+    public static var buttonPrimaryBackgroundPrimaryDefault: Color { Primitives.Colours.neutrals800 }
+    public static var buttonSecondaryBackgroundSecondaryDefault: Color { Primitives.Colours.transparentTransparent }
+    public static var buttonSecondaryBackgroundSecondaryDisabled: Color { Primitives.Colours.transparentTransparent }
+    public static var buttonTerciaryBackgroundTerciaryDefault: Color { Primitives.Colours.transparentTransparent }
+    public static var buttonTerciaryBackgroundTerciaryDisabled: Color { Primitives.Colours.transparentTransparent }
+    public static var buttonTerciaryStrokeTerciaryDefault: Color { Primitives.Colours.transparentTransparent }
+    public static var buttonTerciaryStrokeTerciaryDisabled: Color { Primitives.Colours.transparentTransparent }
+    public static var contentContentInvertedPrimary: Color { Primitives.Colours.neutrals0 }
+    public static var contentContentInvertedPrimarydisabled: Color { Primitives.Colours.neutrals500 }
+    public static var contentContentNegative: Color { Primitives.Colours.semanticError500 }
+    public static var contentContentPositive: Color { Primitives.Colours.semanticSuccess400 }
+    public static var contentContentPrimary: Color { Primitives.Colours.neutrals800 }
+    public static var contentContentPrimaryActive: Color { Primitives.Colours.neutrals0 }
+    public static var contentContentPrimaryDisabled: Color { Primitives.Colours.neutrals400 }
+    public static var contentContentTerciary: Color { Primitives.Colours.neutrals500 }
+    public static var linkLinkPrimaryDefault: Color { Primitives.Colours.neutrals800 }
+    public static var linkLinkPrimaryDisabled: Color { Primitives.Colours.neutrals400 }
+    public static var linkLinkPrimaryInvertedDefault: Color { Primitives.Colours.neutrals0 }
+    public static var linkLinkPrimaryInvertedDisabled: Color { Primitives.Colours.neutrals500 }
+    public static var surfaceBackgroundDestructive: Color { Primitives.Colours.semanticError600 }
+    public static var surfaceBackgroundInvertedPrimary: Color { Primitives.Colours.neutrals800 }
+    public static var surfaceBackgroundNegative: Color { Primitives.Colours.semanticError500 }
+    public static var surfaceBackgroundPositive: Color { Primitives.Colours.semanticSuccess600 }
+    public static var surfaceBackgroundPrimary: Color { Primitives.Colours.neutrals0 }
+    public static var surfaceBackgroundPrimaryActive: Color { Primitives.Colours.neutrals800 }
+    public static var surfaceBackgroundTerciary: Color { Primitives.Colours.neutrals300 }
+    public static var surfaceForegroundInvertedPrimary: Color { Primitives.Colours.neutrals700 }
+    public static var surfaceForegroundPrimary: Color { Primitives.Colours.neutrals100 }
 }

@@ -21,118 +21,148 @@ public struct TypographyStyle {
 
 public enum Typography {
     public enum Body {
-        public static let large = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing18,
-            lineHeight: Primitives.Spacing.spacing28,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let medium = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing16,
-            lineHeight: Primitives.Spacing.spacing24,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let mediumStrikethrough = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing16,
-            lineHeight: Primitives.Spacing.spacing24,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let small = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing12,
-            lineHeight: Primitives.Spacing.spacing16,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
+        public static var large: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing18,
+                lineHeight: Primitives.Spacing.spacing28,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var medium: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing16,
+                lineHeight: Primitives.Spacing.spacing24,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var mediumStrikethrough: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing16,
+                lineHeight: Primitives.Spacing.spacing24,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var small: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing12,
+                lineHeight: Primitives.Spacing.spacing16,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
     }
     public enum Display {
-        public static let large = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyBrand,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing24,
-            lineHeight: Primitives.Spacing.spacing40,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let medium = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyBrand,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing20,
-            lineHeight: Primitives.Spacing.spacing32,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let small = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyBrand,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing18,
-            lineHeight: Primitives.Spacing.spacing28,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
+        public static var large: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyBrand,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing24,
+                lineHeight: Primitives.Spacing.spacing40,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var medium: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyBrand,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing20,
+                lineHeight: Primitives.Spacing.spacing32,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var small: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyBrand,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing18,
+                lineHeight: Primitives.Spacing.spacing28,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
     }
     public enum Heading {
-        public static let large = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing32,
-            lineHeight: Primitives.Spacing.spacing40,
-            letterSpacing: Primitives.Typography.kerningTight
-        )
-        public static let medium = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing24,
-            lineHeight: Primitives.Spacing.spacing32,
-            letterSpacing: Primitives.Typography.kerningTight
-        )
-        public static let small = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing20,
-            lineHeight: Primitives.Spacing.spacing28,
-            letterSpacing: Primitives.Typography.kerningTight
-        )
-        public static let xSmall = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing16,
-            lineHeight: Primitives.Spacing.spacing20,
-            letterSpacing: Primitives.Typography.kerningTight
-        )
+        public static var large: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing32,
+                lineHeight: Primitives.Spacing.spacing40,
+                letterSpacing: Primitives.Typography.kerningTight
+            )
+        }
+        public static var medium: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing24,
+                lineHeight: Primitives.Spacing.spacing32,
+                letterSpacing: Primitives.Typography.kerningTight
+            )
+        }
+        public static var small: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing20,
+                lineHeight: Primitives.Spacing.spacing28,
+                letterSpacing: Primitives.Typography.kerningTight
+            )
+        }
+        public static var xSmall: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing16,
+                lineHeight: Primitives.Spacing.spacing20,
+                letterSpacing: Primitives.Typography.kerningTight
+            )
+        }
     }
     public enum Label {
-        public static let small = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 400,
-            fontSize: Primitives.Spacing.spacing12,
-            lineHeight: Primitives.Spacing.spacing16,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let smallBold = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing12,
-            lineHeight: Primitives.Spacing.spacing16,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
+        public static var small: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 400,
+                fontSize: Primitives.Spacing.spacing12,
+                lineHeight: Primitives.Spacing.spacing16,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var smallBold: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing12,
+                lineHeight: Primitives.Spacing.spacing16,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
     }
     public enum Link {
-        public static let medium = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing16,
-            lineHeight: Primitives.Spacing.spacing24,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
-        public static let small = TypographyStyle(
-            fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
-            fontWeight: 500,
-            fontSize: Primitives.Spacing.spacing12,
-            lineHeight: Primitives.Spacing.spacing16,
-            letterSpacing: Primitives.Typography.kerningNone
-        )
+        public static var medium: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing16,
+                lineHeight: Primitives.Spacing.spacing24,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
+        public static var small: TypographyStyle {
+            TypographyStyle(
+                fontFamily: Primitives.Typography.fontFamilyPrimaryIos,
+                fontWeight: 500,
+                fontSize: Primitives.Spacing.spacing12,
+                lineHeight: Primitives.Spacing.spacing16,
+                letterSpacing: Primitives.Typography.kerningNone
+            )
+        }
     }
 }

@@ -25,23 +25,23 @@ extension UIFont.Weight {
 // MARK: - TypographyStyle -> UIFont bridge
 
 extension TypographyStyle {
-    /// Resolves a generated `TypographyStyle` token to a concrete `UIFont`.
-    /// - "SF Pro" (`fontFamilyPrimaryIos`) resolves to the dynamic system font — there is no
-    ///   "SF Pro" named font to load via `UIFont(name:)`, so `systemFont(ofSize:weight:)` is used.
-    /// - "Libre Baskerville" (`fontFamilyBrand`) resolves to the bundled brand face.
-    /// - Any other family falls back to the system font (safe, never crashes).
+    /// The design-system name for the iOS system font. There's no named face to load via
+    /// `UIFont(name:)`, so it resolves to `systemFont(ofSize:weight:)` (which also honours the token
+    /// weight). Kept as a literal sentinel — NOT `Primitives.Typography.fontFamilyPrimaryIos` — so a
+    /// theme that *overrides* its primary family to a real font still renders that font.
+    private static let systemFontFamily = "SF Pro"
+
+    /// Resolves a generated `TypographyStyle` token to a concrete `UIFont` from its `fontFamily`
+    /// string — so a theme that swaps a font family (e.g. selfFridge) actually renders that font.
+    /// - "SF Pro" → the dynamic system font at the token's weight.
+    /// - A bundled face (e.g. "Libre Baskerville") loads via its PostScript name.
+    /// - Any other family loads by its own name; if it can't be resolved the system font is used
+    ///   (safe, never crashes).
     public var uiFont: UIFont {
-        switch fontFamily {
-        case Primitives.Typography.fontFamilyPrimaryIos:
-            return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
-        case Primitives.Typography.fontFamilyBrand:
-            // If the bundled brand face isn't registered, fall back to the system font at the
-            // token's size/weight rather than `UIFont()` (which loses both).
-            return UIFont(name: FontNames.libreBaskerville.rawValue, size: fontSize)
-                ?? .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
-        default:
-            return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
-        }
+        let systemFallback = UIFont.systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
+        guard fontFamily != Self.systemFontFamily else { return systemFallback }
+        let name = FontNames.postScriptName(forFamily: fontFamily) ?? fontFamily
+        return UIFont(name: name, size: fontSize) ?? systemFallback
     }
 }
 

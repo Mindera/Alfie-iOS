@@ -181,6 +181,7 @@ let package = Package(
         .target(
             name: "DebugMenu",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Mocks",
                 "Model",
@@ -284,8 +285,9 @@ let package = Package(
                 .product(name: "AlicerceLogging", package: "Alicerce"),
             ],
             // Committed DTCG JSON (input to Tools/DesignTokenGen) is not compiled/bundled —
-            // only the generated Swift under GeneratedTokens/ is a normal source.
-            exclude: ["DesignTokens"],
+            // only the generated Swift under GeneratedTokens/ is a normal source. The resolved-token
+            // JSON export (GeneratedTokens/ResolvedTokens) is a non-Swift artifact, likewise excluded.
+            exclude: ["DesignTokens", "GeneratedTokens/ResolvedTokens"],
             resources: [
                 .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
                 .copy("Theme/Typography/Resources/LibreBaskerville-OFL.txt"),
@@ -376,6 +378,8 @@ let package = Package(
             name: "DebugMenuTests",
             dependencies: [
                 "DebugMenu",
+                "Mocks",
+                "SharedUI",
                 "TestUtils",
             ]
         ),
