@@ -136,7 +136,8 @@ private enum Constants {
     static let horizontalPadding: CGFloat = 0
     static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
     static let cornerRadius: CGFloat = Sizing.radiusSoft
-    static let iconSize: CGFloat = 16
+    static let iconSize: CGFloat = Sizing.iconsIconSmall
+    // No design token exists for button heights — literals retained.
     static let smallHeight: CGFloat = 36
     static let mediumHeight: CGFloat = 44
     static let bigHeight: CGFloat = 52
@@ -181,6 +182,7 @@ private struct ThemedButtonStyle: ButtonStyle {
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                    // No design token exists for the 1pt stroke width — literal retained.
                     .stroke(borderColor(configuration), lineWidth: 1)
 
                 if isLoading {
