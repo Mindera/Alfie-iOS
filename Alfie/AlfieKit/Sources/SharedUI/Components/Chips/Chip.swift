@@ -58,7 +58,8 @@ public struct Chip: View {
     }
 
     public var body: some View {
-        ZStack {
+        let style = self.style
+        return ZStack {
             RoundedRectangle(cornerRadius: Sizing.radiusRounded)
                 .stroke(style.borderColor, lineWidth: style.borderWidth)
                 .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(style.backgroundColor))
@@ -78,7 +79,7 @@ public struct Chip: View {
                                 .renderingMode(.template)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: style.closeWidth, height: style.closeHeight)
+                                .frame(width: ChipStyle.closeWidth, height: ChipStyle.closeHeight)
                                 .foregroundStyle(style.textColor)
                         }
                         .frame(maxHeight: .infinity)
@@ -106,6 +107,11 @@ struct ChipStyle {
         static let maxCounter: Int = 99
     }
 
+    // Close-icon dimensions are fixed layout constants (state-independent), so they are exposed
+    // statically rather than as instance properties of this state resolver.
+    static let closeWidth = Constants.closeWidth
+    static let closeHeight = Constants.closeHeight
+
     let type: ChipConfiguration.ChipType
     let isSelected: Bool
     let isDisabled: Bool
@@ -113,6 +119,7 @@ struct ChipStyle {
 
     var borderColor: Color {
         if isDisabled {
+            // surfaceForegroundPrimary is the only Theme alias mapping to neutrals100 (grill decision).
             return Theme.surfaceForegroundPrimary
         } else if isSelected {
             return Theme.contentContentPrimary
@@ -145,10 +152,6 @@ struct ChipStyle {
             return CGFloat(Primitives.Border.borderWeightDefault)
         }
     }
-
-    var closeWidth: CGFloat { Constants.closeWidth }
-
-    var closeHeight: CGFloat { Constants.closeHeight }
 
     var height: CGFloat {
         // swiftlint:disable vertical_whitespace_between_cases

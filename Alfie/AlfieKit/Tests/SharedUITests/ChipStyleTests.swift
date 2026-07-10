@@ -2,6 +2,8 @@ import SwiftUI
 import XCTest
 @testable import SharedUI
 
+// Assertions pin the *resolved* Color value each state maps to (SwiftUI value-equality), not the
+// token identity — same-valued Theme aliases are interchangeable as far as these tests can tell.
 final class ChipStyleTests: XCTestCase {
     // MARK: - Border color
 
@@ -42,6 +44,11 @@ final class ChipStyleTests: XCTestCase {
         XCTAssertEqual(sut.textColor, Primitives.Colours.neutrals600)
     }
 
+    func test_text_color_disabled_takes_precedence_over_selected() {
+        let sut = ChipStyle(type: .small, isSelected: true, isDisabled: true, counter: nil)
+        XCTAssertEqual(sut.textColor, Theme.contentContentPrimaryDisabled)
+    }
+
     // MARK: - Background color
 
     func test_background_color_is_surface_background_when_enabled() {
@@ -57,6 +64,11 @@ final class ChipStyleTests: XCTestCase {
     func test_background_color_is_unaffected_by_selection() {
         let sut = ChipStyle(type: .small, isSelected: true, isDisabled: false, counter: nil)
         XCTAssertEqual(sut.backgroundColor, Theme.surfaceBackgroundPrimary)
+    }
+
+    func test_background_color_disabled_takes_precedence_over_selected() {
+        let sut = ChipStyle(type: .small, isSelected: true, isDisabled: true, counter: nil)
+        XCTAssertEqual(sut.backgroundColor, Theme.surfaceForegroundPrimary)
     }
 
     // MARK: - Border width
