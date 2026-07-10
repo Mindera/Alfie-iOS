@@ -137,10 +137,11 @@ private enum Constants {
     static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
     static let cornerRadius: CGFloat = Sizing.radiusSoft
     static let iconSize: CGFloat = Sizing.iconsIconSmall
-    // No design token exists for button heights — literals retained.
-    static let smallHeight: CGFloat = 36
-    static let mediumHeight: CGFloat = 44
-    static let bigHeight: CGFloat = 52
+    // No dedicated button-height token exists; snapped down to the nearest spacing-scale values
+    // (36→32, 44→40, 52→48) until the design system provides height tokens.
+    static let smallHeight: CGFloat = Primitives.Spacing.spacing32
+    static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
+    static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
 // MARK: - ThemedButtonStyle
