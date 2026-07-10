@@ -80,6 +80,24 @@ struct TokenLoaderTests {
             return message.contains("brand-new") && message.contains("no pinned mode")
         }
     }
+
+    @Test("a single-mode collection whose mode isn't a file list fails fast, naming the offending manifest file")
+    func singleModeNonListFailsFast() throws {
+        // Contract drift: a lone mode whose value is not an array must fail fast, not silently drop the
+        // collection's tokens. The error must name the actual manifest file (not a hardcoded
+        // "manifest.json") so it stays traceable when selectedFiles runs on an arbitrary path.
+        let manifest = #"{ "collections": { "lonely": { "modes": { "only": "not-a-list" } } } }"#
+        let fileName = "drift-\(UUID().uuidString).json"
+        let tmp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
+        try manifest.write(to: tmp, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        #expect {
+            _ = try TokenLoader.selectedFiles(manifestURL: tmp)
+        } throws: { error in
+            let message = String(describing: error)
+            return message.contains("lonely") && message.contains(fileName)
+        }
+    }
 }
 
 @Suite("Resolver")

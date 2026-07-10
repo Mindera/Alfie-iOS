@@ -72,15 +72,18 @@ public enum TokenLoader {
                         throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' is missing expected mode '\(mode)'")
                     }
                     chosen = list
-                } else if modes.count <= 1 {
-                    // Single-mode collection: load its only mode.
-                    chosen = modes.values.compactMap { $0 as? [Any] }.flatMap { $0 }
-                } else {
+                } else if modes.count > 1 {
                     // A newly multi-mode collection with no pin would otherwise load every mode's file
                     // — including ones pull-design-tokens.sh doesn't ship — and crash later with an
-                    // opaque fileNotFound. Fail here with an actionable message instead.
-                    let modeNames = modes.keys.sorted().joined(separator: ", ")
-                    throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' has multiple modes [\(modeNames)] but no pinned mode — add one to TokenLoader.modeForCollection to select the iOS mode")
+                    // opaque fileNotFound. Fail here so the maintainer adds an explicit pin.
+                    throw DesignTokenError.unpinnedMultiModeCollection(collection: collection, modes: modes.keys.sorted())
+                } else {
+                    // Single-mode collection: load its only mode. An absent or non-list mode value is
+                    // contract drift — fail fast rather than silently dropping the collection's tokens.
+                    guard let list = modes.values.first as? [Any] else {
+                        throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' has no usable file list for its single mode")
+                    }
+                    chosen = list
                 }
                 files.append(contentsOf: chosen.compactMap { $0 as? String })
             }
