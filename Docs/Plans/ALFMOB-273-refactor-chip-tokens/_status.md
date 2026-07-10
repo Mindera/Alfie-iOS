@@ -22,5 +22,5 @@ Ticket premise stale (Chip already token-based); real work = semantic color migr
 - [x] Approval gate (approved 2026-07-10)
 - [x] Implement (ios-execute: verify ✅ build+unit, review ✅ no Critical/Important)
 - [x] Commit (e097ae6 impl + tests)
-- [ ] PR → main
-- [ ] Ticket transition → In Review
+- [x] PR → main (#94)
+- [x] Ticket transition → Review
