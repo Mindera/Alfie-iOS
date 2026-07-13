@@ -91,12 +91,11 @@ public struct MyDisclosureStyle: DisclosureGroupStyle {
                 HStack(alignment: .center) {
                     configuration.label
                     Spacer()
-                    Icon.chevronDown.image
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-                        .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
+                    ThemedIcon(
+                        .chevronDown,
+                        size: .small,
+                        tint: isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500
+                    )
                         .rotationEffect(.degrees(configuration.isExpanded ? 0 : -90))
                         .animation(.easeInOut(duration: 0.3), value: configuration.isExpanded)
                 }
