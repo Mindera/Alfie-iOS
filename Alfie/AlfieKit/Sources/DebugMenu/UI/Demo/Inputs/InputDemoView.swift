@@ -11,7 +11,7 @@ struct InputDemoView: View {
     @State private var isRequired = false
     @State private var hasLimit = false
     @State private var hasIcon = false
-    @State private var icon: Icon = .eye
+    @State private var icon: Icon = .search
 
     var body: some View {
         ScrollView {
