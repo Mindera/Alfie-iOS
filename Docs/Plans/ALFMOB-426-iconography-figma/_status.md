@@ -18,6 +18,6 @@ tokens, document the re-export, add appearance coverage.
 - [x] Grill — decisions logged in grill.md (mappings, deletions, fallback list, PR note)
 - [x] APPROVAL gate — approved 2026-07-13
 - [x] Implement (ios-execute) — verify ✅ PASSED, review APPROVED
-- [ ] Commit ← in progress
-- [ ] PR → main
-- [ ] Ticket transition
+- [x] Commit — 4 granular commits (d1ddb28, cd35108, c82910c, 13e9ab7)
+- [x] PR → main — https://github.com/Mindera/Alfie-iOS/pull/95
+- [x] Ticket transition — ALFMOB-426 → Review
