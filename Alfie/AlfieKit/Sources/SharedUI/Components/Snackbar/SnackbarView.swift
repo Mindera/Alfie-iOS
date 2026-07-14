@@ -123,6 +123,7 @@ public struct SnackbarView: View {
                             .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                             .foregroundStyle(foregroundColor)
                     })
+                    .accessibilityLabel(Text(L10n.Accessibility.close))
                 }
             }
             .padding(.horizontal, Primitives.Spacing.spacing16)

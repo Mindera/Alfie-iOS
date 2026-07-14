@@ -286,10 +286,12 @@ public struct ThemedSearchBarView: View {
             }
             .accessibilityAddTraits(.isButton)
             .accessibilityIdentifier(clearAccessibilityId)
+            .accessibilityLabel(Text(L10n.Accessibility.clearSearch))
     }
 
     private var magnifyingGlassIcon: some View {
         configured(trailingImage: Icon.search.image)
+            .accessibilityHidden(true)
     }
 
     @ViewBuilder private var textFieldOverlayIcon: some View {

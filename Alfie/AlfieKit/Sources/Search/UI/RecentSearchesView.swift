@@ -72,6 +72,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 .foregroundStyle(Primitives.Colours.neutrals800)
         })
         .accessibilityIdentifier(AccessibilityId.removeRecentSearchButton)
+        .accessibilityLabel(Text(L10n.Accessibility.removeRecentSearch))
     }
 
     private var clearAllButton: some View {

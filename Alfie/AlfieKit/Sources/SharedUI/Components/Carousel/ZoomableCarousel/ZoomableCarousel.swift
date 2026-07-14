@@ -37,7 +37,7 @@ public struct ZoomableCarousel<Content: View>: View {
                 Button(action: {
                     configuration.isPresented.wrappedValue = false
                 }, label: {
-                    ThemedIcon(.close, size: .medium, tint: Primitives.Colours.neutrals800)
+                    ThemedIcon(.close, size: .medium, tint: Primitives.Colours.neutrals800, accessibilityLabel: L10n.Accessibility.close)
                         .padding(Primitives.Spacing.spacing4)
                         .background(Primitives.Colours.neutrals0.opacity(Constants.closeIconBackgroundOpacity))
                         .clipShape(Circle())

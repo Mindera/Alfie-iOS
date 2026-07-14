@@ -27,11 +27,16 @@ public struct ThemedIcon: View {
     private let icon: Icon
     private let size: Size
     private let tint: Color
+    private let accessibilityLabel: String?
 
-    public init(_ icon: Icon, size: Size = .medium, tint: Color) {
+    /// - Parameter accessibilityLabel: a localized label for a semantic icon (e.g. an icon-only
+    ///   button). Leave `nil` for decorative icons — bundled assets otherwise expose their raw
+    ///   asset name to VoiceOver, so decorative icons are hidden from assistive tech.
+    public init(_ icon: Icon, size: Size = .medium, tint: Color, accessibilityLabel: String? = nil) {
         self.icon = icon
         self.size = size
         self.tint = tint
+        self.accessibilityLabel = accessibilityLabel
     }
 
     public var body: some View {
@@ -41,5 +46,17 @@ public struct ThemedIcon: View {
             .scaledToFit()
             .frame(width: size.dimension, height: size.dimension)
             .foregroundStyle(tint)
+            .accessibilityLabelOrHidden(accessibilityLabel)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func accessibilityLabelOrHidden(_ label: String?) -> some View {
+        if let label {
+            accessibilityLabel(Text(label))
+        } else {
+            accessibilityHidden(true)
+        }
     }
 }

@@ -23,6 +23,7 @@ public struct ThemedToolbarButton: View {
     private let icon: Icon?
     private let tint: Color
     private let accessibilityId: String
+    private let accessibilityLabel: String?
     private let toolBarButtonSize: ToolBarButtonSize
     @Binding private var isDisabled: Bool
     @Binding private var isLoading: Bool
@@ -37,6 +38,7 @@ public struct ThemedToolbarButton: View {
         isLoading: Binding<Bool> = .constant(false),
         badgeValue: Binding<Int?> = .constant(nil),
         accessibilityId: String = "",
+        accessibilityLabel: String? = nil,
         toolBarButtonSize: ToolBarButtonSize = .normal,
         action: @escaping () -> Void
     ) {
@@ -44,6 +46,7 @@ public struct ThemedToolbarButton: View {
         self.text = text
         self.tint = tint
         self.accessibilityId = accessibilityId
+        self.accessibilityLabel = accessibilityLabel
         self.toolBarButtonSize = toolBarButtonSize
         _isDisabled = isDisabled
         _isLoading = isLoading
@@ -80,6 +83,7 @@ public struct ThemedToolbarButton: View {
         .disabled(isDisabled)
         .tint(tint)
         .accessibilityIdentifier(accessibilityId)
+        .accessibilityLabel(Text(accessibilityLabel ?? text ?? ""))
         .buttonStyle(.plain)
     }
 
