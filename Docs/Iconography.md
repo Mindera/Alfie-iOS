@@ -12,8 +12,9 @@ vector assets. This doc explains the model and how to re-export / add icons.
 
 `SharedUI/Theme/Icons/Icon.swift` is a `String`-raw enum. Each case is one of:
 
-- **Asset-backed** (in-scope Figma icon) — raw value = the bundled asset name (kebab-case, Figma
-  vocabulary). Rendered via `Image(rawValue, bundle: .module)` from `Icons.xcassets`.
+- **Asset-backed** (in-scope Figma icon) — resolves to a bundled asset via `assetName` (which is the
+  raw value for most cases; aliased cases like `info`→`help` and `reload`→`loading` keep a unique raw
+  value but point at a shared glyph). Rendered via `Image(assetName, bundle: .module)` from `Icons.xcassets`.
 - **SF Symbol fallback** — raw value = an SF Symbol name. Rendered via `Image(systemName:)`. Used only
   for icons with **no** in-scope Figma equivalent (see `Icon.systemSymbolFallbacks`).
 
@@ -86,9 +87,18 @@ Asset name → Figma component node id (file `PWVgEoKrIw9Hv7QlOCcUoq`).
 `profile-id` 3914:106950 · `star` 4612:41206 · `star-fill` 4612:41205 · `star-half-fill` 4612:41204 ·
 `gift` 5963:4795 · `pencil` 5966:6779.
 
+## Accessibility
+
+Bundled asset `Image`s expose their raw asset name to VoiceOver (SF Symbols carried curated labels).
+So: icon-only buttons set an explicit `.accessibilityLabel` (see `L10n.Accessibility.*`), and
+`ThemedIcon` is **decorative by default** — pass `accessibilityLabel:` only for semantic icons,
+otherwise it is hidden from assistive tech.
+
 ## SF Symbols still in use (fallbacks — no in-scope Figma glyph)
 
 `aCircle` (a.circle), `zCircle` (z.circle), `arrowLeft` (arrow.left),
 `chartUpTrend` (chart.line.uptrend.xyaxis), `chartDownTrend` (chart.line.downtrend.xyaxis),
 `chat2` (note.text), `location` (mappin.circle.fill), `logIn` (ipad.and.arrow.forward),
-`rewards` (rosette), `store` (storefront).
+`rewards` (rosette), `store` (storefront), `closeCircleFill` (xmark.circle.fill — Figma "Clear" is a
+bare X, not a filled-circle badge, so the circled-X affordance stays an SF Symbol; the Tabler Clear
+glyph is available as the separate `clear` case).
