@@ -101,16 +101,14 @@ struct ChipStyle {
     private enum Constants {
         static let heightSmall = 36.0
         static let heightLarge = 44.0
-        static let closeWidth = 12.0
-        static let closeHeight = 12.0
         static let borderSelected = 2.0
         static let maxCounter: Int = 99
     }
 
-    // Close-icon dimensions are fixed layout constants (state-independent), so they are exposed
-    // statically rather than as instance properties of this state resolver.
-    static let closeWidth = Constants.closeWidth
-    static let closeHeight = Constants.closeHeight
+    // Close-icon dimensions are fixed 12pt layout constants (state-independent), sourced from the
+    // spacing12 token and exposed statically rather than as instance properties of this resolver.
+    static let closeWidth = Primitives.Spacing.spacing12
+    static let closeHeight = Primitives.Spacing.spacing12
 
     let type: ChipConfiguration.ChipType
     let isSelected: Bool

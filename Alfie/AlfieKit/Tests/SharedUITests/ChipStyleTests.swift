@@ -105,6 +105,13 @@ final class ChipStyleTests: XCTestCase {
         XCTAssertEqual(sut.height, 44.0)
     }
 
+    // MARK: - Close-icon size
+
+    func test_close_icon_size_uses_spacing12_token() {
+        XCTAssertEqual(ChipStyle.closeWidth, Primitives.Spacing.spacing12)
+        XCTAssertEqual(ChipStyle.closeHeight, Primitives.Spacing.spacing12)
+    }
+
     // MARK: - Counter label
 
     func test_counter_label_is_nil_when_counter_is_nil() {
