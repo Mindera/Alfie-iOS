@@ -4,8 +4,9 @@ import class UIKit.UIImage
 
 /// The Alfie icon set. In-scope icons (Figma "Arrows & System" + "E-commerce") resolve to bundled
 /// vector assets in `Icons.xcassets`; the remaining cases have no Figma equivalent and fall back to
-/// SF Symbols. Asset raw values are the Figma-derived kebab-case asset names; fallback raw values are
-/// SF Symbol names. See `Docs/Iconography.md` for the Figma→repo mapping and re-export process.
+/// SF Symbols. Asset raw values are the Figma-derived kebab-case asset names (except aliased cases
+/// like `info`/`reload`, which keep a unique raw value and resolve via `assetName`); fallback raw
+/// values are SF Symbol names. See `Docs/Iconography.md` for the Figma→repo mapping and re-export.
 public enum Icon: String, IconRepresentable, CaseIterable {
     // MARK: Asset-backed (bundled Figma artwork)
     case accountFill = "account-fill"
@@ -19,8 +20,8 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case chevronLeft = "chevron-left"
     case chevronRight = "chevron-right"
     case chevronUp = "chevron-up"
+    case clear
     case close
-    case closeCircleFill = "clear"
     case creditCard = "credit-card"
     case download
     case edit = "pencil"
@@ -65,6 +66,9 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case chartDownTrend = "chart.line.downtrend.xyaxis"
     case chartUpTrend = "chart.line.uptrend.xyaxis"
     case chat2 = "note.text"
+    // No in-scope Figma equivalent: Figma "Clear" is a bare X, not the filled-circle badge this
+    // provides. Kept as SF Symbol so the wishlist remove affordance stays a circled X.
+    case closeCircleFill = "xmark.circle.fill"
     case location = "mappin.circle.fill"
     case logIn = "ipad.and.arrow.forward"
     case rewards = "rosette"
@@ -83,7 +87,7 @@ public extension Icon {
         if usesSystemSymbol {
             return UIImage(systemName: rawValue) ?? UIImage()
         }
-        return UIImage(named: assetName, in: bundle, with: nil) ?? UIImage()
+        return UIImage(named: assetName, in: bundle, compatibleWith: nil) ?? UIImage()
     }
 }
 
@@ -105,7 +109,7 @@ extension Icon {
 extension Icon {
     /// The cases with no in-scope Figma artwork; everything else resolves to a bundled asset.
     static let systemSymbolFallbacks: Set<Icon> = [
-        .aCircle, .arrowLeft, .chartDownTrend, .chartUpTrend, .chat2,
+        .aCircle, .arrowLeft, .chartDownTrend, .chartUpTrend, .chat2, .closeCircleFill,
         .location, .logIn, .rewards, .store, .zCircle,
     ]
 
