@@ -99,6 +99,6 @@ otherwise it is hidden from assistive tech.
 `aCircle` (a.circle), `zCircle` (z.circle), `arrowLeft` (arrow.left),
 `chartUpTrend` (chart.line.uptrend.xyaxis), `chartDownTrend` (chart.line.downtrend.xyaxis),
 `chat2` (note.text), `location` (mappin.circle.fill), `logIn` (ipad.and.arrow.forward),
-`rewards` (rosette), `store` (storefront), `closeCircleFill` (xmark.circle.fill — Figma "Clear" is a
+`store` (storefront), `closeCircleFill` (xmark.circle.fill — Figma "Clear" is a
 bare X, not a filled-circle badge, so the circled-X affordance stays an SF Symbol; the Tabler Clear
 glyph is available as the separate `clear` case).

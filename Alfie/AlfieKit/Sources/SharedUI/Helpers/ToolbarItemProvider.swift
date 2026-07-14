@@ -46,12 +46,6 @@ public enum ToolbarItemProvider {
 
     // MARK: - Private
 
-    private static func rewardsItem(size: ToolBarButtonSize = .normal) -> some View {
-        ThemedToolbarButton(icon: .rewards, accessibilityId: AccessibilityId.rewardsBtn, toolBarButtonSize: size) {
-            log.debug("REWARDS CARD PRESSED")
-        }
-    }
-
     public static func wishlistItem(
         size: ToolBarButtonSize = .normal,
         openWishlistAction: @escaping () -> Void
@@ -108,7 +102,6 @@ public enum ToolbarItemProvider {
 private enum AccessibilityId {
     static let settingsBtn = "settings-btn"
     static let searchBtn = "search-btn"
-    static let rewardsBtn = "rewards-btn"
     static let wishlistBtn = "wishlist-btn"
     static let listBtn = "list-btn"
     static let accountBtn = "account-btn"

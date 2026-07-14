@@ -48,7 +48,7 @@ final class IconTests: XCTestCase {
     func test_fallbackSet_matchesDesignApprovedList() {
         let expected: Set<Icon> = [
             .aCircle, .arrowLeft, .chartDownTrend, .chartUpTrend, .chat2, .closeCircleFill,
-            .location, .logIn, .rewards, .store, .zCircle,
+            .location, .logIn, .store, .zCircle,
         ]
         XCTAssertEqual(Icon.systemSymbolFallbacks, expected)
     }
@@ -63,8 +63,8 @@ final class IconTests: XCTestCase {
 
     func test_iconSetComposition() {
         XCTAssertEqual(assetBackedIcons.count, 50, "Expected 50 asset-backed in-scope icons")
-        XCTAssertEqual(fallbackIcons.count, 11, "Expected 11 SF-Symbol fallbacks")
-        XCTAssertEqual(Icon.allCases.count, 61)
+        XCTAssertEqual(fallbackIcons.count, 10, "Expected 10 SF-Symbol fallbacks")
+        XCTAssertEqual(Icon.allCases.count, 60)
     }
 
     // MARK: - ThemedIcon size tokens

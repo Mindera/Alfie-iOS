@@ -71,7 +71,6 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case closeCircleFill = "xmark.circle.fill"
     case location = "mappin.circle.fill"
     case logIn = "ipad.and.arrow.forward"
-    case rewards = "rosette"
     case store = "storefront"
     case zCircle = "z.circle"
 }
@@ -110,7 +109,7 @@ extension Icon {
     /// The cases with no in-scope Figma artwork; everything else resolves to a bundled asset.
     static let systemSymbolFallbacks: Set<Icon> = [
         .aCircle, .arrowLeft, .chartDownTrend, .chartUpTrend, .chat2, .closeCircleFill,
-        .location, .logIn, .rewards, .store, .zCircle,
+        .location, .logIn, .store, .zCircle,
     ]
 
     var usesSystemSymbol: Bool {
