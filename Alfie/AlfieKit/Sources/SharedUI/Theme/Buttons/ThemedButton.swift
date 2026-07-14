@@ -136,10 +136,13 @@ private enum Constants {
     static let horizontalPadding: CGFloat = 0
     static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
     static let cornerRadius: CGFloat = Sizing.radiusSoft
-    static let iconSize: CGFloat = 16
-    static let smallHeight: CGFloat = 36
-    static let mediumHeight: CGFloat = 44
-    static let bigHeight: CGFloat = 52
+    static let iconSize: CGFloat = Sizing.iconsIconSmall
+    // FIXME: No dedicated button-height token exists; heights are snapped to the spacing scale
+    // (36→32, 44→40, 52→48). This drops `.medium` (the default) to 40pt — below Apple's 44pt
+    // minimum tap target. Pending design confirmation on adding proper control-height tokens.
+    static let smallHeight: CGFloat = Primitives.Spacing.spacing32
+    static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
+    static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
 // MARK: - ThemedButtonStyle
@@ -181,7 +184,7 @@ private struct ThemedButtonStyle: ButtonStyle {
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                    .stroke(borderColor(configuration), lineWidth: 1)
+                    .stroke(borderColor(configuration), lineWidth: Primitives.Border.borderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)

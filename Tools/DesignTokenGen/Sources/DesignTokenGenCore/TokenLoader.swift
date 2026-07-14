@@ -11,10 +11,13 @@ public struct LoadedTokens {
 }
 
 public enum TokenLoader {
-    /// iOS mode choices for the two multi-mode collections (PLAN.md Q3: mobile uses Small at codegen).
+    /// iOS mode choices for multi-mode collections (PLAN.md Q3: mobile uses Small at codegen).
+    /// Every collection that has more than one mode MUST be pinned here so codegen knows which
+    /// single mode iOS ships — an unpinned multi-mode collection fails fast in `selectedFiles`.
     static let modeForCollection: [String: String] = [
         "system": "ios",
         "screen-size": "small-(s)",
+        "theme": "alfie-theme",
     ]
     static let documentationPrefix = "~~doc-"
 
@@ -47,9 +50,10 @@ public enum TokenLoader {
     /// Filenames to load: skip `.documentation`; pick the iOS mode for multi-mode collections;
     /// include single-mode collections and the typography styles.
     static func selectedFiles(manifestURL: URL) throws -> [String] {
+        let name = manifestURL.lastPathComponent
         let data = try Data(contentsOf: manifestURL)
         guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw DesignTokenError.malformedToken(name: "manifest.json", reason: "not an object")
+            throw DesignTokenError.malformedToken(name: name, reason: "not an object")
         }
         var files: [String] = []
         if let collections = root["collections"] as? [String: Any] {
@@ -58,18 +62,28 @@ public enum TokenLoader {
                 // A collection without a `modes` dictionary is contract drift — fail fast rather than
                 // silently dropping its tokens from the generated set.
                 guard let modes = (value as? [String: Any])?["modes"] as? [String: Any] else {
-                    throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' has no 'modes' dictionary")
+                    throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' has no 'modes' dictionary")
                 }
                 let chosen: [Any]
                 if let mode = modeForCollection[collection] {
                     // A configured collection MUST expose its expected mode — falling back to an empty
                     // list would silently emit an incomplete token set.
                     guard let list = modes[mode] as? [Any] else {
-                        throw DesignTokenError.malformedToken(name: "manifest.json", reason: "collection '\(collection)' is missing expected mode '\(mode)'")
+                        throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' is missing expected mode '\(mode)'")
                     }
                     chosen = list
+                } else if modes.count > 1 {
+                    // A newly multi-mode collection with no pin would otherwise load every mode's file
+                    // — including ones pull-design-tokens.sh doesn't ship — and crash later with an
+                    // opaque fileNotFound. Fail here so the maintainer adds an explicit pin.
+                    throw DesignTokenError.unpinnedMultiModeCollection(collection: collection, modes: modes.keys.sorted())
                 } else {
-                    chosen = modes.values.compactMap { $0 as? [Any] }.flatMap { $0 }
+                    // Single-mode collection: load its only mode. An absent or non-list mode value is
+                    // contract drift — fail fast rather than silently dropping the collection's tokens.
+                    guard let list = modes.values.first as? [Any] else {
+                        throw DesignTokenError.malformedToken(name: name, reason: "collection '\(collection)' has no usable file list for its single mode")
+                    }
+                    chosen = list
                 }
                 files.append(contentsOf: chosen.compactMap { $0 as? String })
             }

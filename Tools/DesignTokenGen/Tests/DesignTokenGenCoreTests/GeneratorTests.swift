@@ -46,6 +46,58 @@ struct TokenLoaderTests {
             _ = try TokenLoader.parseValue(type: "dimension", raw: ["value": 1, "unit": "rem"], name: "x")
         }
     }
+
+    @Test("theme is pinned to alfie-theme, skipping the file-less selfridges mode (regression: dual-mode theme used to load every mode's file)")
+    func themeModeSelection() throws {
+        // The fixture's manifest lists a "selfridges" theme mode with no backing file. If theme
+        // ever stops being pinned, selectedFiles would include theme.selfridges.tokens.json and
+        // load() would throw fileNotFound.
+        let files = try TokenLoader.selectedFiles(manifestURL: miniURL().appendingPathComponent("manifest.json"))
+        #expect(files.contains("theme.alfie-theme.tokens.json"))
+        #expect(!files.contains("theme.selfridges.tokens.json"))
+        _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
+    }
+
+    @Test("an unpinned collection that gains a second mode fails fast with an actionable message")
+    func unpinnedMultiModeFailsFast() throws {
+        // A future collection gaining a second mode without a pin must be caught here, not crash
+        // later on a missing file. "brand-new" is deliberately absent from modeForCollection.
+        let manifest = """
+        { "collections": { "brand-new": { "modes": {
+            "alfie-theme": ["brand-new.alfie-theme.tokens.json"],
+            "selfridges": ["brand-new.selfridges.tokens.json"]
+        } } } }
+        """
+        let tmp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mm-\(UUID().uuidString).json")
+        try manifest.write(to: tmp, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        // Assert on the message, not just the error type — the whole point is that it's actionable
+        // (names the offending collection and tells the maintainer to add a pin).
+        #expect {
+            _ = try TokenLoader.selectedFiles(manifestURL: tmp)
+        } throws: { error in
+            let message = String(describing: error)
+            return message.contains("brand-new") && message.contains("no pinned mode")
+        }
+    }
+
+    @Test("a single-mode collection whose mode isn't a file list fails fast, naming the offending manifest file")
+    func singleModeNonListFailsFast() throws {
+        // Contract drift: a lone mode whose value is not an array must fail fast, not silently drop the
+        // collection's tokens. The error must name the actual manifest file (not a hardcoded
+        // "manifest.json") so it stays traceable when selectedFiles runs on an arbitrary path.
+        let manifest = #"{ "collections": { "lonely": { "modes": { "only": "not-a-list" } } } }"#
+        let fileName = "drift-\(UUID().uuidString).json"
+        let tmp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
+        try manifest.write(to: tmp, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        #expect {
+            _ = try TokenLoader.selectedFiles(manifestURL: tmp)
+        } throws: { error in
+            let message = String(describing: error)
+            return message.contains("lonely") && message.contains(fileName)
+        }
+    }
 }
 
 @Suite("Resolver")
