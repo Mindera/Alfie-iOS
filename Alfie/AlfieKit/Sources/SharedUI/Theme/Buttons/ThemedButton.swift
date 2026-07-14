@@ -137,8 +137,9 @@ private enum Constants {
     static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
     static let cornerRadius: CGFloat = Sizing.radiusSoft
     static let iconSize: CGFloat = Sizing.iconsIconSmall
-    // No dedicated button-height token exists; snapped down to the nearest spacing-scale values
-    // (36→32, 44→40, 52→48) until the design system provides height tokens.
+    // FIXME: No dedicated button-height token exists; heights are snapped to the spacing scale
+    // (36→32, 44→40, 52→48). This drops `.medium` (the default) to 40pt — below Apple's 44pt
+    // minimum tap target. Pending design confirmation on adding proper control-height tokens.
     static let smallHeight: CGFloat = Primitives.Spacing.spacing32
     static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
     static let bigHeight: CGFloat = Primitives.Spacing.spacing48
