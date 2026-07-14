@@ -64,6 +64,6 @@ struct TabBarItemView: View {
         static let effectID: String = "underline"
         static let lineHeight: CGFloat = 2
         static let offsetLineSelected: CGFloat = -1
-        static let iconSize: CGSize = .init(width: 24, height: 24)
+        static let iconSize: CGSize = .init(width: Sizing.iconsIconMedium, height: Sizing.iconsIconMedium)
     }
 }
