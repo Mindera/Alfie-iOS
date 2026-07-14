@@ -46,6 +46,9 @@
       "modes": {
         "alfie-theme": [
           "theme.alfie-theme.tokens.json"
+        ],
+        "selfridges": [
+          "theme.selfridges.tokens.json"
         ]
       }
     },

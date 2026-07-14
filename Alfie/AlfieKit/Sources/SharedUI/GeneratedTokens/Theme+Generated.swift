@@ -4,14 +4,30 @@
 import SwiftUI
 
 public enum Theme {
+    public static let borderMedium = Primitives.Colours.neutrals400
     public static let borderSoft = Primitives.Colours.neutrals200
     public static let buttonDestructiveBackgroundDestructiveDefault = Primitives.Colours.semanticError600
+    public static let buttonDestructiveBackgroundDestructiveDisabled = Primitives.Colours.neutrals300
+    public static let buttonDestructiveContentDestructiveDefault = Primitives.Colours.neutrals0
+    public static let buttonDestructiveContentDestructiveDisabled = Primitives.Colours.neutrals500
     public static let buttonDestructiveStrokeDestructiveDefault = Primitives.Colours.semanticError600
+    public static let buttonDestructiveStrokeDestructiveDisabled = Primitives.Colours.neutrals300
     public static let buttonPrimaryBackgroundPrimaryDefault = Primitives.Colours.neutrals800
+    public static let buttonPrimaryBackgroundPrimaryDisabled = Primitives.Colours.neutrals300
+    public static let buttonPrimaryContentPrimaryDefault = Primitives.Colours.neutrals0
+    public static let buttonPrimaryContentPrimaryDisabled = Primitives.Colours.neutrals500
+    public static let buttonPrimaryStrokePrimaryDefault = Primitives.Colours.neutrals800
+    public static let buttonPrimaryStrokePrimaryDisabled = Primitives.Colours.neutrals300
     public static let buttonSecondaryBackgroundSecondaryDefault = Primitives.Colours.transparentTransparent
     public static let buttonSecondaryBackgroundSecondaryDisabled = Primitives.Colours.transparentTransparent
+    public static let buttonSecondaryContentSecondaryDefault = Primitives.Colours.neutrals800
+    public static let buttonSecondaryContentSecondaryDisabled = Primitives.Colours.neutrals500
+    public static let buttonSecondaryStrokeSecondaryDefault = Primitives.Colours.neutrals900
+    public static let buttonSecondaryStrokeSecondaryDisabled = Primitives.Colours.neutrals500
     public static let buttonTerciaryBackgroundTerciaryDefault = Primitives.Colours.transparentTransparent
     public static let buttonTerciaryBackgroundTerciaryDisabled = Primitives.Colours.transparentTransparent
+    public static let buttonTerciaryContentTerciaryDefault = Primitives.Colours.neutrals800
+    public static let buttonTerciaryContentTerciaryDisabled = Primitives.Colours.neutrals500
     public static let buttonTerciaryStrokeTerciaryDefault = Primitives.Colours.transparentTransparent
     public static let buttonTerciaryStrokeTerciaryDisabled = Primitives.Colours.transparentTransparent
     public static let contentContentInvertedPrimary = Primitives.Colours.neutrals0

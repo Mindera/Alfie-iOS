@@ -60,6 +60,7 @@ public enum DesignTokenError: Error, CustomStringConvertible, Equatable {
     case manifestNotFound(String)
     case fileNotFound(String)
     case malformedToken(name: String, reason: String)
+    case unpinnedMultiModeCollection(collection: String, modes: [String])   // manifest is valid; iOS codegen has no pin for it
     case unknownDimensionUnit(token: String, unit: String)
     case missingReference(token: String, target: String)         // not on broken-ref allowlist
     case brokenReferenceInOutput(target: String)                 // allow-listed broken ref reached an emitted surface
@@ -74,6 +75,7 @@ public enum DesignTokenError: Error, CustomStringConvertible, Equatable {
         case .manifestNotFound(let p): return "manifest.json not found at \(p)"
         case .fileNotFound(let p): return "token file not found: \(p)"
         case .malformedToken(let n, let r): return "malformed token '\(n)': \(r)"
+        case .unpinnedMultiModeCollection(let c, let m): return "collection '\(c)' has multiple modes [\(m.joined(separator: ", "))] but no pinned mode — add one to TokenLoader.modeForCollection to select the iOS mode"
         case .unknownDimensionUnit(let t, let u): return "token '\(t)': unsupported dimension unit '\(u)' (only 'px')"
         case .missingReference(let t, let g): return "token '\(t)' references missing target '{\(g)}' (not on broken-ref allowlist)"
         case .brokenReferenceInOutput(let g): return "an emitted token resolves to allow-listed broken ref '{\(g)}' — it has no concrete value to emit"
