@@ -13,6 +13,12 @@ public enum AccessibilityID {
         public static let item = "brands.item.button"
     }
 
+    // MARK: - Splash
+
+    public enum Splash {
+        public static let screen = "splash.screen"
+    }
+
     // MARK: - ProductDetails
 
     public enum ProductDetails {

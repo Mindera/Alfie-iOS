@@ -109,6 +109,7 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Bag",
                 "CategorySelector",
                 "Core",
@@ -332,6 +333,7 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "AppFeature",
                 "Mocks",
                 "TestUtils",
