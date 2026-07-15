@@ -18,10 +18,10 @@ and tokens. Visual-only, no behaviour change, no feature flag, dark mode deferre
 - [x] 4.5 Grill → hardened plan
 - [x] GATE: approval (2026-07-15)
 - [x] 5. Implement (ios-execute) — 3 phases, verify PASSED, review APPROVED
-- [ ] 6. Commit
-- [ ] 7. PR
-- [ ] 8. Ticket transition
-- [ ] 9. Report
+- [x] 6. Commit (d75c435 impl, 34b8751 docs)
+- [x] 7. PR → https://github.com/Mindera/Alfie-iOS/pull/96
+- [x] 8. Ticket transition → Review
+- [x] 9. Report
 
 ## Notes
 - Project memory: snapshot suite is disabled repo-wide (out of target membership, no committed
