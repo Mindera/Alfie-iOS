@@ -83,12 +83,25 @@ public struct ThemedToolbarButton: View {
         .disabled(isDisabled)
         .tint(tint)
         .accessibilityIdentifier(accessibilityId)
-        .accessibilityLabel(Text(accessibilityLabel ?? text ?? ""))
+        .accessibilityLabelIfPresent(accessibilityLabel)
         .buttonStyle(.plain)
     }
 
     private var iconSize: CGFloat {
         toolBarButtonSize == .normal ? Constants.iconSizeNormal : Constants.iconSizeBig
+    }
+}
+
+private extension View {
+    /// Applies a VoiceOver label only when one is provided; otherwise leaves the control's default
+    /// label untouched (never forces an empty label onto an icon-only button).
+    @ViewBuilder
+    func accessibilityLabelIfPresent(_ label: String?) -> some View {
+        if let label {
+            accessibilityLabel(Text(label))
+        } else {
+            self
+        }
     }
 }
 

@@ -49,8 +49,10 @@ SVG and a `Contents.json` with:
 }
 ```
 `Icons.xcassets` is wired into the SharedUI target `resources` in `Alfie/AlfieKit/Package.swift`
-(`.process(...)`) — a new catalog dir is picked up automatically, but new/renamed **imagesets** just
-need the `Contents.json` above.
+(`.process(...)`). New/renamed **imagesets inside the already-processed `Icons.xcassets`** are picked
+up automatically (they just need the `Contents.json` above). Adding a **new** catalog directory,
+however, requires its own `.process(...)` entry in `Package.swift` — SharedUI resources are
+enumerated explicitly, not auto-discovered.
 
 ### To add or re-map an icon
 1. Export the SVG (above) and create its imageset.
