@@ -5,21 +5,21 @@ vector assets. This doc explains the model and how to re-export / add icons.
 
 - **Figma source of truth:** [Alfie Design System → Iconography](https://www.figma.com/design/PWVgEoKrIw9Hv7QlOCcUoq/Alfie---Design-System?node-id=3001-7582)
   (file key `PWVgEoKrIw9Hv7QlOCcUoq`, page node `3001-7582`). Built on **Tabler Icons** (MIT), 24dp grid.
-- **iOS scope (ALFMOB-426):** only the **Arrows & System** + **E-commerce** categories are integrated.
-  The other categories (Food & Nature, Care Guide, House & Furniture, Accommodations) are not needed yet.
+- **iOS scope (ALFMOB-426):** the **Arrows & System** + **E-commerce** categories, plus the
+  **SF Symbol - iOS** section (dedicated glyphs for icons that previously fell back to Apple SF
+  Symbols). The other categories (Food & Nature, Care Guide, House & Furniture, Accommodations) are not
+  needed yet.
 
 ## How icons resolve
 
-`SharedUI/Theme/Icons/Icon.swift` is a `String`-raw enum. Each case is one of:
+`SharedUI/Theme/Icons/Icon.swift` is a `String`-raw enum. **Every** case is asset-backed — it resolves
+to a bundled glyph via `assetName` (the raw value for most cases; aliased cases like `reload`→`loading`
+keep a unique raw value but point at a shared asset). Rendered via `Image(assetName, bundle: .module)`
+from `Icons.xcassets`. There are **no SF-Symbol fallbacks** — the Figma "SF Symbol - iOS" section
+supplies bundled glyphs for the letter/chart/system icons that have no Tabler equivalent.
 
-- **Asset-backed** (in-scope Figma icon) — resolves to a bundled asset via `assetName` (which is the
-  raw value for most cases; aliased cases like `info`→`help` and `reload`→`loading` keep a unique raw
-  value but point at a shared glyph). Rendered via `Image(assetName, bundle: .module)` from `Icons.xcassets`.
-- **SF Symbol fallback** — raw value = an SF Symbol name. Rendered via `Image(systemName:)`. Used only
-  for icons with **no** in-scope Figma equivalent (see `Icon.systemSymbolFallbacks`).
-
-`Icon.image` / `Icon.uiImage` pick the path automatically. Assets are configured **Render As: Template
-Image** + **Preserve Vector Data**, so they tint via `foregroundStyle`/`tint`.
+Assets are configured **Render As: Template Image** + **Preserve Vector Data**, so they tint via
+`foregroundStyle`/`tint`.
 
 Prefer **`ThemedIcon(_:size:tint:)`** over `Icon.x.image` at call sites — it binds size to the
 `Sizing.iconsIcon{Small,Medium,Large,Xlarge}` (16/24/32/40) tokens and applies the template tint, so
@@ -57,8 +57,7 @@ enumerated explicitly, not auto-discovered.
 ### To add or re-map an icon
 1. Export the SVG (above) and create its imageset.
 2. In `Icon.swift`: add a case (or change an existing case's raw value) to the asset name.
-3. If it replaces an SF Symbol fallback, remove that case from `Icon.systemSymbolFallbacks` and update
-   `IconTests` (`test_fallbackSet_matchesDesignApprovedList`, `test_iconSetComposition`).
+3. Update `IconTests` (`test_iconSetCount`) if the case count changed.
 4. Run `./Alfie/scripts/verify.sh`.
 
 ## Variants
@@ -89,18 +88,25 @@ Asset name → Figma component node id (file `PWVgEoKrIw9Hv7QlOCcUoq`).
 `profile-id` 3914:106950 · `star` 4612:41206 · `star-fill` 4612:41205 · `star-half-fill` 4612:41204 ·
 `gift` 5963:4795 · `pencil` 5966:6779.
 
+### SF Symbol - iOS
+Dedicated glyphs for the icons that previously fell back to Apple SF Symbols (section frame `6951:616`).
+Figma labels them by SF Symbol name; asset names are the kebab-cased form.
+`a-circle` 6951:614 · `z-circle` 6951:610 · `arrow-left` 6951:615 · `chart-line-uptrend-xyaxis` 6951:613 ·
+`chart-line-downtrend-xyaxis` 6951:609 · `note-text` 6951:608 · `mappin-circle-fill` 6951:612 ·
+`ipad-and-arrow-forward` 6951:607 · `storefront` 6951:611 · `xmark-circle-fill` 6951:606 ·
+`info-circle` 6951:730 · `list-bullet` 6951:729.
+
 ## Accessibility
 
-Bundled asset `Image`s expose their raw asset name to VoiceOver (SF Symbols carried curated labels).
-So: icon-only buttons set an explicit `.accessibilityLabel` (see `L10n.Accessibility.*`), and
-`ThemedIcon` is **decorative by default** — pass `accessibilityLabel:` only for semantic icons,
-otherwise it is hidden from assistive tech.
+Bundled asset `Image`s expose their raw asset name to VoiceOver. So: icon-only buttons set an explicit
+`.accessibilityLabel` (see `L10n.Accessibility.*`), and `ThemedIcon` is **decorative by default** —
+pass `accessibilityLabel:` only for semantic icons, otherwise it is hidden from assistive tech.
 
-## SF Symbols still in use (fallbacks — no in-scope Figma glyph)
+## SF Symbols
 
-`aCircle` (a.circle), `zCircle` (z.circle), `arrowLeft` (arrow.left),
-`chartUpTrend` (chart.line.uptrend.xyaxis), `chartDownTrend` (chart.line.downtrend.xyaxis),
-`chat2` (note.text), `location` (mappin.circle.fill), `logIn` (ipad.and.arrow.forward),
-`store` (storefront), `closeCircleFill` (xmark.circle.fill — Figma "Clear" is a
-bare X, not a filled-circle badge, so the circled-X affordance stays an SF Symbol; the Tabler Clear
-glyph is available as the separate `clear` case).
+**None.** Every `Icon` case now resolves to a bundled asset. The letter/chart/system icons that used to
+fall back to SF Symbols (`a.circle`, `z.circle`, `arrow.left`, `chart.line.uptrend/downtrend.xyaxis`,
+`note.text`, `mappin.circle.fill`, `ipad.and.arrow.forward`, `storefront`, `xmark.circle.fill`) are now
+bundled from the "SF Symbol - iOS" section; `info` and `list` also moved to their dedicated
+`info-circle` / `list-bullet` glyphs (previously approximated to `help` / `menu-alt`). `ButtonIcon`
+(checkbox/radio) still uses SF Symbols but is out of this ticket's scope.
