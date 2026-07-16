@@ -25,7 +25,9 @@ struct SplashView: View {
             ThemedSpinnerView()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(theme.color.neutrals0)
+        // Bleed only the background under the safe area; the content stays centred within the
+        // safe area so the wordmark lines up with the launch screen (no jump on hand-off).
+        .background { theme.color.neutrals0.ignoresSafeArea() }
         .accessibilityIdentifier(AccessibilityID.Splash.screen)
     }
 }
