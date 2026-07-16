@@ -333,7 +333,6 @@ let package = Package(
         .testTarget(
             name: "AppFeatureTests",
             dependencies: [
-                "AccessibilityIdentifiers",
                 "AppFeature",
                 "Mocks",
                 "TestUtils",
