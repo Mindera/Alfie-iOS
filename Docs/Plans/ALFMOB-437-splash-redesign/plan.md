@@ -20,9 +20,9 @@ feature-flag, or boot-sequence change. Dark mode deferred.
 - **AC1** In-app splash matches the Figma: white bg, centred MINDERA/ALFIE wordmark + DS loading
   spinner. ✅
 - **AC2** Consumes SharedUI components + design tokens — no bespoke hardcoded colours/spacing/typography. ✅
-- **AC3** Appearance regression-guarded. Snapshot suite is disabled repo-wide, so satisfied via an SPM
-  render smoke test (`SplashView` builds/renders without crashing). True appearance verification is a
-  snapshot concern, deferred to the suite-revival ticket. ✅
+- **AC3** Appearance verification is **deferred to a separate snapshot-suite-revival ticket** — the
+  suite is disabled repo-wide, and a render smoke test added no real signal for a logic-free view, so
+  none is included. No automated appearance guard in this PR; verified manually in the simulator. ⚠️
 - **AC4** No startup/boot regression — `AppStartupServiceTests` unchanged & green. ✅
 - **AC5** Native launch screen shows the new MINDERA/ALFIE wordmark, centred, matching the splash. ✅
 
@@ -57,8 +57,8 @@ loader) is left untouched. The launch storyboard is updated independently to the
 - [x] `SplashView` centres the wordmark (mirrored spacing so it aligns with the launch screen) above
       `ThemedSpinnerView()`; background bleeds under the safe area, content stays in the safe area.
 - [x] `AppFeatureView.view(for: .loading)` renders `SplashView`.
-- [x] `AccessibilityID.Splash.screen` added; `AccessibilityIdentifiers` wired into `AppFeature` + tests.
-- [x] `SplashViewTests` — render smoke test via `UIHostingController`.
+- [x] `AccessibilityID.Splash.screen` added; `AccessibilityIdentifiers` wired into `AppFeature`.
+- [x] No `SplashView` unit test — appearance deferred to the snapshot-suite-revival ticket.
 - [x] `AppStartupServiceTests` unchanged & green.
 
 ### Phase 3 — Native launch screen (logo only) ✅
@@ -84,10 +84,11 @@ loader) is left untouched. The launch storyboard is updated independently to the
 n/a — app unreleased; redesign rolls out directly.
 
 ## Testing Strategy
-- **Unit (SPM):** `SplashViewTests` — render smoke test via `UIHostingController` (no logic to test);
-  `AppStartupServiceTests` kept as the startup regression guard.
-- **Snapshot:** none — suite disabled repo-wide. Appearance is a snapshot concern deferred to the
-  suite-revival ticket; a UI test is intentionally avoided (transient splash → flaky, low value).
+- **Unit (SPM):** none for `SplashView` — it's logic-free; `AppStartupServiceTests` remains the startup
+  regression guard.
+- **Snapshot:** none — suite disabled repo-wide. Appearance verification (splash + DS spinner) is
+  deferred to a separate snapshot-suite-revival ticket. A UI test is intentionally avoided (transient
+  splash → flaky, low value).
 - **Manual:** verified in the simulator — launch screen and in-app splash align (no wordmark jump),
   spinner rotates. Note: iOS caches the launch screen; delete/reinstall to see asset changes.
 
