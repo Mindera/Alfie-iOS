@@ -9,22 +9,18 @@ struct SplashView: View {
     }
 
     var body: some View {
-        VStack(spacing: theme.spacing.space200) {
-            // Mirrors the spinner so the wordmark stays centred, aligned with the launch screen.
-            ThemedSpinnerView()
-                .hidden()
-
-            Image(ThemedImage.splashLogo.literalName, bundle: ThemedImage.splashLogo.bundle)
-                .resizable()
-                .scaledToFit()
-                .frame(width: Constants.wordmarkWidth)
-
-            ThemedSpinnerView()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        // Bleed the background full-screen; content stays in the safe area.
-        .background { theme.color.neutrals0.ignoresSafeArea() }
-        .accessibilityIdentifier(AccessibilityID.Splash.screen)
+        Image(ThemedImage.splashLogo.literalName, bundle: ThemedImage.splashLogo.bundle)
+            .resizable()
+            .scaledToFit()
+            .frame(width: Constants.wordmarkWidth)
+            // Spinner hangs below the wordmark without affecting its centring (aligns with launch screen).
+            .overlay(alignment: .bottom) {
+                ThemedSpinnerView()
+                    .alignmentGuide(.bottom) { $0[.top] - theme.spacing.space200 }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background { theme.color.neutrals0.ignoresSafeArea() }
+            .accessibilityIdentifier(AccessibilityID.Splash.screen)
     }
 }
 
