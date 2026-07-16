@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// Design-system loading spinner: the Figma Loading Spinner artwork — an angular "comet" ring that
-/// fades opaque → transparent — rotated continuously. Sizes S/M/L (24/32/48) per the design.
+/// Design-system loading spinner: the Figma spinner artwork, rotated. Sizes S/M/L.
 public struct ThemedSpinnerView: View {
     public enum Size {
         case small
