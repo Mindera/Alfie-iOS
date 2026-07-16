@@ -75,7 +75,7 @@ final class ChipStyleTests: XCTestCase {
 
     func test_border_width_normal_uses_border_weight_default_token() {
         let sut = ChipStyle(type: .small, isSelected: false, isDisabled: false, counter: nil)
-        XCTAssertEqual(sut.borderWidth, CGFloat(Primitives.Border.borderWeightDefault))
+        XCTAssertEqual(sut.borderWidth, Primitives.Border.borderWeightDefault)
     }
 
     func test_border_width_is_thicker_when_selected() {
@@ -90,7 +90,7 @@ final class ChipStyleTests: XCTestCase {
 
     func test_border_width_is_normal_when_unselected_and_disabled() {
         let sut = ChipStyle(type: .small, isSelected: false, isDisabled: true, counter: nil)
-        XCTAssertEqual(sut.borderWidth, CGFloat(Primitives.Border.borderWeightDefault))
+        XCTAssertEqual(sut.borderWidth, Primitives.Border.borderWeightDefault)
     }
 
     // MARK: - Height

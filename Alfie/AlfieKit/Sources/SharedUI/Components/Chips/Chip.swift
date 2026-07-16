@@ -117,7 +117,7 @@ struct ChipStyle {
 
     var borderColor: Color {
         if isDisabled {
-            // surfaceForegroundPrimary is the only Theme alias mapping to neutrals100 (grill decision).
+            // surfaceForegroundPrimary is the only semantic Theme alias resolving to the disabled neutrals100 value.
             return Theme.surfaceForegroundPrimary
         } else if isSelected {
             return Theme.contentContentPrimary
@@ -147,7 +147,7 @@ struct ChipStyle {
         if isSelected {
             return Constants.borderSelected
         } else {
-            return CGFloat(Primitives.Border.borderWeightDefault)
+            return Primitives.Border.borderWeightDefault
         }
     }
 
