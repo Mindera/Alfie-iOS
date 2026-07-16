@@ -6,14 +6,6 @@ public struct ThemedSpinnerView: View {
         case small
         case medium
         case large
-
-        var dimension: CGFloat {
-            switch self {
-            case .small: Sizing.iconsIconMedium      // 24
-            case .medium: Sizing.iconsIconLarge      // 32
-            case .large: Primitives.Spacing.spacing48 // 48
-            }
-        }
     }
 
     private enum Constants {
@@ -27,11 +19,19 @@ public struct ThemedSpinnerView: View {
         self.size = size
     }
 
+    private var dimension: CGFloat {
+        switch size {
+        case .small: theme.spacing.space300
+        case .medium: theme.spacing.space400
+        case .large: theme.spacing.space600
+        }
+    }
+
     public var body: some View {
         Image(ThemedImage.loadingSpinner.literalName, bundle: ThemedImage.loadingSpinner.bundle)
             .resizable()
             .scaledToFit()
-            .frame(width: size.dimension, height: size.dimension)
+            .frame(width: dimension, height: dimension)
             .rotationEffect(.degrees(isRotating ? 360 : 0))
             .onAppear {
                 withAnimation(.linear(duration: Constants.rotationDuration).repeatForever(autoreverses: false)) {
@@ -42,7 +42,7 @@ public struct ThemedSpinnerView: View {
 }
 
 #Preview {
-    VStack(spacing: Primitives.Spacing.spacing32) {
+    VStack(spacing: DesignSystem.shared.spacing.space400) {
         ThemedSpinnerView(size: .small)
         ThemedSpinnerView(size: .medium)
         ThemedSpinnerView(size: .large)
