@@ -164,9 +164,10 @@ n/a — app unreleased; redesign rolls out directly (per ticket).
 
 ## Out of Scope
 DS foundations (ALFMOB-264/426); splash/launch **timing & boot behaviour**; dark mode.
-**Scope expansion (user-requested):** the loading-indicator **animation** — the ticket deferred motion
-to a later story, but the user asked to implement the full DS Loading Spinner (which rotates) in this
-PR. Now in scope; called out in the PR.
+**Loading-indicator animation — now in scope.** The ticket originally deferred motion because the
+design-system loading indicator wasn't finalized yet. Design has since completed the DS Loading
+Spinner (Figma 6619-47520), so the full animated component is implemented here rather than in a
+later story.
 **Scope expansion (user-requested, beyond ticket):** the native `LaunchScreen.storyboard` — the ticket
 lists it as out of scope, but the user asked to also update it to the new wordmark for launch→in-app
 consistency (Phase 3, logo only, no spinner). Called out in the PR.
