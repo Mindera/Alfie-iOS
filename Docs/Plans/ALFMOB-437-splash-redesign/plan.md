@@ -163,8 +163,10 @@ n/a — app unreleased; redesign rolls out directly (per ticket).
 | Removing `ThemedLoaderView` at call site affects other startup states | Low | Only `.loading` branch changes; other cases untouched; verify build |
 
 ## Out of Scope
-Loading-indicator animation/motion; DS foundations (ALFMOB-264/426); splash/launch **timing & boot
-behaviour**; dark mode.
+DS foundations (ALFMOB-264/426); splash/launch **timing & boot behaviour**; dark mode.
+**Scope expansion (user-requested):** the loading-indicator **animation** — the ticket deferred motion
+to a later story, but the user asked to implement the full DS Loading Spinner (which rotates) in this
+PR. Now in scope; called out in the PR.
 **Scope expansion (user-requested, beyond ticket):** the native `LaunchScreen.storyboard` — the ticket
 lists it as out of scope, but the user asked to also update it to the new wordmark for launch→in-app
 consistency (Phase 3, logo only, no spinner). Called out in the PR.
@@ -172,7 +174,10 @@ consistency (Phase 3, logo only, no spinner). Called out in the PR.
 ## Open Questions — RESOLVED (grill 2026-07-14)
 1. **Wordmark → export vector asset (Option A).** DECIDED. Export MINDERA/ALFIE lockup from Figma
    node 492:16699 as a vector; add to `ThemedImages.xcassets` + `ThemedImage.splashLogo`.
-2. **Spinner → new SharedUI `ThemedSpinnerView`.** DECIDED. Static 24pt arc, reusable, in SharedUI.
+2. **Spinner → new SharedUI `ThemedSpinnerView`.** DECIDED. Implemented as the full DS Loading
+   Spinner component (Figma 6619-47520): angular-gradient "comet" ring (`neutrals800`), sizes
+   **S/M/L (24/32/48)**, **continuously rotating**. Splash uses `.small`.
+   *(Update 2026-07-16: animation brought forward at the user's request — see scope note below.)*
 3. Spinner stroke colour token + arc fraction — implementation detail; tune against the Figma
    screenshot during execute using a neutral token (no user decision needed).
 4. Snapshot-AC substitution (SPM unit test) — accepted; forced by disabled snapshot suite
