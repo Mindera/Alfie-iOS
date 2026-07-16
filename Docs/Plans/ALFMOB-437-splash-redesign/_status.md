@@ -6,9 +6,10 @@
 - **Figma:** https://www.figma.com/design/axx7Bz1fpQurtU6DHwVaJX/Alfie---Designs--Mobile-?node-id=672-80063
 
 ## Summary
-Restyle the startup/splash view in `AppFeature` to the modern Figma design (centred MINDERA/ALFIE
-wordmark + static loading indicator + background colour) using `SharedUI` design-system components
-and tokens. Visual-only, no behaviour change, no feature flag, dark mode deferred.
+Restyled the startup/splash view in `AppFeature` to the modern Figma design (centred MINDERA/ALFIE
+wordmark + design-system loading spinner) using `SharedUI` components and tokens, added the reusable
+animated `ThemedSpinnerView`, and updated the native launch screen to the same wordmark. Visual-only,
+no behaviour change, no feature flag, dark mode deferred. **Status: completed** — see `plan.md`.
 
 ## Phase checklist
 - [x] 1. Resolve input (ticket fetched)
@@ -24,6 +25,7 @@ and tokens. Visual-only, no behaviour change, no feature flag, dark mode deferre
 - [x] 9. Report
 
 ## Notes
-- Project memory: snapshot suite is disabled repo-wide (out of target membership, no committed
-  refs) — the "regenerate snapshot baselines" AC likely cannot be satisfied literally; verify
-  appearance via SPM unit tests instead. Confirm during scout.
+- Snapshot suite is disabled repo-wide (out of target membership, no committed refs) — the
+  "regenerate snapshot baselines" AC was satisfied via an SPM unit test instead.
+- Loading-indicator animation was implemented (DS spinner finalized by design); native launch
+  screen updated for launch → in-app consistency. Both are noted in the PR.
