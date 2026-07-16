@@ -8,7 +8,7 @@
 ## Summary
 Restyled the startup/splash view in `AppFeature` to the modern Figma design (centred MINDERA/ALFIE
 wordmark + design-system loading spinner) using `SharedUI` components and tokens, added the reusable
-animated `ThemedSpinnerView`, and updated the native launch screen to the same wordmark. Visual-only,
+animated `LoadingSpinner`, and updated the native launch screen to the same wordmark. Visual-only,
 no behaviour change, no feature flag, dark mode deferred. **Status: completed** — see `plan.md`.
 
 ## Phase checklist

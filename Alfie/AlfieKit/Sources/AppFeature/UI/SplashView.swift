@@ -8,7 +8,7 @@ struct SplashView: View {
         Image(ThemedImage.splashLogo.literalName, bundle: ThemedImage.splashLogo.bundle)
             // Spinner hangs below the wordmark without affecting its centring (aligns with launch screen).
             .overlay(alignment: .bottom) {
-                ThemedSpinnerView()
+                LoadingSpinner()
                     .alignmentGuide(.bottom) { $0[.top] - theme.spacing.space200 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

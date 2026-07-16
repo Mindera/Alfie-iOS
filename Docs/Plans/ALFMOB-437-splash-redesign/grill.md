@@ -5,7 +5,7 @@
 | # | Decision | Recommended | Chosen | Plan change |
 |---|---|---|---|---|
 | 1 | How to produce the MINDERA/ALFIE wordmark | Export vector asset | Export vector asset | Open Q1 resolved; Phase 1 Step 1 confirmed (add `ThemedImage.splashLogo`) |
-| 2 | Where the static 24pt spinner lives | New SharedUI component | New SharedUI `ThemedSpinnerView` | Open Q2 resolved; Phase 1 Step 2 confirmed |
+| 2 | Where the static 24pt spinner lives | New SharedUI component | New SharedUI `LoadingSpinner` | Open Q2 resolved; Phase 1 Step 2 confirmed |
 
 ## Answered by the codebase / memory (not asked)
 - Snapshot AC cannot be met literally — snapshot suite is out of target membership repo-wide, no

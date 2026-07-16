@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Design-system loading spinner: the Figma spinner artwork, rotated. Sizes S/M/L.
-public struct ThemedSpinnerView: View {
+public struct LoadingSpinner: View {
     public enum Size {
         case small
         case medium
@@ -43,8 +43,8 @@ public struct ThemedSpinnerView: View {
 
 #Preview {
     VStack(spacing: DesignSystem.shared.spacing.space400) {
-        ThemedSpinnerView(size: .small)
-        ThemedSpinnerView(size: .medium)
-        ThemedSpinnerView(size: .large)
+        LoadingSpinner(size: .small)
+        LoadingSpinner(size: .medium)
+        LoadingSpinner(size: .large)
     }
 }
