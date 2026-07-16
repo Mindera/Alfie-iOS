@@ -2,19 +2,22 @@ import Foundation
 import struct SwiftUI.Image
 import class UIKit.UIImage
 
-/// The Alfie icon set. In-scope icons (Figma "Arrows & System" + "E-commerce") resolve to bundled
-/// vector assets in `Icons.xcassets`; the remaining cases have no Figma equivalent and fall back to
-/// SF Symbols. Asset raw values are the Figma-derived kebab-case asset names (except aliased cases
-/// like `info`/`reload`, which keep a unique raw value and resolve via `assetName`); fallback raw
-/// values are SF Symbol names. See `Docs/Iconography.md` for the Figma→repo mapping and re-export.
+/// The Alfie icon set. Every case resolves to a bundled vector asset in `Icons.xcassets`, exported
+/// from the Figma Iconography page (the "Arrows & System", "E-commerce" and "SF Symbol - iOS"
+/// sections). Raw values are the kebab-case asset names, except aliased cases (`reload`) that keep a
+/// unique raw value and resolve via `assetName`. See `Docs/Iconography.md` for the mapping + re-export.
 public enum Icon: String, IconRepresentable, CaseIterable {
-    // MARK: Asset-backed (bundled Figma artwork)
+    case aCircle = "a-circle"
     case accountFill = "account-fill"
+    case arrowLeft = "arrow-left"
     case arrowRight = "forward"
     case back
     case bag
     case bagFill = "bag-fill"
     case bell = "notification"
+    case chartDownTrend = "chart-line-downtrend-xyaxis"
+    case chartUpTrend = "chart-line-uptrend-xyaxis"
+    case chat2 = "note-text"
     case checkmark = "check"
     case chevronDown = "chevron-down"
     case chevronLeft = "chevron-left"
@@ -22,6 +25,7 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case chevronUp = "chevron-up"
     case clear
     case close
+    case closeCircleFill = "xmark-circle-fill"
     case creditCard = "credit-card"
     case download
     case edit = "pencil"
@@ -38,10 +42,13 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case help
     case home
     case homeFill = "home-fill"
-    case info
-    case list = "menu-alt"
+    case info = "info-circle"
+    case list = "list-bullet"
     case listplp = "grid-1"
+    case location = "mappin-circle-fill"
+    case logIn = "ipad-and-arrow-forward"
     case logOut = "exit"
+    case menuAlt = "menu-alt"
     case minus
     case orderReturn = "return"
     case package
@@ -56,37 +63,21 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case star
     case starFill = "star-fill"
     case starHalfFill = "star-half-fill"
+    case store = "storefront"
     case trash = "delete"
     case user = "account"
     case warning = "alert-fill"
-
-    // MARK: SF Symbol fallbacks (no in-scope Figma equivalent)
-    case aCircle = "a.circle"
-    case arrowLeft = "arrow.left"
-    case chartDownTrend = "chart.line.downtrend.xyaxis"
-    case chartUpTrend = "chart.line.uptrend.xyaxis"
-    case chat2 = "note.text"
-    // No in-scope Figma equivalent: Figma "Clear" is a bare X, not the filled-circle badge this
-    // provides. Kept as SF Symbol so the wishlist remove affordance stays a circled X.
-    case closeCircleFill = "xmark.circle.fill"
-    case location = "mappin.circle.fill"
-    case logIn = "ipad.and.arrow.forward"
-    case store = "storefront"
-    case zCircle = "z.circle"
+    case zCircle = "z-circle"
 }
 
 public extension Icon {
-    /// Asset-backed icons render from the bundled catalog (template intent set in the asset);
-    /// fallbacks render from SF Symbols.
+    /// Icons render from the bundled catalog (template intent is set on each asset).
     var image: Image {
-        usesSystemSymbol ? Image(systemName: rawValue) : Image(assetName, bundle: bundle)
+        Image(assetName, bundle: bundle)
     }
 
     var uiImage: UIImage {
-        if usesSystemSymbol {
-            return UIImage(systemName: rawValue) ?? UIImage()
-        }
-        return UIImage(named: assetName, in: bundle, compatibleWith: nil) ?? UIImage()
+        UIImage(named: assetName, in: bundle, compatibleWith: nil) ?? UIImage()
     }
 }
 
@@ -95,24 +86,10 @@ extension Icon {
     /// (raw values must stay unique, but they can point at the same artwork).
     var assetName: String {
         switch self {
-        case .info:
-            return "help"
         case .reload:
             return "loading"
         default:
             return rawValue
         }
-    }
-}
-
-extension Icon {
-    /// The cases with no in-scope Figma artwork; everything else resolves to a bundled asset.
-    static let systemSymbolFallbacks: Set<Icon> = [
-        .aCircle, .arrowLeft, .chartDownTrend, .chartUpTrend, .chat2, .closeCircleFill,
-        .location, .logIn, .store, .zCircle,
-    ]
-
-    var usesSystemSymbol: Bool {
-        Self.systemSymbolFallbacks.contains(self)
     }
 }
