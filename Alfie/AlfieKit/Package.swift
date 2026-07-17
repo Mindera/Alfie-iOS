@@ -292,6 +292,7 @@ let package = Package(
                 .copy("Theme/Typography/Resources/LibreBaskerville-OFL.txt"),
                 .copy("Theme/Components/Loader/spin.gif"),
                 .process("Theme/Images/ThemedImages.xcassets"),
+                .process("Theme/Icons/Icons.xcassets"),
                 .process("Theme/Typography/Resources/Fonts.xcassets"),
                 .process("Resources/Localization/L10n.xcstrings")
             ]

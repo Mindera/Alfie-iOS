@@ -63,6 +63,7 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                                     )
                                                     .tint(Primitives.Colours.neutrals900)
                                             }
+                                            .accessibilityLabel(Text(L10n.Accessibility.close))
                                         }
                                         .padding(.vertical, Primitives.Spacing.spacing8)
                                         .padding(.horizontal, Primitives.Spacing.spacing16)

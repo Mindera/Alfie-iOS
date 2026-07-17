@@ -15,36 +15,27 @@ struct ProductListingListStyleSelector: View {
             Button {
                 selectedStyle = .grid
             } label: {
-                Icon.grid.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.filterIcon, height: Constants.filterIcon)
-                    .foregroundStyle(
-                        selectedStyle == .grid ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200
-                    )
+                ThemedIcon(
+                    .grid,
+                    size: .small,
+                    tint: selectedStyle == .grid ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200,
+                    accessibilityLabel: L10n.Accessibility.gridView
+                )
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleGridButton)
             Button {
                 selectedStyle = .list
             } label: {
-                Icon.listplp.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.filterIcon, height: Constants.filterIcon)
-                    .foregroundStyle(
-                        selectedStyle == .list ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200
-                    )
+                ThemedIcon(
+                    .listplp,
+                    size: .small,
+                    tint: selectedStyle == .list ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200,
+                    accessibilityLabel: L10n.Accessibility.listView
+                )
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleListButton)
         }
     }
-
-    private enum Constants {
-        static let filterIcon: CGFloat = 16.0
-    }
-
 }

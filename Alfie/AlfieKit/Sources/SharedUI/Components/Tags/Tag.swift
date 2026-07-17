@@ -63,6 +63,7 @@ public struct Tag: View {
                             .frame(width: Constants.closeWidth, height: Constants.closeHeight)
                             .foregroundStyle(Primitives.Colours.neutrals900)
                     })
+                    .accessibilityLabel(Text(L10n.Accessibility.close))
                 }
             }
             .padding(.horizontal, Primitives.Spacing.spacing12)

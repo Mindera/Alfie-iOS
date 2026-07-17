@@ -5,6 +5,36 @@ import Foundation
 // MARK: - Strings
 
 public enum L10n {
+  public enum Accessibility {
+    /// Account
+    public static let account = L10n.tr("L10n", "accessibility.account")
+    /// Clear search
+    public static let clearSearch = L10n.tr("L10n", "accessibility.clearSearch")
+    /// Close
+    public static let close = L10n.tr("L10n", "accessibility.close")
+    /// Grid view
+    public static let gridView = L10n.tr("L10n", "accessibility.gridView")
+    /// List view
+    public static let listView = L10n.tr("L10n", "accessibility.listView")
+    /// Menu
+    public static let menu = L10n.tr("L10n", "accessibility.menu")
+    /// Next page
+    public static let nextPage = L10n.tr("L10n", "accessibility.nextPage")
+    /// Previous page
+    public static let previousPage = L10n.tr("L10n", "accessibility.previousPage")
+    /// Remove from wishlist
+    public static let removeFromWishlist = L10n.tr("L10n", "accessibility.removeFromWishlist")
+    /// Remove recent search
+    public static let removeRecentSearch = L10n.tr("L10n", "accessibility.removeRecentSearch")
+    /// Search
+    public static let search = L10n.tr("L10n", "accessibility.search")
+    /// Settings
+    public static let settings = L10n.tr("L10n", "accessibility.settings")
+    /// Share
+    public static let share = L10n.tr("L10n", "accessibility.share")
+    /// Wishlist
+    public static let wishlist = L10n.tr("L10n", "accessibility.wishlist")
+  }
   public enum Account {
     /// Account
     public static let title = L10n.tr("L10n", "account.title")
@@ -477,6 +507,20 @@ private extension String.LocalizationValue.StringInterpolation {
 public extension L10n {
   enum Keys: String, RawRepresentable, CaseIterable {
 
+      case accessibilityAccount = "accessibility.account"
+      case accessibilityClearSearch = "accessibility.clearSearch"
+      case accessibilityClose = "accessibility.close"
+      case accessibilityGridView = "accessibility.gridView"
+      case accessibilityListView = "accessibility.listView"
+      case accessibilityMenu = "accessibility.menu"
+      case accessibilityNextPage = "accessibility.nextPage"
+      case accessibilityPreviousPage = "accessibility.previousPage"
+      case accessibilityRemoveFromWishlist = "accessibility.removeFromWishlist"
+      case accessibilityRemoveRecentSearch = "accessibility.removeRecentSearch"
+      case accessibilitySearch = "accessibility.search"
+      case accessibilitySettings = "accessibility.settings"
+      case accessibilityShare = "accessibility.share"
+      case accessibilityWishlist = "accessibility.wishlist"
       case accountTitle = "account.title"
       case bagTitle = "bag.title"
       case featureToggleTitle = "feature_toggle.title"

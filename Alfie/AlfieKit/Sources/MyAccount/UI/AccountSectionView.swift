@@ -42,7 +42,7 @@ struct AccountSectionView: View {
     }
 
     private enum AccountConstants {
-        static let iconSize: CGFloat = Primitives.Spacing.spacing16
+        static let iconSize: CGFloat = Sizing.iconsIconSmall
         static let sectionHeight: CGFloat = 60
     }
 }
