@@ -12,6 +12,7 @@ public struct LoadingSpinner: View {
         static let rotationDuration: Double = 1
     }
 
+    @Environment(\.theme) private var theme
     private let size: Size
     @State private var isRotating = false
 
@@ -38,6 +39,8 @@ public struct LoadingSpinner: View {
                     isRotating = true
                 }
             }
+            // Reset so the animation restarts if the view reappears with persisted @State.
+            .onDisappear { isRotating = false }
     }
 }
 
