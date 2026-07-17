@@ -5,7 +5,6 @@ import SwiftUI
 struct CustomTabBarView: View {
     private let tabs: [Model.Tab]
     @Binding private var currentTab: Model.Tab
-    @Namespace private var namespace
     @State private var badgeNumbers: [Model.Tab: Int?] = [:]
     private let popToRootAction: (Model.Tab) -> Void
 
@@ -22,20 +21,20 @@ struct CustomTabBarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
             Divider()
+                .overlay(Theme.borderSoft)
             HStack(spacing: Primitives.Spacing.spacing0) {
                 ForEach(tabs, id: \.self) { tab in
                     TabBarItemView(
                         tab: tab,
                         currentTab: $currentTab,
                         badgeValue: .init(get: { badgeValueFor(tab) }, set: { _ in }),
-                        namespace: namespace.self,
                         popToRootAction: popToRootAction
                     )
                     .simultaneousGesture(TapGesture().onEnded { _ in badgeNumbers[tab] = nil })
                 }
             }
         }
-        .background(Primitives.Colours.neutrals0)
+        .background(Theme.surfaceBackgroundPrimary)
         .frame(width: UIScreen.main.bounds.width)
     }
 
