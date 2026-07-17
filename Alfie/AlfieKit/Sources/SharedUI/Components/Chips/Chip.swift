@@ -42,33 +42,33 @@ public struct ChipConfiguration {
 }
 
 public struct Chip: View {
-    private enum Constants {
-        static let heightSmall = 36.0
-        static let heightLarge = 44.0
-        static let closeWidth = 12.0
-        static let closeHeight = 12.0
-        static let borderNormal = 1.0
-        static let borderSelected = 2.0
-        static let maxCounter: Int = 99
-    }
-
     private let configuration: ChipConfiguration
 
     public init(configuration: ChipConfiguration) {
         self.configuration = configuration
     }
 
+    private var style: ChipStyle {
+        ChipStyle(
+            type: configuration.type,
+            isSelected: configuration.isSelected,
+            isDisabled: configuration.isDisabled,
+            counter: configuration.counter
+        )
+    }
+
     public var body: some View {
-        ZStack {
+        let style = self.style
+        return ZStack {
             RoundedRectangle(cornerRadius: Sizing.radiusRounded)
-                .stroke(borderColor, lineWidth: borderWidth)
-                .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(backgroundColor))
+                .stroke(style.borderColor, lineWidth: style.borderWidth)
+                .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(style.backgroundColor))
             HStack(spacing: Primitives.Spacing.spacing8) {
                 Text.build(theme.font.body.small(configuration.label))
-                    .foregroundStyle(textColor)
-                if let counterLabel {
+                    .foregroundStyle(style.textColor)
+                if let counterLabel = style.counterLabel {
                     Text.build(theme.font.body.small(counterLabel))
-                        .foregroundStyle(textColor)
+                        .foregroundStyle(style.textColor)
                 }
                 if configuration.showCloseButton {
                     Button(action: {
@@ -79,8 +79,8 @@ public struct Chip: View {
                                 .renderingMode(.template)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: Constants.closeWidth, height: Constants.closeHeight)
-                                .foregroundStyle(textColor)
+                                .frame(width: ChipStyle.closeWidth, height: ChipStyle.closeHeight)
+                                .foregroundStyle(style.textColor)
                         }
                         .frame(maxHeight: .infinity)
                     })
@@ -91,46 +91,69 @@ public struct Chip: View {
         }
         .fixedSize(horizontal: true, vertical: false)
         .padding(.horizontal, Primitives.Spacing.spacing16)
-        .frame(height: chipHeight)
+        .frame(height: style.height)
+    }
+}
+
+/// Resolves a `Chip`'s visual styling from its state, sourced from design tokens.
+/// Extracted from `Chip` so the state→token mapping is unit-testable without snapshots.
+struct ChipStyle {
+    private enum Constants {
+        static let heightSmall = 36.0
+        static let heightLarge = 44.0
+        static let borderSelected = 2.0
+        static let maxCounter: Int = 99
     }
 
-    private var borderColor: Color {
-        if configuration.isDisabled {
-            return Primitives.Colours.neutrals100
-        } else if configuration.isSelected {
-            return Primitives.Colours.neutrals800
+    // Close-icon dimensions are fixed 12pt layout constants (state-independent), sourced from the
+    // spacing12 token and exposed statically rather than as instance properties of this resolver.
+    static let closeWidth = Primitives.Spacing.spacing12
+    static let closeHeight = Primitives.Spacing.spacing12
+
+    let type: ChipConfiguration.ChipType
+    let isSelected: Bool
+    let isDisabled: Bool
+    let counter: Int?
+
+    var borderColor: Color {
+        if isDisabled {
+            // surfaceForegroundPrimary is the only semantic Theme alias resolving to the disabled neutrals100 value.
+            return Theme.surfaceForegroundPrimary
+        } else if isSelected {
+            return Theme.contentContentPrimary
         } else {
-            return Primitives.Colours.neutrals200
+            return Theme.borderSoft
         }
     }
 
-    private var textColor: Color {
-        if configuration.isDisabled {
-            return Primitives.Colours.neutrals400
+    var textColor: Color {
+        if isDisabled {
+            return Theme.contentContentPrimaryDisabled
         } else {
+            // No Theme alias maps to neutrals600, so this remains a raw primitive.
             return Primitives.Colours.neutrals600
         }
     }
 
-    private var backgroundColor: Color {
-        if configuration.isDisabled {
-            return Primitives.Colours.neutrals100
+    var backgroundColor: Color {
+        if isDisabled {
+            return Theme.surfaceForegroundPrimary
         } else {
-            return Primitives.Colours.neutrals0
+            return Theme.surfaceBackgroundPrimary
         }
     }
 
-    private var borderWidth: CGFloat {
-        if configuration.isSelected {
+    var borderWidth: CGFloat {
+        if isSelected {
             return Constants.borderSelected
         } else {
-            return Constants.borderNormal
+            return Primitives.Border.borderWeightDefault
         }
     }
 
-    private var chipHeight: CGFloat {
+    var height: CGFloat {
         // swiftlint:disable vertical_whitespace_between_cases
-        switch configuration.type {
+        switch type {
         case .small:
             return Constants.heightSmall
         case .large:
@@ -139,8 +162,8 @@ public struct Chip: View {
         // swiftlint:enable vertical_whitespace_between_cases
     }
 
-    private var counterLabel: String? {
-        guard let counter = configuration.counter else {
+    var counterLabel: String? {
+        guard let counter else {
             return nil
         }
         return counter > Constants.maxCounter ? "\(Constants.maxCounter)+" : "\(counter)"
