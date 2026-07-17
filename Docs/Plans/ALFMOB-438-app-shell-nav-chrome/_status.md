@@ -25,5 +25,5 @@ Scope files: AppFeatureView, RootTabView, CustomTabBarView, TabBarItemView.
 - [x] Grill → hardened plan
 - [x] Approval gate
 - [x] Implement (ios-execute)
-- [ ] Commit
-- [ ] PR
+- [x] Commit
+- [x] PR
