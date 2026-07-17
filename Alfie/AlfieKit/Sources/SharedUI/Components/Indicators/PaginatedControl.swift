@@ -3,10 +3,6 @@ import SwiftUI
 import Utils
 
 public struct PaginatedControl: View {
-    private enum Constants {
-        static var chevronIconSize: CGFloat { 16 }
-    }
-
     private let configuration: PaginatedControlConfiguration
     @Binding private var selectedIndex: Int
     private let itemsCount: Int
@@ -33,11 +29,7 @@ public struct PaginatedControl: View {
             Button {
                 decrementIndex()
             } label: {
-                Icon.chevronLeft.image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.chevronIconSize, height: Constants.chevronIconSize)
-                    .tint(configuration.tintColor)
+                ThemedIcon(.chevronLeft, size: .small, tint: configuration.tintColor, accessibilityLabel: L10n.Accessibility.previousPage)
             }
 
             HStack(spacing: Primitives.Spacing.spacing0) {
@@ -61,11 +53,7 @@ public struct PaginatedControl: View {
             Button {
                 incrementIndex()
             } label: {
-                Icon.chevronRight.image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.chevronIconSize, height: Constants.chevronIconSize)
-                    .tint(configuration.tintColor)
+                ThemedIcon(.chevronRight, size: .small, tint: configuration.tintColor, accessibilityLabel: L10n.Accessibility.nextPage)
             }
         }
     }

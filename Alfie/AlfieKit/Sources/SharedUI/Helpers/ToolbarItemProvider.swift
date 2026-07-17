@@ -13,7 +13,7 @@ public enum ToolbarItemProvider {
         ),
         permittedArrowDirections: UIPopoverArrowDirection = []
     ) -> some View {
-        ThemedToolbarButton(icon: .share, accessibilityId: AccessibilityId.shareBtn, toolBarButtonSize: buttonSize) {
+        ThemedToolbarButton(icon: .share, accessibilityId: AccessibilityId.shareBtn, accessibilityLabel: L10n.Accessibility.share, toolBarButtonSize: buttonSize) {
             if let configuration {
                 let activityVC = UIActivityViewController(
                     activityItems: [
@@ -39,30 +39,24 @@ public enum ToolbarItemProvider {
         size: ToolBarButtonSize = .normal,
         openSearchAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .search, accessibilityId: AccessibilityId.searchBtn, toolBarButtonSize: .normal) {
+        ThemedToolbarButton(icon: .search, accessibilityId: AccessibilityId.searchBtn, accessibilityLabel: L10n.Accessibility.search, toolBarButtonSize: .normal) {
             openSearchAction()
         }
     }
 
     // MARK: - Private
 
-    private static func rewardsItem(size: ToolBarButtonSize = .normal) -> some View {
-        ThemedToolbarButton(icon: .rewards, accessibilityId: AccessibilityId.rewardsBtn, toolBarButtonSize: size) {
-            log.debug("REWARDS CARD PRESSED")
-        }
-    }
-
     public static func wishlistItem(
         size: ToolBarButtonSize = .normal,
         openWishlistAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .heart, accessibilityId: AccessibilityId.wishlistBtn, toolBarButtonSize: size) {
+        ThemedToolbarButton(icon: .heart, accessibilityId: AccessibilityId.wishlistBtn, accessibilityLabel: L10n.Accessibility.wishlist, toolBarButtonSize: size) {
             openWishlistAction()
         }
     }
 
     private static func listItem(size: ToolBarButtonSize = .normal) -> some View {
-        ThemedToolbarButton(icon: .list, accessibilityId: AccessibilityId.listBtn, toolBarButtonSize: size) {
+        ThemedToolbarButton(icon: .list, accessibilityId: AccessibilityId.listBtn, accessibilityLabel: L10n.Accessibility.menu, toolBarButtonSize: size) {
             log.debug("LIST ICON PRESSED")
         }
     }
@@ -71,7 +65,7 @@ public enum ToolbarItemProvider {
         size: ToolBarButtonSize = .normal,
         openAccountAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .user, accessibilityId: AccessibilityId.accountBtn, toolBarButtonSize: size) {
+        ThemedToolbarButton(icon: .user, accessibilityId: AccessibilityId.accountBtn, accessibilityLabel: L10n.Accessibility.account, toolBarButtonSize: size) {
             openAccountAction()
         }
     }
@@ -80,7 +74,7 @@ public enum ToolbarItemProvider {
         size: ToolBarButtonSize = .normal,
         openDebugMenuAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .settings, accessibilityId: AccessibilityId.settingsBtn, toolBarButtonSize: size) {
+        ThemedToolbarButton(icon: .settings, accessibilityId: AccessibilityId.settingsBtn, accessibilityLabel: L10n.Accessibility.settings, toolBarButtonSize: size) {
             openDebugMenuAction()
         }
     }
@@ -108,7 +102,6 @@ public enum ToolbarItemProvider {
 private enum AccessibilityId {
     static let settingsBtn = "settings-btn"
     static let searchBtn = "search-btn"
-    static let rewardsBtn = "rewards-btn"
     static let wishlistBtn = "wishlist-btn"
     static let listBtn = "list-btn"
     static let accountBtn = "account-btn"

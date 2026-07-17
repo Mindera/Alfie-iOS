@@ -50,8 +50,12 @@ struct ProductListingFilter: View {
             Button(action: {
                 isVisible.toggle()
             }, label: {
-                Icon.close.image
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                ThemedIcon(
+                    .close,
+                    size: .medium,
+                    tint: Primitives.Colours.neutrals900,
+                    accessibilityLabel: L10n.Accessibility.close
+                )
             })
             Spacer()
             ThemedToolbarTitle(style: .text(L10n.Plp.RefineAndSort.title))

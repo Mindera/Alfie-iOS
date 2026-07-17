@@ -3,7 +3,6 @@ import SwiftUI
 
 private enum Constants {
     static var backgroundOpacity: CGFloat { 0.7 }
-    static let closeIconSize: CGFloat = 24
     static let closeIconBackgroundOpacity: CGFloat = 0.7
 }
 
@@ -38,12 +37,8 @@ public struct ZoomableCarousel<Content: View>: View {
                 Button(action: {
                     configuration.isPresented.wrappedValue = false
                 }, label: {
-                    Icon.close.image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Constants.closeIconSize, height: Constants.closeIconSize)
+                    ThemedIcon(.close, size: .medium, tint: Primitives.Colours.neutrals800, accessibilityLabel: L10n.Accessibility.close)
                         .padding(Primitives.Spacing.spacing4)
-                        .foregroundStyle(Primitives.Colours.neutrals800)
                         .background(Primitives.Colours.neutrals0.opacity(Constants.closeIconBackgroundOpacity))
                         .clipShape(Circle())
                 })

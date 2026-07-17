@@ -85,6 +85,7 @@ public struct Chip: View {
                         .frame(maxHeight: .infinity)
                     })
                     .disabled(configuration.isDisabled)
+                    .accessibilityLabel(Text(L10n.Accessibility.close))
                 }
             }
             .padding(.horizontal, Primitives.Spacing.spacing16)

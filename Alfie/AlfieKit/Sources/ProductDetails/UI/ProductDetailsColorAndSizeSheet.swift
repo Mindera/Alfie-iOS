@@ -58,6 +58,7 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
                         .frame(size: Constants.sheetCloseIconSize)
                         .foregroundStyle(Primitives.Colours.neutrals800)
                 }
+                .accessibilityLabel(Text(L10n.Accessibility.close))
             }
             .padding([.top, .horizontal], Primitives.Spacing.spacing16)
 

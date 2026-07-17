@@ -1,7 +1,6 @@
 import SwiftUI
 
 private enum Constants {
-    static let iconSize: CGFloat = 16
     static let frameMinHeight: CGFloat = 44
 }
 
@@ -23,12 +22,7 @@ public struct PickerMenu<Content: View>: View {
                     HStack {
                         selectedOptionView
                         Spacer()
-                        Icon.chevronDown.image
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: Constants.iconSize, height: Constants.iconSize)
-                            .tint(Primitives.Colours.neutrals800)
+                        ThemedIcon(.chevronDown, size: .small, tint: Primitives.Colours.neutrals800)
                     }
                     .padding(.horizontal, Primitives.Spacing.spacing16)
                 }
