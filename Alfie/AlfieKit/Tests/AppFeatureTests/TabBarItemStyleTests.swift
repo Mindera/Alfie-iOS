@@ -19,4 +19,12 @@ final class TabBarItemStyleTests: XCTestCase {
             TabBarItemView.Style.labelColour(isSelected: false)
         )
     }
+
+    // Selected label is bolder than unselected (the second selection affordance besides colour).
+    func test_selectedLabel_usesHeavierWeightThanUnselected() {
+        XCTAssertGreaterThan(
+            TabBarItemView.Style.labelStyle(isSelected: true).style.fontWeight,
+            TabBarItemView.Style.labelStyle(isSelected: false).style.fontWeight
+        )
+    }
 }

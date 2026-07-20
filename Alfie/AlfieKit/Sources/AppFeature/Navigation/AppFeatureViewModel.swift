@@ -154,22 +154,14 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 webDependencyContainer: webDependencyContainer
             )
         )
-        // Account tab reuses the existing MyAccount flow. Its wishlist intent renders the wishlist
-        // list; deep product navigation from there lives on the dedicated Wishlist tab.
+        // Account tab reuses the existing MyAccount flow. Tapping Wishlist routes to the dedicated
+        // Wishlist tab (wired via onSelectWishlist below), so the intent view is never rendered here.
         let myAccountFlowViewModel = MyAccountFlowViewModel(
             dependencies: MyAccountFlowDependencyContainer(myAccountDependencyContainer: myAccountDependencyContainer)
         ) { intent in
             switch intent {
             case .wishlist:
-                return AnyView(
-                    WishlistView(
-                        viewModel: WishlistViewModel(
-                            hasNavigationSeparator: true,
-                            dependencies: wishlistDependencyContainer,
-                            navigate: { _ in }
-                        )
-                    )
-                )
+                return AnyView(EmptyView())
             }
         }
 
@@ -185,6 +177,10 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         )
 
         self.appUpdateInfoConfiguration = serviceProvider.configurationService.forceAppUpdateInfo
+
+        myAccountFlowViewModel.onSelectWishlist = { [weak self] in
+            self?.rootTabViewModel.navigate(.wishlist(.wishlist))
+        }
 
         setupSubscriptions()
         WebViewPreload.preloadWebView {

@@ -30,7 +30,7 @@ struct TabBarItemView: View {
                 .frame(size: Constants.iconSize)
                 .foregroundStyle(Style.iconColour(isSelected: isSelected))
                 .badgeView(badgeValue: $badgeValue)
-            Text.build(isSelected ? theme.font.label.smallBold(tab.title) : theme.font.label.small(tab.title))
+            Text.build(Style.labelStyle(isSelected: isSelected)(tab.title))
                 .foregroundStyle(Style.labelColour(isSelected: isSelected))
         }
         .frame(maxWidth: .infinity)
@@ -55,6 +55,10 @@ struct TabBarItemView: View {
 
         static func labelColour(isSelected: Bool) -> Color {
             isSelected ? Theme.contentContentPrimary : Theme.contentContentTerciary
+        }
+
+        static func labelStyle(isSelected: Bool) -> ThemedTypographyStyle {
+            isSelected ? DesignSystem.shared.font.label.smallBold : DesignSystem.shared.font.label.small
         }
     }
 
