@@ -22,7 +22,7 @@ extension AppFeatureView {
     private func view(for screen: AppStartupScreen) -> some View {
         switch screen {
         case .loading:
-            ThemedLoaderView(labelHidden: true, labelTitle: L10n.Loading.title)
+            SplashView()
                 .transition(.opacity)
 
         case .error:
