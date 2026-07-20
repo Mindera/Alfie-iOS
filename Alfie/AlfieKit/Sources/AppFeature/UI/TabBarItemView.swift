@@ -23,7 +23,7 @@ struct TabBarItemView: View {
     var body: some View {
         let isSelected = tab == currentTab
         return VStack(spacing: Primitives.Spacing.spacing8) {
-            tab.icon.image
+            tab.icon(isSelected: isSelected).image
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
@@ -59,6 +59,6 @@ struct TabBarItemView: View {
     }
 
     private enum Constants {
-        static let iconSize: CGSize = .init(width: 24, height: 24)
+        static let iconSize: CGSize = .init(width: Sizing.iconsIconMedium, height: Sizing.iconsIconMedium)
     }
 }

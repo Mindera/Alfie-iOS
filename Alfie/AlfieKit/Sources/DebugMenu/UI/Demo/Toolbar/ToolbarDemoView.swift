@@ -158,8 +158,8 @@ struct ToolbarDemoView: View {
 
                 if mode.isMulti {
                     ThemedToolbarButton(
-                        icon: mode.isIcon && mode != .multiMixed ? .chat : nil,
-                        text: mode.isText || mode == .multiMixed ? "Chat" : nil,
+                        icon: mode.isIcon && mode != .multiMixed ? .help : nil,
+                        text: mode.isText || mode == .multiMixed ? "Help" : nil,
                         tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
                     ) {}
                 }

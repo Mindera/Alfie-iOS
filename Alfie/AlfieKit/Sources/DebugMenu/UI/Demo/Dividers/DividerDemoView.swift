@@ -68,7 +68,7 @@ struct DividerDemoView: View {
                                 ThemedDivider.verticalThin
                                 Icon.bag.image
                                 ThemedDivider.verticalThin
-                                Icon.chat.image
+                                Icon.info.image
                             }
                         }
                         ThemedDivider.verticalThick
@@ -78,9 +78,9 @@ struct DividerDemoView: View {
                             HStack {
                                 Icon.bell.image
                                 ThemedDivider.verticalThin
-                                Icon.camera.image
+                                Icon.package.image
                                 ThemedDivider.verticalThin
-                                Icon.calendar.image
+                                Icon.gift.image
                             }
                         }
                     }

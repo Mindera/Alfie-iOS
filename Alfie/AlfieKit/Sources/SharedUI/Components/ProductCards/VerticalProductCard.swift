@@ -182,6 +182,7 @@ public struct VerticalProductCard: View {
             })
             .padding([.top, .trailing], topTrailingEdgePadding)
             .accessibilityIdentifier(actionViewAccessibilityIdentifier)
+            .accessibilityLabel(Text(actionAccessibilityLabel))
         }
     }
 }
@@ -196,6 +197,17 @@ private extension VerticalProductCard {
             isFavorite ? Icon.heartFill.image : Icon.heart.image
         case .remove:
             Icon.closeCircleFill.image
+        }
+        // swiftlint:enable vertical_whitespace_between_cases
+    }
+
+    var actionAccessibilityLabel: String {
+        // swiftlint:disable vertical_whitespace_between_cases
+        switch viewModel.configuration.actionType {
+        case .wishlist:
+            return L10n.Accessibility.wishlist
+        case .remove:
+            return L10n.Accessibility.removeFromWishlist
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

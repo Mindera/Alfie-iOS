@@ -30,10 +30,7 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
                             .foregroundStyle(Primitives.Colours.neutrals800)
 
                         if isExpandable {
-                            Icon.chevronDown.image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(size: Constants.chevronSize)
+                            ThemedIcon(.chevronDown, size: .small, tint: Primitives.Colours.neutrals800)
                         }
                     }
                 }
@@ -42,8 +39,4 @@ public struct ColorAndSizingSelectorHeaderView<Swatch: ColorAndSizingSwatchProto
             .tint(Primitives.Colours.neutrals800)
         }
     }
-}
-
-private enum Constants {
-    static let chevronSize: CGFloat = 16
 }

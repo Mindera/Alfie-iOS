@@ -34,6 +34,26 @@ public extension Model.Tab {
         }
     }
 
+    // Selected tabs use the filled glyph where the design system provides one; shop has no fill variant.
+    func icon(isSelected: Bool) -> Icon {
+        guard isSelected else {
+            return icon
+        }
+        switch self {
+        case .home:
+            return .homeFill
+
+        case .bag:
+            return .bagFill
+
+        case .wishlist:
+            return .heartFill
+
+        case .shop:
+            return .store
+        }
+    }
+
     var accessibilityId: String {
         switch self {
         case .home:
