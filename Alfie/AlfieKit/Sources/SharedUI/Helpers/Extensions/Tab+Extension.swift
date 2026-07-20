@@ -27,7 +27,8 @@ public extension Model.Tab {
             .home
 
         case .shop:
-            .store
+            // Figma's Store tab uses the "menu" glyph (list + search), not the storefront.
+            .hamburguerMenu
 
         case .bag:
             .bag
@@ -59,7 +60,8 @@ public extension Model.Tab {
             return .accountFill
 
         case .shop:
-            return .store
+            // No fill variant for the store/menu glyph; keep the outline when selected.
+            return icon
         }
     }
 
