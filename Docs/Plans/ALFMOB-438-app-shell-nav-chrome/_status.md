@@ -17,6 +17,18 @@ Scope files: AppFeatureView, RootTabView, CustomTabBarView, TabBarItemView.
 - Generated design-token colours largely dormant; app renders via legacy asset-catalog Colors.*.
 - "Refactor to tokens" tickets have had stale premises before — read files first.
 
+## Post-review addition (icons)
+Reported in-app: tab icons didn't match Figma. Root cause: ALFMOB-426 iconography was on
+`main` but not in this branch (based on 437, which predates the 426 merge). Fix:
+- Merged `origin/main` in → brings `Icons.xcassets` (Tabler glyphs) + new `Icon` enum
+  (`Icon.image` → `Image(assetName, bundle:)`), and `Sizing.iconsIconMedium` for icon size.
+- Added `Model.Tab.icon(isSelected:)` in `Tab+Extension` → filled glyph on selected
+  (home/bag/wishlist have `-fill`; shop/store has no fill variant → outline).
+- OPEN: Figma "Store" glyph reads as list+magnifier; code maps shop→`.store`=`storefront`
+  (awning). Which glyph the tab uses is ALFMOB-426 vocabulary — flag for design confirmation.
+- NOTE: PR base is still 437, so the merge makes PR #97 diff noisy until 437 gets main
+  (or retarget PR base to main).
+
 ## Phase checklist
 - [x] Ticket fetched
 - [x] Branch created
