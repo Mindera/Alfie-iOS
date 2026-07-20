@@ -12,8 +12,8 @@ public struct LoadingSpinner: View {
         static let rotationDuration: Double = 1
     }
 
+    @Environment(\.theme) private var theme
     private let size: Size
-    @State private var isRotating = false
 
     public init(size: Size = .small) {
         self.size = size
@@ -28,16 +28,19 @@ public struct LoadingSpinner: View {
     }
 
     public var body: some View {
-        Image(ThemedImage.loadingSpinner.literalName, bundle: ThemedImage.loadingSpinner.bundle)
-            .resizable()
-            .scaledToFit()
-            .frame(width: dimension, height: dimension)
-            .rotationEffect(.degrees(isRotating ? 360 : 0))
-            .onAppear {
-                withAnimation(.linear(duration: Constants.rotationDuration).repeatForever(autoreverses: false)) {
-                    isRotating = true
-                }
-            }
+        // Time-driven rotation: no lifecycle state, so it restarts correctly whenever it reappears.
+        TimelineView(.animation) { context in
+            Image(ThemedImage.loadingSpinner.literalName, bundle: ThemedImage.loadingSpinner.bundle)
+                .resizable()
+                .scaledToFit()
+                .frame(width: dimension, height: dimension)
+                .rotationEffect(angle(at: context.date))
+        }
+    }
+
+    private func angle(at date: Date) -> Angle {
+        let turns = date.timeIntervalSinceReferenceDate / Constants.rotationDuration
+        return .degrees(turns.truncatingRemainder(dividingBy: 1) * 360)
     }
 }
 
