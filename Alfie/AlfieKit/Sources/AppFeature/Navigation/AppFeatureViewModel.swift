@@ -11,6 +11,7 @@ import OrderedCollections
 import ProductDetails
 import ProductListing
 import Search
+import SwiftUI
 import Utils
 import Web
 import Wishlist
@@ -55,6 +56,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         if serviceProvider.configurationService.isFeatureEnabled(.wishlist) {
             tabs.insert(.wishlist, at: 2)
         }
+
+        tabs.append(.account)
 
         let bagDependencyContainer = BagDependencyContainer(
             bagService: serviceProvider.bagService,
@@ -151,6 +154,24 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 webDependencyContainer: webDependencyContainer
             )
         )
+        // Account tab reuses the existing MyAccount flow. Its wishlist intent renders the wishlist
+        // list; deep product navigation from there lives on the dedicated Wishlist tab.
+        let myAccountFlowViewModel = MyAccountFlowViewModel(
+            dependencies: MyAccountFlowDependencyContainer(myAccountDependencyContainer: myAccountDependencyContainer)
+        ) { intent in
+            switch intent {
+            case .wishlist:
+                return AnyView(
+                    WishlistView(
+                        viewModel: WishlistViewModel(
+                            hasNavigationSeparator: true,
+                            dependencies: wishlistDependencyContainer,
+                            navigate: { _ in }
+                        )
+                    )
+                )
+            }
+        }
 
         self.rootTabViewModel = RootTabViewModel(
             tabs: tabs,
@@ -159,7 +180,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             bagFlowViewModel: bagFlowViewModel,
             categorySelectorFlowViewModel: categorySelectorFlowViewModel,
             homeFlowViewModel: homeFlowViewModel,
-            wishlistFlowViewModel: wishlistFlowViewModel
+            wishlistFlowViewModel: wishlistFlowViewModel,
+            myAccountFlowViewModel: myAccountFlowViewModel
         )
 
         self.appUpdateInfoConfiguration = serviceProvider.configurationService.forceAppUpdateInfo

@@ -3,6 +3,7 @@ import CategorySelector
 import Foundation
 import Home
 import Model
+import MyAccount
 import SwiftUI
 import Wishlist
 
@@ -22,6 +23,7 @@ public protocol RootTabViewModelProtocol: ObservableObject {
     var categorySelectorFlowViewModel: CategorySelectorFlowViewModel { get }
     var homeFlowViewModel: HomeFlowViewModel { get }
     var wishlistFlowViewModel: WishlistFlowViewModel { get }
+    var myAccountFlowViewModel: MyAccountFlowViewModel { get }
 
     func popToRoot(in tab: Model.Tab)
     func navigate(_ route: TabRoute)

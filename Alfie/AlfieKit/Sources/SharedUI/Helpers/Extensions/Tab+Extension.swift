@@ -11,10 +11,13 @@ public extension Model.Tab {
             return "Home"
 
         case .shop:
-            return "Shop"
+            return "Store"
 
         case .wishlist:
             return "Wishlist"
+
+        case .account:
+            return "Account"
         }
     }
 
@@ -31,6 +34,9 @@ public extension Model.Tab {
 
         case .wishlist:
             .heart
+
+        case .account:
+            .user
         }
     }
 
@@ -48,6 +54,9 @@ public extension Model.Tab {
 
         case .wishlist:
             return .heartFill
+
+        case .account:
+            return .accountFill
 
         case .shop:
             return .store
@@ -67,6 +76,9 @@ public extension Model.Tab {
 
         case .wishlist:
             "wishlist-tab"
+
+        case .account:
+            "account-tab"
         }
     }
 }
