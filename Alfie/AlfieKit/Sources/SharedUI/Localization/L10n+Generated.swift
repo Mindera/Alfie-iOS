@@ -85,7 +85,7 @@ public enum L10n {
       }
     }
     public enum SearchBar {
-      /// Search Alfie
+      /// What are you looking for?
       public static let placeholder = L10n.tr("L10n", "home.search_bar.placeholder")
     }
     public enum SignIn {
