@@ -29,7 +29,8 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                 viewModel.didTapSearch()
             }
             .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.top, Primitives.Spacing.spacing8)
+            .padding(.bottom, Primitives.Spacing.spacing16)
 
             ScrollView {
                 VStack(spacing: Primitives.Spacing.spacing0) {
