@@ -15,24 +15,26 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: Primitives.Spacing.spacing0) {
-                ThemedSearchBarView(
-                    searchText: .constant(""),
-                    placeholder: L10n.Home.SearchBar.placeholder,
-                    theme: .soft,
-                    dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.cancelButton),
-                    inputAccessibilityId: AccessibilityID.searchInput
-                )
-                .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
-                .disabled(true)
-                .onTapGesture {
-                    viewModel.didTapSearch()
-                }
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.vertical, Primitives.Spacing.spacing8)
+        VStack(spacing: Primitives.Spacing.spacing0) {
+            ThemedSearchBarView(
+                searchText: .constant(""),
+                placeholder: L10n.Home.SearchBar.placeholder,
+                theme: .soft,
+                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.cancelButton),
+                inputAccessibilityId: AccessibilityID.searchInput
+            )
+            .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
+            .disabled(true)
+            .onTapGesture {
+                viewModel.didTapSearch()
+            }
+            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.vertical, Primitives.Spacing.spacing8)
 
-                HomeHeroCarouselView(banners: viewModel.heroBanners)
+            ScrollView {
+                VStack(spacing: Primitives.Spacing.spacing0) {
+                    HomeHeroCarouselView(banners: viewModel.heroBanners)
+                }
             }
         }
         .toolbarView(
