@@ -66,7 +66,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         )
         let myAccountDependencyContainer = MyAccountDependencyContainer(
             configurationService: serviceProvider.configurationService,
-            sessionService: serviceProvider.sessionService
+            sessionService: serviceProvider.sessionService,
+            apiEndpointService: serviceProvider.apiEndpointService
         )
         let productDetailsDependencyContainer = ProductDetailsDependencyContainer(
             productService: serviceProvider.productService,

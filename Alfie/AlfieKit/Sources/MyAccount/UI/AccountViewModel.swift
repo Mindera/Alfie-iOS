@@ -1,14 +1,18 @@
 import Combine
+import DebugMenu
 import Foundation
 import Model
 import SharedUI
+import SwiftUI
 
 public final class AccountViewModel: AccountViewModelProtocol {
     private let configurationService: ConfigurationServiceProtocol
     private let sessionService: SessionServiceProtocol
+    private let apiEndpointService: ApiEndpointServiceProtocol
     private let navigate: (MyAccountRoute) -> Void
     private var subscriptions: Set<AnyCancellable> = []
     @Published public private(set) var sectionList: [AccountSection] = []
+    @Published public var fullScreenCover: AnyView?
 
     public init(
         dependencies: MyAccountDependencyContainer,
@@ -16,6 +20,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
     ) {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
+        self.apiEndpointService = dependencies.apiEndpointService
         self.navigate = navigate
 
         setupBindings()
@@ -34,6 +39,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
                 .wallet,
                 .myAddressBook,
                 featureAvailability[.wishlist] != nil ? .wishlist : nil,
+                .settings,
                 isUserSignedIn ? .signOut : .signIn,
             ]
             .compactMap { $0 }
@@ -51,5 +57,23 @@ public final class AccountViewModel: AccountViewModelProtocol {
 
     public func didTapSignOut() {
         sessionService.signOutUser()
+    }
+
+    public func didTapSettings() {
+        fullScreenCover = AnyView(
+            DebugMenuView(
+                viewModel: DebugMenuViewModel(
+                    configurationService: configurationService,
+                    apiEndpointService: apiEndpointService,
+                    closeMenuAction: { [weak self] in self?.fullScreenCover = nil },
+                    openForceAppUpdate: { [weak self] in
+                        if let configuration = self?.configurationService.forceAppUpdateInfo {
+                            self?.fullScreenCover = AnyView(ForceAppUpdateView(configuration: configuration))
+                        }
+                    },
+                    closeEndpointSelection: { [weak self] in self?.fullScreenCover = nil }
+                )
+            )
+        )
     }
 }

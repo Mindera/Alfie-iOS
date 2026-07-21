@@ -4,6 +4,7 @@ public enum AccountSection: CaseIterable {
     case myAddressBook
     case myDetails
     case myOrders
+    case settings
     case signIn
     case signOut
     case wallet
@@ -17,6 +18,8 @@ public enum AccountSection: CaseIterable {
             "My Details"
         case .myOrders:
             "My Orders"
+        case .settings:
+            "Settings"
         case .signIn:
             "Sign In"
         case .signOut:
@@ -37,6 +40,8 @@ public enum AccountSection: CaseIterable {
             Icon.user
         case .myOrders:
             Icon.store
+        case .settings:
+            Icon.settings
         case .signIn:
             Icon.logIn
         case .signOut:

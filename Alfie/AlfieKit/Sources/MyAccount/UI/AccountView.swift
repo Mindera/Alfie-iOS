@@ -31,6 +31,14 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         }
         .padding(.horizontal, Primitives.Spacing.spacing16)
         .toolbarView()
+        .fullScreenCover(
+            isPresented: Binding(
+                get: { viewModel.fullScreenCover != nil },
+                set: { if !$0 { viewModel.fullScreenCover = nil } }
+            )
+        ) {
+            viewModel.fullScreenCover
+        }
     }
 
     private func navigateToSection(_ section: AccountSection) {
@@ -43,6 +51,9 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
 
         case .signOut:
             viewModel.didTapSignOut()
+
+        case .settings:
+            viewModel.didTapSettings()
 
         case .myAddressBook,
              .myDetails, // swiftlint:disable:this indentation_width
@@ -58,6 +69,7 @@ private enum AccessibilityId { // TODO: Move to a seperate model and see where w
     static let addressBookSection = "address-book-section"
     static let myDetailsSection = "my-details-section"
     static let myOrdersSection = "my-orders-section"
+    static let settingsSection = "settings-section"
     static let signInSection = "sign-in-section"
     static let signOutSection = "sign-out-section"
     static let walletSection = "wallet-section"
@@ -74,6 +86,8 @@ private extension AccountSection {
             AccessibilityId.myDetailsSection
         case .myOrders:
             AccessibilityId.myOrdersSection
+        case .settings:
+            AccessibilityId.settingsSection
         case .signIn:
             AccessibilityId.signInSection
         case .signOut:
@@ -93,7 +107,8 @@ private extension AccountSection {
         viewModel: AccountViewModel(
             dependencies: .init(
                 configurationService: MockConfigurationService(),
-                sessionService: MockSessionService()
+                sessionService: MockSessionService(),
+                apiEndpointService: MockApiEndpointService()
             )
         ) { _ in
         }
