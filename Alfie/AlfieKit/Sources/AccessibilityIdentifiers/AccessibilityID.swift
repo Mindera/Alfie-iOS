@@ -19,6 +19,16 @@ public enum AccessibilityID {
         public static let screen = "splash.screen"
     }
 
+    // MARK: - TabBar
+
+    public enum TabBar {
+        public static let home = "home-tab"
+        public static let shop = "shop-tab"
+        public static let bag = "bag-tab"
+        public static let wishlist = "wishlist-tab"
+        public static let account = "account-tab"
+    }
+
     // MARK: - ProductDetails
 
     public enum ProductDetails {

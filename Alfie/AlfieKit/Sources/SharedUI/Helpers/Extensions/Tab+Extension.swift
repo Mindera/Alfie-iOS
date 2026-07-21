@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Foundation
 import Model
 
@@ -68,19 +69,19 @@ public extension Model.Tab {
     var accessibilityId: String {
         switch self {
         case .home:
-            "home-tab"
+            AccessibilityID.TabBar.home
 
         case .shop:
-            "shop-tab"
+            AccessibilityID.TabBar.shop
 
         case .bag:
-            "bag-tab"
+            AccessibilityID.TabBar.bag
 
         case .wishlist:
-            "wishlist-tab"
+            AccessibilityID.TabBar.wishlist
 
         case .account:
-            "account-tab"
+            AccessibilityID.TabBar.account
         }
     }
 }

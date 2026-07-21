@@ -278,6 +278,7 @@ let package = Package(
         .target(
             name: "SharedUI",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Mocks",
                 "Model",
