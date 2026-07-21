@@ -213,6 +213,9 @@ let package = Package(
                 "SharedUI",
                 "Web",
                 "Wishlist",
+            ],
+            resources: [
+                .process("Resources/HomeAssets.xcassets")
             ]
         ),
 
@@ -238,6 +241,7 @@ let package = Package(
         .target(
             name: "MyAccount",
             dependencies: [
+                "DebugMenu",
                 "Model",
                 "SharedUI",
             ]

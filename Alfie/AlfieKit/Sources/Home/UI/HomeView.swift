@@ -15,44 +15,29 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack {
-            ThemedSearchBarView(
-                searchText: .constant(""),
-                placeholder: L10n.Home.SearchBar.placeholder,
-                theme: .soft,
-                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.cancelButton),
-                inputAccessibilityId: AccessibilityID.searchInput
-            )
-            .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
-            .disabled(true)
-            .onTapGesture {
-                viewModel.didTapSearch()
+        ScrollView {
+            VStack(spacing: Primitives.Spacing.spacing0) {
+                ThemedSearchBarView(
+                    searchText: .constant(""),
+                    placeholder: L10n.Home.SearchBar.placeholder,
+                    theme: .soft,
+                    dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.cancelButton),
+                    inputAccessibilityId: AccessibilityID.searchInput
+                )
+                .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
+                .disabled(true)
+                .onTapGesture {
+                    viewModel.didTapSearch()
+                }
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.vertical, Primitives.Spacing.spacing8)
+
+                HomeHeroCarouselView(banners: viewModel.heroBanners)
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.vertical, Primitives.Spacing.spacing8)
-
-            Spacer()
-
-            Icon.home.image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 75)
-            Text.build(theme.font.heading.small(viewModel.homeTitle))
-            ThemedButton(text: viewModel.signInButtonText) {
-                viewModel.didTapSignInButton()
-            }
-
-            Spacer()
         }
         .toolbarView(
             username: viewModel.username,
-            memberSince: viewModel.memberSince,
-            openDebugAction: {
-                viewModel.didTapDebugMenu()
-            },
-            openMyAccountAction: {
-                viewModel.didTapMyAccount()
-            }
+            memberSince: viewModel.memberSince
         )
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(

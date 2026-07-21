@@ -7,6 +7,7 @@ public class MockHomeViewModel: HomeViewModelProtocol {
     public var signInButtonText: String = "Sign in"
     public var username: String?
     public var memberSince: Int?
+    public var heroBanners: [HomeHeroBanner] = HomeHeroBanner.placeholders
     public var fullScreenCover: AnyView?
 
     public var onDidTapSignInButtonCalled: (() -> Void)?

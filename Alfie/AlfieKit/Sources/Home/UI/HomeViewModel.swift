@@ -29,6 +29,9 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         isUserSignedIn ? 2024 : nil
     }
 
+    // TODO: Replace with BFF-provided home content when the API is ready.
+    public var heroBanners: [HomeHeroBanner] { HomeHeroBanner.placeholders }
+
     @Published public var fullScreenCover: AnyView?
 
     init(

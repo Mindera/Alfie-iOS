@@ -4,7 +4,8 @@ import SwiftUI
 public struct ThemedToolbarTitle: View {
     private enum Constants {
         static let logoWidth = 100.0
-        static let logoHeight = 23.2
+        // MINDERA/ALFIE wordmark aspect (160x49) → height at 100pt wide.
+        static let logoHeight = 30.6
         static let titleFontSize = 18.0
     }
 
@@ -27,7 +28,7 @@ public struct ThemedToolbarTitle: View {
     public var body: some View {
         switch style {
         case .logo:
-            Image("Logo")
+            Image(ThemedImage.splashLogo.literalName, bundle: ThemedImage.splashLogo.bundle)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()

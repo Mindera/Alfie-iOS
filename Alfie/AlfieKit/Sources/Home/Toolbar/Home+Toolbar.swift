@@ -6,14 +6,13 @@ extension View {
     @ViewBuilder
     func toolbarView(
         username: String?,
-        memberSince: Int?,
-        openDebugAction: @escaping () -> Void,
-        openMyAccountAction: @escaping () -> Void
+        memberSince: Int?
     ) -> some View {
         self.modifier(
             DefaultToolbarModifier(
                 hasDivider: false,
                 leadingItems: {
+                    // Signed-in personalization stays leading; signed-out shows the centered logo (principal).
                     if let username, let memberSince {
                         ThemedToolbarTitle(
                             style: .leftText(
@@ -22,27 +21,14 @@ extension View {
                             ),
                             accessibilityId: AccessibilityID.titleHeader
                         )
-                    } else {
-                        ThemedToolbarTitle(style: .logo, accessibilityId: AccessibilityID.titleHeader)
                     }
                 },
                 principalItems: {
-                    Spacer()
+                    if username == nil || memberSince == nil {
+                        ThemedToolbarTitle(style: .logo, accessibilityId: AccessibilityID.titleHeader)
+                    }
                 },
-                trailingItems: {
-                    // TODO: Remove debug menu for production releases
-                    ToolbarItemProvider.debugMenuItem(size: .big) {
-                        openDebugAction()
-                    }
-
-                    ThemedToolbarButton(
-                        icon: .user,
-                        accessibilityId: AccessibilityID.accountBtn,
-                        toolBarButtonSize: .big
-                    ) {
-                        openMyAccountAction()
-                    }
-                }
+                trailingItems: {}
             )
         )
     }
@@ -51,6 +37,5 @@ extension View {
 // MARK: - AccessibilityId
 
 private enum AccessibilityID {
-    static let accountBtn = "account-btn"
     static let titleHeader = "title-header"
 }

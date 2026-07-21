@@ -6,6 +6,7 @@ public protocol HomeViewModelProtocol: ObservableObject {
     var signInButtonText: String { get }
     var username: String? { get }
     var memberSince: Int? { get }
+    var heroBanners: [HomeHeroBanner] { get }
     var fullScreenCover: AnyView? { get set }
 
     func didTapSignInButton()
