@@ -64,6 +64,7 @@ struct HomeHeroBannerView: View {
                         pageDot(isSelected: index == currentIndex)
                     }
                 }
+                .accessibilityHidden(true) // Decorative page indicator; paging is exposed via the TabView.
             }
         }
         .padding(Primitives.Spacing.spacing16)

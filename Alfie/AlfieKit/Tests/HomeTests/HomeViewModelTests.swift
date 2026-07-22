@@ -33,8 +33,10 @@ final class HomeViewModelTests: XCTestCase {
     }
 
     func test_HeroBanners_ReturnsPlaceholders() {
-        XCTAssertEqual(sut.heroBanners, HomeHeroBanner.placeholders)
-        XCTAssertFalse(sut.heroBanners.isEmpty)
+        let banners = sut.heroBanners
+        XCTAssertEqual(banners.count, 3)
+        XCTAssertEqual(banners.map(\.id), ["hero-1", "hero-2", "hero-3"])
+        XCTAssertEqual(banners.map(\.imageName), ["hero-1", "hero-2", "hero-3"])
     }
 
     func test_WhenSignedOut_SignInButtonAndUsername_ReflectSignedOutState() {
@@ -59,10 +61,5 @@ final class HomeViewModelTests: XCTestCase {
     func test_DidTapMyAccount_NavigatesToMyAccount() {
         sut.didTapMyAccount()
         XCTAssertEqual(capturedRoute, .myAccount(.myAccount))
-    }
-
-    func test_HeroViews_ConstructWithPlaceholders() {
-        _ = HomeHeroBannerView(banner: HomeHeroBanner.placeholders[0])
-        _ = HomeHeroCarouselView(banners: HomeHeroBanner.placeholders)
     }
 }

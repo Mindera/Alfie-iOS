@@ -39,6 +39,12 @@ struct HomeHeroCarouselView: View {
         }
         .aspectRatio(Constants.aspectRatio, contentMode: .fit)
         .frame(maxWidth: .infinity)
+        .onChange(of: banners) { newBanners in
+            // Keep the selection valid if the banner set changes (e.g. once BFF content replaces mocks).
+            if !newBanners.contains(where: { $0.id == selectedID }) {
+                selectedID = newBanners.first?.id ?? ""
+            }
+        }
     }
 }
 
