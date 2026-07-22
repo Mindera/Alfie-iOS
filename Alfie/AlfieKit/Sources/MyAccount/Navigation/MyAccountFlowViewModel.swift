@@ -6,6 +6,8 @@ public final class MyAccountFlowViewModel: ObservableObject, FlowViewModelProtoc
     @Published public var path = NavigationPath()
     private let dependencies: MyAccountFlowDependencyContainer
     let intentViewBuilder: (MyAccountIntent) -> AnyView
+    /// When set, tapping Wishlist routes to the dedicated Wishlist tab instead of pushing it here.
+    public var onSelectWishlist: (() -> Void)?
 
     public init(
         dependencies: MyAccountFlowDependencyContainer,
@@ -26,6 +28,10 @@ public final class MyAccountFlowViewModel: ObservableObject, FlowViewModelProtoc
     // MARK: - FlowViewModelProtocol
 
     public func navigate(_ route: MyAccountRoute) {
+        if case .myAccountIntent(.wishlist) = route, let onSelectWishlist {
+            onSelectWishlist()
+            return
+        }
         if case .myAccount = route {
             popToRoot()
         } else {

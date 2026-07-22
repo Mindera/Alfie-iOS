@@ -5,4 +5,5 @@ public enum Tab: Int, Hashable {
     case home
     case shop
     case wishlist
+    case account
 }

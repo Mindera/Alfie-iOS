@@ -45,7 +45,7 @@ final class AlfieUITests: XCTestCase {
         var expectedProductName = ""
 
         XCTContext.runActivity(named: "Open the Shop tab") { _ in
-            let shopTab = app.otherElements["shop-tab"]
+            let shopTab = app.otherElements[AccessibilityID.TabBar.shop]
             waitFor(shopTab, "Shop tab should exist")
             shopTab.tap()
         }
@@ -87,7 +87,7 @@ final class AlfieUITests: XCTestCase {
         }
 
         XCTContext.runActivity(named: "Open the Bag tab") { _ in
-            let bagTab = app.otherElements["bag-tab"]
+            let bagTab = app.otherElements[AccessibilityID.TabBar.bag]
             waitFor(bagTab, "Bag tab should exist")
             bagTab.tap()
         }

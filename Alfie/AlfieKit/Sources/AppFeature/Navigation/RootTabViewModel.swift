@@ -4,6 +4,7 @@ import Combine
 import Foundation
 import Home
 import Model
+import MyAccount
 import SwiftUI
 import Wishlist
 
@@ -25,6 +26,7 @@ WishlistFlowVM.Route == WishlistRoute {
     public let categorySelectorFlowViewModel: CategorySelectorVM
     public let homeFlowViewModel: HomeFlowVM
     public let wishlistFlowViewModel: WishlistFlowVM
+    public let myAccountFlowViewModel: MyAccountFlowViewModel
     @Published public private(set) var overlayView: AnyView?
     @Published public var isOverlayVisible = false
     @Published public var isReadyForNavigation = false
@@ -37,7 +39,8 @@ WishlistFlowVM.Route == WishlistRoute {
         bagFlowViewModel: BagFlowVM,
         categorySelectorFlowViewModel: CategorySelectorVM,
         homeFlowViewModel: HomeFlowVM,
-        wishlistFlowViewModel: WishlistFlowVM
+        wishlistFlowViewModel: WishlistFlowVM,
+        myAccountFlowViewModel: MyAccountFlowViewModel
     ) {
         guard tabs.contains(initialTab) else {
             fatalError("Initial tab \(initialTab) does not exist in the list of tabs \(tabs)")
@@ -50,6 +53,7 @@ WishlistFlowVM.Route == WishlistRoute {
         self.categorySelectorFlowViewModel = categorySelectorFlowViewModel
         self.homeFlowViewModel = homeFlowViewModel
         self.wishlistFlowViewModel = wishlistFlowViewModel
+        self.myAccountFlowViewModel = myAccountFlowViewModel
 
         setupBindings()
     }
@@ -67,6 +71,9 @@ WishlistFlowVM.Route == WishlistRoute {
 
         case .wishlist:
             wishlistFlowViewModel.popToRoot()
+
+        case .account:
+            myAccountFlowViewModel.popToRoot()
         }
     }
 
@@ -87,6 +94,9 @@ WishlistFlowVM.Route == WishlistRoute {
 
         case .wishlist(let wishlistRoute):
             wishlistFlowViewModel.navigate(wishlistRoute)
+
+        case .account(let myAccountRoute):
+            myAccountFlowViewModel.navigate(myAccountRoute)
         }
     }
 

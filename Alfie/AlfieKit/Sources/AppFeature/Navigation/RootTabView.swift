@@ -3,6 +3,7 @@ import CategorySelector
 import Foundation
 import Home
 import Model
+import MyAccount
 import Search
 import SharedUI
 import SwiftUI
@@ -36,6 +37,10 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
 
                     case .wishlist:
                         WishlistFlowView(viewModel: viewModel.wishlistFlowViewModel)
+                            .environment(\.tabBarSize, tabBarSize)
+
+                    case .account:
+                        MyAccountFlowView(viewModel: viewModel.myAccountFlowViewModel)
                             .environment(\.tabBarSize, tabBarSize)
                     }
                 }

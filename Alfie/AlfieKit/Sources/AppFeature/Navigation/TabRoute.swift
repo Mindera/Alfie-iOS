@@ -3,6 +3,7 @@ import CategorySelector
 import Foundation
 import Home
 import Model
+import MyAccount
 import Wishlist
 
 public enum TabRoute: Hashable {
@@ -10,6 +11,7 @@ public enum TabRoute: Hashable {
     case bag(BagRoute)
     case shop(CategorySelectorRoute)
     case wishlist(WishlistRoute)
+    case account(MyAccountRoute)
 }
 
 extension TabRoute {
@@ -26,6 +28,9 @@ extension TabRoute {
 
         case .wishlist:
             return .wishlist
+
+        case .account:
+            return .account
         }
     }
 }

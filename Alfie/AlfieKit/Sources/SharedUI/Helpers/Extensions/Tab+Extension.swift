@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Foundation
 import Model
 
@@ -11,10 +12,13 @@ public extension Model.Tab {
             return "Home"
 
         case .shop:
-            return "Shop"
+            return "Store"
 
         case .wishlist:
             return "Wishlist"
+
+        case .account:
+            return "Account"
         }
     }
 
@@ -24,29 +28,60 @@ public extension Model.Tab {
             .home
 
         case .shop:
-            .store
+            // Figma's Store tab uses the "menu" glyph (list + search), not the storefront.
+            .hamburguerMenu
 
         case .bag:
             .bag
 
         case .wishlist:
             .heart
+
+        case .account:
+            .user
+        }
+    }
+
+    // Selected tabs use the filled glyph where the design system provides one; shop has no fill variant.
+    func icon(isSelected: Bool) -> Icon {
+        guard isSelected else {
+            return icon
+        }
+        switch self {
+        case .home:
+            return .homeFill
+
+        case .bag:
+            return .bagFill
+
+        case .wishlist:
+            return .heartFill
+
+        case .account:
+            return .accountFill
+
+        case .shop:
+            // No fill variant for the store/menu glyph; keep the outline when selected.
+            return icon
         }
     }
 
     var accessibilityId: String {
         switch self {
         case .home:
-            "home-tab"
+            AccessibilityID.TabBar.home
 
         case .shop:
-            "shop-tab"
+            AccessibilityID.TabBar.shop
 
         case .bag:
-            "bag-tab"
+            AccessibilityID.TabBar.bag
 
         case .wishlist:
-            "wishlist-tab"
+            AccessibilityID.TabBar.wishlist
+
+        case .account:
+            AccessibilityID.TabBar.account
         }
     }
 }
