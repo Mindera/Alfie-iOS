@@ -38,10 +38,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                 }
             }
         }
-        .toolbarView(
-            username: viewModel.username,
-            memberSince: viewModel.memberSince
-        )
+        .toolbarView()
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(
             isPresented: Binding(
