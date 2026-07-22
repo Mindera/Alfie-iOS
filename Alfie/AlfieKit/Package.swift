@@ -203,6 +203,7 @@ let package = Package(
         .target(
             name: "Home",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "DebugMenu",
                 "Model",
@@ -241,6 +242,7 @@ let package = Package(
         .target(
             name: "MyAccount",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "DebugMenu",
                 "Model",
                 "SharedUI",

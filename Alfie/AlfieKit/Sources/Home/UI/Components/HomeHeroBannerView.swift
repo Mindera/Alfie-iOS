@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -65,7 +66,7 @@ struct HomeHeroBannerView: View {
                     Text.build(theme.font.link.medium(banner.ctaTitle, underline: true))
                         .foregroundStyle(Theme.contentContentInvertedPrimary)
                 }
-                .accessibilityIdentifier(AccessibilityID.cta)
+                .accessibilityIdentifier(AccessibilityID.Home.heroCTA)
             }
 
             if pageCount > 1 {
@@ -92,10 +93,6 @@ struct HomeHeroBannerView: View {
                 .frame(width: Constants.inactiveDotDiameter, height: Constants.inactiveDotDiameter)
         }
     }
-}
-
-private enum AccessibilityID {
-    static let cta = "hero-cta"
 }
 
 #if DEBUG

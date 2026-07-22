@@ -57,4 +57,16 @@ public enum AccessibilityID {
             "productListing.row.\(id)"
         }
     }
+
+    // MARK: - Home
+
+    public enum Home {
+        public static let heroCTA = "home.hero.cta.button"
+    }
+
+    // MARK: - Account
+
+    public enum Account {
+        public static let settingsSection = "account.settings.section"
+    }
 }

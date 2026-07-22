@@ -19,7 +19,7 @@ public enum AccountSection: CaseIterable {
         case .myOrders:
             "My Orders"
         case .settings:
-            "Settings"
+            L10n.Account.settings
         case .signIn:
             "Sign In"
         case .signOut:

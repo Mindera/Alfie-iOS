@@ -10,27 +10,32 @@ struct HomeHeroCarouselView: View {
 
     private let banners: [HomeHeroBanner]
     private let onTapCTA: (HomeHeroBanner) -> Void
-    @State private var selectedIndex = 0
+    @State private var selectedID: String
 
     init(banners: [HomeHeroBanner], onTapCTA: @escaping (HomeHeroBanner) -> Void = { _ in }) {
         self.banners = banners
         self.onTapCTA = onTapCTA
+        _selectedID = State(initialValue: banners.first?.id ?? "")
+    }
+
+    private var currentIndex: Int {
+        banners.firstIndex { $0.id == selectedID } ?? 0
     }
 
     var body: some View {
         // Bound the paged TabView to an explicit height so each page's bottom overlay isn't clipped.
         GeometryReader { proxy in
-            TabView(selection: $selectedIndex) {
-                ForEach(Array(banners.enumerated()), id: \.element.id) { index, banner in
+            TabView(selection: $selectedID) {
+                ForEach(banners) { banner in
                     HomeHeroBannerView(
                         banner: banner,
                         pageCount: banners.count,
-                        currentIndex: selectedIndex,
+                        currentIndex: currentIndex,
                         size: proxy.size
                     ) {
                         onTapCTA(banner)
                     }
-                    .tag(index)
+                    .tag(banner.id)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))

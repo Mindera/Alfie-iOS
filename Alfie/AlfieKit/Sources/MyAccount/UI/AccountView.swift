@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import SharedUI
 import SwiftUI
 #if DEBUG
@@ -69,7 +70,6 @@ private enum AccessibilityId { // TODO: Move to a seperate model and see where w
     static let addressBookSection = "address-book-section"
     static let myDetailsSection = "my-details-section"
     static let myOrdersSection = "my-orders-section"
-    static let settingsSection = "settings-section"
     static let signInSection = "sign-in-section"
     static let signOutSection = "sign-out-section"
     static let walletSection = "wallet-section"
@@ -87,7 +87,7 @@ private extension AccountSection {
         case .myOrders:
             AccessibilityId.myOrdersSection
         case .settings:
-            AccessibilityId.settingsSection
+            AccessibilityID.Account.settingsSection
         case .signIn:
             AccessibilityId.signInSection
         case .signOut:
