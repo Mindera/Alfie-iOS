@@ -11,7 +11,7 @@ public enum SettingsViewFactory {
     public static func make(
         configurationService: ConfigurationServiceProtocol,
         apiEndpointService: ApiEndpointServiceProtocol,
-        present: @escaping (AnyView?) -> Void
+        present: @escaping PresentCover
     ) -> AnyView {
         AnyView(
             DebugMenuView(

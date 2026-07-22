@@ -31,7 +31,7 @@ struct HomeHeroBannerView: View {
 
     var body: some View {
         // Explicit page-sized frame + clip first, so the image can't grow past the page and the
-        // bottom-left overlay (title, CTA, dots) always stays inside the visible bounds.
+        // bottom-left overlay (title, dots) always stays inside the visible bounds.
         Image(banner.imageName, bundle: .module)
             .resizable()
             .scaledToFill()

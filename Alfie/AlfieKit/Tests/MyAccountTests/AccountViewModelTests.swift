@@ -5,6 +5,7 @@ import XCTest
 
 final class AccountViewModelTests: XCTestCase {
     private var mockSessionService: MockSessionService!
+    private var capturedPresent: PresentCover?
     private var sut: AccountViewModel!
 
     override func setUp() {
@@ -14,7 +15,10 @@ final class AccountViewModelTests: XCTestCase {
             dependencies: MyAccountDependencyContainer(
                 configurationService: MockConfigurationService(),
                 sessionService: mockSessionService,
-                makeSettingsView: { _ in AnyView(EmptyView()) }
+                makeSettingsView: { [weak self] present in
+                    self?.capturedPresent = present
+                    return AnyView(EmptyView())
+                }
             ),
             navigate: { _ in }
         )
@@ -23,6 +27,7 @@ final class AccountViewModelTests: XCTestCase {
     override func tearDown() {
         sut = nil
         mockSessionService = nil
+        capturedPresent = nil
         super.tearDown()
     }
 
@@ -46,5 +51,14 @@ final class AccountViewModelTests: XCTestCase {
         XCTAssertNil(sut.fullScreenCover)
         sut.didTapSettings()
         XCTAssertNotNil(sut.fullScreenCover)
+    }
+
+    func test_DidTapSettings_PresentNil_DismissesFullScreenCover() {
+        sut.didTapSettings()
+        XCTAssertNotNil(sut.fullScreenCover)
+
+        capturedPresent?(nil)
+
+        XCTAssertNil(sut.fullScreenCover)
     }
 }

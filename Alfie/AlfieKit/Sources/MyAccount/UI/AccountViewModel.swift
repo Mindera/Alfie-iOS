@@ -7,7 +7,7 @@ import SwiftUI
 public final class AccountViewModel: AccountViewModelProtocol {
     private let configurationService: ConfigurationServiceProtocol
     private let sessionService: SessionServiceProtocol
-    private let makeSettingsView: (@escaping (AnyView?) -> Void) -> AnyView
+    private let makeSettingsView: (@escaping PresentCover) -> AnyView
     private let navigate: (MyAccountRoute) -> Void
     private var subscriptions: Set<AnyCancellable> = []
     @Published public private(set) var sectionList: [AccountSection] = []

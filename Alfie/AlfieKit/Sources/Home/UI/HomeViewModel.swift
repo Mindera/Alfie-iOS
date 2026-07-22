@@ -21,14 +21,6 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         isUserSignedIn ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta
     }
 
-    public var username: String? {
-        isUserSignedIn ? "Alfie" : nil
-    }
-
-    public var memberSince: Int? {
-        isUserSignedIn ? 2024 : nil
-    }
-
     // TODO: Replace with BFF-provided home content when the API is ready.
     public var heroBanners: [HomeHeroBanner] { HomeHeroBanner.placeholders }
 

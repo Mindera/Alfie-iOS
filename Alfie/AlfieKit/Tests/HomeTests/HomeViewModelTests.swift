@@ -39,18 +39,14 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(banners.map(\.imageName), ["hero-1", "hero-2", "hero-3"])
     }
 
-    func test_WhenSignedOut_SignInButtonAndUsername_ReflectSignedOutState() {
+    func test_WhenSignedOut_SignInButtonText_ReflectsSignedOutState() {
         XCTAssertEqual(sut.signInButtonText, L10n.Home.SignIn.Button.cta)
-        XCTAssertNil(sut.username)
-        XCTAssertNil(sut.memberSince)
     }
 
-    func test_WhenSignIn_SignInButtonAndUsername_ReflectSignedInState() {
+    func test_WhenSignedIn_SignInButtonText_ReflectsSignedInState() {
         mockSessionService.signInUser()
 
         XCTAssertEqual(sut.signInButtonText, L10n.Home.SignOut.Button.cta)
-        XCTAssertNotNil(sut.username)
-        XCTAssertNotNil(sut.memberSince)
     }
 
     func test_DidTapSearch_CallsShowSearch() {
