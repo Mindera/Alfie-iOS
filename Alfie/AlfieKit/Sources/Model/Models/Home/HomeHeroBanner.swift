@@ -6,37 +6,32 @@ public struct HomeHeroBanner: Equatable, Identifiable, Hashable {
     public let id: String
     public let imageName: String
     public let title: String
-    public let ctaTitle: String
 
-    public init(id: String, imageName: String, title: String, ctaTitle: String) {
+    public init(id: String, imageName: String, title: String) {
         self.id = id
         self.imageName = imageName
         self.title = title
-        self.ctaTitle = ctaTitle
     }
 }
 
 public extension HomeHeroBanner {
     /// Placeholder slides shown until the BFF provides home content. Image names match the Home
-    /// module's `HomeAssets` catalog; titles/CTA stand in for server-driven copy (not L10n chrome).
+    /// module's `HomeAssets` catalog; titles stand in for server-driven copy (not L10n chrome).
     static let placeholders: [HomeHeroBanner] = [
         .init(
             id: "hero-1",
             imageName: "hero-1",
-            title: "Transcending Trends\nfor Breezy Nights",
-            ctaTitle: "Explore Collection"
+            title: "Transcending Trends\nfor Breezy Nights"
         ),
         .init(
             id: "hero-2",
             imageName: "hero-2",
-            title: "Effortless Layers\nfor Cooler Days",
-            ctaTitle: "Explore Collection"
+            title: "Effortless Layers\nfor Cooler Days"
         ),
         .init(
             id: "hero-3",
             imageName: "hero-3",
-            title: "Timeless Pieces\nMade to Last",
-            ctaTitle: "Explore Collection"
+            title: "Timeless Pieces\nMade to Last"
         ),
     ]
 }

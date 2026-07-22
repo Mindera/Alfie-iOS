@@ -1,9 +1,8 @@
-import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
 
-/// A single full-bleed hero slide: image + bottom scrim + overlay (title, CTA, page dots), bottom-left.
+/// A single full-bleed hero slide: image + bottom scrim + overlay (title, page dots), bottom-left.
 struct HomeHeroBannerView: View {
     private enum Constants {
         static let scrimOpacity: CGFloat = 0.5
@@ -17,20 +16,17 @@ struct HomeHeroBannerView: View {
     private let pageCount: Int
     private let currentIndex: Int
     private let size: CGSize
-    private let onTapCTA: () -> Void
 
     init(
         banner: HomeHeroBanner,
         pageCount: Int = 1,
         currentIndex: Int = 0,
-        size: CGSize = CGSize(width: 375, height: 500),
-        onTapCTA: @escaping () -> Void = {}
+        size: CGSize = CGSize(width: 375, height: 500)
     ) {
         self.banner = banner
         self.pageCount = pageCount
         self.currentIndex = currentIndex
         self.size = size
-        self.onTapCTA = onTapCTA
     }
 
     var body: some View {
@@ -41,6 +37,7 @@ struct HomeHeroBannerView: View {
             .scaledToFill()
             .frame(width: size.width, height: size.height)
             .clipped()
+            .accessibilityHidden(true) // Decorative; the overlaid title carries the meaning.
             .overlay {
                 LinearGradient(
                     stops: [
@@ -57,17 +54,9 @@ struct HomeHeroBannerView: View {
 
     private var overlayContent: some View {
         VStack(alignment: .leading, spacing: Primitives.Spacing.spacing24) {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
-                Text.build(theme.font.display.medium(banner.title))
-                    .foregroundStyle(Theme.contentContentInvertedPrimary)
-                    .multilineTextAlignment(.leading)
-
-                Button(action: onTapCTA) {
-                    Text.build(theme.font.link.medium(banner.ctaTitle, underline: true))
-                        .foregroundStyle(Theme.contentContentInvertedPrimary)
-                }
-                .accessibilityIdentifier(AccessibilityID.Home.heroCTA)
-            }
+            Text.build(theme.font.display.medium(banner.title))
+                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .multilineTextAlignment(.leading)
 
             if pageCount > 1 {
                 HStack(spacing: Primitives.Spacing.spacing8) {

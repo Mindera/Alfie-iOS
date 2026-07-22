@@ -9,12 +9,10 @@ struct HomeHeroCarouselView: View {
     }
 
     private let banners: [HomeHeroBanner]
-    private let onTapCTA: (HomeHeroBanner) -> Void
     @State private var selectedID: String
 
-    init(banners: [HomeHeroBanner], onTapCTA: @escaping (HomeHeroBanner) -> Void = { _ in }) {
+    init(banners: [HomeHeroBanner]) {
         self.banners = banners
-        self.onTapCTA = onTapCTA
         _selectedID = State(initialValue: banners.first?.id ?? "")
     }
 
@@ -32,9 +30,7 @@ struct HomeHeroCarouselView: View {
                         pageCount: banners.count,
                         currentIndex: currentIndex,
                         size: proxy.size
-                    ) {
-                        onTapCTA(banner)
-                    }
+                    )
                     .tag(banner.id)
                 }
             }

@@ -58,12 +58,6 @@ public enum AccessibilityID {
         }
     }
 
-    // MARK: - Home
-
-    public enum Home {
-        public static let heroCTA = "home.hero.cta.button"
-    }
-
     // MARK: - Account
 
     public enum Account {
