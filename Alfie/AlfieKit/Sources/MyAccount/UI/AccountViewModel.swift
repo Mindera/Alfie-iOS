@@ -1,5 +1,4 @@
 import Combine
-import DebugMenu
 import Foundation
 import Model
 import SharedUI
@@ -8,7 +7,7 @@ import SwiftUI
 public final class AccountViewModel: AccountViewModelProtocol {
     private let configurationService: ConfigurationServiceProtocol
     private let sessionService: SessionServiceProtocol
-    private let apiEndpointService: ApiEndpointServiceProtocol
+    private let makeSettingsView: (@escaping (AnyView?) -> Void) -> AnyView
     private let navigate: (MyAccountRoute) -> Void
     private var subscriptions: Set<AnyCancellable> = []
     @Published public private(set) var sectionList: [AccountSection] = []
@@ -20,7 +19,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
     ) {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
-        self.apiEndpointService = dependencies.apiEndpointService
+        self.makeSettingsView = dependencies.makeSettingsView
         self.navigate = navigate
 
         setupBindings()
@@ -60,20 +59,8 @@ public final class AccountViewModel: AccountViewModelProtocol {
     }
 
     public func didTapSettings() {
-        fullScreenCover = AnyView(
-            DebugMenuView(
-                viewModel: DebugMenuViewModel(
-                    configurationService: configurationService,
-                    apiEndpointService: apiEndpointService,
-                    closeMenuAction: { [weak self] in self?.fullScreenCover = nil },
-                    openForceAppUpdate: { [weak self] in
-                        if let configuration = self?.configurationService.forceAppUpdateInfo {
-                            self?.fullScreenCover = AnyView(ForceAppUpdateView(configuration: configuration))
-                        }
-                    },
-                    closeEndpointSelection: { [weak self] in self?.fullScreenCover = nil }
-                )
-            )
-        )
+        fullScreenCover = makeSettingsView { [weak self] view in
+            self?.fullScreenCover = view
+        }
     }
 }

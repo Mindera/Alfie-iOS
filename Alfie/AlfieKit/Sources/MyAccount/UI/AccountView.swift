@@ -108,7 +108,7 @@ private extension AccountSection {
             dependencies: .init(
                 configurationService: MockConfigurationService(),
                 sessionService: MockSessionService(),
-                apiEndpointService: MockApiEndpointService()
+                makeSettingsView: { _ in AnyView(EmptyView()) }
             )
         ) { _ in
         }

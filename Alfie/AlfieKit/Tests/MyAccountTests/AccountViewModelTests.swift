@@ -1,4 +1,5 @@
 import Mocks
+import SwiftUI
 import XCTest
 @testable import MyAccount
 
@@ -11,7 +12,7 @@ final class AccountViewModelTests: XCTestCase {
             dependencies: MyAccountDependencyContainer(
                 configurationService: MockConfigurationService(),
                 sessionService: MockSessionService(),
-                apiEndpointService: MockApiEndpointService()
+                makeSettingsView: { _ in AnyView(EmptyView()) }
             ),
             navigate: { _ in }
         )
