@@ -1,5 +1,6 @@
 query ProductListQuery(
     $collectionHandle: String!,
+    $platform: String!,
     $after: String,
     $limit: Int!,
     $filters: ProductFilterInput,
@@ -7,6 +8,7 @@ query ProductListQuery(
 ) {
     productList(
         collectionHandle: $collectionHandle,
+        platform: $platform,
         after: $after,
         limit: $limit,
         filters: $filters,

@@ -105,12 +105,14 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+        let platform = BFFPlatform.predefined
+        log.info("productList → collectionHandle=\(collectionHandle) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
             let response = try await executeFetch(
                 BFFGraphAPI.ProductListQuery(
                     collectionHandle: collectionHandle,
+                    platform: platform.rawValue,
                     after: after.map { .some($0) } ?? .none,
                     limit: limit,
                     filters: resolvedFilters,
@@ -136,8 +138,6 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        // Unlike `productList` (which the BFF defaults to Shopify when no platform is sent),
-        // `searchProducts` rejects a request with no platform — so send the predefined one.
         let platform = BFFPlatform.predefined
         log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
