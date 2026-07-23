@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Core
 import Model
 import SharedUI
@@ -15,25 +16,25 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.spacing.space0) {
             ThemedSearchBarView(
                 searchText: .constant(""),
                 placeholder: L10n.Home.SearchBar.placeholder,
                 theme: .soft,
-                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.cancelButton),
-                inputAccessibilityId: AccessibilityID.searchInput
+                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.Home.searchBackButton),
+                inputAccessibilityId: AccessibilityID.Home.searchInput
             )
             .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
             .disabled(true)
             .onTapGesture {
                 viewModel.didTapSearch()
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.top, Primitives.Spacing.spacing8)
-            .padding(.bottom, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.spacing.space200)
+            .padding(.top, theme.spacing.space100)
+            .padding(.bottom, theme.spacing.space200)
 
             ScrollView {
-                VStack(spacing: Primitives.Spacing.spacing0) {
+                VStack(spacing: theme.spacing.space0) {
                     HomeHeroCarouselView(banners: viewModel.heroBanners)
                 }
             }
@@ -53,11 +54,6 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
 
 private enum Constants {
     static let searchBarGeometryID = "SearchBar"
-}
-
-private enum AccessibilityID {
-    static let searchInput = "search-input"
-    static let cancelButton = "back-btn"
 }
 
 #if DEBUG

@@ -35,7 +35,7 @@ struct CustomTabBarView: View {
             }
         }
         .background(Theme.surfaceBackgroundPrimary)
-        .frame(width: UIScreen.main.bounds.width)
+        .frame(maxWidth: .infinity)
     }
 
     private func badgeValueFor(_ tab: Model.Tab) -> Int? {

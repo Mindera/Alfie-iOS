@@ -53,13 +53,13 @@ struct HomeHeroBannerView: View {
     }
 
     private var overlayContent: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing24) {
+        VStack(alignment: .leading, spacing: theme.spacing.space300) {
             Text.build(theme.font.display.medium(banner.title))
                 .foregroundStyle(Theme.contentContentInvertedPrimary)
                 .multilineTextAlignment(.leading)
 
             if pageCount > 1 {
-                HStack(spacing: Primitives.Spacing.spacing8) {
+                HStack(spacing: theme.spacing.space100) {
                     ForEach(0..<pageCount, id: \.self) { index in
                         pageDot(isSelected: index == currentIndex)
                     }
@@ -67,7 +67,7 @@ struct HomeHeroBannerView: View {
                 .accessibilityHidden(true) // Decorative page indicator; paging is exposed via the TabView.
             }
         }
-        .padding(Primitives.Spacing.spacing16)
+        .padding(theme.spacing.space200)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

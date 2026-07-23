@@ -203,6 +203,7 @@ let package = Package(
         .target(
             name: "Home",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "DebugMenu",
                 "Model",

@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Foundation
 import SharedUI
 import SwiftUI
@@ -10,16 +11,10 @@ extension View {
                 hasDivider: false,
                 leadingItems: {},
                 principalItems: {
-                    ThemedToolbarTitle(style: .logo, accessibilityId: AccessibilityID.titleHeader)
+                    ThemedToolbarTitle(style: .logo, accessibilityId: AccessibilityID.Home.titleHeader)
                 },
                 trailingItems: {}
             )
         )
     }
-}
-
-// MARK: - AccessibilityId
-
-private enum AccessibilityID {
-    static let titleHeader = "title-header"
 }
