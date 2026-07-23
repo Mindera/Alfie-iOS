@@ -36,6 +36,8 @@ public enum L10n {
     public static let wishlist = L10n.tr("L10n", "accessibility.wishlist")
   }
   public enum Account {
+    /// Settings
+    public static let settings = L10n.tr("L10n", "account.settings")
     /// Account
     public static let title = L10n.tr("L10n", "account.title")
   }
@@ -85,7 +87,7 @@ public enum L10n {
       }
     }
     public enum SearchBar {
-      /// Search Alfie
+      /// What are you looking for?
       public static let placeholder = L10n.tr("L10n", "home.search_bar.placeholder")
     }
     public enum SignIn {
@@ -521,6 +523,7 @@ public extension L10n {
       case accessibilitySettings = "accessibility.settings"
       case accessibilityShare = "accessibility.share"
       case accessibilityWishlist = "accessibility.wishlist"
+      case accountSettings = "account.settings"
       case accountTitle = "account.title"
       case bagTitle = "bag.title"
       case featureToggleTitle = "feature_toggle.title"

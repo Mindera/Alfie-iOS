@@ -103,6 +103,28 @@ public struct ThemedSearchBarView: View {
                 44
             }
         }
+
+        var cornerRadius: CGFloat {
+            switch self {
+            case .soft:
+                Sizing.radiusSoft
+            case .light,
+                .dark,
+                .softLarge:
+                Sizing.radiusRounded
+            }
+        }
+
+        var horizontalContentPadding: CGFloat {
+            switch self {
+            case .soft:
+                Primitives.Spacing.spacing8
+            case .light,
+                .dark,
+                .softLarge:
+                Primitives.Spacing.spacing16
+            }
+        }
         // swiftlint:enable vertical_whitespace_between_cases
     }
 
@@ -250,14 +272,15 @@ public struct ThemedSearchBarView: View {
                     onSubmitTap?()
                 }
             }
-            .padding(Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.horizontalContentPadding)
+            .padding(.vertical, Primitives.Spacing.spacing16)
             .frame(height: theme.searchBarHeight)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: Sizing.radiusRounded)
+                    RoundedRectangle(cornerRadius: theme.cornerRadius)
                         .fill(isFocused ? theme.focusedBackgroundColor : theme.unfocusedBackgroundColor)
 
-                    RoundedRectangle(cornerRadius: Sizing.radiusRounded)
+                    RoundedRectangle(cornerRadius: theme.cornerRadius)
                         .inset(by: Constants.borderLineWidth)
                         .stroke(
                             isFocused ? theme.focusedBorderColor : theme.unfocusedBorderColor,

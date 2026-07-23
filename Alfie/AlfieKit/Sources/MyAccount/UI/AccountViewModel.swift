@@ -2,13 +2,16 @@ import Combine
 import Foundation
 import Model
 import SharedUI
+import SwiftUI
 
 public final class AccountViewModel: AccountViewModelProtocol {
     private let configurationService: ConfigurationServiceProtocol
     private let sessionService: SessionServiceProtocol
+    private let makeSettingsView: (@escaping PresentCover) -> AnyView
     private let navigate: (MyAccountRoute) -> Void
     private var subscriptions: Set<AnyCancellable> = []
     @Published public private(set) var sectionList: [AccountSection] = []
+    @Published public var fullScreenCover: AnyView?
 
     public init(
         dependencies: MyAccountDependencyContainer,
@@ -16,6 +19,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
     ) {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
+        self.makeSettingsView = dependencies.makeSettingsView
         self.navigate = navigate
 
         setupBindings()
@@ -34,6 +38,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
                 .wallet,
                 .myAddressBook,
                 featureAvailability[.wishlist] != nil ? .wishlist : nil,
+                .settings,
                 isUserSignedIn ? .signOut : .signIn,
             ]
             .compactMap { $0 }
@@ -51,5 +56,11 @@ public final class AccountViewModel: AccountViewModelProtocol {
 
     public func didTapSignOut() {
         sessionService.signOutUser()
+    }
+
+    public func didTapSettings() {
+        fullScreenCover = makeSettingsView { [weak self] view in
+            self?.fullScreenCover = view
+        }
     }
 }

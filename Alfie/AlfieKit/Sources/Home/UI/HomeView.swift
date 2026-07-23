@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Core
 import Model
 import SharedUI
@@ -15,45 +16,30 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(spacing: theme.spacing.space0) {
             ThemedSearchBarView(
                 searchText: .constant(""),
                 placeholder: L10n.Home.SearchBar.placeholder,
                 theme: .soft,
-                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.cancelButton),
-                inputAccessibilityId: AccessibilityID.searchInput
+                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.Home.searchBackButton),
+                inputAccessibilityId: AccessibilityID.Home.searchInput
             )
             .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
             .disabled(true)
             .onTapGesture {
                 viewModel.didTapSearch()
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.horizontal, theme.spacing.space200)
+            .padding(.top, theme.spacing.space100)
+            .padding(.bottom, theme.spacing.space200)
 
-            Spacer()
-
-            Icon.home.image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 75)
-            Text.build(theme.font.heading.small(viewModel.homeTitle))
-            ThemedButton(text: viewModel.signInButtonText) {
-                viewModel.didTapSignInButton()
+            ScrollView {
+                VStack(spacing: theme.spacing.space0) {
+                    HomeHeroCarouselView(banners: viewModel.heroBanners)
+                }
             }
-
-            Spacer()
         }
-        .toolbarView(
-            username: viewModel.username,
-            memberSince: viewModel.memberSince,
-            openDebugAction: {
-                viewModel.didTapDebugMenu()
-            },
-            openMyAccountAction: {
-                viewModel.didTapMyAccount()
-            }
-        )
+        .toolbarView()
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .fullScreenCover(
             isPresented: Binding(
@@ -68,11 +54,6 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
 
 private enum Constants {
     static let searchBarGeometryID = "SearchBar"
-}
-
-private enum AccessibilityID {
-    static let searchInput = "search-input"
-    static let cancelButton = "back-btn"
 }
 
 #if DEBUG

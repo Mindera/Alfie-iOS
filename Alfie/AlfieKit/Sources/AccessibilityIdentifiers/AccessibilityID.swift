@@ -57,4 +57,18 @@ public enum AccessibilityID {
             "productListing.row.\(id)"
         }
     }
+
+    // MARK: - Home
+
+    public enum Home {
+        public static let titleHeader = "home.title.header"
+        public static let searchInput = "home.search.input"
+        public static let searchBackButton = "home.search.back.button"
+    }
+
+    // MARK: - Account
+
+    public enum Account {
+        public static let settingsSection = "account.settings.section"
+    }
 }
