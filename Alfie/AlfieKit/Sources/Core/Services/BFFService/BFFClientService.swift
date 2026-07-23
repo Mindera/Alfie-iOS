@@ -57,31 +57,19 @@ public final class BFFClientService: BFFClientServiceProtocol {
         includeSubItems: Bool,
         includeMedia: Bool
     ) async throws -> [NavigationItem] {
-        // TEMPORARY: the header-nav query was removed from the new BFF schema, so the Shop Categories
-        // screen has no BFF data source yet. Until the BFF exposes a real categories/navigation query
-        // we return a static, in-memory tree so the Categories → PLP → PDP flow works. Each leaf is a
-        // `.listing` whose url is a real Shopify collection handle, so `productList` resolves it.
-        // Tracked for replacement/removal by ALFMOB-387.
-        let categories: [(title: String, handle: String)] = [
-            ("Women", "women"),
-            ("Men", "men"),
-            ("Featured", "frontpage"),
-            ("Tops", "womens-tops"),
-            ("Beauty", "spring-summer"),
-            ("Bags", "womens-bags"),
-            ("Dresses", "dresses"),
-            ("Jackets", "womens-jackets"),
-            ("Jeans", "womens-jeans"),
-        ]
-        return categories.map { category in
-            NavigationItem(
-                type: .listing,
-                title: category.title,
-                url: "/\(category.handle)",
-                media: nil,
-                items: nil,
-                attributes: nil
-            )
+        let platform = BFFPlatform.predefined
+        let menuHandle = handle.bffMenuHandle
+        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue)")
+
+        do {
+            let items = try await executeFetch(
+                BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue))
+            ).mainMenu.convertToNavigationItems()
+            log.info("mainMenu ← items=\(items.count)")
+            return items
+        } catch {
+            log.error("mainMenu failed: \(error)")
+            throw error
         }
     }
 
@@ -280,6 +268,18 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
 
         return success
+    }
+}
+
+private extension NavigationHandle {
+    // The Shop Categories screen maps to Shopify's "main-menu"; other slots fall back to their raw name.
+    var bffMenuHandle: String {
+        switch self {
+        case .header:
+            return "main-menu"
+        case .footer, .social, .topbar:
+            return rawValue
+        }
     }
 }
 
