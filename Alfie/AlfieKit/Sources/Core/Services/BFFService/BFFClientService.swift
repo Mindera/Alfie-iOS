@@ -55,15 +55,20 @@ public final class BFFClientService: BFFClientServiceProtocol {
     public func getHeaderNav(
         handle: NavigationHandle,
         includeSubItems: Bool,
-        includeMedia: Bool
+        includeMedia: Bool,
+        forceRefresh: Bool
     ) async throws -> [NavigationItem] {
         let platform = BFFPlatform.predefined
         let menuHandle = handle.bffMenuHandle
-        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue)")
+        // Pull-to-refresh must bypass the cache; the normalized cache has no TTL, so an identical
+        // query otherwise short-circuits before the network and never sees BFF changes.
+        let cachePolicy: CachePolicy = forceRefresh ? .fetchIgnoringCacheData : .default
+        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue) forceRefresh=\(forceRefresh)")
 
         do {
             let items = try await executeFetch(
-                BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue))
+                BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue)),
+                cachePolicy: cachePolicy
             ).mainMenu.convertToNavigationItems()
             log.info("mainMenu ← items=\(items.count)")
             return items
@@ -179,7 +184,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     // MARK: - Private
 
-    private func executeFetch<Query: GraphQLQuery>(_ query: Query) async throws -> Query.Data {
+    private func executeFetch<Query: GraphQLQuery>(
+        _ query: Query,
+        cachePolicy: CachePolicy = .default
+    ) async throws -> Query.Data {
         try Task.checkCancellation()
 
         // Capture Apollo's `Cancellable` in a thread-safe box so the cancellation
@@ -190,7 +198,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         do {
             return try await withTaskCancellationHandler {
                 try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
-                    let cancellable = apolloClient.fetch(query: query) { result in
+                    let cancellable = apolloClient.fetch(query: query, cachePolicy: cachePolicy) { result in
                         if let failure = Self.resultAsFailure(result) {
                             continuation.resume(throwing: failure)
                             return

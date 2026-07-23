@@ -5,5 +5,5 @@ public enum NavigationItemsScreen {
 }
 
 public protocol NavigationServiceProtocol {
-    func getNavigationItems(for screen: NavigationItemsScreen) async throws -> [NavigationItem]
+    func getNavigationItems(for screen: NavigationItemsScreen, forceRefresh: Bool) async throws -> [NavigationItem]
 }

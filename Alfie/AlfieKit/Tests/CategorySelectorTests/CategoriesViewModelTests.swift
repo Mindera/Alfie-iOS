@@ -191,6 +191,14 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertEqual(requestedScreen, .shop)
     }
 
+    func test_refresh_requests_fresh_data_bypassing_cache() async {
+        mockNavigationService.onGetNavigationItemsCalled = { _ in NavigationItem.fixtures }
+
+        await sut.refresh()
+
+        XCTAssertEqual(mockNavigationService.lastForceRefresh, true)
+    }
+
     func test_refresh_updates_categories_from_service() async {
         let fixtures = NavigationItem.fixtures
         mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }

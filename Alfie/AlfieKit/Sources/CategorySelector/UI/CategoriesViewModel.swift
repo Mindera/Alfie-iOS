@@ -186,18 +186,19 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             state = .loading
         }
 
-        await fetchNavigationItems(preservingListOnError: false)
+        await fetchNavigationItems(preservingListOnError: false, forceRefresh: false)
     }
 
     @MainActor
     public func refresh() async {
         // Pull-to-refresh shows its own spinner, so keep the current list on screen (don't flip to
-        // `.loading`) and don't discard it if the re-fetch fails.
-        await fetchNavigationItems(preservingListOnError: true)
+        // `.loading`) and don't discard it if the re-fetch fails. `forceRefresh` bypasses the cache
+        // so the re-fetch actually hits the BFF instead of replaying the cached menu.
+        await fetchNavigationItems(preservingListOnError: true, forceRefresh: true)
     }
 
     @MainActor
-    private func fetchNavigationItems(preservingListOnError: Bool) async {
+    private func fetchNavigationItems(preservingListOnError: Bool, forceRefresh: Bool) async {
         guard let navigationService else {
             return
         }
@@ -205,7 +206,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         let navigationItems: [NavigationItem]
 
         do {
-            navigationItems = try await navigationService.getNavigationItems(for: .shop)
+            navigationItems = try await navigationService.getNavigationItems(for: .shop, forceRefresh: forceRefresh)
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
             if !(preservingListOnError && state.isSuccess) {

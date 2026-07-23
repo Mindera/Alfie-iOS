@@ -3,9 +3,11 @@ import Model
 public class MockBFFClientService: BFFClientServiceProtocol {
     public init() { }
 
+    public private(set) var lastForceRefresh: Bool?
     public var onGetHeaderNavCalled: ((NavigationHandle, Bool, Bool) throws -> [NavigationItem])?
-    public func getHeaderNav(handle: NavigationHandle, includeSubItems: Bool, includeMedia: Bool) async throws -> [NavigationItem] {
-        try onGetHeaderNavCalled?(handle, includeSubItems, includeMedia) ?? []
+    public func getHeaderNav(handle: NavigationHandle, includeSubItems: Bool, includeMedia: Bool, forceRefresh: Bool) async throws -> [NavigationItem] {
+        lastForceRefresh = forceRefresh
+        return try onGetHeaderNavCalled?(handle, includeSubItems, includeMedia) ?? []
     }
 
     public var onGetProductCalled: ((String) throws -> Product)?

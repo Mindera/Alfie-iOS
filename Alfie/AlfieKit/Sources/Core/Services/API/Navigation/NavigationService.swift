@@ -10,8 +10,13 @@ public final class NavigationService: NavigationServiceProtocol {
         self.bffClient = bffClient
     }
 
-    public func getNavigationItems(for screen: NavigationItemsScreen) async throws -> [NavigationItem] {
-        try await bffClient.getHeaderNav(handle: screen.handle, includeSubItems: true, includeMedia: false)
+    public func getNavigationItems(for screen: NavigationItemsScreen, forceRefresh: Bool) async throws -> [NavigationItem] {
+        try await bffClient.getHeaderNav(
+            handle: screen.handle,
+            includeSubItems: true,
+            includeMedia: false,
+            forceRefresh: forceRefresh
+        )
     }
 }
 
