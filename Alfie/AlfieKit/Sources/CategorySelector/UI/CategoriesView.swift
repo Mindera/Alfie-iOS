@@ -15,6 +15,26 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     var body: some View {
+        scrollContent
+            // Only the root screen can refresh; drill-down screens are static, so gate the
+            // affordance to avoid a spinner that never does anything (`canRefresh` is constant).
+            .refreshableIf(viewModel.canRefresh) {
+                await viewModel.refresh()
+            }
+            .overlay(alignment: .center) {
+                if viewModel.state.didFail {
+                    errorView
+                }
+            }
+            .modifier(CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title))
+            .onAppear {
+                viewModel.viewDidAppear()
+            }
+    }
+
+    // MARK: - Subviews
+
+    private var scrollContent: some View {
         ScrollView {
             if !viewModel.state.didFail {
                 LazyVStack(spacing: Primitives.Spacing.spacing0) {
@@ -34,21 +54,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                     .fill(.clear)
             }
         }
-        .refreshable {
-            await viewModel.refresh()
-        }
-        .overlay(alignment: .center) {
-            if viewModel.state.didFail {
-                errorView
-            }
-        }
-        .modifier(CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title))
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
     }
-
-    // MARK: - Subviews
 
     private func categoryView(_ category: NavigationItem) -> some View {
         // Chevron signals a drill-down; leaves (no sub-menu) go straight to the PLP, so hide it.
@@ -137,6 +143,20 @@ private struct CategoriesToolbarModifier: ViewModifier {
                 .subCategoriesToolbarView(title: title)
         } else {
             content
+        }
+    }
+}
+
+// MARK: - Conditional refresh
+
+private extension View {
+    // `enabled` must be constant for the view's lifetime — it changes the view tree, not just content.
+    @ViewBuilder
+    func refreshableIf(_ enabled: Bool, action: @escaping @Sendable () async -> Void) -> some View {
+        if enabled {
+            refreshable(action: action)
+        } else {
+            self
         }
     }
 }

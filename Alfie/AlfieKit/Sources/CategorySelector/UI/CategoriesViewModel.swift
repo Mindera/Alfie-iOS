@@ -73,6 +73,8 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     public private(set) var shouldShowToolbar: Bool
+    // Only the root screen holds a navigationService; drill-down screens are static snapshots.
+    public var canRefresh: Bool { navigationService != nil }
     /// A bool controling if local tab navigation should be ignored (i.e., shop links like Brands and Service) so that they can be handled by the parent shop view
     private let ignoreLocalNavigation: Bool
     private let navigate: (CategorySelectorRoute) -> Void
@@ -186,19 +188,19 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             state = .loading
         }
 
-        await fetchNavigationItems(preservingListOnError: false, forceRefresh: false)
+        await fetchNavigationItems(forceRefresh: false)
     }
 
     @MainActor
     public func refresh() async {
-        // Pull-to-refresh shows its own spinner, so keep the current list on screen (don't flip to
-        // `.loading`) and don't discard it if the re-fetch fails. `forceRefresh` bypasses the cache
-        // so the re-fetch actually hits the BFF instead of replaying the cached menu.
-        await fetchNavigationItems(preservingListOnError: true, forceRefresh: true)
+        // Pull-to-refresh keeps its own spinner (no flip to `.loading`, current list stays on
+        // screen) and `forceRefresh` bypasses the cache so it hits the BFF instead of replaying
+        // the cached menu.
+        await fetchNavigationItems(forceRefresh: true)
     }
 
     @MainActor
-    private func fetchNavigationItems(preservingListOnError: Bool, forceRefresh: Bool) async {
+    private func fetchNavigationItems(forceRefresh: Bool) async {
         guard let navigationService else {
             return
         }
@@ -209,14 +211,16 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             navigationItems = try await navigationService.getNavigationItems(for: .shop, forceRefresh: forceRefresh)
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
-            if !(preservingListOnError && state.isSuccess) {
+            // Re-check after the await: never downgrade a list already on screen — a concurrent
+            // refresh may have succeeded while this (or an initial) fetch was in flight.
+            if !state.isSuccess {
                 state = .error(CategoriesViewErrorType.from(error: error))
             }
             return
         }
 
         guard !navigationItems.isEmpty else {
-            if !(preservingListOnError && state.isSuccess) {
+            if !state.isSuccess {
                 state = .error(.noResults)
             }
             return

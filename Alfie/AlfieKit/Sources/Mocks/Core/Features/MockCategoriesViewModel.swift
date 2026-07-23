@@ -9,6 +9,7 @@ public class MockCategoriesViewModel: CategoriesViewModelProtocol {
     public lazy var openCategoryPublisher: AnyPublisher<CategoriesNavigationDestination, Never> = openCategorySubject.eraseToAnyPublisher()
     public var title = ""
     public var shouldShowToolbar = false
+    public var canRefresh = true
 
     public init(state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading,
                 categories: [NavigationItem] = []) {

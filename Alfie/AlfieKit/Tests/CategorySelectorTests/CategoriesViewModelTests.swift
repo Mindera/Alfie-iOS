@@ -191,6 +191,21 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertEqual(requestedScreen, .shop)
     }
 
+    func test_can_refresh_is_true_for_root_screen() {
+        XCTAssertTrue(sut.canRefresh)
+    }
+
+    func test_can_refresh_is_false_for_subcategory_screen() {
+        let subCategoryViewModel = CategoriesViewModel(
+            log: log,
+            categories: NavigationItem.fixtures,
+            title: "Women",
+            ignoreLocalNavigation: false
+        ) { _ in }
+
+        XCTAssertFalse(subCategoryViewModel.canRefresh)
+    }
+
     func test_refresh_requests_fresh_data_bypassing_cache() async {
         mockNavigationService.onGetNavigationItemsCalled = { _ in NavigationItem.fixtures }
 
@@ -219,6 +234,20 @@ final class CategoriesViewModelTests: XCTestCase {
         await sut.refresh()
 
         // A failed pull-to-refresh must not discard the categories already on screen.
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.categories.count, fixtures.count)
+    }
+
+    func test_refresh_keeps_existing_list_when_service_returns_empty() async {
+        let fixtures = NavigationItem.fixtures
+        mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
+        await sut.refresh()
+        XCTAssertTrue(sut.state.isSuccess)
+
+        mockNavigationService.onGetNavigationItemsCalled = { _ in [] }
+        await sut.refresh()
+
+        // An empty re-fetch (like a stale/failed one) must not clear the list already on screen.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.categories.count, fixtures.count)
     }
