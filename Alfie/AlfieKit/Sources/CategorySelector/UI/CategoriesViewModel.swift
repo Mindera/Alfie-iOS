@@ -178,10 +178,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     @MainActor
     private func loadItems() async {
-        guard let navigationService else {
-            return
-        }
-
         guard !state.isSuccess else {
             return
         }
@@ -190,18 +186,38 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             state = .loading
         }
 
+        await fetchNavigationItems(preservingListOnError: false)
+    }
+
+    @MainActor
+    public func refresh() async {
+        // Pull-to-refresh shows its own spinner, so keep the current list on screen (don't flip to
+        // `.loading`) and don't discard it if the re-fetch fails.
+        await fetchNavigationItems(preservingListOnError: true)
+    }
+
+    @MainActor
+    private func fetchNavigationItems(preservingListOnError: Bool) async {
+        guard let navigationService else {
+            return
+        }
+
         let navigationItems: [NavigationItem]
 
         do {
             navigationItems = try await navigationService.getNavigationItems(for: .shop)
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
-            state = .error(CategoriesViewErrorType.from(error: error))
+            if !(preservingListOnError && state.isSuccess) {
+                state = .error(CategoriesViewErrorType.from(error: error))
+            }
             return
         }
 
         guard !navigationItems.isEmpty else {
-            state = .error(.noResults)
+            if !(preservingListOnError && state.isSuccess) {
+                state = .error(.noResults)
+            }
             return
         }
 

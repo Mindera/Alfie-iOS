@@ -46,5 +46,6 @@ public protocol CategoriesViewModelProtocol: ObservableObject {
     var shouldShowToolbar: Bool { get }
 
     func viewDidAppear()
+    func refresh() async
     func didSelectCategory(_ category: NavigationItem)
 }

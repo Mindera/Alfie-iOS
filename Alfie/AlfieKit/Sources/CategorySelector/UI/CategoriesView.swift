@@ -34,6 +34,9 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                     .fill(.clear)
             }
         }
+        .refreshable {
+            await viewModel.refresh()
+        }
         .overlay(alignment: .center) {
             if viewModel.state.didFail {
                 errorView

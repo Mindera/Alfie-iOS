@@ -21,6 +21,11 @@ public class MockCategoriesViewModel: CategoriesViewModelProtocol {
         onViewDidAppearCalled?()
     }
 
+    public var onRefreshCalled: (() -> Void)?
+    public func refresh() async {
+        onRefreshCalled?()
+    }
+
     public var onDidSelectCategoryCalled: ((NavigationItem) -> Void)?
     public func didSelectCategory(_ category: NavigationItem) {
         onDidSelectCategoryCalled?(category)
