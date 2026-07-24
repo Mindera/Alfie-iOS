@@ -21,7 +21,9 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         let product = try await sut.getProduct(handle: slug)
 
         XCTAssertFalse(product.variants.isEmpty, "Product details should expose at least one variant")
-        XCTAssertFalse(product.defaultVariant.sku.isEmpty)
+        // Not asserting on `sku`: every variant in the seed store has an empty one.
+        XCTAssertTrue(product.variants.contains(product.defaultVariant),
+                      "The default variant should be one of the product's variants")
     }
 
     func test_getProduct_unknownHandle_throwsBFFRequestError() async throws {
