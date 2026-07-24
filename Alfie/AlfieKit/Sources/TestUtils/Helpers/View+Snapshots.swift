@@ -1,6 +1,6 @@
-import Mocks
 import SwiftUI
-@testable import Alfie
+import UIKit
+import Utils
 
 extension View {
     var defaultSnapshotSize: CGSize { .init(width: 393, height: 852) } // iPhone 15 Pro

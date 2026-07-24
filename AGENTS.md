@@ -98,6 +98,7 @@ When you need specific guidance, read the appropriate guide:
 - **GraphQL Integration** → `Docs/GraphQL.md`
 - **Localization (L10n)** → `Docs/Localization.md`
 - **Testing & Mocking** → `Docs/Testing.md`
+- **Snapshot Testing** → `Docs/SnapshotTesting.md`
 - **Accessibility Identifiers (UI tests)** → `Docs/Accessibility.md`
 - **Feature Development Process** → `Docs/Development.md`
 - **Code Style & Conventions** → `Docs/CodeStyle.md`
