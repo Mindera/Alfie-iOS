@@ -51,8 +51,6 @@
 				Snapshots/CategoriesViewSnapshotTests.swift,
 				Snapshots/ProductDetailsColorSheetSnapshotTests.swift,
 				Snapshots/ProductDetailsViewSnapshotTests.swift,
-				Snapshots/RecentSearchesSnapshotTests.swift,
-				Snapshots/SearchViewSnapshotTests.swift,
 				Snapshots/ShopViewSnapshotTests.swift,
 			);
 			target = BE8B02332B616979007AE489 /* AlfieTests */;
