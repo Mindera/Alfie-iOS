@@ -70,7 +70,13 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue)),
                 cachePolicy: cachePolicy
             ).mainMenu.convertToNavigationItems()
-            log.info("mainMenu ← items=\(items.count)")
+            if items.isEmpty {
+                // Menu came back but nothing resolved to a collection handle — likely non-collection
+                // links (e.g. /pages/*, absolute urls). Surfaces an otherwise-silent empty Shop screen.
+                log.error("mainMenu ← 0 actionable categories (menu items had no resolvable collection handle)")
+            } else {
+                log.info("mainMenu ← items=\(items.count)")
+            }
             return items
         } catch {
             log.error("mainMenu failed: \(error)")
@@ -198,16 +204,19 @@ public final class BFFClientService: BFFClientServiceProtocol {
         do {
             return try await withTaskCancellationHandler {
                 try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
+                    box.setResumeOnCancel { continuation.resume(throwing: CancellationError()) }
                     let cancellable = apolloClient.fetch(query: query, cachePolicy: cachePolicy) { result in
-                        if let failure = Self.resultAsFailure(result) {
-                            continuation.resume(throwing: failure)
-                            return
+                        box.resumeOnce {
+                            if let failure = Self.resultAsFailure(result) {
+                                continuation.resume(throwing: failure)
+                                return
+                            }
+                            guard let data = Self.resultAsSuccess(result)?.data else {
+                                continuation.resume(throwing: BFFRequestError(type: .generic))
+                                return
+                            }
+                            continuation.resume(returning: data)
                         }
-                        guard let data = Self.resultAsSuccess(result)?.data else {
-                            continuation.resume(throwing: BFFRequestError(type: .generic))
-                            return
-                        }
-                        continuation.resume(returning: data)
                     }
                     box.set(cancellable)
                 }
@@ -279,7 +288,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
     }
 }
 
-private extension NavigationHandle {
+extension NavigationHandle {
     // The Shop Categories screen maps to Shopify's "main-menu"; other slots fall back to their raw name.
     var bffMenuHandle: String {
         switch self {

@@ -11,7 +11,7 @@ struct PlatformSelectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
-            DemoHelper.demoSectionHeader(title: "Commerce Platform")
+            DemoHelper.demoSectionHeader(title: "Choose Platform")
 
             RadioButtonList(
                 values: viewModel.availablePlatforms,
@@ -19,7 +19,7 @@ struct PlatformSelectionView: View {
                 verticalSpacing: Primitives.Spacing.spacing24
             )
 
-            Text.build(theme.font.body.small("Sent as the `platform` argument on the next BFF request — no restart needed."))
+            Text.build(theme.font.body.small("Sent as the platform argument on the next BFF request — no restart needed."))
                 .foregroundStyle(Primitives.Colours.neutrals700)
 
             Spacer()

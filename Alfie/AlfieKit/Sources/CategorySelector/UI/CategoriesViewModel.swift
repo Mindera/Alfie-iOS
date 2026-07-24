@@ -27,6 +27,17 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             }
             // swiftlint:enable vertical_whitespace_between_cases
         }
+
+        var themedUrl: ThemedURL {
+            // swiftlint:disable vertical_whitespace_between_cases
+            switch self {
+            case .services:
+                .services
+            case .brands:
+                .brands
+            }
+            // swiftlint:enable vertical_whitespace_between_cases
+        }
     }
 
     private let navigationService: NavigationServiceProtocol?
@@ -121,13 +132,13 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             where: { $0.rawValue == category.url?.lowercased() }
         ) {
             openCategorySubject.send(specialCategory.destination)
-            guard !ignoreLocalNavigation, let url = ThemedURL.services.internalUrl else { return }
+            guard !ignoreLocalNavigation, let url = specialCategory.themedUrl.internalUrl else { return }
             ExternalAppLauncher.open(url: url)
             return
         }
 
         // If this category has sub-categories, show them, otherwise open the PLP
-        if let subCategories = category.items, !subCategories.isEmpty {
+        if category.hasSubCategories, let subCategories = category.items {
             openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
             navigate(.subCategories(subCategories: subCategories, parent: category))
             return
@@ -176,6 +187,14 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
     }
 
+    @MainActor
+    public func refresh() async {
+        // Pull-to-refresh keeps its own spinner (no flip to `.loading`, current list stays on
+        // screen) and `forceRefresh` bypasses the cache so it hits the BFF instead of replaying
+        // the cached menu.
+        await fetchNavigationItems(forceRefresh: true)
+    }
+
     // MARK: - Private
 
     @MainActor
@@ -192,14 +211,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     @MainActor
-    public func refresh() async {
-        // Pull-to-refresh keeps its own spinner (no flip to `.loading`, current list stays on
-        // screen) and `forceRefresh` bypasses the cache so it hits the BFF instead of replaying
-        // the cached menu.
-        await fetchNavigationItems(forceRefresh: true)
-    }
-
-    @MainActor
     private func fetchNavigationItems(forceRefresh: Bool) async {
         guard let navigationService else {
             return
@@ -209,6 +220,9 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
         do {
             navigationItems = try await navigationService.getNavigationItems(for: .shop, forceRefresh: forceRefresh)
+        } catch is CancellationError {
+            // The screen was dismissed (or the refresh superseded) mid-fetch — not a user-facing error.
+            return
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
             // Re-check after the await: never downgrade a list already on screen — a concurrent

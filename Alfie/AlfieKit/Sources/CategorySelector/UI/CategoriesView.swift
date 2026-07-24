@@ -62,7 +62,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             for: category.title,
             isShimmering: false,
             foregroundColor: Primitives.Colours.neutrals700,
-            showChevron: category.items?.isEmpty == false
+            showChevron: category.hasSubCategories
         )
             .modifier(
                 TapHighlightableModifier {

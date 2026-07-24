@@ -92,8 +92,34 @@ final class MainMenuConverterTests: XCTestCase {
             Mock<MenuItem>(id: "2", title: "Top", url: "/dresses#top")
         ]).convertToNavigationItems()
 
-        XCTAssertEqual(items[0].url, "/sale")
-        XCTAssertEqual(items[1].url, "/dresses")
+        XCTAssertEqual(items.count, 2)
+        XCTAssertEqual(items.first?.url, "/sale")
+        XCTAssertEqual(items.last?.url, "/dresses")
+    }
+
+    func test_empty_string_url_leaf_is_dropped() {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Empty", url: "")])
+            .convertToNavigationItems()
+        XCTAssertTrue(items.isEmpty)
+    }
+
+    func test_whitespace_only_url_leaf_is_dropped() {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Blank", url: "   ")])
+            .convertToNavigationItems()
+        XCTAssertTrue(items.isEmpty)
+    }
+
+    func test_trailing_slash_is_stripped_to_last_segment() throws {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Dresses", url: "/dresses/")])
+            .convertToNavigationItems()
+        XCTAssertEqual(try XCTUnwrap(items.first).url, "/dresses")
+    }
+
+    func test_absolute_url_reduces_to_last_path_segment() throws {
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Dresses", url: "https://shop.example.com/collections/dresses")
+        ]).convertToNavigationItems()
+        XCTAssertEqual(try XCTUnwrap(items.first).url, "/dresses")
     }
 
     func test_handle_is_lowercased() throws {
