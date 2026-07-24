@@ -310,6 +310,7 @@ let package = Package(
             dependencies: [
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
+                "Utils",
             ]
         ),
 

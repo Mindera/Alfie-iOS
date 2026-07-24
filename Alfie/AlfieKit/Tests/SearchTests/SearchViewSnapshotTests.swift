@@ -2,10 +2,10 @@ import Mocks
 import Model
 import SnapshotTesting
 import SwiftUI
+import TestUtils
 import XCTest
-@testable import Alfie
+@testable import Search
 
-// TODO: Re-add Target Memebership once Snapshot tests are checked for working properly
 final class SearchViewSnapshotTests: XCTestCase {
     private let isRecording = false
     private var sut: SearchView<MockSearchViewModel>!
