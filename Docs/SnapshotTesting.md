@@ -59,38 +59,36 @@ offending file:line, so a stray `isRecording = true` cannot land green.
 
 ## Where the tests live
 
-All snapshot tests have been migrated out of the `AlfieTests` app target into their module test targets.
-SPM test targets have no "Target Membership" setting — every file under `Tests/<Target>/` is automatically
-a member, so tests can no longer silently fall out of the build.
+Snapshot tests live in the AlfieKit module test targets. SPM test targets have no "Target Membership"
+setting — every file under `Tests/<Target>/` is automatically a member, so tests cannot silently fall out
+of the build.
 
-| Test file | Target | `@testable import` | Tests |
-|---|---|---|---|
-| `SearchViewSnapshotTests` | `SearchTests` | `Search` | 2 |
-| `RecentSearchesSnapshotTests` | `SearchTests` | `Search` | 3 |
-| `BrandsViewSnapshotTests` | `CategorySelectorTests` | `CategorySelector` | 3 |
-| `CategoriesViewSnapshotTests` | `CategorySelectorTests` | `CategorySelector` | 3 |
-| `ShopViewSnapshotTests` | `CategorySelectorTests` | `CategorySelector` | 8 |
-| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | `ProductDetails` | 7 |
-| `ProductDetailsColorSheetSnapshotTests` | `ProductDetailsTests` | `ProductDetails` | 1 |
+| Test file | Target | Covers |
+|---|---|---|
+| `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
 
-**27 snapshot tests, 27 committed reference images.** The `membershipExceptions` set that used to exclude
-them from `AlfieTests` has been removed from `project.pbxproj`, along with the empty `AlfieTests/Snapshots/`
-folder.
+The pre-existing suite (Search, CategorySelector, ProductDetails) was removed: those screens are mid
+Modern Design Rollout, so their references would churn on every rollout PR. Re-add them per screen once a
+design has settled.
 
-### Adding a snapshot test to a new module
+### Adding a snapshot test
 
 1. Ensure the module's test target depends on `TestUtils` (most already do).
 2. `import TestUtils` and `@testable import <Module>`.
 3. Use `embededInContainer()` / `embededInFullHeightContainer()` and `.defaultImage()`.
-4. Record → inspect → assert → commit the PNGs.
+4. Record → **inspect the PNG** → assert → commit.
 
-### API drift encountered during migration
+## Beware: animated and time-driven views
 
-These tests predated several refactors. For reference, what the migration had to fix:
+`precision: 0.9` means 10% of pixels may differ. A small element is well inside that budget, so a snapshot
+can pass **even if that element is missing entirely**. This was measured on the splash screen: with
+`LoadingSpinner` removed from `SplashView`, the test still passed.
 
-- **`ColorSwatch` gained a required `id:`** — `ColorSwatch(id: "red", name: "Red", type: .color(.red))`.
-- **`ProductDetailsColorSheet` was renamed to `ProductDetailsColorAndSizeSheet`** and gained a `type:`
-  parameter (`.color` / `.size`), since one component now serves both sheets.
-- **`ShopView.init` gained `isRoot`, `isWishlistEnabled`, `activeShopTabPublisher` and `navigate`.** The test
-  uses a private `makeSut(initialTab:)` factory so the six construction sites stay readable.
-- The Search pair needed only the import swap.
+Raising precision is not a free fix — at `precision: 1.0` the same test fails every run, because
+`LoadingSpinner` derives its rotation from wall-clock time and lands on a different angle each capture.
+
+So for any view containing animated or time-driven content:
+
+- Treat the snapshot as covering the **static** parts, and say so in a comment on the test.
+- Cover the animated component with a unit test instead.
+- Don't raise precision to chase it — you trade a blind spot for a flake.
