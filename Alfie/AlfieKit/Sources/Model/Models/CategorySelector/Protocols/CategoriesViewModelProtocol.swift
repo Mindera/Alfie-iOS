@@ -44,7 +44,11 @@ public protocol CategoriesViewModelProtocol: ObservableObject {
     var categories: [NavigationItem] { get }
     var title: String { get }
     var shouldShowToolbar: Bool { get }
+    /// Whether this screen can pull-to-refresh. Only the root categories screen fetches from the
+    /// service; drill-down screens render a static snapshot, so their refresh affordance is hidden.
+    var canRefresh: Bool { get }
 
     func viewDidAppear()
+    func refresh() async
     func didSelectCategory(_ category: NavigationItem)
 }

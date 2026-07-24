@@ -8,11 +8,12 @@ public extension BFFGraphAPI {
     public static let operationName: String = "ProductListQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query ProductListQuery($collectionHandle: String!, $after: String, $limit: Int!, $filters: ProductFilterInput, $sort: ProductSortEnum = NEWEST) { productList( collectionHandle: $collectionHandle after: $after limit: $limit filters: $filters sort: $sort ) { __typename totalCount pageInfo { __typename endCursor hasNextPage } products { __typename ...ProductListItemFragment } } }"#,
+        #"query ProductListQuery($collectionHandle: String!, $platform: String!, $after: String, $limit: Int!, $filters: ProductFilterInput, $sort: ProductSortEnum = NEWEST) { productList( collectionHandle: $collectionHandle platform: $platform after: $after limit: $limit filters: $filters sort: $sort ) { __typename totalCount pageInfo { __typename endCursor hasNextPage } products { __typename ...ProductListItemFragment } } }"#,
         fragments: [MoneyFragment.self, ProductListItemFragment.self]
       ))
 
     public var collectionHandle: String
+    public var platform: String
     public var after: GraphQLNullable<String>
     public var limit: Int
     public var filters: GraphQLNullable<ProductFilterInput>
@@ -20,12 +21,14 @@ public extension BFFGraphAPI {
 
     public init(
       collectionHandle: String,
+      platform: String,
       after: GraphQLNullable<String>,
       limit: Int,
       filters: GraphQLNullable<ProductFilterInput>,
       sort: GraphQLNullable<GraphQLEnum<ProductSortEnum>> = .init(.newest)
     ) {
       self.collectionHandle = collectionHandle
+      self.platform = platform
       self.after = after
       self.limit = limit
       self.filters = filters
@@ -34,6 +37,7 @@ public extension BFFGraphAPI {
 
     public var __variables: Variables? { [
       "collectionHandle": collectionHandle,
+      "platform": platform,
       "after": after,
       "limit": limit,
       "filters": filters,
@@ -48,6 +52,7 @@ public extension BFFGraphAPI {
       public static var __selections: [ApolloAPI.Selection] { [
         .field("productList", ProductList.self, arguments: [
           "collectionHandle": .variable("collectionHandle"),
+          "platform": .variable("platform"),
           "after": .variable("after"),
           "limit": .variable("limit"),
           "filters": .variable("filters"),

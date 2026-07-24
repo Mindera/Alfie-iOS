@@ -15,6 +15,26 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     var body: some View {
+        scrollContent
+            // Only the root screen can refresh; drill-down screens are static, so gate the
+            // affordance to avoid a spinner that never does anything (`canRefresh` is constant).
+            .refreshableIf(viewModel.canRefresh) {
+                await viewModel.refresh()
+            }
+            .overlay(alignment: .center) {
+                if viewModel.state.didFail {
+                    errorView
+                }
+            }
+            .modifier(CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title))
+            .onAppear {
+                viewModel.viewDidAppear()
+            }
+    }
+
+    // MARK: - Subviews
+
+    private var scrollContent: some View {
         ScrollView {
             if !viewModel.state.didFail {
                 LazyVStack(spacing: Primitives.Spacing.spacing0) {
@@ -34,21 +54,16 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                     .fill(.clear)
             }
         }
-        .overlay(alignment: .center) {
-            if viewModel.state.didFail {
-                errorView
-            }
-        }
-        .modifier(CategoriesToolbarModifier(showToolbar: viewModel.shouldShowToolbar, title: viewModel.title))
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
     }
 
-    // MARK: - Subviews
-
     private func categoryView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title, isShimmering: false, foregroundColor: Primitives.Colours.neutrals700)
+        // Chevron signals a drill-down; leaves (no sub-menu) go straight to the PLP, so hide it.
+        categoriesListItem(
+            for: category.title,
+            isShimmering: false,
+            foregroundColor: Primitives.Colours.neutrals700,
+            showChevron: category.hasSubCategories
+        )
             .modifier(
                 TapHighlightableModifier {
                     withAnimation(.standard) {
@@ -59,7 +74,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private func placeholderView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title, isShimmering: true, foregroundColor: Primitives.Colours.neutrals400)
+        categoriesListItem(for: category.title, isShimmering: true, foregroundColor: Primitives.Colours.neutrals400, showChevron: true)
     }
 
     private var errorView: some View {
@@ -76,19 +91,21 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
         return ErrorView(title: title, message: message)
     }
 
-    private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color) -> some View {
+    private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color, showChevron: Bool) -> some View {
         VStack(spacing: Primitives.Spacing.spacing0) {
             HStack {
                 Text.build(theme.font.body.medium(text))
                     .foregroundStyle(foregroundColor)
                     .shimmering(while: .constant(isShimmering))
                 Spacer()
-                Icon.chevronRight.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                    .foregroundStyle(foregroundColor)
+                if showChevron {
+                    Icon.chevronRight.image
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: Constants.chevronSize, height: Constants.chevronSize)
+                        .foregroundStyle(foregroundColor)
+                }
             }
             .frame(height: Constants.categoryViewHeight)
 
@@ -126,6 +143,20 @@ private struct CategoriesToolbarModifier: ViewModifier {
                 .subCategoriesToolbarView(title: title)
         } else {
             content
+        }
+    }
+}
+
+// MARK: - Conditional refresh
+
+private extension View {
+    // `enabled` must be constant for the view's lifetime — it changes the view tree, not just content.
+    @ViewBuilder
+    func refreshableIf(_ enabled: Bool, action: @escaping @Sendable () async -> Void) -> some View {
+        if enabled {
+            refreshable(action: action)
+        } else {
+            self
         }
     }
 }

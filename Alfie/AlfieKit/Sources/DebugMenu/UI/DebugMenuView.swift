@@ -28,6 +28,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
                     link(for: .brazeInfo, text: "Braze Push")
                     #if DEBUG
                     link(for: .featureToggle, text: "Feature Toggle")
+                    link(for: .platform, text: "Commerce Platform")
                     #endif
                     link(for: .endpoint, text: "Environment")
                 }
@@ -93,6 +94,12 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
                 .modifier(
                     ContainerDemoViewModifier(headerTitle: L10n.FeatureToggle.title, embedInScrollView: true)
                 )
+
+        case .platform:
+            PlatformSelectionView(viewModel: PlatformSelectionViewModel())
+                .modifier(
+                    ContainerDemoViewModifier(headerTitle: "Commerce Platform", embedInScrollView: false)
+                )
         }
     }
 
@@ -103,6 +110,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         case brazeInfo
         case endpoint
         case featureToggle
+        case platform
     }
 }
 

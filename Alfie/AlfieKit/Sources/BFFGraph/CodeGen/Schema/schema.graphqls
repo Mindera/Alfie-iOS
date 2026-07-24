@@ -2,9 +2,67 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddToCartInput {
+  cartId: ID!
+  lines: [CartLineInput!]!
+}
+
 type Barcode {
   type: String!
   value: String!
+}
+
+type Cart {
+  checkoutUrl: String
+  createdAt: String
+  customerId: String
+  externalReferences: CartExternalReferences!
+  id: ID!
+  lineItems: [CartItem!]!
+  platformId: String!
+  status: String!
+  totals: CartTotals!
+  updatedAt: String
+}
+
+type CartExternalReferences {
+  bigcommerceCartId: String
+  shopifyCartId: String
+}
+
+type CartItem {
+  id: ID!
+  image: Image
+  lineTotal: Money!
+  name: String
+  price: Money!
+  productId: String
+  quantity: Int!
+  sku: String
+  variantId: String
+}
+
+input CartLineInput {
+  options: [CartLineOptionInput!]
+  productId: ID
+  quantity: Int! = 1
+  variantId: ID!
+}
+
+input CartLineOptionInput {
+  name: String!
+  value: String!
+}
+
+type CartTotals {
+  currency: String!
+  grandTotal: Money!
+  subtotal: Money!
+}
+
+input CreateCartInput {
+  customerAccessToken: String
+  lines: [CartLineInput!]
 }
 
 type Dimensions {
@@ -20,6 +78,20 @@ type Image {
 
 type Inventory {
   available: Int
+}
+
+type Menu {
+  handle: String
+  id: ID
+  items: [MenuItem!]!
+  title: String
+}
+
+type MenuItem {
+  id: ID!
+  items: [MenuItem]
+  title: String!
+  url: String
 }
 
 type Metafield {
@@ -48,6 +120,11 @@ type MoneyRange {
   minVariantPrice: Money!
 }
 
+type Mutation {
+  addToCart(input: AddToCartInput!, platform: String): Cart!
+  createCart(input: CreateCartInput!, platform: String): Cart!
+}
+
 type OmniProduct {
   brandName: String
   categories: [String]
@@ -65,7 +142,6 @@ type OmniProduct {
   priceRange: MoneyRange!
   primaryImage: Image
   productType: String
-  rating: Rating
   relatedProducts: [String]
   seo: Seo
   slug: String!
@@ -134,14 +210,12 @@ type ProductVariant {
 }
 
 type Query {
+  cart(cartId: String!, platform: String): Cart!
+  cartCheckoutUrl(cartId: String!, platform: String): String!
+  mainMenu(handle: String! = "main-menu", platform: String): Menu!
   productDetails(handle: String!, platform: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
   productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, platform: String, sort: ProductSortEnum! = NEWEST): ProductListResponse!
   searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, platform: String, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
-}
-
-type Rating {
-  average: Float!
-  count: Int!
 }
 
 type Seo {

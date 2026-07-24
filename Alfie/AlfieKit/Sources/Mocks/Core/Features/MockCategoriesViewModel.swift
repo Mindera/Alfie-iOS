@@ -9,6 +9,7 @@ public class MockCategoriesViewModel: CategoriesViewModelProtocol {
     public lazy var openCategoryPublisher: AnyPublisher<CategoriesNavigationDestination, Never> = openCategorySubject.eraseToAnyPublisher()
     public var title = ""
     public var shouldShowToolbar = false
+    public var canRefresh = true
 
     public init(state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading,
                 categories: [NavigationItem] = []) {
@@ -19,6 +20,11 @@ public class MockCategoriesViewModel: CategoriesViewModelProtocol {
     public var onViewDidAppearCalled: (() -> Void)?
     public func viewDidAppear() {
         onViewDidAppearCalled?()
+    }
+
+    public var onRefreshCalled: (() -> Void)?
+    public func refresh() async {
+        onRefreshCalled?()
     }
 
     public var onDidSelectCategoryCalled: ((NavigationItem) -> Void)?

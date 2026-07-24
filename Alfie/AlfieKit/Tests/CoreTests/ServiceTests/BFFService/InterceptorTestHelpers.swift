@@ -9,6 +9,7 @@ enum InterceptorTestHelpers {
     static func makeRequest() -> HTTPRequest<BFFGraphAPI.ProductListQuery> {
         let operation = BFFGraphAPI.ProductListQuery(
             collectionHandle: "test",
+            platform: "shopify",
             after: .none,
             limit: 1,
             filters: .none

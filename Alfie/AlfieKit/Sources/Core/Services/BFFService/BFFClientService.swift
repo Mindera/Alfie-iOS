@@ -55,33 +55,32 @@ public final class BFFClientService: BFFClientServiceProtocol {
     public func getHeaderNav(
         handle: NavigationHandle,
         includeSubItems: Bool,
-        includeMedia: Bool
+        includeMedia: Bool,
+        forceRefresh: Bool
     ) async throws -> [NavigationItem] {
-        // TEMPORARY: the header-nav query was removed from the new BFF schema, so the Shop Categories
-        // screen has no BFF data source yet. Until the BFF exposes a real categories/navigation query
-        // we return a static, in-memory tree so the Categories → PLP → PDP flow works. Each leaf is a
-        // `.listing` whose url is a real Shopify collection handle, so `productList` resolves it.
-        // Tracked for replacement/removal by ALFMOB-387.
-        let categories: [(title: String, handle: String)] = [
-            ("Women", "women"),
-            ("Men", "men"),
-            ("Featured", "frontpage"),
-            ("Tops", "womens-tops"),
-            ("Beauty", "spring-summer"),
-            ("Bags", "womens-bags"),
-            ("Dresses", "dresses"),
-            ("Jackets", "womens-jackets"),
-            ("Jeans", "womens-jeans"),
-        ]
-        return categories.map { category in
-            NavigationItem(
-                type: .listing,
-                title: category.title,
-                url: "/\(category.handle)",
-                media: nil,
-                items: nil,
-                attributes: nil
-            )
+        let platform = BFFPlatform.predefined
+        let menuHandle = handle.bffMenuHandle
+        // Pull-to-refresh must bypass the cache; the normalized cache has no TTL, so an identical
+        // query otherwise short-circuits before the network and never sees BFF changes.
+        let cachePolicy: CachePolicy = forceRefresh ? .fetchIgnoringCacheData : .default
+        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue) forceRefresh=\(forceRefresh)")
+
+        do {
+            let items = try await executeFetch(
+                BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue)),
+                cachePolicy: cachePolicy
+            ).mainMenu.convertToNavigationItems()
+            if items.isEmpty {
+                // Menu came back but nothing resolved to a collection handle — likely non-collection
+                // links (e.g. /pages/*, absolute urls). Surfaces an otherwise-silent empty Shop screen.
+                log.error("mainMenu ← 0 actionable categories (menu items had no resolvable collection handle)")
+            } else {
+                log.info("mainMenu ← items=\(items.count)")
+            }
+            return items
+        } catch {
+            log.error("mainMenu failed: \(error)")
+            throw error
         }
     }
 
@@ -117,12 +116,14 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+        let platform = BFFPlatform.predefined
+        log.info("productList → collectionHandle=\(collectionHandle) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
             let response = try await executeFetch(
                 BFFGraphAPI.ProductListQuery(
                     collectionHandle: collectionHandle,
+                    platform: platform.rawValue,
                     after: after.map { .some($0) } ?? .none,
                     limit: limit,
                     filters: resolvedFilters,
@@ -148,8 +149,6 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        // Unlike `productList` (which the BFF defaults to Shopify when no platform is sent),
-        // `searchProducts` rejects a request with no platform — so send the predefined one.
         let platform = BFFPlatform.predefined
         log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
@@ -191,7 +190,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     // MARK: - Private
 
-    private func executeFetch<Query: GraphQLQuery>(_ query: Query) async throws -> Query.Data {
+    private func executeFetch<Query: GraphQLQuery>(
+        _ query: Query,
+        cachePolicy: CachePolicy = .default
+    ) async throws -> Query.Data {
         try Task.checkCancellation()
 
         // Capture Apollo's `Cancellable` in a thread-safe box so the cancellation
@@ -202,16 +204,19 @@ public final class BFFClientService: BFFClientServiceProtocol {
         do {
             return try await withTaskCancellationHandler {
                 try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
-                    let cancellable = apolloClient.fetch(query: query) { result in
-                        if let failure = Self.resultAsFailure(result) {
-                            continuation.resume(throwing: failure)
-                            return
+                    box.setResumeOnCancel { continuation.resume(throwing: CancellationError()) }
+                    let cancellable = apolloClient.fetch(query: query, cachePolicy: cachePolicy) { result in
+                        box.resumeOnce {
+                            if let failure = Self.resultAsFailure(result) {
+                                continuation.resume(throwing: failure)
+                                return
+                            }
+                            guard let data = Self.resultAsSuccess(result)?.data else {
+                                continuation.resume(throwing: BFFRequestError(type: .generic))
+                                return
+                            }
+                            continuation.resume(returning: data)
                         }
-                        guard let data = Self.resultAsSuccess(result)?.data else {
-                            continuation.resume(throwing: BFFRequestError(type: .generic))
-                            return
-                        }
-                        continuation.resume(returning: data)
                     }
                     box.set(cancellable)
                 }
@@ -280,6 +285,18 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
 
         return success
+    }
+}
+
+extension NavigationHandle {
+    // The Shop Categories screen maps to Shopify's "main-menu"; other slots fall back to their raw name.
+    var bffMenuHandle: String {
+        switch self {
+        case .header:
+            return "main-menu"
+        case .footer, .social, .topbar:
+            return rawValue
+        }
     }
 }
 

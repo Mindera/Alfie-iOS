@@ -27,6 +27,17 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             }
             // swiftlint:enable vertical_whitespace_between_cases
         }
+
+        var themedUrl: ThemedURL {
+            // swiftlint:disable vertical_whitespace_between_cases
+            switch self {
+            case .services:
+                .services
+            case .brands:
+                .brands
+            }
+            // swiftlint:enable vertical_whitespace_between_cases
+        }
     }
 
     private let navigationService: NavigationServiceProtocol?
@@ -73,6 +84,8 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     public private(set) var shouldShowToolbar: Bool
+    // Only the root screen holds a navigationService; drill-down screens are static snapshots.
+    public var canRefresh: Bool { navigationService != nil }
     /// A bool controling if local tab navigation should be ignored (i.e., shop links like Brands and Service) so that they can be handled by the parent shop view
     private let ignoreLocalNavigation: Bool
     private let navigate: (CategorySelectorRoute) -> Void
@@ -119,13 +132,13 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             where: { $0.rawValue == category.url?.lowercased() }
         ) {
             openCategorySubject.send(specialCategory.destination)
-            guard !ignoreLocalNavigation, let url = ThemedURL.services.internalUrl else { return }
+            guard !ignoreLocalNavigation, let url = specialCategory.themedUrl.internalUrl else { return }
             ExternalAppLauncher.open(url: url)
             return
         }
 
         // If this category has sub-categories, show them, otherwise open the PLP
-        if let subCategories = category.items, !subCategories.isEmpty {
+        if category.hasSubCategories, let subCategories = category.items {
             openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
             navigate(.subCategories(subCategories: subCategories, parent: category))
             return
@@ -174,14 +187,18 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
     }
 
+    @MainActor
+    public func refresh() async {
+        // Pull-to-refresh keeps its own spinner (no flip to `.loading`, current list stays on
+        // screen) and `forceRefresh` bypasses the cache so it hits the BFF instead of replaying
+        // the cached menu.
+        await fetchNavigationItems(forceRefresh: true)
+    }
+
     // MARK: - Private
 
     @MainActor
     private func loadItems() async {
-        guard let navigationService else {
-            return
-        }
-
         guard !state.isSuccess else {
             return
         }
@@ -190,18 +207,36 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             state = .loading
         }
 
+        await fetchNavigationItems(forceRefresh: false)
+    }
+
+    @MainActor
+    private func fetchNavigationItems(forceRefresh: Bool) async {
+        guard let navigationService else {
+            return
+        }
+
         let navigationItems: [NavigationItem]
 
         do {
-            navigationItems = try await navigationService.getNavigationItems(for: .shop)
+            navigationItems = try await navigationService.getNavigationItems(for: .shop, forceRefresh: forceRefresh)
+        } catch is CancellationError {
+            // The screen was dismissed (or the refresh superseded) mid-fetch — not a user-facing error.
+            return
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
-            state = .error(CategoriesViewErrorType.from(error: error))
+            // Re-check after the await: never downgrade a list already on screen — a concurrent
+            // refresh may have succeeded while this (or an initial) fetch was in flight.
+            if !state.isSuccess {
+                state = .error(CategoriesViewErrorType.from(error: error))
+            }
             return
         }
 
         guard !navigationItems.isEmpty else {
-            state = .error(.noResults)
+            if !state.isSuccess {
+                state = .error(.noResults)
+            }
             return
         }
 
