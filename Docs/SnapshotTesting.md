@@ -57,58 +57,40 @@ offending file:line, so a stray `isRecording = true` cannot land green.
 
 ---
 
-## Migration playbook — remaining files
+## Where the tests live
 
-`SearchTests` was migrated as the pilot. **5 files / 22 tests remain** in `Alfie/AlfieTests/Snapshots/`,
-excluded from the app target via `membershipExceptions` in `project.pbxproj` (so they do not currently
-compile or run).
+All snapshot tests have been migrated out of the `AlfieTests` app target into their module test targets.
+SPM test targets have no "Target Membership" setting — every file under `Tests/<Target>/` is automatically
+a member, so tests can no longer silently fall out of the build.
 
-| File | Destination target | `@testable import` | Tests |
+| Test file | Target | `@testable import` | Tests |
 |---|---|---|---|
-| `BrandsViewSnapshotTests.swift` | `CategorySelectorTests` | `CategorySelector` | 3 |
-| `CategoriesViewSnapshotTests.swift` | `CategorySelectorTests` | `CategorySelector` | 3 |
-| `ShopViewSnapshotTests.swift` | `CategorySelectorTests` | `CategorySelector` | 8 |
-| `ProductDetailsViewSnapshotTests.swift` | `ProductDetailsTests` | `ProductDetails` | 7 |
-| `ProductDetailsColorSheetSnapshotTests.swift` | `ProductDetailsTests` | `ProductDetails` | 1 |
+| `SearchViewSnapshotTests` | `SearchTests` | `Search` | 2 |
+| `RecentSearchesSnapshotTests` | `SearchTests` | `Search` | 3 |
+| `BrandsViewSnapshotTests` | `CategorySelectorTests` | `CategorySelector` | 3 |
+| `CategoriesViewSnapshotTests` | `CategorySelectorTests` | `CategorySelector` | 3 |
+| `ShopViewSnapshotTests` | `CategorySelectorTests` | `CategorySelector` | 8 |
+| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | `ProductDetails` | 7 |
+| `ProductDetailsColorSheetSnapshotTests` | `ProductDetailsTests` | `ProductDetails` | 1 |
 
-Both destination targets already depend on their module + `Mocks` + `TestUtils`, so **no `Package.swift`
-change is expected**.
+**27 snapshot tests, 27 committed reference images.** The `membershipExceptions` set that used to exclude
+them from `AlfieTests` has been removed from `project.pbxproj`, along with the empty `AlfieTests/Snapshots/`
+folder.
 
-### Per file
+### Adding a snapshot test to a new module
 
-1. `git mv` the file into `Alfie/AlfieKit/Tests/<Target>/`.
-2. Replace `@testable import Alfie` with `@testable import <Module>`, add `import TestUtils`, and delete the
-   stale `// TODO: Re-add Target Memebership …` comment.
-3. Build. Fix API drift (below).
-4. Record → inspect → assert → commit the `__Snapshots__/` PNGs.
-5. Run `./Alfie/scripts/verify.sh --skip-integration` and confirm green.
+1. Ensure the module's test target depends on `TestUtils` (most already do).
+2. `import TestUtils` and `@testable import <Module>`.
+3. Use `embededInContainer()` / `embededInFullHeightContainer()` and `.defaultImage()`.
+4. Record → inspect → assert → commit the PNGs.
 
-### Known API drift
+### API drift encountered during migration
 
-The pilot needed **only the import swap** — but it was the simplest module. Expect these:
+These tests predated several refactors. For reference, what the migration had to fix:
 
-- **`ColorSwatch` now requires `id:`** — `ColorSwatch(id: "red", name: "Red", type: .color(.red))`.
-  Affects both ProductDetails files.
-- **Constructor drift generally** — these tests predate several refactors; check each SUT's current
-  initializer rather than assuming (e.g. `ProductDetailsView(viewModel:showFailureState:)`).
-- **`import OrderedCollections`** (Brands, Shop) and **`import Model`** resolve transitively today. If a
-  build fails on them, add the explicit dependency to the test target:
-  `.product(name: "OrderedCollections", package: "swift-collections")`.
-- `ShopViewSnapshotTests` uses `MockWebViewModel` (present in `Mocks`) — its generic signature is the widest
-  of the set, so expect this file to need the most attention.
-
-### Estimate
-
-- Categories / Brands (3 tests each): small, likely import-swap only.
-- ProductDetailsColorSheet (1 test): small, plus the `ColorSwatch(id:)` fix.
-- ProductDetailsView (7 tests): medium — `ColorSwatch(id:)` plus possible constructor drift.
-- ShopView (8 tests): largest — three generic parameters and the most mock setup.
-
-Roughly one session per module (CategorySelector, ProductDetails).
-
-### Final cleanup — after all files have moved
-
-`project.pbxproj` still lists every snapshot file in `membershipExceptions`. Entries for already-moved files
-are **stale no-ops** (the app target builds fine with them present). Once all 5 remaining files have moved,
-remove the whole exception set in one deliberate change — note that `CLAUDE.md` forbids editing
-`project.pbxproj` directly, so do it through Xcode.
+- **`ColorSwatch` gained a required `id:`** — `ColorSwatch(id: "red", name: "Red", type: .color(.red))`.
+- **`ProductDetailsColorSheet` was renamed to `ProductDetailsColorAndSizeSheet`** and gained a `type:`
+  parameter (`.color` / `.size`), since one component now serves both sheets.
+- **`ShopView.init` gained `isRoot`, `isWishlistEnabled`, `activeShopTabPublisher` and `navigate`.** The test
+  uses a private `makeSut(initialTab:)` factory so the six construction sites stay readable.
+- The Search pair needed only the import swap.

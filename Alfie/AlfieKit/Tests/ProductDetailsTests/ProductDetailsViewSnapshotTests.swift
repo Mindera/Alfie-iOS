@@ -3,10 +3,10 @@ import Mocks
 import Model
 import SnapshotTesting
 import SwiftUI
+import TestUtils
 import XCTest
-@testable import Alfie
+@testable import ProductDetails
 
-// TODO: Re-add Target Memebership once Snapshot tests are checked for working properly
 final class ProductDetailsViewSnapshotTests: XCTestCase {
     private let isRecording = false
     private var sut: ProductDetailsView<MockProductDetailsViewModel>!
@@ -56,7 +56,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     func test_product_details_view_loaded_state_single_color() {
         buildDefaultMock()
         let swatches = [
-            ColorSwatch(name: "Red", type: .color(.red)),
+            ColorSwatch(id: "red", name: "Red", type: .color(.red)),
         ]
         mockViewModel.colorSelectionConfiguration = .init(items: swatches, selectedItem: swatches.first)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -66,7 +66,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
 
     func test_product_details_view_loaded_state_many_many_colors() {
         buildDefaultMock()
-        let swatches = Array.init(repeating: ColorSwatch(name: "Red", type: .color(.red)), count: 10)
+        let swatches = Array.init(repeating: ColorSwatch(id: "red", name: "Red", type: .color(.red)), count: 10)
         mockViewModel.colorSelectionConfiguration = .init(items: swatches, selectedItem: swatches.first)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
@@ -97,9 +97,9 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         mockViewModel.productName = "Mock Product Name"
         mockViewModel.complementaryInfoToShow = [.paymentOptions, .returns]
         let swatches = [
-            ColorSwatch(name: "Red", type: .color(.red)),
-            ColorSwatch(name: "Green", type: .color(.green), isDisabled: true),
-            ColorSwatch(name: "Blue", type: .color(.blue)),
+            ColorSwatch(id: "red", name: "Red", type: .color(.red)),
+            ColorSwatch(id: "green", name: "Green", type: .color(.green), isDisabled: true),
+            ColorSwatch(id: "blue", name: "Blue", type: .color(.blue)),
         ]
         mockViewModel.colorSelectionConfiguration = .init(items: swatches, selectedItem: swatches.first)
         mockViewModel.productImageUrls = [

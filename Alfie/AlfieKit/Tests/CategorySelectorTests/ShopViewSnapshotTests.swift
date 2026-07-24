@@ -1,12 +1,13 @@
+import Combine
 import OrderedCollections
 import Mocks
 import Model
 import SnapshotTesting
 import SwiftUI
+import TestUtils
 import XCTest
-@testable import Alfie
+@testable import CategorySelector
 
-// TODO: Re-add Target Memebership once Snapshot tests are checked for working properly
 final class ShopViewSnapshotTests: XCTestCase {
     private let isRecording = false
     private var sut: ShopView<MockCategoriesViewModel, MockBrandsViewModel, MockWebViewModel>!
@@ -19,10 +20,7 @@ final class ShopViewSnapshotTests: XCTestCase {
         mockCategoriesViewModel = .init()
         mockBrandsViewModel = .init()
         mockServicesViewModel = .init()
-        sut = .init(categoriesViewModel: mockCategoriesViewModel,
-                    brandsViewModel: mockBrandsViewModel,
-                    servicesViewModel: mockServicesViewModel,
-                    initialTab: .categories)
+        sut = makeSut(initialTab: .categories)
     }
 
     override func tearDownWithError() throws {
@@ -31,6 +29,17 @@ final class ShopViewSnapshotTests: XCTestCase {
         mockBrandsViewModel = nil
         mockServicesViewModel = nil
         try super.tearDownWithError()
+    }
+
+    private func makeSut(initialTab: ShopViewTab) -> ShopView<MockCategoriesViewModel, MockBrandsViewModel, MockWebViewModel> {
+        .init(isRoot: true,
+              isWishlistEnabled: true,
+              categoriesViewModel: mockCategoriesViewModel,
+              brandsViewModel: mockBrandsViewModel,
+              servicesViewModel: mockServicesViewModel,
+              initialTab: initialTab,
+              activeShopTabPublisher: Empty<ShopViewTab, Never>().eraseToAnyPublisher(),
+              navigate: { _ in })
     }
 
     // MARK: Categories
@@ -64,10 +73,7 @@ final class ShopViewSnapshotTests: XCTestCase {
         mockBrandsViewModel.onBrandsCalled = { _ in
             Brand.fixtures
         }
-        sut = .init(categoriesViewModel: mockCategoriesViewModel,
-                    brandsViewModel: mockBrandsViewModel,
-                    servicesViewModel: mockServicesViewModel,
-                    initialTab: .brands)
+        sut = makeSut(initialTab: .brands)
         mockBrandsViewModel.state = .loading
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
@@ -75,10 +81,7 @@ final class ShopViewSnapshotTests: XCTestCase {
     }
 
     func test_shopview_brands_loaded_state() {
-        sut = .init(categoriesViewModel: mockCategoriesViewModel,
-                    brandsViewModel: mockBrandsViewModel,
-                    servicesViewModel: mockServicesViewModel,
-                    initialTab: .brands)
+        sut = makeSut(initialTab: .brands)
 
         let sections = ["A", "B", "C", "D", "E"]
         let brands: [Brand] = sections.flatMap { letter -> [Brand] in
@@ -94,10 +97,7 @@ final class ShopViewSnapshotTests: XCTestCase {
     }
 
     func test_shopview_brands_searching_with_no_results() {
-        sut = .init(categoriesViewModel: mockCategoriesViewModel,
-                    brandsViewModel: mockBrandsViewModel,
-                    servicesViewModel: mockServicesViewModel,
-                    initialTab: .brands)
+        sut = makeSut(initialTab: .brands)
 
         mockBrandsViewModel.state = .success(OrderedDictionary(grouping: [], by: { String($0.name.first!) }))
         mockBrandsViewModel.sectionTitles = OrderedSet([])
@@ -109,10 +109,7 @@ final class ShopViewSnapshotTests: XCTestCase {
     }
 
     func test_shopview_brands_error_state() {
-        sut = .init(categoriesViewModel: mockCategoriesViewModel,
-                    brandsViewModel: mockBrandsViewModel,
-                    servicesViewModel: mockServicesViewModel,
-                    initialTab: .brands)
+        sut = makeSut(initialTab: .brands)
 
         mockBrandsViewModel.state = .error(.generic)
         assertSnapshot(of: sut.embededInContainer(),
@@ -123,10 +120,7 @@ final class ShopViewSnapshotTests: XCTestCase {
     // MARK: Services
 
     func test_shopview_services_loading_state() {
-        sut = .init(categoriesViewModel: mockCategoriesViewModel,
-                    brandsViewModel: mockBrandsViewModel,
-                    servicesViewModel: mockServicesViewModel,
-                    initialTab: .services)
+        sut = makeSut(initialTab: .services)
         mockServicesViewModel.state = .loading
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
