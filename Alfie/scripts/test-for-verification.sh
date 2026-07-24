@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test script for AI agents to verify code changes
-# Works across different developer machines by automatically selecting an available simulator
+# Selects an iPhone simulator on the pinned iOS major so snapshot references stay comparable
 
 set -o pipefail  # Ensure pipe returns the exit code of the failing command
 
@@ -9,6 +9,8 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 TEST_LOG="/tmp/alfie_test.log"
+# Snapshot references are recorded on this iOS major; asserting on another major shifts rendering.
+SNAPSHOT_OS_MAJOR="26"
 
 # Parse arguments
 TEST_FILTER=""
@@ -71,11 +73,50 @@ if [ -n "$TEST_FILTER" ]; then
     FILTER_ARG="-only-testing:$TEST_FILTER"
 fi
 
-# Try to run tests with generic iOS Simulator destination (most portable)
-echo "🎯 Attempting tests with generic iOS Simulator destination..."
+# Fail fast if a snapshot test was committed in record mode — record mode always fails the
+# assertion anyway, but catching it here costs a second instead of a full test run.
+if grep -rnE 'record:[[:space:]]*true|isRecording[[:space:]]*=[[:space:]]*true' \
+        "$PROJECT_DIR/Alfie/AlfieKit/Tests" --include='*.swift' 2>/dev/null; then
+    echo ""
+    echo "❌ ERROR: A snapshot test is committed in record mode (see matches above)"
+    echo "Set it back to false and re-run so the test asserts against the committed reference."
+    exit 1
+fi
+
+# Snapshot references are pinned to an iOS major, so resolve an iPhone on that runtime rather
+# than accepting whatever generic destination xcodebuild picks (which may be an older iOS).
+SIMULATOR_ID=$(xcrun simctl list devices available --json | \
+    SNAPSHOT_OS_MAJOR="$SNAPSHOT_OS_MAJOR" /usr/bin/python3 -c '
+import json, os, re, sys
+
+major = os.environ["SNAPSHOT_OS_MAJOR"]
+for runtime, devices in json.load(sys.stdin)["devices"].items():
+    match = re.search(r"iOS-(\d+)-", runtime)
+    if not match or match.group(1) != major:
+        continue
+    for device in devices:
+        if "iPhone" in device["name"]:
+            print(device["udid"])
+            sys.exit(0)
+')
+
+if [ -z "$SIMULATOR_ID" ]; then
+    echo "❌ ERROR: No iPhone simulator running iOS $SNAPSHOT_OS_MAJOR was found"
+    echo "Snapshot references are recorded on iOS $SNAPSHOT_OS_MAJOR — asserting on another major shifts rendering."
+    echo "Install an iOS $SNAPSHOT_OS_MAJOR simulator via Xcode > Settings > Components."
+    exit 1
+fi
+
+SIMULATOR_NAME=$(xcrun simctl list devices available | \
+    grep "$SIMULATOR_ID" | \
+    sed -E 's/^[[:space:]]+(.+) \([A-F0-9-]+\).*/\1/')
+
+echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — iOS $SNAPSHOT_OS_MAJOR"
+echo ""
+
 xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
-    -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+    -destination "id=$SIMULATOR_ID" \
     $FILTER_ARG \
     $TEST_ACTION 2>&1 | tee "$TEST_LOG"
 
@@ -85,46 +126,6 @@ if [ $TEST_RESULT -eq 0 ]; then
     echo ""
     echo "✅ TESTS PASSED"
     exit 0
-fi
-
-# Check if it was a destination error
-if grep -q "Unable to find a device matching the provided destination" "$TEST_LOG"; then
-    echo "⚠️  Generic destination failed, trying specific iPhone simulator..."
-    
-    # Get first available iPhone simulator
-    SIMULATOR_ID=$(xcrun simctl list devices available | \
-        grep -E "iPhone" | \
-        grep -v "unavailable" | \
-        head -1 | \
-        sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-    
-    if [ -z "$SIMULATOR_ID" ]; then
-        echo "❌ ERROR: No iPhone simulator found"
-        echo "Please install iPhone simulators via Xcode"
-        exit 1
-    fi
-    
-    SIMULATOR_NAME=$(xcrun simctl list devices available | \
-        grep "$SIMULATOR_ID" | \
-        sed -E 's/^[[:space:]]+(.+) \(.+\).*/\1/')
-    
-    echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID)"
-    echo ""
-    
-    # Run tests with specific simulator
-    xcodebuild -project "$PROJECT_FILE" \
-        -scheme "$SCHEME" \
-        -destination "id=$SIMULATOR_ID" \
-        $FILTER_ARG \
-        $TEST_ACTION 2>&1 | tee "$TEST_LOG"
-    
-    TEST_RESULT=${PIPESTATUS[0]}
-    
-    if [ $TEST_RESULT -eq 0 ]; then
-        echo ""
-        echo "✅ TESTS PASSED"
-        exit 0
-    fi
 fi
 
 # Tests failed
