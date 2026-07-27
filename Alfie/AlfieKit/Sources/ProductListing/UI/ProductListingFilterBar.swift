@@ -41,7 +41,7 @@ struct ProductListingFilterBar: View {
                 }
             }
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.spacing.space200)
         .frame(minHeight: Constants.barMinHeight)
     }
 
@@ -49,18 +49,13 @@ struct ProductListingFilterBar: View {
         Button {
             filterAction()
         } label: {
-            HStack(spacing: Primitives.Spacing.spacing8) {
-                Icon.filter.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(size: Constants.filterIcon)
-                    .tint(Primitives.Colours.neutrals800)
+            HStack(spacing: theme.spacing.space100) {
+                ThemedIcon(.filter, size: .small, tint: Theme.contentContentPrimary)
                 Text
                     .build(
                         theme.font.body.medium(L10n.Plp.Refine.Button.cta)
                     )
-                    .foregroundStyle(Primitives.Colours.neutrals800)
+                    .foregroundStyle(Theme.contentContentPrimary)
             }
         }
         .buttonStyle(.plain)
@@ -69,7 +64,7 @@ struct ProductListingFilterBar: View {
 
     private var resultInfoView: some View {
         Text.build(theme.font.body.small(L10n.Plp.NumberOfResults.message(total)))
-            .foregroundStyle(Primitives.Colours.neutrals500)
+            .foregroundStyle(Theme.contentContentTerciary)
             .accessibilityIdentifier(AccessibilityID.ProductListing.resultsLabel)
     }
 
@@ -77,8 +72,8 @@ struct ProductListingFilterBar: View {
 
     private enum Constants {
         static let fullOpacityResults: CGFloat = 1
+        // No spacing token maps to 60pt; retained to preserve the bar's touch-target height.
         static let barMinHeight: CGFloat = 60.0
-        static let filterIcon: CGFloat = 16.0
     }
 
 }

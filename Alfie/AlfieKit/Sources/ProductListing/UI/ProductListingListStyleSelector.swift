@@ -11,31 +11,45 @@ struct ProductListingListStyleSelector: View {
     }
 
     var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing16) {
-            Button {
-                selectedStyle = .grid
-            } label: {
-                ThemedIcon(
-                    .grid,
-                    size: .small,
-                    tint: selectedStyle == .grid ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200,
-                    accessibilityLabel: L10n.Accessibility.gridView
-                )
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleGridButton)
-            Button {
-                selectedStyle = .list
-            } label: {
-                ThemedIcon(
-                    .listplp,
-                    size: .small,
-                    tint: selectedStyle == .list ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200,
-                    accessibilityLabel: L10n.Accessibility.listView
-                )
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleListButton)
+        HStack(spacing: theme.spacing.space200) {
+            styleButton(
+                for: .grid,
+                icon: .grid,
+                accessibilityLabel: L10n.Accessibility.gridView,
+                accessibilityID: AccessibilityID.ProductListing.listStyleGridButton
+            )
+            styleButton(
+                for: .list,
+                icon: .listplp,
+                accessibilityLabel: L10n.Accessibility.listView,
+                accessibilityID: AccessibilityID.ProductListing.listStyleListButton
+            )
+        }
+    }
+
+    private func styleButton(
+        for style: ProductListingListStyle,
+        icon: Icon,
+        accessibilityLabel: String,
+        accessibilityID: String
+    ) -> some View {
+        Button {
+            selectedStyle = style
+        } label: {
+            ThemedIcon(
+                icon,
+                size: .small,
+                tint: Style.iconTint(isSelected: selectedStyle == style),
+                accessibilityLabel: accessibilityLabel
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityID)
+    }
+
+    enum Style {
+        static func iconTint(isSelected: Bool) -> Color {
+            isSelected ? Theme.contentContentPrimary : Theme.borderSoft
         }
     }
 }

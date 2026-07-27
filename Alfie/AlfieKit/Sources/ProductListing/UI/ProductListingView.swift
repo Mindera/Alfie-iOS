@@ -27,7 +27,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     public var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.spacing.space0) {
             if viewModel.state.didFail {
                 errorView
             } else {
@@ -56,7 +56,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     @ViewBuilder private var productCardList: some View {
-        LazyVGrid(columns: gridStruct, spacing: Primitives.Spacing.spacing16) {
+        LazyVGrid(columns: gridStruct, spacing: theme.spacing.space200) {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
                     viewModel: .init(
@@ -83,11 +83,11 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 }
             }
         }
-        .padding(Primitives.Spacing.spacing16)
+        .padding(theme.spacing.space200)
 
         if viewModel.state.isLoadingNextPage {
             LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
-                .padding(.bottom, Primitives.Spacing.spacing32)
+                .padding(.bottom, theme.spacing.space400)
         }
     }
 
@@ -111,7 +111,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     private var gridStruct: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top), count: numberOfCardsPerRow)
+        Array(repeating: GridItem(.flexible(), spacing: theme.spacing.space200, alignment: .top), count: numberOfCardsPerRow)
     }
 
     private var numberOfCardsPerRow: Int {
