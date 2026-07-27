@@ -60,13 +60,15 @@ private func makeNavigationItem(
     )
 }
 
-// Reduces a BFF menu path to `/<collection-handle>`: the last path segment, minus any query or
-// fragment, lowercased (Shopify handles are lowercase). `didSelectCategory` strips the leading `/`
-// and passes the remainder to `productList` as the collectionHandle, so a multi-segment path like
-// `/shop/new/dresses` must collapse to `/dresses`.
+// Reduces a BFF menu path to `/<collection-handle>`: the last path segment, lowercased (Shopify
+// handles are lowercase). `didSelectCategory` strips the leading `/` and passes the remainder to
+// `productList` as the collectionHandle, so a multi-segment path like `/shop/new/dresses` must
+// collapse to `/dresses`. Parsing via `URLComponents` keeps the host out of the handle — an
+// absolute url with no path (`https://example.com`) has no segment and is dropped, not read as
+// `/example.com` — and drops query/fragment for free.
 private func collectionHandleURL(from url: String?) -> String? {
     guard let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else { return nil }
-    let path = trimmed.components(separatedBy: CharacterSet(charactersIn: "?#"))[0]
+    guard let path = URLComponents(string: trimmed)?.path else { return nil }
     guard let handle = path.split(separator: "/").last.map(String.init), !handle.isEmpty else { return nil }
     return "/\(handle.lowercased())"
 }

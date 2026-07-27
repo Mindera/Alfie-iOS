@@ -115,6 +115,19 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(items.first).url, "/dresses")
     }
 
+    func test_absolute_host_only_url_is_dropped() {
+        // The host must never be read as a collection handle (would yield a bogus "/example.com").
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Home", url: "https://example.com")])
+            .convertToNavigationItems()
+        XCTAssertTrue(items.isEmpty)
+    }
+
+    func test_absolute_root_path_url_is_dropped() {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Home", url: "https://example.com/")])
+            .convertToNavigationItems()
+        XCTAssertTrue(items.isEmpty)
+    }
+
     func test_absolute_url_reduces_to_last_path_segment() throws {
         let items = makeMenu(items: [
             Mock<MenuItem>(id: "1", title: "Dresses", url: "https://shop.example.com/collections/dresses")
