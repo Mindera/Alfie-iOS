@@ -66,6 +66,7 @@ of the build.
 | Test file | Target | Covers |
 |---|---|---|
 | `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
+| `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
 
 The pre-existing suite (Search, CategorySelector, ProductDetails) was removed: those screens are mid
 Modern Design Rollout, so their references would churn on every rollout PR. Re-add them per screen once a
@@ -77,6 +78,14 @@ design has settled.
 2. `import TestUtils` and `@testable import <Module>`.
 3. Use `embededInContainer()` / `embededInFullHeightContainer()` and `.defaultImage()`.
 4. Record → **inspect the PNG** → assert → commit.
+
+## A test target must be in the test plan
+
+Being an SPM test target is not enough — `verify.sh` runs `Alfie.xctestplan`, so a target missing from it
+never runs. `HomeTests`, `ModelTests`, `MyAccountTests` and `UtilsTests` were all in this state (25 test
+functions silently not running) and have been added.
+
+`BFFIntegrationTests` is deliberately excluded: it has its own `AlfieIntegration.xctestplan`.
 
 ## Beware: animated and time-driven views
 
