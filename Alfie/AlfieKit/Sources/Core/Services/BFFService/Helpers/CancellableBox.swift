@@ -14,12 +14,23 @@ final class CancellableBox: @unchecked Sendable {
     private var cancellable: (any Apollo.Cancellable)?
     private var hasResumed = false
     private var resumeOnCancel: (@Sendable () -> Void)?
+    private var cancelledBeforeResumeSet = false
 
-    /// Store how to resume the continuation with cancellation. Set once, at the start of the
-    /// continuation body, before the request can complete or be cancelled.
+    /// Store how to resume the continuation with cancellation. Called once, at the start of the
+    /// continuation body. If cancellation already fired in the race window before this ran (task
+    /// cancelled between entering `withTaskCancellationHandler` and this line), resume immediately
+    /// — otherwise `cancel()` had no closure to call and the continuation would hang forever.
     func setResumeOnCancel(_ resume: @escaping @Sendable () -> Void) {
-        lock.lock(); defer { lock.unlock() }
+        lock.lock()
+        guard !cancelledBeforeResumeSet else {
+            // `cancel()` already set `hasResumed`, so the Apollo callback will no-op — this is the
+            // one and only resume.
+            lock.unlock()
+            resume()
+            return
+        }
         resumeOnCancel = resume
+        lock.unlock()
     }
 
     func set(_ cancellable: any Apollo.Cancellable) {
@@ -52,6 +63,10 @@ final class CancellableBox: @unchecked Sendable {
         let shouldResume = !hasResumed
         hasResumed = true
         let resume = resumeOnCancel
+        if shouldResume, resume == nil {
+            // Lost the race with `setResumeOnCancel` — mark it so that call resumes the continuation.
+            cancelledBeforeResumeSet = true
+        }
         lock.unlock()
         if shouldResume {
             resume?()
