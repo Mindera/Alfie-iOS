@@ -10,7 +10,8 @@ PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 TEST_LOG="/tmp/alfie_test.log"
 # Snapshot references are recorded on this iOS major; asserting on another major shifts rendering.
-SNAPSHOT_OS_MAJOR="26"
+# Overridable per environment (e.g. CI on a newer runtime) without editing the script.
+SNAPSHOT_OS_MAJOR="${SNAPSHOT_OS_MAJOR:-26}"
 
 # Parse arguments
 TEST_FILTER=""
@@ -75,8 +76,8 @@ fi
 
 # Fail fast if a snapshot test was committed in record mode — record mode always fails the
 # assertion anyway, but catching it here costs a second instead of a full test run.
-if grep -rnE 'record:[[:space:]]*true|isRecording[[:space:]]*=[[:space:]]*true' \
-        "$PROJECT_DIR/Alfie/AlfieKit/Tests" --include='*.swift' 2>/dev/null; then
+if grep -rnE --include='*.swift' 'record:[[:space:]]*true|isRecording[[:space:]]*=[[:space:]]*true' \
+        "$PROJECT_DIR/Alfie/AlfieKit/Tests" 2>/dev/null; then
     echo ""
     echo "❌ ERROR: A snapshot test is committed in record mode (see matches above)"
     echo "Set it back to false and re-run so the test asserts against the committed reference."

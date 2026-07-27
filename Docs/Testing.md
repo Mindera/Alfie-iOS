@@ -53,6 +53,6 @@ final class FeatureServiceTests: XCTestCase {
 - Record mode: Set `isRecording = true` temporarily
 - Verify mode: Default behavior
 - Tests live in the AlfieKit module test targets; shared helpers are in `TestUtils`
-- References are pinned to iOS major 26 and run as part of `verify.sh`
+- References are pinned to iOS major 26 and run as part of `./Alfie/scripts/verify.sh`
 
 See `Docs/SnapshotTesting.md` for the device/precision policy, the record loop, and the migration playbook.
