@@ -282,6 +282,42 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertEqual(title, itemTitle)
     }
 
+    func test_absolute_page_url_opens_verbatim_in_web() {
+        // Real Shopify page links are absolute — the webview must hit the real host, not ours.
+        let absolute = "https://mindera-test-store.myshopify.com/pages/contact"
+        let fixture = NavigationItem.fixture(type: .page, url: absolute)
+
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { self.sut.didSelectCategory(fixture) }
+        )
+
+        guard let destination, case .web(let url, _) = destination else {
+            XCTFail("Unexpected destination type: \(String(describing: destination))")
+            return
+        }
+
+        XCTAssertEqual(url.absoluteString, absolute)
+    }
+
+    func test_relative_page_url_resolves_against_local_web_host() {
+        // A relative path (no host) still resolves against our own web host.
+        let fixture = NavigationItem.fixture(type: .page, url: "/pages/contact")
+
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { self.sut.didSelectCategory(fixture) }
+        )
+
+        guard let destination, case .web(let url, _) = destination else {
+            XCTFail("Unexpected destination type: \(String(describing: destination))")
+            return
+        }
+
+        XCTAssertTrue(url.absoluteString.hasPrefix("https://\(ThemedURL.hostWithPortComponent)"))
+        XCTAssertTrue(url.absoluteString.hasSuffix("/pages/contact"))
+    }
+
     func test_triggers_navigation_to_plp_when_listing_item_is_selected() {
         let path = "/clothing"
         let fixture = NavigationItem.fixture(type: .listing, url: path)

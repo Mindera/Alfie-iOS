@@ -64,31 +64,34 @@ private func makeNavigationItem(
 
 // Maps a Shopify menu url to a domain destination based on its route prefix, so non-collection
 // links don't masquerade as (broken) product listings:
-//   /collections/<handle>  → `.listing`, url `/<handle>`   (PLP)
-//   /pages/…, /blogs/…      → `.page`,    full path kept    (webview)
-//   /products/<handle>      → `.product`, full path kept    (product)
+//   /collections/<handle>  → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
+//   /pages/…, /blogs/…      → `.page`,    url kept verbatim (webview opens it as-is)
+//   /products/…            → `.product`, url kept verbatim
 //   /<handle> (bare)        → `.listing`, url `/<handle>`   (PLP; also SpecialCategories like /brands)
 // Anything else — path-less absolute urls (`https://host`), root `/`, or unrecognized multi-segment
-// paths — is dropped rather than guessed. `URLComponents` keeps the host out of the path and drops
-// any query/fragment.
+// paths — is dropped rather than guessed. Collections resolve to just the handle (host irrelevant to
+// the PLP flow); page/blog/product links keep their original url (Shopify returns absolute urls, and
+// the webview must hit the real host, not ours).
 private func menuDestination(from url: String?) -> (type: NavigationItemType, url: String)? {
     guard
         let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty,
-        let path = URLComponents(string: trimmed)?.path
+        let components = URLComponents(string: trimmed)
     else {
         return nil
     }
-    let segments = path.split(separator: "/").map { $0.lowercased() }
+    let segments = components.path.split(separator: "/").map { $0.lowercased() }
     guard let first = segments.first else { return nil }
 
     switch first {
     case "collections":
-        guard let handle = segments.last, !handle.isEmpty else { return nil }
-        return (.listing, "/\(handle)")
+        // Handle is the segment *after* "collections" — a tag-filtered link like
+        // `/collections/all/sale` keeps the tag last — and a bare `/collections` has no handle.
+        guard segments.count >= 2 else { return nil }
+        return (.listing, "/\(segments[1])")
     case "pages", "blogs":
-        return (.page, "/\(segments.joined(separator: "/"))")
+        return (.page, trimmed)
     case "products":
-        return (.product, "/\(segments.joined(separator: "/"))")
+        return (.product, trimmed)
     default:
         // A bare single segment is a collection handle (or a SpecialCategory, matched upstream).
         guard segments.count == 1 else { return nil }

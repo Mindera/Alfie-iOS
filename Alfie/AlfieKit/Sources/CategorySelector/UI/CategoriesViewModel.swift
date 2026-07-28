@@ -144,10 +144,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             return
         }
 
-        guard
-            var url = URL(string: "https://\(ThemedURL.hostWithPortComponent)"),
-            let categoryUrl = category.url
-        else {
+        guard let categoryUrl = category.url else {
             log.error("Error building URL for category from navigation item: \(category)")
             state = .error(.generic)
             return
@@ -178,13 +175,25 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
              .account,
              .wishlist:
             // Temporarily open a webview with this category, until we have all screens
-            let paths = categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }
-            paths.forEach { path in
-                url = url.appending(component: path)
+            guard let url = webViewURL(from: categoryUrl) else {
+                log.error("Error building web URL for category from navigation item: \(category)")
+                state = .error(.generic)
+                return
             }
             openCategorySubject.send(.web(url: url, title: category.title))
             navigate(.web(url: url, title: category.title))
         }
+    }
+
+    // Shopify returns absolute page/blog urls — open those verbatim so the webview hits the real
+    // host. A relative path resolves against our own web host (the pre-BFF behavior).
+    private func webViewURL(from categoryUrl: String) -> URL? {
+        if let absolute = URL(string: categoryUrl), absolute.scheme != nil, absolute.host != nil {
+            return absolute
+        }
+        guard var url = URL(string: "https://\(ThemedURL.hostWithPortComponent)") else { return nil }
+        categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }.forEach { url = url.appending(component: $0) }
+        return url
     }
 
     @MainActor

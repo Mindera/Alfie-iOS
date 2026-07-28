@@ -30,6 +30,43 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertEqual(item.url, "/womens-tops")
     }
 
+    func test_absolute_collections_url_uses_handle_and_drops_host() throws {
+        // Real Shopify menu urls are absolute; a collection only needs its handle, so the host is
+        // correctly dropped here.
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Home", url: "https://mindera-test-store.myshopify.com/collections/frontpage")
+        ]).convertToNavigationItems()
+
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.type, .listing)
+        XCTAssertEqual(item.url, "/frontpage")
+    }
+
+    func test_collections_tag_url_uses_handle_not_tag() throws {
+        // Tag-filtered collection link — the handle is the segment after `collections`, not the tag.
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Sale", url: "/collections/all/sale")])
+            .convertToNavigationItems()
+        XCTAssertEqual(try XCTUnwrap(items.first).url, "/all")
+    }
+
+    func test_bare_collections_url_is_dropped() {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Collections", url: "/collections")])
+            .convertToNavigationItems()
+        XCTAssertTrue(items.isEmpty)
+    }
+
+    func test_absolute_page_url_is_kept_verbatim_with_host() throws {
+        // Page/blog links open in a webview and must hit the real host, so the absolute url is kept
+        // intact (host included) rather than reduced to a path.
+        let url = "https://mindera-test-store.myshopify.com/pages/contact"
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Contact", url: url)])
+            .convertToNavigationItems()
+
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.type, .page)
+        XCTAssertEqual(item.url, url)
+    }
+
     func test_pages_link_maps_to_page_type_keeping_full_path() throws {
         let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Store Locator", url: "/pages/store-locator")])
             .convertToNavigationItems()
@@ -167,13 +204,6 @@ final class MainMenuConverterTests: XCTestCase {
         let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Home", url: "https://example.com/")])
             .convertToNavigationItems()
         XCTAssertTrue(items.isEmpty)
-    }
-
-    func test_absolute_url_reduces_to_last_path_segment() throws {
-        let items = makeMenu(items: [
-            Mock<MenuItem>(id: "1", title: "Dresses", url: "https://shop.example.com/collections/dresses")
-        ]).convertToNavigationItems()
-        XCTAssertEqual(try XCTUnwrap(items.first).url, "/dresses")
     }
 
     func test_handle_is_lowercased() throws {
