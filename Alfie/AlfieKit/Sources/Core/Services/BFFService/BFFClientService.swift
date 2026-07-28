@@ -55,25 +55,23 @@ public final class BFFClientService: BFFClientServiceProtocol {
     public func getHeaderNav(
         handle: NavigationHandle,
         includeSubItems: Bool,
-        includeMedia: Bool,
-        forceRefresh: Bool
+        includeMedia: Bool
     ) async throws -> [NavigationItem] {
         let platform = BFFPlatform.predefined
         let menuHandle = handle.bffMenuHandle
-        // Pull-to-refresh must bypass the cache; the normalized cache has no TTL, so an identical
-        // query otherwise short-circuits before the network and never sees BFF changes.
-        let cachePolicy: CachePolicy = forceRefresh ? .fetchIgnoringCacheData : .default
-        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue) forceRefresh=\(forceRefresh)")
+        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue)")
 
         do {
+            // The menu is never served from cache: the normalized cache has no TTL, so a cached menu
+            // would hide merchandising changes until an app relaunch. Always fetch fresh.
             let items = try await executeFetch(
                 BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue)),
-                cachePolicy: cachePolicy
+                cachePolicy: .fetchIgnoringCacheData
             ).mainMenu.convertToNavigationItems()
             if items.isEmpty {
-                // Menu came back but nothing resolved to a collection handle — likely non-collection
-                // links (e.g. /pages/*, absolute urls). Surfaces an otherwise-silent empty Shop screen.
-                log.error("mainMenu ← 0 actionable categories (menu items had no resolvable collection handle)")
+                // Menu returned but nothing was actionable — no recognizable collection/page/product
+                // links. Surfaces an otherwise-silent empty Shop screen.
+                log.error("mainMenu ← 0 actionable categories (no recognizable collection/page/product links)")
             } else {
                 log.info("mainMenu ← items=\(items.count)")
             }

@@ -362,6 +362,10 @@ public enum L10n {
         public static let message = L10n.tr("L10n", "shop.categories.error_view.message")
         /// Cannot load categories
         public static let title = L10n.tr("L10n", "shop.categories.error_view.title")
+        public enum Button {
+          /// Retry
+          public static let cta = L10n.tr("L10n", "shop.categories.error_view.button.cta")
+        }
         public enum RateLimited {
           /// Please wait a moment and try again.
           public static let message = L10n.tr("L10n", "shop.categories.error_view.rate_limited.message")
@@ -596,6 +600,7 @@ public extension L10n {
       case shopBrandsSegmentTitle = "shop.brands.segment.title"
       case shopCategoriesErrorViewMessage = "shop.categories.error_view.message"
       case shopCategoriesErrorViewTitle = "shop.categories.error_view.title"
+      case shopCategoriesErrorViewButtonCta = "shop.categories.error_view.button.cta"
       case shopCategoriesErrorViewRateLimitedMessage = "shop.categories.error_view.rate_limited.message"
       case shopCategoriesErrorViewRateLimitedTitle = "shop.categories.error_view.rate_limited.title"
       case shopCategoriesErrorViewServerErrorMessage = "shop.categories.error_view.server_error.message"

@@ -21,11 +21,48 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertNil(item.items)
     }
 
-    func test_multi_segment_url_reduces_to_last_path_component() throws {
-        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Dresses", url: "/shop/new/dresses")])
+    func test_collections_link_maps_to_listing_with_handle() throws {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Tops", url: "/collections/womens-tops")])
             .convertToNavigationItems()
 
-        XCTAssertEqual(try XCTUnwrap(items.first).url, "/dresses")
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.type, .listing)
+        XCTAssertEqual(item.url, "/womens-tops")
+    }
+
+    func test_pages_link_maps_to_page_type_keeping_full_path() throws {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Store Locator", url: "/pages/store-locator")])
+            .convertToNavigationItems()
+
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.type, .page)
+        XCTAssertEqual(item.url, "/pages/store-locator")
+    }
+
+    func test_blogs_link_maps_to_page_type_keeping_full_path() throws {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "News", url: "/blogs/news")])
+            .convertToNavigationItems()
+
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.type, .page)
+        XCTAssertEqual(item.url, "/blogs/news")
+    }
+
+    func test_products_link_maps_to_product_type_keeping_full_path() throws {
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Shirt", url: "/products/some-shirt")])
+            .convertToNavigationItems()
+
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.type, .product)
+        XCTAssertEqual(item.url, "/products/some-shirt")
+    }
+
+    func test_unknown_multi_segment_url_is_dropped() {
+        // Not a recognized Shopify route (collections/pages/blogs/products) — dropped rather than
+        // guessed into a bogus collection handle.
+        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Deep", url: "/shop/new/dresses")])
+            .convertToNavigationItems()
+        XCTAssertTrue(items.isEmpty)
     }
 
     func test_nested_children_are_preserved() throws {
@@ -69,14 +106,18 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertEqual(parentItem.items?.count, 1)
     }
 
-    func test_all_items_map_to_listing_type() throws {
-        // Every leaf routes through the PLP flow; the converter doesn't infer other nav types.
+    func test_type_is_derived_from_the_route_prefix() {
+        // The converter maps each link to a type by its Shopify route so non-collection links don't
+        // become broken PLPs.
         let items = makeMenu(items: [
             Mock<MenuItem>(id: "1", title: "Women", url: "/women"),
-            Mock<MenuItem>(id: "2", title: "Sale", url: "/collections/sale")
+            Mock<MenuItem>(id: "2", title: "Sale", url: "/collections/sale"),
+            Mock<MenuItem>(id: "3", title: "Store Locator", url: "/pages/store-locator"),
+            Mock<MenuItem>(id: "4", title: "News", url: "/blogs/news"),
+            Mock<MenuItem>(id: "5", title: "Shirt", url: "/products/some-shirt")
         ]).convertToNavigationItems()
 
-        XCTAssertEqual(items.map(\.type), [.listing, .listing])
+        XCTAssertEqual(items.map(\.type), [.listing, .listing, .page, .page, .product])
     }
 
     func test_root_url_leaf_is_dropped() {

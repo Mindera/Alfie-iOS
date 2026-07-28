@@ -88,7 +88,17 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                 return (L10n.Shop.Categories.ErrorView.title, L10n.Shop.Categories.ErrorView.message)
             }
         }()
-        return ErrorView(title: title, message: message)
+        // A retry gives the error state a recovery path — pull-to-refresh can't be relied on here
+        // (the error sits in an overlay above the scroll view's gesture).
+        return ErrorView(
+            title: title,
+            message: message,
+            buttons: [
+                .init(cta: L10n.Shop.Categories.ErrorView.Button.cta) {
+                    Task { await viewModel.refresh() }
+                },
+            ]
+        )
     }
 
     private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color, showChevron: Bool) -> some View {

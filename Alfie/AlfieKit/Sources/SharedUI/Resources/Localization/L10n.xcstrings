@@ -937,6 +937,17 @@
         }
       }
     },
+    "shop.categories.error_view.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
     "shop.categories.error_view.message" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -46,29 +46,52 @@ private func makeNavigationItem(
     url rawURL: String?,
     children: [NavigationItem]
 ) -> NavigationItem? {
-    let handleURL = collectionHandleURL(from: rawURL)
-    // A leaf that resolves to no collection handle and has no sub-menu isn't actionable — drop it.
-    guard !children.isEmpty || handleURL != nil else { return nil }
+    let destination = menuDestination(from: rawURL)
+    // A leaf with no actionable destination and no sub-menu isn't actionable — drop it.
+    guard !children.isEmpty || destination != nil else { return nil }
     return NavigationItem(
+        // Type is irrelevant for a parent with no destination of its own (tapping drills in), so a
+        // `.listing` default is harmless there.
         id: id,
-        type: .listing,
+        type: destination?.type ?? .listing,
         title: title,
-        url: handleURL,
+        url: destination?.url,
         media: nil,
         items: children.isEmpty ? nil : children,
         attributes: nil
     )
 }
 
-// Reduces a BFF menu path to `/<collection-handle>`: the last path segment, lowercased (Shopify
-// handles are lowercase). `didSelectCategory` strips the leading `/` and passes the remainder to
-// `productList` as the collectionHandle, so a multi-segment path like `/shop/new/dresses` must
-// collapse to `/dresses`. Parsing via `URLComponents` keeps the host out of the handle — an
-// absolute url with no path (`https://example.com`) has no segment and is dropped, not read as
-// `/example.com` — and drops query/fragment for free.
-private func collectionHandleURL(from url: String?) -> String? {
-    guard let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else { return nil }
-    guard let path = URLComponents(string: trimmed)?.path else { return nil }
-    guard let handle = path.split(separator: "/").last.map(String.init), !handle.isEmpty else { return nil }
-    return "/\(handle.lowercased())"
+// Maps a Shopify menu url to a domain destination based on its route prefix, so non-collection
+// links don't masquerade as (broken) product listings:
+//   /collections/<handle>  → `.listing`, url `/<handle>`   (PLP)
+//   /pages/…, /blogs/…      → `.page`,    full path kept    (webview)
+//   /products/<handle>      → `.product`, full path kept    (product)
+//   /<handle> (bare)        → `.listing`, url `/<handle>`   (PLP; also SpecialCategories like /brands)
+// Anything else — path-less absolute urls (`https://host`), root `/`, or unrecognized multi-segment
+// paths — is dropped rather than guessed. `URLComponents` keeps the host out of the path and drops
+// any query/fragment.
+private func menuDestination(from url: String?) -> (type: NavigationItemType, url: String)? {
+    guard
+        let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty,
+        let path = URLComponents(string: trimmed)?.path
+    else {
+        return nil
+    }
+    let segments = path.split(separator: "/").map { $0.lowercased() }
+    guard let first = segments.first else { return nil }
+
+    switch first {
+    case "collections":
+        guard let handle = segments.last, !handle.isEmpty else { return nil }
+        return (.listing, "/\(handle)")
+    case "pages", "blogs":
+        return (.page, "/\(segments.joined(separator: "/"))")
+    case "products":
+        return (.product, "/\(segments.joined(separator: "/"))")
+    default:
+        // A bare single segment is a collection handle (or a SpecialCategory, matched upstream).
+        guard segments.count == 1 else { return nil }
+        return (.listing, "/\(first)")
+    }
 }

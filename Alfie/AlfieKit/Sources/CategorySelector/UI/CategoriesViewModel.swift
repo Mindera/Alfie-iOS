@@ -189,10 +189,9 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     @MainActor
     public func refresh() async {
-        // Pull-to-refresh keeps its own spinner (no flip to `.loading`, current list stays on
-        // screen) and `forceRefresh` bypasses the cache so it hits the BFF instead of replaying
-        // the cached menu.
-        await fetchNavigationItems(forceRefresh: true)
+        // Pull-to-refresh keeps its own spinner (no flip to `.loading`) and keeps the current list on
+        // screen. The menu is never cached, so this always re-fetches from the BFF.
+        await fetchNavigationItems()
     }
 
     // MARK: - Private
@@ -207,11 +206,11 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             state = .loading
         }
 
-        await fetchNavigationItems(forceRefresh: false)
+        await fetchNavigationItems()
     }
 
     @MainActor
-    private func fetchNavigationItems(forceRefresh: Bool) async {
+    private func fetchNavigationItems() async {
         guard let navigationService else {
             return
         }
@@ -219,7 +218,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         let navigationItems: [NavigationItem]
 
         do {
-            navigationItems = try await navigationService.getNavigationItems(for: .shop, forceRefresh: forceRefresh)
+            navigationItems = try await navigationService.getNavigationItems(for: .shop)
         } catch is CancellationError {
             // The screen was dismissed (or the refresh superseded) mid-fetch — not a user-facing error.
             return

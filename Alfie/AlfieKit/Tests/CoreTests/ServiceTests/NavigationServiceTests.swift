@@ -32,16 +32,8 @@ final class NavigationServiceTests: XCTestCase {
         }
 
         Task {
-            _ = try await sut.getNavigationItems(for: .shop, forceRefresh: false)
+            _ = try await sut.getNavigationItems(for: .shop)
         }
         wait(for: [expectation], timeout: .default)
-    }
-
-    func test_get_navigation_items_forwards_force_refresh_to_bff_service() async throws {
-        mockClientService.onGetHeaderNavCalled = { _, _, _ in [] }
-
-        _ = try await sut.getNavigationItems(for: .shop, forceRefresh: true)
-
-        XCTAssertEqual(mockClientService.lastForceRefresh, true)
     }
 }
