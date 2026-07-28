@@ -42,6 +42,8 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     private let navigationService: NavigationServiceProtocol?
     private let log: Logger
+    // True while a fetch is in flight, so concurrent loads/refreshes don't race (last-writer-wins).
+    private var isFetching = false
     private let openCategorySubject: PassthroughSubject<CategoriesNavigationDestination, Never> = .init()
     private lazy var placeholders: [NavigationItem] = {
         (0..<Constants.placeholderItemCount).map { _ in
@@ -127,20 +129,21 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     public func didSelectCategory(_ category: NavigationItem) {
-        // Special categories
+        // A category with sub-categories drills in — even if its url matches a SpecialCategory, the
+        // sub-menu takes precedence so the children remain reachable.
+        if category.hasSubCategories, let subCategories = category.items {
+            openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
+            navigate(.subCategories(subCategories: subCategories, parent: category))
+            return
+        }
+
+        // Special categories (as leaves) open their native screen.
         if let specialCategory = SpecialCategories.allCases.first(
             where: { $0.rawValue == category.url?.lowercased() }
         ) {
             openCategorySubject.send(specialCategory.destination)
             guard !ignoreLocalNavigation, let url = specialCategory.themedUrl.internalUrl else { return }
             ExternalAppLauncher.open(url: url)
-            return
-        }
-
-        // If this category has sub-categories, show them, otherwise open the PLP
-        if category.hasSubCategories, let subCategories = category.items {
-            openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
-            navigate(.subCategories(subCategories: subCategories, parent: category))
             return
         }
 
@@ -199,7 +202,16 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     @MainActor
     public func refresh() async {
         // Pull-to-refresh keeps its own spinner (no flip to `.loading`) and keeps the current list on
-        // screen. The menu is never cached, so this always re-fetches from the BFF.
+        // screen. The menu is never cached, so this always re-fetches. If a fetch is already in
+        // flight (e.g. the initial load) `fetchNavigationItems` no-ops, so the two can't race.
+        await fetchNavigationItems()
+    }
+
+    @MainActor
+    public func retry() async {
+        // Recovery from the error screen: unlike pull-to-refresh, show the loading state for feedback.
+        guard !isFetching else { return }
+        state = .loading
         await fetchNavigationItems()
     }
 
@@ -207,7 +219,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     @MainActor
     private func loadItems() async {
-        guard !state.isSuccess else {
+        guard !state.isSuccess, !isFetching else {
             return
         }
 
@@ -220,9 +232,13 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     @MainActor
     private func fetchNavigationItems() async {
-        guard let navigationService else {
+        // Only one fetch runs at a time — a pull-to-refresh during the initial load (or vice versa)
+        // is ignored, so a slower fetch can't overwrite a newer result.
+        guard let navigationService, !isFetching else {
             return
         }
+        isFetching = true
+        defer { isFetching = false }
 
         let navigationItems: [NavigationItem]
 

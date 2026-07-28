@@ -52,11 +52,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     // MARK: - BFFClientServiceProtocol
 
-    public func getHeaderNav(
-        handle: NavigationHandle,
-        includeSubItems: Bool,
-        includeMedia: Bool
-    ) async throws -> [NavigationItem] {
+    public func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem] {
         let platform = BFFPlatform.predefined
         let menuHandle = handle.bffMenuHandle
         log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue)")

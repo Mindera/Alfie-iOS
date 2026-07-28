@@ -23,10 +23,8 @@ final class NavigationServiceTests: XCTestCase {
 
     func test_get_navigation_items_calls_bff_service() {
         let expectation = expectation(description: "Wait for service call")
-        mockClientService.onGetHeaderNavCalled = { handle, includeSubItems, includeMedia in
+        mockClientService.onGetHeaderNavCalled = { handle in
             XCTAssertEqual(handle, .header)
-            XCTAssertTrue(includeSubItems)
-            XCTAssertFalse(includeMedia)
             expectation.fulfill()
             return []
         }

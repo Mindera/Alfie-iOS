@@ -50,6 +50,9 @@ final class CancellableBox: @unchecked Sendable {
         lock.lock()
         guard !hasResumed else { lock.unlock(); return }
         hasResumed = true
+        // Nothing more will run — drop the request and the continuation-capturing closure.
+        cancellable = nil
+        resumeOnCancel = nil
         lock.unlock()
         resume()
     }

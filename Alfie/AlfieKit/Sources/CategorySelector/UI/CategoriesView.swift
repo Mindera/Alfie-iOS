@@ -95,7 +95,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             message: message,
             buttons: [
                 .init(cta: L10n.Shop.Categories.ErrorView.Button.cta) {
-                    Task { await viewModel.refresh() }
+                    Task { await viewModel.retry() }
                 },
             ]
         )

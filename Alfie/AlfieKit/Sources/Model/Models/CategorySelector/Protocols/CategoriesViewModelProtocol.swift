@@ -50,5 +50,6 @@ public protocol CategoriesViewModelProtocol: ObservableObject {
 
     func viewDidAppear()
     func refresh() async
+    func retry() async
     func didSelectCategory(_ category: NavigationItem)
 }

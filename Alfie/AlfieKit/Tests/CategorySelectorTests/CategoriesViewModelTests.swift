@@ -244,6 +244,19 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertEqual(sut.categories.count, fixtures.count)
     }
 
+    func test_retry_recovers_from_error_state() async {
+        // Drive into an error state (invalid selection), then retry with a working service.
+        sut.didSelectCategory(NavigationItem.fixture(url: nil))
+        XCTAssertTrue(sut.state.didFail)
+
+        let fixtures = NavigationItem.fixtures
+        mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
+        await sut.retry()
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.categories.count, fixtures.count)
+    }
+
     // MARK: - Category selection
 
     func test_triggers_navigation_when_category_without_subcategories_is_selected() {
@@ -406,6 +419,24 @@ final class CategoriesViewModelTests: XCTestCase {
             default:
                 XCTFail("Unexpected destination: \(destination)")
         }
+    }
+
+    func test_category_with_subcategories_drills_down_even_when_url_is_special() {
+        // A special url (e.g. /brands) that came back *with* children must still drill into them.
+        let subFixtures = NavigationItem.fixtures
+        let fixture = NavigationItem.fixture(type: .page, url: "/brands", items: subFixtures)
+
+        let destination = XCTAssertEmitsValue(
+            from: sut.openCategoryPublisher,
+            afterTrigger: { self.sut.didSelectCategory(fixture) }
+        )
+
+        guard let destination, case .subCategories(let subCategories, _) = destination else {
+            XCTFail("Unexpected destination type: \(String(describing: destination))")
+            return
+        }
+
+        XCTAssertEqual(subCategories, subFixtures)
     }
 
     // MARK: - Title
