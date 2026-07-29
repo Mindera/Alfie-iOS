@@ -170,14 +170,8 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
                 )
             )
 
-        case .externalHttp,
-             .home, // swiftlint:disable:this indentation_width
-             .page,
-             .product,
-             .search,
-             .account,
-             .wishlist:
-            // Temporarily open a webview with this category, until we have all screens
+        default:
+            // Non-listing links (pages/products) open a webview until the native screens exist.
             guard let url = webViewURL(from: categoryUrl) else {
                 log.error("Error building web URL for category from navigation item: \(category)")
                 state = .error(.generic)
