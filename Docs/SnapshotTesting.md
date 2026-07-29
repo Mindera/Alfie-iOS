@@ -27,8 +27,9 @@ simulator — the container no longer mutates `UIScreen.main`.
 References are pixel comparisons, so rendering must be comparable between recording and asserting.
 
 - **Pinned to iOS major 26.** `test-for-verification.sh` resolves an iPhone simulator on iOS 26 and runs the
-  whole test suite against it. If none exists, it fails with install instructions rather than asserting
-  against the wrong OS.
+  whole test suite against it. If no iOS 26 iPhone exists, it falls back to the newest available iPhone with
+  a loud warning and **skips the snapshot classes** (discovered as any file calling `assertSnapshot`), so a
+  missing runtime costs snapshot coverage rather than blocking every other test.
 - **Model and iOS minor are free.** Verified: references recorded on iPhone 17 Pro / iOS 26.5 assert green on
   iPhone 17 / iOS 26.4 and on iPhone 16. `perceptualPrecision: 0.95` absorbs anti-aliasing differences.
 - Record on **any available iPhone at iOS major 26**.

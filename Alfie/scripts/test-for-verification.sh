@@ -108,25 +108,68 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
             sys.exit(0)
 ')
 
-if [ -z "$SIMULATOR_ID" ]; then
-    echo "❌ ERROR: No iPhone simulator running iOS $SNAPSHOT_OS_MAJOR was found"
-    echo "Snapshot references are recorded on iOS $SNAPSHOT_OS_MAJOR — asserting on another major shifts rendering."
-    echo "Install an iOS $SNAPSHOT_OS_MAJOR simulator via Xcode > Settings > Components,"
-    echo "or override the pinned major for this run: SNAPSHOT_OS_MAJOR=<major> ./Alfie/scripts/verify.sh"
-    exit 1
+SNAPSHOT_SKIP_ARGS=()
+
+if [ -n "$SIMULATOR_ID" ]; then
+    SIMULATOR_OS_LABEL="iOS $SNAPSHOT_OS_MAJOR"
+else
+    # No iPhone on the pinned iOS major. Rather than block the whole suite, fall back to the newest
+    # available iPhone and skip the snapshot classes: their references are pinned to iOS
+    # $SNAPSHOT_OS_MAJOR and would fail on another major, but every non-snapshot test still runs.
+    FALLBACK=$(xcrun simctl list devices available --json | /usr/bin/python3 -c '
+import json, re, sys
+
+best = None
+for runtime, devices in json.load(sys.stdin)["devices"].items():
+    match = re.search(r"iOS-(\d+)-(\d+)", runtime)
+    if not match:
+        continue
+    version = (int(match.group(1)), int(match.group(2)))
+    for device in devices:
+        if "iPhone" in device["name"] and (best is None or version > best[0]):
+            best = (version, device["udid"], "%s.%s" % (match.group(1), match.group(2)))
+if best:
+    print("%s %s" % (best[1], best[2]))
+')
+    SIMULATOR_ID="${FALLBACK%% *}"
+    FALLBACK_OS="${FALLBACK##* }"
+    FALLBACK_OS_MAJOR="${FALLBACK_OS%%.*}"
+
+    if [ -z "$SIMULATOR_ID" ]; then
+        echo "❌ ERROR: No iPhone simulator is available"
+        echo "Install an iOS $SNAPSHOT_OS_MAJOR iPhone simulator via Xcode > Settings > Components,"
+        echo "or override the pinned major for this run: SNAPSHOT_OS_MAJOR=<major> ./Alfie/scripts/verify.sh"
+        exit 1
+    fi
+
+    # Discover snapshot test classes (any file that calls assertSnapshot) and skip them by target/class,
+    # so new snapshot suites are covered without maintaining a hard-coded list here.
+    while IFS= read -r file; do
+        target=$(printf '%s\n' "$file" | sed -E 's#.*/Tests/([^/]+)/.*#\1#')
+        class=$(grep -oE 'class[[:space:]]+[A-Za-z0-9_]+' "$file" | head -1 | awk '{print $2}')
+        [ -n "$target" ] && [ -n "$class" ] && SNAPSHOT_SKIP_ARGS+=("-skip-testing:$target/$class")
+    done < <(grep -rlE 'assertSnapshot\(' --include='*.swift' "$PROJECT_DIR/Alfie/AlfieKit/Tests" 2>/dev/null)
+
+    echo "⚠️  No iPhone on iOS $SNAPSHOT_OS_MAJOR — falling back to iOS $FALLBACK_OS and SKIPPING snapshot tests."
+    echo "⚠️  Snapshot references are pinned to iOS $SNAPSHOT_OS_MAJOR; asserting them on iOS $FALLBACK_OS would fail on rendering differences."
+    echo "⚠️  To run snapshots: install an iOS $SNAPSHOT_OS_MAJOR simulator, or set SNAPSHOT_OS_MAJOR=$FALLBACK_OS_MAJOR and re-record every reference."
+    [ ${#SNAPSHOT_SKIP_ARGS[@]} -gt 0 ] && echo "⚠️  Skipping: ${SNAPSHOT_SKIP_ARGS[*]//-skip-testing:/}"
+    echo ""
+    SIMULATOR_OS_LABEL="iOS $FALLBACK_OS (fallback — snapshots skipped)"
 fi
 
 SIMULATOR_NAME=$(xcrun simctl list devices available | \
     grep "$SIMULATOR_ID" | \
     sed -E 's/^[[:space:]]+(.+) \([A-F0-9-]+\).*/\1/')
 
-echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — iOS $SNAPSHOT_OS_MAJOR"
+echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — $SIMULATOR_OS_LABEL"
 echo ""
 
 xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination "id=$SIMULATOR_ID" \
     $FILTER_ARG \
+    "${SNAPSHOT_SKIP_ARGS[@]}" \
     $TEST_ACTION 2>&1 | tee "$TEST_LOG"
 
 TEST_RESULT=${PIPESTATUS[0]}
