@@ -13,7 +13,6 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
                 isRoot: true,
                 isWishlistEnabled: viewModel.isWishlistEnabled,
                 categoriesViewModel: viewModel.makeCategoriesViewModel(),
-                brandsViewModel: viewModel.makeBrandsViewModel(),
                 servicesViewModel: viewModel.isStoreServicesEnabled ? viewModel.makeServicesViewModel() : nil,
                 activeShopTabPublisher: viewModel.activeShopTabPublisher
             ) {
@@ -25,7 +24,6 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
                     isWishlistEnabled: viewModel.isWishlistEnabled,
                     activeShopTabPublisher: viewModel.activeShopTabPublisher,
                     categoriesViewModel: viewModel.makeCategoriesViewModel,
-                    brandsViewModel: viewModel.makeBrandsViewModel,
                     isStoreServicesEnabled: viewModel.isStoreServicesEnabled,
                     servicesViewModel: viewModel.makeServicesViewModel,
                     accountViewModel: viewModel.makeAccountViewModel,

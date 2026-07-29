@@ -79,17 +79,6 @@ final class DefaultDeepLinkParserTests: XCTestCase {
         try assertParse(testLinks, to: .shop(route: nil))
     }
 
-    func test_parses_special_brands_shop_links() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/brand",
-            "\(Self.appUrl)/brand/",
-            "\(Self.appUrl)/bRaNd",
-            "\(Self.appUrl)/BRAND/",
-        ]
-
-        try assertParse(testLinks, to: .shop(route: ThemedURL.brands.path))
-    }
-
     func test_parses_special_services_shop_links() throws {
         let testLinks: [String] = [
             "\(Self.httpUrl)/services/store-services",

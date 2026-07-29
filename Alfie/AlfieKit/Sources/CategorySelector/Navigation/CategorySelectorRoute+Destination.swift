@@ -15,7 +15,6 @@ public extension CategorySelectorRoute {
         isWishlistEnabled: Bool,
         activeShopTabPublisher: AnyPublisher<ShopViewTab, Never>,
         categoriesViewModel: () -> some CategoriesViewModelProtocol,
-        brandsViewModel: () -> some BrandsViewModelProtocol,
         isStoreServicesEnabled: Bool,
         servicesViewModel: () -> some WebViewModelProtocol,
         accountViewModel: () -> some AccountViewModelProtocol,
@@ -34,7 +33,6 @@ public extension CategorySelectorRoute {
                 isRoot: isRoot,
                 isWishlistEnabled: isWishlistEnabled,
                 categoriesViewModel: categoriesViewModel(),
-                brandsViewModel: brandsViewModel(),
                 servicesViewModel: isStoreServicesEnabled ? servicesViewModel() : nil,
                 initialTab: tab,
                 activeShopTabPublisher: activeShopTabPublisher

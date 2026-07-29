@@ -220,9 +220,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
 
         case .shop(let route):
             switch route {
-            case ThemedURL.brands.path:
-                rootTabViewModel.navigate(.shop(.categorySelector(.brands)))
-
             case ThemedURL.services.path:
                 rootTabViewModel.navigate(.shop(.categorySelector(.services)))
 

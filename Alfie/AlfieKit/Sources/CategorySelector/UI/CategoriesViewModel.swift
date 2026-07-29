@@ -12,34 +12,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         static let placeholderItemCount: Int = 10
     }
 
-    // Special categories that open specific native screens instead of a webview / PLP / sub-categories screen
-    private enum SpecialCategories: String, CaseIterable {
-        case services = "/store-services"
-        case brands = "/brands"
-
-        var destination: CategoriesNavigationDestination {
-            // swiftlint:disable vertical_whitespace_between_cases
-            switch self {
-            case .services:
-                .services
-            case .brands:
-                .brands
-            }
-            // swiftlint:enable vertical_whitespace_between_cases
-        }
-
-        var themedUrl: ThemedURL {
-            // swiftlint:disable vertical_whitespace_between_cases
-            switch self {
-            case .services:
-                .services
-            case .brands:
-                .brands
-            }
-            // swiftlint:enable vertical_whitespace_between_cases
-        }
-    }
-
     private let navigationService: NavigationServiceProtocol?
     private let log: Logger
     // True while a fetch is in flight, so concurrent loads/refreshes don't race (last-writer-wins).
@@ -88,21 +60,17 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     public private(set) var shouldShowToolbar: Bool
     // Only the root screen holds a navigationService; drill-down screens are static snapshots.
     public var canRefresh: Bool { navigationService != nil }
-    /// A bool controling if local tab navigation should be ignored (i.e., shop links like Brands and Service) so that they can be handled by the parent shop view
-    private let ignoreLocalNavigation: Bool
     private let navigate: (CategorySelectorRoute) -> Void
 
     init(
         navigationService: NavigationServiceProtocol,
         log: Logger,
         showToolbar: Bool = false,
-        ignoreLocalNavigation: Bool,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.navigationService = navigationService
         self.log = log
         self.shouldShowToolbar = showToolbar
-        self.ignoreLocalNavigation = ignoreLocalNavigation
         self.navigate = navigate
     }
 
@@ -111,14 +79,12 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         categories: [NavigationItem],
         title: String,
         showToolbar: Bool = true,
-        ignoreLocalNavigation: Bool,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.log = log
         self.navigationService = nil
         self.state = .success(.init(categories: categories, title: title))
         self.shouldShowToolbar = showToolbar
-        self.ignoreLocalNavigation = ignoreLocalNavigation
         self.navigate = navigate
     }
 
@@ -129,21 +95,11 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     public func didSelectCategory(_ category: NavigationItem) {
-        // A category with sub-categories drills in — even if its url matches a SpecialCategory, the
-        // sub-menu takes precedence so the children remain reachable.
+        // The BFF menu is always a static store menu of collections: a category either drills into
+        // its sub-menu, or (as a leaf) opens the PLP for its collection handle. No page/product links.
         if category.hasSubCategories, let subCategories = category.items {
             openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
             navigate(.subCategories(subCategories: subCategories, parent: category))
-            return
-        }
-
-        // Special categories (as leaves) open their native screen.
-        if let specialCategory = SpecialCategories.allCases.first(
-            where: { $0.rawValue == category.url?.lowercased() }
-        ) {
-            openCategorySubject.send(specialCategory.destination)
-            guard !ignoreLocalNavigation, let url = specialCategory.themedUrl.internalUrl else { return }
-            ExternalAppLauncher.open(url: url)
             return
         }
 
@@ -153,44 +109,20 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             return
         }
 
-        switch category.type {
-        case .listing:
-            let sanitizedCategoryUrl = categoryUrl.deletingPrefix("/")
-            openCategorySubject.send(.plp(category: sanitizedCategoryUrl))
-            navigate(
+        let collectionHandle = categoryUrl.deletingPrefix("/")
+        openCategorySubject.send(.plp(category: collectionHandle))
+        navigate(
+            .productListing(
                 .productListing(
-                    .productListing(
-                        .init(
-                            category: sanitizedCategoryUrl,
-                            searchText: nil,
-                            urlQueryParameters: nil,
-                            mode: .listing
-                        )
+                    .init(
+                        category: collectionHandle,
+                        searchText: nil,
+                        urlQueryParameters: nil,
+                        mode: .listing
                     )
                 )
             )
-
-        default:
-            // Non-listing links (pages/products) open a webview until the native screens exist.
-            guard let url = webViewURL(from: categoryUrl) else {
-                log.error("Error building web URL for category from navigation item: \(category)")
-                state = .error(.generic)
-                return
-            }
-            openCategorySubject.send(.web(url: url, title: category.title))
-            navigate(.web(url: url, title: category.title))
-        }
-    }
-
-    // Shopify returns absolute page/blog urls — open those verbatim so the webview hits the real
-    // host. A relative path resolves against our own web host (the pre-BFF behavior).
-    private func webViewURL(from categoryUrl: String) -> URL? {
-        if let absolute = URL(string: categoryUrl), absolute.scheme != nil, absolute.host != nil {
-            return absolute
-        }
-        guard var url = URL(string: "https://\(ThemedURL.hostWithPortComponent)") else { return nil }
-        categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }.forEach { url = url.appending(component: $0) }
-        return url
+        )
     }
 
     @MainActor

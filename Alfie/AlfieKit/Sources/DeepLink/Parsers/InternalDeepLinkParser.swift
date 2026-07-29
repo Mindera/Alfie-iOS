@@ -16,9 +16,7 @@ final class InternalDeepLinkParser: DeepLinkParserProtocol {
         }
 
         let path = url.cleanPath
-        if path == ThemedURL.brands.path {
-            return DeepLink(type: .shop(route: ThemedURL.brands.path), fullUrl: url)
-        } else if path == ThemedURL.services.path {
+        if path == ThemedURL.services.path {
             return DeepLink(type: .shop(route: ThemedURL.services.path), fullUrl: url)
         } else if path == ThemedURL.shop.path {
             return DeepLink(type: .shop(route: ThemedURL.shop.path), fullUrl: url)

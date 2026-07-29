@@ -42,26 +42,6 @@ final class InternalDeepLinkParserTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    // MARK: - Brands links
-
-    func test_parses_brands_links() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/brand",
-            "\(Self.appUrl)/brand/",
-        ]
-
-        try assertParse(testLinks, to: .shop(route: ThemedURL.brands.path))
-    }
-
-    func test_does_not_parse_specific_brands_links() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/brand/gucci",
-            "\(Self.appUrl)/brand/gucci/",
-        ]
-
-        try assertNoParse(testLinks)
-    }
-
     // MARK: - Service links
 
     func test_parses_service_links() throws {

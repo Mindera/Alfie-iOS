@@ -2,7 +2,6 @@ import Foundation
 
 public enum ThemedURL: String, WebURLEndpoint {
     case shop
-    case brands = "brand"
     case services = "services/store-services"
     case paymentOptions = "payment-options"
     case returnOptions = "return-options"

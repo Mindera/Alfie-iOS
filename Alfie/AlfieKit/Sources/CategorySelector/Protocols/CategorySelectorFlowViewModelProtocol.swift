@@ -8,7 +8,6 @@ import SwiftUI
 
 public protocol CategorySelectorFlowViewModelProtocol: ObservableObject, FlowViewModelProtocol {
     associatedtype CategoriesViewModel: CategoriesViewModelProtocol
-    associatedtype BrandsViewModel: BrandsViewModelProtocol
     associatedtype WebViewModel: WebViewModelProtocol
     associatedtype AccountViewModel: AccountViewModelProtocol
     associatedtype ProductDetailsViewModel: ProductDetailsViewModelProtocol
@@ -20,7 +19,6 @@ public protocol CategorySelectorFlowViewModelProtocol: ObservableObject, FlowVie
     var activeShopTabPublisher: AnyPublisher<ShopViewTab, Never> { get }
 
     func makeCategoriesViewModel() -> CategoriesViewModel
-    func makeBrandsViewModel() -> BrandsViewModel
     func makeServicesViewModel() -> WebViewModel
     func makeAccountViewModel() -> AccountViewModel
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView

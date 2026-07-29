@@ -326,36 +326,6 @@ public enum L10n {
   public enum Shop {
     /// Shop
     public static let title = L10n.tr("L10n", "shop.title")
-    public enum Brands {
-      public enum ErrorView {
-        /// Please try again later
-        public static let message = L10n.tr("L10n", "shop.brands.error_view.message")
-        /// Cannot load Brands list
-        public static let title = L10n.tr("L10n", "shop.brands.error_view.title")
-        public enum RateLimited {
-          /// Please wait a moment and try again.
-          public static let message = L10n.tr("L10n", "shop.brands.error_view.rate_limited.message")
-          /// Too many requests
-          public static let title = L10n.tr("L10n", "shop.brands.error_view.rate_limited.title")
-        }
-        public enum ServerError {
-          /// We're having trouble reaching our servers. Please try again.
-          public static let message = L10n.tr("L10n", "shop.brands.error_view.server_error.message")
-          /// Service unavailable
-          public static let title = L10n.tr("L10n", "shop.brands.error_view.server_error.title")
-        }
-      }
-      public enum SearchBar {
-        /// Sorry, no results were found for
-        public static let noResultsMessage = L10n.tr("L10n", "shop.brands.search_bar.no_results_message")
-        /// Search Brands
-        public static let placeholder = L10n.tr("L10n", "shop.brands.search_bar.placeholder")
-      }
-      public enum Segment {
-        /// Brands
-        public static let title = L10n.tr("L10n", "shop.brands.segment.title")
-      }
-    }
     public enum Categories {
       public enum ErrorView {
         /// Please try again later
@@ -589,15 +559,6 @@ public extension L10n {
       case searchBarPlaceholder = "search_bar.placeholder"
       case searchBarFocusedPlaceholder = "search_bar.focused.placeholder"
       case shopTitle = "shop.title"
-      case shopBrandsErrorViewMessage = "shop.brands.error_view.message"
-      case shopBrandsErrorViewTitle = "shop.brands.error_view.title"
-      case shopBrandsErrorViewRateLimitedMessage = "shop.brands.error_view.rate_limited.message"
-      case shopBrandsErrorViewRateLimitedTitle = "shop.brands.error_view.rate_limited.title"
-      case shopBrandsErrorViewServerErrorMessage = "shop.brands.error_view.server_error.message"
-      case shopBrandsErrorViewServerErrorTitle = "shop.brands.error_view.server_error.title"
-      case shopBrandsSearchBarNoResultsMessage = "shop.brands.search_bar.no_results_message"
-      case shopBrandsSearchBarPlaceholder = "shop.brands.search_bar.placeholder"
-      case shopBrandsSegmentTitle = "shop.brands.segment.title"
       case shopCategoriesErrorViewMessage = "shop.categories.error_view.message"
       case shopCategoriesErrorViewTitle = "shop.categories.error_view.title"
       case shopCategoriesErrorViewButtonCta = "shop.categories.error_view.button.cta"

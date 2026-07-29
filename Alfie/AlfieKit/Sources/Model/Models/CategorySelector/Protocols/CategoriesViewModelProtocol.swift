@@ -32,9 +32,6 @@ public enum CategoriesViewErrorType: Error, CaseIterable {
 
 public enum CategoriesNavigationDestination {
     case plp(category: String)
-    case web(url: URL, title: String)
-    case services
-    case brands
     case subCategories(_ subCategories: [NavigationItem], parentCategory: NavigationItem)
 }
 

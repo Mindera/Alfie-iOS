@@ -67,7 +67,7 @@ private func makeNavigationItem(
 //   /collections/<handle>  → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
 //   /pages/…, /blogs/…      → `.page`,    url kept verbatim (webview opens it as-is)
 //   /products/…            → `.product`, url kept verbatim
-//   /<handle> (bare)        → `.listing`, url `/<handle>`   (PLP; also SpecialCategories like /brands)
+//   /<handle> (bare)        → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
 // Anything else — path-less absolute urls (`https://host`), root `/`, or unrecognized multi-segment
 // paths — is dropped rather than guessed. Collections resolve to just the handle (host irrelevant to
 // the PLP flow); page/blog/product links keep their original url (Shopify returns absolute urls, and

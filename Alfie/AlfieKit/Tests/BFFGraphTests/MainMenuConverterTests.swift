@@ -212,9 +212,8 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(items.first).url, "/womens-tops")
     }
 
-    func test_special_category_url_is_preserved_for_matching() throws {
-        // `/store-services` and `/brands` are single-segment lowercase, so the handle rule preserves
-        // them exactly, keeping SpecialCategories matching in didSelectCategory intact.
+    func test_hyphenated_single_segment_url_is_preserved_as_handle() throws {
+        // A hyphenated single-segment path is a valid collection handle — preserved verbatim (lowercased).
         let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Services", url: "/store-services")])
             .convertToNavigationItems()
         XCTAssertEqual(try XCTUnwrap(items.first).url, "/store-services")
