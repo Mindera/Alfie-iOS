@@ -143,12 +143,17 @@ if best:
     fi
 
     # Discover snapshot test classes (any file that calls assertSnapshot) and skip them by target/class,
-    # so new snapshot suites are covered without maintaining a hard-coded list here.
+    # so new snapshot suites are covered without maintaining a hard-coded list here. Scans the same roots
+    # as the record guard; derives the target from either the AlfieKit SPM layout or the AlfieTests app target.
     while IFS= read -r file; do
-        target=$(printf '%s\n' "$file" | sed -E 's#.*/Tests/([^/]+)/.*#\1#')
+        case "$file" in
+            */AlfieKit/Tests/*) target=$(printf '%s\n' "$file" | sed -E 's#.*/AlfieKit/Tests/([^/]+)/.*#\1#') ;;
+            */AlfieTests/*)     target="AlfieTests" ;;
+            *)                  target="" ;;
+        esac
         class=$(grep -oE 'class[[:space:]]+[A-Za-z0-9_]+' "$file" | head -1 | awk '{print $2}')
         [ -n "$target" ] && [ -n "$class" ] && SNAPSHOT_SKIP_ARGS+=("-skip-testing:$target/$class")
-    done < <(grep -rlE 'assertSnapshot\(' --include='*.swift' "$PROJECT_DIR/Alfie/AlfieKit/Tests" 2>/dev/null)
+    done < <(grep -rlE 'assertSnapshot\(' --include='*.swift' "${SNAPSHOT_TEST_ROOTS[@]}" 2>/dev/null)
 
     echo "⚠️  No iPhone on iOS $SNAPSHOT_OS_MAJOR — falling back to iOS $FALLBACK_OS and SKIPPING snapshot tests."
     echo "⚠️  Snapshot references are pinned to iOS $SNAPSHOT_OS_MAJOR; asserting them on iOS $FALLBACK_OS would fail on rendering differences."
