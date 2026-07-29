@@ -560,13 +560,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d result"
+                  "value" : "%d Item"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d results"
+                  "value" : "%d Items"
                 }
               }
             }

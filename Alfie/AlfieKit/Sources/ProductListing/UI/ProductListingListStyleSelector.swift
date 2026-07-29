@@ -11,25 +11,22 @@ struct ProductListingListStyleSelector: View {
     }
 
     var body: some View {
-        HStack(spacing: theme.spacing.space200) {
-            styleButton(
-                for: .grid,
-                icon: .grid,
-                accessibilityLabel: L10n.Accessibility.gridView,
-                accessibilityID: AccessibilityID.ProductListing.listStyleGridButton
-            )
+        HStack(spacing: theme.spacing.space100) {
             styleButton(
                 for: .list,
-                icon: .listplp,
                 accessibilityLabel: L10n.Accessibility.listView,
                 accessibilityID: AccessibilityID.ProductListing.listStyleListButton
+            )
+            styleButton(
+                for: .grid,
+                accessibilityLabel: L10n.Accessibility.gridView,
+                accessibilityID: AccessibilityID.ProductListing.listStyleGridButton
             )
         }
     }
 
     private func styleButton(
         for style: ProductListingListStyle,
-        icon: Icon,
         accessibilityLabel: String,
         accessibilityID: String
     ) -> some View {
@@ -37,9 +34,9 @@ struct ProductListingListStyleSelector: View {
             selectedStyle = style
         } label: {
             ThemedIcon(
-                icon,
-                size: .small,
-                tint: Style.iconTint(isSelected: selectedStyle == style),
+                Style.icon(for: style, isSelected: selectedStyle == style),
+                size: .medium,
+                tint: Theme.contentContentPrimary,
                 accessibilityLabel: accessibilityLabel
             )
         }
@@ -48,8 +45,14 @@ struct ProductListingListStyleSelector: View {
     }
 
     enum Style {
-        static func iconTint(isSelected: Bool) -> Color {
-            isSelected ? Theme.contentContentPrimary : Theme.borderSoft
+        /// Selection is shown by swapping the outline icon for its filled variant (tint stays constant).
+        static func icon(for style: ProductListingListStyle, isSelected: Bool) -> Icon {
+            switch style {
+            case .grid:
+                return isSelected ? .grid2Fill : .grid
+            case .list:
+                return isSelected ? .grid1Fill : .listplp
+            }
         }
     }
 }

@@ -26,13 +26,13 @@ struct ProductListingFilterBar: View {
 
     public var body: some View {
         HStack {
-            filterView
+            ProductListingListStyleSelector(selectedStyle: $selectedStyle)
             Spacer()
             resultInfoView
                 .animation(.emphasizedDecelerate, value: opacity)
                 .opacity(opacity)
             Spacer()
-            ProductListingListStyleSelector(selectedStyle: $selectedStyle)
+            refineButton
         }
         .onChange(of: isLoading) { newValue in
             if !newValue {
@@ -42,21 +42,15 @@ struct ProductListingFilterBar: View {
             }
         }
         .padding(.horizontal, theme.spacing.space200)
-        .frame(minHeight: Constants.barMinHeight)
+        .frame(minHeight: theme.spacing.space400)
     }
 
-    private var filterView: some View {
+    private var refineButton: some View {
         Button {
             filterAction()
         } label: {
-            HStack(spacing: theme.spacing.space100) {
-                ThemedIcon(.filter, size: .small, tint: Theme.contentContentPrimary)
-                Text
-                    .build(
-                        theme.font.body.medium(L10n.Plp.Refine.Button.cta)
-                    )
-                    .foregroundStyle(Theme.contentContentPrimary)
-            }
+            Text.build(theme.font.link.medium(L10n.Plp.Refine.Button.cta, underline: true))
+                .foregroundStyle(Theme.linkLinkPrimaryDefault)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(AccessibilityID.ProductListing.filterButton)
@@ -72,8 +66,6 @@ struct ProductListingFilterBar: View {
 
     private enum Constants {
         static let fullOpacityResults: CGFloat = 1
-        // No spacing token maps to 60pt; retained to preserve the bar's touch-target height.
-        static let barMinHeight: CGFloat = 60.0
     }
 
 }
