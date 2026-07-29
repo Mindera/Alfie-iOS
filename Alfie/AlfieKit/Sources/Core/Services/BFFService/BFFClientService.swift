@@ -53,21 +53,20 @@ public final class BFFClientService: BFFClientServiceProtocol {
     // MARK: - BFFClientServiceProtocol
 
     public func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem] {
-        let platform = BFFPlatform.predefined
         let menuHandle = handle.bffMenuHandle
-        log.info("mainMenu → handle=\(menuHandle) platform=\(platform.rawValue)")
+        log.info("mainMenu → handle=\(menuHandle)")
 
         do {
             // The menu is never served from cache: the normalized cache has no TTL, so a cached menu
             // would hide merchandising changes until an app relaunch. Always fetch fresh.
             let items = try await executeFetch(
-                BFFGraphAPI.MainMenuQuery(handle: menuHandle, platform: .some(platform.rawValue)),
+                BFFGraphAPI.MainMenuQuery(handle: menuHandle),
                 cachePolicy: .fetchIgnoringCacheData
             ).mainMenu.convertToNavigationItems()
             if items.isEmpty {
-                // Menu returned but nothing was actionable — no recognizable collection/page/product
-                // links. Surfaces an otherwise-silent empty Shop screen.
-                log.error("mainMenu ← 0 actionable categories (no recognizable collection/page/product links)")
+                // Menu returned but nothing was actionable — no recognizable collection links.
+                // Surfaces an otherwise-silent empty Shop screen.
+                log.error("mainMenu ← 0 actionable categories (no recognizable collection links)")
             } else {
                 log.info("mainMenu ← items=\(items.count)")
             }
@@ -79,14 +78,11 @@ public final class BFFClientService: BFFClientServiceProtocol {
     }
 
     public func getProduct(handle: String) async throws -> Product {
-        // `platform` is a predefined, app-level choice (see `BFFPlatform`) — not a per-request
-        // argument — so it's resolved here rather than threaded through the call chain.
-        let platform = BFFPlatform.predefined
-        log.info("productDetails → handle=\(handle) platform=\(platform.rawValue)")
+        log.info("productDetails → handle=\(handle)")
 
         do {
             let product = try await executeFetch(
-                BFFGraphAPI.ProductDetailsQuery(handle: handle, platform: platform.rawValue)
+                BFFGraphAPI.ProductDetailsQuery(handle: handle)
             ).productDetails
 
             guard let product else {
@@ -110,14 +106,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        let platform = BFFPlatform.predefined
-        log.info("productList → collectionHandle=\(collectionHandle) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+        log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
             let response = try await executeFetch(
                 BFFGraphAPI.ProductListQuery(
                     collectionHandle: collectionHandle,
-                    platform: platform.rawValue,
                     after: after.map { .some($0) } ?? .none,
                     limit: limit,
                     filters: resolvedFilters,
@@ -143,14 +137,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
     ) async throws -> ProductListing {
         let resolvedSort = BFFGraphAPI.ProductSortEnum.from(sortOption: sort)
         let resolvedFilters = BFFGraphAPI.ProductFilterInput.from(domain: filters)
-        let platform = BFFPlatform.predefined
-        log.info("searchProducts → searchTerm=\(searchTerm) platform=\(platform.rawValue) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
+        log.info("searchProducts → searchTerm=\(searchTerm) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
             let response = try await executeFetch(
                 BFFGraphAPI.SearchProductsQuery(
                     searchTerm: searchTerm,
-                    platform: platform.rawValue,
                     after: after.map { .some($0) } ?? .none,
                     limit: limit,
                     filters: resolvedFilters,

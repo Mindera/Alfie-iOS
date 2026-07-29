@@ -121,8 +121,8 @@ type MoneyRange {
 }
 
 type Mutation {
-  addToCart(input: AddToCartInput!, platform: String): Cart!
-  createCart(input: CreateCartInput!, platform: String): Cart!
+  addToCart(input: AddToCartInput!): Cart!
+  createCart(input: CreateCartInput!): Cart!
 }
 
 type OmniProduct {
@@ -210,12 +210,12 @@ type ProductVariant {
 }
 
 type Query {
-  cart(cartId: String!, platform: String): Cart!
-  cartCheckoutUrl(cartId: String!, platform: String): String!
-  mainMenu(handle: String! = "main-menu", platform: String): Menu!
-  productDetails(handle: String!, platform: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
-  productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, platform: String, sort: ProductSortEnum! = NEWEST): ProductListResponse!
-  searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, platform: String, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
+  cart(cartId: String!): Cart!
+  cartCheckoutUrl(cartId: String!): String!
+  mainMenu(handle: String! = "main-menu"): Menu!
+  productDetails(handle: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
+  productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, sort: ProductSortEnum! = NEWEST): ProductListResponse!
+  searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
 }
 
 type Seo {

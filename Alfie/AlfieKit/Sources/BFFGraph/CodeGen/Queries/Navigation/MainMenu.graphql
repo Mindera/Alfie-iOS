@@ -1,8 +1,7 @@
 query MainMenuQuery(
-    $handle: String!,
-    $platform: String
+    $handle: String!
 ) {
-    mainMenu(handle: $handle, platform: $platform) {
+    mainMenu(handle: $handle) {
         handle
         title
         items {

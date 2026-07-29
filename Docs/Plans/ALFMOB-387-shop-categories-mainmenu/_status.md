@@ -3,7 +3,7 @@
 - **Ticket:** [ALFMOB-387](https://mindera.atlassian.net/browse/ALFMOB-387) — [iOS] Implement Shop categories (header-nav) via BFF — replace temporary mock (Story, Trivial)
 - **Base:** main
 - **Branch:** ALFMOB-387-shop-categories-mainmenu
-- **BFF query:** `mainMenu(handle: String! = "main-menu", platform: String): Menu!` (on Alfie-BFF `origin/main`)
+- **BFF query:** `mainMenu(handle: String! = "main-menu"): Menu!` (on Alfie-BFF `origin/main`). The Shop screen uses the `product-category` handle.
 
 ## Phase checklist
 - [x] P1 — Sync schema + add `MainMenu.graphql` operation + Apollo codegen

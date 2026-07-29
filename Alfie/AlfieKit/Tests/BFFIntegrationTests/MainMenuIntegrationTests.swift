@@ -8,7 +8,7 @@ final class MainMenuIntegrationTests: IntegrationTestCase {
     func test_getHeaderNav_returnsActionableItemsWithHandleUrls() async throws {
         let items = try await sut.getHeaderNav(handle: .header)
 
-        try XCTSkipUnless(!items.isEmpty, "Seed BFF returned an empty Shop menu for handle .header")
+        XCTAssertFalse(items.isEmpty, "Seed BFF returned an empty Shop menu for handle .header")
 
         // Every actionable leaf (a node with no sub-menu) must carry a `/`-prefixed collection handle;
         // parents that only drill into children may legitimately have no url of their own.
