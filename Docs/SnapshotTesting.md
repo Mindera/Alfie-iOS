@@ -8,14 +8,17 @@ They live **in the AlfieKit module test targets** (not the `AlfieTests` app targ
 
 ## How it works
 
-**Shared helpers** live in `TestUtils` (which links `SnapshotTesting` and is already a dependency of every
-module test target):
+**Shared helpers** live in `TestUtils` (which links `SnapshotTesting`; add it to a module's test target in
+`Package.swift` if that target doesn't already depend on it):
 
 | Helper | Purpose |
 |---|---|
-| `View.embededInContainer()` | Wraps a view in a 393×852 @3x `UIView` |
+| `View.embededInContainer()` | Wraps a view in a 393×852 `UIView` |
 | `View.embededInFullHeightContainer()` | Same at 393×1500, for long screens |
-| `Snapshotting.defaultImage(precision:perceptualPrecision:)` | Image strategy, defaults `0.9` / `0.95`, SRGB |
+| `Snapshotting.defaultImage(precision:perceptualPrecision:)` | Image strategy, defaults `0.9` / `0.95`, SRGB, `displayScale` 3 |
+
+`defaultImage` pins `displayScale` to 3 via the strategy's traits, so rendering is @3x regardless of the host
+simulator — the container no longer mutates `UIScreen.main`.
 
 **Reference images** are committed alongside the tests in `__Snapshots__/<TestFileName>/`.
 
@@ -30,8 +33,10 @@ References are pixel comparisons, so rendering must be comparable between record
   iPhone 17 / iOS 26.4 and on iPhone 16. `perceptualPrecision: 0.95` absorbs anti-aliasing differences.
 - Record on **any available iPhone at iOS major 26**.
 
-To change the pinned major, edit `SNAPSHOT_OS_MAJOR` in `Alfie/scripts/test-for-verification.sh` — and
-re-record every reference.
+`SNAPSHOT_OS_MAJOR` (in `Alfie/scripts/test-for-verification.sh`, default `26`) is overridable per run —
+`SNAPSHOT_OS_MAJOR=27 ./Alfie/scripts/verify.sh` — to assert on a different major on a machine that lacks
+iOS 26. To re-pin the suite for good, change the default in the script **and** re-record every reference on
+the new major; overriding without re-recording asserts against the wrong OS.
 
 ### Precision
 
@@ -68,9 +73,12 @@ of the build.
 | `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
 
-The pre-existing suite (Search, CategorySelector, ProductDetails) was removed: those screens are mid
-Modern Design Rollout, so their references would churn on every rollout PR. Re-add them per screen once a
-design has settled.
+The pre-existing suite — the seven out-of-membership files under `AlfieTests/Snapshots/` (Brands,
+Categories, Shop, RecentSearches, Search, ProductDetails, ProductDetailsColorSheet) — was removed: those
+screens are mid Modern Design Rollout, so their references would churn on every rollout PR. They also never
+ran (excluded from the target, no references ever committed). Re-add them per screen once a design has
+settled; the state matrices they covered (loading / loaded / error / empty per screen) are worth restoring,
+not just the happy path.
 
 ### Adding a snapshot test
 

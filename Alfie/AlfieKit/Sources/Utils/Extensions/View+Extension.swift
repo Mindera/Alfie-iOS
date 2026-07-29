@@ -6,27 +6,6 @@ extension View {
         UIDevice.current.userInterfaceIdiom == .pad
     }
 
-    public func embededInContainer(size: CGSize, scale: CGFloat) -> UIView {
-        UIScreen.main.setValue(scale, forKeyPath: "scale")
-        let uiViewWrapper = self.asUIView(backgroundColor: .white)
-        uiViewWrapper.translatesAutoresizingMaskIntoConstraints = false
-        uiViewWrapper.frame.size = size
-        uiViewWrapper.layoutIfNeeded()
-        return uiViewWrapper
-    }
-
-    public func asUIView(backgroundColor: UIColor = .clear) -> UIView {
-        let hostingView = UIHostingController(rootView: self).view
-        hostingView?.translatesAutoresizingMaskIntoConstraints = false
-        hostingView?.backgroundColor = backgroundColor
-
-        // We don't want to compress the views, we want them to use all the available space inside the UIView
-        hostingView?.setContentHuggingPriority(.required, for: .horizontal)
-        hostingView?.setContentHuggingPriority(.required, for: .vertical)
-
-        return hostingView ?? UIView()
-    }
-
     public func frame(size: CGSize, alignment: Alignment = .center) -> some View {
         frame(width: size.width, height: size.height, alignment: alignment)
     }

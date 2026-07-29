@@ -75,14 +75,21 @@ if [ -n "$TEST_FILTER" ]; then
 fi
 
 # Fail fast if a snapshot test was committed in record mode — record mode always fails the
-# assertion anyway, but catching it here costs a second instead of a full test run.
-if grep -rnE --include='*.swift' 'record:[[:space:]]*true|isRecording[[:space:]]*=[[:space:]]*true' \
-        "$PROJECT_DIR/Alfie/AlfieKit/Tests" 2>/dev/null; then
-    echo ""
-    echo "❌ ERROR: A snapshot test is committed in record mode (see matches above)"
-    echo "Set it back to false and re-run so the test asserts against the committed reference."
-    exit 1
-fi
+# assertion anyway, but catching it here costs a second instead of a full test run. Covers the
+# common spellings: record: true/.all/.failed, withSnapshotTesting(record:), and an isRecording
+# flag set true (with or without a `: Bool` annotation). Scans both test roots.
+SNAPSHOT_TEST_ROOTS=("$PROJECT_DIR/Alfie/AlfieKit/Tests" "$PROJECT_DIR/Alfie/AlfieTests")
+for root in "${SNAPSHOT_TEST_ROOTS[@]}"; do
+    [ -d "$root" ] || continue
+    if grep -rnE --include='*.swift' \
+            'record:[[:space:]]*(true|\.all|\.failed)|withSnapshotTesting\(record:|isRecording[[:space:]]*(:[[:space:]]*Bool)?[[:space:]]*=[[:space:]]*true' \
+            "$root"; then
+        echo ""
+        echo "❌ ERROR: A snapshot test is committed in record mode (see matches above)"
+        echo "Set it back to false and re-run so the test asserts against the committed reference."
+        exit 1
+    fi
+done
 
 # Snapshot references are pinned to an iOS major, so resolve an iPhone on that runtime rather
 # than accepting whatever generic destination xcodebuild picks (which may be an older iOS).
@@ -104,7 +111,8 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
 if [ -z "$SIMULATOR_ID" ]; then
     echo "❌ ERROR: No iPhone simulator running iOS $SNAPSHOT_OS_MAJOR was found"
     echo "Snapshot references are recorded on iOS $SNAPSHOT_OS_MAJOR — asserting on another major shifts rendering."
-    echo "Install an iOS $SNAPSHOT_OS_MAJOR simulator via Xcode > Settings > Components."
+    echo "Install an iOS $SNAPSHOT_OS_MAJOR simulator via Xcode > Settings > Components,"
+    echo "or override the pinned major for this run: SNAPSHOT_OS_MAJOR=<major> ./Alfie/scripts/verify.sh"
     exit 1
 fi
 
