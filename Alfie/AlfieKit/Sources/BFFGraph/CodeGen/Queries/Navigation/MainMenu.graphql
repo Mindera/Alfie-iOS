@@ -1,0 +1,23 @@
+query MainMenuQuery(
+    $handle: String!
+) {
+    mainMenu(handle: $handle) {
+        handle
+        title
+        items {
+            id
+            title
+            url
+            items {
+                id
+                title
+                url
+                items {
+                    id
+                    title
+                    url
+                }
+            }
+        }
+    }
+}

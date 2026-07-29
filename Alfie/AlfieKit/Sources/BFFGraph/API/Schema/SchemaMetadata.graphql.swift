@@ -31,6 +31,8 @@ public extension BFFGraphAPI {
       switch typename {
       case "Image": return BFFGraphAPI.Objects.Image
       case "Inventory": return BFFGraphAPI.Objects.Inventory
+      case "Menu": return BFFGraphAPI.Objects.Menu
+      case "MenuItem": return BFFGraphAPI.Objects.MenuItem
       case "Money": return BFFGraphAPI.Objects.Money
       case "MoneyRange": return BFFGraphAPI.Objects.MoneyRange
       case "OmniProduct": return BFFGraphAPI.Objects.OmniProduct

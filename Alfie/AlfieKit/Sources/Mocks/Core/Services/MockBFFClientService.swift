@@ -3,9 +3,9 @@ import Model
 public class MockBFFClientService: BFFClientServiceProtocol {
     public init() { }
 
-    public var onGetHeaderNavCalled: ((NavigationHandle, Bool, Bool) throws -> [NavigationItem])?
-    public func getHeaderNav(handle: NavigationHandle, includeSubItems: Bool, includeMedia: Bool) async throws -> [NavigationItem] {
-        try onGetHeaderNavCalled?(handle, includeSubItems, includeMedia) ?? []
+    public var onGetHeaderNavCalled: ((NavigationHandle) throws -> [NavigationItem])?
+    public func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem] {
+        try onGetHeaderNavCalled?(handle) ?? []
     }
 
     public var onGetProductCalled: ((String) throws -> Product)?
@@ -30,14 +30,6 @@ public class MockBFFClientService: BFFClientServiceProtocol {
             throw BFFRequestError(type: .emptyResponse)
         }
         return productListing
-    }
-
-    public var onGetBrandsCalled: (() throws -> [Brand])?
-    public func getBrands() async throws -> [Brand] {
-        guard let brands = try onGetBrandsCalled?() else {
-            throw BFFRequestError(type: .emptyResponse)
-        }
-        return brands
     }
 
     public var onGetWebViewConfigCalled: (() throws -> WebViewConfiguration)?

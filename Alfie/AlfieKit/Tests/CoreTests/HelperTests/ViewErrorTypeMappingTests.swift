@@ -2,11 +2,11 @@ import Foundation
 import Model
 import XCTest
 
-/// All four feature error enums (PLP, PDP, Categories, Brands) map from
+/// The feature error enums (PLP, PDP, Categories) map from
 /// `BFFRequestError` via a `from(error:)` helper. The mapping is symmetric across
 /// features for transient categories (rate-limit, server-error, no-internet,
 /// generic, non-BFF) and only diverges for "no results / not found" semantics.
-/// One driver covers all four — if a future feature adds a new BFF case, every
+/// One driver covers all — if a future feature adds a new BFF case, every
 /// suite fails until the mapping is updated everywhere.
 final class ViewErrorTypeMappingTests: XCTestCase {
     // MARK: - PLP
@@ -49,19 +49,6 @@ final class ViewErrorTypeMappingTests: XCTestCase {
     func test_categories_mapping() {
         assertCommonMapping(
             from: CategoriesViewErrorType.from(error:),
-            rateLimited: .rateLimited,
-            serverError: .serverError,
-            noInternet: .noInternet,
-            generic: .generic,
-            nonBFFFallback: .generic
-        )
-    }
-
-    // MARK: - Brands
-
-    func test_brands_mapping() {
-        assertCommonMapping(
-            from: BrandsViewErrorType.from(error:),
             rateLimited: .rateLimited,
             serverError: .serverError,
             noInternet: .noInternet,

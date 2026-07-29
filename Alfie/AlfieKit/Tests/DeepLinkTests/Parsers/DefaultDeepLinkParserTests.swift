@@ -79,28 +79,6 @@ final class DefaultDeepLinkParserTests: XCTestCase {
         try assertParse(testLinks, to: .shop(route: nil))
     }
 
-    func test_parses_special_brands_shop_links() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/brand",
-            "\(Self.appUrl)/brand/",
-            "\(Self.appUrl)/bRaNd",
-            "\(Self.appUrl)/BRAND/",
-        ]
-
-        try assertParse(testLinks, to: .shop(route: ThemedURL.brands.path))
-    }
-
-    func test_parses_special_services_shop_links() throws {
-        let testLinks: [String] = [
-            "\(Self.httpUrl)/services/store-services",
-            "\(Self.httpUrl)/services/store-services/",
-            "\(Self.httpUrl)/SERVICES/store-services",
-            "\(Self.httpUrl)/services/sToRe-sErViCeS/",
-        ]
-
-        try assertParse(testLinks, to: .shop(route: ThemedURL.services.path))
-    }
-
     func test_parses_invalid_shop_links_as_web() throws {
         let testLinks: [String] = [
             "\(Self.appUrl)/something/shop",
@@ -110,6 +88,8 @@ final class DefaultDeepLinkParserTests: XCTestCase {
             "\(Self.httpUrl)/brands",
             "\(Self.httpUrl)/service/store-services",
             "\(Self.httpUrl)/services/storeservices",
+            // Store Services retired: the former special route now falls back to a web view.
+            "\(Self.httpUrl)/services/store-services",
         ]
 
         try assertFallbackToNormalisedWebViewUrl(testLinks)

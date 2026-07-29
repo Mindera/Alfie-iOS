@@ -47,11 +47,7 @@ final class DeepLinkHandlerTests: XCTestCase {
         var result = sut.canHandleDeepLink(deepLink)
         XCTAssertEqual(result, true)
 
-        deepLink = DeepLink(type: .shop(route: ThemedURL.brands.path), fullUrl: testUrl)
-        result = sut.canHandleDeepLink(deepLink)
-        XCTAssertEqual(result, true)
-
-        deepLink = DeepLink(type: .shop(route: ThemedURL.services.path), fullUrl: testUrl)
+        deepLink = DeepLink(type: .shop(route: ThemedURL.shop.path), fullUrl: testUrl)
         result = sut.canHandleDeepLink(deepLink)
         XCTAssertEqual(result, true)
     }
@@ -181,40 +177,6 @@ final class DeepLinkHandlerTests: XCTestCase {
 
         wait(for: [expectation], timeout: .default)
         XCTAssertEqual(receivedLinkType, .shop(route: ThemedURL.shop.path))
-    }
-
-    func test_handles_shop_links_with_brands_route() {
-        var receivedLinkType: DeepLink.LinkType?
-        let expectation = expectation(description: "navigation closure called")
-
-        sut = sutWithNavigation { linkType in
-            receivedLinkType = linkType
-            expectation.fulfill()
-        }
-        sut.isReadyToHandleLinks = true
-
-        let deepLink = DeepLink(type: .shop(route: ThemedURL.brands.path), fullUrl: testUrl)
-        sut.handleDeepLink(deepLink)
-
-        wait(for: [expectation], timeout: .default)
-        XCTAssertEqual(receivedLinkType, .shop(route: ThemedURL.brands.path))
-    }
-
-    func test_handles_shop_links_with_services_route() {
-        var receivedLinkType: DeepLink.LinkType?
-        let expectation = expectation(description: "navigation closure called")
-
-        sut = sutWithNavigation { linkType in
-            receivedLinkType = linkType
-            expectation.fulfill()
-        }
-        sut.isReadyToHandleLinks = true
-
-        let deepLink = DeepLink(type: .shop(route: ThemedURL.services.path), fullUrl: testUrl)
-        sut.handleDeepLink(deepLink)
-
-        wait(for: [expectation], timeout: .default)
-        XCTAssertEqual(receivedLinkType, .shop(route: ThemedURL.services.path))
     }
 
     func test_handles_product_listing_links() {

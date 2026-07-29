@@ -45,6 +45,69 @@ final class CancellableBoxTests: XCTestCase {
         XCTAssertEqual(first.cancelCount, 1)
         XCTAssertEqual(second.cancelCount, 1)
     }
+
+    // MARK: - Continuation resume (exactly-once)
+
+    func test_cancel_after_resume_closure_set_resumes_with_cancellation() {
+        let box = CancellableBox()
+        let cancelResumes = Counter()
+        box.setResumeOnCancel { cancelResumes.increment() }
+
+        box.cancel()
+
+        XCTAssertEqual(cancelResumes.value, 1)
+    }
+
+    // Regression (Copilot): the task is cancelled in the window before the continuation body sets
+    // its resume closure — `cancel()` runs before `setResumeOnCancel()`. Before the fix the
+    // continuation was never resumed and the awaiting task hung forever.
+    func test_cancel_before_resume_closure_set_still_resumes_when_set() {
+        let box = CancellableBox()
+        let cancelResumes = Counter()
+
+        box.cancel() // races ahead of the continuation body — no resume closure stored yet
+
+        box.setResumeOnCancel { cancelResumes.increment() }
+
+        XCTAssertEqual(cancelResumes.value, 1)
+    }
+
+    func test_result_resume_wins_and_cancel_is_a_noop() {
+        let box = CancellableBox()
+        let cancelResumes = Counter()
+        let resultResumes = Counter()
+        box.setResumeOnCancel { cancelResumes.increment() }
+
+        box.resumeOnce { resultResumes.increment() }
+        box.cancel()
+
+        XCTAssertEqual(resultResumes.value, 1)
+        XCTAssertEqual(cancelResumes.value, 0)
+    }
+
+    func test_cancel_wins_and_a_later_result_is_a_noop() {
+        let box = CancellableBox()
+        let cancelResumes = Counter()
+        let resultResumes = Counter()
+        box.setResumeOnCancel { cancelResumes.increment() }
+
+        box.cancel()
+        box.resumeOnce { resultResumes.increment() }
+
+        XCTAssertEqual(cancelResumes.value, 1)
+        XCTAssertEqual(resultResumes.value, 0)
+    }
+
+    func test_repeated_cancel_resumes_exactly_once() {
+        let box = CancellableBox()
+        let cancelResumes = Counter()
+        box.setResumeOnCancel { cancelResumes.increment() }
+
+        box.cancel()
+        box.cancel()
+
+        XCTAssertEqual(cancelResumes.value, 1)
+    }
 }
 
 // MARK: - Helpers
@@ -57,4 +120,10 @@ private final class SpyCancellable: Apollo.Cancellable, @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         cancelCount += 1
     }
+}
+
+/// Reference counter so the `@Sendable` resume closures can record how often they ran.
+private final class Counter: @unchecked Sendable {
+    private(set) var value = 0
+    func increment() { value += 1 }
 }

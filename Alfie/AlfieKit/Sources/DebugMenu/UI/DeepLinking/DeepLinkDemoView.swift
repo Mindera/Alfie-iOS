@@ -145,17 +145,11 @@ struct DeepLinkDemoView: View {
 
     private enum ShopLinks: String, CaseIterable {
         case shop = "shop"
-        case brands = "brand"
-        case services = "services/store-services"
 
         var label: String {
             switch self {
             case .shop:
                 return "Shop"
-            case .brands:
-                return "Brands"
-            case .services:
-                return "Services"
             }
         }
     }

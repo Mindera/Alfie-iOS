@@ -42,46 +42,15 @@ final class InternalDeepLinkParserTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    // MARK: - Brands links
+    // MARK: - Shop links
 
-    func test_parses_brands_links() throws {
+    func test_parses_shop_links() throws {
         let testLinks: [String] = [
-            "\(Self.appUrl)/brand",
-            "\(Self.appUrl)/brand/",
+            "\(Self.appUrl)/shop",
+            "\(Self.appUrl)/shop/",
         ]
 
-        try assertParse(testLinks, to: .shop(route: ThemedURL.brands.path))
-    }
-
-    func test_does_not_parse_specific_brands_links() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/brand/gucci",
-            "\(Self.appUrl)/brand/gucci/",
-        ]
-
-        try assertNoParse(testLinks)
-    }
-
-    // MARK: - Service links
-
-    func test_parses_service_links() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/services/store-services",
-            "\(Self.appUrl)/services/store-services/",
-        ]
-
-        try assertParse(testLinks, to: .shop(route: ThemedURL.services.path))
-    }
-
-    func test_does_not_parse_service_links_with_unexpected_format() throws {
-        let testLinks: [String] = [
-            "\(Self.appUrl)/service/store-services",
-            "\(Self.appUrl)/services/store-service",
-            "\(Self.appUrl)/services",
-            "\(Self.appUrl)/services/storeservices",
-        ]
-
-        try assertNoParse(testLinks)
+        try assertParse(testLinks, to: .shop(route: ThemedURL.shop.path))
     }
 
     // MARK: - Other links
@@ -89,6 +58,7 @@ final class InternalDeepLinkParserTests: XCTestCase {
     func test_does_not_parse_other_links() throws {
         let testLinks: [String] = [
             Self.appUrl,
+            "\(Self.appUrl)/services/store-services",
             "\(Self.appUrl)/something",
             "\(Self.appUrl)/something/",
             "\(Self.appUrl)/something/other",
