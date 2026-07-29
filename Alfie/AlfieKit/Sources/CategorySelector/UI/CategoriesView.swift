@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Combine
 import Core
 import Model
@@ -46,7 +47,6 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                                 .accessibilityIdentifier(AccessibilityId.categoryItem)
                         }
                     }
-                    Spacer()
                 }
             } else {
                 // Something other than an empty view so that the overlay shown on top of the scroll view has a layout base
@@ -94,7 +94,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             title: title,
             message: message,
             buttons: [
-                .init(cta: L10n.Shop.Categories.ErrorView.Button.cta) {
+                .init(cta: L10n.Shop.Categories.ErrorView.Button.cta, accessibilityId: AccessibilityID.Categories.retryButton) {
                     Task { await viewModel.retry() }
                 },
             ]

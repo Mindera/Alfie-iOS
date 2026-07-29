@@ -167,12 +167,6 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
-    public func getBrands() async throws -> [Brand] {
-        // ALFMOB-331: BFF schema migration. The new schema removed the brands query;
-        // a follow-up will reintroduce/replace it.
-        throw BFFRequestError(type: .generic)
-    }
-
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         let url = baseUrl.appending(path: BFFEndpoint.webviewConfig.rawValue)
         do {

@@ -55,43 +55,15 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertTrue(items.isEmpty)
     }
 
-    func test_absolute_page_url_is_kept_verbatim_with_host() throws {
-        // Page/blog links open in a webview and must hit the real host, so the absolute url is kept
-        // intact (host included) rather than reduced to a path.
-        let url = "https://mindera-test-store.myshopify.com/pages/contact"
-        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Contact", url: url)])
-            .convertToNavigationItems()
+    func test_page_blog_product_links_are_dropped() {
+        // The static store menu is collections-only; page/blog/product links are not actionable.
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Contact", url: "/pages/x"),
+            Mock<MenuItem>(id: "2", title: "News", url: "/blogs/y"),
+            Mock<MenuItem>(id: "3", title: "Shirt", url: "/products/z")
+        ]).convertToNavigationItems()
 
-        let item = try XCTUnwrap(items.first)
-        XCTAssertEqual(item.type, .page)
-        XCTAssertEqual(item.url, url)
-    }
-
-    func test_pages_link_maps_to_page_type_keeping_full_path() throws {
-        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Store Locator", url: "/pages/store-locator")])
-            .convertToNavigationItems()
-
-        let item = try XCTUnwrap(items.first)
-        XCTAssertEqual(item.type, .page)
-        XCTAssertEqual(item.url, "/pages/store-locator")
-    }
-
-    func test_blogs_link_maps_to_page_type_keeping_full_path() throws {
-        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "News", url: "/blogs/news")])
-            .convertToNavigationItems()
-
-        let item = try XCTUnwrap(items.first)
-        XCTAssertEqual(item.type, .page)
-        XCTAssertEqual(item.url, "/blogs/news")
-    }
-
-    func test_products_link_maps_to_product_type_keeping_full_path() throws {
-        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Shirt", url: "/products/some-shirt")])
-            .convertToNavigationItems()
-
-        let item = try XCTUnwrap(items.first)
-        XCTAssertEqual(item.type, .product)
-        XCTAssertEqual(item.url, "/products/some-shirt")
+        XCTAssertTrue(items.isEmpty)
     }
 
     func test_unknown_multi_segment_url_is_dropped() {
@@ -143,9 +115,9 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertEqual(parentItem.items?.count, 1)
     }
 
-    func test_type_is_derived_from_the_route_prefix() {
-        // The converter maps each link to a type by its Shopify route so non-collection links don't
-        // become broken PLPs.
+    func test_non_collection_links_are_dropped_and_survivors_are_listing() {
+        // Only collection/bare-handle links survive (all `.listing`); page/blog/product links are
+        // dropped as non-actionable.
         let items = makeMenu(items: [
             Mock<MenuItem>(id: "1", title: "Women", url: "/women"),
             Mock<MenuItem>(id: "2", title: "Sale", url: "/collections/sale"),
@@ -154,7 +126,7 @@ final class MainMenuConverterTests: XCTestCase {
             Mock<MenuItem>(id: "5", title: "Shirt", url: "/products/some-shirt")
         ]).convertToNavigationItems()
 
-        XCTAssertEqual(items.map(\.type), [.listing, .listing, .page, .page, .product])
+        XCTAssertEqual(items.map(\.type), [.listing, .listing])
     }
 
     func test_root_url_leaf_is_dropped() {

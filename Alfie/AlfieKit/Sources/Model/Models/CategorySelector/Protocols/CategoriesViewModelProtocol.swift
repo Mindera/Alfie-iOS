@@ -30,13 +30,7 @@ public enum CategoriesViewErrorType: Error, CaseIterable {
     }
 }
 
-public enum CategoriesNavigationDestination {
-    case plp(category: String)
-    case subCategories(_ subCategories: [NavigationItem], parentCategory: NavigationItem)
-}
-
 public protocol CategoriesViewModelProtocol: ObservableObject {
-    var openCategoryPublisher: AnyPublisher<CategoriesNavigationDestination, Never> { get }
     var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> { get }
     var categories: [NavigationItem] { get }
     var title: String { get }

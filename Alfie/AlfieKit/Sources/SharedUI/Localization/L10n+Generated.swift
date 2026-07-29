@@ -354,12 +354,6 @@ public enum L10n {
         public static let title = L10n.tr("L10n", "shop.categories.segment.title")
       }
     }
-    public enum Services {
-      public enum Segment {
-        /// Services
-        public static let title = L10n.tr("L10n", "shop.services.segment.title")
-      }
-    }
   }
   public enum SortBy {
     public enum AlphaAsc {
@@ -567,7 +561,6 @@ public extension L10n {
       case shopCategoriesErrorViewServerErrorMessage = "shop.categories.error_view.server_error.message"
       case shopCategoriesErrorViewServerErrorTitle = "shop.categories.error_view.server_error.title"
       case shopCategoriesSegmentTitle = "shop.categories.segment.title"
-      case shopServicesSegmentTitle = "shop.services.segment.title"
       case sortByAlphaAscTitle = "sort_by.alpha_asc.title"
       case sortByAlphaDescTitle = "sort_by.alpha_desc.title"
       case sortByMostPopularTitle = "sort_by.most_popular.title"

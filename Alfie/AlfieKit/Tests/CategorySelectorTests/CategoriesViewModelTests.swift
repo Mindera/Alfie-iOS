@@ -1,6 +1,7 @@
 import AlicerceLogging
 import Mocks
 import Model
+import ProductListing
 import TestUtils
 import XCTest
 @testable import CategorySelector
@@ -8,17 +9,19 @@ import XCTest
 final class CategoriesViewModelTests: XCTestCase {
     private var sut: CategoriesViewModel!
     private var mockNavigationService: MockNavigationService!
+    private var navigatedRoute: CategorySelectorRoute?
     private var log = Log.DummyLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockNavigationService = MockNavigationService()
-        sut = .init(navigationService: mockNavigationService, log: log) { _ in }
+        sut = .init(navigationService: mockNavigationService, log: log) { self.navigatedRoute = $0 }
     }
 
     override func tearDownWithError() throws {
         sut = nil
         mockNavigationService = nil
+        navigatedRoute = nil
         try super.tearDownWithError()
     }
 
@@ -257,39 +260,30 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertEqual(sut.categories.count, fixtures.count)
     }
 
+    func test_retry_is_noop_on_subcategory_screen() async {
+        // A drill-down VM has no service; retry must not strand the screen in `.loading`.
+        sut = .init(log: log, categories: NavigationItem.fixtures, title: "Women") { _ in }
+        XCTAssertTrue(sut.state.isSuccess)
+
+        await sut.retry()
+
+        XCTAssertTrue(sut.state.isSuccess)
+    }
+
     // MARK: - Category selection
 
     func test_triggers_navigation_to_plp_when_leaf_without_subcategories_is_selected() {
-        let fixture = NavigationItem.fixture(type: .listing, url: "/something")
+        let fixture = NavigationItem.fixture(type: .listing, url: "/clothing")
 
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
+        sut.didSelectCategory(fixture)
 
-        guard let destination, case .plp(let category) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
+        guard case .productListing(.productListing(let config)) = navigatedRoute else {
+            XCTFail("Unexpected route: \(String(describing: navigatedRoute))")
             return
         }
 
-        XCTAssertEqual(category, "something")
-    }
-
-    func test_triggers_navigation_to_plp_when_listing_item_is_selected() {
-        let path = "/clothing"
-        let fixture = NavigationItem.fixture(type: .listing, url: path)
-
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
-
-        guard let destination, case .plp(let category) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
-            return
-        }
-
-        XCTAssertEqual(category, "clothing")
+        // Leading slash is stripped to the bare collection handle.
+        XCTAssertEqual(config.category, "clothing")
     }
 
     func test_sets_error_state_when_category_with_invalid_url_is_selected() {
@@ -307,35 +301,19 @@ final class CategoriesViewModelTests: XCTestCase {
         let subFixtures = NavigationItem.fixtures
         let fixture = NavigationItem.fixture(title: parentTitle, items: subFixtures)
 
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
+        sut.didSelectCategory(fixture)
 
-        guard let destination, case .subCategories(let subCategories, let parentCategory) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
-            return
-        }
-
-        XCTAssertEqual(subCategories, subFixtures)
-        XCTAssertEqual(parentCategory.title, parentTitle)
+        XCTAssertEqual(navigatedRoute, .subCategories(subCategories: subFixtures, parent: fixture))
     }
 
     func test_category_with_subcategories_drills_down() {
+        // Items take priority over url/type: a node with sub-items drills down even with a leaf-like url/type.
         let subFixtures = NavigationItem.fixtures
         let fixture = NavigationItem.fixture(type: .page, url: "/women", items: subFixtures)
 
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
+        sut.didSelectCategory(fixture)
 
-        guard let destination, case .subCategories(let subCategories, _) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
-            return
-        }
-
-        XCTAssertEqual(subCategories, subFixtures)
+        XCTAssertEqual(navigatedRoute, .subCategories(subCategories: subFixtures, parent: fixture))
     }
 
     // MARK: - Title

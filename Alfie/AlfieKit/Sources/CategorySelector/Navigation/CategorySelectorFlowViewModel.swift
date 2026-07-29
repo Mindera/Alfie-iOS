@@ -16,16 +16,10 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     @Published private var isSearchPresented = false
     @Published private var overlayView: AnyView?
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
-    @Published private var activeShopTab: ShopViewTab = .categories
-    public var activeShopTabPublisher: AnyPublisher<ShopViewTab, Never> { $activeShopTab.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
     public var isWishlistEnabled: Bool {
         dependencies.categorySelectorDependencyContainer.configurationService.isFeatureEnabled(.wishlist)
-    }
-
-    public var isStoreServicesEnabled: Bool {
-        dependencies.categorySelectorDependencyContainer.configurationService.isFeatureEnabled(.storeServices)
     }
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
@@ -67,10 +61,6 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
         ) { [weak self] in
             self?.navigate($0)
         }
-    }
-
-    public func makeServicesViewModel() -> WebViewModel {
-        WebViewModel(webFeature: .storeServices, dependencies: dependencies.webDependencyContainer)
     }
 
     public func makeSubCategoriesViewModel(
@@ -255,9 +245,8 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
 
     public func navigate(_ route: CategorySelectorRoute) {
         switch route {
-        case .categorySelector(let shopViewTab):
+        case .categorySelector:
             popToRoot()
-            activeShopTab = shopViewTab
 
         default:
             path.append(route)

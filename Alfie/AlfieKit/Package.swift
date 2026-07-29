@@ -368,6 +368,7 @@ let package = Package(
             dependencies: [
                 "CategorySelector",
                 "Mocks",
+                "ProductListing",
                 "TestUtils",
             ]
         ),

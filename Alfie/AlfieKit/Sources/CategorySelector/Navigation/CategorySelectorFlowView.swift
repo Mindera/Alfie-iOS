@@ -12,9 +12,7 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
             ShopView(
                 isRoot: true,
                 isWishlistEnabled: viewModel.isWishlistEnabled,
-                categoriesViewModel: viewModel.makeCategoriesViewModel(),
-                servicesViewModel: viewModel.isStoreServicesEnabled ? viewModel.makeServicesViewModel() : nil,
-                activeShopTabPublisher: viewModel.activeShopTabPublisher
+                categoriesViewModel: viewModel.makeCategoriesViewModel()
             ) {
                 viewModel.navigate($0)
             }
@@ -22,10 +20,7 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
                 route.destination(
                     isRoot: false,
                     isWishlistEnabled: viewModel.isWishlistEnabled,
-                    activeShopTabPublisher: viewModel.activeShopTabPublisher,
                     categoriesViewModel: viewModel.makeCategoriesViewModel,
-                    isStoreServicesEnabled: viewModel.isStoreServicesEnabled,
-                    servicesViewModel: viewModel.makeServicesViewModel,
                     accountViewModel: viewModel.makeAccountViewModel,
                     myAccountIntentViewBuilder: viewModel.myAccountIntentViewBuilder,
                     productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),

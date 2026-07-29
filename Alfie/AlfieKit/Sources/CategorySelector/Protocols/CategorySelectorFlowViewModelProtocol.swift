@@ -1,4 +1,3 @@
-import Combine
 import Foundation
 import Model
 import MyAccount
@@ -15,11 +14,8 @@ public protocol CategorySelectorFlowViewModelProtocol: ObservableObject, FlowVie
     associatedtype WishlistViewModel: WishlistViewModelProtocol
 
     var isWishlistEnabled: Bool { get }
-    var isStoreServicesEnabled: Bool { get }
-    var activeShopTabPublisher: AnyPublisher<ShopViewTab, Never> { get }
 
     func makeCategoriesViewModel() -> CategoriesViewModel
-    func makeServicesViewModel() -> WebViewModel
     func makeAccountViewModel() -> AccountViewModel
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView
     func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel

@@ -926,17 +926,6 @@
         }
       }
     },
-    "shop.services.segment.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Services"
-          }
-        }
-      }
-    },
     "shop.title" : {
       "extractionState" : "manual",
       "localizations" : {

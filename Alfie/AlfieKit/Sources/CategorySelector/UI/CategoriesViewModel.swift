@@ -1,6 +1,5 @@
 import AlicerceLogging
 import Combine
-import Core
 import Foundation
 import Model
 import Utils
@@ -16,7 +15,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     private let log: Logger
     // True while a fetch is in flight, so concurrent loads/refreshes don't race (last-writer-wins).
     private var isFetching = false
-    private let openCategorySubject: PassthroughSubject<CategoriesNavigationDestination, Never> = .init()
     private lazy var placeholders: [NavigationItem] = {
         (0..<Constants.placeholderItemCount).map { _ in
             .init(
@@ -35,7 +33,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }()
 
     @Published public private(set) var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading
-    public lazy var openCategoryPublisher = openCategorySubject.eraseToAnyPublisher()
 
     public var categories: [NavigationItem] {
         if state.isLoading {
@@ -97,8 +94,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     public func didSelectCategory(_ category: NavigationItem) {
         // The BFF menu is always a static store menu of collections: a category either drills into
         // its sub-menu, or (as a leaf) opens the PLP for its collection handle. No page/product links.
-        if category.hasSubCategories, let subCategories = category.items {
-            openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
+        if let subCategories = category.items, !subCategories.isEmpty {
             navigate(.subCategories(subCategories: subCategories, parent: category))
             return
         }
@@ -110,7 +106,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
 
         let collectionHandle = categoryUrl.deletingPrefix("/")
-        openCategorySubject.send(.plp(category: collectionHandle))
         navigate(
             .productListing(
                 .productListing(
@@ -136,7 +131,9 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     @MainActor
     public func retry() async {
         // Recovery from the error screen: unlike pull-to-refresh, show the loading state for feedback.
-        guard !isFetching else { return }
+        // A drill-down screen has no service to retry against — bail before flipping to `.loading`,
+        // which the no-op fetch would otherwise strand.
+        guard canRefresh, !isFetching else { return }
         state = .loading
         await fetchNavigationItems()
     }
@@ -175,8 +172,7 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             return
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
-            // Re-check after the await: never downgrade a list already on screen — a concurrent
-            // refresh may have succeeded while this (or an initial) fetch was in flight.
+            // A failed re-fetch must not downgrade the `.success` list already on screen.
             if !state.isSuccess {
                 state = .error(CategoriesViewErrorType.from(error: error))
             }

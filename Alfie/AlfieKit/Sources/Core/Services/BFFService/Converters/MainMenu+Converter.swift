@@ -62,16 +62,13 @@ private func makeNavigationItem(
     )
 }
 
-// Maps a Shopify menu url to a domain destination based on its route prefix, so non-collection
-// links don't masquerade as (broken) product listings:
+// Maps a Shopify menu url to a domain destination based on its route prefix. The static store menu
+// is collections-only, so only these links are actionable — everything else is dropped:
 //   /collections/<handle>  → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
-//   /pages/…, /blogs/…      → `.page`,    url kept verbatim (webview opens it as-is)
-//   /products/…            → `.product`, url kept verbatim
 //   /<handle> (bare)        → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
-// Anything else — path-less absolute urls (`https://host`), root `/`, or unrecognized multi-segment
-// paths — is dropped rather than guessed. Collections resolve to just the handle (host irrelevant to
-// the PLP flow); page/blog/product links keep their original url (Shopify returns absolute urls, and
-// the webview must hit the real host, not ours).
+// Anything else — page/blog/product links, path-less absolute urls (`https://host`), root `/`, or
+// unrecognized multi-segment paths — is dropped rather than guessed. Collections resolve to just the
+// handle (host irrelevant to the PLP flow).
 private func menuDestination(from url: String?) -> (type: NavigationItemType, url: String)? {
     guard
         let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty,
@@ -88,10 +85,6 @@ private func menuDestination(from url: String?) -> (type: NavigationItemType, ur
         // `/collections/all/sale` keeps the tag last — and a bare `/collections` has no handle.
         guard segments.count >= 2 else { return nil }
         return (.listing, "/\(segments[1])")
-    case "pages", "blogs":
-        return (.page, trimmed)
-    case "products":
-        return (.product, trimmed)
     default:
         // A bare single segment is a collection handle (or a SpecialCategory, matched upstream).
         guard segments.count == 1 else { return nil }
