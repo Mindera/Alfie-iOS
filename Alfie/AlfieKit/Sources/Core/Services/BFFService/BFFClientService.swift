@@ -277,11 +277,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
 }
 
 extension NavigationHandle {
-    // The Shop Categories screen maps to Shopify's "main-menu"; other slots fall back to their raw name.
+    // The Shop Categories screen maps to the curated "product-category" menu (collections-only);
+    // other slots fall back to their raw name.
     var bffMenuHandle: String {
         switch self {
         case .header:
-            return "main-menu"
+            return "product-category"
         case .footer, .social, .topbar:
             return rawValue
         }
