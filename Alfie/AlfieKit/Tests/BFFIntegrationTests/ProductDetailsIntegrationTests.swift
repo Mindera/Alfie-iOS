@@ -21,9 +21,11 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         let product = try await sut.getProduct(handle: slug)
 
         XCTAssertFalse(product.variants.isEmpty, "Product details should expose at least one variant")
-        // Not asserting on `sku`: every variant in the seed store has an empty one.
-        XCTAssertTrue(product.variants.contains(product.defaultVariant),
-                      "The default variant should be one of the product's variants")
+        // Not asserting on `sku`: the seed store's variants may carry an empty one.
+        // The default variant must surface media so the PDP carousel isn't blank
+        // (see the media fallback in ProductDetails+Converter).
+        XCTAssertFalse(product.defaultVariant.media.isEmpty,
+                       "The default variant should surface media for the PDP carousel")
     }
 
     func test_getProduct_unknownHandle_throwsBFFRequestError() async throws {
