@@ -2,8 +2,9 @@ import SwiftUI
 import UIKit
 
 extension View {
-    var defaultSnapshotSize: CGSize { .init(width: 393, height: 852) } // iPhone 15 Pro
-    var fullHeightSnapshotSize: CGSize { .init(width: 393, height: 1500) } // iPhone 15 Pro, for long screens
+    // Fixed logical container sizes (pt), not a device pin — the OS is what's pinned (see Docs/SnapshotTesting.md).
+    var defaultSnapshotSize: CGSize { .init(width: 393, height: 852) }
+    var fullHeightSnapshotSize: CGSize { .init(width: 393, height: 1500) } // taller, for long screens
 
     public func embededInContainer() -> UIView {
         embededInContainer(size: defaultSnapshotSize)

@@ -15,7 +15,7 @@ They live **in the AlfieKit module test targets** (not the `AlfieTests` app targ
 |---|---|
 | `View.embededInContainer()` | Wraps a view in a 393×852 `UIView` |
 | `View.embededInFullHeightContainer()` | Same at 393×1500, for long screens |
-| `Snapshotting.defaultImage(precision:perceptualPrecision:)` | Image strategy, defaults `0.9` / `0.95`, SRGB, `displayScale` 3 |
+| `Snapshotting.defaultImage(precision:perceptualPrecision:)` | Image strategy, defaults `1.0` / `0.95`, SRGB, `displayScale` 3 |
 
 `defaultImage` pins `displayScale` to 3 via the strategy's traits, so rendering is @3x regardless of the host
 simulator — the container no longer mutates `UIScreen.main`.
@@ -41,11 +41,17 @@ the new major; overriding without re-recording asserts against the wrong OS.
 
 ### Precision
 
-`0.9` / `0.95` is the suite-wide default. A genuinely noisy test may override explicitly:
+`precision: 1.0` / `perceptualPrecision: 0.95` is the suite-wide default: every pixel must match, so a test
+cannot pass with an element missing, while `perceptualPrecision` still absorbs anti-aliasing across devices.
+A view with genuinely non-deterministic content (e.g. a time-driven animation) may lower `precision`:
 
 ```swift
-assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(precision: 0.98), record: isRecording)
+assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(precision: 0.9), record: isRecording)
 ```
+
+`SplashViewSnapshotTests` does exactly this — its `LoadingSpinner` rotates off wall-clock time, so it asserts
+at `0.9` and covers only the static parts. Reach for an override only when the content is truly
+non-deterministic; prefer re-recording over loosening precision to chase a rendering diff.
 
 Prefer re-recording over loosening precision. Watch for override drift across the suite in review.
 
@@ -98,15 +104,16 @@ functions silently not running) and have been added.
 
 ## Beware: animated and time-driven views
 
-`precision: 0.9` means 10% of pixels may differ. A small element is well inside that budget, so a snapshot
-can pass **even if that element is missing entirely**. This was measured on the splash screen: with
-`LoadingSpinner` removed from `SplashView`, the test still passed.
-
-Raising precision is not a free fix — at `precision: 1.0` the same test fails every run, because
-`LoadingSpinner` derives its rotation from wall-clock time and lands on a different angle each capture.
+The suite default is `precision: 1.0`, so a static screen cannot pass with an element missing. But a lower
+precision has a sharp edge: any slack big enough to hide an animation's motion is also big enough to hide a
+whole small element. Measured on the splash screen at `precision: 0.9`: with `LoadingSpinner` removed from
+`SplashView`, the test still passed. And you can't just keep the default `1.0` for such a view — the same
+test fails every run at `1.0`, because `LoadingSpinner` derives its rotation from wall-clock time and lands
+on a different angle each capture.
 
 So for any view containing animated or time-driven content:
 
-- Treat the snapshot as covering the **static** parts, and say so in a comment on the test.
+- Lower `precision` on that test only (the suite stays tight at `1.0`), and say in a comment that the
+  snapshot covers the **static** parts.
 - Cover the animated component with a unit test instead.
-- Don't raise precision to chase it — you trade a blind spot for a flake.
+- Don't lower precision to chase a *rendering* diff on a static view — re-record instead.
