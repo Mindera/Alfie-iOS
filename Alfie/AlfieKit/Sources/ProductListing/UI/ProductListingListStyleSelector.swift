@@ -30,11 +30,12 @@ struct ProductListingListStyleSelector: View {
         accessibilityLabel: String,
         accessibilityID: String
     ) -> some View {
-        Button {
+        let isSelected = selectedStyle == style
+        return Button {
             selectedStyle = style
         } label: {
             ThemedIcon(
-                Style.icon(for: style, isSelected: selectedStyle == style),
+                Style.icon(for: style, isSelected: isSelected),
                 size: .medium,
                 tint: Theme.contentContentPrimary,
                 accessibilityLabel: accessibilityLabel
@@ -42,6 +43,8 @@ struct ProductListingListStyleSelector: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(accessibilityID)
+        // Announce the active layout to VoiceOver (selection is otherwise icon-only).
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     enum Style {
