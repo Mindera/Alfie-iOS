@@ -72,6 +72,8 @@ public enum AccessibilityID {
         public static let listStyleGridButton = "productListing.listStyle.grid.button"
         public static let listStyleListButton = "productListing.listStyle.list.button"
         public static let retryButton = "productListing.retry.button"
+        public static let filterChips = "productListing.filterChips"
+        public static func filterChip(label: String) -> String { "productListing.filterChip.\(label)" }
 
         /// Returns a row-scoped prefix for composing element identifiers within a listing row.
         /// Append a type suffix for specific elements: `row(id:) + ".image"`, `row(id:) + ".button"`, etc.

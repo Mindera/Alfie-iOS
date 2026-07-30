@@ -121,12 +121,15 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     @ViewBuilder private var infoFilterBarView: some View {
-        ProductListingFilterBar(
-            style: $viewModel.style,
-            total: viewModel.totalNumberOfProducts,
-            isLoading: viewModel.state.isLoadingFirstPage
-        ) {
-            viewModel.showRefine.toggle()
+        VStack(spacing: theme.spacing.space100) {
+            ProductListingFilterBar(
+                style: $viewModel.style,
+                total: viewModel.totalNumberOfProducts,
+                isLoading: viewModel.state.isLoadingFirstPage
+            ) {
+                viewModel.showRefine.toggle()
+            }
+            ProductListingFilterChips()
         }
         .onChange(of: viewModel.style, perform: viewModel.setListStyle)
         .sheet(isPresented: $viewModel.showRefine) {
