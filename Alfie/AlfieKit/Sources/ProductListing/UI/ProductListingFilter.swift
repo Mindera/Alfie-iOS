@@ -29,13 +29,13 @@ struct ProductListingFilter: View {
     }
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing8) {
+        VStack(spacing: theme.spacing.space100) {
             header
             ThemedDivider.horizontalThin
-            VStack(spacing: Primitives.Spacing.spacing24) {
+            VStack(spacing: theme.spacing.space300) {
                 listStyleView
                 sortView
-            }.padding(.vertical, Primitives.Spacing.spacing16)
+            }.padding(.vertical, theme.spacing.space200)
             Spacer()
             ThemedButton(text: L10n.Plp.ShowResults.Button.cta) {
                 onFilter()
@@ -53,7 +53,7 @@ struct ProductListingFilter: View {
                 ThemedIcon(
                     .close,
                     size: .medium,
-                    tint: Primitives.Colours.neutrals900,
+                    tint: Theme.contentContentPrimary,
                     accessibilityLabel: L10n.Accessibility.close
                 )
             })
@@ -61,7 +61,7 @@ struct ProductListingFilter: View {
             ThemedToolbarTitle(style: .text(L10n.Plp.RefineAndSort.title))
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing24)
+        .padding(.horizontal, theme.spacing.space300)
     }
 
     var sortView: some View {
@@ -74,18 +74,12 @@ struct ProductListingFilter: View {
 
     var listStyleView: some View {
         HStack {
-            Text(L10n.Plp.ListStyle.Option.title)
-                .font(Constants.listStyleFont)
-                .foregroundStyle(Primitives.Colours.neutrals800)
+            Text.build(theme.font.body.medium(L10n.Plp.ListStyle.Option.title))
+                .foregroundStyle(Theme.contentContentPrimary)
             Spacer()
             ProductListingListStyleSelector(selectedStyle: $listStyle)
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
-    }
-
-    private enum Constants {
-        static let listStyleFontSize: CGFloat = 18
-        static let listStyleFont = DesignSystem.shared.font.body.medium.uiFont.withSize(Constants.listStyleFontSize).font
+        .padding(.horizontal, theme.spacing.space200)
     }
 }
 
