@@ -118,6 +118,7 @@ public struct ErrorView: View {
                     }
                 }
             }
+            .padding(.horizontal, Primitives.Spacing.spacing16)
 
             Spacer()
         }
