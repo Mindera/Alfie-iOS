@@ -38,7 +38,7 @@ public struct SortByView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(size: Constants.iconSize)
-                                            .tint(Theme.contentContentPrimary)
+                                            .foregroundStyle(Theme.contentContentPrimary)
                                             .padding(.vertical, theme.spacing.space150)
                                             .padding(.leading, theme.spacing.space150)
                                     }
