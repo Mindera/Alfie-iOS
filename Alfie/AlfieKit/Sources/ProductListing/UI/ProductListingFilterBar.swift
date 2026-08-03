@@ -42,7 +42,7 @@ struct ProductListingFilterBar: View {
             }
         }
         .padding(.horizontal, theme.spacing.space200)
-        .frame(minHeight: theme.spacing.space400)
+        .padding(.vertical, theme.spacing.space050)
     }
 
     private var refineButton: some View {

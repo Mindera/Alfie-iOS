@@ -92,7 +92,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     @ViewBuilder private var infoFilterBarView: some View {
-        VStack(spacing: theme.spacing.space100) {
+        VStack(spacing: theme.spacing.space0) {
             ProductListingFilterBar(
                 style: $viewModel.style,
                 total: viewModel.totalNumberOfProducts,
@@ -102,6 +102,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             }
             ProductListingFilterChips()
         }
+        .padding(.bottom, theme.spacing.space100)
         .onChange(of: viewModel.style, perform: viewModel.setListStyle)
         .sheet(isPresented: $viewModel.showRefine) {
             ProductListingFilter(

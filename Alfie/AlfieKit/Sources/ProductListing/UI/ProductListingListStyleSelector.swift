@@ -11,7 +11,7 @@ struct ProductListingListStyleSelector: View {
     }
 
     var body: some View {
-        HStack(spacing: theme.spacing.space100) {
+        HStack(spacing: theme.spacing.space0) {
             styleButton(
                 for: .list,
                 accessibilityLabel: L10n.Accessibility.listView,
@@ -40,6 +40,9 @@ struct ProductListingListStyleSelector: View {
                 tint: Theme.contentContentPrimary,
                 accessibilityLabel: accessibilityLabel
             )
+            // Figma: 24pt icon centred in a 32×32 button (two sit flush → 8pt visible gap).
+            .frame(width: theme.spacing.space400, height: theme.spacing.space400)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(accessibilityID)
