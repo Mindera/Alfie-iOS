@@ -15,13 +15,12 @@ extension VerticalProductCardConfiguration {
     }
 
     var verticalInterSpacing: CGFloat {
+        // Figma: 8pt between image, details and price for the PLP grid/list cards.
         switch size {
-        case .small:
+        case .small,
+             .medium,
+             .large: // swiftlint:disable:this indentation_width
             Primitives.Spacing.spacing8
-        case .medium:
-            Primitives.Spacing.spacing12
-        case .large:
-            Primitives.Spacing.spacing16
         }
     }
 
@@ -36,13 +35,41 @@ extension VerticalProductCardConfiguration {
         }
     }
 
-    var textFont: UIFont {
+    /// Brand / designer label — Figma `label/small` (12pt) across all card sizes.
+    var designerFont: UIFont {
+        DesignSystem.shared.font.body.small.uiFont
+    }
+
+    /// Product name — Figma `body/medium` (16pt) on PLP grid/list; small carousel keeps 12pt.
+    var nameFont: UIFont {
         switch size {
-        case .small,
-             .medium: // swiftlint:disable:this indentation_width
+        case .small:
             DesignSystem.shared.font.body.small.uiFont
-        case .large:
+        case .medium,
+             .large: // swiftlint:disable:this indentation_width
             DesignSystem.shared.font.body.medium.uiFont
+        }
+    }
+
+    /// Product name colour — Figma `#111111` on PLP grid/list; small carousel keeps its muted tone.
+    var nameColor: Color {
+        switch size {
+        case .small:
+            Primitives.Colours.neutrals500
+        case .medium,
+             .large: // swiftlint:disable:this indentation_width
+            Primitives.Colours.neutrals800
+        }
+    }
+
+    /// Product name line height — Figma `body/medium` is 24pt on PLP grid/list; small carousel keeps the font's natural leading.
+    var nameLineHeight: CGFloat {
+        switch size {
+        case .small:
+            DesignSystem.shared.font.body.small.uiFont.lineHeight
+        case .medium,
+             .large: // swiftlint:disable:this indentation_width
+            Primitives.Spacing.spacing24
         }
     }
 

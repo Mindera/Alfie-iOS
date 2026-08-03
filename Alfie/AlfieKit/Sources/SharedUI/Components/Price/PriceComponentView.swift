@@ -205,9 +205,10 @@ public struct PriceComponentView: View {
     }
 
     private func priceText(_ price: String, textSize: CGFloat) -> Text {
+        // Figma price token is `body/medium-bold` (SF Pro Medium, weight 510) — `.medium`, not `.semibold`.
         Text(price)
             .font(Font(theme.font.body.medium.uiFont.withSize(textSize)))
-            .fontWeight(.semibold)
+            .fontWeight(.medium)
     }
 }
 
