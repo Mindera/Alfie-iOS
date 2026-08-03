@@ -60,12 +60,15 @@ Prefer re-recording over loosening precision. Watch for override drift across th
 ## Recording or updating a snapshot
 
 1. Set `isRecording = true` in the test file.
-2. Run the test (record mode always *fails* — that's expected; it writes the PNG).
+2. Record the PNG. Either run the single test from Xcode, or run the script with the guard bypassed:
+   `SNAPSHOT_ALLOW_RECORD=1 ./Alfie/scripts/verify.sh --skip-integration --filter <TestClass>`
+   (record mode always *fails* — that's expected; it writes the PNG).
 3. **Inspect the produced PNG** before trusting it.
 4. Set `isRecording = false`, re-run to confirm it asserts green, and commit the PNG.
 
 `verify.sh` refuses to run if any test is left in record mode — a grep guard fails in <1s with the
-offending file:line, so a stray `isRecording = true` cannot land green.
+offending file:line, so a stray `isRecording = true` cannot land green. `SNAPSHOT_ALLOW_RECORD=1`
+lifts the guard only for the deliberate record run in step 2.
 
 ---
 

@@ -78,18 +78,22 @@ fi
 # assertion anyway, but catching it here costs a second instead of a full test run. Covers the
 # common spellings: record: true/.all/.failed, withSnapshotTesting(record:), and an isRecording
 # flag set true (with or without a `: Bool` annotation). Scans both test roots.
+# Set SNAPSHOT_ALLOW_RECORD=1 to bypass while intentionally re-recording a reference through this script.
 SNAPSHOT_TEST_ROOTS=("$PROJECT_DIR/Alfie/AlfieKit/Tests" "$PROJECT_DIR/Alfie/AlfieTests")
-for root in "${SNAPSHOT_TEST_ROOTS[@]}"; do
-    [ -d "$root" ] || continue
-    if grep -rnE --include='*.swift' \
-            'record:[[:space:]]*(true|\.all|\.failed)|withSnapshotTesting\(record:|isRecording[[:space:]]*(:[[:space:]]*Bool)?[[:space:]]*=[[:space:]]*true' \
-            "$root"; then
-        echo ""
-        echo "❌ ERROR: A snapshot test is committed in record mode (see matches above)"
-        echo "Set it back to false and re-run so the test asserts against the committed reference."
-        exit 1
-    fi
-done
+if [ "${SNAPSHOT_ALLOW_RECORD:-0}" != "1" ]; then
+    for root in "${SNAPSHOT_TEST_ROOTS[@]}"; do
+        [ -d "$root" ] || continue
+        if grep -rnE --include='*.swift' \
+                'record:[[:space:]]*(true|\.all|\.failed)|withSnapshotTesting\(record:|isRecording[[:space:]]*(:[[:space:]]*Bool)?[[:space:]]*=[[:space:]]*true' \
+                "$root"; then
+            echo ""
+            echo "❌ ERROR: A snapshot test is committed in record mode (see matches above)"
+            echo "Set it back to false and re-run so the test asserts against the committed reference."
+            echo "To record intentionally through this script, re-run with SNAPSHOT_ALLOW_RECORD=1."
+            exit 1
+        fi
+    done
+fi
 
 # Snapshot references are pinned to an iOS major, so resolve an iPhone on that runtime rather
 # than accepting whatever generic destination xcodebuild picks (which may be an older iOS).
