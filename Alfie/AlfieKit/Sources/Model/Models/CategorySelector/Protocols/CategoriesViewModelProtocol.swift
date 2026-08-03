@@ -30,21 +30,17 @@ public enum CategoriesViewErrorType: Error, CaseIterable {
     }
 }
 
-public enum CategoriesNavigationDestination {
-    case plp(category: String)
-    case web(url: URL, title: String)
-    case services
-    case brands
-    case subCategories(_ subCategories: [NavigationItem], parentCategory: NavigationItem)
-}
-
 public protocol CategoriesViewModelProtocol: ObservableObject {
-    var openCategoryPublisher: AnyPublisher<CategoriesNavigationDestination, Never> { get }
     var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> { get }
     var categories: [NavigationItem] { get }
     var title: String { get }
     var shouldShowToolbar: Bool { get }
+    /// Whether this screen can pull-to-refresh. Only the root categories screen fetches from the
+    /// service; drill-down screens render a static snapshot, so their refresh affordance is hidden.
+    var canRefresh: Bool { get }
 
     func viewDidAppear()
+    func refresh() async
+    func retry() async
     func didSelectCategory(_ category: NavigationItem)
 }

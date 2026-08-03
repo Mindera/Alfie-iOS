@@ -9,10 +9,6 @@ final class DefaultDeepLinkParser: DeepLinkParserProtocol {
         case wishlist
         case account
         case bag
-
-        // Special Shop cases
-        case shopBrands = "brand"
-        case shopServices = "services/store-services"
     }
 
     let configuration: LinkConfigurationProtocol
@@ -27,20 +23,6 @@ final class DefaultDeepLinkParser: DeepLinkParserProtocol {
         guard configuration.isURLSupported(url) else {
             return DeepLink(type: .unknown, fullUrl: url)
         }
-
-        let path = url.cleanPath.lowercased()
-
-        // Shop cases
-        // swiftlint:disable vertical_whitespace_between_cases
-        switch path {
-        case PathComponents.shopBrands.rawValue:
-            return .init(type: .shop(route: ThemedURL.brands.path), fullUrl: url)
-        case PathComponents.shopServices.rawValue:
-            return .init(type: .shop(route: ThemedURL.services.path), fullUrl: url)
-        default:
-            break
-        }
-        // swiftlint:enable vertical_whitespace_between_cases
 
         let components = url.cleanPathComponents
 

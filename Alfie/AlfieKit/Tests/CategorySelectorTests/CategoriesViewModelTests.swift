@@ -1,23 +1,27 @@
 import AlicerceLogging
 import Mocks
 import Model
+import ProductListing
+import TestUtils
 import XCTest
 @testable import CategorySelector
 
 final class CategoriesViewModelTests: XCTestCase {
     private var sut: CategoriesViewModel!
     private var mockNavigationService: MockNavigationService!
+    private var navigatedRoute: CategorySelectorRoute?
     private var log = Log.DummyLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockNavigationService = MockNavigationService()
-        sut = .init(navigationService: mockNavigationService, log: log, ignoreLocalNavigation: false) { _ in }
+        sut = .init(navigationService: mockNavigationService, log: log) { self.navigatedRoute = $0 }
     }
 
     override func tearDownWithError() throws {
         sut = nil
         mockNavigationService = nil
+        navigatedRoute = nil
         try super.tearDownWithError()
     }
 
@@ -135,7 +139,7 @@ final class CategoriesViewModelTests: XCTestCase {
     }
 
     func test_ignores_loads_items_from_service_when_view_appears_if_categories_init_is_used() {
-        sut = .init(log: log, categories: [], title: "", ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: "") { _ in }
 
         let expectation = expectation(description: "Wait for no service call")
         expectation.isInverted = true
@@ -152,7 +156,7 @@ final class CategoriesViewModelTests: XCTestCase {
 
     func test_categories_are_available_immediately_on_categories_init() {
         let fixtures = NavigationItem.fixtures
-        sut = .init(log: log, categories: fixtures, title: "", ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: fixtures, title: "") { _ in }
         XCTAssertEqual(sut.categories.count, fixtures.count)
     }
 
@@ -177,59 +181,109 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertTrue(sut.categories.isEmpty)
     }
 
+    // MARK: - Refresh
+
+    func test_refresh_requests_shop_navigation_items() async {
+        var requestedScreen: NavigationItemsScreen?
+        mockNavigationService.onGetNavigationItemsCalled = { screen in
+            requestedScreen = screen
+            return NavigationItem.fixtures
+        }
+
+        await sut.refresh()
+
+        XCTAssertEqual(requestedScreen, .shop)
+    }
+
+    func test_can_refresh_is_true_for_root_screen() {
+        XCTAssertTrue(sut.canRefresh)
+    }
+
+    func test_can_refresh_is_false_for_subcategory_screen() {
+        let subCategoryViewModel = CategoriesViewModel(
+            log: log,
+            categories: NavigationItem.fixtures,
+            title: "Women"
+        ) { _ in }
+
+        XCTAssertFalse(subCategoryViewModel.canRefresh)
+    }
+
+    func test_refresh_updates_categories_from_service() async {
+        let fixtures = NavigationItem.fixtures
+        mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
+
+        await sut.refresh()
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.categories.count, fixtures.count)
+    }
+
+    func test_refresh_keeps_existing_list_when_service_fails() async {
+        let fixtures = NavigationItem.fixtures
+        mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
+        await sut.refresh()
+        XCTAssertTrue(sut.state.isSuccess)
+
+        mockNavigationService.onGetNavigationItemsCalled = { _ in throw BFFRequestError(type: .generic) }
+        await sut.refresh()
+
+        // A failed pull-to-refresh must not discard the categories already on screen.
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.categories.count, fixtures.count)
+    }
+
+    func test_refresh_keeps_existing_list_when_service_returns_empty() async {
+        let fixtures = NavigationItem.fixtures
+        mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
+        await sut.refresh()
+        XCTAssertTrue(sut.state.isSuccess)
+
+        mockNavigationService.onGetNavigationItemsCalled = { _ in [] }
+        await sut.refresh()
+
+        // An empty re-fetch (like a stale/failed one) must not clear the list already on screen.
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.categories.count, fixtures.count)
+    }
+
+    func test_retry_recovers_from_error_state() async {
+        // Drive into an error state (invalid selection), then retry with a working service.
+        sut.didSelectCategory(NavigationItem.fixture(url: nil))
+        XCTAssertTrue(sut.state.didFail)
+
+        let fixtures = NavigationItem.fixtures
+        mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
+        await sut.retry()
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.categories.count, fixtures.count)
+    }
+
+    func test_retry_is_noop_on_subcategory_screen() async {
+        // A drill-down VM has no service; retry must not strand the screen in `.loading`.
+        sut = .init(log: log, categories: NavigationItem.fixtures, title: "Women") { _ in }
+        XCTAssertTrue(sut.state.isSuccess)
+
+        await sut.retry()
+
+        XCTAssertTrue(sut.state.isSuccess)
+    }
+
     // MARK: - Category selection
 
-    func test_triggers_navigation_when_category_without_subcategories_is_selected() {
-        let path = "/something"
-        let fixture = NavigationItem.fixture(type: .page, url: path)
+    func test_triggers_navigation_to_plp_when_leaf_without_subcategories_is_selected() {
+        let fixture = NavigationItem.fixture(type: .listing, url: "/clothing")
 
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
+        sut.didSelectCategory(fixture)
 
-        guard let destination, case .web(let url, _) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
+        guard case .productListing(.productListing(let config)) = navigatedRoute else {
+            XCTFail("Unexpected route: \(String(describing: navigatedRoute))")
             return
         }
 
-        XCTAssertEqual(url.absoluteString.contains(path), true)
-    }
-
-    func test_triggers_navigation_to_web_when_page_item_is_selected() {
-        let path = "/something"
-        let itemTitle = "Something"
-        let fixture = NavigationItem.fixture(type: .page, title: itemTitle, url: path)
-
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
-
-        guard let destination, case .web(let url, let title) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
-            return
-        }
-
-        XCTAssertEqual(url.absoluteString.contains(path), true)
-        XCTAssertEqual(title, itemTitle)
-    }
-
-    func test_triggers_navigation_to_plp_when_listing_item_is_selected() {
-        let path = "/clothing"
-        let fixture = NavigationItem.fixture(type: .listing, url: path)
-
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
-
-        guard let destination, case .plp(let category) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
-            return
-        }
-
-        XCTAssertEqual(category, "clothing")
+        // Leading slash is stripped to the bare collection handle.
+        XCTAssertEqual(config.category, "clothing")
     }
 
     func test_sets_error_state_when_category_with_invalid_url_is_selected() {
@@ -247,69 +301,26 @@ final class CategoriesViewModelTests: XCTestCase {
         let subFixtures = NavigationItem.fixtures
         let fixture = NavigationItem.fixture(title: parentTitle, items: subFixtures)
 
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
+        sut.didSelectCategory(fixture)
 
-        guard let destination, case .subCategories(let subCategories, let parentCategory) = destination else {
-            XCTFail("Unexpected destination type: \(String(describing: destination))")
-            return
-        }
-
-        XCTAssertEqual(subCategories, subFixtures)
-        XCTAssertEqual(parentCategory.title, parentTitle)
+        XCTAssertEqual(navigatedRoute, .subCategories(subCategories: subFixtures, parent: fixture))
     }
 
-    func test_triggers_navigation_when_special_services_category_is_selected() {
-        let fixture = NavigationItem.fixture(type: .page, url: "/store-services")
+    func test_category_with_subcategories_drills_down() {
+        // Items take priority over url/type: a node with sub-items drills down even with a leaf-like url/type.
+        let subFixtures = NavigationItem.fixtures
+        let fixture = NavigationItem.fixture(type: .page, url: "/women", items: subFixtures)
 
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
+        sut.didSelectCategory(fixture)
 
-        guard let destination else {
-            XCTFail("Unexpected nil destination")
-            return
-        }
-
-        switch destination {
-            case .services:
-                // Nothing else to check
-                return
-            default:
-                XCTFail("Unexpected destination: \(destination)")
-        }
-    }
-
-    func test_triggers_navigation_when_special_brands_category_is_selected() {
-        let fixture = NavigationItem.fixture(type: .page, url: "/brands")
-
-        let destination = XCTAssertEmitsValue(
-            from: sut.openCategoryPublisher,
-            afterTrigger: { self.sut.didSelectCategory(fixture) }
-        )
-
-        guard let destination else {
-            XCTFail("Unexpected nil destination")
-            return
-        }
-
-        switch destination {
-            case .brands:
-                // Nothing else to check
-                return
-            default:
-                XCTFail("Unexpected destination: \(destination)")
-        }
+        XCTAssertEqual(navigatedRoute, .subCategories(subCategories: subFixtures, parent: fixture))
     }
 
     // MARK: - Title
 
     func test_title_is_available_when_passed_on_categories_init() {
         let title = "Some Title"
-        sut = .init(log: log, categories: [], title: title, ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: title) { _ in }
         XCTAssertEqual(sut.title, title)
     }
 
@@ -320,25 +331,23 @@ final class CategoriesViewModelTests: XCTestCase {
     // MARK: - Toolbar
 
     func test_show_toolbar_is_properly_set_on_init() {
-        sut = .init(log: log, categories: [], title: "", showToolbar: true, ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: "", showToolbar: true) { _ in }
         XCTAssertTrue(sut.shouldShowToolbar)
 
-        sut = .init(log: log, categories: [], title: "", showToolbar: false, ignoreLocalNavigation: false) { _ in }
+        sut = .init(log: log, categories: [], title: "", showToolbar: false) { _ in }
         XCTAssertFalse(sut.shouldShowToolbar)
 
         sut = .init(
             navigationService: mockNavigationService,
             log: log,
-            showToolbar: true,
-            ignoreLocalNavigation: false
+            showToolbar: true
         ) { _ in }
         XCTAssertTrue(sut.shouldShowToolbar)
 
         sut = .init(
             navigationService: mockNavigationService,
             log: log,
-            showToolbar: false,
-            ignoreLocalNavigation: false
+            showToolbar: false
         ) { _ in }
         XCTAssertFalse(sut.shouldShowToolbar)
     }

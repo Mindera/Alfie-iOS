@@ -27,7 +27,6 @@ struct SegmentsDemoView: View {
 
     private enum CategoryPages {
         case categories
-        case brands
         case services
     }
 
@@ -118,29 +117,27 @@ struct SegmentsDemoView: View {
         .onAppear {
             self.segmentsSection1 = [
                 selectedSegmentSection1,
-                Segment(title: "Brands", CategoryPages.brands),
                 Segment(title: "Services", CategoryPages.services),
             ]
 
             self.segmentsSection2 = [
                 selectedSegmentSection2,
-                Segment(title: "Brands", CategoryPages.brands),
+                Segment(title: "Services", CategoryPages.services),
             ]
 
             self.segmentsSection3 = [
                 selectedSegmentSection3,
-                Segment(title: "Brands", CategoryPages.brands),
                 Segment(title: "Services", CategoryPages.services),
             ]
 
             self.segmentsSection4 = [
                 selectedSegmentSection4,
-                Segment(title: "Brands", CategoryPages.brands),
+                Segment(title: "Services", CategoryPages.services),
             ]
 
             self.segmentsSection5 = [
                 selectedSegmentSection5,
-                Segment(title: "Brands", icon: Icon.heart.image, CategoryPages.brands),
+                Segment(title: "Services", icon: Icon.heart.image, CategoryPages.services),
             ]
         }
         .padding(.horizontal, Primitives.Spacing.spacing16)
@@ -152,8 +149,6 @@ struct SegmentsDemoView: View {
         switch segment.object as? CategoryPages {
         case .categories:
             segmentContentView(title: "Categories", color: Primitives.Colours.semanticSuccess400)
-        case .brands:
-            segmentContentView(title: "Brands", color: Primitives.Colours.neutrals300)
         case .services:
             segmentContentView(title: "Services", color: Primitives.Colours.semanticError300)
         case .none:

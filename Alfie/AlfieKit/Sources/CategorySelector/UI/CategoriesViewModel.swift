@@ -1,6 +1,5 @@
 import AlicerceLogging
 import Combine
-import Core
 import Foundation
 import Model
 import Utils
@@ -12,26 +11,10 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         static let placeholderItemCount: Int = 10
     }
 
-    // Special categories that open specific native screens instead of a webview / PLP / sub-categories screen
-    private enum SpecialCategories: String, CaseIterable {
-        case services = "/store-services"
-        case brands = "/brands"
-
-        var destination: CategoriesNavigationDestination {
-            // swiftlint:disable vertical_whitespace_between_cases
-            switch self {
-            case .services:
-                .services
-            case .brands:
-                .brands
-            }
-            // swiftlint:enable vertical_whitespace_between_cases
-        }
-    }
-
     private let navigationService: NavigationServiceProtocol?
     private let log: Logger
-    private let openCategorySubject: PassthroughSubject<CategoriesNavigationDestination, Never> = .init()
+    // True while a fetch is in flight, so concurrent loads/refreshes don't race (last-writer-wins).
+    private var isFetching = false
     private lazy var placeholders: [NavigationItem] = {
         (0..<Constants.placeholderItemCount).map { _ in
             .init(
@@ -50,7 +33,6 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }()
 
     @Published public private(set) var state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading
-    public lazy var openCategoryPublisher = openCategorySubject.eraseToAnyPublisher()
 
     public var categories: [NavigationItem] {
         if state.isLoading {
@@ -73,21 +55,19 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     public private(set) var shouldShowToolbar: Bool
-    /// A bool controling if local tab navigation should be ignored (i.e., shop links like Brands and Service) so that they can be handled by the parent shop view
-    private let ignoreLocalNavigation: Bool
+    // Only the root screen holds a navigationService; drill-down screens are static snapshots.
+    public var canRefresh: Bool { navigationService != nil }
     private let navigate: (CategorySelectorRoute) -> Void
 
     init(
         navigationService: NavigationServiceProtocol,
         log: Logger,
         showToolbar: Bool = false,
-        ignoreLocalNavigation: Bool,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.navigationService = navigationService
         self.log = log
         self.shouldShowToolbar = showToolbar
-        self.ignoreLocalNavigation = ignoreLocalNavigation
         self.navigate = navigate
     }
 
@@ -96,14 +76,12 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
         categories: [NavigationItem],
         title: String,
         showToolbar: Bool = true,
-        ignoreLocalNavigation: Bool,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) {
         self.log = log
         self.navigationService = nil
         self.state = .success(.init(categories: categories, title: title))
         self.shouldShowToolbar = showToolbar
-        self.ignoreLocalNavigation = ignoreLocalNavigation
         self.navigate = navigate
     }
 
@@ -114,75 +92,57 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
     }
 
     public func didSelectCategory(_ category: NavigationItem) {
-        // Special categories
-        if let specialCategory = SpecialCategories.allCases.first(
-            where: { $0.rawValue == category.url?.lowercased() }
-        ) {
-            openCategorySubject.send(specialCategory.destination)
-            guard !ignoreLocalNavigation, let url = ThemedURL.services.internalUrl else { return }
-            ExternalAppLauncher.open(url: url)
-            return
-        }
-
-        // If this category has sub-categories, show them, otherwise open the PLP
+        // The BFF menu is always a static store menu of collections: a category either drills into
+        // its sub-menu, or (as a leaf) opens the PLP for its collection handle. No page/product links.
         if let subCategories = category.items, !subCategories.isEmpty {
-            openCategorySubject.send(.subCategories(subCategories, parentCategory: category))
             navigate(.subCategories(subCategories: subCategories, parent: category))
             return
         }
 
-        guard
-            var url = URL(string: "https://\(ThemedURL.hostWithPortComponent)"),
-            let categoryUrl = category.url
-        else {
+        guard let categoryUrl = category.url else {
             log.error("Error building URL for category from navigation item: \(category)")
             state = .error(.generic)
             return
         }
 
-        switch category.type {
-        case .listing:
-            let sanitizedCategoryUrl = categoryUrl.deletingPrefix("/")
-            openCategorySubject.send(.plp(category: sanitizedCategoryUrl))
-            navigate(
+        let collectionHandle = categoryUrl.deletingPrefix("/")
+        navigate(
+            .productListing(
                 .productListing(
-                    .productListing(
-                        .init(
-                            category: sanitizedCategoryUrl,
-                            searchText: nil,
-                            urlQueryParameters: nil,
-                            mode: .listing
-                        )
+                    .init(
+                        category: collectionHandle,
+                        searchText: nil,
+                        urlQueryParameters: nil,
+                        mode: .listing
                     )
                 )
             )
+        )
+    }
 
-        case .externalHttp,
-             .home, // swiftlint:disable:this indentation_width
-             .page,
-             .product,
-             .search,
-             .account,
-             .wishlist:
-            // Temporarily open a webview with this category, until we have all screens
-            let paths = categoryUrl.components(separatedBy: "/").filter { !$0.isEmpty }
-            paths.forEach { path in
-                url = url.appending(component: path)
-            }
-            openCategorySubject.send(.web(url: url, title: category.title))
-            navigate(.web(url: url, title: category.title))
-        }
+    @MainActor
+    public func refresh() async {
+        // Pull-to-refresh keeps its own spinner (no flip to `.loading`) and keeps the current list on
+        // screen. The menu is never cached, so this always re-fetches. If a fetch is already in
+        // flight (e.g. the initial load) `fetchNavigationItems` no-ops, so the two can't race.
+        await fetchNavigationItems()
+    }
+
+    @MainActor
+    public func retry() async {
+        // Recovery from the error screen: unlike pull-to-refresh, show the loading state for feedback.
+        // A drill-down screen has no service to retry against — bail before flipping to `.loading`,
+        // which the no-op fetch would otherwise strand.
+        guard canRefresh, !isFetching else { return }
+        state = .loading
+        await fetchNavigationItems()
     }
 
     // MARK: - Private
 
     @MainActor
     private func loadItems() async {
-        guard let navigationService else {
-            return
-        }
-
-        guard !state.isSuccess else {
+        guard !state.isSuccess, !isFetching else {
             return
         }
 
@@ -190,18 +150,39 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
             state = .loading
         }
 
+        await fetchNavigationItems()
+    }
+
+    @MainActor
+    private func fetchNavigationItems() async {
+        // Only one fetch runs at a time — a pull-to-refresh during the initial load (or vice versa)
+        // is ignored, so a slower fetch can't overwrite a newer result.
+        guard let navigationService, !isFetching else {
+            return
+        }
+        isFetching = true
+        defer { isFetching = false }
+
         let navigationItems: [NavigationItem]
 
         do {
             navigationItems = try await navigationService.getNavigationItems(for: .shop)
+        } catch is CancellationError {
+            // The screen was dismissed (or the refresh superseded) mid-fetch — not a user-facing error.
+            return
         } catch {
             log.error("Error fetching categories navigation items for Shop screen: \(error)")
-            state = .error(CategoriesViewErrorType.from(error: error))
+            // A failed re-fetch must not downgrade the `.success` list already on screen.
+            if !state.isSuccess {
+                state = .error(CategoriesViewErrorType.from(error: error))
+            }
             return
         }
 
         guard !navigationItems.isEmpty else {
-            state = .error(.noResults)
+            if !state.isSuccess {
+                state = .error(.noResults)
+            }
             return
         }
 

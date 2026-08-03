@@ -98,7 +98,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         )
         let categorySelectorDependencyContainer = CategorySelectorDependencyContainer(
             navigationService: serviceProvider.navigationService,
-            brandsService: serviceProvider.brandsService,
             configurationService: serviceProvider.configurationService
         )
         let productListingDependencyContainer = ProductListingDependencyContainer(
@@ -218,17 +217,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         case .home:
             rootTabViewModel.navigate(.home(.home))
 
-        case .shop(let route):
-            switch route {
-            case ThemedURL.brands.path:
-                rootTabViewModel.navigate(.shop(.categorySelector(.brands)))
-
-            case ThemedURL.services.path:
-                rootTabViewModel.navigate(.shop(.categorySelector(.services)))
-
-            default:
-                rootTabViewModel.navigate(.shop(.categorySelector(.categories)))
-            }
+        case .shop:
+            rootTabViewModel.navigate(.shop(.categorySelector))
 
         case .bag:
             rootTabViewModel.navigate(.bag(.bag))

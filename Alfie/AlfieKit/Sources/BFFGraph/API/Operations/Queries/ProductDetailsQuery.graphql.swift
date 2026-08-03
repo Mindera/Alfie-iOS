@@ -8,25 +8,17 @@ public extension BFFGraphAPI {
     public static let operationName: String = "ProductDetailsQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query ProductDetailsQuery($handle: String!, $platform: String!) { productDetails(handle: $handle, platform: $platform) { __typename ...ProductDetailsFragment } }"#,
+        #"query ProductDetailsQuery($handle: String!) { productDetails(handle: $handle) { __typename ...ProductDetailsFragment } }"#,
         fragments: [MoneyFragment.self, ProductDetailsFragment.self]
       ))
 
     public var handle: String
-    public var platform: String
 
-    public init(
-      handle: String,
-      platform: String
-    ) {
+    public init(handle: String) {
       self.handle = handle
-      self.platform = platform
     }
 
-    public var __variables: Variables? { [
-      "handle": handle,
-      "platform": platform
-    ] }
+    public var __variables: Variables? { ["handle": handle] }
 
     public struct Data: BFFGraphAPI.SelectionSet {
       public let __data: DataDict
@@ -34,10 +26,7 @@ public extension BFFGraphAPI {
 
       public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Query }
       public static var __selections: [ApolloAPI.Selection] { [
-        .field("productDetails", ProductDetails?.self, arguments: [
-          "handle": .variable("handle"),
-          "platform": .variable("platform")
-        ]),
+        .field("productDetails", ProductDetails?.self, arguments: ["handle": .variable("handle")]),
       ] }
 
       public var productDetails: ProductDetails? { __data["productDetails"] }

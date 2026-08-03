@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol BFFClientServiceProtocol {
-    func getHeaderNav(handle: NavigationHandle, includeSubItems: Bool, includeMedia: Bool) async throws -> [NavigationItem]
+    func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem]
     func getProduct(handle: String) async throws -> Product
     func productList(
         collectionHandle: String,
@@ -17,6 +17,5 @@ public protocol BFFClientServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing
-    func getBrands() async throws -> [Brand]
     func getWebViewConfig() async throws -> WebViewConfiguration
 }

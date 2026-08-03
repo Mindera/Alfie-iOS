@@ -7,14 +7,16 @@ public struct ErrorView: View {
 
     public struct ButtonConfiguration: Identifiable {
         let cta: String
+        let accessibilityId: String?
         let action: () -> Void
 
         public var id: String {
             cta
         }
 
-        public init(cta: String, action: @escaping () -> Void) {
+        public init(cta: String, accessibilityId: String? = nil, action: @escaping () -> Void) {
             self.cta = cta
+            self.accessibilityId = accessibilityId
             self.action = action
         }
     }
@@ -107,8 +109,13 @@ public struct ErrorView: View {
             }
 
             VStack(spacing: Primitives.Spacing.spacing8) {
-                ForEach(buttons) {
-                    ThemedButton(text: $0.cta, isFullWidth: true, action: $0.action)
+                ForEach(buttons) { button in
+                    let themedButton = ThemedButton(text: button.cta, isFullWidth: true, action: button.action)
+                    if let accessibilityId = button.accessibilityId {
+                        themedButton.accessibilityIdentifier(accessibilityId)
+                    } else {
+                        themedButton
+                    }
                 }
             }
 

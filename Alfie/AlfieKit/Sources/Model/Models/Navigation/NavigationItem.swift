@@ -38,6 +38,12 @@ public struct NavigationItem: Equatable, Hashable {
         self.attributes = attributes
     }
 
+    /// Whether this item drills into a sub-category list. Single source of truth for the categories
+    /// row chevron and the tap-handling branch, so the two can't disagree.
+    public var hasSubCategories: Bool {
+        items?.isEmpty == false
+    }
+
     public static func == (lhs: NavigationItem, rhs: NavigationItem) -> Bool {
         lhs.id == rhs.id
     }
