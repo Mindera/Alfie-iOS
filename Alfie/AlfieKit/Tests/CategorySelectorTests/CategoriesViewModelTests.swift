@@ -209,6 +209,20 @@ final class CategoriesViewModelTests: XCTestCase {
         XCTAssertFalse(subCategoryViewModel.canRefresh)
     }
 
+    func test_is_root_is_true_for_root_screen() {
+        XCTAssertTrue(sut.isRoot)
+    }
+
+    func test_is_root_is_false_for_subcategory_screen() {
+        let subCategoryViewModel = CategoriesViewModel(
+            log: log,
+            categories: NavigationItem.fixtures,
+            title: "Women"
+        ) { _ in }
+
+        XCTAssertFalse(subCategoryViewModel.isRoot)
+    }
+
     func test_refresh_updates_categories_from_service() async {
         let fixtures = NavigationItem.fixtures
         mockNavigationService.onGetNavigationItemsCalled = { _ in fixtures }
