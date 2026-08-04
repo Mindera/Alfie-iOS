@@ -2,7 +2,7 @@ import BFFGraph
 import Foundation
 import Model
 
-extension BFFGraphAPI.MainMenuQuery.Data.MainMenu {
+extension BFFGraphAPI.MainMenuQuery.Data.Menu {
     public func convertToNavigationItems() -> [NavigationItem] {
         items.compactMap { $0.convertToNavigationItem() }
     }
@@ -10,7 +10,7 @@ extension BFFGraphAPI.MainMenuQuery.Data.MainMenu {
 
 // Apollo generates a distinct type per nesting level, so each level gets a thin adapter over the
 // shared `makeNavigationItem` builder.
-extension BFFGraphAPI.MainMenuQuery.Data.MainMenu.Item {
+extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item {
     fileprivate func convertToNavigationItem() -> NavigationItem? {
         makeNavigationItem(
             id: id,
@@ -21,7 +21,7 @@ extension BFFGraphAPI.MainMenuQuery.Data.MainMenu.Item {
     }
 }
 
-extension BFFGraphAPI.MainMenuQuery.Data.MainMenu.Item.Item {
+extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item {
     fileprivate func convertToNavigationItem() -> NavigationItem? {
         makeNavigationItem(
             id: id,
@@ -32,7 +32,7 @@ extension BFFGraphAPI.MainMenuQuery.Data.MainMenu.Item.Item {
     }
 }
 
-extension BFFGraphAPI.MainMenuQuery.Data.MainMenu.Item.Item.Item {
+extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item.Item {
     // The query intentionally caps nesting at 3 levels (Shopify's menu depth limit), so the
     // deepest level has no children to convert.
     fileprivate func convertToNavigationItem() -> NavigationItem? {
