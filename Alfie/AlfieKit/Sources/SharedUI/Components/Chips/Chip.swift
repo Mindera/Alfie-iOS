@@ -61,7 +61,7 @@ public struct Chip: View {
         let style = self.style
         return ZStack {
             RoundedRectangle(cornerRadius: Sizing.radiusRounded)
-                .strokeBorder(style.borderColor, lineWidth: style.borderWidth)
+                .stroke(style.borderColor, lineWidth: style.borderWidth)
                 .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(style.backgroundColor))
             HStack(spacing: Primitives.Spacing.spacing8) {
                 Text.build(theme.font.body.small(configuration.label))
@@ -91,6 +91,7 @@ public struct Chip: View {
             .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .fixedSize(horizontal: true, vertical: false)
+        .padding(.horizontal, Primitives.Spacing.spacing16)
         .frame(height: style.height)
     }
 }

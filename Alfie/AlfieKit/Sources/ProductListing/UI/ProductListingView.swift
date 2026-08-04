@@ -83,7 +83,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 }
             }
         }
-        .padding([.horizontal, .bottom], theme.spacing.space200)
+        .padding(theme.spacing.space200)
 
         if viewModel.state.isLoadingNextPage {
             LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
@@ -92,17 +92,13 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     @ViewBuilder private var infoFilterBarView: some View {
-        VStack(spacing: theme.spacing.space0) {
-            ProductListingFilterBar(
-                style: $viewModel.style,
-                total: viewModel.totalNumberOfProducts,
-                isLoading: viewModel.state.isLoadingFirstPage
-            ) {
-                viewModel.showRefine.toggle()
-            }
-            ProductListingFilterChips()
+        ProductListingFilterBar(
+            style: $viewModel.style,
+            total: viewModel.totalNumberOfProducts,
+            isLoading: viewModel.state.isLoadingFirstPage
+        ) {
+            viewModel.showRefine.toggle()
         }
-        .padding(.bottom, theme.spacing.space100)
         .onChange(of: viewModel.style, perform: viewModel.setListStyle)
         .sheet(isPresented: $viewModel.showRefine) {
             ProductListingFilter(
