@@ -19,15 +19,13 @@ public extension CategorySelectorRoute {
         webViewModel: (WebFeature) -> some WebViewModelProtocol,
         urlWebViewModel: (URL, String) -> some WebViewModelProtocol,
         wishlistViewModel: () -> some WishlistViewModelProtocol,
-        presentSearch: @escaping () -> Void,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) -> some View {
         switch self {
         case .categorySelector:
-            ShopView(
-                categoriesViewModel: categoriesViewModel(),
-                didTapSearch: presentSearch
-            )
+            // Unreachable: `navigate(.categorySelector)` pops to root rather than pushing. The live
+            // root ShopView is built directly in CategorySelectorFlowView.body.
+            EmptyView()
 
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(

@@ -23,7 +23,6 @@ public enum AccessibilityID {
 
     public enum Shop {
         public static let searchInput = "shop.search.input"
-        public static let searchBackButton = "shop.search.back.button"
     }
 
     // MARK: - Splash
@@ -76,7 +75,6 @@ public enum AccessibilityID {
     public enum Home {
         public static let titleHeader = "home.title.header"
         public static let searchInput = "home.search.input"
-        public static let searchBackButton = "home.search.back.button"
     }
 
     // MARK: - Account

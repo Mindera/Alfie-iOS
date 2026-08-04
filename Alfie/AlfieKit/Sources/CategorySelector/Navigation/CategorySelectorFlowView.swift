@@ -24,7 +24,6 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
                     webViewModel: viewModel.makeWebViewModel(feature:),
                     urlWebViewModel: viewModel.makeURLWebViewModel(url:title:),
                     wishlistViewModel: viewModel.makeWishlistViewModel,
-                    presentSearch: viewModel.presentSearch,
                     navigate: viewModel.navigate(_:)
                 )
             }

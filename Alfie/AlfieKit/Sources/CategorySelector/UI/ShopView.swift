@@ -21,16 +21,23 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol>: View {
 
     var body: some View {
         VStack(spacing: theme.spacing.space0) {
-            ThemedSearchBarView(
-                searchText: .constant(""),
-                placeholder: L10n.Home.SearchBar.placeholder,
-                theme: .soft,
-                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.Shop.searchBackButton),
-                inputAccessibilityId: AccessibilityID.Shop.searchInput
-            )
-            // Non-editable entry point; the tap presents the full search flow (matches Home).
-            .disabled(true)
-            .onTapGesture { didTapSearch() }
+            // Non-editable entry point: a Button (VoiceOver-operable) wrapping a display-only search
+            // bar; the tap presents the full search flow.
+            Button {
+                didTapSearch()
+            } label: {
+                ThemedSearchBarView(
+                    searchText: .constant(""),
+                    placeholder: L10n.Home.SearchBar.placeholder,
+                    theme: .soft,
+                    dismissConfiguration: .init(type: .hidden)
+                )
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(AccessibilityID.Shop.searchInput)
+            .accessibilityLabel(L10n.Home.SearchBar.placeholder)
             .padding(.horizontal, theme.spacing.space200)
             .padding(.top, theme.spacing.space100)
             .padding(.bottom, theme.spacing.space200)

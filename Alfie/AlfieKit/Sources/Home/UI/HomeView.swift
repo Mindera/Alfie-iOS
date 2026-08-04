@@ -17,18 +17,24 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
 
     var body: some View {
         VStack(spacing: theme.spacing.space0) {
-            ThemedSearchBarView(
-                searchText: .constant(""),
-                placeholder: L10n.Home.SearchBar.placeholder,
-                theme: .soft,
-                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.Home.searchBackButton),
-                inputAccessibilityId: AccessibilityID.Home.searchInput
-            )
-            .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
-            .disabled(true)
-            .onTapGesture {
+            // Non-editable entry point: a Button (VoiceOver-operable) wrapping a display-only search
+            // bar; the tap presents the full search flow.
+            Button {
                 viewModel.didTapSearch()
+            } label: {
+                ThemedSearchBarView(
+                    searchText: .constant(""),
+                    placeholder: L10n.Home.SearchBar.placeholder,
+                    theme: .soft,
+                    dismissConfiguration: .init(type: .hidden)
+                )
+                .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
             }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(AccessibilityID.Home.searchInput)
+            .accessibilityLabel(L10n.Home.SearchBar.placeholder)
             .padding(.horizontal, theme.spacing.space200)
             .padding(.top, theme.spacing.space100)
             .padding(.bottom, theme.spacing.space200)
