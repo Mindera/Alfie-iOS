@@ -33,8 +33,8 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     /// stateless and just fetches the page identified by `after`.
     private var pagination: ProductListing.Pagination?
 
-    // True while any page fetch (first page / next page / refresh) is in flight, so a pull-to-refresh
-    // and a load-more can't race and overwrite each other (last-writer-wins).
+    // True while a load-more or a refresh is in flight, so the two can't race and overwrite each
+    // other (last-writer-wins).
     private var isFetching = false
 
     public enum Constants {
@@ -171,15 +171,22 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         state = .success(.init(title: productListing.title, products: productListing.products))
     }
 
+    public func didDismissRefreshError() {
+        // Clear the transient error once its Snackbar is dismissed, so it never lingers as stale state
+        // and a later identical failure re-presents cleanly.
+        refreshError = nil
+    }
+
     // MARK: - Private
 
     @MainActor
     private func loadProductsIfNeeded() async {
-        guard !state.isSuccess, !isFetching else {
+        // Not gated on `isFetching`: this is the first-page / filter-apply load, and `didApplyFilters`
+        // has already blanked the grid before calling it — dropping it here would strand an empty
+        // screen. The `isFetching` guard is only for refresh-vs-load-more (which the ticket scoped).
+        guard !state.isSuccess else {
             return
         }
-        isFetching = true
-        defer { isFetching = false }
 
         let productListing: ProductListing?
 

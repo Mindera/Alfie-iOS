@@ -549,4 +549,59 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(forwardedFilters.count, 3)
         XCTAssertTrue(forwardedFilters.allSatisfy { $0 == filters })
     }
+
+    func test_second_refresh_is_dropped_while_a_refresh_is_in_flight() async {
+        sut = makeSUT(category: "clothing")
+
+        // Seed a successful first page.
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        XCTAssertTrue(sut.state.isSuccess)
+
+        // Hold the first refresh's fetch open so `isFetching` stays true while a second refresh runs.
+        let gate = FetchGate()
+        let firstFetchInFlight = expectation(description: "first refresh fetch is in-flight")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            await gate.recordAndMaybeWait(signal: firstFetchInFlight)
+            return ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
+        }
+
+        async let firstRefresh: Void = sut.refresh()
+        await fulfillment(of: [firstFetchInFlight], timeout: 1)
+
+        // Second refresh while the first is in-flight must bail on the guard (no second fetch).
+        await sut.refresh()
+        let fetchesWhileInFlight = await gate.entries
+        XCTAssertEqual(fetchesWhileInFlight, 1)
+
+        await gate.open()
+        await firstRefresh
+        let totalFetches = await gate.entries
+        XCTAssertEqual(totalFetches, 1)
+        XCTAssertTrue(sut.state.isSuccess)
+    }
+}
+
+/// Test gate that holds the first fetch suspended until released, and counts how many fetches ran —
+/// so a concurrent-fetch guard can be exercised deterministically (no sleeps, no races).
+private actor FetchGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var opened = false
+    private(set) var entries = 0
+
+    func recordAndMaybeWait(signal: XCTestExpectation) async {
+        entries += 1
+        guard entries == 1 else { return }
+        signal.fulfill()
+        guard !opened else { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func open() {
+        opened = true
+        continuation?.resume()
+        continuation = nil
+    }
 }

@@ -45,19 +45,20 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             }
         }
         .snackbarView(configuration: $refreshSnackbarConfig)
-        // A failed pull-to-refresh keeps the grid and surfaces a transient error here, rather than the
-        // full error screen. `refreshError` is cleared by the ViewModel on the next refresh.
+        // A failed pull-to-refresh keeps the grid and surfaces a transient error here, not the full
+        // error screen. Dismissing the Snackbar clears `refreshError` so an identical later failure
+        // re-presents cleanly.
         .onChange(of: viewModel.refreshError) { refreshError in
             guard refreshError != nil else {
                 refreshSnackbarConfig = nil
                 return
             }
-            // swiftlint:disable:next trailing_closure
             refreshSnackbarConfig = .init(
                 type: .error,
                 text: L10n.Plp.Refresh.errorMessage,
                 showCloseButton: true,
-                icon: Icon.warning.image
+                icon: Icon.warning.image,
+                onDismiss: { viewModel.didDismissRefreshError() }
             )
         }
         .toolbarView(

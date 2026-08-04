@@ -71,4 +71,9 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public func refresh() async {
         onRefreshCalled?()
     }
+
+    public var onDidDismissRefreshErrorCalled: (() -> Void)?
+    public func didDismissRefreshError() {
+        onDidDismissRefreshErrorCalled?()
+    }
 }

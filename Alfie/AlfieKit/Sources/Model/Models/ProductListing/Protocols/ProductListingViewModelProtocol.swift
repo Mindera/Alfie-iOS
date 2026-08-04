@@ -24,4 +24,5 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func setListStyle(_ style: ProductListingListStyle)
     func didApplyFilters()
     func refresh() async
+    func didDismissRefreshError()
 }
