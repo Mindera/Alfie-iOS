@@ -10,8 +10,6 @@ import Wishlist
 public extension CategorySelectorRoute {
     @ViewBuilder
     func destination(
-        isRoot: Bool,
-        isWishlistEnabled: Bool,
         categoriesViewModel: () -> some CategoriesViewModelProtocol,
         accountViewModel: () -> some AccountViewModelProtocol,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView,
@@ -21,17 +19,15 @@ public extension CategorySelectorRoute {
         webViewModel: (WebFeature) -> some WebViewModelProtocol,
         urlWebViewModel: (URL, String) -> some WebViewModelProtocol,
         wishlistViewModel: () -> some WishlistViewModelProtocol,
+        presentSearch: @escaping () -> Void,
         navigate: @escaping (CategorySelectorRoute) -> Void
     ) -> some View {
         switch self {
         case .categorySelector:
             ShopView(
-                isRoot: isRoot,
-                isWishlistEnabled: isWishlistEnabled,
-                categoriesViewModel: categoriesViewModel()
-            ) {
-                navigate($0)
-            }
+                categoriesViewModel: categoriesViewModel(),
+                didTapSearch: presentSearch
+            )
 
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(

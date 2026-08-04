@@ -19,6 +19,13 @@ public enum AccessibilityID {
         public static let retryButton = "categories.retry.button"
     }
 
+    // MARK: - Shop
+
+    public enum Shop {
+        public static let searchInput = "shop.search.input"
+        public static let searchBackButton = "shop.search.back.button"
+    }
+
     // MARK: - Splash
 
     public enum Splash {
