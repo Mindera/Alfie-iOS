@@ -24,11 +24,18 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public private(set) var state: PaginatedViewState<
         ProductListingViewStateModel, ProductListingViewErrorType
     >
+    // Transient pull-to-refresh failure: the grid stays put and the View shows a Snackbar. Never a
+    // full `.error` screen — a failed refresh must not discard the products already on screen.
+    @Published public private(set) var refreshError: ProductListingViewErrorType?
 
     /// Cursor state for cursor-based pagination. Lives on the ViewModel (which is the
     /// only caller that needs to drive "load more" decisions); the service itself is
     /// stateless and just fetches the page identified by `after`.
     private var pagination: ProductListing.Pagination?
+
+    // True while any page fetch (first page / next page / refresh) is in flight, so a pull-to-refresh
+    // and a load-more can't race and overwrite each other (last-writer-wins).
+    private var isFetching = false
 
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
@@ -132,13 +139,47 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
     }
 
+    @MainActor
+    public func refresh() async {
+        // Pull-to-refresh keeps the current grid on screen (no `.loadingFirstPage` skeleton flip) and
+        // re-fetches page 1, preserving the active sort + filters. If a load-more or another refresh is
+        // already running, bail — the in-flight fetch wins. The cursor is only reset (to the new page-1
+        // pagination) on success, so a failed refresh leaves paging intact over the preserved grid.
+        guard !isFetching else { return }
+        isFetching = true
+        defer { isFetching = false }
+        refreshError = nil
+
+        let productListing: ProductListing?
+
+        do {
+            productListing = try await fetchPage(after: nil)
+        } catch is CancellationError {
+            return
+        } catch {
+            dependencies.log.error("Error refreshing product listing: \(error)")
+            refreshError = ProductListingViewErrorType.from(error: error)
+            return
+        }
+
+        guard let productListing else {
+            refreshError = .noResults
+            return
+        }
+
+        pagination = productListing.pagination
+        state = .success(.init(title: productListing.title, products: productListing.products))
+    }
+
     // MARK: - Private
 
     @MainActor
     private func loadProductsIfNeeded() async {
-        guard !state.isSuccess else {
+        guard !state.isSuccess, !isFetching else {
             return
         }
+        isFetching = true
+        defer { isFetching = false }
 
         let productListing: ProductListing?
 
@@ -162,11 +203,14 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @MainActor
     private func loadMoreProducts() async {
         guard
+            !isFetching,
             pagination?.hasNextPage == true,
             case .success(let model) = state
         else {
             return
         }
+        isFetching = true
+        defer { isFetching = false }
 
         state = .loadingNextPage(.init(title: title, products: products))
         let productListing: ProductListing?
