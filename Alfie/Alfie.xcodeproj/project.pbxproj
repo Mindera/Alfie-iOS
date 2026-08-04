@@ -44,19 +44,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		615E06D72CF633FC00065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Snapshots/BrandsViewSnapshotTests.swift,
-				Snapshots/CategoriesViewSnapshotTests.swift,
-				Snapshots/ProductDetailsColorSheetSnapshotTests.swift,
-				Snapshots/ProductDetailsViewSnapshotTests.swift,
-				Snapshots/RecentSearchesSnapshotTests.swift,
-				Snapshots/SearchViewSnapshotTests.swift,
-				Snapshots/ShopViewSnapshotTests.swift,
-			);
-			target = BE8B02332B616979007AE489 /* AlfieTests */;
-		};
 		615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -72,7 +59,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		615E06B92CF633FC00065ECF /* AlfieTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E06D72CF633FC00065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = AlfieTests; sourceTree = "<group>"; };
+		615E06B92CF633FC00065ECF /* AlfieTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AlfieTests; sourceTree = "<group>"; };
 		615E06DA2CF633FE00065ECF /* AlfieUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AlfieUITests; sourceTree = "<group>"; };
 		615E07D42CF6369900065ECF /* Alfie */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (615E08462CF6369900065ECF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Alfie; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
