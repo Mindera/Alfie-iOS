@@ -134,7 +134,7 @@ private enum AccessibilityId {
 }
 
 private enum Constants {
-    static let chevronSize: CGFloat = 24
+    static let chevronSize: CGFloat = Sizing.iconsIconMedium
     static let categoryViewHeight: CGFloat = 48
 }
 
