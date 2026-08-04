@@ -109,6 +109,34 @@
         "identifier" : "WishlistTests",
         "name" : "WishlistTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "HomeTests",
+        "name" : "HomeTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "ModelTests",
+        "name" : "ModelTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "MyAccountTests",
+        "name" : "MyAccountTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
+        "identifier" : "UtilsTests",
+        "name" : "UtilsTests"
+      }
     }
   ],
   "version" : 1
