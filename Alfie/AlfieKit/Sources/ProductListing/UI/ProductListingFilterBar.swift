@@ -26,13 +26,13 @@ struct ProductListingFilterBar: View {
 
     public var body: some View {
         HStack {
-            filterView
+            ProductListingListStyleSelector(selectedStyle: $selectedStyle)
             Spacer()
             resultInfoView
                 .animation(.emphasizedDecelerate, value: opacity)
                 .opacity(opacity)
             Spacer()
-            ProductListingListStyleSelector(selectedStyle: $selectedStyle)
+            refineButton
         }
         .onChange(of: isLoading) { newValue in
             if !newValue {
@@ -41,27 +41,16 @@ struct ProductListingFilterBar: View {
                 }
             }
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
-        .frame(minHeight: Constants.barMinHeight)
+        .padding(.horizontal, theme.spacing.space200)
+        .padding(.vertical, theme.spacing.space050)
     }
 
-    private var filterView: some View {
+    private var refineButton: some View {
         Button {
             filterAction()
         } label: {
-            HStack(spacing: Primitives.Spacing.spacing8) {
-                Icon.filter.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(size: Constants.filterIcon)
-                    .tint(Primitives.Colours.neutrals800)
-                Text
-                    .build(
-                        theme.font.body.medium(L10n.Plp.Refine.Button.cta)
-                    )
-                    .foregroundStyle(Primitives.Colours.neutrals800)
-            }
+            Text.build(theme.font.link.medium(L10n.Plp.Refine.Button.cta, underline: true))
+                .foregroundStyle(Theme.linkLinkPrimaryDefault)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(AccessibilityID.ProductListing.filterButton)
@@ -69,7 +58,7 @@ struct ProductListingFilterBar: View {
 
     private var resultInfoView: some View {
         Text.build(theme.font.body.small(L10n.Plp.NumberOfResults.message(total)))
-            .foregroundStyle(Primitives.Colours.neutrals500)
+            .foregroundStyle(Theme.contentContentTerciary)
             .accessibilityIdentifier(AccessibilityID.ProductListing.resultsLabel)
     }
 
@@ -77,8 +66,6 @@ struct ProductListingFilterBar: View {
 
     private enum Constants {
         static let fullOpacityResults: CGFloat = 1
-        static let barMinHeight: CGFloat = 60.0
-        static let filterIcon: CGFloat = 16.0
     }
 
 }

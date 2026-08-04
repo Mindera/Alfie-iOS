@@ -11,31 +11,54 @@ struct ProductListingListStyleSelector: View {
     }
 
     var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing16) {
-            Button {
-                selectedStyle = .grid
-            } label: {
-                ThemedIcon(
-                    .grid,
-                    size: .small,
-                    tint: selectedStyle == .grid ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200,
-                    accessibilityLabel: L10n.Accessibility.gridView
-                )
+        HStack(spacing: theme.spacing.space0) {
+            styleButton(
+                for: .list,
+                accessibilityLabel: L10n.Accessibility.listView,
+                accessibilityID: AccessibilityID.ProductListing.listStyleListButton
+            )
+            styleButton(
+                for: .grid,
+                accessibilityLabel: L10n.Accessibility.gridView,
+                accessibilityID: AccessibilityID.ProductListing.listStyleGridButton
+            )
+        }
+    }
+
+    private func styleButton(
+        for style: ProductListingListStyle,
+        accessibilityLabel: String,
+        accessibilityID: String
+    ) -> some View {
+        let isSelected = selectedStyle == style
+        return Button {
+            selectedStyle = style
+        } label: {
+            ThemedIcon(
+                Style.icon(for: style, isSelected: isSelected),
+                size: .medium,
+                tint: Theme.contentContentPrimary,
+                accessibilityLabel: accessibilityLabel
+            )
+            // Figma: 24pt icon centred in a 32×32 button (two sit flush → 8pt visible gap).
+            .frame(width: theme.spacing.space400, height: theme.spacing.space400)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(accessibilityID)
+        // Announce the active layout to VoiceOver (selection is otherwise icon-only).
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    enum Style {
+        /// Selection is shown by swapping the outline icon for its filled variant (tint stays constant).
+        static func icon(for style: ProductListingListStyle, isSelected: Bool) -> Icon {
+            switch style {
+            case .grid:
+                return isSelected ? .grid2Fill : .grid
+            case .list:
+                return isSelected ? .grid1Fill : .listplp
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleGridButton)
-            Button {
-                selectedStyle = .list
-            } label: {
-                ThemedIcon(
-                    .listplp,
-                    size: .small,
-                    tint: selectedStyle == .list ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals200,
-                    accessibilityLabel: L10n.Accessibility.listView
-                )
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.ProductListing.listStyleListButton)
         }
     }
 }

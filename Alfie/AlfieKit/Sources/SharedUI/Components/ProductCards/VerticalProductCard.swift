@@ -82,30 +82,31 @@ public struct VerticalProductCard: View {
 
     private var productDesignerView: some View {
         Text(viewModel.designer)
-            .font(Font(viewModel.configuration.textFont))
+            .font(Font(viewModel.configuration.designerFont))
             .foregroundStyle(Primitives.Colours.neutrals800)
             .lineLimit(Constants.productDesignerLineLimit)
             .shimmeringMultiline(
                 while: $isSkeleton,
                 lines: Constants.productDesignerLineLimit,
-                font: viewModel.configuration.textFont
+                font: viewModel.configuration.designerFont
             )
             .accessibilityIdentifier(AccessibilityId.productDesigner)
     }
 
     @ViewBuilder private var productNameView: some View {
         Text(viewModel.name)
-            .font(Font(viewModel.configuration.textFont))
-            .foregroundStyle(Primitives.Colours.neutrals500)
+            .font(Font(viewModel.configuration.nameFont))
+            .foregroundStyle(viewModel.configuration.nameColor)
+            .lineSpacing(max(0, viewModel.configuration.nameLineHeight - viewModel.configuration.nameFont.lineHeight))
             .frame(
-                height: (viewModel.configuration.textFont.lineHeight * CGFloat(Constants.productNameLineLimit)),
+                height: (viewModel.configuration.nameLineHeight * CGFloat(Constants.productNameLineLimit)),
                 alignment: .top
             )
             .lineLimit(Constants.productNameLineLimit)
             .shimmeringMultiline(
                 while: $isSkeleton,
                 lines: Constants.productNameLineLimit,
-                font: viewModel.configuration.textFont
+                font: viewModel.configuration.nameFont
             )
             .accessibilityIdentifier(AccessibilityId.productName)
     }
