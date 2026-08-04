@@ -212,7 +212,7 @@ type ProductVariant {
 type Query {
   cart(cartId: String!): Cart!
   cartCheckoutUrl(cartId: String!): String!
-  mainMenu(handle: String! = "main-menu"): Menu!
+  menu(handle: String! = "main-menu"): Menu!
   productDetails(handle: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
   productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, sort: ProductSortEnum! = NEWEST): ProductListResponse!
   searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
