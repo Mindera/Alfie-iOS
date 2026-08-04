@@ -210,6 +210,10 @@ public enum L10n {
       /// Refine and Sort
       public static let title = L10n.tr("L10n", "plp.refine_and_sort.title")
     }
+    public enum Refresh {
+      /// Couldn't refresh. Please try again.
+      public static let errorMessage = L10n.tr("L10n", "plp.refresh.error_message")
+    }
     public enum ShowResults {
       public enum Button {
         /// Show results
@@ -530,6 +534,7 @@ public extension L10n {
       case plpNumberOfResultsMessage = "plp.number_of_results.message"
       case plpRefineButtonCta = "plp.refine.button.cta"
       case plpRefineAndSortTitle = "plp.refine_and_sort.title"
+      case plpRefreshErrorMessage = "plp.refresh.error_message"
       case plpShowResultsButtonCta = "plp.show_results.button.cta"
       case plpSortByOptionTitle = "plp.sort_by.option.title"
       case productAddToBagButtonCta = "product.add_to_bag.button.cta"

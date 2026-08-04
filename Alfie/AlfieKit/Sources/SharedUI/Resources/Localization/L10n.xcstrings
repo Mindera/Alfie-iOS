@@ -585,6 +585,17 @@
         }
       }
     },
+    "plp.refresh.error_message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't refresh. Please try again."
+          }
+        }
+      }
+    },
     "plp.refine_and_sort.title" : {
       "extractionState" : "manual",
       "localizations" : {

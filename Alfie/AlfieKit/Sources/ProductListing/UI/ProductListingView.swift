@@ -21,6 +21,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @StateObject private var viewModel: ViewModel
     @State private var orientation = UIDeviceOrientation.unknown
+    @State private var refreshSnackbarConfig: SnackbarViewConfiguration?
 
     public init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -38,7 +39,26 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 }
                 .animation(.standardDecelerate, value: viewModel.style)
                 .disabled(viewModel.state.isLoadingFirstPage)
+                .refreshable {
+                    await viewModel.refresh()
+                }
             }
+        }
+        .snackbarView(configuration: $refreshSnackbarConfig)
+        // A failed pull-to-refresh keeps the grid and surfaces a transient error here, rather than the
+        // full error screen. `refreshError` is cleared by the ViewModel on the next refresh.
+        .onChange(of: viewModel.refreshError) { refreshError in
+            guard refreshError != nil else {
+                refreshSnackbarConfig = nil
+                return
+            }
+            // swiftlint:disable:next trailing_closure
+            refreshSnackbarConfig = .init(
+                type: .error,
+                text: L10n.Plp.Refresh.errorMessage,
+                showCloseButton: true,
+                icon: Icon.warning.image
+            )
         }
         .toolbarView(
             configuration: .init(
