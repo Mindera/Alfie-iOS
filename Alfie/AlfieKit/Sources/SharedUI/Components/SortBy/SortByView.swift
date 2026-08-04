@@ -16,15 +16,14 @@ public struct SortByView: View {
     public var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(title)
-                    .font(Constants.fontTitle)
-                    .foregroundStyle(Primitives.Colours.neutrals800)
+                Text.build(theme.font.body.medium(title))
+                    .foregroundStyle(Theme.contentContentPrimary)
                 Spacer()
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.spacing.space200)
             ScrollViewReader { reader in
                 ScrollView(.horizontal) {
-                    HStack(spacing: Primitives.Spacing.spacing8) {
+                    HStack(spacing: theme.spacing.space100) {
                         ForEach(options, id: \.value) { option in
                             Button {
                                 sortBy = option.value
@@ -32,22 +31,22 @@ public struct SortByView: View {
                                     reader.scrollTo(option.value, anchor: .center)
                                 }
                             } label: {
-                                HStack(spacing: Primitives.Spacing.spacing8) {
+                                HStack(spacing: theme.spacing.space100) {
                                     if let icon = option.icon {
                                         icon.image
                                             .renderingMode(.template)
                                             .resizable()
                                             .scaledToFit()
                                             .frame(size: Constants.iconSize)
-                                            .tint(Primitives.Colours.neutrals800)
-                                            .padding(.vertical, Primitives.Spacing.spacing12)
-                                            .padding(.leading, Primitives.Spacing.spacing12)
+                                            .foregroundStyle(Theme.contentContentPrimary)
+                                            .padding(.vertical, theme.spacing.space150)
+                                            .padding(.leading, theme.spacing.space150)
                                     }
                                     Text.build(theme.font.body.small(option.title))
-                                        .foregroundStyle(Primitives.Colours.neutrals800)
-                                        .padding(.trailing, Primitives.Spacing.spacing12)
-                                        .padding(.vertical, Primitives.Spacing.spacing12)
-                                        .padding(.leading, option.icon == nil ? Primitives.Spacing.spacing12 : 0)
+                                        .foregroundStyle(Theme.contentContentPrimary)
+                                        .padding(.trailing, theme.spacing.space150)
+                                        .padding(.vertical, theme.spacing.space150)
+                                        .padding(.leading, option.icon == nil ? theme.spacing.space150 : 0)
                                 }
                                 .overlay {
                                     RoundedRectangle(cornerRadius: Sizing.radiusSoft)
@@ -61,7 +60,7 @@ public struct SortByView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .padding(.horizontal, theme.spacing.space200)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -69,14 +68,12 @@ public struct SortByView: View {
     }
 
     private func colorForOptionBorder(_ option: SortByType) -> Color {
-        option == sortBy ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals100
+        option == sortBy ? Theme.contentContentPrimary : Theme.borderSoft
     }
 
     private enum Constants {
-        static let titleFontSize: CGFloat = 18
         static let borderLineWidth: CGFloat = 1
         static let iconSize: CGSize = .init(width: 16, height: 16)
-        static let fontTitle: Font = DesignSystem.shared.font.body.medium.uiFont.withSize(Constants.titleFontSize).font
         static let scrollBuffer: CGFloat = 1
     }
 }
