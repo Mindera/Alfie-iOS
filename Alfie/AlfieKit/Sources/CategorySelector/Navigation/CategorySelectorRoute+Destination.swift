@@ -23,9 +23,11 @@ public extension CategorySelectorRoute {
     ) -> some View {
         switch self {
         case .categorySelector:
-            // Unreachable: `navigate(.categorySelector)` pops to root rather than pushing. The live
-            // root ShopView is built directly in CategorySelectorFlowView.body.
-            EmptyView()
+            // `navigate(.categorySelector)` pops to root rather than pushing, so this normally isn't
+            // reached — the live root ShopView (with its search bar) is built in
+            // CategorySelectorFlowView.body. Render the categories list as a safe fallback rather than
+            // a blank screen if the route is ever pushed (deep link, future call site).
+            CategoriesView(viewModel: categoriesViewModel())
 
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(
