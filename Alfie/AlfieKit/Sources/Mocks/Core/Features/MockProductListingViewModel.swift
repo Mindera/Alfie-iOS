@@ -76,4 +76,9 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public func didDismissRefreshError() {
         onDidDismissRefreshErrorCalled?()
     }
+
+    public var onRetryCalled: (() -> Void)?
+    public func retry() async {
+        onRetryCalled?()
+    }
 }

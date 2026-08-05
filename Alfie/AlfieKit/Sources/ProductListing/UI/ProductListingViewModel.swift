@@ -177,6 +177,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         refreshError = nil
     }
 
+    @MainActor
+    public func retry() async {
+        // Recovery from the full error screen (pull-to-refresh can't be relied on above the error
+        // overlay). Unlike refresh, show the loading state for feedback, then re-fetch page 1.
+        guard !isFetching else { return }
+        state = .loadingFirstPage(.init(title: "", products: []))
+        await loadProductsIfNeeded()
+    }
+
     // MARK: - Private
 
     @MainActor

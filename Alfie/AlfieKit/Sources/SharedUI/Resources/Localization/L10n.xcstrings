@@ -474,6 +474,17 @@
         }
       }
     },
+    "plp.error_view.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
     "plp.error_view.message" : {
       "extractionState" : "manual",
       "localizations" : {

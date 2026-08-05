@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -28,20 +29,27 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     public var body: some View {
-        VStack(spacing: theme.spacing.space0) {
+        ScrollView(.vertical) {
+            if viewModel.state.didFail {
+                // A non-empty view so the error overlay on top of the scroll view has a layout base.
+                Rectangle()
+                    .fill(.clear)
+            } else {
+                infoFilterBarView
+                productCardList
+                    .animation(.standardDecelerate, value: viewModel.style)
+            }
+        }
+        .animation(.standardDecelerate, value: viewModel.style)
+        .disabled(viewModel.state.isLoadingFirstPage)
+        // Keep the scroll view (and its pull-to-refresh) in the tree even on error, and render the
+        // error as an overlay — so the error state still has a recovery path (the Retry button).
+        .refreshable {
+            await viewModel.refresh()
+        }
+        .overlay(alignment: .center) {
             if viewModel.state.didFail {
                 errorView
-            } else {
-                ScrollView(.vertical) {
-                    infoFilterBarView
-                    productCardList
-                        .animation(.standardDecelerate, value: viewModel.style)
-                }
-                .animation(.standardDecelerate, value: viewModel.style)
-                .disabled(viewModel.state.isLoadingFirstPage)
-                .refreshable {
-                    await viewModel.refresh()
-                }
             }
         }
         .snackbarView(configuration: $refreshSnackbarConfig)
@@ -162,7 +170,15 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
 
     private var errorView: some View {
         let (title, message) = errorCopy(for: viewModel.state.failure)
-        return ErrorView(title: title, message: message)
+        return ErrorView(
+            title: title,
+            message: message,
+            buttons: [
+                .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityIdentifiers.AccessibilityID.ProductListing.retryButton) {
+                    Task { await viewModel.retry() }
+                },
+            ]
+        )
     }
 
     private func errorCopy(for error: ProductListingViewErrorType?) -> (String, String) {

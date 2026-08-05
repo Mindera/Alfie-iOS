@@ -25,4 +25,5 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didApplyFilters()
     func refresh() async
     func didDismissRefreshError()
+    func retry() async
 }
