@@ -5,6 +5,7 @@ import SwiftUI
 
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
+    public var refreshError: ProductListingViewErrorType?
     public var products: [Product]
     public var wishlistContent: [SelectedProduct]
     public var title: String = "Title"
@@ -64,5 +65,20 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var onDidApplyFiltersCalled: (() -> Void)?
     public func didApplyFilters() {
         onDidApplyFiltersCalled?()
+    }
+
+    public var onRefreshCalled: (() -> Void)?
+    public func refresh() async {
+        onRefreshCalled?()
+    }
+
+    public var onDidDismissRefreshErrorCalled: (() -> Void)?
+    public func didDismissRefreshError() {
+        onDidDismissRefreshErrorCalled?()
+    }
+
+    public var onRetryCalled: (() -> Void)?
+    public func retry() async {
+        onRetryCalled?()
     }
 }
