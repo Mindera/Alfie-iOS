@@ -652,6 +652,40 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.state.didFail)
         XCTAssertEqual(sut.state.failure, .serverError)
     }
+
+    func test_refresh_is_dropped_while_a_retry_is_in_flight() async {
+        sut = makeSUT(category: "clothing")
+
+        // Drive into the error state.
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        XCTAssertTrue(sut.state.didFail)
+
+        // Hold the retry's page-1 fetch open, then fire a pull-to-refresh — retry must hold `isFetching`
+        // so refresh bails on its guard and no second fetch races.
+        let gate = FetchGate()
+        let retryInFlight = expectation(description: "retry fetch is in-flight")
+        let refreshFetched = expectation(description: "refresh must not fetch during retry")
+        refreshFetched.isInverted = true
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            await gate.recordAndMaybeWait(signal: retryInFlight, secondSignal: refreshFetched)
+            return ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        async let retrying: Void = sut.retry()
+        await fulfillment(of: [retryInFlight], timeout: 1)
+
+        await sut.refresh()
+        await fulfillment(of: [refreshFetched], timeout: 0.5)
+
+        await gate.open()
+        await retrying
+        let totalFetches = await gate.entries
+        XCTAssertEqual(totalFetches, 1)
+        XCTAssertTrue(sut.state.isSuccess)
+    }
 }
 
 /// Test gate that holds the first fetch suspended until released, and counts how many fetches ran —

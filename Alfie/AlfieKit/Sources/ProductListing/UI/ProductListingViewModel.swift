@@ -179,9 +179,12 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     @MainActor
     public func retry() async {
-        // Recovery from the full error screen (pull-to-refresh can't be relied on above the error
-        // overlay). Unlike refresh, show the loading state for feedback, then re-fetch page 1.
+        // Recovery from the full error screen. Show the loading state for feedback, then re-fetch
+        // page 1. Holds `isFetching` for the whole fetch so a concurrent pull-to-refresh (now
+        // reachable over the error overlay) or a double-tap can't start a second racing page-1 fetch.
         guard !isFetching else { return }
+        isFetching = true
+        defer { isFetching = false }
         state = .loadingFirstPage(.init(title: "", products: []))
         await loadProductsIfNeeded()
     }
