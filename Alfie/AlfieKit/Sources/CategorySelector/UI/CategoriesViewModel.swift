@@ -56,7 +56,9 @@ public final class CategoriesViewModel: CategoriesViewModelProtocol {
 
     public private(set) var shouldShowToolbar: Bool
     // Only the root screen holds a navigationService; drill-down screens are static snapshots.
-    public var canRefresh: Bool { navigationService != nil }
+    private var hasNavigationService: Bool { navigationService != nil }
+    public var canRefresh: Bool { hasNavigationService }
+    public var isRoot: Bool { hasNavigationService }
     private let navigate: (CategorySelectorRoute) -> Void
 
     init(

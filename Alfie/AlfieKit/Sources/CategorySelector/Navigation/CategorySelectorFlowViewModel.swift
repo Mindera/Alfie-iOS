@@ -18,10 +18,6 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
-    public var isWishlistEnabled: Bool {
-        dependencies.categorySelectorDependencyContainer.configurationService.isFeatureEnabled(.wishlist)
-    }
-
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
         SearchFlowViewModel(
             dependencies: dependencies.searchDependencyContainer,
@@ -239,6 +235,12 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
                 WishlistView(viewModel: makeWishlistViewModel())
             )
         }
+    }
+
+    // MARK: - Search
+
+    public func presentSearch() {
+        isSearchPresented = true
     }
 
     // MARK: - FlowViewModelProtocol

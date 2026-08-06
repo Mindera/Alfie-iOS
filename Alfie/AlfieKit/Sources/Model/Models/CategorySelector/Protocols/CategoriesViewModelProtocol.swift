@@ -38,6 +38,8 @@ public protocol CategoriesViewModelProtocol: ObservableObject {
     /// Whether this screen can pull-to-refresh. Only the root categories screen fetches from the
     /// service; drill-down screens render a static snapshot, so their refresh affordance is hidden.
     var canRefresh: Bool { get }
+    /// Root (level 1) vs drill-down (level 2/3) — drives the larger root menu typography per Figma.
+    var isRoot: Bool { get }
 
     func viewDidAppear()
     func refresh() async

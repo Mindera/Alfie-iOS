@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Core
 import Model
 import SharedUI
@@ -7,31 +8,30 @@ import Mocks
 #endif
 
 struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol>: View {
-    private let isRoot: Bool
-    private let isWishlistEnabled: Bool
     @ViewBuilder private let categoriesView: CategoriesView<CategoriesViewModel>
-    private let navigate: (CategorySelectorRoute) -> Void
+    private let didTapSearch: () -> Void
 
     init(
-        isRoot: Bool,
-        isWishlistEnabled: Bool,
         categoriesViewModel: CategoriesViewModel,
-        navigate: @escaping (CategorySelectorRoute) -> Void
+        didTapSearch: @escaping () -> Void
     ) {
-        self.isRoot = isRoot
-        self.isWishlistEnabled = isWishlistEnabled
         self.categoriesView = CategoriesView(viewModel: categoriesViewModel)
-        self.navigate = navigate
+        self.didTapSearch = didTapSearch
     }
 
     var body: some View {
-        categoriesView
-            .toolbarView(
-                isRoot: isRoot,
-                isWishlistEnabled: isWishlistEnabled,
-                openWishlistAction: { navigate(.wishlist(.wishlist)) },
-                myAccountAction: { navigate(.myAccount(.myAccount)) }
+        VStack(spacing: theme.spacing.space0) {
+            SearchBarEntryButton(
+                placeholder: L10n.Home.SearchBar.placeholder,
+                accessibilityIdentifier: AccessibilityID.Shop.searchInput,
+                action: didTapSearch
             )
+            .padding(.horizontal, theme.spacing.space200)
+            .padding(.top, theme.spacing.space100)
+            .padding(.bottom, theme.spacing.space200)
+
+            categoriesView
+        }
     }
 }
 
@@ -40,12 +40,10 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol>: View {
 #if DEBUG
 #Preview {
     ShopView(
-        isRoot: true,
-        isWishlistEnabled: true,
         categoriesViewModel: MockCategoriesViewModel(
             state: .success(.init(categories: [])),
             categories: NavigationItem.fixtures
         )
-    ) { _ in }
+    ) {}
 }
 #endif

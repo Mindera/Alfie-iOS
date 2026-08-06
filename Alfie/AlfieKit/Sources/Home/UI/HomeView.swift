@@ -17,18 +17,12 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
 
     var body: some View {
         VStack(spacing: theme.spacing.space0) {
-            ThemedSearchBarView(
-                searchText: .constant(""),
+            SearchBarEntryButton(
                 placeholder: L10n.Home.SearchBar.placeholder,
-                theme: .soft,
-                dismissConfiguration: .init(type: .back, accessibilityId: AccessibilityID.Home.searchBackButton),
-                inputAccessibilityId: AccessibilityID.Home.searchInput
+                accessibilityIdentifier: AccessibilityID.Home.searchInput,
+                action: { viewModel.didTapSearch() }
             )
             .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
-            .disabled(true)
-            .onTapGesture {
-                viewModel.didTapSearch()
-            }
             .padding(.horizontal, theme.spacing.space200)
             .padding(.top, theme.spacing.space100)
             .padding(.bottom, theme.spacing.space200)
