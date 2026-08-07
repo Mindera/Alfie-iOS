@@ -5,27 +5,18 @@ import Core
 import Mocks
 #endif
 import Model
-import OrderedCollections
 import SharedUI
 import SwiftUI
 import Utils
 
 public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
-    @Environment(\.tabBarSize) private var tabBarSize
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
     @State private var showSizeSheet = false
-    @State private var showDetailsSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
-    @State private var carouselSize: CGSize = .zero
-    @State private var viewSize: CGSize = .zero
     @State private var colorSelectorSize: CGSize = .zero
-    @State private var bottomSheetCurrentDetent = PresentationDetent.height(0)
-    // store the detents before navigation to restore afterwards
-    @State private var bottomSheetDetentBeforeNavigation: PresentationDetent?
-    @State private var bottomSheetDetents: OrderedSet<PresentationDetent> = [PresentationDetent.height(0)]
     @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
     @State private var hasSpaceForSizeSelector = true
@@ -33,11 +24,15 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
     // There are multiple types of color pickers, but they all depend on the same conditions
     private var canShowColorPickers: Bool {
-        viewModel.colorSelectionConfiguration.items.count > 1
+        ProductDetailsLayoutRules.colourLayout(
+            forColourCount: viewModel.colorSelectionConfiguration.items.count
+        ) != .summaryOnly
     }
 
     private var canShowSizePickers: Bool {
-        viewModel.sizingSelectionConfiguration.items.count > 6
+        ProductDetailsLayoutRules.sizeLayout(
+            forSizeCount: viewModel.sizingSelectionConfiguration.items.count
+        ) == .verticalList
     }
 
     private var isOneSize: Bool {
@@ -67,7 +62,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     .padding(.horizontal, horizontalPadding)
             } else {
                 pdpView
-                    .writingSize(to: $viewSize)
             }
         }
         .toolbarView(
@@ -86,27 +80,26 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
             }
         }
         .onChange(of: viewModel.state.didFail) { newValue in
-            if newValue {
-                // give the sheet time to dismiss in case we catch it in the middle of the presentation
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    showDetailsSheet = false
-                    showFailureState = true
-                }
-            } else {
-                showFailureState = false
-            }
+            showFailureState = newValue
         }
     }
 
-    @ViewBuilder private var pdpView: some View {
-        if isIpad {
-            legacyPDPView
-        } else {
-            if #available(iOS 16.4, *) {
-                iPhonePDPView
-            } else {
-                legacyPDPView
+    private var pdpView: some View {
+        ScrollView {
+            VStack(spacing: Primitives.Spacing.spacing0) {
+                mediaCarousel
+                complementaryViews
             }
+        }
+        .padding(.horizontal, horizontalPadding)
+        .fullScreenCover(isPresented: $isMediaFullScreen) {
+            fullscreenMediaCarousel
+        }
+        .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }) {
+            colorSheet
+        }
+        .sheet(isPresented: $showSizeSheet) {
+            sizeSheet
         }
     }
 
@@ -126,74 +119,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         }
     }
 
-    @available(iOS 16.4, *)
-    // swiftlint:disable:next attributes
-    private var iPhonePDPView: some View {
-        VStack {
-            mediaCarousel
-            Spacer()
-        }
-        .padding(.horizontal, horizontalPadding)
-        .task {
-            showDetailsSheet = true
-        }
-        .onAppear {
-            if let bottomSheetDetentBeforeNavigation {
-                bottomSheetCurrentDetent = bottomSheetDetentBeforeNavigation
-                showDetailsSheet = true
-            }
-        }
-        .onChange(of: viewSize) { newValue in
-            if newValue != .zero {
-                setupDetents(with: newValue)
-            }
-        }
-        .sheet(isPresented: $showDetailsSheet) {
-            popupView
-                .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
-                    colorSheet
-                        .presentationBackgroundInteraction(.enabled)
-                })
-                .sheet(isPresented: $showSizeSheet) {
-                    sizeSheet
-                        .presentationBackgroundInteraction(.enabled)
-                }
-                .fullScreenCover(isPresented: $isMediaFullScreen) {
-                    fullscreenMediaCarousel
-                }
-        }
-    }
-
-    private var legacyPDPView: some View {
-        VStack {
-            ScrollView {
-                mediaCarousel
-                complementaryViews
-                    .padding(.horizontal, horizontalPadding)
-            }
-            addToBag
-        }
-        .fullScreenCover(isPresented: $isMediaFullScreen) {
-            fullscreenMediaCarousel
-        }
-        .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
-            colorSheet
-        })
-    }
-
     // MARK: - Helpers
-
-    private func setupDetents(with viewSize: CGSize) {
-        let collapsedDetent = PresentationDetent.height(viewSize.height + tabBarSize.height - carouselSize.height)
-        let expandedDetent = PresentationDetent.height(viewSize.height + tabBarSize.height)
-
-        bottomSheetDetents = [
-            collapsedDetent,
-            expandedDetent,
-        ]
-
-        bottomSheetCurrentDetent = collapsedDetent
-    }
 
     private func shimmeringBinding(for section: ProductDetailsSection) -> Binding<Bool> {
         .init(get: { viewModel.shouldShowLoading(for: section) }, set: { _ in })
@@ -250,37 +176,18 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
 // MARK: - Sections
 extension ProductDetailsView {
-    @available(iOS 16.4, *)
-    // swiftlint:disable:next attributes
-    private var popupView: some View {
-        VStack {
-            ScrollView(showsIndicators: false) {
-                complementaryViews
-                    .padding([.horizontal, .top], Primitives.Spacing.spacing16)
-            }
-
-            VStack {
-                addToBag
-                addToWishlist
-            }
-            .padding(.vertical, Primitives.Spacing.spacing8)
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-        }
-        .presentationDetents(Set(bottomSheetDetents), selection: $bottomSheetCurrentDetent)
-        .presentationDragIndicator(.hidden)
-        .presentationBackgroundInteraction(.enabled)
-        .interactiveDismissDisabled()
-        .persistentSystemOverlays(.hidden)
-    }
-
     /// contains every view except the media carousel
     private var complementaryViews: some View {
         VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
             titleHeader
 
-            Spacer()
-
             price
+
+            VStack(spacing: Primitives.Spacing.spacing8) {
+                addToBag
+                addToWishlist
+            }
+            .padding(.vertical, Primitives.Spacing.spacing8)
 
             colorSelector
 
@@ -292,8 +199,6 @@ extension ProductDetailsView {
                 .padding(.vertical, Primitives.Spacing.spacing16)
 
             complementaryInfo
-
-            Spacer()
         }
     }
 
@@ -324,7 +229,6 @@ extension ProductDetailsView {
             paginatedControl
                 .padding(.bottom, Primitives.Spacing.spacing16)
         }
-        .writingSize(to: $carouselSize)
         .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
     }
 
@@ -568,8 +472,6 @@ extension ProductDetailsView {
             .modifier(
                 TapHighlightableModifier {
                     guard let feature = viewModel.complementaryInfoWebFeature(for: type) else { return }
-                    showDetailsSheet = false
-                    bottomSheetDetentBeforeNavigation = bottomSheetCurrentDetent
                     viewModel.openWebFeature(feature)
                 }
             )
@@ -584,10 +486,8 @@ private enum Constants {
     static let minTitleHeight = 20.0
     static let minColorSelectorHeight = 26.0
     static let chevronSize: CGFloat = 16
-    static let sheetCloseIconSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210
-    static let colorChevronSize: CGFloat = 16
 }
 
 #if DEBUG
