@@ -311,7 +311,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             if let url = color.swatch?.url {
                 type = .url(url)
             } else {
-                type = .color(Primitives.Colours.neutrals900)
+                // A filled stand-in for a missing swatch image, so it reads as a surface token.
+                type = .color(Theme.surfaceBackgroundInvertedPrimary)
             }
 
             let isAvailable = product.variants.contains { $0.colour?.id == color.id && $0.stock > 0 }
