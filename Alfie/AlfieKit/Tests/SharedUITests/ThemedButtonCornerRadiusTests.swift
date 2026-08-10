@@ -21,7 +21,9 @@ final class ThemedButtonCornerRadiusTests: XCTestCase {
         XCTAssertEqual(sut.cornerRadius, 0)
     }
 
-    func test_borderlessStyles_staySquareRegardlessOfTheOverride() {
+    func test_borderlessStyles_shimmerStaysSquareRegardlessOfTheOverride() {
+        // Only the shimmer is pinned to 0 here — these styles draw no background, so the button's
+        // own radius is not observable.
         let sut = ThemedButton(text: "Link", style: .underline, cornerRadius: 99) {}
         XCTAssertEqual(sut.cornerRadius, 0)
     }

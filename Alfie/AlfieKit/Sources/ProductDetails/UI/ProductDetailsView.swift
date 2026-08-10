@@ -49,7 +49,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         return productStockCount != 0
     }
 
-    // TODO: remove showFailureState (created for snapshot purposes)
+    // showFailureState is driven by the view model; the flag lets the error-state snapshot render it.
     public init(viewModel: ViewModel, showFailureState: Bool = false) {
         _showFailureState = State(initialValue: showFailureState)
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -91,6 +91,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 complementaryViews
             }
         }
+        .scrollIndicators(.hidden)
         .padding(.horizontal, horizontalPadding)
         .fullScreenCover(isPresented: $isMediaFullScreen) {
             fullscreenMediaCarousel

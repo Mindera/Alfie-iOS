@@ -68,6 +68,19 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
+        .backgroundInteractionEnabledIfAvailable()
+    }
+}
+
+private extension View {
+    /// The sheet is half-height, so the page stays visible behind it and must stay scrollable —
+    /// the behaviour the removed wrapper sheet used to provide.
+    @ViewBuilder func backgroundInteractionEnabledIfAvailable() -> some View {
+        if #available(iOS 16.4, *) {
+            presentationBackgroundInteraction(.enabled)
+        } else {
+            self
+        }
     }
 }
 
