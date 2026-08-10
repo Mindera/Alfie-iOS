@@ -86,7 +86,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
     private var pdpView: some View {
         ScrollView {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 mediaCarousel
                 complementaryViews
             }
@@ -110,7 +110,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 itemsCount: viewModel.productImageUrls.count,
                 selectedIndex: $currentMediaIndex
             )
-            .frame(maxHeight: Primitives.Spacing.spacing16)
+            .frame(maxHeight: theme.spacing.space200)
             .shimmering(
                 while: shimmeringBinding(for: .mediaCarousel),
                 animateOnStateTransition: false,
@@ -126,7 +126,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     }
 
     private var horizontalPadding: CGFloat {
-        isIpad ? Primitives.Spacing.spacing40 : Primitives.Spacing.spacing16
+        isIpad ? theme.spacing.space500 : theme.spacing.space200
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
@@ -178,16 +178,16 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 extension ProductDetailsView {
     /// contains every view except the media carousel
     private var complementaryViews: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
+        VStack(alignment: .leading, spacing: theme.spacing.space100) {
             titleHeader
 
             price
 
-            VStack(spacing: Primitives.Spacing.spacing8) {
+            VStack(spacing: theme.spacing.space100) {
                 addToBag
                 addToWishlist
             }
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.vertical, theme.spacing.space100)
 
             colorSelector
 
@@ -196,14 +196,14 @@ extension ProductDetailsView {
             }
 
             descriptionTab
-                .padding(.vertical, Primitives.Spacing.spacing16)
+                .padding(.vertical, theme.spacing.space200)
 
             complementaryInfo
         }
     }
 
     var mediaCarousel: some View {
-        VStack(spacing: Primitives.Spacing.spacing16) {
+        VStack(spacing: theme.spacing.space200) {
             SnapCarousel(
                 areItemsLoading: shimmeringBinding(for: .mediaCarousel),
                 itemIndex: $currentMediaIndex,
@@ -217,17 +217,17 @@ extension ProductDetailsView {
                                 .resizable()
                                 .onTapGesture { isMediaFullScreen = true }
                         },
-                        placeholder: { Primitives.Colours.neutrals100 },
-                        failure: { _ in Primitives.Colours.neutrals900 }
+                        placeholder: { Theme.surfaceForegroundPrimary },
+                        failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
                     )
                     .cornerRadius(Sizing.radiusSoft)
                 }
             }
-            .padding(.top, Primitives.Spacing.spacing16)
-            .padding(.bottom, viewModel.hasSingleImage ? Primitives.Spacing.spacing16 : Primitives.Spacing.spacing0)
+            .padding(.top, theme.spacing.space200)
+            .padding(.bottom, viewModel.hasSingleImage ? theme.spacing.space200 : theme.spacing.space0)
             .disabled(isMediaFullScreen)
             paginatedControl
-                .padding(.bottom, Primitives.Spacing.spacing16)
+                .padding(.bottom, theme.spacing.space200)
         }
         .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
     }
@@ -242,8 +242,8 @@ extension ProductDetailsView {
                             .resizable()
                             .scaledToFit()
                     },
-                    placeholder: { Primitives.Colours.neutrals100 },
-                    failure: { _ in Primitives.Colours.neutrals900 }
+                    placeholder: { Theme.surfaceForegroundPrimary },
+                    failure: { _ in Theme.contentContentPrimary }
                 )
             }
         }
@@ -251,9 +251,9 @@ extension ProductDetailsView {
 
     @ViewBuilder private var titleHeader: some View {
         if viewModel.shouldShow(section: .titleHeader) {
-            HStack(spacing: Primitives.Spacing.spacing0) {
+            HStack(spacing: theme.spacing.space0) {
                 Text.build(theme.font.body.medium(viewModel.productName))
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(Theme.contentContentPrimary)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productTitle)
@@ -286,7 +286,7 @@ extension ProductDetailsView {
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             if hasSpaceForSizeSelector {
-                VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
+                VStack(alignment: .leading, spacing: theme.spacing.space150) {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.colorSelectionConfiguration,
                         isExpandable: canShowColorPickers
@@ -298,7 +298,7 @@ extension ProductDetailsView {
                         ColorSelectorComponentView(
                             configuration: viewModel.colorSelectionConfiguration,
                             layoutConfiguration: .init(
-                                arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8, scrollable: false),
+                                arrangement: .horizontal(itemSpacing: theme.spacing.space100, scrollable: false),
                                 hideSelectionTitle: true,
                                 hideOnSingleColor: false
                             ),
@@ -318,10 +318,10 @@ extension ProductDetailsView {
             } else if canShowColorPickers {
                 if let selectedColor = viewModel.colorSelectionConfiguration.selectedItem {
                     PickerMenu(isModalPresented: $showColorSheet) {
-                        HStack(spacing: Primitives.Spacing.spacing8) {
+                        HStack(spacing: theme.spacing.space100) {
                             ColorSwatchView(item: selectedColor, swatchSize: .normal, isSelected: false)
                             Text.build(theme.font.body.small(selectedColor.name.capitalized))
-                                .foregroundStyle(Primitives.Colours.neutrals800)
+                                .foregroundStyle(Theme.contentContentPrimary)
                         }
                     }
                     .id(selectedColor.id)
@@ -332,7 +332,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
+            VStack(alignment: .leading, spacing: theme.spacing.space150) {
                 if viewModel.canShowSizeSelector {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.sizingSelectionConfiguration,
@@ -362,15 +362,15 @@ extension ProductDetailsView {
             : L10n.Product.OneSize.title
         HStack {
             Text.build(theme.font.body.small(L10n.Product.Size.title + ":"))
-                .foregroundStyle(Primitives.Colours.neutrals800)
+                .foregroundStyle(Theme.contentContentPrimary)
             Text.build(theme.font.body.small(sizeText))
-                .foregroundStyle(Primitives.Colours.neutrals800)
+                .foregroundStyle(Theme.contentContentPrimary)
         }
     }
 
     @ViewBuilder private var complementaryInfo: some View {
         if viewModel.shouldShow(section: .complementaryInfo) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 ForEach(Array(viewModel.complementaryInfoToShow.enumerated()), id: \.0) { index, type in
                     complementaryInfoCell(type: type, showTopDivider: index == 0)
                 }
@@ -380,16 +380,16 @@ extension ProductDetailsView {
 
     @ViewBuilder private var descriptionTab: some View {
         if viewModel.shouldShow(section: .productDescription) {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
+            VStack(alignment: .leading, spacing: theme.spacing.space200) {
                 TabControl(
                     theme: .dark,
-                    configuration: .fixedSize(horizontalMargins: Primitives.Spacing.spacing16),
+                    configuration: .fixedSize(horizontalMargins: theme.spacing.space200),
                     options: [TabControl.TabOption(title: L10n.Pdp.TabControl.DescriptionOption.title)],
                     currentIndex: $currentDescriptionTabIndex
                 )
 
                 Text.build(theme.font.body.medium(viewModel.productDescription))
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(Theme.contentContentPrimary)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
             }
         }
@@ -397,7 +397,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 let addToBagText = L10n.Product.AddToBag.Button.cta
                 let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
@@ -419,7 +419,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToWishlist: some View {
         if viewModel.shouldShow(section: .addToWishlist) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 ThemedButton(
                     text: L10n.Product.AddToWishlist.Button.cta,
                     style: .secondary,
@@ -435,10 +435,12 @@ extension ProductDetailsView {
 
     @ViewBuilder private var errorView: some View {
         ErrorView(
-            spacing: Primitives.Spacing.spacing40,
+            spacing: theme.spacing.space500,
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(errorTitle),
             message: theme.font.body.medium(errorMessage),
+            // No Theme alias maps to neutrals600 (#4A4A4A) — see token-requests.md G3. Matches the
+            // other 16 consumers of this value, including WebView's error message.
             messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(cta: L10n.Pdp.ErrorView.GoBack.Button.cta) {
@@ -449,24 +451,24 @@ extension ProductDetailsView {
     }
 
     private func complementaryInfoCell(type: ProductDetailsComplementaryInfoType, showTopDivider: Bool) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.spacing.space0) {
             if showTopDivider {
                 ThemedDivider.horizontalThin
             }
 
-            HStack(spacing: Primitives.Spacing.spacing0) {
-                HStack(spacing: Primitives.Spacing.spacing0) {
+            HStack(spacing: theme.spacing.space0) {
+                HStack(spacing: theme.spacing.space0) {
                     Text.build(theme.font.body.medium(complementaryInfoTitle(for: type)))
-                        .foregroundStyle(Primitives.Colours.neutrals900)
-                        .padding(.leading, Primitives.Spacing.spacing8)
+                        .foregroundStyle(Theme.contentContentPrimary)
+                        .padding(.leading, theme.spacing.space100)
                     Spacer()
                     Icon.chevronRight.image
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .foregroundStyle(Primitives.Colours.neutrals900)
-                        .padding(.trailing, Primitives.Spacing.spacing8)
+                        .foregroundStyle(Theme.contentContentPrimary)
+                        .padding(.trailing, theme.spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }
