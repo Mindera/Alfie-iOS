@@ -407,7 +407,8 @@ extension ProductDetailsView {
                         get: { !viewModel.isAddToBagEnabled },
                         set: { _ in }
                     ),
-                    isFullWidth: true
+                    isFullWidth: true,
+                    cornerRadius: Constants.ctaCornerRadius
                 ) {
                     viewModel.didTapAddToBag()
                 }
@@ -422,7 +423,8 @@ extension ProductDetailsView {
                 ThemedButton(
                     text: L10n.Product.AddToWishlist.Button.cta,
                     style: .secondary,
-                    isFullWidth: true
+                    isFullWidth: true,
+                    cornerRadius: Constants.ctaCornerRadius
                 ) {
                     viewModel.didTapAddToWishlist()
                 }
@@ -483,6 +485,8 @@ extension ProductDetailsView {
 }
 
 private enum Constants {
+    /// The design draws the call-to-action and wishlist buttons square, unlike the 4pt default.
+    static let ctaCornerRadius: CGFloat = 0
     static let minTitleHeight = 20.0
     static let minColorSelectorHeight = 26.0
     static let chevronSize: CGFloat = 16

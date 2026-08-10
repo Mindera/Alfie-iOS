@@ -12,6 +12,7 @@ public struct ThemedButton: View {
     private let trailingAsset: Icon?
     private let action: () -> Void
     private let isFullWidth: Bool
+    private let buttonCornerRadius: CGFloat
 
     public init(
         text: String,
@@ -22,6 +23,7 @@ public struct ThemedButton: View {
         isDisabled: Binding<Bool> = .constant(false),
         isLoading: Binding<Bool> = .constant(false),
         isFullWidth: Bool = false,
+        cornerRadius: CGFloat = Sizing.radiusSoft,
         action: @escaping () -> Void
     ) {
         self.text = text
@@ -32,6 +34,7 @@ public struct ThemedButton: View {
         _isDisabled = isDisabled
         _isLoading = isLoading
         self.isFullWidth = isFullWidth
+        self.buttonCornerRadius = cornerRadius
         self.action = action
     }
 
@@ -63,7 +66,8 @@ public struct ThemedButton: View {
                 isDisabled: isDisabled,
                 isLoading: isLoading,
                 leadingAsset: leadingAsset,
-                trailingAsset: trailingAsset
+                trailingAsset: trailingAsset,
+                cornerRadius: buttonCornerRadius
             )
         )
     }
@@ -135,7 +139,6 @@ public enum ButtonType {
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
     static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
-    static let cornerRadius: CGFloat = Sizing.radiusSoft
     static let iconSize: CGFloat = Sizing.iconsIconSmall
     // FIXME: No dedicated button-height token exists; heights are snapped to the spacing scale
     // (36→32, 44→40, 52→48). This drops `.medium` (the default) to 40pt — below Apple's 44pt
@@ -154,6 +157,7 @@ private struct ThemedButtonStyle: ButtonStyle {
     let isLoading: Bool
     let leadingAsset: Icon?
     let trailingAsset: Icon?
+    let cornerRadius: CGFloat
 
     func makeBody(configuration: Self.Configuration) -> some View {
         HStack {
@@ -180,17 +184,17 @@ private struct ThemedButtonStyle: ButtonStyle {
         .padding(.horizontal, Primitives.Spacing.spacing8)
         .foregroundStyle(textColor(configuration))
         .background(background(configuration))
-        .cornerRadius(Constants.cornerRadius)
+        .cornerRadius(cornerRadius)
         .overlay(
             ZStack {
-                RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(borderColor(configuration), lineWidth: Primitives.Border.borderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(background(configuration))
-                        .cornerRadius(Constants.cornerRadius)
+                        .cornerRadius(cornerRadius)
                 }
             }
         )
@@ -288,7 +292,8 @@ extension ThemedButton: CustomShimmerable {
         switch style {
         case .primary,
              .secondary: // swiftlint:disable:this indentation_width
-            return Constants.cornerRadius
+            // Follows the instance radius so a square button does not shimmer with rounded corners.
+            return buttonCornerRadius
         case .tertiary,
              .underline: // swiftlint:disable:this indentation_width
             return 0
