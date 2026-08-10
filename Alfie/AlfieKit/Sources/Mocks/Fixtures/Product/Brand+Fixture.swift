@@ -21,8 +21,8 @@ extension Brand {
     ]
 
     public static func fixture(id: String = UUID().uuidString,
-                               name: String = "",
-                               slug: String = "") -> Brand {
+                               name: String = "Ralph Lauren",
+                               slug: String = "ralph-lauren") -> Brand {
         .init(id: id,
               name: name,
               slug: slug)

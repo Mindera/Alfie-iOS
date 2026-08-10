@@ -76,6 +76,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var shouldShowMediaPaginatedControl: Bool { productImageUrls.count > 1 }
     public var hasSingleImage: Bool { productImageUrls.count == 1 }
     public var priceType: PriceType? { product?.priceType }
+    // Empty collapses to nil so the metadata line omits the part rather than rendering a blank.
+    public var selectedColourName: String? { selectedVariant?.colour?.name.nilWhenEmpty }
+    public var productReference: String? { selectedVariant?.sku.nilWhenEmpty }
 
     public init(
         configuration: ProductDetailsConfiguration,
@@ -431,4 +434,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
         return SelectedProduct(product: product, selectedVariant: selectedVariant)
     }
+}
+
+private extension String {
+    var nilWhenEmpty: String? { isEmpty ? nil : self }
 }
