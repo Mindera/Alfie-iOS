@@ -10,6 +10,237 @@
       "value": 1
     }
   },
+  "colours-brand-0": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "colours-brand-02-color-3": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.478431,
+        0.356863,
+        0
+      ]
+    }
+  },
+  "colours-brand-100": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.97,
+        0.97,
+        0.97
+      ]
+    }
+  },
+  "colours-brand-200": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.913725,
+        0.913725,
+        0.913725
+      ]
+    }
+  },
+  "colours-brand-300": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.803922,
+        0.803922,
+        0.803922
+      ]
+    }
+  },
+  "colours-brand-400": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.63,
+        0.63,
+        0.63
+      ]
+    }
+  },
+  "colours-brand-500": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.066667,
+        0.066667,
+        0.066667
+      ]
+    }
+  },
+  "colours-brand-600": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.290196,
+        0.290196,
+        0.290196
+      ]
+    }
+  },
+  "colours-brand-700": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.168627,
+        0.168627,
+        0.168627
+      ]
+    }
+  },
+  "colours-brand-800": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.066667,
+        0.066667,
+        0.066667
+      ]
+    }
+  },
+  "colours-brand-900": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.023529,
+        0.031373,
+        0.039216
+      ]
+    }
+  },
+  "colours-brand-new-brand-0": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "colours-brand-new-brand-100": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        0.984314,
+        0.898039
+      ]
+    }
+  },
+  "colours-brand-new-brand-200": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        0.960784,
+        0.721569
+      ]
+    }
+  },
+  "colours-brand-new-brand-300": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        0.909804,
+        0.541176
+      ]
+    }
+  },
+  "colours-brand-new-brand-400": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        0.870588,
+        0.360784
+      ]
+    }
+  },
+  "colours-brand-new-brand-500": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        1,
+        0.819608,
+        0
+      ]
+    }
+  },
+  "colours-brand-new-brand-600": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.858824,
+        0.690196,
+        0
+      ]
+    }
+  },
+  "colours-brand-new-brand-700": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.721569,
+        0.564706,
+        0
+      ]
+    }
+  },
+  "colours-brand-new-brand-800": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.580392,
+        0.443137,
+        0
+      ]
+    }
+  },
+  "colours-brand-new-brand-900": {
+    "$type": "color",
+    "$value": {
+      "colorSpace": "srgb",
+      "components": [
+        0.478431,
+        0.356863,
+        0
+      ]
+    }
+  },
   "colours-neutrals-0": {
     "$type": "color",
     "$value": {
@@ -404,6 +635,13 @@
     "$value": {
       "unit": "px",
       "value": 40
+    }
+  },
+  "spacing-spacing-44": {
+    "$type": "dimension",
+    "$value": {
+      "unit": "px",
+      "value": 44
     }
   },
   "spacing-spacing-48": {
