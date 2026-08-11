@@ -244,7 +244,7 @@ extension ProductDetailsView {
                             .scaledToFit()
                     },
                     placeholder: { Theme.surfaceForegroundPrimary },
-                    failure: { _ in Theme.contentContentPrimary }
+                    failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
                 )
             }
         }

@@ -31,12 +31,14 @@ final class TypographyStyleFontTests: XCTestCase {
         XCTAssertEqual(Typography.Body.medium.fontWeight, 400)
     }
 
-    func test_withSize_preservesWeight() {
+    func test_withSize_preservesWeight() throws {
         // The price resizes the token font per PriceSize. If `withSize` dropped the weight, the
         // price would silently render regular — so this pins the behaviour the call site relies on.
         let resized = Typography.Body.mediumBold.uiFont.withSize(14)
         let traits = resized.fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
-        XCTAssertEqual(traits?[.weight] as? CGFloat, UIFont.Weight.medium.rawValue)
+        let weight = try XCTUnwrap(traits?[.weight] as? CGFloat)
+        // Descriptor traits round-trip through floating point, so compare with a tolerance.
+        XCTAssertEqual(weight, UIFont.Weight.medium.rawValue, accuracy: 0.001)
         XCTAssertEqual(resized.pointSize, 14)
     }
 
