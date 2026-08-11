@@ -111,7 +111,8 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         if viewModel.shouldShowMediaPaginatedControl {
             let configuration = ThemedPageControlConfiguration(
                 color: Constants.unselectedIndicatorColor,
-                selectedColor: Theme.contentContentPrimary,
+                // White, not primary: the indicators overlay the image rather than sit below it.
+                selectedColor: Theme.contentContentInvertedPrimary,
                 size: Constants.indicatorSize,
                 spacing: theme.spacing.space100,
                 padding: theme.spacing.space0
@@ -218,10 +219,13 @@ extension ProductDetailsView {
 
     /// Full-bleed: the images fill the screen width, so there is no item spacing, no slice of the
     /// neighbouring image, and no corner radius. The gutter belongs to the content below.
+    ///
+    /// The height is the image's own — the design's gallery hugs its content and each image carries
+    /// its own ratio variant (3:4 and 1:1 both exist), so nothing here fixes one.
     var mediaCarousel: some View {
         SnapCarousel(
             areItemsLoading: shimmeringBinding(for: .mediaCarousel),
-            itemAspectRatio: Constants.galleryAspectRatio,
+            itemAspectRatio: nil,
             itemIndex: $currentMediaIndex,
             shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
             showsAdjacentItemPeek: false
@@ -232,14 +236,20 @@ extension ProductDetailsView {
                     success: { image in
                         image
                             .resizable()
-                            // Fill, not stretch: sources are not guaranteed to be 3:4.
-                            .aspectRatio(contentMode: .fill)
+                            // Fit at the full width: height follows the image's intrinsic ratio,
+                            // and nothing is cropped or stretched.
+                            .aspectRatio(contentMode: .fit)
                             .onTapGesture { isMediaFullScreen = true }
                     },
-                    placeholder: { Theme.surfaceForegroundPrimary },
-                    failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
+                    // Placeholder and failure have no intrinsic size, so they reserve a square until
+                    // the image resolves. A loading reservation, not a design ratio.
+                    placeholder: {
+                        Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit)
+                    },
+                    failure: { _ in
+                        Theme.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
+                    }
                 )
-                .clipped()
             }
         }
         // Inert on phones; on iPad a full-width 3:4 gallery would be taller than the screen and push
@@ -579,8 +589,6 @@ extension ProductDetailsView {
 private enum Constants {
     /// The design draws the call-to-action and wishlist buttons square, unlike the 4pt default.
     static let ctaCornerRadius: CGFloat = 0
-    /// 3:4 portrait, as width over height.
-    static let galleryAspectRatio: CGFloat = 0.75
     static let indicatorSize: CGFloat = 6
     static let selectedIndicatorWidth: CGFloat = 12
     /// The gallery is full-bleed, but 3:4 at an iPad's full width is taller than the screen.
