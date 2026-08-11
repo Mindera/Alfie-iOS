@@ -23,8 +23,16 @@ final class ProductDetailsPage {
         app.otherElements[AccessibilityID.ProductDetails.productImage]
     }
 
-    var productTitle: XCUIElement {
-        app.staticTexts[AccessibilityID.ProductDetails.productTitle]
+    var brandName: XCUIElement {
+        app.staticTexts[AccessibilityID.ProductDetails.brandName]
+    }
+
+    var productName: XCUIElement {
+        app.staticTexts[AccessibilityID.ProductDetails.productName]
+    }
+
+    var colourSummary: XCUIElement {
+        app.buttons[AccessibilityID.ProductDetails.colourSummary]
     }
 
     var productDescription: XCUIElement {
@@ -68,6 +76,12 @@ final class ProductDetailsPage {
     }
 
     @discardableResult
+    func tapColourSummary() -> Self {
+        colourSummary.tap()
+        return self
+    }
+
+    @discardableResult
     func openSizeSheet() -> Self {
         sizeSelector.tap()
         return self
@@ -77,8 +91,8 @@ final class ProductDetailsPage {
 
     func assertVisible(timeout: TimeInterval = 5) {
         XCTAssertTrue(
-            productTitle.waitForExistence(timeout: timeout),
-            "Product Details product title should be visible"
+            productName.waitForExistence(timeout: timeout),
+            "Product Details product name should be visible"
         )
     }
 }

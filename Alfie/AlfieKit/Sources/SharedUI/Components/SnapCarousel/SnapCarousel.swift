@@ -8,6 +8,9 @@ public struct SnapCarousel<Content: View>: View {
     private let itemSpacing: CGFloat
     // Mininum velocity for the user for the swipe to happen
     private let minimumScrollVelocity: CGFloat
+    // When false the item fills the carousel width: no slice of the neighbouring items, and no
+    // spacing to inset it, so the carousel can run edge to edge.
+    private let showsAdjacentItemPeek: Bool
     private let replicatedItems: [Content]
     private let uniqueItems: [Content]
 
@@ -32,25 +35,27 @@ public struct SnapCarousel<Content: View>: View {
         itemSpacing: CGFloat = Primitives.Spacing.spacing8,
         minimumScrollVelocity: CGFloat = 40,
         shouldAnimateRealIndexUpdate: Binding<Bool> = .constant(true),
+        showsAdjacentItemPeek: Bool = true,
         items: @escaping () -> [Content]
     ) {
         self.areItemsLoading = areItemsLoading
         self.shouldAnimateRealIndexUpdate = shouldAnimateRealIndexUpdate
         self.itemAspectRatio = itemAspectRatio
         self.minimumScrollVelocity = minimumScrollVelocity
+        self.showsAdjacentItemPeek = showsAdjacentItemPeek
         self._realIndex = itemIndex
 
         let uniqueItems = items()
         self.isSingleItem = uniqueItems.count == 1
         self.uniqueItems = uniqueItems
         self.replicatedItems = isSingleItem ? uniqueItems : uniqueItems + uniqueItems + uniqueItems
-        self.itemSpacing = isSingleItem ? 0 : itemSpacing
+        self.itemSpacing = (isSingleItem || !showsAdjacentItemPeek) ? 0 : itemSpacing
         self.offsetIndex = uniqueItems.count
     }
 
     public var body: some View {
         GeometryReader { proxy in
-            let sideCutWidth = isSingleItem ? 0 : proxy.size.width / Primitives.Spacing.spacing20
+            let sideCutWidth = (isSingleItem || !showsAdjacentItemPeek) ? 0 : proxy.size.width / Primitives.Spacing.spacing20
             let itemWidth = proxy.size.width - (2 * itemSpacing + 2 * sideCutWidth)
             let itemHeight = itemWidth / itemAspectRatio
             // Adjustment that keeps the images centered on each swipe

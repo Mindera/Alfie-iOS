@@ -108,6 +108,18 @@ public enum L10n {
     public static let title = L10n.tr("L10n", "loading.title")
   }
   public enum Pdp {
+    public enum ColourSummary {
+      /// Opens colour selection
+      public static let accessibilityHint = L10n.tr("L10n", "pdp.colour_summary.accessibility_hint")
+      /// Plural format key: pdp.colour_summary.accessibility_label
+      public static func accessibilityLabel(_ p1: Any, _ p2: Int) -> String {
+        return L10n.tr("L10n", "pdp.colour_summary.accessibility_label", String(describing: p1), p2)
+      }
+      /// +%d
+      public static func count(_ p1: Int) -> String {
+        return L10n.tr("L10n", "pdp.colour_summary.count", p1)
+      }
+    }
     public enum ComplementaryInfo {
       public enum Delivery {
         /// Delivery
@@ -150,6 +162,16 @@ public enum L10n {
         public static let message = L10n.tr("L10n", "pdp.error_view.server_error.message")
         /// Service unavailable
         public static let title = L10n.tr("L10n", "pdp.error_view.server_error.title")
+      }
+    }
+    public enum Gallery {
+      /// Opens full screen
+      public static let accessibilityHint = L10n.tr("L10n", "pdp.gallery.accessibility_hint")
+      /// Product images
+      public static let accessibilityLabel = L10n.tr("L10n", "pdp.gallery.accessibility_label")
+      /// Image %1$d of %2$d
+      public static func accessibilityValue(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("L10n", "pdp.gallery.accessibility_value", p1, p2)
       }
     }
     public enum SearchColors {
@@ -514,6 +536,9 @@ public extension L10n {
       case homeSignInButtonCta = "home.sign_in.button.cta"
       case homeSignOutButtonCta = "home.sign_out.button.cta"
       case loadingTitle = "loading.title"
+      case pdpColourSummaryAccessibilityHint = "pdp.colour_summary.accessibility_hint"
+      case pdpColourSummaryAccessibilityLabel = "pdp.colour_summary.accessibility_label"
+      case pdpColourSummaryCount = "pdp.colour_summary.count"
       case pdpComplementaryInfoDeliveryTitle = "pdp.complementary_info.delivery.title"
       case pdpComplementaryInfoPaymentTitle = "pdp.complementary_info.payment.title"
       case pdpComplementaryInfoReturnsTitle = "pdp.complementary_info.returns.title"
@@ -525,6 +550,9 @@ public extension L10n {
       case pdpErrorViewRateLimitedTitle = "pdp.error_view.rate_limited.title"
       case pdpErrorViewServerErrorMessage = "pdp.error_view.server_error.message"
       case pdpErrorViewServerErrorTitle = "pdp.error_view.server_error.title"
+      case pdpGalleryAccessibilityHint = "pdp.gallery.accessibility_hint"
+      case pdpGalleryAccessibilityLabel = "pdp.gallery.accessibility_label"
+      case pdpGalleryAccessibilityValue = "pdp.gallery.accessibility_value"
       case pdpSearchColorsPlaceholder = "pdp.search_colors.placeholder"
       case pdpShareProductFromSubject = "pdp.share_product.from.subject"
       case pdpTabControlDescriptionOptionTitle = "pdp.tab_control.description_option.title"

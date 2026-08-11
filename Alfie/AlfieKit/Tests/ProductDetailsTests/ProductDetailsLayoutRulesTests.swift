@@ -46,6 +46,36 @@ final class ProductDetailsLayoutRulesTests: XCTestCase {
         }
     }
 
+    // MARK: - Colour summary
+
+    func test_colour_summary_is_hidden_when_there_is_nothing_to_choose() {
+        XCTAssertNil(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 0, hasSelection: true))
+        XCTAssertNil(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 1, hasSelection: true))
+    }
+
+    func test_colour_summary_counts_every_colour_but_the_selected_one() {
+        XCTAssertEqual(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 2, hasSelection: true), 1)
+        XCTAssertEqual(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 4, hasSelection: true), 3)
+    }
+
+    func test_colour_summary_is_hidden_without_a_selected_colour() {
+        // The converter leaves the selection nil when the variant carries no colour; there is then
+        // no swatch to summarise, even though the picker itself would still render.
+        XCTAssertNil(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 4, hasSelection: false))
+    }
+
+    func test_colour_summary_is_shown_whenever_a_colour_picker_would_be_and_a_colour_is_selected() {
+        // The summary is the entry point to the picker, so the two must never disagree.
+        for count in 0...20 {
+            let hasSummary = ProductDetailsLayoutRules.colourSummaryRemainingCount(
+                forColourCount: count,
+                hasSelection: true
+            ) != nil
+            let hasPicker = ProductDetailsLayoutRules.colourLayout(forColourCount: count) != .summaryOnly
+            XCTAssertEqual(hasSummary, hasPicker, "diverged at \(count)")
+        }
+    }
+
     // MARK: - Low stock message
 
     func test_stock_message_is_none_when_stock_is_unknown() {

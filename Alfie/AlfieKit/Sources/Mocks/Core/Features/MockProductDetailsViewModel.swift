@@ -19,7 +19,6 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
     public var shouldShowMediaPaginatedControl = true
-    public var hasSingleImage: Bool = false
     public var priceType: PriceType? = nil
     public var selectedColourName: String?
     public var productReference: String?

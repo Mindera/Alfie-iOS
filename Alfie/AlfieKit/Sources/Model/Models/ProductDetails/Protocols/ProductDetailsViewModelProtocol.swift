@@ -17,7 +17,6 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] { get }
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
-    var hasSingleImage: Bool { get }
     var priceType: PriceType? { get }
     /// Selected variant's colour name, for the description metadata line.
     /// Nil for single-option products and the no-variant fallback.

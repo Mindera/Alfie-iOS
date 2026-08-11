@@ -46,9 +46,13 @@ public enum AccessibilityID {
     public enum ProductDetails {
         public static let titleHeader = "productDetails.title.header"
         public static let productImage = "productDetails.product.image"
-        public static let productTitle = "productDetails.product.title"
+        /// The brand line above the product name — this is the view model's `productTitle`. The
+        /// in-body product name is `productName`, which used to carry the `productTitle` identifier.
+        public static let brandName = "productDetails.brand.name"
+        public static let productName = "productDetails.product.name"
         public static let productDescription = "productDetails.description.text"
         public static let colourSelector = "productDetails.colour.selector"
+        public static let colourSummary = "productDetails.colour.summary"
         public static let sizeSelector = "productDetails.size.selector"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
