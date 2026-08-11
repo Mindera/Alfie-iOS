@@ -37,7 +37,7 @@ public enum Theme {
     public static let contentContentPrimary = Primitives.Colours.neutrals800
     public static let contentContentPrimaryActive = Primitives.Colours.neutrals0
     public static let contentContentPrimaryDisabled = Primitives.Colours.neutrals400
-    public static let contentContentSecondary = Primitives.Colours.neutrals800
+    public static let contentContentSecondary = Primitives.Colours.neutrals700
     public static let contentContentTerciary = Primitives.Colours.neutrals500
     public static let linkLinkPrimaryDefault = Primitives.Colours.neutrals800
     public static let linkLinkPrimaryDisabled = Primitives.Colours.neutrals400

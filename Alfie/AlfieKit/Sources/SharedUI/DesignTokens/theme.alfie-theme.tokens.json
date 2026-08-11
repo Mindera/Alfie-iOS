@@ -133,7 +133,7 @@
   },
   "content-content-secondary": {
     "$type": "color",
-    "$value": "{colours-neutrals-800}"
+    "$value": "{colours-neutrals-700}"
   },
   "content-content-terciary": {
     "$type": "color",
