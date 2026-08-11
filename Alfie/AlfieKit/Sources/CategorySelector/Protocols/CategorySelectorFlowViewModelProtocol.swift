@@ -13,8 +13,6 @@ public protocol CategorySelectorFlowViewModelProtocol: ObservableObject, FlowVie
     associatedtype ProductListingViewModel: ProductListingViewModelProtocol
     associatedtype WishlistViewModel: WishlistViewModelProtocol
 
-    var isWishlistEnabled: Bool { get }
-
     func makeCategoriesViewModel() -> CategoriesViewModel
     func makeAccountViewModel() -> AccountViewModel
     func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView
@@ -25,5 +23,6 @@ public protocol CategorySelectorFlowViewModelProtocol: ObservableObject, FlowVie
     func makeURLWebViewModel(url: URL, title: String) -> WebViewModel
     func makeWishlistViewModel() -> WishlistViewModel
 
+    func presentSearch()
     func navigate(_ route: CategorySelectorRoute)
 }

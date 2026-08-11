@@ -8,7 +8,7 @@ public extension BFFGraphAPI {
     public static let operationName: String = "MainMenuQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query MainMenuQuery($handle: String!) { mainMenu(handle: $handle) { __typename handle title items { __typename id title url items { __typename id title url items { __typename id title url } } } } }"#
+        #"query MainMenuQuery($handle: String!) { menu(handle: $handle) { __typename handle title items { __typename id title url items { __typename id title url items { __typename id title url } } } } }"#
       ))
 
     public var handle: String
@@ -25,15 +25,15 @@ public extension BFFGraphAPI {
 
       public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Query }
       public static var __selections: [ApolloAPI.Selection] { [
-        .field("mainMenu", MainMenu.self, arguments: ["handle": .variable("handle")]),
+        .field("menu", Menu.self, arguments: ["handle": .variable("handle")]),
       ] }
 
-      public var mainMenu: MainMenu { __data["mainMenu"] }
+      public var menu: Menu { __data["menu"] }
 
-      /// MainMenu
+      /// Menu
       ///
       /// Parent Type: `Menu`
-      public struct MainMenu: BFFGraphAPI.SelectionSet {
+      public struct Menu: BFFGraphAPI.SelectionSet {
         public let __data: DataDict
         public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -49,7 +49,7 @@ public extension BFFGraphAPI {
         public var title: String? { __data["title"] }
         public var items: [Item] { __data["items"] }
 
-        /// MainMenu.Item
+        /// Menu.Item
         ///
         /// Parent Type: `MenuItem`
         public struct Item: BFFGraphAPI.SelectionSet {
@@ -70,7 +70,7 @@ public extension BFFGraphAPI {
           public var url: String? { __data["url"] }
           public var items: [Item?]? { __data["items"] }
 
-          /// MainMenu.Item.Item
+          /// Menu.Item.Item
           ///
           /// Parent Type: `MenuItem`
           public struct Item: BFFGraphAPI.SelectionSet {
@@ -91,7 +91,7 @@ public extension BFFGraphAPI {
             public var url: String? { __data["url"] }
             public var items: [Item?]? { __data["items"] }
 
-            /// MainMenu.Item.Item.Item
+            /// Menu.Item.Item.Item
             ///
             /// Parent Type: `MenuItem`
             public struct Item: BFFGraphAPI.SelectionSet {

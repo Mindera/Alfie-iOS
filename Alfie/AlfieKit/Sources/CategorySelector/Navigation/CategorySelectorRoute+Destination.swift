@@ -10,8 +10,6 @@ import Wishlist
 public extension CategorySelectorRoute {
     @ViewBuilder
     func destination(
-        isRoot: Bool,
-        isWishlistEnabled: Bool,
         categoriesViewModel: () -> some CategoriesViewModelProtocol,
         accountViewModel: () -> some AccountViewModelProtocol,
         myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView,
@@ -25,13 +23,11 @@ public extension CategorySelectorRoute {
     ) -> some View {
         switch self {
         case .categorySelector:
-            ShopView(
-                isRoot: isRoot,
-                isWishlistEnabled: isWishlistEnabled,
-                categoriesViewModel: categoriesViewModel()
-            ) {
-                navigate($0)
-            }
+            // `navigate(.categorySelector)` pops to root rather than pushing, so this normally isn't
+            // reached — the live root ShopView (with its search bar) is built in
+            // CategorySelectorFlowView.body. Render the categories list as a safe fallback rather than
+            // a blank screen if the route is ever pushed (deep link, future call site).
+            CategoriesView(viewModel: categoriesViewModel())
 
         case .myAccount(let myAccountRoute):
             myAccountRoute.destination(

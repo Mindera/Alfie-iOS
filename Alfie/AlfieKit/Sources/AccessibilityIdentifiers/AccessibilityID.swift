@@ -19,6 +19,12 @@ public enum AccessibilityID {
         public static let retryButton = "categories.retry.button"
     }
 
+    // MARK: - Shop
+
+    public enum Shop {
+        public static let searchInput = "shop.search.input"
+    }
+
     // MARK: - Splash
 
     public enum Splash {
@@ -69,7 +75,6 @@ public enum AccessibilityID {
     public enum Home {
         public static let titleHeader = "home.title.header"
         public static let searchInput = "home.search.input"
-        public static let searchBackButton = "home.search.back.button"
     }
 
     // MARK: - Account

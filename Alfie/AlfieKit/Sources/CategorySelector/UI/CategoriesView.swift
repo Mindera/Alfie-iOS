@@ -38,7 +38,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     private var scrollContent: some View {
         ScrollView {
             if !viewModel.state.didFail {
-                LazyVStack(spacing: Primitives.Spacing.spacing0) {
+                LazyVStack(spacing: theme.spacing.space0) {
                     ForEach(viewModel.categories, id: \.id) { category in
                         if viewModel.state.isLoading {
                             placeholderView(category)
@@ -56,12 +56,18 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
         }
     }
 
+    // Root (level 1) menu uses the larger body style; drill-down levels step down to body medium (Figma).
+    private var rowFont: ThemedTypographyStyle {
+        viewModel.isRoot ? theme.font.body.large : theme.font.body.medium
+    }
+
     private func categoryView(_ category: NavigationItem) -> some View {
         // Chevron signals a drill-down; leaves (no sub-menu) go straight to the PLP, so hide it.
         categoriesListItem(
             for: category.title,
+            font: rowFont,
             isShimmering: false,
-            foregroundColor: Primitives.Colours.neutrals700,
+            foregroundColor: Theme.contentContentPrimary,
             showChevron: category.hasSubCategories
         )
             .modifier(
@@ -74,7 +80,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private func placeholderView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title, isShimmering: true, foregroundColor: Primitives.Colours.neutrals400, showChevron: true)
+        categoriesListItem(for: category.title, font: rowFont, isShimmering: true, foregroundColor: Theme.contentContentPrimaryDisabled, showChevron: true)
     }
 
     private var errorView: some View {
@@ -101,27 +107,25 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
         )
     }
 
-    private func categoriesListItem(for text: String, isShimmering: Bool, foregroundColor: Color, showChevron: Bool) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
-            HStack {
-                Text.build(theme.font.body.medium(text))
+    private func categoriesListItem(for text: String, font: ThemedTypographyStyle, isShimmering: Bool, foregroundColor: Color, showChevron: Bool) -> some View {
+        HStack {
+            Text.build(font(text))
+                .foregroundStyle(foregroundColor)
+                .shimmering(while: .constant(isShimmering))
+            Spacer()
+            if showChevron {
+                Icon.chevronRight.image
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: Constants.chevronSize, height: Constants.chevronSize)
                     .foregroundStyle(foregroundColor)
-                    .shimmering(while: .constant(isShimmering))
-                Spacer()
-                if showChevron {
-                    Icon.chevronRight.image
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .foregroundStyle(foregroundColor)
-                }
+                    // Decorative drill-down affordance — the row Button already announces the title.
+                    .accessibilityHidden(true)
             }
-            .frame(height: Constants.categoryViewHeight)
-
-            ThemedDivider.horizontalThin
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .frame(height: Constants.categoryViewHeight)
+        .padding(.horizontal, theme.spacing.space200)
     }
 }
 
@@ -130,9 +134,8 @@ private enum AccessibilityId {
 }
 
 private enum Constants {
-    static let segmentedControlHeight: CGFloat = 46
-    static let chevronSize: CGFloat = 16
-    static let categoryViewHeight: CGFloat = 56
+    static let chevronSize: CGFloat = Sizing.iconsIconMedium
+    static let categoryViewHeight: CGFloat = 48
 }
 
 // MARK: - CategoriesToolbarModifier

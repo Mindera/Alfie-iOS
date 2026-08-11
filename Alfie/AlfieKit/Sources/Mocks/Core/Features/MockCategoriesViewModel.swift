@@ -8,6 +8,7 @@ public class MockCategoriesViewModel: CategoriesViewModelProtocol {
     public var title = ""
     public var shouldShowToolbar = false
     public var canRefresh = true
+    public var isRoot = true
 
     public init(state: ViewState<CategoriesViewStateModel, CategoriesViewErrorType> = .loading,
                 categories: [NavigationItem] = []) {

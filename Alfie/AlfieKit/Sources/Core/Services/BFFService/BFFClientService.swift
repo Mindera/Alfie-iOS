@@ -54,7 +54,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     public func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem] {
         let menuHandle = handle.bffMenuHandle
-        log.info("mainMenu → handle=\(menuHandle)")
+        log.info("menu → handle=\(menuHandle)")
 
         do {
             // The menu is never served from cache: the normalized cache has no TTL, so a cached menu
@@ -62,17 +62,17 @@ public final class BFFClientService: BFFClientServiceProtocol {
             let items = try await executeFetch(
                 BFFGraphAPI.MainMenuQuery(handle: menuHandle),
                 cachePolicy: .fetchIgnoringCacheData
-            ).mainMenu.convertToNavigationItems()
+            ).menu.convertToNavigationItems()
             if items.isEmpty {
                 // Menu returned but nothing was actionable — no recognizable collection links.
                 // Surfaces an otherwise-silent empty Shop screen.
-                log.error("mainMenu ← 0 actionable categories (no recognizable collection links)")
+                log.error("menu ← 0 actionable categories (no recognizable collection links)")
             } else {
-                log.info("mainMenu ← items=\(items.count)")
+                log.info("menu ← items=\(items.count)")
             }
             return items
         } catch {
-            log.error("mainMenu failed: \(error)")
+            log.error("menu failed: \(error)")
             throw error
         }
     }

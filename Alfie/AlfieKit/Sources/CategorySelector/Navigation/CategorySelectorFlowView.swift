@@ -10,16 +10,11 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
     public var body: some View {
         NavigationStack(path: $viewModel.path) {
             ShopView(
-                isRoot: true,
-                isWishlistEnabled: viewModel.isWishlistEnabled,
-                categoriesViewModel: viewModel.makeCategoriesViewModel()
-            ) {
-                viewModel.navigate($0)
-            }
+                categoriesViewModel: viewModel.makeCategoriesViewModel(),
+                didTapSearch: { viewModel.presentSearch() }
+            )
             .navigationDestination(for: CategorySelectorRoute.self) { route in
                 route.destination(
-                    isRoot: false,
-                    isWishlistEnabled: viewModel.isWishlistEnabled,
                     categoriesViewModel: viewModel.makeCategoriesViewModel,
                     accountViewModel: viewModel.makeAccountViewModel,
                     myAccountIntentViewBuilder: viewModel.myAccountIntentViewBuilder,

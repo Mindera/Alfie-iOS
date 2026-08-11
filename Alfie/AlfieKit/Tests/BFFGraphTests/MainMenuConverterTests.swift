@@ -207,7 +207,7 @@ final class MainMenuConverterTests: XCTestCase {
 // MARK: - Test factory
 
 private extension MainMenuConverterTests {
-    func makeMenu(items: [Mock<MenuItem>]) -> BFFGraphAPI.MainMenuQuery.Data.MainMenu {
-        BFFGraphAPI.MainMenuQuery.Data.MainMenu.from(Mock<Menu>(handle: "main-menu", items: items, title: "Main"))
+    func makeMenu(items: [Mock<MenuItem>]) -> BFFGraphAPI.MainMenuQuery.Data.Menu {
+        BFFGraphAPI.MainMenuQuery.Data.Menu.from(Mock<Menu>(handle: "main-menu", items: items, title: "Main"))
     }
 }
