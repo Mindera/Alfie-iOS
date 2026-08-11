@@ -21,6 +21,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var shouldShowMediaPaginatedControl = true
     public var hasSingleImage: Bool = false
     public var priceType: PriceType? = nil
+    public var selectedColourName: String?
+    public var productReference: String?
 
     public init(state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading,
                 productId: String = "",
@@ -28,6 +30,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 productName: String = "",
                 productImageUrls: [URL] = [],
                 productDescription: String = "",
+                selectedColourName: String? = nil,
+                productReference: String? = nil,
                 colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: []),
                 sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: []),
                 complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = [],
@@ -39,6 +43,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.productName = productName
         self.productImageUrls = productImageUrls
         self.productDescription = productDescription
+        self.selectedColourName = selectedColourName
+        self.productReference = productReference
         self.colorSelectionConfiguration = colorSelectionConfiguration
         self.sizingSelectionConfiguration = sizingSelectionConfiguration
         self.complementaryInfoToShow = complementaryInfoToShow

@@ -127,3 +127,6 @@ Alfie/AlfieKit/apollo-ios-cli
 !*.secret
 Alfie/Alfie/Configuration/Debug/GoogleService-Info.plist
 Alfie/Alfie/Configuration/Release/GoogleService-Info.plist
+
+# Local working notes — not part of the repo
+.scratch/

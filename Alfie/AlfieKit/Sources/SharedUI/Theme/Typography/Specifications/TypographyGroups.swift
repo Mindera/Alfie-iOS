@@ -48,17 +48,20 @@ public struct TypographyHeading {
 public struct TypographyBody {
     public let large: ThemedTypographyStyle
     public let medium: ThemedTypographyStyle
+    public let mediumBold: ThemedTypographyStyle
     public let mediumStrikethrough: ThemedTypographyStyle
     public let small: ThemedTypographyStyle
 
     public init(
         large: ThemedTypographyStyle = .init(style: Typography.Body.large),
         medium: ThemedTypographyStyle = .init(style: Typography.Body.medium),
+        mediumBold: ThemedTypographyStyle = .init(style: Typography.Body.mediumBold),
         mediumStrikethrough: ThemedTypographyStyle = .init(style: Typography.Body.mediumStrikethrough),
         small: ThemedTypographyStyle = .init(style: Typography.Body.small)
     ) {
         self.large = large
         self.medium = medium
+        self.mediumBold = mediumBold
         self.mediumStrikethrough = mediumStrikethrough
         self.small = small
     }

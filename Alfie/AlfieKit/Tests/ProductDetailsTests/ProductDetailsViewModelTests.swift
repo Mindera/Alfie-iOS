@@ -683,7 +683,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(Primitives.Colours.neutrals900))
+        XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
     }
 
     func test_state_has_selected_variant_when_color_is_selected() {

@@ -5,27 +5,18 @@ import Core
 import Mocks
 #endif
 import Model
-import OrderedCollections
 import SharedUI
 import SwiftUI
 import Utils
 
 public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
-    @Environment(\.tabBarSize) private var tabBarSize
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
     @State private var showSizeSheet = false
-    @State private var showDetailsSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
-    @State private var carouselSize: CGSize = .zero
-    @State private var viewSize: CGSize = .zero
     @State private var colorSelectorSize: CGSize = .zero
-    @State private var bottomSheetCurrentDetent = PresentationDetent.height(0)
-    // store the detents before navigation to restore afterwards
-    @State private var bottomSheetDetentBeforeNavigation: PresentationDetent?
-    @State private var bottomSheetDetents: OrderedSet<PresentationDetent> = [PresentationDetent.height(0)]
     @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
     @State private var hasSpaceForSizeSelector = true
@@ -33,11 +24,15 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
     // There are multiple types of color pickers, but they all depend on the same conditions
     private var canShowColorPickers: Bool {
-        viewModel.colorSelectionConfiguration.items.count > 1
+        ProductDetailsLayoutRules.colourLayout(
+            forColourCount: viewModel.colorSelectionConfiguration.items.count
+        ) != .summaryOnly
     }
 
     private var canShowSizePickers: Bool {
-        viewModel.sizingSelectionConfiguration.items.count > 6
+        ProductDetailsLayoutRules.sizeLayout(
+            forSizeCount: viewModel.sizingSelectionConfiguration.items.count
+        ) == .verticalList
     }
 
     private var isOneSize: Bool {
@@ -54,7 +49,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         return productStockCount != 0
     }
 
-    // TODO: remove showFailureState (created for snapshot purposes)
+    // showFailureState is driven by the view model; the flag lets the error-state snapshot render it.
     public init(viewModel: ViewModel, showFailureState: Bool = false) {
         _showFailureState = State(initialValue: showFailureState)
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -67,7 +62,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     .padding(.horizontal, horizontalPadding)
             } else {
                 pdpView
-                    .writingSize(to: $viewSize)
             }
         }
         .toolbarView(
@@ -86,27 +80,27 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
             }
         }
         .onChange(of: viewModel.state.didFail) { newValue in
-            if newValue {
-                // give the sheet time to dismiss in case we catch it in the middle of the presentation
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    showDetailsSheet = false
-                    showFailureState = true
-                }
-            } else {
-                showFailureState = false
-            }
+            showFailureState = newValue
         }
     }
 
-    @ViewBuilder private var pdpView: some View {
-        if isIpad {
-            legacyPDPView
-        } else {
-            if #available(iOS 16.4, *) {
-                iPhonePDPView
-            } else {
-                legacyPDPView
+    private var pdpView: some View {
+        ScrollView {
+            VStack(spacing: theme.spacing.space0) {
+                mediaCarousel
+                complementaryViews
             }
+        }
+        .scrollIndicators(.hidden)
+        .padding(.horizontal, horizontalPadding)
+        .fullScreenCover(isPresented: $isMediaFullScreen) {
+            fullscreenMediaCarousel
+        }
+        .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }) {
+            colorSheet
+        }
+        .sheet(isPresented: $showSizeSheet) {
+            sizeSheet
         }
     }
 
@@ -117,7 +111,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 itemsCount: viewModel.productImageUrls.count,
                 selectedIndex: $currentMediaIndex
             )
-            .frame(maxHeight: Primitives.Spacing.spacing16)
+            .frame(maxHeight: theme.spacing.space200)
             .shimmering(
                 while: shimmeringBinding(for: .mediaCarousel),
                 animateOnStateTransition: false,
@@ -126,81 +120,14 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         }
     }
 
-    @available(iOS 16.4, *)
-    // swiftlint:disable:next attributes
-    private var iPhonePDPView: some View {
-        VStack {
-            mediaCarousel
-            Spacer()
-        }
-        .padding(.horizontal, horizontalPadding)
-        .task {
-            showDetailsSheet = true
-        }
-        .onAppear {
-            if let bottomSheetDetentBeforeNavigation {
-                bottomSheetCurrentDetent = bottomSheetDetentBeforeNavigation
-                showDetailsSheet = true
-            }
-        }
-        .onChange(of: viewSize) { newValue in
-            if newValue != .zero {
-                setupDetents(with: newValue)
-            }
-        }
-        .sheet(isPresented: $showDetailsSheet) {
-            popupView
-                .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
-                    colorSheet
-                        .presentationBackgroundInteraction(.enabled)
-                })
-                .sheet(isPresented: $showSizeSheet) {
-                    sizeSheet
-                        .presentationBackgroundInteraction(.enabled)
-                }
-                .fullScreenCover(isPresented: $isMediaFullScreen) {
-                    fullscreenMediaCarousel
-                }
-        }
-    }
-
-    private var legacyPDPView: some View {
-        VStack {
-            ScrollView {
-                mediaCarousel
-                complementaryViews
-                    .padding(.horizontal, horizontalPadding)
-            }
-            addToBag
-        }
-        .fullScreenCover(isPresented: $isMediaFullScreen) {
-            fullscreenMediaCarousel
-        }
-        .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }, content: {
-            colorSheet
-        })
-    }
-
     // MARK: - Helpers
-
-    private func setupDetents(with viewSize: CGSize) {
-        let collapsedDetent = PresentationDetent.height(viewSize.height + tabBarSize.height - carouselSize.height)
-        let expandedDetent = PresentationDetent.height(viewSize.height + tabBarSize.height)
-
-        bottomSheetDetents = [
-            collapsedDetent,
-            expandedDetent,
-        ]
-
-        bottomSheetCurrentDetent = collapsedDetent
-    }
 
     private func shimmeringBinding(for section: ProductDetailsSection) -> Binding<Bool> {
         .init(get: { viewModel.shouldShowLoading(for: section) }, set: { _ in })
     }
 
     private var horizontalPadding: CGFloat {
-        isIpad ? Primitives.Spacing.spacing40 : Primitives.Spacing.spacing16
+        isIpad ? theme.spacing.space500 : theme.spacing.space200
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
@@ -250,37 +177,18 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
 // MARK: - Sections
 extension ProductDetailsView {
-    @available(iOS 16.4, *)
-    // swiftlint:disable:next attributes
-    private var popupView: some View {
-        VStack {
-            ScrollView(showsIndicators: false) {
-                complementaryViews
-                    .padding([.horizontal, .top], Primitives.Spacing.spacing16)
-            }
+    /// contains every view except the media carousel
+    private var complementaryViews: some View {
+        VStack(alignment: .leading, spacing: theme.spacing.space100) {
+            titleHeader
 
-            VStack {
+            price
+
+            VStack(spacing: theme.spacing.space100) {
                 addToBag
                 addToWishlist
             }
-            .padding(.vertical, Primitives.Spacing.spacing8)
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-        }
-        .presentationDetents(Set(bottomSheetDetents), selection: $bottomSheetCurrentDetent)
-        .presentationDragIndicator(.hidden)
-        .presentationBackgroundInteraction(.enabled)
-        .interactiveDismissDisabled()
-        .persistentSystemOverlays(.hidden)
-    }
-
-    /// contains every view except the media carousel
-    private var complementaryViews: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
-            titleHeader
-
-            Spacer()
-
-            price
+            .padding(.vertical, theme.spacing.space100)
 
             colorSelector
 
@@ -289,16 +197,14 @@ extension ProductDetailsView {
             }
 
             descriptionTab
-                .padding(.vertical, Primitives.Spacing.spacing16)
+                .padding(.vertical, theme.spacing.space200)
 
             complementaryInfo
-
-            Spacer()
         }
     }
 
     var mediaCarousel: some View {
-        VStack(spacing: Primitives.Spacing.spacing16) {
+        VStack(spacing: theme.spacing.space200) {
             SnapCarousel(
                 areItemsLoading: shimmeringBinding(for: .mediaCarousel),
                 itemIndex: $currentMediaIndex,
@@ -312,19 +218,18 @@ extension ProductDetailsView {
                                 .resizable()
                                 .onTapGesture { isMediaFullScreen = true }
                         },
-                        placeholder: { Primitives.Colours.neutrals100 },
-                        failure: { _ in Primitives.Colours.neutrals900 }
+                        placeholder: { Theme.surfaceForegroundPrimary },
+                        failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
                     )
                     .cornerRadius(Sizing.radiusSoft)
                 }
             }
-            .padding(.top, Primitives.Spacing.spacing16)
-            .padding(.bottom, viewModel.hasSingleImage ? Primitives.Spacing.spacing16 : Primitives.Spacing.spacing0)
+            .padding(.top, theme.spacing.space200)
+            .padding(.bottom, viewModel.hasSingleImage ? theme.spacing.space200 : theme.spacing.space0)
             .disabled(isMediaFullScreen)
             paginatedControl
-                .padding(.bottom, Primitives.Spacing.spacing16)
+                .padding(.bottom, theme.spacing.space200)
         }
-        .writingSize(to: $carouselSize)
         .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
     }
 
@@ -338,8 +243,8 @@ extension ProductDetailsView {
                             .resizable()
                             .scaledToFit()
                     },
-                    placeholder: { Primitives.Colours.neutrals100 },
-                    failure: { _ in Primitives.Colours.neutrals900 }
+                    placeholder: { Theme.surfaceForegroundPrimary },
+                    failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
                 )
             }
         }
@@ -347,9 +252,9 @@ extension ProductDetailsView {
 
     @ViewBuilder private var titleHeader: some View {
         if viewModel.shouldShow(section: .titleHeader) {
-            HStack(spacing: Primitives.Spacing.spacing0) {
+            HStack(spacing: theme.spacing.space0) {
                 Text.build(theme.font.body.medium(viewModel.productName))
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(Theme.contentContentPrimary)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productTitle)
@@ -382,7 +287,7 @@ extension ProductDetailsView {
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             if hasSpaceForSizeSelector {
-                VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
+                VStack(alignment: .leading, spacing: theme.spacing.space150) {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.colorSelectionConfiguration,
                         isExpandable: canShowColorPickers
@@ -394,7 +299,7 @@ extension ProductDetailsView {
                         ColorSelectorComponentView(
                             configuration: viewModel.colorSelectionConfiguration,
                             layoutConfiguration: .init(
-                                arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8, scrollable: false),
+                                arrangement: .horizontal(itemSpacing: theme.spacing.space100, scrollable: false),
                                 hideSelectionTitle: true,
                                 hideOnSingleColor: false
                             ),
@@ -414,10 +319,10 @@ extension ProductDetailsView {
             } else if canShowColorPickers {
                 if let selectedColor = viewModel.colorSelectionConfiguration.selectedItem {
                     PickerMenu(isModalPresented: $showColorSheet) {
-                        HStack(spacing: Primitives.Spacing.spacing8) {
+                        HStack(spacing: theme.spacing.space100) {
                             ColorSwatchView(item: selectedColor, swatchSize: .normal, isSelected: false)
                             Text.build(theme.font.body.small(selectedColor.name.capitalized))
-                                .foregroundStyle(Primitives.Colours.neutrals800)
+                                .foregroundStyle(Theme.contentContentPrimary)
                         }
                     }
                     .id(selectedColor.id)
@@ -428,7 +333,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing12) {
+            VStack(alignment: .leading, spacing: theme.spacing.space150) {
                 if viewModel.canShowSizeSelector {
                     ColorAndSizingSelectorHeaderView(
                         configuration: viewModel.sizingSelectionConfiguration,
@@ -458,15 +363,15 @@ extension ProductDetailsView {
             : L10n.Product.OneSize.title
         HStack {
             Text.build(theme.font.body.small(L10n.Product.Size.title + ":"))
-                .foregroundStyle(Primitives.Colours.neutrals800)
+                .foregroundStyle(Theme.contentContentPrimary)
             Text.build(theme.font.body.small(sizeText))
-                .foregroundStyle(Primitives.Colours.neutrals800)
+                .foregroundStyle(Theme.contentContentPrimary)
         }
     }
 
     @ViewBuilder private var complementaryInfo: some View {
         if viewModel.shouldShow(section: .complementaryInfo) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 ForEach(Array(viewModel.complementaryInfoToShow.enumerated()), id: \.0) { index, type in
                     complementaryInfoCell(type: type, showTopDivider: index == 0)
                 }
@@ -476,16 +381,16 @@ extension ProductDetailsView {
 
     @ViewBuilder private var descriptionTab: some View {
         if viewModel.shouldShow(section: .productDescription) {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
+            VStack(alignment: .leading, spacing: theme.spacing.space200) {
                 TabControl(
                     theme: .dark,
-                    configuration: .fixedSize(horizontalMargins: Primitives.Spacing.spacing16),
+                    configuration: .fixedSize(horizontalMargins: theme.spacing.space200),
                     options: [TabControl.TabOption(title: L10n.Pdp.TabControl.DescriptionOption.title)],
                     currentIndex: $currentDescriptionTabIndex
                 )
 
                 Text.build(theme.font.body.medium(viewModel.productDescription))
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(Theme.contentContentPrimary)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
             }
         }
@@ -493,7 +398,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 let addToBagText = L10n.Product.AddToBag.Button.cta
                 let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
@@ -503,7 +408,8 @@ extension ProductDetailsView {
                         get: { !viewModel.isAddToBagEnabled },
                         set: { _ in }
                     ),
-                    isFullWidth: true
+                    isFullWidth: true,
+                    cornerRadius: Constants.ctaCornerRadius
                 ) {
                     viewModel.didTapAddToBag()
                 }
@@ -514,11 +420,12 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToWishlist: some View {
         if viewModel.shouldShow(section: .addToWishlist) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.spacing.space0) {
                 ThemedButton(
                     text: L10n.Product.AddToWishlist.Button.cta,
                     style: .secondary,
-                    isFullWidth: true
+                    isFullWidth: true,
+                    cornerRadius: Constants.ctaCornerRadius
                 ) {
                     viewModel.didTapAddToWishlist()
                 }
@@ -529,10 +436,12 @@ extension ProductDetailsView {
 
     @ViewBuilder private var errorView: some View {
         ErrorView(
-            spacing: Primitives.Spacing.spacing40,
+            spacing: theme.spacing.space500,
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(errorTitle),
             message: theme.font.body.medium(errorMessage),
+            // No Theme alias maps to neutrals600 (#4A4A4A) — see token-requests.md G3. Matches the
+            // other 16 consumers of this value, including WebView's error message.
             messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(cta: L10n.Pdp.ErrorView.GoBack.Button.cta) {
@@ -543,24 +452,24 @@ extension ProductDetailsView {
     }
 
     private func complementaryInfoCell(type: ProductDetailsComplementaryInfoType, showTopDivider: Bool) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.spacing.space0) {
             if showTopDivider {
                 ThemedDivider.horizontalThin
             }
 
-            HStack(spacing: Primitives.Spacing.spacing0) {
-                HStack(spacing: Primitives.Spacing.spacing0) {
+            HStack(spacing: theme.spacing.space0) {
+                HStack(spacing: theme.spacing.space0) {
                     Text.build(theme.font.body.medium(complementaryInfoTitle(for: type)))
-                        .foregroundStyle(Primitives.Colours.neutrals900)
-                        .padding(.leading, Primitives.Spacing.spacing8)
+                        .foregroundStyle(Theme.contentContentPrimary)
+                        .padding(.leading, theme.spacing.space100)
                     Spacer()
                     Icon.chevronRight.image
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .foregroundStyle(Primitives.Colours.neutrals900)
-                        .padding(.trailing, Primitives.Spacing.spacing8)
+                        .foregroundStyle(Theme.contentContentPrimary)
+                        .padding(.trailing, theme.spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }
@@ -568,8 +477,6 @@ extension ProductDetailsView {
             .modifier(
                 TapHighlightableModifier {
                     guard let feature = viewModel.complementaryInfoWebFeature(for: type) else { return }
-                    showDetailsSheet = false
-                    bottomSheetDetentBeforeNavigation = bottomSheetCurrentDetent
                     viewModel.openWebFeature(feature)
                 }
             )
@@ -581,13 +488,13 @@ extension ProductDetailsView {
 }
 
 private enum Constants {
+    /// The design draws the call-to-action and wishlist buttons square, unlike the 4pt default.
+    static let ctaCornerRadius: CGFloat = 0
     static let minTitleHeight = 20.0
     static let minColorSelectorHeight = 26.0
     static let chevronSize: CGFloat = 16
-    static let sheetCloseIconSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210
-    static let colorChevronSize: CGFloat = 16
 }
 
 #if DEBUG

@@ -3,8 +3,8 @@ import Model
 
 extension Product {
     public static func fixture(id: String = UUID().uuidString,
-                               styleNumber: String = String(UUID().uuidString.prefix(8)),
-                               name: String = "",
+                               styleNumber: String = "0273393",
+                               name: String = "Nolita SW Signature Loafer",
                                brand: Brand = .fixture(),
                                shortDescription: String = "",
                                longDescription: String? = nil,
@@ -48,7 +48,7 @@ extension Product.Variant {
 extension Product.Colour {
     public static func fixture(id: String = UUID().uuidString,
                                swatch: MediaImage? = nil,
-                               name: String = "",
+                               name: String = "Black",
                                media: [Media] = []) -> Product.Colour {
         .init(id: id,
               swatch: swatch,

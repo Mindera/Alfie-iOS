@@ -8,7 +8,8 @@ final class TypographyStyleFontTests: XCTestCase {
     private let allStyles: [TypographyStyle] = [
         Typography.Display.large, Typography.Display.medium, Typography.Display.small,
         Typography.Heading.large, Typography.Heading.medium, Typography.Heading.small, Typography.Heading.xSmall,
-        Typography.Body.large, Typography.Body.medium, Typography.Body.mediumStrikethrough, Typography.Body.small,
+        Typography.Body.large, Typography.Body.medium, Typography.Body.mediumBold,
+        Typography.Body.mediumStrikethrough, Typography.Body.small,
         Typography.Label.small, Typography.Label.smallBold,
         Typography.Link.medium, Typography.Link.small,
     ]
@@ -23,6 +24,22 @@ final class TypographyStyleFontTests: XCTestCase {
         for style in allStyles {
             XCTAssertEqual(style.uiFont.pointSize, style.fontSize, "pointSize must equal token fontSize")
         }
+    }
+
+    func test_bodyMediumBold_isMediumWeight_whileBodyMedium_isRegular() {
+        XCTAssertEqual(Typography.Body.mediumBold.fontWeight, 500)
+        XCTAssertEqual(Typography.Body.medium.fontWeight, 400)
+    }
+
+    func test_withSize_preservesWeight() throws {
+        // The price resizes the token font per PriceSize. If `withSize` dropped the weight, the
+        // price would silently render regular — so this pins the behaviour the call site relies on.
+        let resized = Typography.Body.mediumBold.uiFont.withSize(14)
+        let traits = resized.fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
+        let weight = try XCTUnwrap(traits?[.weight] as? CGFloat)
+        // Descriptor traits round-trip through floating point, so compare with a tolerance.
+        XCTAssertEqual(weight, UIFont.Weight.medium.rawValue, accuracy: 0.001)
+        XCTAssertEqual(resized.pointSize, 14)
     }
 
     func test_weightMapping_400isRegular_500isMedium() {

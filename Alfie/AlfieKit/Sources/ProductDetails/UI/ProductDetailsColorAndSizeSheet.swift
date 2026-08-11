@@ -43,9 +43,8 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
     var body: some View {
         VStack {
             HStack {
-                Text(title)
-                    .font(Font(theme.font.body.medium.uiFont.withSize(18)))
-                    .foregroundStyle(Primitives.Colours.neutrals800)
+                Text.build(theme.font.body.large(title))
+                    .foregroundStyle(Theme.contentContentPrimary)
 
                 Spacer()
 
@@ -56,19 +55,32 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
                         .resizable()
                         .scaledToFit()
                         .frame(size: Constants.sheetCloseIconSize)
-                        .foregroundStyle(Primitives.Colours.neutrals800)
+                        .foregroundStyle(Theme.contentContentPrimary)
                 }
                 .accessibilityLabel(Text(L10n.Accessibility.close))
             }
-            .padding([.top, .horizontal], Primitives.Spacing.spacing16)
+            .padding([.top, .horizontal], theme.spacing.space200)
 
             ThemedDivider.horizontalThin
-                .padding(.bottom, Primitives.Spacing.spacing8)
+                .padding(.bottom, theme.spacing.space100)
 
             itemsView
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
+        .backgroundInteractionEnabledIfAvailable()
+    }
+}
+
+private extension View {
+    /// The sheet is half-height, so the page stays visible behind it and must stay scrollable —
+    /// the behaviour the removed wrapper sheet used to provide.
+    @ViewBuilder func backgroundInteractionEnabledIfAvailable() -> some View {
+        if #available(iOS 16.4, *) {
+            presentationBackgroundInteraction(.enabled)
+        } else {
+            self
+        }
     }
 }
 
@@ -92,7 +104,7 @@ private extension ProductDetailsColorAndSizeSheet {
                         viewModel.colorSelectionConfiguration.selectedItem = item
                         isPresented = false
                     } label: {
-                        HStack(spacing: Primitives.Spacing.spacing16) {
+                        HStack(spacing: theme.spacing.space200) {
                             ColorSwatchView(
                                 item: item,
                                 swatchSize: .normal,
@@ -108,13 +120,13 @@ private extension ProductDetailsColorAndSizeSheet {
                             }
                         }
                     }
-                    .tint(Primitives.Colours.neutrals900)
+                    .tint(Theme.contentContentPrimary)
 
                     ThemedDivider.horizontalThin
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.horizontal, theme.spacing.space200)
+            .padding(.vertical, theme.spacing.space100)
         }
         .searchable(
             placeholder: L10n.Pdp.SearchColors.placeholder,
@@ -122,7 +134,7 @@ private extension ProductDetailsColorAndSizeSheet {
             searchText: $searchText,
             theme: .soft,
             dismissConfiguration: .init(type: .cancel(title: L10n.SearchBar.cancel)),
-            verticalSpacing: Primitives.Spacing.spacing16
+            verticalSpacing: theme.spacing.space200
         )
     }
 
@@ -134,7 +146,7 @@ private extension ProductDetailsColorAndSizeSheet {
                         viewModel.sizingSelectionConfiguration.selectedItem = item
                         isPresented = false
                     } label: {
-                        HStack(spacing: Primitives.Spacing.spacing16) {
+                        HStack(spacing: theme.spacing.space200) {
                             Text.build(theme.font.body.medium(item.name.capitalized))
 
                             Spacer()
@@ -144,14 +156,14 @@ private extension ProductDetailsColorAndSizeSheet {
                             }
                         }
                     }
-                    .padding(.vertical, Primitives.Spacing.spacing8)
-                    .tint(Primitives.Colours.neutrals900)
+                    .padding(.vertical, theme.spacing.space100)
+                    .tint(Theme.contentContentPrimary)
 
                     ThemedDivider.horizontalThin
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.horizontal, theme.spacing.space200)
+            .padding(.vertical, theme.spacing.space100)
         }
     }
 

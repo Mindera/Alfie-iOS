@@ -19,6 +19,11 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var shouldShowMediaPaginatedControl: Bool { get }
     var hasSingleImage: Bool { get }
     var priceType: PriceType? { get }
+    /// Selected variant's colour name, for the description metadata line.
+    /// Nil for single-option products and the no-variant fallback.
+    var selectedColourName: String? { get }
+    /// Selected variant's SKU, rendered as the product reference.
+    var productReference: String? { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool

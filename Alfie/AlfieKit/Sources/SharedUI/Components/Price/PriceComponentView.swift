@@ -205,10 +205,9 @@ public struct PriceComponentView: View {
     }
 
     private func priceText(_ price: String, textSize: CGFloat) -> Text {
-        // Figma price token is `body/medium-bold` (SF Pro Medium, weight 510) — `.medium`, not `.semibold`.
+        // Size still varies per `PriceSize`; the weight now comes from the token, not a modifier.
         Text(price)
-            .font(Font(theme.font.body.medium.uiFont.withSize(textSize)))
-            .fontWeight(.medium)
+            .font(Font(theme.font.body.mediumBold.uiFont.withSize(textSize)))
     }
 }
 
