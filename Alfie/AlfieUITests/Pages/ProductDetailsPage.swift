@@ -75,6 +75,7 @@ final class ProductDetailsPage {
         return self
     }
 
+    /// Only rendered for multi-colour products, so callers must check `exists` first.
     @discardableResult
     func tapColourSummary() -> Self {
         colourSummary.tap()
@@ -93,6 +94,10 @@ final class ProductDetailsPage {
         XCTAssertTrue(
             productName.waitForExistence(timeout: timeout),
             "Product Details product name should be visible"
+        )
+        XCTAssertTrue(
+            brandName.exists,
+            "Product Details brand line should be visible above the product name"
         )
     }
 }

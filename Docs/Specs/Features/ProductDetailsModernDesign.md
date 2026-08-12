@@ -54,7 +54,7 @@ AND the content order is: gallery, product info, _Add to Bag_, size selector, de
 **GIVEN** the shopper is on the _Product Details screen_
 **WHEN** the gallery renders
 **THEN** the images span the full screen width with no horizontal padding and no corner radius
-AND the gallery uses a 3:4 aspect ratio
+AND the gallery's height follows the image's own ratio rather than a fixed one
 AND the gallery does not extend behind the navigation header
 AND pagination indicators are overlaid near the bottom of the image, the selected one rendered as a wider pill
 
@@ -348,10 +348,47 @@ After this slice ships, the screen will **not** match the Figma frame. Four thin
 | Notify-me — makes the out-of-stock bell functional | No service exists |
 | Size guide — makes the link functional | No content and no destination exist |
 | Category-driven size layouts — image cards and price-delta cards | Product type is not selected in the query and no category-to-layout mapping is agreed |
+| A multi-image gallery — carousel paging and its indicators are unreachable in practice | The query never selects the product-level `images` array; see below |
 
 Additionally, the design's exact product-reference format cannot be reproduced: no reference or style-number field exists on the product or variant types, so the SKU is used instead.
 
 **State this plainly on the Jira ticket** so it is not discovered at design review.
+
+### The gallery can currently show only one image — needs its own ticket
+
+Found while verifying the gallery on the Shopify test store (2026-08-11). Not a defect in this slice;
+it predates it and is out of scope here.
+
+The schema exposes **four** image sources across two types, and the app selects only two:
+
+| Type | Field | Selected by the app? | Notes |
+|---|---|---|---|
+| `ProductVariant` | `media` — `[Image]` | ✅ the gallery source | `ProductDetailsFragment.graphql` |
+| `OmniProduct` | `primaryImage` — `Image` | ✅ but only as a fallback | one image, used when a variant carries no media (`ProductDetails+Converter.swift`) |
+| `OmniProduct` | `images` — `[Image!]!` | ❌ never requested | where product-level photography appears on the test store |
+| `OmniProduct` | `media` — `[Image]` | ❌ never requested | a second product-level collection; which one the BFF populates needs confirming |
+
+So `productImageUrls` resolves to *variant media, else a single `primaryImage`* — the ceiling is one
+image whenever a variant carries one or none. On the test store every product is a single implicit
+Shopify variant (`Title = Default`) with exactly one media entry, so:
+
+- the carousel never paginates and `shouldShowMediaPaginatedControl` is always `false`, leaving the
+  pagination indicators, swipe paging and the multi-ratio height rule **unexercised end to end**;
+- images added to a *product* in Shopify do not appear on the PDP unless they are also attached to
+  the variant.
+
+The fix is a product decision, not just a technical one. Options, cheapest first:
+
+1. **Attach the images to the variant** in the storefront — no code change; keeps per-colour photo
+   sets correct once real colour variants exist.
+2. **Union** variant media with the product-level collection, de-duplicated — richest gallery, but a
+   shopper viewing one colour may see photographs of another.
+3. **Prefer the product-level collection when a variant carries ≤ 1** — treats a lone variant image
+   as "no real gallery".
+
+Options 2 and 3 need a fragment change, converter work and Apollo codegen — and first a decision on
+which of `OmniProduct.images` and `OmniProduct.media` the BFF actually populates, since picking the
+wrong one silently yields an empty gallery.
 
 ---
 
@@ -415,3 +452,4 @@ Questionnaire: `.scratch/pdp-modern-design/to-questionnaire-pdp-control-behaviou
 | Date | Change |
 |---|---|
 | 2026-08-07 | Initial draft, synthesised from the resolved decision map at `.scratch/pdp-modern-design/map.md` |
+| 2026-08-11 | Recorded the single-image gallery limitation found while verifying slice 2 on the test store |

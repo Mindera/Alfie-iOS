@@ -67,6 +67,10 @@ public struct SnapCarousel<Content: View>: View {
                 ForEach(Array(replicatedItems.enumerated()), id: \.0) { _, item in
                     item
                         .frame(width: abs(itemWidth), height: fixedItemHeight.map { abs($0) })
+                        // Hug mode: the item must report the height it actually wants. Without this
+                        // it would answer with the height offered — which comes from this very
+                        // measurement — and the two would settle at the initial zero.
+                        .fixedSize(horizontal: false, vertical: fixedItemHeight == nil)
                         .shimmering(
                             while: areItemsLoading ?? .constant(false),
                             animateOnStateTransition: true,
@@ -109,7 +113,15 @@ public struct SnapCarousel<Content: View>: View {
         .frame(height: itemHeight)
         // Hug mode only: the tallest item decides the carousel's height.
         .onPreferenceChange(ItemHeightKey.self) { measuredHeight in
-            guard itemAspectRatio == nil, measuredHeight > 0 else { return }
+            guard itemAspectRatio == nil else { return }
+            // With no items there is nothing to measure and the preference falls back to zero, which
+            // must collapse the carousel rather than leave the last height stranded as a blank block.
+            guard !replicatedItems.isEmpty else {
+                itemHeight = 0
+                return
+            }
+            // Measurements carry float drift, so compare with a tolerance rather than for equality.
+            guard measuredHeight > 0, abs(measuredHeight - itemHeight) > 0.5 else { return }
             itemHeight = measuredHeight
         }
         .animation(.snappy, value: gestureOffset == 0)

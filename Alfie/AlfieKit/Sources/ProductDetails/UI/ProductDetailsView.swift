@@ -91,6 +91,8 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 mediaCarousel
                 complementaryViews
                     .padding(.horizontal, horizontalPadding)
+                    // Same bound as the gallery, so the two stay in one column on a wide screen.
+                    .frame(maxWidth: Constants.maxContentWidth)
             }
         }
         .scrollIndicators(.hidden)
@@ -142,8 +144,25 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         .init(get: { viewModel.shouldShowLoading(for: section) }, set: { _ in })
     }
 
+    private func stepMediaIndex(by offset: Int) {
+        let imageCount = viewModel.productImageUrls.count
+        guard imageCount > 1 else { return }
+        currentMediaIndex = (currentMediaIndex + offset + imageCount) % imageCount
+    }
+
     private var horizontalPadding: CGFloat {
         isIpad ? theme.spacing.space500 : theme.spacing.space200
+    }
+
+    /// The gallery when there is imagery, otherwise one empty slot while the product loads: the
+    /// carousel hugs its content, so with nothing to measure it would collapse and then shove the
+    /// information block down the moment the images arrive.
+    private var galleryImageUrls: [URL?] {
+        let urls = viewModel.productImageUrls
+        guard urls.isEmpty, viewModel.shouldShowLoading(for: .mediaCarousel) else {
+            return urls
+        }
+        return [nil]
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
@@ -220,8 +239,9 @@ extension ProductDetailsView {
     /// Full-bleed: the images fill the screen width, so there is no item spacing, no slice of the
     /// neighbouring image, and no corner radius. The gutter belongs to the content below.
     ///
-    /// The height is the image's own — the design's gallery hugs its content and each image carries
-    /// its own ratio variant (3:4 and 1:1 both exist), so nothing here fixes one.
+    /// The height comes from the imagery — the design's gallery hugs its content and each image
+    /// carries its own ratio variant (3:4 and 1:1 both exist), so nothing here fixes one. Where a set
+    /// mixes ratios the tallest wins, so paging never shifts the content below.
     var mediaCarousel: some View {
         SnapCarousel(
             areItemsLoading: shimmeringBinding(for: .mediaCarousel),
@@ -230,7 +250,7 @@ extension ProductDetailsView {
             shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
             showsAdjacentItemPeek: false
         ) {
-            viewModel.productImageUrls.map { url in
+            galleryImageUrls.map { url in
                 RemoteImage(
                     url: url,
                     success: { image in
@@ -252,9 +272,7 @@ extension ProductDetailsView {
                 )
             }
         }
-        // Inert on phones; on iPad a full-width 3:4 gallery would be taller than the screen and push
-        // the whole information block below the fold. Constraining width keeps the ratio intact.
-        .frame(maxWidth: Constants.maxGalleryWidth)
+        .frame(maxWidth: Constants.maxContentWidth)
         .frame(maxWidth: .infinity)
         .disabled(isMediaFullScreen)
         .overlay(alignment: .bottom) {
@@ -270,19 +288,21 @@ extension ProductDetailsView {
         .accessibilityHint(L10n.Pdp.Gallery.accessibilityHint)
         // The image's tap gesture is not reachable once the carousel is a single element.
         .accessibilityAction { isMediaFullScreen = true }
-        // The carousel pages by drag, which VoiceOver cannot perform — this is its only way through.
+        // The carousel pages by drag, which assistive technologies cannot perform. The adjustable
+        // action serves VoiceOver; the named actions serve Voice Control, Switch Control and Full
+        // Keyboard Access, which the replaced chevron control used to cover with real buttons.
         .accessibilityAdjustableAction { direction in
-            let imageCount = viewModel.productImageUrls.count
-            guard imageCount > 1 else { return }
             switch direction {
             case .increment:
-                currentMediaIndex = (currentMediaIndex + 1) % imageCount
+                stepMediaIndex(by: 1)
             case .decrement:
-                currentMediaIndex = (currentMediaIndex - 1 + imageCount) % imageCount
+                stepMediaIndex(by: -1)
             @unknown default:
                 break
             }
         }
+        .accessibilityAction(named: Text(L10n.Accessibility.nextPage)) { stepMediaIndex(by: 1) }
+        .accessibilityAction(named: Text(L10n.Accessibility.previousPage)) { stepMediaIndex(by: -1) }
         .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
     }
 
@@ -365,7 +385,9 @@ extension ProductDetailsView {
         if let priceType = viewModel.priceType {
             PriceComponentView(
                 type: priceType,
-                configuration: .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
+                // `.large` is the 16pt that `body/medium-bold` defines; `.small` would override the
+                // token down to 14pt.
+                configuration: .init(preferredDistribution: .horizontal, size: .large, textAlignment: .leading)
             )
         }
     }
@@ -591,8 +613,10 @@ private enum Constants {
     static let ctaCornerRadius: CGFloat = 0
     static let indicatorSize: CGFloat = 6
     static let selectedIndicatorWidth: CGFloat = 12
-    /// The gallery is full-bleed, but 3:4 at an iPad's full width is taller than the screen.
-    static let maxGalleryWidth: CGFloat = 500
+    /// Bounds the whole screen on a wide device: the gallery hugs its image, so at an iPad's full
+    /// width it would be taller than the screen and push the information block below the fold.
+    /// Applied to the gallery and the content block alike so they stay in one aligned column.
+    static let maxContentWidth: CGFloat = 500
     /// TOKEN GAP (G1): the design's unselected indicator is #CDCDCD. The theme has no *border*
     /// alias at that value — only `surfaceBackgroundTerciary`, a surface token — so a semantic
     /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.

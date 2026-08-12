@@ -4,8 +4,6 @@ import SwiftUI
 /// Collapsed colour representation for the product info block: the selected swatch plus a count of
 /// the remaining colours. Nothing in SharedUI covers this shape, hence a dedicated small component.
 public struct ColorSummaryView: View {
-    @ScaledMetric(relativeTo: .body) private var swatchSize: CGFloat = Constants.swatchBaseSize
-
     private let selectedItem: ColorSwatch
     private let remainingCount: Int
     private let action: () -> Void
@@ -20,7 +18,6 @@ public struct ColorSummaryView: View {
         Button(action: action) {
             HStack(spacing: theme.spacing.space100) {
                 ColorSwatchView(item: selectedItem, swatchSize: .small, isSelected: false)
-                    .frame(width: swatchSize, height: swatchSize)
                 Text.build(theme.font.body.medium(L10n.Pdp.ColourSummary.count(remainingCount)))
                     .foregroundStyle(Theme.contentContentPrimary)
             }
@@ -36,7 +33,6 @@ public struct ColorSummaryView: View {
 }
 
 private enum Constants {
-    static let swatchBaseSize: CGFloat = 24
     static let minTapTargetSize: CGFloat = 44
 }
 
