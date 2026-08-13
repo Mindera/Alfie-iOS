@@ -18,8 +18,7 @@ public struct SizingSwatchView: View {
         Text.build(theme.font.body.medium(item.name))
             .frame(maxWidth: .infinity)
             .lineLimit(1)
-            .padding(.vertical, theme.spacing.space100)
-            .padding(.horizontal, theme.spacing.space300)
+            .padding(theme.spacing.space100)
             .foregroundStyle(appearance.textColor)
             .background(
                 ZStack {
@@ -52,10 +51,12 @@ public struct SizingSwatchView: View {
     }
 
     /// Decoration only: notify-me has no service behind it yet, so the bell carries no tap target
-    /// and no accessibility label.
+    /// and no accessibility label. The design insets it from the corner rather than centring it.
     @ViewBuilder private var outOfStockBellView: some View {
         if appearance.isCrossedOut {
             ThemedIcon(.bell, tint: Theme.contentContentTerciary)
+                .padding(.top, theme.spacing.space050)
+                .padding(.trailing, theme.spacing.space025)
         }
     }
 }
