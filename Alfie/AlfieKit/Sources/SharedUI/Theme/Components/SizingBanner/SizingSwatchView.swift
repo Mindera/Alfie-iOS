@@ -16,7 +16,9 @@ public struct SizingSwatchView: View {
 
     public var body: some View {
         Text.build(theme.font.body.medium(item.name))
-            .frame(maxWidth: .infinity)
+            // The token's line height, which `Text` does not apply on its own — without it the chip
+            // renders 6pt shorter than the design and the bell reads oversized against it.
+            .frame(maxWidth: .infinity, minHeight: theme.font.body.medium.style.lineHeight)
             .lineLimit(1)
             .padding(theme.spacing.space100)
             .foregroundStyle(appearance.textColor)
@@ -44,7 +46,7 @@ public struct SizingSwatchView: View {
 
     @ViewBuilder private var outOfStockSlashView: some View {
         if appearance.isCrossedOut {
-            UnavailableCrossedOutShape()
+            UnavailableCrossedOutShape(direction: .topLeadingToBottomTrailing)
                 .stroke(appearance.borderColor, style: StrokeStyle(lineWidth: appearance.borderWidth))
                 .padding(appearance.borderWidth)
         }
