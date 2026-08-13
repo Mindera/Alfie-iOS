@@ -75,6 +75,10 @@ final class AlfieUITests: XCTestCase {
             expectedProductName = name
         }
 
+        XCTContext.runActivity(named: "Size Guide renders but is not a control") { _ in
+            pdp.assertSizeGuideIsInert()
+        }
+
         XCTContext.runActivity(named: "Add to bag") { _ in
             waitFor(pdp.addToBagButton, "Add to bag button should exist")
             pdp.tapAddToBag()

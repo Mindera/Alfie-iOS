@@ -5,6 +5,10 @@ public struct SizingSwatchView: View {
     private let item: SizingSwatch
     private let isSelected: Bool
 
+    private var appearance: SizingSwatchAppearance {
+        .resolve(for: item.state, isSelected: isSelected)
+    }
+
     public init(item: SizingSwatch, isSelected: Bool) {
         self.item = item
         self.isSelected = isSelected
@@ -14,47 +18,46 @@ public struct SizingSwatchView: View {
         Text.build(theme.font.body.medium(item.name))
             .frame(maxWidth: .infinity)
             .lineLimit(1)
-            .padding(.vertical, Constants.insetVertical)
-            .padding(.horizontal, Constants.insetHorizontal)
-            .foregroundStyle(textColor)
+            .padding(.vertical, theme.spacing.space100)
+            .padding(.horizontal, theme.spacing.space300)
+            .foregroundStyle(appearance.textColor)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                        .fill(isSelected ? Primitives.Colours.neutrals900 : .clear)
+                    // The design draws the chip square, so no corner radius token applies.
+                    Rectangle()
+                        .fill(appearance.backgroundColor)
 
-                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                        .inset(by: Constants.borderLineWidth)
-                        .stroke(
-                            item.state == .available ? Primitives.Colours.neutrals900 : Constants.disabledStateColor,
-                            lineWidth: Constants.borderLineWidth
-                        )
+                    Rectangle()
+                        .inset(by: appearance.borderWidth / 2)
+                        .stroke(appearance.borderColor, lineWidth: appearance.borderWidth)
 
                     outOfStockSlashView
                 }
             )
-    }
-
-    private var textColor: Color {
-        guard item.state == .available else {
-            return Constants.disabledStateColor
-        }
-        return isSelected ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals900
+            .overlay(alignment: .topTrailing) {
+                outOfStockBellView
+            }
+            .accessibilityElement(children: .combine)
+            // Selection is drawn as a border, which assistive technology cannot see.
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
+            .accessibilityValue(appearance.isCrossedOut ? L10n.Product.Size.OutOfStock.accessibilityValue : "")
     }
 
     @ViewBuilder private var outOfStockSlashView: some View {
-        if item.state == .outOfStock {
+        if appearance.isCrossedOut {
             UnavailableCrossedOutShape()
-                .stroke(Constants.disabledStateColor, style: StrokeStyle(lineWidth: Constants.borderLineWidth))
-                .padding(Constants.borderLineWidth)
+                .stroke(appearance.borderColor, style: StrokeStyle(lineWidth: appearance.borderWidth))
+                .padding(appearance.borderWidth)
         }
     }
-}
 
-private enum Constants {
-    static let disabledStateColor: Color = Primitives.Colours.neutrals500
-    static let insetVertical: CGFloat = Primitives.Spacing.spacing8
-    static let insetHorizontal: CGFloat = Primitives.Spacing.spacing24
-    static let borderLineWidth: CGFloat = 1
+    /// Decoration only: notify-me has no service behind it yet, so the bell carries no tap target
+    /// and no accessibility label.
+    @ViewBuilder private var outOfStockBellView: some View {
+        if appearance.isCrossedOut {
+            ThemedIcon(.bell, tint: Theme.contentContentTerciary)
+        }
+    }
 }
 
 @available(iOS 17, *)

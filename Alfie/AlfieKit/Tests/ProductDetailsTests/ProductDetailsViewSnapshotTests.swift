@@ -65,6 +65,30 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    /// The size run that wraps: every size stays inline whatever the count, so the second and third
+    /// rows keep the first row's chip width, and each chip state renders at once.
+    func test_productDetailsView_withManySizes() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.sizingSelectionConfiguration = .init(
+            items: [
+                .init(id: "1", name: "XS", state: .available),
+                .init(id: "2", name: "S", state: .available),
+                .init(id: "3", name: "M", state: .outOfStock),
+                .init(id: "4", name: "L", state: .available),
+                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "6", name: "XXL", state: .available),
+                .init(id: "7", name: "XXXL", state: .available),
+                .init(id: "8", name: "XXXXL", state: .outOfStock),
+            ],
+            selectedItem: .init(id: "2", name: "S", state: .available)
+        )
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)

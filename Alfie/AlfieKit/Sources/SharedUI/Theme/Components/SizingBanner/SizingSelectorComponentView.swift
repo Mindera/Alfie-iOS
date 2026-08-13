@@ -24,7 +24,10 @@ public struct SizingSelectorComponentView: View {
     }
 
     private func gridSwatches(columns: Int) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: columns)) {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: theme.spacing.space100), count: columns),
+            spacing: theme.spacing.space100
+        ) {
             swatches()
         }
     }

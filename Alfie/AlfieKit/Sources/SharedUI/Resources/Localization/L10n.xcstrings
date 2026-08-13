@@ -541,6 +541,28 @@
         }
       }
     },
+    "pdp.size_guide.link" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size Guide"
+          }
+        }
+      }
+    },
+    "pdp.size_selector.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Your Size"
+          }
+        }
+      }
+    },
     "pdp.tab_control.description_option.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -769,6 +791,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Out of Stock"
+          }
+        }
+      }
+    },
+    "product.size.out_of_stock.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Out of stock"
+          }
+        }
+      }
+    },
+    "product.size.selected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size: %@"
           }
         }
       }
