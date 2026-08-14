@@ -95,9 +95,9 @@ final class ProductDetailsPage {
             productName.waitForExistence(timeout: timeout),
             "Product Details product name should be visible"
         )
-        XCTAssertTrue(
-            brandName.waitForExistence(timeout: timeout),
-            "Product Details brand line should be visible above the product name"
-        )
+        // The brand line is deliberately NOT asserted here. It is omitted for a product with no
+        // brand, so any test that lands on such a product would fail on data rather than on a
+        // defect — and no timeout fixes that. Its shown/hidden behaviour is pinned instead by the
+        // two ProductDetailsView snapshots, which control the fixture.
     }
 }
