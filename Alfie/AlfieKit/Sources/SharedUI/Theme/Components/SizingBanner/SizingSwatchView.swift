@@ -47,7 +47,8 @@ public struct SizingSwatchView: View {
             )
     }
 
-    @ViewBuilder private func outOfStockSlashView(_ appearance: SizingSwatchAppearance) -> some View {
+    @ViewBuilder
+    private func outOfStockSlashView(_ appearance: SizingSwatchAppearance) -> some View {
         if appearance.isCrossedOut {
             UnavailableCrossedOutShape(direction: .topLeadingToBottomTrailing)
                 .stroke(appearance.borderColor, style: StrokeStyle(lineWidth: appearance.borderWidth))
@@ -57,7 +58,8 @@ public struct SizingSwatchView: View {
 
     /// Decoration only: notify-me has no service behind it yet, so the bell carries no tap target
     /// and no accessibility label. The design insets it from the corner rather than centring it.
-    @ViewBuilder private func outOfStockBellView(_ appearance: SizingSwatchAppearance) -> some View {
+    @ViewBuilder
+    private func outOfStockBellView(_ appearance: SizingSwatchAppearance) -> some View {
         if appearance.isCrossedOut {
             ThemedIcon(.bell, tint: Theme.contentContentTerciary)
                 .padding(.top, theme.spacing.space050)
@@ -69,7 +71,8 @@ public struct SizingSwatchView: View {
 private extension View {
     /// Mirrors `accessibilityLabelOrHidden`: a state with nothing to announce leaves the value
     /// unset rather than setting it to an empty string.
-    @ViewBuilder func accessibilityValueOrNone(_ value: String?) -> some View {
+    @ViewBuilder
+    func accessibilityValueOrNone(_ value: String?) -> some View {
         if let value {
             accessibilityValue(value)
         } else {
