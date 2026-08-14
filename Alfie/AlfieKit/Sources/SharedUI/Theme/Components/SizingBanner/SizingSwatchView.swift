@@ -15,7 +15,8 @@ public struct SizingSwatchView: View {
     }
 
     public var body: some View {
-        Text.build(theme.font.body.medium(item.name))
+        let appearance = self.appearance
+        return Text.build(theme.font.body.medium(item.name))
             // The token's line height, which `Text` does not apply on its own — without it the chip
             // renders 6pt shorter than the design and the bell reads oversized against it.
             .frame(maxWidth: .infinity, minHeight: theme.font.body.medium.style.lineHeight)
@@ -32,19 +33,21 @@ public struct SizingSwatchView: View {
                         .inset(by: appearance.borderWidth / 2)
                         .stroke(appearance.borderColor, lineWidth: appearance.borderWidth)
 
-                    outOfStockSlashView
+                    outOfStockSlashView(appearance)
                 }
             )
             .overlay(alignment: .topTrailing) {
-                outOfStockBellView
+                outOfStockBellView(appearance)
             }
             .accessibilityElement(children: .combine)
             // Selection is drawn as a border, which assistive technology cannot see.
             .accessibilityAddTraits(isSelected ? .isSelected : [])
-            .accessibilityValue(appearance.isCrossedOut ? L10n.Product.Size.OutOfStock.accessibilityValue : "")
+            .accessibilityValueOrNone(
+                appearance.isCrossedOut ? L10n.Product.Size.OutOfStock.accessibilityValue : nil
+            )
     }
 
-    @ViewBuilder private var outOfStockSlashView: some View {
+    @ViewBuilder private func outOfStockSlashView(_ appearance: SizingSwatchAppearance) -> some View {
         if appearance.isCrossedOut {
             UnavailableCrossedOutShape(direction: .topLeadingToBottomTrailing)
                 .stroke(appearance.borderColor, style: StrokeStyle(lineWidth: appearance.borderWidth))
@@ -54,11 +57,23 @@ public struct SizingSwatchView: View {
 
     /// Decoration only: notify-me has no service behind it yet, so the bell carries no tap target
     /// and no accessibility label. The design insets it from the corner rather than centring it.
-    @ViewBuilder private var outOfStockBellView: some View {
+    @ViewBuilder private func outOfStockBellView(_ appearance: SizingSwatchAppearance) -> some View {
         if appearance.isCrossedOut {
             ThemedIcon(.bell, tint: Theme.contentContentTerciary)
                 .padding(.top, theme.spacing.space050)
                 .padding(.trailing, theme.spacing.space025)
+        }
+    }
+}
+
+private extension View {
+    /// Mirrors `accessibilityLabelOrHidden`: a state with nothing to announce leaves the value
+    /// unset rather than setting it to an empty string.
+    @ViewBuilder func accessibilityValueOrNone(_ value: String?) -> some View {
+        if let value {
+            accessibilityValue(value)
+        } else {
+            self
         }
     }
 }
