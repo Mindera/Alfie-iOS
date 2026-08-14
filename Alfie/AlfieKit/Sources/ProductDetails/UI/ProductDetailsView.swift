@@ -157,12 +157,38 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     /// The gallery when there is imagery, otherwise one empty slot while the product loads: the
     /// carousel hugs its content, so with nothing to measure it would collapse and then shove the
     /// information block down the moment the images arrive.
-    private var galleryImageUrls: [URL?] {
+    /// The gallery takes its height from its content, so with no images it would collapse to nothing
+    /// and then shove the whole information block down once they arrive. An empty set reserves a
+    /// square instead. It cannot reserve with a url-less `RemoteImage`: that resolves to the failure
+    /// branch, which paints the inverted surface — a black block, not a neutral placeholder.
+    private var galleryItems: [AnyView] {
         let urls = viewModel.productImageUrls
-        guard urls.isEmpty, viewModel.shouldShowLoading(for: .mediaCarousel) else {
-            return urls
+        guard !urls.isEmpty else {
+            return [AnyView(Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit))]
         }
-        return [nil]
+        return urls.map { url in
+            AnyView(
+                RemoteImage(
+                    url: url,
+                    success: { image in
+                        image
+                            .resizable()
+                            // Fit at the full width: height follows the image's intrinsic ratio,
+                            // and nothing is cropped or stretched.
+                            .aspectRatio(contentMode: .fit)
+                            .onTapGesture { isMediaFullScreen = true }
+                    },
+                    // Neither has an intrinsic size, so both hold a square while the image resolves.
+                    // A loading reservation, not a design ratio.
+                    placeholder: {
+                        Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit)
+                    },
+                    failure: { _ in
+                        Theme.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
+                    }
+                )
+            )
+        }
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
@@ -250,27 +276,7 @@ extension ProductDetailsView {
             shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
             showsAdjacentItemPeek: false
         ) {
-            galleryImageUrls.map { url in
-                RemoteImage(
-                    url: url,
-                    success: { image in
-                        image
-                            .resizable()
-                            // Fit at the full width: height follows the image's intrinsic ratio,
-                            // and nothing is cropped or stretched.
-                            .aspectRatio(contentMode: .fit)
-                            .onTapGesture { isMediaFullScreen = true }
-                    },
-                    // Placeholder and failure have no intrinsic size, so they reserve a square until
-                    // the image resolves. A loading reservation, not a design ratio.
-                    placeholder: {
-                        Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit)
-                    },
-                    failure: { _ in
-                        Theme.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
-                    }
-                )
-            }
+            galleryItems
         }
         .frame(maxWidth: Constants.maxContentWidth)
         .frame(maxWidth: .infinity)
@@ -286,6 +292,9 @@ extension ProductDetailsView {
             L10n.Pdp.Gallery.accessibilityValue(currentMediaIndex + 1, viewModel.productImageUrls.count)
         )
         .accessibilityHint(L10n.Pdp.Gallery.accessibilityHint)
+        // The reserved slot is a placeholder, not an image — announcing "image 1 of 0" would be
+        // worse than announcing nothing.
+        .accessibilityHidden(viewModel.productImageUrls.isEmpty)
         // The image's tap gesture is not reachable once the carousel is a single element.
         .accessibilityAction { isMediaFullScreen = true }
         // The carousel pages by drag, which assistive technologies cannot perform. The adjustable

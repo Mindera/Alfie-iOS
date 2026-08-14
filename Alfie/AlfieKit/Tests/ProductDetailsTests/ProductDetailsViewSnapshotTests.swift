@@ -40,9 +40,10 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         viewModel.priceType = .default(price: "£450.00")
         // Deliberately no image URLs. Any real URL puts `RemoteImage` in a race between its empty
         // and failure branches — which paint very different colours over a third of the frame — and
-        // `defaultImage()` compares at full precision. The carousel still reserves its full-bleed
-        // 3:4 height, so the layout below it is positioned exactly as on the real screen.
-        // Consequence: the pagination indicators are NOT covered here; they need one image per dot.
+        // `defaultImage()` compares at full precision. With none, the gallery renders its reserved
+        // placeholder slot: a solid square, no network, no animation, so the full-bleed band and
+        // everything positioned below it are covered deterministically.
+        // Still NOT covered: the pagination indicators, which need one image per dot.
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),

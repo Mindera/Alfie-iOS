@@ -96,7 +96,7 @@ final class ProductDetailsPage {
             "Product Details product name should be visible"
         )
         XCTAssertTrue(
-            brandName.exists,
+            brandName.waitForExistence(timeout: timeout),
             "Product Details brand line should be visible above the product name"
         )
     }
