@@ -7,7 +7,6 @@ import Mocks
 
 private enum Constants {
     static let sheetCloseIconSize: CGFloat = 16
-    static let colorCheckmarkSize: CGFloat = 16
 }
 
 /// Colour only: the size sheet is gone — every size renders inline on the page.
@@ -27,7 +26,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
     var body: some View {
         VStack {
             HStack {
-                Text.build(theme.font.body.large(L10n.Product.Color.title))
+                Text.build(theme.font.heading.xSmall(L10n.Pdp.ColourSelector.title))
                     .foregroundStyle(Theme.contentContentPrimary)
 
                 Spacer()
@@ -77,23 +76,25 @@ private extension ProductDetailsColorSheet {
                         viewModel.colorSelectionConfiguration.selectedItem = item
                         isPresented = false
                     } label: {
+                        // The design puts the name first and the swatch at the trailing edge, and
+                        // marks the selection with the swatch's own border rather than a checkmark.
                         HStack(spacing: theme.spacing.space200) {
+                            Text.build(theme.font.body.medium(item.name.capitalized))
+                                .foregroundStyle(Theme.contentContentPrimary)
+
+                            Spacer()
+
                             ColorSwatchView(
                                 item: item,
                                 swatchSize: .normal,
                                 isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
                             )
-
-                            Text.build(theme.font.body.medium(item.name.capitalized))
-
-                            Spacer()
-
-                            if viewModel.colorSelectionConfiguration.selectedItem == item {
-                                checkmark
-                            }
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityAddTraits(
+                            viewModel.colorSelectionConfiguration.selectedItem == item ? .isSelected : []
+                        )
                     }
-                    .tint(Theme.contentContentPrimary)
 
                     ThemedDivider.horizontalThin
                 }
@@ -109,13 +110,6 @@ private extension ProductDetailsColorSheet {
             dismissConfiguration: .init(type: .cancel(title: L10n.SearchBar.cancel)),
             verticalSpacing: theme.spacing.space200
         )
-    }
-
-    @ViewBuilder var checkmark: some View {
-        Icon.checkmark.image
-            .resizable()
-            .scaledToFit()
-            .frame(size: Constants.colorCheckmarkSize)
     }
 }
 

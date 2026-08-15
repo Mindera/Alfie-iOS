@@ -320,6 +320,17 @@
         }
       }
     },
+    "pdp.colour_selector.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a Colour"
+          }
+        }
+      }
+    },
     "pdp.colour_summary.accessibility_hint" : {
       "extractionState" : "manual",
       "localizations" : {

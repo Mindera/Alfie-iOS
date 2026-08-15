@@ -108,6 +108,10 @@ public enum L10n {
     public static let title = L10n.tr("L10n", "loading.title")
   }
   public enum Pdp {
+    public enum ColourSelector {
+      /// Select a Colour
+      public static let title = L10n.tr("L10n", "pdp.colour_selector.title")
+    }
     public enum ColourSummary {
       /// Opens colour selection
       public static let accessibilityHint = L10n.tr("L10n", "pdp.colour_summary.accessibility_hint")
@@ -552,6 +556,7 @@ public extension L10n {
       case homeSignInButtonCta = "home.sign_in.button.cta"
       case homeSignOutButtonCta = "home.sign_out.button.cta"
       case loadingTitle = "loading.title"
+      case pdpColourSelectorTitle = "pdp.colour_selector.title"
       case pdpColourSummaryAccessibilityHint = "pdp.colour_summary.accessibility_hint"
       case pdpColourSummaryAccessibilityLabel = "pdp.colour_summary.accessibility_label"
       case pdpColourSummaryCount = "pdp.colour_summary.count"
