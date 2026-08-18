@@ -42,9 +42,15 @@ private struct ColorCardView: View {
         // and only a control announces "dimmed" when an out-of-stock colour disables it.
         return Button(action: onTap) {
             VStack(spacing: theme.spacing.space100) {
-                ColorSwatchView(item: item, swatchSize: .small, isSelected: false)
+                ColorSwatchView(item: item, swatchSize: .normal, isSelected: false)
 
-                Text.build(theme.font.body.medium(item.name.capitalized))
+                // The design bolds the selected colour's name, so selection survives even where the
+                // border cannot show it — an out-of-stock colour draws no selected border.
+                Text.build(
+                    appearance.isSelected
+                        ? theme.font.body.mediumBold(item.name.capitalized)
+                        : theme.font.body.medium(item.name.capitalized)
+                )
                     // The token's line height, which `Text` does not apply on its own. Real colour
                     // names ("Midnight Navy") do not fit a third of the width on one line, so the
                     // label wraps — capped at two lines, past which a card would tower over its row.

@@ -83,14 +83,19 @@ private extension ProductDetailsColorSheet {
                         // The design puts the name first and the swatch at the trailing edge, and
                         // marks the selection with the swatch's own border rather than a checkmark.
                         HStack(spacing: theme.spacing.space200) {
-                            Text.build(theme.font.body.medium(item.name.capitalized))
-                                .foregroundStyle(
-                                    item.isDisabled ? Theme.contentContentTerciary : Theme.contentContentPrimary
-                                )
+                            // Bold marks the selection, as it does on the card grid.
+                            Text.build(
+                                isSelected
+                                    ? theme.font.body.mediumBold(item.name.capitalized)
+                                    : theme.font.body.medium(item.name.capitalized)
+                            )
+                            .foregroundStyle(
+                                item.isDisabled ? Theme.contentContentTerciary : Theme.contentContentPrimary
+                            )
 
                             Spacer()
 
-                            ColorSwatchView(item: item, swatchSize: .normal, isSelected: isSelected)
+                            ColorSwatchView(item: item, swatchSize: .small, isSelected: isSelected)
                         }
                     }
                     // An out-of-stock colour is not selectable here either — the card grid disables

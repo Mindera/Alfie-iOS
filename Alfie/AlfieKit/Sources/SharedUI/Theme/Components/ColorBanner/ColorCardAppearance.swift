@@ -10,13 +10,13 @@ public struct ColorCardAppearance: Equatable {
     /// card can never announce a selection it does not show.
     public let isSelected: Bool
 
-    /// Selection is a heavier *border* on the card, matching the size chip — the swatch inside keeps
-    /// its own unselected appearance so the two selection marks never stack.
+    /// Selection darkens the border and bolds the label — the stroke stays 1pt, unlike the size
+    /// chip, and the swatch inside keeps its own unselected appearance so the marks never stack.
     public static func resolve(isSelected: Bool, isDisabled: Bool) -> Self {
         guard !isDisabled else {
             return .init(
                 borderColor: Theme.borderSoft,
-                borderWidth: Constants.borderWidthDefault,
+                borderWidth: Constants.borderWidth,
                 textColor: Theme.contentContentTerciary,
                 isSelected: false
             )
@@ -24,7 +24,7 @@ public struct ColorCardAppearance: Equatable {
 
         return .init(
             borderColor: isSelected ? Theme.contentContentPrimary : Theme.borderSoft,
-            borderWidth: isSelected ? Constants.borderWidthSelected : Constants.borderWidthDefault,
+            borderWidth: Constants.borderWidth,
             textColor: Theme.contentContentPrimary,
             isSelected: isSelected
         )
@@ -32,6 +32,5 @@ public struct ColorCardAppearance: Equatable {
 }
 
 private enum Constants {
-    static let borderWidthDefault: CGFloat = 1
-    static let borderWidthSelected: CGFloat = 2
+    static let borderWidth: CGFloat = 1
 }

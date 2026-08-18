@@ -7,10 +7,13 @@ import XCTest
 final class ColorCardAppearanceTests: XCTestCase {
     // MARK: - Selection
 
-    func test_selected_card_has_a_heavier_border_than_unselected() {
+    // Unlike the size chip, the colour card does not thicken its border when selected — the design
+    // keeps 1pt throughout and changes the colour and the label weight instead.
+    func test_selection_changes_the_border_colour_not_its_width() {
         let selected = ColorCardAppearance.resolve(isSelected: true, isDisabled: false)
         let unselected = ColorCardAppearance.resolve(isSelected: false, isDisabled: false)
-        XCTAssertGreaterThan(selected.borderWidth, unselected.borderWidth)
+        XCTAssertEqual(selected.borderWidth, unselected.borderWidth)
+        XCTAssertNotEqual(selected.borderColor, unselected.borderColor)
     }
 
     func test_selected_card_border_is_content_primary() {
