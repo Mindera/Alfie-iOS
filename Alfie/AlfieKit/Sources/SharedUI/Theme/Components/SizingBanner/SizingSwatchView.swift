@@ -40,7 +40,8 @@ public struct SizingSwatchView: View {
                 outOfStockBellView(appearance)
             }
             .accessibilityElement(children: .combine)
-            // Selection is drawn as a border, which assistive technology cannot see.
+            // Selection is drawn as a border, which assistive technology cannot see. The button
+            // trait comes from the `Button` the selector wraps this in.
             .accessibilityAddTraits(isSelected ? .isSelected : [])
             .accessibilityValueOrNone(
                 appearance.isCrossedOut ? L10n.Product.Size.OutOfStock.accessibilityValue : nil

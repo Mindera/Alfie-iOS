@@ -52,14 +52,27 @@ public struct SizingSelectorComponentView: View {
     @ViewBuilder
     private func swatches() -> some View {
         ForEach(configuration.items) { item in
-            Group {
+            // A `Button`, not a tap gesture: the swatch is the only way to choose a size, and only a
+            // button carries the trait, VoiceOver activation and Voice/Switch/keyboard reachability.
+            Button {
+                configuration.selectedItem = item
+            } label: {
                 SizingSwatchView(item: item, isSelected: configuration.selectedItem == item)
-                    .onTapGesture {
-                        configuration.selectedItem = item
-                    }
+                    // The design draws a 40pt chip, 4pt under the minimum target. Outset the hit
+                    // region rather than the frame, so the drawn box and the row gaps stay put.
+                    .contentShape(Rectangle().inset(by: -theme.spacing.space025))
             }
+            .buttonStyle(SizingSwatchButtonStyle())
             .disabled(item.state != .available)
         }
+    }
+}
+
+/// Renders the label and nothing else. The built-in styles dim a disabled label, which would stack
+/// on top of the dimming the design already specifies for unavailable sizes.
+private struct SizingSwatchButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
     }
 }
 

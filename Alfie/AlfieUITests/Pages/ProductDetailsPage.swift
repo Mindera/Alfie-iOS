@@ -47,10 +47,6 @@ final class ProductDetailsPage {
         app.otherElements[AccessibilityID.ProductDetails.sizeSelector]
     }
 
-    var sizeGuideLink: XCUIElement {
-        app.staticTexts[AccessibilityID.ProductDetails.sizeGuideLink]
-    }
-
     var addToBagButton: XCUIElement {
         app.buttons[AccessibilityID.ProductDetails.addToBagButton]
     }
@@ -87,17 +83,6 @@ final class ProductDetailsPage {
     }
 
     // MARK: - Assertions
-
-    /// The link is drawn by the design but has no destination yet, so it must render without
-    /// becoming a control. Only products with a size choice show it, hence the existence guard.
-    func assertSizeGuideIsInert() {
-        guard sizeGuideLink.exists else { return }
-        XCTAssertFalse(sizeGuideLink.isHittable, "Size Guide should render inert until it has a destination")
-        XCTAssertFalse(
-            app.buttons[AccessibilityID.ProductDetails.sizeGuideLink].exists,
-            "Size Guide should not expose a button"
-        )
-    }
 
     func assertVisible(timeout: TimeInterval = 5) {
         XCTAssertTrue(

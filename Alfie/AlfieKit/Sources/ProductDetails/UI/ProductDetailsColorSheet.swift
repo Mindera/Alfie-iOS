@@ -12,12 +12,14 @@ private enum Constants {
 
 /// Colour only: the size sheet is gone — every size renders inline on the page.
 struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: View {
-    @StateObject private var viewModel: ViewModel
+    // Injected, not owned: `@StateObject` would pin the first view model this sheet ever saw and
+    // silently ignore later ones.
+    @ObservedObject private var viewModel: ViewModel
     @Binding private var isPresented: Bool
     @Binding private var searchText: String
 
     internal init(viewModel: ViewModel, isPresented: Binding<Bool>, searchText: Binding<String> = Binding.constant("")) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
+        self._viewModel = ObservedObject(wrappedValue: viewModel)
         self._isPresented = isPresented
         self._searchText = searchText
     }
