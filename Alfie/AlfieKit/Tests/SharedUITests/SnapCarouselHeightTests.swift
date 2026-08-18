@@ -66,10 +66,67 @@ final class SnapCarouselHeightTests: XCTestCase {
         XCTAssertEqual(onScreen.green, 0, accuracy: 0.1, "green means the carousel opened on image 2")
     }
 
-    private func carousel(items: @escaping () -> [AnyView]) -> some View {
+    /// External paging (the VoiceOver adjustable action, the named next/previous actions) must keep
+    /// working after the item set is replaced and the index reset in the same update — a colour swap
+    /// whose new variant has a different image count.
+    ///
+    /// Note on what this does NOT prove. The related failure — the internal lock stranding, so the
+    /// indicator advances but the image does not — only occurs if SwiftUI runs the item-count
+    /// handler before the index handler. This SDK runs them the other way round, which is the benign
+    /// order, so this test passes with or without the guard in `handleExternalIndexUpdate`. It pins
+    /// the behaviour, not the guard; the guard is defensive against an ordering SwiftUI does not
+    /// contractually promise.
+    func test_externalPagingStillWorks_afterTheItemSetAndIndexChangeTogether() {
+        let index = Box()
+        let first = { [UIColor.red, UIColor.green, UIColor.blue].map(Self.swatch) }
+        let second = { [UIColor.cyan, UIColor.magenta].map(Self.swatch) }
+
+        let host = UIHostingController(rootView: carousel(items: first, index: index.binding))
+        if #available(iOS 16.4, *) {
+            host.safeAreaRegions = []
+        }
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: width, height: 1000))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        settle(host)
+
+        // External move within the original set — proves the path works before the swap.
+        index.value = 1
+        host.rootView = carousel(items: first, index: index.binding)
+        settle(host)
+        XCTAssertEqual(centrePixel(of: host, height: width).green, 1, accuracy: 0.1, "external paging should reach image 2")
+
+        // The colour swap: fewer images, and the index reset to 0, in one update.
+        index.value = 0
+        host.rootView = carousel(items: second, index: index.binding)
+        settle(host)
+
+        // Now page externally again. This is what the stranded lock swallows.
+        index.value = 1
+        host.rootView = carousel(items: second, index: index.binding)
+        settle(host)
+
+        let onScreen = centrePixel(of: host, height: width)
+        XCTAssertEqual(onScreen.red, 1, accuracy: 0.1, "expected magenta — external paging is dead after the swap")
+        XCTAssertEqual(onScreen.green, 0, accuracy: 0.1, "cyan means the carousel never moved")
+    }
+
+    private static func swatch(_ colour: UIColor) -> AnyView {
+        AnyView(Color(colour).aspectRatio(1, contentMode: .fit))
+    }
+
+    /// Backs a real `Binding`, so external index changes behave as they do in the app.
+    private final class Box {
+        var value = 0
+        var binding: Binding<Int> { .init(get: { self.value }, set: { self.value = $0 }) }
+    }
+
+    private func carousel(items: @escaping () -> [AnyView], index: Binding<Int> = .constant(0)) -> some View {
         SnapCarousel(
             itemAspectRatio: nil,
-            itemIndex: .constant(0),
+            itemIndex: index,
+            // Without this the offset animates and the rasterised pixel is mid-flight.
+            shouldAnimateRealIndexUpdate: .constant(false),
             showsAdjacentItemPeek: false,
             items: items
         )

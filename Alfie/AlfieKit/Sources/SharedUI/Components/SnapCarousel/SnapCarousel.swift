@@ -182,6 +182,15 @@ extension SnapCarousel {
         guard !lockRealIndexAnimationTrigger else {
             return
         }
+        // The flags below are cleared by `performInfiniteIndexCorrectionIfNeeded`, which only runs
+        // when `offsetIndex` actually changes. When it would not — an item-count change and an index
+        // reset landing in the same update both target this value — setting them would strand them
+        // and swallow the next external update.
+        guard uniqueItems.count + newIndex != offsetIndex else {
+            self.lockRealIndexAnimationTrigger = false
+            shouldUpdateRealIndex = false
+            return
+        }
         self.lockRealIndexAnimationTrigger = true
         shouldUpdateRealIndex = true
         if shouldAnimateRealIndexUpdate.wrappedValue {
