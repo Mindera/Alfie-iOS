@@ -408,7 +408,7 @@ Follow the shape of the PLP rollout — a tight, mostly-mechanical diff — rath
 - The description tab control.
 - The bespoke complementary-info row, replaced by the shared accordion component.
 - The hand-forced 18pt font override in the colour/size sheet — no token defines it.
-- Dead constants: the sheet close icon size and the colour chevron size, both already unreferenced.
+- The complementary-row chevron size and cell min-height, once the accordion replaces that row. (The sheet close icon size, previously listed here as unreferenced, is in use again.)
 
 **Additions:**
 
