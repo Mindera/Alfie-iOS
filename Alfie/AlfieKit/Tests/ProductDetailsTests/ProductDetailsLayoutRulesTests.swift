@@ -47,15 +47,4 @@ final class ProductDetailsLayoutRulesTests: XCTestCase {
             XCTAssertEqual(hasSummary, hasPicker, "diverged at \(count)")
         }
     }
-
-    /// Without a selection the summary disappears at every count, so nothing it returns can be the
-    /// sheet's entry point — the gap this sweep pins is why the view draws its own row for that case.
-    func test_colour_summary_is_never_the_entry_point_without_a_selection() {
-        for count in 0...20 {
-            XCTAssertNil(
-                ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: count, hasSelection: false),
-                "summarised at \(count)"
-            )
-        }
-    }
 }

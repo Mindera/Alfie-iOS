@@ -28,8 +28,8 @@ public struct ColorCardGridView: View {
 
 // MARK: - ColorCardView
 
-/// A struct rather than a builder func on the grid: SwiftUI can then diff each card and skip the
-/// ones whose inputs did not change, instead of rebuilding every swatch on each selection.
+/// A struct rather than a builder func on the grid, so each card is a view SwiftUI can identify and
+/// lay out on its own rather than a fragment of the grid's body.
 private struct ColorCardView: View {
     let item: ColorSwatch
     let isSelected: Bool
@@ -47,11 +47,14 @@ private struct ColorCardView: View {
                 Text.build(theme.font.body.medium(item.name.capitalized))
                     // The token's line height, which `Text` does not apply on its own. Real colour
                     // names ("Midnight Navy") do not fit a third of the width on one line, so the
-                    // label wraps and the cards share the tallest card's height.
+                    // label wraps — capped at two lines, past which a card would tower over its row.
                     .frame(minHeight: theme.font.body.medium.style.lineHeight)
+                    .lineLimit(Constants.nameLineLimit)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(appearance.textColor)
             }
+            // Cards in one row share that row's height; `LazyVGrid` sizes each row on its own, so
+            // rows can still differ.
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(theme.spacing.space100)
             .background(
@@ -67,7 +70,13 @@ private struct ColorCardView: View {
         // Selection is drawn as a border, which assistive technology cannot see. Taken from the
         // appearance, so an out-of-stock card that draws no border does not announce one either.
         .accessibilityAddTraits(appearance.isSelected ? .isSelected : [])
+        // "Dimmed" alone does not say why; the size chip announces the same reason.
+        .accessibilityValueOrNone(item.isDisabled ? L10n.Pdp.Colour.OutOfStock.accessibilityValue : nil)
     }
+}
+
+private enum Constants {
+    static let nameLineLimit = 2
 }
 
 @available(iOS 17, *)

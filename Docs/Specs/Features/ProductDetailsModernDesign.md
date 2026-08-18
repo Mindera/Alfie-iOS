@@ -429,7 +429,7 @@ Four rules below are **inferences drawn from static Figma frames, not design ins
 
 | Open question | Assumption encoded in this spec |
 |---|---|
-| When does each of the three colour surfaces appear? The design shows a summary, an inline grid and a sheet, but never says which applies when. | Summary always visible and tappable; inline grid for few colours; sheet for many — mirroring the size rule. |
+| When does each of the three colour surfaces appear? The design shows a summary, an inline grid and a sheet, but never says which applies when. | Summary whenever a colour is selected, and tappable; inline grid for few colours; sheet for many — mirroring the size rule. **The summary needs a selected swatch to draw, so a long colour run with no selection shows a tappable heading row instead; without it that product has no way to open the sheet.** |
 | At what size count does the chip grid become a vertical list? | Reuse the existing threshold in the current implementation. |
 | What are the low-stock thresholds and wording? | One remaining shows the single-unit message; at or below a small N shows the low-stock message. **N is unconfirmed.** |
 | Should the accordion expand to reveal a link, or keep today's one-tap navigation? | Expand to a link — the affordance matches the design, and the panel is the exact slot the real content later fills. Regresses a one-tap journey to two taps. |

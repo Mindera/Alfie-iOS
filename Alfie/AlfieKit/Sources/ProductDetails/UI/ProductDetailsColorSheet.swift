@@ -71,6 +71,10 @@ private extension ProductDetailsColorSheet {
     @ViewBuilder var colorItemsView: some View {
         ScrollView {
             ForEach(viewModel.colorSwatches(filteredBy: searchText)) { item in
+                // An out-of-stock colour cannot be the selection the row draws, matching the card
+                // grid — otherwise the two surfaces disagree about the same colour.
+                let isSelected = !item.isDisabled && viewModel.colorSelectionConfiguration.selectedItem == item
+
                 VStack {
                     Button {
                         viewModel.colorSelectionConfiguration.selectedItem = item
@@ -86,19 +90,17 @@ private extension ProductDetailsColorSheet {
 
                             Spacer()
 
-                            ColorSwatchView(
-                                item: item,
-                                swatchSize: .normal,
-                                isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
-                            )
+                            ColorSwatchView(item: item, swatchSize: .normal, isSelected: isSelected)
                         }
                     }
                     // An out-of-stock colour is not selectable here either — the card grid disables
                     // it, and the same colour must not become selectable purely because the product
                     // carries enough colours to open the sheet instead.
                     .disabled(item.isDisabled)
-                    .accessibilityAddTraits(
-                        viewModel.colorSelectionConfiguration.selectedItem == item ? .isSelected : []
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    // "Dimmed" alone does not say why; the size chip announces the same reason.
+                    .accessibilityValueOrNone(
+                        item.isDisabled ? L10n.Pdp.Colour.OutOfStock.accessibilityValue : nil
                     )
 
                     ThemedDivider.horizontalThin

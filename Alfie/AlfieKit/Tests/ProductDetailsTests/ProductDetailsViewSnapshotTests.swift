@@ -90,8 +90,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// Past the inline limit the cards give way to the summary alone, which opens the sheet — so the
-    /// page shows no colour section however many colours the product has.
+    /// Past the inline limit the cards give way to the summary, which opens the sheet — so with a
+    /// colour selected the page body carries no colour section at all.
     func test_productDetailsView_withManyColours() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")

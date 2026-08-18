@@ -23,8 +23,8 @@ final class ColorCardAppearanceTests: XCTestCase {
         XCTAssertEqual(sut.borderColor, Theme.borderSoft)
     }
 
-    // The trait assistive technology reads comes from the same resolver that draws the border, so
-    // the two channels cannot disagree.
+    // On the card, the trait assistive technology reads comes from the same resolver that draws the
+    // border, so those two channels cannot disagree. The sheet resolves its own row separately.
     func test_selection_the_card_draws_is_the_selection_it_announces() {
         for isSelected in [true, false] {
             for isDisabled in [true, false] {

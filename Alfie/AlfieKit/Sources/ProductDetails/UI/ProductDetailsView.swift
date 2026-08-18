@@ -439,19 +439,21 @@ extension ProductDetailsView {
 
                     Spacer()
 
-                    Icon.chevronRight.image
+                    // Down, not right: this presents a sheet rather than pushing a screen.
+                    Icon.chevronDown.image
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
                         .foregroundStyle(Theme.contentContentPrimary)
                 }
+                // The heading alone is 20pt tall, and this row is the only colour control on screen.
+                .frame(minHeight: Constants.minTapTargetSize)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityHint(L10n.Pdp.ColourSummary.accessibilityHint)
             .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
-            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSheetRow)
         }
     }
 
@@ -626,6 +628,7 @@ private enum Constants {
     static let sizeGridColumns = 3
     /// The colour cards follow the size chips: three to a row.
     static let colourGridColumns = 3
+    static let minTapTargetSize: CGFloat = 44
     static let selectedIndicatorWidth: CGFloat = 12
     /// Bounds the whole screen on a wide device: the gallery hugs its image, so at an iPad's full
     /// width it would be taller than the screen and push the information block below the fold.

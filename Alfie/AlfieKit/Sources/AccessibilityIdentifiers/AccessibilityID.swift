@@ -51,7 +51,10 @@ public enum AccessibilityID {
         public static let brandName = "productDetails.brand.name"
         public static let productName = "productDetails.product.name"
         public static let productDescription = "productDetails.description.text"
+        /// The inline card grid. Present only for a short colour run — a long one uses the summary,
+        /// or `colourSheetRow` when nothing is selected yet.
         public static let colourSelector = "productDetails.colour.selector"
+        public static let colourSheetRow = "productDetails.colour.sheetRow"
         public static let colourSummary = "productDetails.colour.summary"
         public static let sizeSelector = "productDetails.size.selector"
         /// Drawn by the design with no destination behind it — rendered, but not interactive.
