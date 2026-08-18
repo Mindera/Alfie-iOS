@@ -318,16 +318,18 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     func test_selected_colour_name_and_reference_come_from_the_selected_variant() {
-        let variant = Product.Variant.fixture(sku: "0273/393", colour: .fixture(name: "Black"))
+        // "Cobalt Blue" deliberately differs from the colour fixture's "Black" default, so the
+        // assertion fails if the value stops coming from this variant.
+        let variant = Product.Variant.fixture(sku: "0273/393", colour: .fixture(name: "Cobalt Blue"))
         initViewModel(configuration: .product(.fixture(defaultVariant: variant, variants: [variant])))
 
-        XCTAssertEqual(sut.selectedColourName, "Black")
+        XCTAssertEqual(sut.selectedColourName, "Cobalt Blue")
         XCTAssertEqual(sut.productReference, "0273/393")
     }
 
-    /// Single-option products carry a nameless colour purely to hold media, so the metadata line
-    /// must drop the colour rather than render a blank segment.
-    func test_selected_colour_name_is_nil_when_the_variant_colour_is_nameless() {
+    /// Single-option products carry a colour with an empty name purely to hold media, so the
+    /// metadata line must drop the colour rather than render a blank segment.
+    func test_selected_colour_name_is_nil_when_the_variant_colour_name_is_empty() {
         let variant = Product.Variant.fixture(sku: "0273/393", colour: .fixture(name: ""))
         initViewModel(configuration: .product(.fixture(defaultVariant: variant, variants: [variant])))
 
@@ -892,6 +894,31 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.productImageUrls.count, variant2.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant2.media[0].asImage?.url.absoluteString)
         XCTAssertEqual(sut.productImageUrls[1].absoluteString, variant2.media[1].asImage?.url.absoluteString)
+    }
+
+    func test_selected_colour_name_and_reference_are_updated_when_color_is_selected() {
+        let variant1 = Product.Variant.fixture(sku: "SKU-1", colour: .fixture(id: "1", name: "Color 1"), stock: 1)
+        let variant2 = Product.Variant.fixture(sku: "SKU-2", colour: .fixture(id: "2", name: "Color 2"), stock: 1)
+        let product = Product.fixture(defaultVariant: variant1, variants: [variant1, variant2])
+        initViewModel(configuration: .product(product))
+
+        mockProductService.onGetProductCalled = { _ in
+            product
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.selectedColourName, "Color 1")
+        XCTAssertEqual(sut.productReference, "SKU-1")
+
+        let colorSelectionConfiguration = sut.colorSelectionConfiguration
+        XCTAssertEmitsValue(
+            from: sut.$state.drop(while: \.isLoading),
+            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
+        )
+
+        XCTAssertEqual(sut.selectedColourName, "Color 2")
+        XCTAssertEqual(sut.productReference, "SKU-2")
     }
 
     // MARK: - Complementary Info

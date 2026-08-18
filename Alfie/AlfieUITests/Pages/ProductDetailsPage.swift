@@ -39,6 +39,11 @@ final class ProductDetailsPage {
         app.staticTexts[AccessibilityID.ProductDetails.productDescription]
     }
 
+    /// The `<colour> | Ref. <sku>` line. Absent only when the variant has neither value.
+    var descriptionMetadata: XCUIElement {
+        app.staticTexts[AccessibilityID.ProductDetails.descriptionMetadata]
+    }
+
     /// The inline colour card grid. Absent for single-colour products and for a long colour run,
     /// which uses `colourSummary` or `colourSheetRow` instead.
     var colourSelector: XCUIElement {

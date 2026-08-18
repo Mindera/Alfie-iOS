@@ -52,13 +52,12 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// The hiding half of the new elements: no brand line, no colour summary for a single-colour
-    /// product, and a metadata line left with only the reference.
+    /// The hiding half of both new elements: no brand line, and no colour summary for a
+    /// single-colour product.
     func test_productDetailsView_withoutBrandOrColourChoice() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.productTitle = ""
-        viewModel.selectedColourName = nil
         viewModel.colorSelectionConfiguration = .init(
             items: [.init(id: "1", name: "Black", type: .color(.black))],
             selectedItem: .init(id: "1", name: "Black", type: .color(.black))
@@ -118,6 +117,19 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
             items: (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
             selectedItem: nil
         )
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// A product with no marketing copy still shows the colour and reference — they are what a
+    /// shopper quotes to customer service.
+    func test_productDetailsView_withoutDescription() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.productDescription = ""
+        viewModel.onShouldShowSectionCalled = { $0 != .productDescription }
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),

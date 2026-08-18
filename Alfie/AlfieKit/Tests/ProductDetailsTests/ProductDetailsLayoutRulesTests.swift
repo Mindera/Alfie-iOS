@@ -47,4 +47,36 @@ final class ProductDetailsLayoutRulesTests: XCTestCase {
             XCTAssertEqual(hasSummary, hasPicker, "diverged at \(count)")
         }
     }
+
+    // MARK: - Description metadata
+
+    func test_description_metadata_joins_both_halves_through_a_localised_string() {
+        let metadata = ProductDetailsLayoutRules.descriptionMetadata(colourName: "Black", reference: "0273/393")
+
+        XCTAssertEqual(metadata?.display, "Black | Ref. 0273/393")
+    }
+
+    func test_description_metadata_speaks_a_comma_rather_than_the_pipe() {
+        let metadata = ProductDetailsLayoutRules.descriptionMetadata(colourName: "Black", reference: "0273/393")
+
+        XCTAssertEqual(metadata?.accessibilityLabel, "Black, Ref. 0273/393")
+    }
+
+    func test_description_metadata_drops_the_separator_when_only_the_colour_exists() {
+        let metadata = ProductDetailsLayoutRules.descriptionMetadata(colourName: "Black", reference: nil)
+
+        XCTAssertEqual(metadata?.display, "Black")
+        XCTAssertEqual(metadata?.accessibilityLabel, "Black")
+    }
+
+    func test_description_metadata_drops_the_separator_when_only_the_reference_exists() {
+        let metadata = ProductDetailsLayoutRules.descriptionMetadata(colourName: nil, reference: "0273/393")
+
+        XCTAssertEqual(metadata?.display, "Ref. 0273/393")
+        XCTAssertEqual(metadata?.accessibilityLabel, "Ref. 0273/393")
+    }
+
+    func test_description_metadata_is_omitted_when_neither_half_exists() {
+        XCTAssertNil(ProductDetailsLayoutRules.descriptionMetadata(colourName: nil, reference: nil))
+    }
 }

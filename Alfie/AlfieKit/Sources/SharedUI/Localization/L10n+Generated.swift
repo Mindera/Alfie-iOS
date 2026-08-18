@@ -144,6 +144,16 @@ public enum L10n {
         public static let title = L10n.tr("L10n", "pdp.complementary_info.returns.title")
       }
     }
+    public enum DescriptionMetadata {
+      /// %1$@, Ref. %2$@
+      public static func accessibilityLabel(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("L10n", "pdp.description_metadata.accessibility_label", String(describing: p1), String(describing: p2))
+      }
+      /// %1$@ | Ref. %2$@
+      public static func colourAndReference(_ p1: Any, _ p2: Any) -> String {
+        return L10n.tr("L10n", "pdp.description_metadata.colour_and_reference", String(describing: p1), String(describing: p2))
+      }
+    }
     public enum ErrorView {
       /// Oops!
       public static let title = L10n.tr("L10n", "pdp.error_view.title")
@@ -570,6 +580,8 @@ public extension L10n {
       case pdpComplementaryInfoDeliveryTitle = "pdp.complementary_info.delivery.title"
       case pdpComplementaryInfoPaymentTitle = "pdp.complementary_info.payment.title"
       case pdpComplementaryInfoReturnsTitle = "pdp.complementary_info.returns.title"
+      case pdpDescriptionMetadataAccessibilityLabel = "pdp.description_metadata.accessibility_label"
+      case pdpDescriptionMetadataColourAndReference = "pdp.description_metadata.colour_and_reference"
       case pdpErrorViewTitle = "pdp.error_view.title"
       case pdpErrorViewGenericMessage = "pdp.error_view.generic.message"
       case pdpErrorViewGoBackButtonCta = "pdp.error_view.go_back.button.cta"

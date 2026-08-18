@@ -515,29 +515,30 @@ extension ProductDetailsView {
     }
 
     @ViewBuilder private var descriptionSection: some View {
-        if viewModel.shouldShow(section: .productDescription) {
-            VStack(alignment: .leading, spacing: theme.spacing.space100) {
-                Text.build(theme.font.body.medium(viewModel.productDescription))
-                    .foregroundStyle(Theme.contentContentPrimary)
-                    .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
+        let showDescription = viewModel.shouldShow(section: .productDescription)
+        // Gated apart from the description: the colour and reference are what a shopper quotes to
+        // customer service, and a product without marketing copy still has both.
+        let metadata = ProductDetailsLayoutRules.descriptionMetadata(
+            colourName: viewModel.selectedColourName,
+            reference: viewModel.productReference
+        )
 
-                if let descriptionMetadata {
-                    Text.build(theme.font.label.small(descriptionMetadata))
+        if showDescription || metadata != nil {
+            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+                if showDescription {
+                    Text.build(theme.font.body.medium(viewModel.productDescription))
+                        .foregroundStyle(Theme.contentContentPrimary)
+                        .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
+                }
+
+                if let metadata {
+                    Text.build(theme.font.label.small(metadata.display))
                         .foregroundStyle(Theme.contentContentTerciary)
+                        .accessibilityLabel(metadata.accessibilityLabel)
                         .accessibilityIdentifier(AccessibilityID.ProductDetails.descriptionMetadata)
                 }
             }
         }
-    }
-
-    /// `Black | Ref. <sku>` — either half drops out with its separator when the value is absent.
-    private var descriptionMetadata: String? {
-        let segments = [
-            viewModel.selectedColourName,
-            viewModel.productReference.map { L10n.Pdp.ProductReference.value($0) },
-        ].compactMap { $0 }
-
-        return segments.isEmpty ? nil : segments.joined(separator: Constants.metadataSeparator)
     }
 
     @ViewBuilder private var addToBag: some View {
@@ -650,8 +651,6 @@ private enum Constants {
     /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
     static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
-    /// Figma draws the meta line as three nodes gapped 4pt; a spaced pipe is the same to the eye.
-    static let metadataSeparator = " | "
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210
