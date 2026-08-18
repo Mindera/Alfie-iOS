@@ -6,6 +6,9 @@ public struct ColorCardAppearance: Equatable {
     public let borderColor: Color
     public let borderWidth: CGFloat
     public let textColor: Color
+    /// What the card actually draws as selected — the source for the accessibility trait too, so a
+    /// card can never announce a selection it does not show.
+    public let isSelected: Bool
 
     /// Selection is a heavier *border* on the card, matching the size chip — the swatch inside keeps
     /// its own unselected appearance so the two selection marks never stack.
@@ -14,14 +17,16 @@ public struct ColorCardAppearance: Equatable {
             return .init(
                 borderColor: Theme.borderSoft,
                 borderWidth: Constants.borderWidthDefault,
-                textColor: Theme.contentContentTerciary
+                textColor: Theme.contentContentTerciary,
+                isSelected: false
             )
         }
 
         return .init(
             borderColor: isSelected ? Theme.contentContentPrimary : Theme.borderSoft,
             borderWidth: isSelected ? Constants.borderWidthSelected : Constants.borderWidthDefault,
-            textColor: Theme.contentContentPrimary
+            textColor: Theme.contentContentPrimary,
+            isSelected: isSelected
         )
     }
 }

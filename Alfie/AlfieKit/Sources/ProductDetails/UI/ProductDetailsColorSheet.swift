@@ -80,7 +80,9 @@ private extension ProductDetailsColorSheet {
                         // marks the selection with the swatch's own border rather than a checkmark.
                         HStack(spacing: theme.spacing.space200) {
                             Text.build(theme.font.body.medium(item.name.capitalized))
-                                .foregroundStyle(Theme.contentContentPrimary)
+                                .foregroundStyle(
+                                    item.isDisabled ? Theme.contentContentTerciary : Theme.contentContentPrimary
+                                )
 
                             Spacer()
 
@@ -90,11 +92,14 @@ private extension ProductDetailsColorSheet {
                                 isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
                             )
                         }
-                        .accessibilityElement(children: .combine)
-                        .accessibilityAddTraits(
-                            viewModel.colorSelectionConfiguration.selectedItem == item ? .isSelected : []
-                        )
                     }
+                    // An out-of-stock colour is not selectable here either — the card grid disables
+                    // it, and the same colour must not become selectable purely because the product
+                    // carries enough colours to open the sheet instead.
+                    .disabled(item.isDisabled)
+                    .accessibilityAddTraits(
+                        viewModel.colorSelectionConfiguration.selectedItem == item ? .isSelected : []
+                    )
 
                     ThemedDivider.horizontalThin
                 }

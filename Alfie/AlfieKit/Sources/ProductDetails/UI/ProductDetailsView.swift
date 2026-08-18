@@ -394,19 +394,62 @@ extension ProductDetailsView {
         )
     }
 
-    /// Few colours render inline as cards; a long colour run stays in the sheet the info block's
-    /// summary opens, so the page never fills with swatches.
+    /// Few colours render inline as cards; a long colour run stays in the sheet, which the info
+    /// block's summary opens — so the page never fills with swatches. Both surfaces show together
+    /// for a short run: the summary states the current colour, the grid changes it.
     @ViewBuilder private var colorSelector: some View {
-        if viewModel.shouldShow(section: .colorSelector), colourLayout == .inlineGrid {
-            VStack(alignment: .leading, spacing: theme.spacing.space150) {
-                Text.build(theme.font.heading.xSmall(L10n.Pdp.ColourSelector.title))
-                    .foregroundStyle(Theme.contentContentPrimary)
+        if viewModel.shouldShow(section: .colorSelector) {
+            switch colourLayout {
+            case .inlineGrid:
+                VStack(alignment: .leading, spacing: theme.spacing.space150) {
+                    colourSelectorTitle
 
-                ColorCardGridView(
-                    configuration: viewModel.colorSelectionConfiguration,
-                    columns: Constants.colourGridColumns
-                )
+                    ColorCardGridView(
+                        configuration: viewModel.colorSelectionConfiguration,
+                        columns: Constants.colourGridColumns
+                    )
+                }
+                .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
+
+            case .sheet:
+                colourSheetRow
+
+            case .summaryOnly:
+                EmptyView()
             }
+        }
+    }
+
+    private var colourSelectorTitle: some View {
+        Text.build(theme.font.heading.xSmall(L10n.Pdp.ColourSelector.title))
+            .foregroundStyle(Theme.contentContentPrimary)
+    }
+
+    /// A long colour run is reachable through the info block's summary — but that summary needs a
+    /// selected swatch to draw, and a variant can carry no colour at all. This row is the entry
+    /// point for that case, and it claims no selection the summary cannot honestly show.
+    @ViewBuilder private var colourSheetRow: some View {
+        if viewModel.colorSelectionConfiguration.selectedItem == nil {
+            Button {
+                showColorSheet = true
+            } label: {
+                HStack(spacing: theme.spacing.space0) {
+                    colourSelectorTitle
+
+                    Spacer()
+
+                    Icon.chevronRight.image
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: Constants.chevronSize, height: Constants.chevronSize)
+                        .foregroundStyle(Theme.contentContentPrimary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(L10n.Pdp.ColourSummary.accessibilityHint)
             .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
         }

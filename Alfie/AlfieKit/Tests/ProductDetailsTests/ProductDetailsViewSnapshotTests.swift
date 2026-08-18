@@ -105,6 +105,22 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    /// The state that had no colour affordance at all: past the inline limit the grid is gone, and
+    /// with no selected colour the summary has no swatch to draw — so the heading itself must open
+    /// the sheet.
+    func test_productDetailsView_withManyColoursAndNoSelection() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.colorSelectionConfiguration = .init(
+            items: (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
+            selectedItem: nil
+        )
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)

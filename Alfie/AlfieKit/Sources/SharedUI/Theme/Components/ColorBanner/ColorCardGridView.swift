@@ -18,40 +18,55 @@ public struct ColorCardGridView: View {
             spacing: theme.spacing.space100
         ) {
             ForEach(configuration.items) { item in
-                card(for: item)
+                ColorCardView(item: item, isSelected: configuration.selectedItem == item) {
+                    configuration.selectedItem = item
+                }
             }
         }
     }
+}
 
-    private func card(for item: ColorSwatch) -> some View {
-        let isSelected = configuration.selectedItem == item
+// MARK: - ColorCardView
+
+/// A struct rather than a builder func on the grid: SwiftUI can then diff each card and skip the
+/// ones whose inputs did not change, instead of rebuilding every swatch on each selection.
+private struct ColorCardView: View {
+    let item: ColorSwatch
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
         let appearance = ColorCardAppearance.resolve(isSelected: isSelected, isDisabled: item.isDisabled)
 
-        return VStack(spacing: theme.spacing.space100) {
-            ColorSwatchView(item: item, swatchSize: .small, isSelected: false)
+        // A `Button`, not a tap gesture: the card is a control, so it belongs in the Buttons rotor,
+        // and only a control announces "dimmed" when an out-of-stock colour disables it.
+        return Button(action: onTap) {
+            VStack(spacing: theme.spacing.space100) {
+                ColorSwatchView(item: item, swatchSize: .small, isSelected: false)
 
-            Text.build(theme.font.body.medium(item.name.capitalized))
-                // The token's line height, which `Text` does not apply on its own.
-                .frame(minHeight: theme.font.body.medium.style.lineHeight)
-                .lineLimit(1)
-                .foregroundStyle(appearance.textColor)
+                Text.build(theme.font.body.medium(item.name.capitalized))
+                    // The token's line height, which `Text` does not apply on its own. Real colour
+                    // names ("Midnight Navy") do not fit a third of the width on one line, so the
+                    // label wraps and the cards share the tallest card's height.
+                    .frame(minHeight: theme.font.body.medium.style.lineHeight)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(appearance.textColor)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(theme.spacing.space100)
+            .background(
+                // The design draws the card square, so no corner radius token applies.
+                Rectangle()
+                    .inset(by: appearance.borderWidth / 2)
+                    .stroke(appearance.borderColor, lineWidth: appearance.borderWidth)
+            )
+            .contentShape(Rectangle())
         }
-        .frame(maxWidth: .infinity)
-        .padding(theme.spacing.space100)
-        .background(
-            // The design draws the card square, so no corner radius token applies.
-            Rectangle()
-                .inset(by: appearance.borderWidth / 2)
-                .stroke(appearance.borderColor, lineWidth: appearance.borderWidth)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            configuration.selectedItem = item
-        }
+        .buttonStyle(.plain)
         .disabled(item.isDisabled)
-        .accessibilityElement(children: .combine)
-        // Selection is drawn as a border, which assistive technology cannot see.
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        // Selection is drawn as a border, which assistive technology cannot see. Taken from the
+        // appearance, so an out-of-stock card that draws no border does not announce one either.
+        .accessibilityAddTraits(appearance.isSelected ? .isSelected : [])
     }
 }
 
@@ -63,6 +78,8 @@ public struct ColorCardGridView: View {
                 .init(id: "1", name: "White", type: .color(.white)),
                 .init(id: "2", name: "Black", type: .color(.black)),
                 .init(id: "3", name: "Terracotta", type: .color(.orange)),
+                .init(id: "4", name: "Midnight Navy", type: .color(.blue)),
+                .init(id: "5", name: "Sand", type: .color(.brown), isDisabled: true),
             ],
             selectedItem: .init(id: "2", name: "Black", type: .color(.black))
         ),

@@ -23,7 +23,24 @@ final class ColorCardAppearanceTests: XCTestCase {
         XCTAssertEqual(sut.borderColor, Theme.borderSoft)
     }
 
+    // The trait assistive technology reads comes from the same resolver that draws the border, so
+    // the two channels cannot disagree.
+    func test_selection_the_card_draws_is_the_selection_it_announces() {
+        for isSelected in [true, false] {
+            for isDisabled in [true, false] {
+                let sut = ColorCardAppearance.resolve(isSelected: isSelected, isDisabled: isDisabled)
+                let drawsSelectedBorder = sut.borderColor == Theme.contentContentPrimary
+                XCTAssertEqual(sut.isSelected, drawsSelectedBorder, "selected \(isSelected), disabled \(isDisabled)")
+            }
+        }
+    }
+
     // MARK: - Unavailable colours
+
+    func test_enabled_card_name_is_content_primary() {
+        let sut = ColorCardAppearance.resolve(isSelected: false, isDisabled: false)
+        XCTAssertEqual(sut.textColor, Theme.contentContentPrimary)
+    }
 
     func test_disabled_card_dims_its_name() {
         let sut = ColorCardAppearance.resolve(isSelected: false, isDisabled: true)
@@ -35,6 +52,7 @@ final class ColorCardAppearanceTests: XCTestCase {
     func test_disabled_card_never_draws_the_selected_border() {
         let sut = ColorCardAppearance.resolve(isSelected: true, isDisabled: true)
         XCTAssertEqual(sut.borderColor, Theme.borderSoft)
+        XCTAssertFalse(sut.isSelected)
         XCTAssertEqual(
             sut.borderWidth,
             ColorCardAppearance.resolve(isSelected: false, isDisabled: false).borderWidth

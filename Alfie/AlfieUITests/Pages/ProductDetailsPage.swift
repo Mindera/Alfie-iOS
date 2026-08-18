@@ -39,6 +39,9 @@ final class ProductDetailsPage {
         app.staticTexts[AccessibilityID.ProductDetails.productDescription]
     }
 
+    /// The inline colour card grid, or — for a long colour run with nothing selected — the row that
+    /// opens the sheet. Absent for single-colour products and for a long run that has a selection,
+    /// where the summary is the only colour control.
     var colourSelector: XCUIElement {
         app.otherElements[AccessibilityID.ProductDetails.colourSelector]
     }
@@ -69,12 +72,7 @@ final class ProductDetailsPage {
         return self
     }
 
-    @discardableResult
-    func openColourSheet() -> Self {
-        colourSelector.tap()
-        return self
-    }
-
+    /// The sheet opens from the summary, never from `colourSelector` — tapping that picks a colour.
     /// Only rendered for multi-colour products, so callers must check `exists` first.
     @discardableResult
     func tapColourSummary() -> Self {
