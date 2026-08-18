@@ -7,6 +7,7 @@ import Mocks
 
 private enum Constants {
     static let sheetCloseIconSize: CGFloat = 16
+    static let minTapTargetSize: CGFloat = 44
 }
 
 /// Colour only: the size sheet is gone — every size renders inline on the page.
@@ -97,6 +98,11 @@ private extension ProductDetailsColorSheet {
 
                             ColorSwatchView(item: item, swatchSize: .small, isSelected: isSelected)
                         }
+                        // The 24pt swatch is the tallest thing in the row, so without this the
+                        // button is 24pt; and the gap the Spacer opens takes no taps without a
+                        // content shape.
+                        .frame(minHeight: Constants.minTapTargetSize)
+                        .contentShape(Rectangle())
                     }
                     // An out-of-stock colour is not selectable here either — the card grid disables
                     // it, and the same colour must not become selectable purely because the product

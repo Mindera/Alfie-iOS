@@ -399,24 +399,31 @@ extension ProductDetailsView {
     /// for a short run: the summary states the current colour, the grid changes it.
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
-            switch colourLayout {
-            case .inlineGrid:
-                VStack(alignment: .leading, spacing: theme.spacing.space150) {
-                    colourSelectorTitle
+            // Loading needs its own branch: the colours arrive with the product, so until they do an
+            // empty item list would read as a single-colour product and the section would occupy no
+            // space at all, then shove the page down when it appears.
+            if viewModel.shouldShowLoading(for: .colorSelector) {
+                colourSelectorTitle
+                    .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
+            } else {
+                switch colourLayout {
+                case .inlineGrid:
+                    VStack(alignment: .leading, spacing: theme.spacing.space150) {
+                        colourSelectorTitle
 
-                    ColorCardGridView(
-                        configuration: viewModel.colorSelectionConfiguration,
-                        columns: Constants.colourGridColumns
-                    )
+                        ColorCardGridView(
+                            configuration: viewModel.colorSelectionConfiguration,
+                            columns: Constants.colourGridColumns
+                        )
+                    }
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
+
+                case .sheet:
+                    colourSheetRow
+
+                case .summaryOnly:
+                    EmptyView()
                 }
-                .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
-                .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
-
-            case .sheet:
-                colourSheetRow
-
-            case .summaryOnly:
-                EmptyView()
             }
         }
     }
@@ -440,19 +447,15 @@ extension ProductDetailsView {
                     Spacer()
 
                     // Down, not right: this presents a sheet rather than pushing a screen.
-                    Icon.chevronDown.image
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .foregroundStyle(Theme.contentContentPrimary)
+                    // `ThemedIcon` hides it from assistive technology; the raw asset would be read
+                    // aloud by its file name.
+                    ThemedIcon(.chevronDown, size: .small, tint: Theme.contentContentPrimary)
                 }
                 // The heading alone is 20pt tall, and this row is the only colour control on screen.
                 .frame(minHeight: Constants.minTapTargetSize)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSheetRow)
         }
     }
