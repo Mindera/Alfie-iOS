@@ -125,6 +125,12 @@ public struct SnapCarousel<Content: View>: View {
             itemHeight = measuredHeight
         }
         .animation(.snappy, value: gestureOffset == 0)
+        // The item set can be replaced after the first render — a reserved placeholder giving way to
+        // real images, or a colour swap with a different count. `offsetIndex` is `@State` seeded at
+        // init, so without this it keeps the first seed and the carousel opens on the wrong item.
+        .onChange(of: uniqueItems.count) { newCount in
+            offsetIndex = newCount
+        }
         .onChange(of: offsetIndex) { _ in
             performInfiniteIndexCorrectionIfNeeded()
         }
