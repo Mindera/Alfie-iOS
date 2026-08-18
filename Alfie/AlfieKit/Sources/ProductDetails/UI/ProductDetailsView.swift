@@ -15,7 +15,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
-    @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
     @State private var colorSheetSearchText = ""
 
@@ -240,7 +239,7 @@ extension ProductDetailsView {
                 sizeSelector
             }
 
-            descriptionTab
+            descriptionSection
                 .padding(.vertical, theme.spacing.space200)
 
             complementaryInfo
@@ -515,21 +514,30 @@ extension ProductDetailsView {
         }
     }
 
-    @ViewBuilder private var descriptionTab: some View {
+    @ViewBuilder private var descriptionSection: some View {
         if viewModel.shouldShow(section: .productDescription) {
-            VStack(alignment: .leading, spacing: theme.spacing.space200) {
-                TabControl(
-                    theme: .dark,
-                    configuration: .fixedSize(horizontalMargins: theme.spacing.space200),
-                    options: [TabControl.TabOption(title: L10n.Pdp.TabControl.DescriptionOption.title)],
-                    currentIndex: $currentDescriptionTabIndex
-                )
-
+            VStack(alignment: .leading, spacing: theme.spacing.space100) {
                 Text.build(theme.font.body.medium(viewModel.productDescription))
                     .foregroundStyle(Theme.contentContentPrimary)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
+
+                if let descriptionMetadata {
+                    Text.build(theme.font.label.small(descriptionMetadata))
+                        .foregroundStyle(Theme.contentContentTerciary)
+                        .accessibilityIdentifier(AccessibilityID.ProductDetails.descriptionMetadata)
+                }
             }
         }
+    }
+
+    /// `Black | Ref. <sku>` — either half drops out with its separator when the value is absent.
+    private var descriptionMetadata: String? {
+        let segments = [
+            viewModel.selectedColourName,
+            viewModel.productReference.map { L10n.Pdp.ProductReference.value($0) },
+        ].compactMap { $0 }
+
+        return segments.isEmpty ? nil : segments.joined(separator: Constants.metadataSeparator)
     }
 
     @ViewBuilder private var addToBag: some View {
@@ -642,6 +650,8 @@ private enum Constants {
     /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
     static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
+    /// Figma draws the meta line as three nodes gapped 4pt; a spaced pipe is the same to the eye.
+    static let metadataSeparator = " | "
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210

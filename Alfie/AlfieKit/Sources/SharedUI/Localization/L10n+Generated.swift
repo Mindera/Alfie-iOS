@@ -184,6 +184,12 @@ public enum L10n {
         return L10n.tr("L10n", "pdp.gallery.accessibility_value", p1, p2)
       }
     }
+    public enum ProductReference {
+      /// Ref. %@
+      public static func value(_ p1: Any) -> String {
+        return L10n.tr("L10n", "pdp.product_reference.value", String(describing: p1))
+      }
+    }
     public enum SearchColors {
       /// Search Colours
       public static let placeholder = L10n.tr("L10n", "pdp.search_colors.placeholder")
@@ -201,12 +207,6 @@ public enum L10n {
     public enum SizeSelector {
       /// Select Your Size
       public static let title = L10n.tr("L10n", "pdp.size_selector.title")
-    }
-    public enum TabControl {
-      public enum DescriptionOption {
-        /// Description
-        public static let title = L10n.tr("L10n", "pdp.tab_control.description_option.title")
-      }
     }
   }
   public enum Plp {
@@ -581,11 +581,11 @@ public extension L10n {
       case pdpGalleryAccessibilityHint = "pdp.gallery.accessibility_hint"
       case pdpGalleryAccessibilityLabel = "pdp.gallery.accessibility_label"
       case pdpGalleryAccessibilityValue = "pdp.gallery.accessibility_value"
+      case pdpProductReferenceValue = "pdp.product_reference.value"
       case pdpSearchColorsPlaceholder = "pdp.search_colors.placeholder"
       case pdpShareProductFromSubject = "pdp.share_product.from.subject"
       case pdpSizeGuideLink = "pdp.size_guide.link"
       case pdpSizeSelectorTitle = "pdp.size_selector.title"
-      case pdpTabControlDescriptionOptionTitle = "pdp.tab_control.description_option.title"
       case plpErrorViewMessage = "plp.error_view.message"
       case plpErrorViewTitle = "plp.error_view.title"
       case plpErrorViewButtonCta = "plp.error_view.button.cta"

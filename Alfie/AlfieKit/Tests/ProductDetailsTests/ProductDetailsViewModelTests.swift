@@ -316,6 +316,31 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEqual(sut.productDescription, product.longDescription)
     }
+
+    func test_selected_colour_name_and_reference_come_from_the_selected_variant() {
+        let variant = Product.Variant.fixture(sku: "0273/393", colour: .fixture(name: "Black"))
+        initViewModel(configuration: .product(.fixture(defaultVariant: variant, variants: [variant])))
+
+        XCTAssertEqual(sut.selectedColourName, "Black")
+        XCTAssertEqual(sut.productReference, "0273/393")
+    }
+
+    /// Single-option products carry a nameless colour purely to hold media, so the metadata line
+    /// must drop the colour rather than render a blank segment.
+    func test_selected_colour_name_is_nil_when_the_variant_colour_is_nameless() {
+        let variant = Product.Variant.fixture(sku: "0273/393", colour: .fixture(name: ""))
+        initViewModel(configuration: .product(.fixture(defaultVariant: variant, variants: [variant])))
+
+        XCTAssertNil(sut.selectedColourName)
+        XCTAssertEqual(sut.productReference, "0273/393")
+    }
+
+    func test_selected_colour_name_and_reference_are_nil_if_no_product_was_fetched() {
+        initViewModel()
+
+        XCTAssertNil(sut.selectedColourName)
+        XCTAssertNil(sut.productReference)
+    }
     
     func test_price_type_is_nil_when_no_product_is_missing() {
         initViewModel()
