@@ -82,12 +82,6 @@ final class ProductDetailsPage {
         return self
     }
 
-    @discardableResult
-    func openSizeSheet() -> Self {
-        sizeSelector.tap()
-        return self
-    }
-
     // MARK: - Assertions
 
     func assertVisible(timeout: TimeInterval = 5) {

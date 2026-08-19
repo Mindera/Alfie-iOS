@@ -14,7 +14,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
-    @State private var showSizeSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var colorSelectorSize: CGSize = .zero
     @State private var currentDescriptionTabIndex = 0
@@ -27,12 +26,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         ProductDetailsLayoutRules.colourLayout(
             forColourCount: viewModel.colorSelectionConfiguration.items.count
         ) != .summaryOnly
-    }
-
-    private var canShowSizePickers: Bool {
-        ProductDetailsLayoutRules.sizeLayout(
-            forSizeCount: viewModel.sizingSelectionConfiguration.items.count
-        ) == .verticalList
     }
 
     private var isOneSize: Bool {
@@ -101,9 +94,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         }
         .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }) {
             colorSheet
-        }
-        .sheet(isPresented: $showSizeSheet) {
-            sizeSheet
         }
     }
 
@@ -402,16 +392,11 @@ extension ProductDetailsView {
     }
 
     private var colorSheet: some View {
-        ProductDetailsColorAndSizeSheet(
+        ProductDetailsColorSheet(
             viewModel: viewModel,
-            type: .color,
             isPresented: $showColorSheet,
             searchText: $colorSheetSearchText
         )
-    }
-
-    private var sizeSheet: some View {
-        ProductDetailsColorAndSizeSheet(viewModel: viewModel, type: .size, isPresented: $showSizeSheet)
     }
 
     @ViewBuilder private var colorSelector: some View {
@@ -461,23 +446,18 @@ extension ProductDetailsView {
         }
     }
 
+    /// Every size renders inline, whatever the count — the design draws one chip grid and no
+    /// collapse-to-sheet, so the sheet the screen used to open is gone.
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: theme.spacing.space150) {
                 if viewModel.canShowSizeSelector {
-                    ColorAndSizingSelectorHeaderView(
-                        configuration: viewModel.sizingSelectionConfiguration,
-                        isExpandable: canShowSizePickers
-                    ) {
-                        showSizeSheet = true
-                    }
+                    sizeSelectorHeader
 
-                    if !canShowSizePickers {
-                        SizingSelectorComponentView(
-                            configuration: viewModel.sizingSelectionConfiguration,
-                            layoutConfiguration: .init(arrangement: .grid(columns: 3))
-                        )
-                    }
+                    SizingSelectorComponentView(
+                        configuration: viewModel.sizingSelectionConfiguration,
+                        layoutConfiguration: .init(arrangement: .grid(columns: Constants.sizeGridColumns))
+                    )
                 } else {
                     singleSizeView
                 }
@@ -487,16 +467,28 @@ extension ProductDetailsView {
         }
     }
 
-    @ViewBuilder private var singleSizeView: some View {
+    private var sizeSelectorHeader: some View {
+        HStack(alignment: .firstTextBaseline, spacing: theme.spacing.space100) {
+            Text.build(theme.font.heading.xSmall(L10n.Pdp.SizeSelector.title))
+                .foregroundStyle(Theme.contentContentPrimary)
+
+            Spacer()
+
+            // The design draws the link with no destination behind it; slice 5 makes it live. Until
+            // then it renders as designed but offers no tap target and no accessibility action.
+            Text.build(theme.font.link.medium(L10n.Pdp.SizeGuide.link, underline: true))
+                .foregroundStyle(Theme.linkLinkPrimaryDefault)
+                .allowsHitTesting(false)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeGuideLink)
+        }
+    }
+
+    private var singleSizeView: some View {
         let sizeText: String = isOneSize
             ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
             : L10n.Product.OneSize.title
-        HStack {
-            Text.build(theme.font.body.small(L10n.Product.Size.title + ":"))
-                .foregroundStyle(Theme.contentContentPrimary)
-            Text.build(theme.font.body.small(sizeText))
-                .foregroundStyle(Theme.contentContentPrimary)
-        }
+        return Text.build(theme.font.body.medium(L10n.Product.Size.selected(sizeText)))
+            .foregroundStyle(Theme.contentContentPrimary)
     }
 
     @ViewBuilder private var complementaryInfo: some View {
@@ -621,6 +613,8 @@ private enum Constants {
     /// The design draws the call-to-action and wishlist buttons square, unlike the 4pt default.
     static let ctaCornerRadius: CGFloat = 0
     static let indicatorSize: CGFloat = 6
+    /// The design lays the size chips out three to a row, the last row keeping that width.
+    static let sizeGridColumns = 3
     static let selectedIndicatorWidth: CGFloat = 12
     /// Bounds the whole screen on a wide device: the gallery hugs its image, so at an iPad's full
     /// width it would be taller than the screen and push the information block below the fold.

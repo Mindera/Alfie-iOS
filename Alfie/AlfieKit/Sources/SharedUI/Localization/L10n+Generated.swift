@@ -184,6 +184,14 @@ public enum L10n {
         public static let subject = L10n.tr("L10n", "pdp.share_product.from.subject")
       }
     }
+    public enum SizeGuide {
+      /// Size Guide
+      public static let link = L10n.tr("L10n", "pdp.size_guide.link")
+    }
+    public enum SizeSelector {
+      /// Select Your Size
+      public static let title = L10n.tr("L10n", "pdp.size_selector.title")
+    }
     public enum TabControl {
       public enum DescriptionOption {
         /// Description
@@ -281,8 +289,16 @@ public enum L10n {
       }
     }
     public enum Size {
+      /// Size: %@
+      public static func selected(_ p1: Any) -> String {
+        return L10n.tr("L10n", "product.size.selected", String(describing: p1))
+      }
       /// Size
       public static let title = L10n.tr("L10n", "product.size.title")
+      public enum OutOfStock {
+        /// Out of stock
+        public static let accessibilityValue = L10n.tr("L10n", "product.size.out_of_stock.accessibility_value")
+      }
     }
   }
   public enum Search {
@@ -555,6 +571,8 @@ public extension L10n {
       case pdpGalleryAccessibilityValue = "pdp.gallery.accessibility_value"
       case pdpSearchColorsPlaceholder = "pdp.search_colors.placeholder"
       case pdpShareProductFromSubject = "pdp.share_product.from.subject"
+      case pdpSizeGuideLink = "pdp.size_guide.link"
+      case pdpSizeSelectorTitle = "pdp.size_selector.title"
       case pdpTabControlDescriptionOptionTitle = "pdp.tab_control.description_option.title"
       case plpErrorViewMessage = "plp.error_view.message"
       case plpErrorViewTitle = "plp.error_view.title"
@@ -575,7 +593,9 @@ public extension L10n {
       case productColorTitle = "product.color.title"
       case productOneSizeTitle = "product.one_size.title"
       case productOutOfStockButtonCta = "product.out_of_stock.button.cta"
+      case productSizeSelected = "product.size.selected"
       case productSizeTitle = "product.size.title"
+      case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"

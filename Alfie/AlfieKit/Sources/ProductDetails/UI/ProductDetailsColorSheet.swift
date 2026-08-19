@@ -10,40 +10,24 @@ private enum Constants {
     static let colorCheckmarkSize: CGFloat = 16
 }
 
-enum SheetType {
-    case color
-    case size
-}
-
-struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtocol>: View {
-    @StateObject private var viewModel: ViewModel
+/// Colour only: the size sheet is gone — every size renders inline on the page.
+struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: View {
+    // Injected, not owned: `@StateObject` would pin the first view model this sheet ever saw and
+    // silently ignore later ones.
+    @ObservedObject private var viewModel: ViewModel
     @Binding private var isPresented: Bool
     @Binding private var searchText: String
 
-    private let type: SheetType
-
-    private var title: String {
-        // swiftlint:disable vertical_whitespace_between_cases
-        switch type {
-        case .color:
-            L10n.Product.Color.title
-        case .size:
-            L10n.Product.Size.title
-        }
-        // swiftlint:enable vertical_whitespace_between_cases
-    }
-
-    internal init(viewModel: ViewModel, type: SheetType, isPresented: Binding<Bool>, searchText: Binding<String> = Binding.constant("")) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
+    internal init(viewModel: ViewModel, isPresented: Binding<Bool>, searchText: Binding<String> = Binding.constant("")) {
+        self._viewModel = ObservedObject(wrappedValue: viewModel)
         self._isPresented = isPresented
         self._searchText = searchText
-        self.type = type
     }
 
     var body: some View {
         VStack {
             HStack {
-                Text.build(theme.font.body.large(title))
+                Text.build(theme.font.body.large(L10n.Product.Color.title))
                     .foregroundStyle(Theme.contentContentPrimary)
 
                 Spacer()
@@ -64,7 +48,7 @@ struct ProductDetailsColorAndSizeSheet<ViewModel: ProductDetailsViewModelProtoco
             ThemedDivider.horizontalThin
                 .padding(.bottom, theme.spacing.space100)
 
-            itemsView
+            colorItemsView
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
@@ -84,18 +68,7 @@ private extension View {
     }
 }
 
-private extension ProductDetailsColorAndSizeSheet {
-    @ViewBuilder var itemsView: some View {
-        // swiftlint:disable vertical_whitespace_between_cases
-        switch type {
-        case .color:
-            colorItemsView
-        case .size:
-            sizeItemsView
-        }
-        // swiftlint:enable vertical_whitespace_between_cases
-    }
-
+private extension ProductDetailsColorSheet {
     @ViewBuilder var colorItemsView: some View {
         ScrollView {
             ForEach(viewModel.colorSwatches(filteredBy: searchText)) { item in
@@ -138,35 +111,6 @@ private extension ProductDetailsColorAndSizeSheet {
         )
     }
 
-    @ViewBuilder var sizeItemsView: some View {
-        ScrollView {
-            ForEach(viewModel.sizingSelectionConfiguration.items) { item in
-                VStack {
-                    Button {
-                        viewModel.sizingSelectionConfiguration.selectedItem = item
-                        isPresented = false
-                    } label: {
-                        HStack(spacing: theme.spacing.space200) {
-                            Text.build(theme.font.body.medium(item.name.capitalized))
-
-                            Spacer()
-
-                            if viewModel.sizingSelectionConfiguration.selectedItem == item {
-                                checkmark
-                            }
-                        }
-                    }
-                    .padding(.vertical, theme.spacing.space100)
-                    .tint(Theme.contentContentPrimary)
-
-                    ThemedDivider.horizontalThin
-                }
-            }
-            .padding(.horizontal, theme.spacing.space200)
-            .padding(.vertical, theme.spacing.space100)
-        }
-    }
-
     @ViewBuilder var checkmark: some View {
         Icon.checkmark.image
             .resizable()
@@ -177,9 +121,8 @@ private extension ProductDetailsColorAndSizeSheet {
 
 #if DEBUG
 #Preview {
-    ProductDetailsColorAndSizeSheet(
+    ProductDetailsColorSheet(
         viewModel: MockProductDetailsViewModel(),
-        type: .color,
         isPresented: .constant(true),
         searchText: .constant("")
     )

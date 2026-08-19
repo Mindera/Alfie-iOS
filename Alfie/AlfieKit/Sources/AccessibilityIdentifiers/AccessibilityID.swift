@@ -54,6 +54,8 @@ public enum AccessibilityID {
         public static let colourSelector = "productDetails.colour.selector"
         public static let colourSummary = "productDetails.colour.summary"
         public static let sizeSelector = "productDetails.size.selector"
+        /// Drawn by the design with no destination behind it — rendered, but not interactive.
+        public static let sizeGuideLink = "productDetails.sizeGuide.link"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
     }
