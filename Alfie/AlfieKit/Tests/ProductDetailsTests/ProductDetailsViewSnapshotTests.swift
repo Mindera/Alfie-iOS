@@ -136,6 +136,36 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    /// Every section shimmering at once — the state a shopper sees before the product resolves.
+    func test_productDetailsView_loadingState() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.onShouldShowLoadingForSectionCalled = { _ in true }
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// Every size out of stock: `canShowSize` drops the whole selector rather than offering a grid
+    /// where nothing is buyable.
+    func test_productDetailsView_withEverySizeOutOfStock() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.sizingSelectionConfiguration = .init(
+            items: [
+                .init(id: "1", name: "S", state: .outOfStock),
+                .init(id: "2", name: "M", state: .outOfStock),
+                .init(id: "3", name: "L", state: .outOfStock),
+            ],
+            selectedItem: nil
+        )
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)
