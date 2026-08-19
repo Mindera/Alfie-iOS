@@ -35,6 +35,143 @@ final class SnapCarouselHeightTests: XCTestCase {
         XCTAssertEqual(height, width / 0.77, accuracy: 1)
     }
 
+    /// A carousel first built around one reserved placeholder and then handed the real image set
+    /// must still show the FIRST image. `offsetIndex` is `@State` seeded at init, so it survives the
+    /// item swap; before the fix it stayed at 1 and the gallery opened on the second image while the
+    /// indicator still read "1 of N". `realIndex` does not move when this happens, so the assertion
+    /// has to be what is actually on screen.
+    func test_replacingTheItemSet_showsTheFirstItemNotTheSecond() {
+        let placeholder = { [AnyView(Color.gray.aspectRatio(1, contentMode: .fit))] }
+        let images = {
+            [UIColor.red, UIColor.green, UIColor.blue].map {
+                AnyView(Color($0).aspectRatio(1, contentMode: .fit))
+            }
+        }
+
+        let host = UIHostingController(rootView: carousel(items: placeholder))
+        if #available(iOS 16.4, *) {
+            host.safeAreaRegions = []
+        }
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: width, height: 1000))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        settle(host)
+
+        // The reserved slot gives way to the real set, exactly as it does when a fetch returns.
+        host.rootView = carousel(items: images)
+        settle(host)
+
+        let onScreen = centrePixel(of: host, height: width)
+        XCTAssertEqual(onScreen.red, 1, accuracy: 0.1, "expected the first image (red) to be centred")
+        XCTAssertEqual(onScreen.green, 0, accuracy: 0.1, "green means the carousel opened on image 2")
+    }
+
+    /// External paging (the VoiceOver adjustable action, the named next/previous actions) must keep
+    /// working after the item set is replaced and the index reset in the same update — a colour swap
+    /// whose new variant has a different image count.
+    ///
+    /// Note on what this does NOT prove. The related failure — the internal lock stranding, so the
+    /// indicator advances but the image does not — only occurs if SwiftUI runs the item-count
+    /// handler before the index handler. This SDK runs them the other way round, which is the benign
+    /// order, so this test passes with or without the guard in `handleExternalIndexUpdate`. It pins
+    /// the behaviour, not the guard; the guard is defensive against an ordering SwiftUI does not
+    /// contractually promise.
+    func test_externalPagingStillWorks_afterTheItemSetAndIndexChangeTogether() {
+        let index = Box()
+        let first = { [UIColor.red, UIColor.green, UIColor.blue].map(Self.swatch) }
+        let second = { [UIColor.cyan, UIColor.magenta].map(Self.swatch) }
+
+        let host = UIHostingController(rootView: carousel(items: first, index: index.binding))
+        if #available(iOS 16.4, *) {
+            host.safeAreaRegions = []
+        }
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: width, height: 1000))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        settle(host)
+
+        // External move within the original set — proves the path works before the swap.
+        index.value = 1
+        host.rootView = carousel(items: first, index: index.binding)
+        settle(host)
+        XCTAssertEqual(centrePixel(of: host, height: width).green, 1, accuracy: 0.1, "external paging should reach image 2")
+
+        // The colour swap: fewer images, and the index reset to 0, in one update.
+        index.value = 0
+        host.rootView = carousel(items: second, index: index.binding)
+        settle(host)
+
+        // Now page externally again. This is what the stranded lock swallows.
+        index.value = 1
+        host.rootView = carousel(items: second, index: index.binding)
+        settle(host)
+
+        let onScreen = centrePixel(of: host, height: width)
+        XCTAssertEqual(onScreen.red, 1, accuracy: 0.1, "expected magenta — external paging is dead after the swap")
+        XCTAssertEqual(onScreen.green, 0, accuracy: 0.1, "cyan means the carousel never moved")
+    }
+
+    private static func swatch(_ colour: UIColor) -> AnyView {
+        AnyView(Color(colour).aspectRatio(1, contentMode: .fit))
+    }
+
+    /// Backs a real `Binding`, so external index changes behave as they do in the app.
+    private final class Box {
+        var value = 0
+        var binding: Binding<Int> { .init(get: { self.value }, set: { self.value = $0 }) }
+    }
+
+    private func carousel(items: @escaping () -> [AnyView], index: Binding<Int> = .constant(0)) -> some View {
+        SnapCarousel(
+            itemAspectRatio: nil,
+            itemIndex: index,
+            // Without this the offset animates and the rasterised pixel is mid-flight.
+            shouldAnimateRealIndexUpdate: .constant(false),
+            showsAdjacentItemPeek: false,
+            items: items
+        )
+        .frame(width: width)
+    }
+
+    private func settle(_ host: UIViewController) {
+        for _ in 0 ..< 3 {
+            host.view.setNeedsLayout()
+            host.view.layoutIfNeeded()
+            RunLoop.current.run(until: Date())
+        }
+    }
+
+    /// Rasterises the carousel and reads the middle pixel — the only way to tell which item the
+    /// carousel actually scrolled to, since that lives in the offset rather than in any binding.
+    private func centrePixel(of host: UIViewController, height: CGFloat) -> (red: CGFloat, green: CGFloat) {
+        host.view.frame = .init(x: 0, y: 0, width: width, height: height)
+        host.view.layoutIfNeeded()
+        let renderer = UIGraphicsImageRenderer(bounds: host.view.bounds)
+        let image = renderer.image { context in host.view.layer.render(in: context.cgContext) }
+        guard let cgImage = image.cgImage else { return (0, 0) }
+
+        var pixel = [UInt8](repeating: 0, count: 4)
+        let context = CGContext(
+            data: &pixel,
+            width: 1,
+            height: 1,
+            bitsPerComponent: 8,
+            bytesPerRow: 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )
+        context?.draw(
+            cgImage,
+            in: .init(
+                x: -CGFloat(cgImage.width) / 2,
+                y: -CGFloat(cgImage.height) / 2,
+                width: CGFloat(cgImage.width),
+                height: CGFloat(cgImage.height)
+            )
+        )
+        return (CGFloat(pixel[0]) / 255, CGFloat(pixel[1]) / 255)
+    }
+
     /// Renders the carousel in a window and lets the measure/adopt round trip settle.
     private func resolvedHeight(
         itemAspectRatio: CGFloat?,

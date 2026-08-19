@@ -125,6 +125,12 @@ public struct SnapCarousel<Content: View>: View {
             itemHeight = measuredHeight
         }
         .animation(.snappy, value: gestureOffset == 0)
+        // The item set can be replaced after the first render — a reserved placeholder giving way to
+        // real images, or a colour swap with a different count. `offsetIndex` is `@State` seeded at
+        // init, so without this it keeps the first seed and the carousel opens on the wrong item.
+        .onChange(of: uniqueItems.count) { newCount in
+            offsetIndex = newCount
+        }
         .onChange(of: offsetIndex) { _ in
             performInfiniteIndexCorrectionIfNeeded()
         }
@@ -174,6 +180,15 @@ extension SnapCarousel {
     // Handles an external change of the index (eg. paginated controls)
     private func handleExternalIndexUpdate(with newIndex: Int, and lockRealIndexAnimationTrigger: Bool) {
         guard !lockRealIndexAnimationTrigger else {
+            return
+        }
+        // The flags below are cleared by `performInfiniteIndexCorrectionIfNeeded`, which only runs
+        // when `offsetIndex` actually changes. When it would not — an item-count change and an index
+        // reset landing in the same update both target this value — setting them would strand them
+        // and swallow the next external update.
+        guard uniqueItems.count + newIndex != offsetIndex else {
+            self.lockRealIndexAnimationTrigger = false
+            shouldUpdateRealIndex = false
             return
         }
         self.lockRealIndexAnimationTrigger = true

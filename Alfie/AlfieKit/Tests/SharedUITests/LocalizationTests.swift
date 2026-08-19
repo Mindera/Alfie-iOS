@@ -43,6 +43,14 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    /// `validateLocalizedStrings` only proves no specifier was left unresolved — it would pass just
+    /// as happily if the plural selected on the colour name instead of the count. These pin the
+    /// resolved text, so a plural bound to the wrong argument fails here.
+    func test_colourSummaryAccessibilityLabel_pluralSelectsOnTheCount() {
+        XCTAssertEqual(L10n.Pdp.ColourSummary.accessibilityLabel("Black", 1), "Black, 1 other colour")
+        XCTAssertEqual(L10n.Pdp.ColourSummary.accessibilityLabel("Black", 3), "Black, 3 other colours")
+    }
+
     // MARK: - Test String Replacer Regex private helper
 
     func test_StringReplacerRegex_ForObjectSpecifier_Failing() {
