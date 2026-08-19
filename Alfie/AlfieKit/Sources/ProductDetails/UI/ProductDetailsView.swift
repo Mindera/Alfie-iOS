@@ -51,8 +51,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 pdpView
             }
         }
+        // Figma titles the header with the product name; the brand stays in the info block, which
+        // otherwise repeated it in both places and never named the product in the header.
         .toolbarView(
-            productTitle: viewModel.productTitle,
+            productTitle: viewModel.productName,
             shareConfiguration: viewModel.shareConfiguration,
             didFail: viewModel.state.didFail
         )
@@ -235,7 +237,8 @@ extension ProductDetailsView {
         VStack(alignment: .leading, spacing: theme.spacing.space100) {
             productInfo
 
-            VStack(spacing: theme.spacing.space100) {
+            // Figma: one row — Add to Bag fills, the wishlist is a 40pt square beside it.
+            HStack(spacing: theme.spacing.space100) {
                 addToBag
                 addToWishlist
             }
@@ -576,19 +579,21 @@ extension ProductDetailsView {
         }
     }
 
+    /// Icon-only in the design, so the label it used to carry becomes the accessibility label —
+    /// otherwise VoiceOver reaches an unnamed button.
     @ViewBuilder private var addToWishlist: some View {
         if viewModel.shouldShow(section: .addToWishlist) {
-            VStack(spacing: theme.spacing.space0) {
-                ThemedButton(
-                    text: L10n.Product.AddToWishlist.Button.cta,
-                    style: .secondary,
-                    isFullWidth: true,
-                    cornerRadius: Constants.ctaCornerRadius
-                ) {
-                    viewModel.didTapAddToWishlist()
-                }
-                .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
+            ThemedButton(
+                text: "",
+                style: .secondary,
+                leadingAsset: .heart,
+                cornerRadius: Constants.ctaCornerRadius
+            ) {
+                viewModel.didTapAddToWishlist()
             }
+            .frame(width: Sizing.iconsIconXlarge, height: Sizing.iconsIconXlarge)
+            .accessibilityLabel(L10n.Product.AddToWishlist.Button.cta)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
         }
     }
 
