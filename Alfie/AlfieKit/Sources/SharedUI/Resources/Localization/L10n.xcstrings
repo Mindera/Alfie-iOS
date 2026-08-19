@@ -320,6 +320,28 @@
         }
       }
     },
+    "pdp.colour.out_of_stock.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Out of stock"
+          }
+        }
+      }
+    },
+    "pdp.colour_selector.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a Colour"
+          }
+        }
+      }
+    },
     "pdp.colour_summary.accessibility_hint" : {
       "extractionState" : "manual",
       "localizations" : {

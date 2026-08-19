@@ -15,17 +15,12 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @State private var isMediaFullScreen = false
     @State private var showColorSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
-    @State private var colorSelectorSize: CGSize = .zero
     @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
-    @State private var hasSpaceForSizeSelector = true
     @State private var colorSheetSearchText = ""
 
-    // There are multiple types of color pickers, but they all depend on the same conditions
-    private var canShowColorPickers: Bool {
-        ProductDetailsLayoutRules.colourLayout(
-            forColourCount: viewModel.colorSelectionConfiguration.items.count
-        ) != .summaryOnly
+    private var colourLayout: ProductDetailsLayoutRules.ColourLayout {
+        ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.colorSelectionConfiguration.items.count)
     }
 
     private var isOneSize: Bool {
@@ -399,50 +394,69 @@ extension ProductDetailsView {
         )
     }
 
+    /// Few colours render inline as cards; a long colour run stays in the sheet, which the info
+    /// block's summary opens — so the page never fills with swatches. Both surfaces show together
+    /// for a short run: the summary states the current colour, the grid changes it.
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
-            if hasSpaceForSizeSelector {
-                VStack(alignment: .leading, spacing: theme.spacing.space150) {
-                    ColorAndSizingSelectorHeaderView(
-                        configuration: viewModel.colorSelectionConfiguration,
-                        isExpandable: canShowColorPickers
-                    ) {
-                        showColorSheet = true
-                    }
+            // Loading needs its own branch: the colours arrive with the product, so until they do an
+            // empty item list would read as a single-colour product and the section would occupy no
+            // space at all, then shove the page down when it appears.
+            if viewModel.shouldShowLoading(for: .colorSelector) {
+                colourSelectorTitle
+                    .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
+            } else {
+                switch colourLayout {
+                case .inlineGrid:
+                    VStack(alignment: .leading, spacing: theme.spacing.space150) {
+                        colourSelectorTitle
 
-                    if canShowColorPickers {
-                        ColorSelectorComponentView(
+                        ColorCardGridView(
                             configuration: viewModel.colorSelectionConfiguration,
-                            layoutConfiguration: .init(
-                                arrangement: .horizontal(itemSpacing: theme.spacing.space100, scrollable: false),
-                                hideSelectionTitle: true,
-                                hideOnSingleColor: false
-                            ),
-                            frameSize: .init(
-                                get: { .zero },
-                                set: { colorSwatchesFrameSize in
-                                    hasSpaceForSizeSelector = colorSwatchesFrameSize.width < colorSelectorSize.width
-                                }
-                            )
+                            columns: Constants.colourGridColumns
                         )
-                        .frame(minHeight: Constants.minColorSelectorHeight, alignment: .leading)
                     }
-                }
-                .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
-                .writingSize(to: $colorSelectorSize)
-                .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
-            } else if canShowColorPickers {
-                if let selectedColor = viewModel.colorSelectionConfiguration.selectedItem {
-                    PickerMenu(isModalPresented: $showColorSheet) {
-                        HStack(spacing: theme.spacing.space100) {
-                            ColorSwatchView(item: selectedColor, swatchSize: .normal, isSelected: false)
-                            Text.build(theme.font.body.small(selectedColor.name.capitalized))
-                                .foregroundStyle(Theme.contentContentPrimary)
-                        }
-                    }
-                    .id(selectedColor.id)
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
+
+                case .sheet:
+                    colourSheetRow
+
+                case .summaryOnly:
+                    EmptyView()
                 }
             }
+        }
+    }
+
+    private var colourSelectorTitle: some View {
+        Text.build(theme.font.heading.xSmall(L10n.Pdp.ColourSelector.title))
+            .foregroundStyle(Theme.contentContentPrimary)
+    }
+
+    /// A long colour run is reachable through the info block's summary — but that summary needs a
+    /// selected swatch to draw, and a variant can carry no colour at all. This row is the entry
+    /// point for that case, and it claims no selection the summary cannot honestly show.
+    @ViewBuilder private var colourSheetRow: some View {
+        if viewModel.colorSelectionConfiguration.selectedItem == nil {
+            Button {
+                showColorSheet = true
+            } label: {
+                HStack(spacing: theme.spacing.space0) {
+                    colourSelectorTitle
+
+                    Spacer()
+
+                    // Down, not right: this presents a sheet rather than pushing a screen.
+                    // `ThemedIcon` hides it from assistive technology; the raw asset would be read
+                    // aloud by its file name.
+                    ThemedIcon(.chevronDown, size: .small, tint: Theme.contentContentPrimary)
+                }
+                // The heading alone is 20pt tall, and this row is the only colour control on screen.
+                .frame(minHeight: Constants.minTapTargetSize)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSheetRow)
         }
     }
 
@@ -615,6 +629,9 @@ private enum Constants {
     static let indicatorSize: CGFloat = 6
     /// The design lays the size chips out three to a row, the last row keeping that width.
     static let sizeGridColumns = 3
+    /// The colour cards follow the size chips: three to a row.
+    static let colourGridColumns = 3
+    static let minTapTargetSize: CGFloat = 44
     static let selectedIndicatorWidth: CGFloat = 12
     /// Bounds the whole screen on a wide device: the gallery hugs its image, so at an iPad's full
     /// width it would be taller than the screen and push the information block below the fold.
@@ -625,7 +642,6 @@ private enum Constants {
     /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
     static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
-    static let minColorSelectorHeight = 26.0
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210

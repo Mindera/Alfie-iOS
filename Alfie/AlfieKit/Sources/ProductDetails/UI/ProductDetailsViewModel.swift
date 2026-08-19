@@ -287,11 +287,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             selectedSwatch = colorSwatches.first { $0.id == selectedVariant.colour?.id }
         }
 
-        colorSelectionConfiguration = .init(
-            selectedTitle: L10n.Product.Color.title + ":",
-            items: colorSwatches,
-            selectedItem: selectedSwatch
-        )
+        colorSelectionConfiguration = .init(items: colorSwatches, selectedItem: selectedSwatch)
         colorSelectionSubscription = colorSelectionConfiguration.$selectedItem
             .receive(on: dependencies.scheduler)
             .dropFirst()

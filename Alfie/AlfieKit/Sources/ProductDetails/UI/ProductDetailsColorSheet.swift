@@ -7,7 +7,7 @@ import Mocks
 
 private enum Constants {
     static let sheetCloseIconSize: CGFloat = 16
-    static let colorCheckmarkSize: CGFloat = 16
+    static let minTapTargetSize: CGFloat = 44
 }
 
 /// Colour only: the size sheet is gone — every size renders inline on the page.
@@ -27,7 +27,7 @@ struct ProductDetailsColorSheet<ViewModel: ProductDetailsViewModelProtocol>: Vie
     var body: some View {
         VStack {
             HStack {
-                Text.build(theme.font.body.large(L10n.Product.Color.title))
+                Text.build(theme.font.heading.xSmall(L10n.Pdp.ColourSelector.title))
                     .foregroundStyle(Theme.contentContentPrimary)
 
                 Spacer()
@@ -72,28 +72,47 @@ private extension ProductDetailsColorSheet {
     @ViewBuilder var colorItemsView: some View {
         ScrollView {
             ForEach(viewModel.colorSwatches(filteredBy: searchText)) { item in
+                // An out-of-stock colour cannot be the selection the row draws, matching the card
+                // grid — otherwise the two surfaces disagree about the same colour.
+                let isSelected = !item.isDisabled && viewModel.colorSelectionConfiguration.selectedItem == item
+
                 VStack {
                     Button {
                         viewModel.colorSelectionConfiguration.selectedItem = item
                         isPresented = false
                     } label: {
+                        // The design puts the name first and the swatch at the trailing edge, and
+                        // marks the selection with the swatch's own border rather than a checkmark.
                         HStack(spacing: theme.spacing.space200) {
-                            ColorSwatchView(
-                                item: item,
-                                swatchSize: .normal,
-                                isSelected: viewModel.colorSelectionConfiguration.selectedItem == item
+                            // Bold marks the selection, as it does on the card grid.
+                            Text.build(
+                                isSelected
+                                    ? theme.font.body.mediumBold(item.name.capitalized)
+                                    : theme.font.body.medium(item.name.capitalized)
                             )
-
-                            Text.build(theme.font.body.medium(item.name.capitalized))
+                            .foregroundStyle(
+                                item.isDisabled ? Theme.contentContentTerciary : Theme.contentContentPrimary
+                            )
 
                             Spacer()
 
-                            if viewModel.colorSelectionConfiguration.selectedItem == item {
-                                checkmark
-                            }
+                            ColorSwatchView(item: item, swatchSize: .small, isSelected: isSelected)
                         }
+                        // The 24pt swatch is the tallest thing in the row, so without this the
+                        // button is 24pt; and the gap the Spacer opens takes no taps without a
+                        // content shape.
+                        .frame(minHeight: Constants.minTapTargetSize)
+                        .contentShape(Rectangle())
                     }
-                    .tint(Theme.contentContentPrimary)
+                    // An out-of-stock colour is not selectable here either — the card grid disables
+                    // it, and the same colour must not become selectable purely because the product
+                    // carries enough colours to open the sheet instead.
+                    .disabled(item.isDisabled)
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    // "Dimmed" alone does not say why; the size chip announces the same reason.
+                    .accessibilityValueOrNone(
+                        item.isDisabled ? L10n.Pdp.Colour.OutOfStock.accessibilityValue : nil
+                    )
 
                     ThemedDivider.horizontalThin
                 }
@@ -109,13 +128,6 @@ private extension ProductDetailsColorSheet {
             dismissConfiguration: .init(type: .cancel(title: L10n.SearchBar.cancel)),
             verticalSpacing: theme.spacing.space200
         )
-    }
-
-    @ViewBuilder var checkmark: some View {
-        Icon.checkmark.image
-            .resizable()
-            .scaledToFit()
-            .frame(size: Constants.colorCheckmarkSize)
     }
 }
 

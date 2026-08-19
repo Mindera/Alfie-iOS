@@ -32,7 +32,7 @@ final class ProductDetailsLayoutRulesTests: XCTestCase {
 
     func test_colour_summary_is_hidden_without_a_selected_colour() {
         // The converter leaves the selection nil when the variant carries no colour; there is then
-        // no swatch to summarise, even though the picker itself would still render.
+        // no swatch to summarise. The view owes that case its own entry point to the sheet.
         XCTAssertNil(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 4, hasSelection: false))
     }
 

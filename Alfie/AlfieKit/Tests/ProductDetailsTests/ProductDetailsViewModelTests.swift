@@ -686,6 +686,81 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
     }
 
+    /// `isDisabled` is the flag both colour surfaces key off — the card grid and the sheet row each
+    /// refuse selection on it — so the stock-to-flag mapping is worth pinning on its own.
+    func test_color_swatch_is_disabled_when_no_variant_in_that_colour_has_stock() {
+        initViewModel()
+
+        let inStock = Product.Colour.fixture(id: "1", name: "In Stock")
+        let soldOut = Product.Colour.fixture(id: "2", name: "Sold Out")
+        let product = Product.fixture(
+            name: "Product Name",
+            brand: .fixture(name: "Product Brand"),
+            defaultVariant: .fixture(colour: inStock, stock: 3),
+            variants: [
+                .fixture(colour: inStock, stock: 3),
+                .fixture(colour: soldOut, stock: 0),
+            ]
+        )
+        mockProductService.onGetProductCalled = { _ in
+            product
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        let items = sut.colorSelectionConfiguration.items
+        XCTAssertEqual(items.first { $0.id == inStock.id }?.isDisabled, false)
+        XCTAssertEqual(items.first { $0.id == soldOut.id }?.isDisabled, true)
+    }
+
+    /// One colour out of stock in one size is still buyable in another, so the colour stays enabled.
+    func test_color_swatch_stays_enabled_when_only_some_of_its_variants_are_out_of_stock() {
+        initViewModel()
+
+        let colour = Product.Colour.fixture(id: "1", name: "Colour 1")
+        let product = Product.fixture(
+            name: "Product Name",
+            brand: .fixture(name: "Product Brand"),
+            defaultVariant: .fixture(colour: colour, stock: 0),
+            variants: [
+                .fixture(colour: colour, stock: 0),
+                .fixture(colour: colour, stock: 2),
+            ]
+        )
+        mockProductService.onGetProductCalled = { _ in
+            product
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.colorSelectionConfiguration.items.first?.isDisabled, false)
+    }
+
+    /// The sheet's list source: an empty term shows everything, otherwise it matches by name,
+    /// ignoring case.
+    func test_color_swatches_filter_by_name_ignoring_case() {
+        initViewModel()
+
+        let navy = Product.Colour.fixture(id: "1", name: "Midnight Navy")
+        let sand = Product.Colour.fixture(id: "2", name: "Sand")
+        let product = Product.fixture(
+            name: "Product Name",
+            brand: .fixture(name: "Product Brand"),
+            defaultVariant: .fixture(colour: navy, stock: 1),
+            variants: [.fixture(colour: navy, stock: 1), .fixture(colour: sand, stock: 1)]
+        )
+        mockProductService.onGetProductCalled = { _ in
+            product
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.colorSwatches(filteredBy: "").count, 2)
+        XCTAssertEqual(sut.colorSwatches(filteredBy: "navy").map(\.id), [navy.id])
+        XCTAssertEqual(sut.colorSwatches(filteredBy: "SAND").map(\.id), [sand.id])
+        XCTAssertTrue(sut.colorSwatches(filteredBy: "teal").isEmpty)
+    }
+
     func test_state_has_selected_variant_when_color_is_selected() {
         initViewModel()
 
