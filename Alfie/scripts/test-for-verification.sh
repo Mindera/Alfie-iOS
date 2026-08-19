@@ -9,9 +9,12 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 TEST_LOG="/tmp/alfie_test.log"
-# Snapshot references are recorded on this iOS major; asserting on another major shifts rendering.
-# Overridable per environment (e.g. CI on a newer runtime) without editing the script.
-SNAPSHOT_OS_MAJOR="${SNAPSHOT_OS_MAJOR:-26}"
+# Snapshot references are recorded on this exact iOS version. A major-only pin is not enough: glyph
+# antialiasing differs between minors (26.2 vs 26.4 drifts ~24 px/screen, enough to fail precision 1.0),
+# so a machine holding several 26.x runtimes could otherwise record against one and assert on another.
+# Keep in lockstep with SCAN_DEVICE in fastlane/.env.default. Overridable per run, but changing it
+# means re-recording every reference.
+SNAPSHOT_OS_VERSION="${SNAPSHOT_OS_VERSION:-26.4}"
 
 # Parse arguments
 TEST_FILTER=""
@@ -95,16 +98,16 @@ if [ "${SNAPSHOT_ALLOW_RECORD:-0}" != "1" ]; then
     done
 fi
 
-# Snapshot references are pinned to an iOS major, so resolve an iPhone on that runtime rather
-# than accepting whatever generic destination xcodebuild picks (which may be an older iOS).
+# Snapshot references are pinned to an exact iOS version, so resolve an iPhone on that runtime rather
+# than accepting whatever generic destination xcodebuild picks (which may be another minor).
 SIMULATOR_ID=$(xcrun simctl list devices available --json | \
-    SNAPSHOT_OS_MAJOR="$SNAPSHOT_OS_MAJOR" /usr/bin/python3 -c '
+    SNAPSHOT_OS_VERSION="$SNAPSHOT_OS_VERSION" /usr/bin/python3 -c '
 import json, os, re, sys
 
-major = os.environ["SNAPSHOT_OS_MAJOR"]
+wanted = os.environ["SNAPSHOT_OS_VERSION"].replace(".", "-")
 for runtime, devices in json.load(sys.stdin)["devices"].items():
-    match = re.search(r"iOS-(\d+)-", runtime)
-    if not match or match.group(1) != major:
+    match = re.search(r"iOS-(\d+-\d+)", runtime)
+    if not match or match.group(1) != wanted:
         continue
     for device in devices:
         if "iPhone" in device["name"]:
@@ -115,11 +118,11 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
 SNAPSHOT_SKIP_ARGS=()
 
 if [ -n "$SIMULATOR_ID" ]; then
-    SIMULATOR_OS_LABEL="iOS $SNAPSHOT_OS_MAJOR"
+    SIMULATOR_OS_LABEL="iOS $SNAPSHOT_OS_VERSION"
 else
-    # No iPhone on the pinned iOS major. Rather than block the whole suite, fall back to the newest
+    # No iPhone on the pinned iOS version. Rather than block the whole suite, fall back to the newest
     # available iPhone and skip the snapshot classes: their references are pinned to iOS
-    # $SNAPSHOT_OS_MAJOR and would fail on another major, but every non-snapshot test still runs.
+    # $SNAPSHOT_OS_VERSION and would fail on another version, but every non-snapshot test still runs.
     FALLBACK=$(xcrun simctl list devices available --json | /usr/bin/python3 -c '
 import json, re, sys
 
@@ -141,8 +144,8 @@ if best:
 
     if [ -z "$SIMULATOR_ID" ]; then
         echo "❌ ERROR: No iPhone simulator is available"
-        echo "Install an iOS $SNAPSHOT_OS_MAJOR iPhone simulator via Xcode > Settings > Components,"
-        echo "or override the pinned major for this run: SNAPSHOT_OS_MAJOR=<major> ./Alfie/scripts/verify.sh"
+        echo "Install an iOS $SNAPSHOT_OS_VERSION iPhone simulator via Xcode > Settings > Components,"
+        echo "or override for this run: SNAPSHOT_OS_VERSION=<major.minor> ./Alfie/scripts/verify.sh"
         exit 1
     fi
 
@@ -159,9 +162,9 @@ if best:
         [ -n "$target" ] && [ -n "$class" ] && SNAPSHOT_SKIP_ARGS+=("-skip-testing:$target/$class")
     done < <(grep -rlE 'assertSnapshot\(' --include='*.swift' "${SNAPSHOT_TEST_ROOTS[@]}" 2>/dev/null)
 
-    echo "⚠️  No iPhone on iOS $SNAPSHOT_OS_MAJOR — falling back to iOS $FALLBACK_OS and SKIPPING snapshot tests."
-    echo "⚠️  Snapshot references are pinned to iOS $SNAPSHOT_OS_MAJOR; asserting them on iOS $FALLBACK_OS would fail on rendering differences."
-    echo "⚠️  To run snapshots: install an iOS $SNAPSHOT_OS_MAJOR simulator, or set SNAPSHOT_OS_MAJOR=$FALLBACK_OS_MAJOR and re-record every reference."
+    echo "⚠️  No iPhone on iOS $SNAPSHOT_OS_VERSION — falling back to iOS $FALLBACK_OS and SKIPPING snapshot tests."
+    echo "⚠️  Snapshot references are pinned to iOS $SNAPSHOT_OS_VERSION; asserting them on iOS $FALLBACK_OS would fail on rendering differences."
+    echo "⚠️  To run snapshots: install an iOS $SNAPSHOT_OS_VERSION simulator, or set SNAPSHOT_OS_VERSION=$FALLBACK_OS and re-record every reference."
     [ ${#SNAPSHOT_SKIP_ARGS[@]} -gt 0 ] && echo "⚠️  Skipping: ${SNAPSHOT_SKIP_ARGS[*]//-skip-testing:/}"
     echo ""
     SIMULATOR_OS_LABEL="iOS $FALLBACK_OS (fallback — snapshots skipped)"
