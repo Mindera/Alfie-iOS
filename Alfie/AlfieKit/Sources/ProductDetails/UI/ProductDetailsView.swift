@@ -80,6 +80,14 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     .padding(.horizontal, horizontalPadding)
                     // Same bound as the gallery, so the two stay in one column on a wide screen.
                     .frame(maxWidth: Constants.maxContentWidth)
+                    .frame(maxWidth: .infinity)
+                    // The design draws this panel opaque over the gallery (Figma: fill #FFFFFF,
+                    // 1px top border). Without it a taller-than-reserved image renders through the
+                    // product info and the call to action.
+                    .background(alignment: .top) {
+                        Theme.surfaceBackgroundPrimary
+                            .overlay(alignment: .top) { Theme.borderSoft.frame(height: 1) }
+                    }
             }
         }
         .scrollIndicators(.hidden)
