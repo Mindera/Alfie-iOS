@@ -14,6 +14,13 @@ import XCTest
 final class ProductListingViewSnapshotTests: XCTestCase {
     private let isRecording = false
 
+    /// The default `precision: 1.0` fails on a single mismatched pixel, and glyph rasterisation
+    /// differs slightly between iOS minor versions — CI records against 26.2, a developer may be on
+    /// 26.4. Measured drift on this suite was 159 pixels of 5.3M (0.003%) at up to 10% delta, which
+    /// clears `perceptualPrecision`'s 5% budget. 0.99 leaves ~300x headroom over that noise while
+    /// still failing loudly on a real regression: a dropped card moves whole percent of the frame.
+    private let precision: Float = 0.99
+
     /// Names vary in length on purpose: a one-line name and a wrapping two-line name in the same
     /// row are what make a card-alignment regression visible.
     private func makeProducts(_ count: Int) -> [Product] {
@@ -50,7 +57,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         viewModel.style = .grid
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
+                       as: .defaultImage(precision: precision),
                        record: isRecording)
     }
 
@@ -60,7 +67,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         viewModel.style = .list
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
+                       as: .defaultImage(precision: precision),
                        record: isRecording)
     }
 
@@ -73,7 +80,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         )
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
+                       as: .defaultImage(precision: precision),
                        record: isRecording)
     }
 
@@ -86,7 +93,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         )
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
+                       as: .defaultImage(precision: precision),
                        record: isRecording)
     }
 
@@ -96,7 +103,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         let viewModel = makeViewModel(products: [], state: .error(.generic))
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
+                       as: .defaultImage(precision: precision),
                        record: isRecording)
     }
 
@@ -106,7 +113,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         let viewModel = makeViewModel(products: [], state: .error(.serverError))
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
-                       as: .defaultImage(),
+                       as: .defaultImage(precision: precision),
                        record: isRecording)
     }
 }
