@@ -257,13 +257,18 @@ extension ProductDetailsView {
     /// Full-bleed: the images fill the screen width, so there is no item spacing, no slice of the
     /// neighbouring image, and no corner radius. The gutter belongs to the content below.
     ///
-    /// The height comes from the imagery — the design's gallery hugs its content and each image
-    /// carries its own ratio variant (3:4 and 1:1 both exist), so nothing here fixes one. Where a set
-    /// mixes ratios the tallest wins, so paging never shifts the content below.
+    /// The height is the design's 3:4 gallery ratio (Figma: the Image component's default variant),
+    /// not the imagery's. Hugging the content was tried and shipped, but in the app the carousel
+    /// settled on the reserved placeholder's square and a taller photo drew past the frame, over the
+    /// product info beneath it. The measurement is not obviously at fault — `SnapCarouselHeightTests`
+    /// pins the hug path growing correctly for a declared ratio, a resizable image, an item-set swap
+    /// and an item that grows in place — so the cause is unresolved and a fixed ratio is the
+    /// deterministic choice rather than the diagnosed one. Images keep `.fit` inside the box, so
+    /// nothing is cropped; anything other than 3:4 letterboxes.
     var mediaCarousel: some View {
         SnapCarousel(
             areItemsLoading: shimmeringBinding(for: .mediaCarousel),
-            itemAspectRatio: nil,
+            itemAspectRatio: Constants.galleryAspectRatio,
             itemIndex: $currentMediaIndex,
             shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
             showsAdjacentItemPeek: false
@@ -659,6 +664,8 @@ private enum Constants {
     /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
     static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
+    /// Figma: the gallery Image component's default variant is `Ratio=3:4` (375x500).
+    static let galleryAspectRatio: CGFloat = 0.75
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210

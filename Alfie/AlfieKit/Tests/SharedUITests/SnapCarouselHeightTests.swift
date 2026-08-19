@@ -112,6 +112,55 @@ final class SnapCarouselHeightTests: XCTestCase {
         XCTAssertEqual(grown, width * 300 / 200, accuracy: 1, "the carousel must adopt the taller image's height")
     }
 
+    /// `RemoteImage` does not swap the item set — it keeps one item whose *content* changes from the
+    /// reserved placeholder to the loaded image, so the item grows in place. The carousel must
+    /// follow that growth; if it keeps the placeholder's square, the image renders past the frame
+    /// and over whatever sits beneath it in the scroll view.
+    func test_anItemThatGrowsInPlace_growsTheCarousel() {
+        let grew = GrowingItem.Model()
+        let items = { [AnyView(GrowingItem(model: grew))] }
+
+        let host = UIHostingController(rootView: carousel(items: items))
+        if #available(iOS 16.4, *) {
+            host.safeAreaRegions = []
+        }
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: width, height: 1000))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        settle(host)
+
+        XCTAssertEqual(
+            host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height,
+            width,
+            accuracy: 1,
+            "the reserved placeholder is square"
+        )
+
+        grew.isLoaded = true
+        settle(host)
+
+        XCTAssertEqual(
+            host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height,
+            width / 0.75,
+            accuracy: 1,
+            "the carousel must adopt the loaded image's 3:4 height"
+        )
+    }
+
+    /// A square reservation that becomes a 3:4 image, without the item set changing — the shape
+    /// `RemoteImage` presents to the carousel.
+    private struct GrowingItem: View {
+        final class Model: ObservableObject {
+            @Published var isLoaded = false
+        }
+
+        @ObservedObject var model: Model
+
+        var body: some View {
+            Color.red.aspectRatio(model.isLoaded ? 0.75 : 1, contentMode: .fit)
+        }
+    }
+
     /// External paging (the VoiceOver adjustable action, the named next/previous actions) must keep
     /// working after the item set is replaced and the index reset in the same update — a colour swap
     /// whose new variant has a different image count.
