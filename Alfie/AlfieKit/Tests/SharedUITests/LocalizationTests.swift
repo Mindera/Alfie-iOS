@@ -33,6 +33,24 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    func testLocalizableColourSummaryWithArgs() {
+        // Two positional arguments across a plural — the singular branch is the two-colour product,
+        // which is the commonest case.
+        localizations.forEach { localization in
+            let labels = [1, 3].map { L10n.Pdp.ColourSummary.accessibilityLabel("Black", $0) }
+            let counts = [1, 3].map { L10n.Pdp.ColourSummary.count($0) }
+            XCTAssertTrue(validateLocalizedStrings(labels + counts, for: localization))
+        }
+    }
+
+    /// `validateLocalizedStrings` only proves no specifier was left unresolved — it would pass just
+    /// as happily if the plural selected on the colour name instead of the count. These pin the
+    /// resolved text, so a plural bound to the wrong argument fails here.
+    func test_colourSummaryAccessibilityLabel_pluralSelectsOnTheCount() {
+        XCTAssertEqual(L10n.Pdp.ColourSummary.accessibilityLabel("Black", 1), "Black, 1 other colour")
+        XCTAssertEqual(L10n.Pdp.ColourSummary.accessibilityLabel("Black", 3), "Black, 3 other colours")
+    }
+
     // MARK: - Test String Replacer Regex private helper
 
     func test_StringReplacerRegex_ForObjectSpecifier_Failing() {

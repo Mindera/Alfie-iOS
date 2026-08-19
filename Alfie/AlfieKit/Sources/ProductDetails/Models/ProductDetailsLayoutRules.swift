@@ -43,6 +43,19 @@ enum ProductDetailsLayoutRules {
         return count > Constants.inlineItemLimit ? .sheet : .inlineGrid
     }
 
+    /// Colours other than the selected one, for the info block's `+N` summary. `nil` hides the
+    /// summary — single-colour and no-colour products have nothing to choose between, and a product
+    /// whose selected variant carries no colour has no swatch to show.
+    ///
+    /// Derived from `colourLayout` rather than restating its threshold, so the summary and the
+    /// picker it opens cannot drift apart.
+    static func colourSummaryRemainingCount(forColourCount count: Int, hasSelection: Bool) -> Int? {
+        guard hasSelection, colourLayout(forColourCount: count) != .summaryOnly else {
+            return nil
+        }
+        return count - 1
+    }
+
     static func stockMessage(forAvailable available: Int?) -> StockMessage {
         guard let available, available > 0 else {
             return .none

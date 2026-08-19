@@ -23,8 +23,16 @@ final class ProductDetailsPage {
         app.otherElements[AccessibilityID.ProductDetails.productImage]
     }
 
-    var productTitle: XCUIElement {
-        app.staticTexts[AccessibilityID.ProductDetails.productTitle]
+    var brandName: XCUIElement {
+        app.staticTexts[AccessibilityID.ProductDetails.brandName]
+    }
+
+    var productName: XCUIElement {
+        app.staticTexts[AccessibilityID.ProductDetails.productName]
+    }
+
+    var colourSummary: XCUIElement {
+        app.buttons[AccessibilityID.ProductDetails.colourSummary]
     }
 
     var productDescription: XCUIElement {
@@ -67,6 +75,13 @@ final class ProductDetailsPage {
         return self
     }
 
+    /// Only rendered for multi-colour products, so callers must check `exists` first.
+    @discardableResult
+    func tapColourSummary() -> Self {
+        colourSummary.tap()
+        return self
+    }
+
     @discardableResult
     func openSizeSheet() -> Self {
         sizeSelector.tap()
@@ -77,8 +92,12 @@ final class ProductDetailsPage {
 
     func assertVisible(timeout: TimeInterval = 5) {
         XCTAssertTrue(
-            productTitle.waitForExistence(timeout: timeout),
-            "Product Details product title should be visible"
+            productName.waitForExistence(timeout: timeout),
+            "Product Details product name should be visible"
         )
+        // The brand line is deliberately NOT asserted here. It is omitted for a product with no
+        // brand, so any test that lands on such a product would fail on data rather than on a
+        // defect — and no timeout fixes that. Its shown/hidden behaviour is pinned instead by the
+        // two ProductDetailsView snapshots, which control the fixture.
     }
 }

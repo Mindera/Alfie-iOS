@@ -320,6 +320,51 @@
         }
       }
     },
+    "pdp.colour_summary.accessibility_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens colour selection"
+          }
+        }
+      }
+    },
+    "pdp.colour_summary.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$@, %2$d other colour"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%1$@, %2$d other colours"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pdp.colour_summary.count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%d"
+          }
+        }
+      }
+    },
     "pdp.complementary_info.delivery.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -437,6 +482,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oops!"
+          }
+        }
+      }
+    },
+    "pdp.gallery.accessibility_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens full screen"
+          }
+        }
+      }
+    },
+    "pdp.gallery.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Product images"
+          }
+        }
+      }
+    },
+    "pdp.gallery.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image %1$d of %2$d"
           }
         }
       }

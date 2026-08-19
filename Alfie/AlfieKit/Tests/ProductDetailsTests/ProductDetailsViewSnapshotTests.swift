@@ -38,10 +38,28 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     func test_productDetailsView_defaultState() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
-        // The gallery renders empty: its images are remote, and loading them would make the
-        // baseline network-dependent. The carousel still reserves its height, so the layout below
-        // it — which is what this ticket changes — is positioned exactly as in the real screen.
-        viewModel.shouldShowMediaPaginatedControl = false
+        // Deliberately no image URLs. Any real URL puts `RemoteImage` in a race between its empty
+        // and failure branches — which paint very different colours over a third of the frame — and
+        // `defaultImage()` compares at full precision. With none, the gallery renders its reserved
+        // placeholder slot: a solid square, no network, no animation, so the full-bleed band and
+        // everything positioned below it are covered deterministically.
+        // Still NOT covered: the pagination indicators, which need one image per dot.
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// The hiding half of both new elements: no brand line, and no colour summary for a
+    /// single-colour product.
+    func test_productDetailsView_withoutBrandOrColourChoice() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.productTitle = ""
+        viewModel.colorSelectionConfiguration = .init(
+            items: [.init(id: "1", name: "Black", type: .color(.black))],
+            selectedItem: .init(id: "1", name: "Black", type: .color(.black))
+        )
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),

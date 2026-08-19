@@ -74,7 +74,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public var shouldShowMediaPaginatedControl: Bool { productImageUrls.count > 1 }
-    public var hasSingleImage: Bool { productImageUrls.count == 1 }
     public var priceType: PriceType? { product?.priceType }
     // Empty collapses to nil so the metadata line omits the part rather than rendering a blank.
     public var selectedColourName: String? { selectedVariant?.colour?.name.nilWhenEmpty }

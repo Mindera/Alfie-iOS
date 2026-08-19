@@ -87,12 +87,15 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     private var pdpView: some View {
         ScrollView {
             VStack(spacing: theme.spacing.space0) {
+                // The gallery is full-bleed, so the gutter belongs to the content below it.
                 mediaCarousel
                 complementaryViews
+                    .padding(.horizontal, horizontalPadding)
+                    // Same bound as the gallery, so the two stay in one column on a wide screen.
+                    .frame(maxWidth: Constants.maxContentWidth)
             }
         }
         .scrollIndicators(.hidden)
-        .padding(.horizontal, horizontalPadding)
         .fullScreenCover(isPresented: $isMediaFullScreen) {
             fullscreenMediaCarousel
         }
@@ -104,19 +107,34 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         }
     }
 
+    /// The design draws the selected indicator as a wider pill, so the dots come from
+    /// `ThemedPageControl`'s custom-control path rather than its default circles.
     @ViewBuilder private var paginatedControl: some View {
         if viewModel.shouldShowMediaPaginatedControl {
-            PaginatedControl(
-                configuration: .init(),
-                itemsCount: viewModel.productImageUrls.count,
-                selectedIndex: $currentMediaIndex
+            let configuration = ThemedPageControlConfiguration(
+                color: Constants.unselectedIndicatorColor,
+                // White, not primary: the indicators overlay the image rather than sit below it.
+                selectedColor: Theme.contentContentInvertedPrimary,
+                size: Constants.indicatorSize,
+                spacing: theme.spacing.space100,
+                padding: theme.spacing.space0
             )
-            .frame(maxHeight: theme.spacing.space200)
-            .shimmering(
-                while: shimmeringBinding(for: .mediaCarousel),
-                animateOnStateTransition: false,
-                cornerRadius: Sizing.radiusStrong
-            )
+            ThemedPageControl(
+                data: viewModel.productImageUrls,
+                selectedIndex: $currentMediaIndex,
+                configuration: configuration
+            ) { _, isSelected in
+                RoundedRectangle(cornerRadius: theme.radius.rounded)
+                    .fill(isSelected ? configuration.selectedColor : configuration.color)
+                    .frame(
+                        width: isSelected ? Constants.selectedIndicatorWidth : Constants.indicatorSize,
+                        height: Constants.indicatorSize
+                    )
+                    .animation(.linear(duration: configuration.animationDuration), value: isSelected)
+            }
+            // Decorative: the carousel carries the accessible paging affordance, not the dots.
+            .accessibilityHidden(true)
+            .allowsHitTesting(false)
         }
     }
 
@@ -126,8 +144,51 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         .init(get: { viewModel.shouldShowLoading(for: section) }, set: { _ in })
     }
 
+    private func stepMediaIndex(by offset: Int) {
+        let imageCount = viewModel.productImageUrls.count
+        guard imageCount > 1 else { return }
+        currentMediaIndex = (currentMediaIndex + offset + imageCount) % imageCount
+    }
+
     private var horizontalPadding: CGFloat {
         isIpad ? theme.spacing.space500 : theme.spacing.space200
+    }
+
+    /// The gallery when there is imagery, otherwise one empty slot while the product loads: the
+    /// carousel hugs its content, so with nothing to measure it would collapse and then shove the
+    /// information block down the moment the images arrive.
+    /// The gallery takes its height from its content, so with no images it would collapse to nothing
+    /// and then shove the whole information block down once they arrive. An empty set reserves a
+    /// square instead. It cannot reserve with a url-less `RemoteImage`: that resolves to the failure
+    /// branch, which paints the inverted surface — a black block, not a neutral placeholder.
+    private var galleryItems: [AnyView] {
+        let urls = viewModel.productImageUrls
+        guard !urls.isEmpty else {
+            return [AnyView(Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit))]
+        }
+        return urls.map { url in
+            AnyView(
+                RemoteImage(
+                    url: url,
+                    success: { image in
+                        image
+                            .resizable()
+                            // Fit at the full width: height follows the image's intrinsic ratio,
+                            // and nothing is cropped or stretched.
+                            .aspectRatio(contentMode: .fit)
+                            .onTapGesture { isMediaFullScreen = true }
+                    },
+                    // Neither has an intrinsic size, so both hold a square while the image resolves.
+                    // A loading reservation, not a design ratio.
+                    placeholder: {
+                        Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit)
+                    },
+                    failure: { _ in
+                        Theme.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
+                    }
+                )
+            )
+        }
     }
 
     private func complementaryInfoTitle(for type: ProductDetailsComplementaryInfoType) -> String {
@@ -180,9 +241,7 @@ extension ProductDetailsView {
     /// contains every view except the media carousel
     private var complementaryViews: some View {
         VStack(alignment: .leading, spacing: theme.spacing.space100) {
-            titleHeader
-
-            price
+            productInfo
 
             VStack(spacing: theme.spacing.space100) {
                 addToBag
@@ -203,33 +262,56 @@ extension ProductDetailsView {
         }
     }
 
+    /// Full-bleed: the images fill the screen width, so there is no item spacing, no slice of the
+    /// neighbouring image, and no corner radius. The gutter belongs to the content below.
+    ///
+    /// The height comes from the imagery — the design's gallery hugs its content and each image
+    /// carries its own ratio variant (3:4 and 1:1 both exist), so nothing here fixes one. Where a set
+    /// mixes ratios the tallest wins, so paging never shifts the content below.
     var mediaCarousel: some View {
-        VStack(spacing: theme.spacing.space200) {
-            SnapCarousel(
-                areItemsLoading: shimmeringBinding(for: .mediaCarousel),
-                itemIndex: $currentMediaIndex,
-                shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex
-            ) {
-                viewModel.productImageUrls.map { url in
-                    RemoteImage(
-                        url: url,
-                        success: { image in
-                            image
-                                .resizable()
-                                .onTapGesture { isMediaFullScreen = true }
-                        },
-                        placeholder: { Theme.surfaceForegroundPrimary },
-                        failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
-                    )
-                    .cornerRadius(Sizing.radiusSoft)
-                }
-            }
-            .padding(.top, theme.spacing.space200)
-            .padding(.bottom, viewModel.hasSingleImage ? theme.spacing.space200 : theme.spacing.space0)
-            .disabled(isMediaFullScreen)
-            paginatedControl
-                .padding(.bottom, theme.spacing.space200)
+        SnapCarousel(
+            areItemsLoading: shimmeringBinding(for: .mediaCarousel),
+            itemAspectRatio: nil,
+            itemIndex: $currentMediaIndex,
+            shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
+            showsAdjacentItemPeek: false
+        ) {
+            galleryItems
         }
+        .frame(maxWidth: Constants.maxContentWidth)
+        .frame(maxWidth: .infinity)
+        .disabled(isMediaFullScreen)
+        .overlay(alignment: .bottom) {
+            paginatedControl
+                .padding(.bottom, theme.spacing.space150)
+        }
+        .padding(.bottom, theme.spacing.space200)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(L10n.Pdp.Gallery.accessibilityLabel)
+        .accessibilityValue(
+            L10n.Pdp.Gallery.accessibilityValue(currentMediaIndex + 1, viewModel.productImageUrls.count)
+        )
+        .accessibilityHint(L10n.Pdp.Gallery.accessibilityHint)
+        // The reserved slot is a placeholder, not an image — announcing "image 1 of 0" would be
+        // worse than announcing nothing.
+        .accessibilityHidden(viewModel.productImageUrls.isEmpty)
+        // The image's tap gesture is not reachable once the carousel is a single element.
+        .accessibilityAction { isMediaFullScreen = true }
+        // The carousel pages by drag, which assistive technologies cannot perform. The adjustable
+        // action serves VoiceOver; the named actions serve Voice Control, Switch Control and Full
+        // Keyboard Access, which the replaced chevron control used to cover with real buttons.
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment:
+                stepMediaIndex(by: 1)
+            case .decrement:
+                stepMediaIndex(by: -1)
+            @unknown default:
+                break
+            }
+        }
+        .accessibilityAction(named: Text(L10n.Accessibility.nextPage)) { stepMediaIndex(by: 1) }
+        .accessibilityAction(named: Text(L10n.Accessibility.previousPage)) { stepMediaIndex(by: -1) }
         .accessibilityIdentifier(AccessibilityID.ProductDetails.productImage)
     }
 
@@ -250,6 +332,35 @@ extension ProductDetailsView {
         }
     }
 
+    /// Brand, product name and price, with the colour summary pinned to the trailing edge.
+    private var productInfo: some View {
+        HStack(alignment: .top, spacing: theme.spacing.space100) {
+            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+                brandName
+
+                titleHeader
+
+                price
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            colorSummary
+        }
+    }
+
+    @ViewBuilder private var brandName: some View {
+        // Fixtures and the no-variant fallback can produce an empty brand; omit the line rather than
+        // leaving blank space above the product name.
+        if viewModel.shouldShow(section: .titleHeader), !viewModel.productTitle.isEmpty {
+            Text.build(theme.font.label.small(viewModel.productTitle))
+                // TOKEN GAP (G2): the design's #2B2B2B has no `content/secondary` alias upstream, so
+                // the brand line renders at primary weight — flatter than designed — until it lands.
+                .foregroundStyle(Theme.contentContentPrimary)
+                .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.brandName)
+        }
+    }
+
     @ViewBuilder private var titleHeader: some View {
         if viewModel.shouldShow(section: .titleHeader) {
             HStack(spacing: theme.spacing.space0) {
@@ -257,8 +368,25 @@ extension ProductDetailsView {
                     .foregroundStyle(Theme.contentContentPrimary)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
-                    .accessibilityIdentifier(AccessibilityID.ProductDetails.productTitle)
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.productName)
             }
+        }
+    }
+
+    @ViewBuilder private var colorSummary: some View {
+        let configuration = viewModel.colorSelectionConfiguration
+        let remainingCount = ProductDetailsLayoutRules.colourSummaryRemainingCount(
+            forColourCount: configuration.items.count,
+            hasSelection: configuration.selectedItem != nil
+        )
+        if viewModel.shouldShow(section: .colorSelector),
+           let selectedItem = configuration.selectedItem,
+           let remainingCount {
+            ColorSummaryView(selectedItem: selectedItem, remainingCount: remainingCount) {
+                showColorSheet = true
+            }
+            .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
         }
     }
 
@@ -266,7 +394,9 @@ extension ProductDetailsView {
         if let priceType = viewModel.priceType {
             PriceComponentView(
                 type: priceType,
-                configuration: .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
+                // `.large` is the 16pt that `body/medium-bold` defines; `.small` would override the
+                // token down to 14pt.
+                configuration: .init(preferredDistribution: .horizontal, size: .large, textAlignment: .leading)
             )
         }
     }
@@ -490,6 +620,16 @@ extension ProductDetailsView {
 private enum Constants {
     /// The design draws the call-to-action and wishlist buttons square, unlike the 4pt default.
     static let ctaCornerRadius: CGFloat = 0
+    static let indicatorSize: CGFloat = 6
+    static let selectedIndicatorWidth: CGFloat = 12
+    /// Bounds the whole screen on a wide device: the gallery hugs its image, so at an iPad's full
+    /// width it would be taller than the screen and push the information block below the fold.
+    /// Applied to the gallery and the content block alike so they stay in one aligned column.
+    static let maxContentWidth: CGFloat = 500
+    /// TOKEN GAP (G1): the design's unselected indicator is #CDCDCD. The theme has no *border*
+    /// alias at that value — only `surfaceBackgroundTerciary`, a surface token — so a semantic
+    /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
+    static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
     static let minColorSelectorHeight = 26.0
     static let chevronSize: CGFloat = 16

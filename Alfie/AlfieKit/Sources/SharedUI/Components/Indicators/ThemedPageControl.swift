@@ -33,7 +33,7 @@ public struct ThemedPageControl<CustomControl: View, DataType: Any>: View {
             }
         }
         .frame(height: configuration.size)
-        .padding()
+        .padding(configuration.padding)
     }
 }
 
