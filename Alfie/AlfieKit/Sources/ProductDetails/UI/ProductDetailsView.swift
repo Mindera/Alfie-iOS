@@ -572,9 +572,10 @@ extension ProductDetailsView {
 
             HStack(spacing: theme.spacing.space0) {
                 HStack(spacing: theme.spacing.space0) {
+                    // No inset of its own: the panel's gutter already positions the row, and the
+                    // extra 8pt pushed these titles out of line with the description above them.
                     Text.build(theme.font.body.medium(complementaryInfoTitle(for: type)))
                         .foregroundStyle(Theme.contentContentPrimary)
-                        .padding(.leading, theme.spacing.space100)
                     Spacer()
                     Icon.chevronRight.image
                         .renderingMode(.template)
@@ -582,7 +583,6 @@ extension ProductDetailsView {
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
                         .foregroundStyle(Theme.contentContentPrimary)
-                        .padding(.trailing, theme.spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }
