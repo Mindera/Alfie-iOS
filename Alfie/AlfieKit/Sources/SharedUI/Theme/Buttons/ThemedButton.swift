@@ -13,6 +13,7 @@ public struct ThemedButton: View {
     private let action: () -> Void
     private let isFullWidth: Bool
     private let buttonCornerRadius: CGFloat
+    private let iconSize: CGFloat
 
     public init(
         text: String,
@@ -24,6 +25,9 @@ public struct ThemedButton: View {
         isLoading: Binding<Bool> = .constant(false),
         isFullWidth: Bool = false,
         cornerRadius: CGFloat = Sizing.radiusSoft,
+        // Defaults to the small icon every existing caller renders; an icon-only button sized from
+        // the design needs a larger glyph than a label-with-icon does.
+        iconSize: CGFloat = Sizing.iconsIconSmall,
         action: @escaping () -> Void
     ) {
         self.text = text
@@ -35,6 +39,7 @@ public struct ThemedButton: View {
         _isLoading = isLoading
         self.isFullWidth = isFullWidth
         self.buttonCornerRadius = cornerRadius
+        self.iconSize = iconSize
         self.action = action
     }
 
@@ -67,7 +72,8 @@ public struct ThemedButton: View {
                 isLoading: isLoading,
                 leadingAsset: leadingAsset,
                 trailingAsset: trailingAsset,
-                cornerRadius: buttonCornerRadius
+                cornerRadius: buttonCornerRadius,
+                iconSize: iconSize
             )
         )
     }
@@ -139,7 +145,6 @@ public enum ButtonType {
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
     static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
-    static let iconSize: CGFloat = Sizing.iconsIconSmall
     // FIXME: No dedicated button-height token exists; heights are snapped to the spacing scale
     // (36→32, 44→40, 52→48). This drops `.medium` (the default) to 40pt — below Apple's 44pt
     // minimum tap target. Pending design confirmation on adding proper control-height tokens.
@@ -158,6 +163,7 @@ private struct ThemedButtonStyle: ButtonStyle {
     let leadingAsset: Icon?
     let trailingAsset: Icon?
     let cornerRadius: CGFloat
+    let iconSize: CGFloat
 
     func makeBody(configuration: Self.Configuration) -> some View {
         HStack {
@@ -166,7 +172,7 @@ private struct ThemedButtonStyle: ButtonStyle {
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: Constants.iconSize, height: Constants.iconSize)
+                    .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(textColor(configuration))
             }
             configuration.label
@@ -177,7 +183,7 @@ private struct ThemedButtonStyle: ButtonStyle {
                     .resizable()
                     .tint(textColor(configuration))
                     .scaledToFit()
-                    .frame(width: Constants.iconSize, height: Constants.iconSize)
+                    .frame(width: iconSize, height: iconSize)
             }
         }
         .frame(height: type.height)

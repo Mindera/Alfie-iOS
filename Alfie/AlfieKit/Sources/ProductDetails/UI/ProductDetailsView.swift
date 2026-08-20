@@ -535,7 +535,9 @@ extension ProductDetailsView {
                 text: "",
                 style: .secondary,
                 leadingAsset: .heart,
-                cornerRadius: Constants.ctaCornerRadius
+                cornerRadius: Constants.ctaCornerRadius,
+                // Figma: a 24pt glyph in the 40pt square, not the 16pt a label-with-icon uses.
+                iconSize: Sizing.iconsIconMedium
             ) {
                 viewModel.didTapAddToWishlist()
             }
