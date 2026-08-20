@@ -53,10 +53,8 @@ public enum AccessibilityID {
         public static let productDescription = "productDetails.description.text"
         /// The `<colour> | Ref. <sku>` line beneath the description.
         public static let descriptionMetadata = "productDetails.description.metadata"
-        /// The inline card grid. Present only for a short colour run — a long one uses the summary,
-        /// or `colourSheetRow` when nothing is selected yet.
+        /// The inline card grid, present whenever the product has more than one colour.
         public static let colourSelector = "productDetails.colour.selector"
-        public static let colourSheetRow = "productDetails.colour.sheetRow"
         public static let colourSummary = "productDetails.colour.summary"
         public static let sizeSelector = "productDetails.size.selector"
         /// Drawn by the design with no destination behind it — rendered, but not interactive.

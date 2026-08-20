@@ -13,10 +13,8 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @StateObject private var viewModel: ViewModel
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
-    @State private var showColorSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var showFailureState: Bool
-    @State private var colorSheetSearchText = ""
 
     private var colourLayout: ProductDetailsLayoutRules.ColourLayout {
         ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.colorSelectionConfiguration.items.count)
@@ -83,21 +81,14 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     // Same bound as the gallery, so the two stay in one column on a wide screen.
                     .frame(maxWidth: Constants.maxContentWidth)
                     .frame(maxWidth: .infinity)
-                    // The design draws this panel opaque over the gallery (Figma: fill #FFFFFF,
-                    // 1px top border). Without it a taller-than-reserved image renders through the
-                    // product info and the call to action.
-                    .background(alignment: .top) {
-                        Theme.surfaceBackgroundPrimary
-                            .overlay(alignment: .top) { Theme.borderSoft.frame(height: 1) }
-                    }
+                    // Opaque, so nothing from the gallery can render through the product info.
+                    // No rule between the two — the design runs the panel straight off the image.
+                    .background(Theme.surfaceBackgroundPrimary)
             }
         }
         .scrollIndicators(.hidden)
         .fullScreenCover(isPresented: $isMediaFullScreen) {
             fullscreenMediaCarousel
-        }
-        .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }) {
-            colorSheet
         }
     }
 
@@ -382,9 +373,9 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .colorSelector),
            let selectedItem = configuration.selectedItem,
            let remainingCount {
-            ColorSummaryView(selectedItem: selectedItem, remainingCount: remainingCount) {
-                showColorSheet = true
-            }
+            // Informational: with the grid always inline there is nowhere left for a tap to go.
+            ColorSummaryView(selectedItem: selectedItem, remainingCount: remainingCount) {}
+                .allowsHitTesting(false)
             .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
         }
@@ -401,17 +392,6 @@ extension ProductDetailsView {
         }
     }
 
-    private var colorSheet: some View {
-        ProductDetailsColorSheet(
-            viewModel: viewModel,
-            isPresented: $showColorSheet,
-            searchText: $colorSheetSearchText
-        )
-    }
-
-    /// Few colours render inline as cards; a long colour run stays in the sheet, which the info
-    /// block's summary opens — so the page never fills with swatches. Both surfaces show together
-    /// for a short run: the summary states the current colour, the grid changes it.
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             // Loading needs its own branch: the colours arrive with the product, so until they do an
@@ -433,9 +413,6 @@ extension ProductDetailsView {
                     }
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
 
-                case .sheet:
-                    colourSheetRow
-
                 case .summaryOnly:
                     EmptyView()
                 }
@@ -448,35 +425,6 @@ extension ProductDetailsView {
             .foregroundStyle(Theme.contentContentPrimary)
     }
 
-    /// A long colour run is reachable through the info block's summary — but that summary needs a
-    /// selected swatch to draw, and a variant can carry no colour at all. This row is the entry
-    /// point for that case, and it claims no selection the summary cannot honestly show.
-    @ViewBuilder private var colourSheetRow: some View {
-        if viewModel.colorSelectionConfiguration.selectedItem == nil {
-            Button {
-                showColorSheet = true
-            } label: {
-                HStack(spacing: theme.spacing.space0) {
-                    colourSelectorTitle
-
-                    Spacer()
-
-                    // Down, not right: this presents a sheet rather than pushing a screen.
-                    // `ThemedIcon` hides it from assistive technology; the raw asset would be read
-                    // aloud by its file name.
-                    ThemedIcon(.chevronDown, size: .small, tint: Theme.contentContentPrimary)
-                }
-                // The heading alone is 20pt tall, and this row is the only colour control on screen.
-                .frame(minHeight: Constants.minTapTargetSize)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSheetRow)
-        }
-    }
-
-    /// Every size renders inline, whatever the count — the design draws one chip grid and no
-    /// collapse-to-sheet, so the sheet the screen used to open is gone.
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: theme.spacing.space150) {

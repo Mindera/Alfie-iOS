@@ -44,18 +44,13 @@ final class ProductDetailsPage {
         app.staticTexts[AccessibilityID.ProductDetails.descriptionMetadata]
     }
 
-    /// The inline colour card grid. Absent for single-colour products and for a long colour run,
-    /// which uses `colourSummary` or `colourSheetRow` instead.
+    /// The inline colour card grid. Absent only for single-colour products.
     var colourSelector: XCUIElement {
         app.otherElements[AccessibilityID.ProductDetails.colourSelector]
     }
 
     /// Opens the colour sheet for a long colour run that has no selection yet — the one state where
     /// `colourSummary` has no swatch to draw.
-    var colourSheetRow: XCUIElement {
-        app.buttons[AccessibilityID.ProductDetails.colourSheetRow]
-    }
-
     var sizeSelector: XCUIElement {
         app.otherElements[AccessibilityID.ProductDetails.sizeSelector]
     }

@@ -9,13 +9,16 @@ final class ProductDetailsLayoutRulesTests: XCTestCase {
         XCTAssertEqual(ProductDetailsLayoutRules.colourLayout(forColourCount: 1), .summaryOnly)
     }
 
-    func test_colour_layout_is_inline_grid_up_to_the_inline_limit() {
+    func test_colour_layout_is_inline_grid_whenever_there_is_something_to_choose() {
         XCTAssertEqual(ProductDetailsLayoutRules.colourLayout(forColourCount: 2), .inlineGrid)
         XCTAssertEqual(ProductDetailsLayoutRules.colourLayout(forColourCount: 6), .inlineGrid)
     }
 
-    func test_colour_layout_is_sheet_above_the_inline_limit() {
-        XCTAssertEqual(ProductDetailsLayoutRules.colourLayout(forColourCount: 7), .sheet)
+    /// The long colour run used to collapse into a bottom sheet. The sheet is gone, so the grid has
+    /// to keep taking every count rather than silently showing nothing.
+    func test_colour_layout_stays_inline_for_a_long_colour_run() {
+        XCTAssertEqual(ProductDetailsLayoutRules.colourLayout(forColourCount: 7), .inlineGrid)
+        XCTAssertEqual(ProductDetailsLayoutRules.colourLayout(forColourCount: 24), .inlineGrid)
     }
 
     // MARK: - Colour summary
@@ -32,7 +35,7 @@ final class ProductDetailsLayoutRulesTests: XCTestCase {
 
     func test_colour_summary_is_hidden_without_a_selected_colour() {
         // The converter leaves the selection nil when the variant carries no colour; there is then
-        // no swatch to summarise. The view owes that case its own entry point to the sheet.
+        // no swatch to summarise, and the inline grid is the only picker.
         XCTAssertNil(ProductDetailsLayoutRules.colourSummaryRemainingCount(forColourCount: 4, hasSelection: false))
     }
 

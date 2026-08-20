@@ -6,20 +6,12 @@ enum ProductDetailsLayoutRules {
     enum ColourLayout: Equatable {
         case summaryOnly
         case inlineGrid
-        case sheet
     }
 
-    private enum Constants {
-        /// Beyond this count the colour selector stops rendering inline. Reuses the count the
-        /// pre-redesign screen used to collapse into a sheet, so the cut-over point is unchanged.
-        static let inlineItemLimit = 6
-    }
-
+    /// Every product with something to choose between picks inline. The long-run case used to
+    /// collapse into a bottom sheet; the design has no such sheet, so the grid simply grows.
     static func colourLayout(forColourCount count: Int) -> ColourLayout {
-        guard count > 1 else {
-            return .summaryOnly
-        }
-        return count > Constants.inlineItemLimit ? .sheet : .inlineGrid
+        count > 1 ? .inlineGrid : .summaryOnly
     }
 
     /// Colours other than the selected one, for the info block's `+N` summary. `nil` hides the
