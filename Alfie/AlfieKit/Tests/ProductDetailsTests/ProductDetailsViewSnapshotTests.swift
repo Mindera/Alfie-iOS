@@ -16,6 +16,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
             productTitle: "Tommy Hilfiger",
             productName: "Nolita SW Signature Loafer",
             productDescription: "A refined loafer in soft nappa leather with a signature hardware detail.",
+            selectedColourName: "Black",
+            productReference: "0273/393",
             colorSelectionConfiguration: .init(
                 items: [
                     .init(id: "1", name: "Black", type: .color(.black)),
@@ -113,6 +115,49 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         viewModel.priceType = .default(price: "£450.00")
         viewModel.colorSelectionConfiguration = .init(
             items: (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
+            selectedItem: nil
+        )
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// A product with no marketing copy still shows the colour and reference — they are what a
+    /// shopper quotes to customer service.
+    func test_productDetailsView_withoutDescription() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.productDescription = ""
+        viewModel.onShouldShowSectionCalled = { $0 != .productDescription }
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// Every section shimmering at once — the state a shopper sees before the product resolves.
+    func test_productDetailsView_loadingState() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.onShouldShowLoadingForSectionCalled = { _ in true }
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// Every size out of stock: `canShowSize` drops the whole selector rather than offering a grid
+    /// where nothing is buyable.
+    func test_productDetailsView_withEverySizeOutOfStock() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.sizingSelectionConfiguration = .init(
+            items: [
+                .init(id: "1", name: "S", state: .outOfStock),
+                .init(id: "2", name: "M", state: .outOfStock),
+                .init(id: "3", name: "L", state: .outOfStock),
+            ],
             selectedItem: nil
         )
         let sut = ProductDetailsView(viewModel: viewModel)

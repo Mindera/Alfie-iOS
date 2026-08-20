@@ -23,6 +23,25 @@ final class SnapCarouselHeightTests: XCTestCase {
         XCTAssertEqual(height, width / 0.75, accuracy: 1)
     }
 
+    /// The PDP gallery item is not a shape with a declared ratio — it is a `resizable()` image with
+    /// only a `contentMode`, whose height at a constrained width comes from the pixels. Pin that
+    /// shape directly: a 2:3 portrait image in a 300pt carousel must resolve to 450pt, not to the
+    /// square the placeholder reserved.
+    func test_hugMode_adoptsTheHeightOfAResizableImage() {
+        let portrait = Self.solidImage(width: 200, height: 300)
+        let height = resolvedHeight(itemAspectRatio: nil) {
+            [AnyView(Image(uiImage: portrait).resizable().aspectRatio(contentMode: .fit))]
+        }
+        XCTAssertEqual(height, width * 300 / 200, accuracy: 1)
+    }
+
+    private static func solidImage(width: CGFloat, height: CGFloat) -> UIImage {
+        UIGraphicsImageRenderer(size: .init(width: width, height: height)).image { context in
+            UIColor.red.setFill()
+            context.fill(.init(x: 0, y: 0, width: width, height: height))
+        }
+    }
+
     func test_hugMode_collapsesWhenThereIsNothingToShow() {
         let height = resolvedHeight(itemAspectRatio: nil) { [] }
         XCTAssertEqual(height, 0, accuracy: 1)
@@ -64,6 +83,82 @@ final class SnapCarouselHeightTests: XCTestCase {
         let onScreen = centrePixel(of: host, height: width)
         XCTAssertEqual(onScreen.red, 1, accuracy: 0.1, "expected the first image (red) to be centred")
         XCTAssertEqual(onScreen.green, 0, accuracy: 0.1, "green means the carousel opened on image 2")
+    }
+
+    /// The gallery's real sequence: a square placeholder is reserved while the fetch runs, then the
+    /// real portrait image arrives. The carousel must grow to the image, or the image paints outside
+    /// the frame and over the content beneath it.
+    func test_replacingAPlaceholderWithATallerImage_growsTheCarousel() {
+        let placeholder = { [AnyView(Color.gray.aspectRatio(1, contentMode: .fit))] }
+        let portrait = Self.solidImage(width: 200, height: 300)
+        let images = { [AnyView(Image(uiImage: portrait).resizable().aspectRatio(contentMode: .fit))] }
+
+        let host = UIHostingController(rootView: carousel(items: placeholder))
+        if #available(iOS 16.4, *) {
+            host.safeAreaRegions = []
+        }
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: width, height: 1000))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        settle(host)
+
+        let reserved = host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height
+        XCTAssertEqual(reserved, width, accuracy: 1, "the placeholder reserves a square")
+
+        host.rootView = carousel(items: images)
+        settle(host)
+
+        let grown = host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height
+        XCTAssertEqual(grown, width * 300 / 200, accuracy: 1, "the carousel must adopt the taller image's height")
+    }
+
+    /// `RemoteImage` does not swap the item set — it keeps one item whose *content* changes from the
+    /// reserved placeholder to the loaded image, so the item grows in place. The carousel must
+    /// follow that growth; if it keeps the placeholder's square, the image renders past the frame
+    /// and over whatever sits beneath it in the scroll view.
+    func test_anItemThatGrowsInPlace_growsTheCarousel() {
+        let grew = GrowingItem.Model()
+        let items = { [AnyView(GrowingItem(model: grew))] }
+
+        let host = UIHostingController(rootView: carousel(items: items))
+        if #available(iOS 16.4, *) {
+            host.safeAreaRegions = []
+        }
+        let window = UIWindow(frame: .init(x: 0, y: 0, width: width, height: 1000))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        settle(host)
+
+        XCTAssertEqual(
+            host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height,
+            width,
+            accuracy: 1,
+            "the reserved placeholder is square"
+        )
+
+        grew.isLoaded = true
+        settle(host)
+
+        XCTAssertEqual(
+            host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height,
+            width / 0.75,
+            accuracy: 1,
+            "the carousel must adopt the loaded image's 3:4 height"
+        )
+    }
+
+    /// A square reservation that becomes a 3:4 image, without the item set changing — the shape
+    /// `RemoteImage` presents to the carousel.
+    private struct GrowingItem: View {
+        final class Model: ObservableObject {
+            @Published var isLoaded = false
+        }
+
+        @ObservedObject var model: Model
+
+        var body: some View {
+            Color.red.aspectRatio(model.isLoaded ? 0.75 : 1, contentMode: .fit)
+        }
     }
 
     /// External paging (the VoiceOver adjustable action, the named next/previous actions) must keep

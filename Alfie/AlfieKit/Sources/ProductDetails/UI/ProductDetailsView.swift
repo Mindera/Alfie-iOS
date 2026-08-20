@@ -13,11 +13,8 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @StateObject private var viewModel: ViewModel
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
-    @State private var showColorSheet = false
     @State private var shouldAnimateCurrentMediaIndex = true
-    @State private var currentDescriptionTabIndex = 0
     @State private var showFailureState: Bool
-    @State private var colorSheetSearchText = ""
 
     private var colourLayout: ProductDetailsLayoutRules.ColourLayout {
         ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.colorSelectionConfiguration.items.count)
@@ -52,8 +49,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 pdpView
             }
         }
+        // Figma titles the header with the product name; the brand stays in the info block, which
+        // otherwise repeated it in both places and never named the product in the header.
         .toolbarView(
-            productTitle: viewModel.productTitle,
+            productTitle: viewModel.productName,
             shareConfiguration: viewModel.shareConfiguration,
             didFail: viewModel.state.didFail
         )
@@ -81,14 +80,15 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     .padding(.horizontal, horizontalPadding)
                     // Same bound as the gallery, so the two stay in one column on a wide screen.
                     .frame(maxWidth: Constants.maxContentWidth)
+                    .frame(maxWidth: .infinity)
+                    // Opaque, so nothing from the gallery can render through the product info.
+                    // No rule between the two — the design runs the panel straight off the image.
+                    .background(Theme.surfaceBackgroundPrimary)
             }
         }
         .scrollIndicators(.hidden)
         .fullScreenCover(isPresented: $isMediaFullScreen) {
             fullscreenMediaCarousel
-        }
-        .sheet(isPresented: $showColorSheet, onDismiss: { colorSheetSearchText = "" }) {
-            colorSheet
         }
     }
 
@@ -228,7 +228,8 @@ extension ProductDetailsView {
         VStack(alignment: .leading, spacing: theme.spacing.space100) {
             productInfo
 
-            VStack(spacing: theme.spacing.space100) {
+            // Figma: one row — Add to Bag fills, the wishlist is a 40pt square beside it.
+            HStack(spacing: theme.spacing.space100) {
                 addToBag
                 addToWishlist
             }
@@ -240,7 +241,7 @@ extension ProductDetailsView {
                 sizeSelector
             }
 
-            descriptionTab
+            descriptionSection
                 .padding(.vertical, theme.spacing.space200)
 
             complementaryInfo
@@ -250,13 +251,18 @@ extension ProductDetailsView {
     /// Full-bleed: the images fill the screen width, so there is no item spacing, no slice of the
     /// neighbouring image, and no corner radius. The gutter belongs to the content below.
     ///
-    /// The height comes from the imagery — the design's gallery hugs its content and each image
-    /// carries its own ratio variant (3:4 and 1:1 both exist), so nothing here fixes one. Where a set
-    /// mixes ratios the tallest wins, so paging never shifts the content below.
+    /// The height is the design's 3:4 gallery ratio (Figma: the Image component's default variant),
+    /// not the imagery's. Hugging the content was tried and shipped, but in the app the carousel
+    /// settled on the reserved placeholder's square and a taller photo drew past the frame, over the
+    /// product info beneath it. The measurement is not obviously at fault — `SnapCarouselHeightTests`
+    /// pins the hug path growing correctly for a declared ratio, a resizable image, an item-set swap
+    /// and an item that grows in place — so the cause is unresolved and a fixed ratio is the
+    /// deterministic choice rather than the diagnosed one. Images keep `.fit` inside the box, so
+    /// nothing is cropped; anything other than 3:4 letterboxes.
     var mediaCarousel: some View {
         SnapCarousel(
             areItemsLoading: shimmeringBinding(for: .mediaCarousel),
-            itemAspectRatio: nil,
+            itemAspectRatio: Constants.galleryAspectRatio,
             itemIndex: $currentMediaIndex,
             shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
             showsAdjacentItemPeek: false
@@ -367,9 +373,9 @@ extension ProductDetailsView {
         if viewModel.shouldShow(section: .colorSelector),
            let selectedItem = configuration.selectedItem,
            let remainingCount {
-            ColorSummaryView(selectedItem: selectedItem, remainingCount: remainingCount) {
-                showColorSheet = true
-            }
+            // Informational: with the grid always inline there is nowhere left for a tap to go.
+            ColorSummaryView(selectedItem: selectedItem, remainingCount: remainingCount) {}
+                .allowsHitTesting(false)
             .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
         }
@@ -386,17 +392,6 @@ extension ProductDetailsView {
         }
     }
 
-    private var colorSheet: some View {
-        ProductDetailsColorSheet(
-            viewModel: viewModel,
-            isPresented: $showColorSheet,
-            searchText: $colorSheetSearchText
-        )
-    }
-
-    /// Few colours render inline as cards; a long colour run stays in the sheet, which the info
-    /// block's summary opens — so the page never fills with swatches. Both surfaces show together
-    /// for a short run: the summary states the current colour, the grid changes it.
     @ViewBuilder private var colorSelector: some View {
         if viewModel.shouldShow(section: .colorSelector) {
             // Loading needs its own branch: the colours arrive with the product, so until they do an
@@ -418,9 +413,6 @@ extension ProductDetailsView {
                     }
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
 
-                case .sheet:
-                    colourSheetRow
-
                 case .summaryOnly:
                     EmptyView()
                 }
@@ -433,35 +425,6 @@ extension ProductDetailsView {
             .foregroundStyle(Theme.contentContentPrimary)
     }
 
-    /// A long colour run is reachable through the info block's summary — but that summary needs a
-    /// selected swatch to draw, and a variant can carry no colour at all. This row is the entry
-    /// point for that case, and it claims no selection the summary cannot honestly show.
-    @ViewBuilder private var colourSheetRow: some View {
-        if viewModel.colorSelectionConfiguration.selectedItem == nil {
-            Button {
-                showColorSheet = true
-            } label: {
-                HStack(spacing: theme.spacing.space0) {
-                    colourSelectorTitle
-
-                    Spacer()
-
-                    // Down, not right: this presents a sheet rather than pushing a screen.
-                    // `ThemedIcon` hides it from assistive technology; the raw asset would be read
-                    // aloud by its file name.
-                    ThemedIcon(.chevronDown, size: .small, tint: Theme.contentContentPrimary)
-                }
-                // The heading alone is 20pt tall, and this row is the only colour control on screen.
-                .frame(minHeight: Constants.minTapTargetSize)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSheetRow)
-        }
-    }
-
-    /// Every size renders inline, whatever the count — the design draws one chip grid and no
-    /// collapse-to-sheet, so the sheet the screen used to open is gone.
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: theme.spacing.space150) {
@@ -515,19 +478,29 @@ extension ProductDetailsView {
         }
     }
 
-    @ViewBuilder private var descriptionTab: some View {
-        if viewModel.shouldShow(section: .productDescription) {
-            VStack(alignment: .leading, spacing: theme.spacing.space200) {
-                TabControl(
-                    theme: .dark,
-                    configuration: .fixedSize(horizontalMargins: theme.spacing.space200),
-                    options: [TabControl.TabOption(title: L10n.Pdp.TabControl.DescriptionOption.title)],
-                    currentIndex: $currentDescriptionTabIndex
-                )
+    @ViewBuilder private var descriptionSection: some View {
+        let showDescription = viewModel.shouldShow(section: .productDescription)
+        // Gated apart from the description: the colour and reference are what a shopper quotes to
+        // customer service, and a product without marketing copy still has both.
+        let metadata = ProductDetailsLayoutRules.descriptionMetadata(
+            colourName: viewModel.selectedColourName,
+            reference: viewModel.productReference
+        )
 
-                Text.build(theme.font.body.medium(viewModel.productDescription))
-                    .foregroundStyle(Theme.contentContentPrimary)
-                    .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
+        if showDescription || metadata != nil {
+            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+                if showDescription {
+                    Text.build(theme.font.body.medium(viewModel.productDescription))
+                        .foregroundStyle(Theme.contentContentPrimary)
+                        .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
+                }
+
+                if let metadata {
+                    Text.build(theme.font.label.small(metadata.display))
+                        .foregroundStyle(Theme.contentContentTerciary)
+                        .accessibilityLabel(metadata.accessibilityLabel)
+                        .accessibilityIdentifier(AccessibilityID.ProductDetails.descriptionMetadata)
+                }
             }
         }
     }
@@ -554,19 +527,23 @@ extension ProductDetailsView {
         }
     }
 
+    /// Icon-only in the design, so the label it used to carry becomes the accessibility label —
+    /// otherwise VoiceOver reaches an unnamed button.
     @ViewBuilder private var addToWishlist: some View {
         if viewModel.shouldShow(section: .addToWishlist) {
-            VStack(spacing: theme.spacing.space0) {
-                ThemedButton(
-                    text: L10n.Product.AddToWishlist.Button.cta,
-                    style: .secondary,
-                    isFullWidth: true,
-                    cornerRadius: Constants.ctaCornerRadius
-                ) {
-                    viewModel.didTapAddToWishlist()
-                }
-                .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
+            ThemedButton(
+                text: "",
+                style: .secondary,
+                leadingAsset: .heart,
+                cornerRadius: Constants.ctaCornerRadius,
+                // Figma: a 24pt glyph in the 40pt square, not the 16pt a label-with-icon uses.
+                iconSize: Sizing.iconsIconMedium
+            ) {
+                viewModel.didTapAddToWishlist()
             }
+            .frame(width: Sizing.iconsIconXlarge, height: Sizing.iconsIconXlarge)
+            .accessibilityLabel(L10n.Product.AddToWishlist.Button.cta)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
         }
     }
 
@@ -595,9 +572,10 @@ extension ProductDetailsView {
 
             HStack(spacing: theme.spacing.space0) {
                 HStack(spacing: theme.spacing.space0) {
+                    // No inset of its own: the panel's gutter already positions the row, and the
+                    // extra 8pt pushed these titles out of line with the description above them.
                     Text.build(theme.font.body.medium(complementaryInfoTitle(for: type)))
                         .foregroundStyle(Theme.contentContentPrimary)
-                        .padding(.leading, theme.spacing.space100)
                     Spacer()
                     Icon.chevronRight.image
                         .renderingMode(.template)
@@ -605,7 +583,6 @@ extension ProductDetailsView {
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
                         .foregroundStyle(Theme.contentContentPrimary)
-                        .padding(.trailing, theme.spacing.space100)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }
@@ -642,6 +619,8 @@ private enum Constants {
     /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
     static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
+    /// Figma: the gallery Image component's default variant is `Ratio=3:4` (375x500).
+    static let galleryAspectRatio: CGFloat = 0.75
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210

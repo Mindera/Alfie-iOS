@@ -26,18 +26,24 @@ simulator — the container no longer mutates `UIScreen.main`.
 
 References are pixel comparisons, so rendering must be comparable between recording and asserting.
 
-- **Pinned to iOS major 26.** `test-for-verification.sh` resolves an iPhone simulator on iOS 26 and runs the
-  whole test suite against it. If no iOS 26 iPhone exists, it falls back to the newest available iPhone with
-  a loud warning and **skips the snapshot classes** (discovered as any file calling `assertSnapshot`), so a
-  missing runtime costs snapshot coverage rather than blocking every other test.
-- **Model and iOS minor are free.** Verified: references recorded on iPhone 17 Pro / iOS 26.5 assert green on
-  iPhone 17 / iOS 26.4 and on iPhone 16. `perceptualPrecision: 0.95` absorbs anti-aliasing differences.
-- Record on **any available iPhone at iOS major 26**.
+- **Pinned to an exact iOS version.** `test-for-verification.sh` resolves an iPhone simulator on the
+  pinned major.minor and runs the whole test suite against it. If no iPhone on that version exists, it
+  falls back to the newest available iPhone with a loud warning and **skips the snapshot classes**
+  (discovered as any file calling `assertSnapshot`), so a missing runtime costs snapshot coverage rather
+  than blocking every other test.
+- **Model is free; the iOS minor is not.** Device model does not matter — the container fixes the size in
+  points and `defaultImage` pins `displayScale`, so an iPhone 17 Pro and a Pro Max render identically.
+  The iOS **minor** does matter: glyph rasterisation changed between 26.2 and 26.4, drifting ~24 pixels
+  per screen past `perceptualPrecision`'s budget — enough to fail `precision: 1.0`. Measured on
+  `ProductListingViewSnapshotTests`, where 3 of 6 cases failed on CI purely from that gap.
+- Record on **the pinned version**, not merely the pinned major.
 
-`SNAPSHOT_OS_MAJOR` (in `Alfie/scripts/test-for-verification.sh`, default `26`) is overridable per run —
-`SNAPSHOT_OS_MAJOR=27 ./Alfie/scripts/verify.sh` — to assert on a different major on a machine that lacks
-iOS 26. To re-pin the suite for good, change the default in the script **and** re-record every reference on
-the new major; overriding without re-recording asserts against the wrong OS.
+`SNAPSHOT_OS_VERSION` (in `Alfie/scripts/test-for-verification.sh`, default `26.4`) pins the exact
+iOS **major.minor** references are recorded on, and must stay in lockstep with `SCAN_DEVICE` in
+`fastlane/.env.default` so CI asserts on the same runtime. Override per run —
+`SNAPSHOT_OS_VERSION=26.5 ./Alfie/scripts/verify.sh` — but changing the pin for good means updating
+both places **and** re-recording every reference; overriding without re-recording asserts against the
+wrong OS. The `macos-26` runner image ships iOS 26.2, 26.4 and 26.5, so the pin must name one of those.
 
 ### Precision
 

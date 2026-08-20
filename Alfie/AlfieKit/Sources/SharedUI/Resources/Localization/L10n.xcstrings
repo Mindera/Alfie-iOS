@@ -420,6 +420,28 @@
         }
       }
     },
+    "pdp.description_metadata.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, Ref. %2$@"
+          }
+        }
+      }
+    },
+    "pdp.description_metadata.colour_and_reference" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ | Ref. %2$@"
+          }
+        }
+      }
+    },
     "pdp.error_view.generic.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -541,6 +563,17 @@
         }
       }
     },
+    "pdp.product_reference.value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ref. %@"
+          }
+        }
+      }
+    },
     "pdp.search_colors.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -581,17 +614,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select Your Size"
-          }
-        }
-      }
-    },
-    "pdp.tab_control.description_option.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Description"
           }
         }
       }

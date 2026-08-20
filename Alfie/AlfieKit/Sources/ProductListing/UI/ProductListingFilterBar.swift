@@ -7,7 +7,6 @@ import SwiftUI
 
 struct ProductListingFilterBar: View {
     @Binding private var selectedStyle: ProductListingListStyle
-    @State private var opacity: CGFloat = .zero
     private var isLoading: Bool
     private var total: Int
     private var filterAction: () -> Void
@@ -29,17 +28,12 @@ struct ProductListingFilterBar: View {
             ProductListingListStyleSelector(selectedStyle: $selectedStyle)
             Spacer()
             resultInfoView
-                .animation(.emphasizedDecelerate, value: opacity)
-                .opacity(opacity)
+                // Derived, not stored: as stored state raised only by `onChange`, the count stayed
+                // invisible whenever the bar was born already loaded, since no transition occurred.
+                .opacity(isLoading ? .zero : Constants.fullOpacityResults)
+                .animation(.emphasizedDecelerate, value: isLoading)
             Spacer()
             refineButton
-        }
-        .onChange(of: isLoading) { newValue in
-            if !newValue {
-                withAnimation {
-                    opacity = Constants.fullOpacityResults
-                }
-            }
         }
         .padding(.horizontal, theme.spacing.space200)
         .padding(.vertical, theme.spacing.space050)
