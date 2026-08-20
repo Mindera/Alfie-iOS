@@ -73,7 +73,8 @@ public struct ThemedButton: View {
                 leadingAsset: leadingAsset,
                 trailingAsset: trailingAsset,
                 cornerRadius: buttonCornerRadius,
-                iconSize: iconSize
+                iconSize: iconSize,
+                isIconOnly: text.isEmpty
             )
         )
     }
@@ -164,9 +165,12 @@ private struct ThemedButtonStyle: ButtonStyle {
     let trailingAsset: Icon?
     let cornerRadius: CGFloat
     let iconSize: CGFloat
+    /// An empty label still occupies the stack and its default spacing, which makes an icon-only
+    /// button wider than it is tall. Dropping it lets the button size to icon + padding.
+    let isIconOnly: Bool
 
     func makeBody(configuration: Self.Configuration) -> some View {
-        HStack {
+        HStack(spacing: isIconOnly ? Primitives.Spacing.spacing0 : nil) {
             if let leadingAsset {
                 leadingAsset.image
                     .renderingMode(.template)
@@ -175,8 +179,10 @@ private struct ThemedButtonStyle: ButtonStyle {
                     .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(textColor(configuration))
             }
-            configuration.label
-                .padding(.vertical, Primitives.Spacing.spacing16)
+            if !isIconOnly {
+                configuration.label
+                    .padding(.vertical, Primitives.Spacing.spacing16)
+            }
             if let trailingAsset {
                 trailingAsset.image
                     .renderingMode(.template)
