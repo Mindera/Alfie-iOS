@@ -3,11 +3,13 @@ import SwiftUI
 // MARK: - SortByView
 
 public struct SortByView: View {
-    @Binding private var sortBy: SortByType
+    /// Optional because no sort is pre-selected — the BFF's own default applies until the user
+    /// picks one, and a radio group cannot otherwise represent "nothing chosen".
+    @Binding private var sortBy: SortByType?
     private var title: String
     private var options: [SortByItemProtocol]
 
-    public init(sortBy: Binding<SortByType>, title: String, options: [SortByItemProtocol]) {
+    public init(sortBy: Binding<SortByType?>, title: String, options: [SortByItemProtocol]) {
         _sortBy = sortBy
         self.title = title
         self.options = options
@@ -79,5 +81,5 @@ public struct SortByView: View {
 }
 
 #Preview {
-    SortByView(sortBy: .constant(.alphaDesc), title: "Sort By", options: [])
+    SortByView(sortBy: .constant(nil), title: "Sort By", options: [])
 }
