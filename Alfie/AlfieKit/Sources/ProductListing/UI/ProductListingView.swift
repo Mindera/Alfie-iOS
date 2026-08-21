@@ -137,9 +137,12 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             ProductListingFilter(
                 isVisible: $viewModel.showRefine,
                 listStyle: $viewModel.style,
-                sortOption: $viewModel.sortOption,
-                onFilter: viewModel.didApplyFilters
-            )
+                priceBounds: viewModel.priceBounds,
+                appliedFilters: viewModel.filters,
+                appliedSort: viewModel.sortOption.flatMap(SortByType.init(rawValue:))
+            ) { filters, sort in
+                viewModel.didApplyFilters(filters, sort: sort?.rawValue)
+            }
         }
     }
 
