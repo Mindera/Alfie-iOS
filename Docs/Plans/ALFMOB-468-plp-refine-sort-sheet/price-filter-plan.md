@@ -1,8 +1,11 @@
 ---
-status: in-progress
+status: completed
 ticket: ALFMOB-475 (map) → delivered on ALFMOB-468 / PR #103
 complexity: high
 ---
+
+> **Done.** All 9 phases landed; `verify.sh --skip-integration` passes. Deviations and findings
+> recorded at the bottom under "Outcome".
 
 # PLP Price filter — execution plan (ALFMOB-475 build order)
 
@@ -95,3 +98,36 @@ The PLP quick-filter chip row stays mocked and filters nothing (ALFMOB-480) — 
 
 No shadow token for Figma `Shadow-Sheer` (`0 1px 2px rgba(0,0,0,0.05)`) — commented
 literal, not a substitute (ALFMOB-479).
+
+---
+
+## Outcome
+
+### Calls made during implementation
+- **Remove All when nothing is filtered** — hidden, not disabled (ALFMOB-486 left this open).
+  Present on both the panel and sub-screen headers per Figma, with distinct accessibility ids
+  since both sit in the hierarchy while a sub-screen is pushed.
+- **Price row on the search-driven PLP** — hidden. `categoryPriceRange` is keyed by collection
+  handle, so search has no bounds; 477's no-dead-ends rule says no row rather than a dead one.
+- **A category whose price range collapses to one whole unit** yields no bounds, so no Price row —
+  there is nothing to narrow.
+
+### Correction to ALFMOB-479's premise
+479 states "SharedUI has no text input at all today". It does: `ThemedInput`
+(`SharedUI/Theme/Inputs/`), used by eight DebugMenu call sites. It is the *legacy*-design input —
+legacy `Primitives` palette, focus bar, status-label row — and restyling it would have changed
+those screens, so the new `TextInput` was still the right call. The two now coexist; a follow-up
+should decide whether `ThemedInput` is retired once the modern design lands more widely.
+
+### Pre-existing failure fixed in passing
+Four PLP snapshot baselines were stale: recorded at `81458a4` (main), while `83bf544` / `8f9153c`
+on this branch changed the filter-bar height and added the chip row without re-recording. They
+failed on the untouched branch too (verified by stashing). Re-recorded after confirming the only
+diff is the intended ALFMOB-467 chip row. Note this contradicts ALFMOB-488's "PLP has no snapshot
+coverage at all" — it does, added by 467 on this branch.
+
+### Not verified
+The sheet has not been exercised in the simulator — the tool needs device access the user has not
+granted. Build, unit tests and snapshots pass; gesture behaviour and the visual states of
+`RangeSlider` / `TextInput` are covered by neither unit tests nor snapshots (accepted by 488), so
+they remain unverified by anything but `#Preview`.
