@@ -17,5 +17,6 @@ public protocol BFFClientServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing
+    func categoryPriceRange(collectionHandle: String) async throws -> PriceRange?
     func getWebViewConfig() async throws -> WebViewConfiguration
 }

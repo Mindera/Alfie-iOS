@@ -10,6 +10,7 @@ class Query: MockObject {
   typealias MockValueCollectionType = Array<Mock<Query>>
 
   struct MockFields {
+    @Field<CategoryPriceRange>("categoryPriceRange") public var categoryPriceRange
     @Field<Menu>("menu") public var menu
     @Field<OmniProduct>("productDetails") public var productDetails
     @Field<ProductListResponse>("productList") public var productList
@@ -19,12 +20,14 @@ class Query: MockObject {
 
 extension Mock where O == Query {
   convenience init(
+    categoryPriceRange: Mock<CategoryPriceRange>? = nil,
     menu: Mock<Menu>? = nil,
     productDetails: Mock<OmniProduct>? = nil,
     productList: Mock<ProductListResponse>? = nil,
     searchProducts: Mock<ProductListResponse>? = nil
   ) {
     self.init()
+    _setEntity(categoryPriceRange, for: \.categoryPriceRange)
     _setEntity(menu, for: \.menu)
     _setEntity(productDetails, for: \.productDetails)
     _setEntity(productList, for: \.productList)
