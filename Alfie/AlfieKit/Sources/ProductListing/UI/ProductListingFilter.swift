@@ -39,11 +39,16 @@ struct ProductListingFilter: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            root
-                .navigationDestination(for: RefineRoute.self) { route in
-                    destination(for: route)
-                }
+        // The CTA lives outside the stack so it is pinned across every screen as one instance —
+        // duplicating it per screen would put two identical accessibility ids in the hierarchy.
+        VStack(spacing: theme.spacing.space0) {
+            NavigationStack(path: $path) {
+                root
+                    .navigationDestination(for: RefineRoute.self) { route in
+                        destination(for: route)
+                    }
+            }
+            applyButton
         }
         .presentationDetents([.large])
         .accessibilityIdentifier(AccessibilityID.ProductListing.refineSheet)
@@ -61,7 +66,6 @@ struct ProductListingFilter: View {
             }
             .padding(.vertical, theme.spacing.space200)
             Spacer()
-            applyButton
         }
         .navigationBarHidden(true)
     }
@@ -83,21 +87,25 @@ struct ProductListingFilter: View {
             Spacer()
             ThemedToolbarTitle(style: .text(L10n.Plp.RefineAndSort.title))
             Spacer()
-            removeAllButton
+            removeAllButton(accessibilityIdentifier: AccessibilityID.ProductListing.refineRemoveAllButton)
         }
         .padding(.horizontal, theme.spacing.space300)
     }
 
-    @ViewBuilder private var removeAllButton: some View {
+    /// Figma places Remove All on both the panel and the sub-screen headers. With one filterable
+    /// dimension the two are the same operation (ALFMOB-486), so they share behaviour but carry
+    /// distinct identifiers — both can be in the hierarchy at once while a sub-screen is pushed.
+    @ViewBuilder private func removeAllButton(accessibilityIdentifier: String) -> some View {
         // Hidden rather than disabled while there is nothing to remove (ALFMOB-486 left the
         // visual state to implementation).
         if viewModel.hasActiveFilters {
-            Button(L10n.Plp.Refine.RemoveAll.Button.cta) {
+            Button {
                 viewModel.removeAllFilters()
+            } label: {
+                Text.build(theme.font.body.small(L10n.Plp.Refine.RemoveAll.Button.cta))
+                    .foregroundStyle(Theme.linkLinkPrimaryDefault)
             }
-            .font(Font(theme.font.body.small.uiFont))
-            .foregroundStyle(Theme.linkLinkPrimaryDefault)
-            .accessibilityIdentifier(AccessibilityID.ProductListing.refineRemoveAllButton)
+            .accessibilityIdentifier(accessibilityIdentifier)
         }
     }
 
@@ -194,8 +202,16 @@ struct ProductListingFilter: View {
         .navigationTitle(title(for: route))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                removeAllButton(
+                    accessibilityIdentifier: AccessibilityID.ProductListing.refineSubscreenRemoveAllButton
+                )
+            }
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
+                    // Back is navigation only — pending edits stand, and nothing is committed
+                    // until the CTA (ALFMOB-476).
+                    guard !path.isEmpty else { return }
                     path.removeLast()
                 } label: {
                     ThemedIcon(
@@ -209,9 +225,6 @@ struct ProductListingFilter: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        // Back is navigation only — pending edits made on a sub-screen stand, and nothing is
-        // committed until the CTA (ALFMOB-476).
-        .safeAreaInset(edge: .bottom) { applyButton }
     }
 
     private func title(for route: RefineRoute) -> String {

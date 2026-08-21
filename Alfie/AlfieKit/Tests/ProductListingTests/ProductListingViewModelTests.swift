@@ -809,6 +809,27 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertNil(sut.priceBounds)
     }
 
+    func test_a_category_without_bounds_is_not_requeried_on_every_appearance() {
+        // `viewDidAppear` fires again on every return from a PDP. A category with no filterable
+        // range yields nil legitimately, so the absence of a result must not look like "not asked".
+        sut = makeSUT(category: "clothing")
+        var boundsFetches = 0
+        mockProductListing.onCategoryPriceRangeCalled = { _ in
+            boundsFetches += 1
+            return nil
+        }
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        sut.viewDidAppear()
+        sut.viewDidAppear()
+
+        XCTAssertEqual(boundsFetches, 1)
+        XCTAssertNil(sut.priceBounds)
+    }
+
     private func money(_ amount: Int) -> Money {
         Money(currencyCode: "GBP", amount: amount, amountFormatted: "")
     }

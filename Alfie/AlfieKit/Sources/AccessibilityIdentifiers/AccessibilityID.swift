@@ -80,6 +80,9 @@ public enum AccessibilityID {
         public static let refineSheet = "productListing.refine.sheet"
         public static let refineCloseButton = "productListing.refine.close.button"
         public static let refineRemoveAllButton = "productListing.refine.removeAll.button"
+        /// The sub-screen header's Remove All. Same behaviour as the panel's, but a distinct id —
+        /// both are in the hierarchy while a sub-screen is pushed.
+        public static let refineSubscreenRemoveAllButton = "productListing.refine.subscreen.removeAll.button"
         public static let refineApplyButton = "productListing.refine.apply.button"
         public static let refineBackButton = "productListing.refine.back.button"
         public static let refinePriceRow = "productListing.refine.price.row"

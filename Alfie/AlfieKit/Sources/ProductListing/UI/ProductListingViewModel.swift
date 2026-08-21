@@ -40,6 +40,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     // other (last-writer-wins).
     private var isFetching = false
 
+    // The bounds query is fired at most once per screen, whatever it returns.
+    private var didRequestPriceBounds = false
+
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
     }
@@ -235,7 +238,11 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     /// is not surfaced — the Price row simply doesn't appear.
     @MainActor
     private func loadPriceBoundsIfNeeded() async {
-        guard priceBounds == nil, mode == .listing, let collectionHandle = category else { return }
+        // Gated on "asked", not on "got a result": `viewDidAppear` fires again on every return
+        // from a PDP, and a category with no filterable range legitimately yields nil — keying
+        // off `priceBounds` would re-query it every time.
+        guard !didRequestPriceBounds, mode == .listing, let collectionHandle = category else { return }
+        didRequestPriceBounds = true
 
         do {
             let range = try await dependencies.productListingService.categoryPriceRange(

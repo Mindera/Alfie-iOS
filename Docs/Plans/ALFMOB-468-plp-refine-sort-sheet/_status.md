@@ -15,7 +15,7 @@
 - [x] Scout scope (scope.md)
 - [x] Approval gate — approved
 - [x] Implement (ios-execute) — 2 files, verify PASSED (unit; integration skipped), review APPROVED
-- [ ] Commit
-- [ ] PR → main
-- [ ] Ticket → In Review
-- [ ] Report
+- [x] Commit (53eec92 code, db24c1e plan)
+- [x] PR → ALFMOB-467 (#103)
+- [x] Ticket → Review
+- [x] Report

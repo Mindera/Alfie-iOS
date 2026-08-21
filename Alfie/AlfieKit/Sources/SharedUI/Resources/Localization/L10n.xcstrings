@@ -751,6 +751,39 @@
         }
       }
     },
+    "plp.refine.price.summary.up_to" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to %@"
+          }
+        }
+      }
+    },
+    "plp.refine.price.summary.from" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ and up"
+          }
+        }
+      }
+    },
+    "plp.refine.price.summary.between" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
     "plp.refine.remove_all.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {

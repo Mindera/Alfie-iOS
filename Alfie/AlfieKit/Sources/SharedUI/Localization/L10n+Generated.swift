@@ -278,6 +278,20 @@ public enum L10n {
           /// Price
           public static let title = L10n.tr("L10n", "plp.refine.price.option.title")
         }
+        public enum Summary {
+          /// %1$@ – %2$@
+          public static func between(_ p1: Any, _ p2: Any) -> String {
+            return L10n.tr("L10n", "plp.refine.price.summary.between", String(describing: p1), String(describing: p2))
+          }
+          /// %@ and up
+          public static func from(_ p1: Any) -> String {
+            return L10n.tr("L10n", "plp.refine.price.summary.from", String(describing: p1))
+          }
+          /// Up to %@
+          public static func upTo(_ p1: Any) -> String {
+            return L10n.tr("L10n", "plp.refine.price.summary.up_to", String(describing: p1))
+          }
+        }
       }
       public enum RemoveAll {
         public enum Button {
@@ -639,6 +653,9 @@ public extension L10n {
       case plpRefinePriceMaxLabel = "plp.refine.price.max.label"
       case plpRefinePriceMinLabel = "plp.refine.price.min.label"
       case plpRefinePriceOptionTitle = "plp.refine.price.option.title"
+      case plpRefinePriceSummaryBetween = "plp.refine.price.summary.between"
+      case plpRefinePriceSummaryFrom = "plp.refine.price.summary.from"
+      case plpRefinePriceSummaryUpTo = "plp.refine.price.summary.up_to"
       case plpRefineRemoveAllButtonCta = "plp.refine.remove_all.button.cta"
       case plpRefineAndSortTitle = "plp.refine_and_sort.title"
       case plpRefreshErrorMessage = "plp.refresh.error_message"

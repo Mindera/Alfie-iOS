@@ -75,11 +75,11 @@ final class RefineViewModel: RefineViewModelProtocol {
         let maximum = pendingMaxPrice.map { "\(symbol)\(Int($0))" }
         switch (minimum, maximum) {
         case (let minimum?, let maximum?):
-            return "\(minimum) – \(maximum)"
+            return L10n.Plp.Refine.Price.Summary.between(minimum, maximum)
         case (let minimum?, nil):
-            return "\(minimum)+"
+            return L10n.Plp.Refine.Price.Summary.from(minimum)
         case (nil, let maximum?):
-            return "≤ \(maximum)"
+            return L10n.Plp.Refine.Price.Summary.upTo(maximum)
         case (nil, nil):
             return nil
         }
