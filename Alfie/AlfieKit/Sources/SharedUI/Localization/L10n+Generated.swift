@@ -8,6 +8,8 @@ public enum L10n {
   public enum Accessibility {
     /// Account
     public static let account = L10n.tr("L10n", "accessibility.account")
+    /// Back
+    public static let back = L10n.tr("L10n", "accessibility.back")
     /// Clear search
     public static let clearSearch = L10n.tr("L10n", "accessibility.clearSearch")
     /// Close
@@ -258,6 +260,44 @@ public enum L10n {
       public enum Button {
         /// Refine
         public static let cta = L10n.tr("L10n", "plp.refine.button.cta")
+      }
+      public enum Price {
+        public enum InvalidRange {
+          /// The minimum must be lower than the maximum.
+          public static let message = L10n.tr("L10n", "plp.refine.price.invalid_range.message")
+        }
+        public enum Max {
+          /// Max
+          public static let label = L10n.tr("L10n", "plp.refine.price.max.label")
+        }
+        public enum Min {
+          /// Min
+          public static let label = L10n.tr("L10n", "plp.refine.price.min.label")
+        }
+        public enum Option {
+          /// Price
+          public static let title = L10n.tr("L10n", "plp.refine.price.option.title")
+        }
+        public enum Summary {
+          /// %1$@ – %2$@
+          public static func between(_ p1: Any, _ p2: Any) -> String {
+            return L10n.tr("L10n", "plp.refine.price.summary.between", String(describing: p1), String(describing: p2))
+          }
+          /// %@ and up
+          public static func from(_ p1: Any) -> String {
+            return L10n.tr("L10n", "plp.refine.price.summary.from", String(describing: p1))
+          }
+          /// Up to %@
+          public static func upTo(_ p1: Any) -> String {
+            return L10n.tr("L10n", "plp.refine.price.summary.up_to", String(describing: p1))
+          }
+        }
+      }
+      public enum RemoveAll {
+        public enum Button {
+          /// Remove All
+          public static let cta = L10n.tr("L10n", "plp.refine.remove_all.button.cta")
+        }
       }
     }
     public enum RefineAndSort {
@@ -544,6 +584,7 @@ public extension L10n {
   enum Keys: String, RawRepresentable, CaseIterable {
 
       case accessibilityAccount = "accessibility.account"
+      case accessibilityBack = "accessibility.back"
       case accessibilityClearSearch = "accessibility.clearSearch"
       case accessibilityClose = "accessibility.close"
       case accessibilityGridView = "accessibility.gridView"
@@ -608,6 +649,14 @@ public extension L10n {
       case plpListStyleOptionTitle = "plp.list_style.option.title"
       case plpNumberOfResultsMessage = "plp.number_of_results.message"
       case plpRefineButtonCta = "plp.refine.button.cta"
+      case plpRefinePriceInvalidRangeMessage = "plp.refine.price.invalid_range.message"
+      case plpRefinePriceMaxLabel = "plp.refine.price.max.label"
+      case plpRefinePriceMinLabel = "plp.refine.price.min.label"
+      case plpRefinePriceOptionTitle = "plp.refine.price.option.title"
+      case plpRefinePriceSummaryBetween = "plp.refine.price.summary.between"
+      case plpRefinePriceSummaryFrom = "plp.refine.price.summary.from"
+      case plpRefinePriceSummaryUpTo = "plp.refine.price.summary.up_to"
+      case plpRefineRemoveAllButtonCta = "plp.refine.remove_all.button.cta"
       case plpRefineAndSortTitle = "plp.refine_and_sort.title"
       case plpRefreshErrorMessage = "plp.refresh.error_message"
       case plpShowResultsButtonCta = "plp.show_results.button.cta"

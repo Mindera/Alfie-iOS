@@ -14,10 +14,13 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public var style: ProductListingListStyle
     @Published public var showRefine = false
     @Published public var sortOption: String?
-    // ALFMOB-331 AC 4: BFF `ProductFilterInput` shape is plumbed end-to-end. The Refine UI
-    // doesn't expose filter dimensions yet, so this stays `nil` until a follow-up wires the
-    // sheet to populate it (brandNames / productTypes / price range / inventory).
-    @Published public var filters: ProductFilterInput?
+    // Populated by the Refine sheet. Price is the only dimension the sheet exposes today; the
+    // rest of `ProductFilterInput` waits on a BFF facet API.
+    @Published public internal(set) var filters: ProductFilterInput?
+    // Whole-collection price bounds for the Refine sheet's Price row. A plain optional rather
+    // than a `ViewState`: the design has no loading or error affordance for it, and an absent
+    // range is a legitimate answer — both cases simply mean the Price row is not shown.
+    @Published public internal(set) var priceBounds: PriceFilterBounds?
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
     private let showSearch: () -> Void
@@ -36,6 +39,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     // True while a load-more or a refresh is in flight, so the two can't race and overwrite each
     // other (last-writer-wins).
     private var isFetching = false
+
+    // The bounds query is fired at most once per screen, whatever it returns.
+    private var didRequestPriceBounds = false
 
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
@@ -91,6 +97,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         Task {
             await loadProductsIfNeeded()
         }
+        Task {
+            await loadPriceBoundsIfNeeded()
+        }
     }
 
     public func didDisplay(_ product: Product) {
@@ -130,8 +139,13 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
     }
 
-    public func didApplyFilters() {
+    public func didApplyFilters(_ filters: ProductFilterInput?, sort: String?) {
+        self.filters = filters
+        sortOption = sort
         showRefine = false
+        // Discard the cursor: an `after` from the previous query addresses a result set that no
+        // longer exists, and would silently paginate into the old one (ALFMOB-487).
+        pagination = nil
         state = .loadingFirstPage(.init(title: "", products: []))
 
         Task {
@@ -217,6 +231,27 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         pagination = productListing.pagination
         state = .success(.init(title: productListing.title, products: productListing.products))
+    }
+
+    /// Fetched once per screen. The bounds describe the whole collection: constant across
+    /// pagination and unaffected by the active filters, mirroring web (ALFMOB-472). A failure
+    /// is not surfaced — the Price row simply doesn't appear.
+    @MainActor
+    private func loadPriceBoundsIfNeeded() async {
+        // Gated on "asked", not on "got a result": `viewDidAppear` fires again on every return
+        // from a PDP, and a category with no filterable range legitimately yields nil — keying
+        // off `priceBounds` would re-query it every time.
+        guard !didRequestPriceBounds, mode == .listing, let collectionHandle = category else { return }
+        didRequestPriceBounds = true
+
+        do {
+            let range = try await dependencies.productListingService.categoryPriceRange(
+                collectionHandle: collectionHandle
+            )
+            priceBounds = range.flatMap(PriceFilterBounds.init(priceRange:))
+        } catch {
+            dependencies.log.error("Error fetching category price range: \(error)")
+        }
     }
 
     @MainActor

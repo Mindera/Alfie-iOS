@@ -9,4 +9,7 @@ public protocol ProductServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing
+    /// Whole-collection price bounds, independent of any active filter. `nil` when the BFF has
+    /// no range for the collection.
+    func categoryPriceRange(collectionHandle: String) async throws -> PriceRange?
 }

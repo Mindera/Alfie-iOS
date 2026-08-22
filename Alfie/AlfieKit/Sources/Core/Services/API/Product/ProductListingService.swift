@@ -50,6 +50,10 @@ public final class ProductListingService: ProductListingServiceProtocol {
             filters: filters
         )
     }
+
+    public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
+        try await productService.categoryPriceRange(collectionHandle: collectionHandle)
+    }
 }
 
 // MARK: - Configuration

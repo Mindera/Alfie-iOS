@@ -2,12 +2,11 @@ import SwiftUI
 
 import SharedUI
 struct DemoSortByView: View {
-    @State private var sortBy: SortByType = .alphaDesc
+    @State private var sortBy: SortByType?
     private var list: [SortByItem] = [
         .init(value: .priceDesc, title: "Price - High to Low", icon: .chartDownTrend),
         .init(value: .priceAsc, title: "Price - Low to High", icon: .chartUpTrend),
         .init(value: .alphaAsc, title: "A-Z"),
-        .init(value: .alphaDesc, title: "Z-A"),
     ]
 
     var body: some View {

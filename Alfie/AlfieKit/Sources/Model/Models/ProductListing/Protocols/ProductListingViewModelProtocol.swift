@@ -10,6 +10,10 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     var style: ProductListingListStyle { get set }
     var showRefine: Bool { get set }
     var sortOption: String? { get set }
+    var filters: ProductFilterInput? { get }
+    /// Whole-collection price bounds for the Refine sheet's Price row; `nil` when the category
+    /// has no filterable range — the row is then not shown.
+    var priceBounds: PriceFilterBounds? { get }
     var title: String { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
@@ -22,7 +26,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didTapSearch()
     func didTapAddToWishlist(for product: Product, isFavorite: Bool)
     func setListStyle(_ style: ProductListingListStyle)
-    func didApplyFilters()
+    func didApplyFilters(_ filters: ProductFilterInput?, sort: String?)
     func refresh() async
     func didDismissRefreshError()
     func retry() async

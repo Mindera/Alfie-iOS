@@ -686,6 +686,153 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(totalFetches, 1)
         XCTAssertTrue(sut.state.isSuccess)
     }
+
+    // MARK: - Filter lifetime (ALFMOB-487)
+
+    func test_applying_filters_discards_the_cursor_and_refetches_page_one() {
+        sut = makeSUT(category: "clothing")
+        var requestedCursors: [String?] = []
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            requestedCursors.append(after)
+            return ProductListing.fixture(
+                pagination: .fixture(endCursor: "cursor-1", hasNextPage: true),
+                products: Array(Product.fixtures.prefix(3))
+            )
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        // A cursor from the unfiltered result set addresses a page that no longer exists once the
+        // filter changes; carrying it over silently paginates into the previous query.
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.sut.didApplyFilters(.init(minPrice: 40), sort: nil) }
+        )
+
+        XCTAssertEqual(requestedCursors, [nil, nil])
+        XCTAssertEqual(sut.filters?.minPrice, 40)
+    }
+
+    func test_changing_sort_discards_the_cursor_and_preserves_filters() {
+        sut = makeSUT(category: "clothing")
+        var requestedCursors: [String?] = []
+        var requestedSorts: [String?] = []
+        var requestedFilters: [ProductFilterInput?] = []
+        mockProductListing.onProductListPageCalled = { _, after, sort, filters in
+            requestedCursors.append(after)
+            requestedSorts.append(sort)
+            requestedFilters.append(filters)
+            return ProductListing.fixture(
+                pagination: .fixture(endCursor: "cursor-1", hasNextPage: true),
+                products: Array(Product.fixtures.prefix(3))
+            )
+        }
+        let filters = ProductFilterInput(minPrice: 40)
+        sut.filters = filters
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.sut.didApplyFilters(filters, sort: "LOW_TO_HIGH") }
+        )
+
+        XCTAssertEqual(requestedCursors, [nil, nil])
+        XCTAssertEqual(requestedSorts.last, "LOW_TO_HIGH")
+        XCTAssertEqual(requestedFilters.last, filters, "A sort change must not drop the active filters")
+    }
+
+    func test_a_new_category_starts_with_no_filters() {
+        // Emergent from the navigation design — a different category is a different pushed screen
+        // with its own view model — so this pins it as a guarantee rather than an accident.
+        sut = makeSUT(category: "clothing")
+        sut.filters = ProductFilterInput(minPrice: 40)
+
+        let other = makeSUT(category: "shoes")
+
+        XCTAssertNil(other.filters)
+        XCTAssertNil(other.priceBounds)
+    }
+
+    // MARK: - Price bounds (ALFMOB-472 semantics)
+
+    func test_price_bounds_are_fetched_once_on_screen_entry() {
+        sut = makeSUT(category: "clothing")
+        var boundsFetches = 0
+        mockProductListing.onCategoryPriceRangeCalled = { handle in
+            boundsFetches += 1
+            XCTAssertEqual(handle, "clothing")
+            return PriceRange(low: self.money(1_023), high: self.money(48_000))
+        }
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$priceBounds, where: { $0 != nil }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.priceBounds?.minimum, 10, "1023 GBP minor units → £10")
+        XCTAssertEqual(sut.priceBounds?.maximum, 480)
+        XCTAssertEqual(boundsFetches, 1)
+    }
+
+    func test_a_failed_bounds_fetch_leaves_the_listing_alone() {
+        // Bounds are auxiliary: losing them hides the Price row, it does not error the screen.
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onCategoryPriceRangeCalled = { _ in
+            throw BFFRequestError(type: .product(.generic))
+        }
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertNil(sut.priceBounds)
+    }
+
+    func test_no_bounds_are_fetched_for_the_search_driven_listing() {
+        // `categoryPriceRange` is keyed by collection handle, which a search has none of.
+        sut = makeSUT(searchText: "shirt", mode: .searchResults)
+        var boundsFetches = 0
+        mockProductListing.onCategoryPriceRangeCalled = { _ in
+            boundsFetches += 1
+            return nil
+        }
+        mockProductListing.onSearchPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(boundsFetches, 0)
+        XCTAssertNil(sut.priceBounds)
+    }
+
+    func test_a_category_without_bounds_is_not_requeried_on_every_appearance() {
+        // `viewDidAppear` fires again on every return from a PDP. A category with no filterable
+        // range yields nil legitimately, so the absence of a result must not look like "not asked".
+        sut = makeSUT(category: "clothing")
+        var boundsFetches = 0
+        mockProductListing.onCategoryPriceRangeCalled = { _ in
+            boundsFetches += 1
+            return nil
+        }
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        sut.viewDidAppear()
+        sut.viewDidAppear()
+
+        XCTAssertEqual(boundsFetches, 1)
+        XCTAssertNil(sut.priceBounds)
+    }
+
+    private func money(_ amount: Int) -> Money {
+        Money(currencyCode: "GBP", amount: amount, amountFormatted: "")
+    }
 }
 
 /// Test gate that holds the first fetch suspended until released, and counts how many fetches ran —

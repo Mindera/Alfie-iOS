@@ -60,6 +60,11 @@ type CartTotals {
   subtotal: Money!
 }
 
+type CategoryPriceRange {
+  maxVariantPrice: Money!
+  minVariantPrice: Money!
+}
+
 input CreateCartInput {
   customerAccessToken: String
   lines: [CartLineInput!]
@@ -123,6 +128,8 @@ type MoneyRange {
 type Mutation {
   addToCart(input: AddToCartInput!): Cart!
   createCart(input: CreateCartInput!): Cart!
+  removeFromCart(cartId: String!, lineId: String!): Cart!
+  updateCart(input: UpdateCartInput!): Cart!
 }
 
 type OmniProduct {
@@ -212,6 +219,7 @@ type ProductVariant {
 type Query {
   cart(cartId: String!): Cart!
   cartCheckoutUrl(cartId: String!): String!
+  categoryPriceRange(collectionHandle: String!): CategoryPriceRange
   menu(handle: String! = "main-menu"): Menu!
   productDetails(handle: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
   productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, sort: ProductSortEnum! = NEWEST): ProductListResponse!
@@ -222,6 +230,22 @@ type Seo {
   description: String
   keywords: [String]
   title: String
+}
+
+input UpdateCartInput {
+  cartId: ID!
+  lines: [UpdateCartLineInput!]!
+}
+
+input UpdateCartLineInput {
+  id: ID!
+
+  """Required by BigCommerce; ignored by Shopify."""
+  productId: ID
+  quantity: Int!
+
+  """Required by BigCommerce; ignored by Shopify."""
+  variantId: ID
 }
 
 type VariantOption {

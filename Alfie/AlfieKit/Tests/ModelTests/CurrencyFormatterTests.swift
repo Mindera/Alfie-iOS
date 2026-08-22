@@ -74,6 +74,51 @@ final class CurrencyFormatterTests: XCTestCase {
         )
     }
 
+    // MARK: - symbol (glyph only, for use as a field affix)
+
+    func test_symbol_returns_the_glyph_not_the_code() {
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "GBP", locale: enGB), "£")
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "EUR", locale: enGB), "€")
+    }
+
+    func test_symbol_matches_the_symbol_rendered_prices_use() {
+        // The affix sits beside a plain numeric field standing in for a formatted price, so it has
+        // to be the same glyph `string(...)` renders — including the disambiguated forms the
+        // locale applies to non-home currencies (en_GB renders USD as "US$", not "$").
+        for code in ["GBP", "USD", "EUR", "JPY"] {
+            let symbol = CurrencyFormatter.symbol(for: code, locale: enGB)
+            let formatted = CurrencyFormatter.string(amount: Decimal(12), currencyCode: code, locale: enGB)
+            XCTAssertTrue(
+                formatted.hasPrefix(symbol),
+                "\(code): affix \"\(symbol)\" should match the rendered price \"\(formatted)\""
+            )
+        }
+    }
+
+    func test_symbol_falls_back_to_the_code_when_unrecognised() {
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "ZZZ", locale: enGB), "ZZZ")
+    }
+
+    func test_symbol_is_consistent_across_repeated_calls() {
+        // Memoised per (code, locale) — repeated calls must return the same glyph.
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "GBP", locale: enGB), "£")
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "GBP", locale: enGB), "£")
+    }
+
+    func test_symbol_is_concurrency_safe() {
+        let codes = ["GBP", "USD", "JPY", "EUR"]
+        DispatchQueue.concurrentPerform(iterations: 1_000) { i in
+            _ = CurrencyFormatter.symbol(for: codes[i % codes.count], locale: self.enGB)
+        }
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "GBP", locale: enGB), "£")
+    }
+
+    func test_symbol_is_locale_aware() {
+        // The same currency can carry a different glyph per locale, so the cache is keyed by both.
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "USD", locale: Locale(identifier: "en_US")), "$")
+        XCTAssertEqual(CurrencyFormatter.symbol(for: "USD", locale: enGB), "US$")
+    }
+
     // MARK: - string (locale/currency-symbol aware)
 
     func test_string_gbp_renders_pound_symbol_and_two_decimals() {
