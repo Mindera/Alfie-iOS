@@ -162,10 +162,14 @@ struct ProductListingFilter: View {
     }
 
     private var applyButton: some View {
-        ThemedButton(text: L10n.Plp.ShowResults.Button.cta) {
+        // `ThemedButton` owns its own disabled appearance; SwiftUI's `.disabled()` would block the
+        // tap but leave it rendering as enabled, which reads as a dead control.
+        ThemedButton(
+            text: L10n.Plp.ShowResults.Button.cta,
+            isDisabled: .constant(!viewModel.canApply)
+        ) {
             viewModel.apply()
         }
-        .disabled(!viewModel.canApply)
         .accessibilityIdentifier(AccessibilityID.ProductListing.refineApplyButton)
     }
 
