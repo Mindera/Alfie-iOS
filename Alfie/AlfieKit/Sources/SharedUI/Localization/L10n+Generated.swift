@@ -75,6 +75,12 @@ public enum L10n {
       }
     }
   }
+  public enum General {
+    public enum Done {
+      /// Done
+      public static let cta = L10n.tr("L10n", "general.done.cta")
+    }
+  }
   public enum Home {
     /// Home
     public static let title = L10n.tr("L10n", "home.title")
@@ -256,6 +262,36 @@ public enum L10n {
         return L10n.tr("L10n", "plp.number_of_results.message", p1)
       }
     }
+    public enum QuickFilter {
+      public enum Cotton {
+        /// Cotton
+        public static let label = L10n.tr("L10n", "plp.quick_filter.cotton.label")
+      }
+      public enum Linen {
+        /// Linen
+        public static let label = L10n.tr("L10n", "plp.quick_filter.linen.label")
+      }
+      public enum RegularFit {
+        /// Regular Fit
+        public static let label = L10n.tr("L10n", "plp.quick_filter.regular_fit.label")
+      }
+      public enum Silk {
+        /// Silk
+        public static let label = L10n.tr("L10n", "plp.quick_filter.silk.label")
+      }
+      public enum SlimFit {
+        /// Slim Fit
+        public static let label = L10n.tr("L10n", "plp.quick_filter.slim_fit.label")
+      }
+      public enum StraightFit {
+        /// Straight Fit
+        public static let label = L10n.tr("L10n", "plp.quick_filter.straight_fit.label")
+      }
+      public enum Wool {
+        /// Wool
+        public static let label = L10n.tr("L10n", "plp.quick_filter.wool.label")
+      }
+    }
     public enum Refine {
       public enum Button {
         /// Refine
@@ -273,6 +309,14 @@ public enum L10n {
         public enum Min {
           /// Min
           public static let label = L10n.tr("L10n", "plp.refine.price.min.label")
+        }
+        public enum NoMaximum {
+          /// No maximum
+          public static let accessibilityValue = L10n.tr("L10n", "plp.refine.price.no_maximum.accessibility_value")
+        }
+        public enum NoMinimum {
+          /// No minimum
+          public static let accessibilityValue = L10n.tr("L10n", "plp.refine.price.no_minimum.accessibility_value")
         }
         public enum Option {
           /// Price
@@ -466,10 +510,6 @@ public enum L10n {
       /// A-Z
       public static let title = L10n.tr("L10n", "sort_by.alpha_asc.title")
     }
-    public enum AlphaDesc {
-      /// Z-A
-      public static let title = L10n.tr("L10n", "sort_by.alpha_desc.title")
-    }
     public enum MostPopular {
       /// Most Popular
       public static let title = L10n.tr("L10n", "sort_by.most_popular.title")
@@ -606,6 +646,7 @@ public extension L10n {
       case featureToggleDebugConfigurationOptionTitle = "feature_toggle.debug_configuration.option.title"
       case featureToggleStoreServicesOptionTitle = "feature_toggle.store_services.option.title"
       case featureToggleWishlistOptionTitle = "feature_toggle.wishlist.option.title"
+      case generalDoneCta = "general.done.cta"
       case homeTitle = "home.title"
       case homeLoggedInSubtitle = "home.logged_in.subtitle"
       case homeLoggedInTitle = "home.logged_in.title"
@@ -648,10 +689,19 @@ public extension L10n {
       case plpErrorViewServerErrorTitle = "plp.error_view.server_error.title"
       case plpListStyleOptionTitle = "plp.list_style.option.title"
       case plpNumberOfResultsMessage = "plp.number_of_results.message"
+      case plpQuickFilterCottonLabel = "plp.quick_filter.cotton.label"
+      case plpQuickFilterLinenLabel = "plp.quick_filter.linen.label"
+      case plpQuickFilterRegularFitLabel = "plp.quick_filter.regular_fit.label"
+      case plpQuickFilterSilkLabel = "plp.quick_filter.silk.label"
+      case plpQuickFilterSlimFitLabel = "plp.quick_filter.slim_fit.label"
+      case plpQuickFilterStraightFitLabel = "plp.quick_filter.straight_fit.label"
+      case plpQuickFilterWoolLabel = "plp.quick_filter.wool.label"
       case plpRefineButtonCta = "plp.refine.button.cta"
       case plpRefinePriceInvalidRangeMessage = "plp.refine.price.invalid_range.message"
       case plpRefinePriceMaxLabel = "plp.refine.price.max.label"
       case plpRefinePriceMinLabel = "plp.refine.price.min.label"
+      case plpRefinePriceNoMaximumAccessibilityValue = "plp.refine.price.no_maximum.accessibility_value"
+      case plpRefinePriceNoMinimumAccessibilityValue = "plp.refine.price.no_minimum.accessibility_value"
       case plpRefinePriceOptionTitle = "plp.refine.price.option.title"
       case plpRefinePriceSummaryBetween = "plp.refine.price.summary.between"
       case plpRefinePriceSummaryFrom = "plp.refine.price.summary.from"
@@ -693,7 +743,6 @@ public extension L10n {
       case shopCategoriesErrorViewServerErrorTitle = "shop.categories.error_view.server_error.title"
       case shopCategoriesSegmentTitle = "shop.categories.segment.title"
       case sortByAlphaAscTitle = "sort_by.alpha_asc.title"
-      case sortByAlphaDescTitle = "sort_by.alpha_desc.title"
       case sortByMostPopularTitle = "sort_by.most_popular.title"
       case sortByPriceHighToLowTitle = "sort_by.price_high_to_low.title"
       case sortByPriceLowToHighTitle = "sort_by.price_low_to_high.title"

@@ -254,6 +254,17 @@
         }
       }
     },
+    "general.done.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
     "home.logged_in.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -740,6 +751,83 @@
         }
       }
     },
+    "plp.quick_filter.wool.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wool"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.straight_fit.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Straight Fit"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.slim_fit.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slim Fit"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.silk.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silk"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.regular_fit.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regular Fit"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.linen.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linen"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.cotton.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cotton"
+          }
+        }
+      }
+    },
     "plp.refine.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -747,6 +835,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refine"
+          }
+        }
+      }
+    },
+    "plp.refine.price.no_minimum.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No minimum"
+          }
+        }
+      }
+    },
+    "plp.refine.price.no_maximum.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No maximum"
           }
         }
       }
@@ -1231,17 +1341,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A-Z"
-          }
-        }
-      }
-    },
-    "sort_by.alpha_desc.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Z-A"
           }
         }
       }

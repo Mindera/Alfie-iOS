@@ -10,7 +10,18 @@ import SwiftUI
 struct ProductListingFilterChips: View {
     @State private var selectedIndices: Set<Int> = []
 
-    private let filters = ["Slim Fit", "Linen", "Cotton", "Straight Fit", "Wool", "Regular Fit", "Silk"]
+    // Localised even though the row is mocked: these render on every PLP, so shipping raw English
+    // would break the project's no-hardcoded-strings rule for real users. The eventual facet model
+    // supplies its own display text and these keys go with it.
+    private let filters = [
+        L10n.Plp.QuickFilter.SlimFit.label,
+        L10n.Plp.QuickFilter.Linen.label,
+        L10n.Plp.QuickFilter.Cotton.label,
+        L10n.Plp.QuickFilter.StraightFit.label,
+        L10n.Plp.QuickFilter.Wool.label,
+        L10n.Plp.QuickFilter.RegularFit.label,
+        L10n.Plp.QuickFilter.Silk.label,
+    ]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
