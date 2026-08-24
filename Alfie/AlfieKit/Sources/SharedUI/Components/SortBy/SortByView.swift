@@ -6,10 +6,12 @@ public struct SortByView: View {
     /// Optional because no sort is pre-selected — the BFF's own default applies until the user
     /// picks one, and a radio group cannot otherwise represent "nothing chosen".
     @Binding private var sortBy: SortByType?
-    private var title: String
+    /// `nil` omits the in-content heading, for hosts that already title the surface — the refine
+    /// sub-screen carries "Sort By" in its navigation bar and would otherwise show it twice.
+    private var title: String?
     private var options: [SortByItemProtocol]
 
-    public init(sortBy: Binding<SortByType?>, title: String, options: [SortByItemProtocol]) {
+    public init(sortBy: Binding<SortByType?>, title: String?, options: [SortByItemProtocol]) {
         _sortBy = sortBy
         self.title = title
         self.options = options
@@ -17,12 +19,14 @@ public struct SortByView: View {
 
     public var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Text.build(theme.font.body.medium(title))
-                    .foregroundStyle(Theme.contentContentPrimary)
-                Spacer()
+            if let title {
+                HStack {
+                    Text.build(theme.font.body.medium(title))
+                        .foregroundStyle(Theme.contentContentPrimary)
+                    Spacer()
+                }
+                .padding(.horizontal, theme.spacing.space200)
             }
-            .padding(.horizontal, theme.spacing.space200)
             ScrollViewReader { reader in
                 ScrollView(.horizontal) {
                     HStack(spacing: theme.spacing.space100) {

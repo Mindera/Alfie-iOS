@@ -21,6 +21,8 @@ struct RefinePriceView<ViewModel: RefineViewModelProtocol>: View {
                     valueDescription: { value in
                         CurrencyFormatter.string(amount: Decimal(value), currencyCode: bounds.currencyCode)
                     },
+                    lowerUnboundedDescription: L10n.Plp.Refine.Price.NoMinimum.accessibilityValue,
+                    upperUnboundedDescription: L10n.Plp.Refine.Price.NoMaximum.accessibilityValue,
                     inputs: .init(
                         prefix: viewModel.currencySymbol,
                         isError: viewModel.isPriceRangeInvalid,
@@ -40,5 +42,15 @@ struct RefinePriceView<ViewModel: RefineViewModelProtocol>: View {
         }
         .padding(.horizontal, theme.spacing.space200)
         .padding(.top, theme.spacing.space300)
+        // `.numberPad` has no return key, so without these the keyboard covers the slider the user
+        // is trying to set with no way to dismiss it.
+        .contentShape(Rectangle())
+        .onTapGesture { hideKeyboard() }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button(L10n.General.Done.cta) { hideKeyboard() }
+            }
+        }
     }
 }

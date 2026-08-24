@@ -84,8 +84,14 @@ public struct TextInput: View {
                 .tint(Theme.contentContentPrimary)
                 .keyboardType(configuration.keyboardType)
                 .focused($isFocused)
+                // Applied only when supplied — an empty override would silence the field's own
+                // announcement and leave an unlabelled input.
                 .accessibilityIdentifier(configuration.accessibilityIdentifier ?? "")
-                .accessibilityLabel(configuration.accessibilityLabel ?? configuration.label ?? "")
+                .modifier(
+                    OptionalAccessibilityLabel(
+                        label: configuration.accessibilityLabel ?? configuration.label
+                    )
+                )
             }
             .padding(.horizontal, theme.spacing.space150)
             .frame(height: TextInputStyle.height)
@@ -96,6 +102,20 @@ public struct TextInput: View {
             )
             .contentShape(Rectangle())
             .onTapGesture { isFocused = true }
+        }
+    }
+}
+
+/// Applies an accessibility label only when one exists, so an unlabelled `TextInput` keeps the
+/// system's own announcement instead of being overridden with an empty string.
+private struct OptionalAccessibilityLabel: ViewModifier {
+    let label: String?
+
+    func body(content: Content) -> some View {
+        if let label, !label.isEmpty {
+            content.accessibilityLabel(label)
+        } else {
+            content
         }
     }
 }

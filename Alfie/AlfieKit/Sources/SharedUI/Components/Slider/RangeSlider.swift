@@ -34,6 +34,11 @@ public struct RangeSliderConfiguration {
     public let upperLabel: String
     /// Announced by VoiceOver for each thumb, e.g. `{ "£\(Int($0))" }`.
     public let valueDescription: (Double) -> String
+    /// Announced instead of `valueDescription` when that side is unbounded. Without these,
+    /// VoiceOver reads the track endpoint the thumb happens to rest on, so "no maximum" is
+    /// indistinguishable from a maximum deliberately set to the top of the range.
+    public let lowerUnboundedDescription: String
+    public let upperUnboundedDescription: String
     /// `nil` hides the paired fields.
     public let inputs: Inputs?
 
@@ -45,8 +50,12 @@ public struct RangeSliderConfiguration {
         lowerLabel: String,
         upperLabel: String,
         valueDescription: @escaping (Double) -> String,
+        lowerUnboundedDescription: String,
+        upperUnboundedDescription: String,
         inputs: Inputs? = nil
     ) {
+        self.lowerUnboundedDescription = lowerUnboundedDescription
+        self.upperUnboundedDescription = upperUnboundedDescription
         self.bounds = bounds
         self.step = step
         self._lowerValue = lowerValue
@@ -142,7 +151,7 @@ public struct RangeSlider: View {
             .offset(x: style.offset(forFraction: fraction(for: thumb), trackWidth: trackWidth))
             .accessibilityElement()
             .accessibilityLabel(label(for: thumb))
-            .accessibilityValue(configuration.valueDescription(effectiveValue(for: thumb)))
+            .accessibilityValue(accessibilityValue(for: thumb))
             .accessibilityAdjustableAction { direction in
                 adjust(thumb, by: direction == .increment ? configuration.step : -configuration.step)
             }
@@ -170,7 +179,13 @@ public struct RangeSlider: View {
                 isError: inputs.isError,
                 accessibilityIdentifier: thumb == .lower
                     ? inputs.lowerAccessibilityIdentifier
-                    : inputs.upperAccessibilityIdentifier
+                    : inputs.upperAccessibilityIdentifier,
+                // The prefix carries the unit and is hidden from VoiceOver visually, so fold it
+                // into the label — otherwise the field announces an unqualified number while the
+                // thumbs announce a currency amount.
+                accessibilityLabel: [inputs.prefix, label(for: thumb)]
+                    .compactMap { $0 }
+                    .joined(separator: " ")
             )
         )
     }
@@ -211,6 +226,16 @@ public struct RangeSlider: View {
 
     private func label(for thumb: RangeSliderStyle.Thumb) -> String {
         thumb == .lower ? configuration.lowerLabel : configuration.upperLabel
+    }
+
+    /// An unset side announces as unbounded rather than as the endpoint its thumb rests on.
+    private func accessibilityValue(for thumb: RangeSliderStyle.Thumb) -> String {
+        guard let value = value(for: thumb) else {
+            return thumb == .lower
+                ? configuration.lowerUnboundedDescription
+                : configuration.upperUnboundedDescription
+        }
+        return configuration.valueDescription(value)
     }
 
     // MARK: - Interaction
@@ -262,6 +287,8 @@ public struct RangeSlider: View {
                         lowerLabel: "Min",
                         upperLabel: "Max",
                         valueDescription: { "£\(Int($0))" },
+                        lowerUnboundedDescription: "No minimum",
+                        upperUnboundedDescription: "No maximum",
                         inputs: .init(prefix: "£")
                     )
                 )
