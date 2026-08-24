@@ -184,6 +184,17 @@ final class RefineViewModelTests: XCTestCase {
         XCTAssertNotNil(sut.priceSummary)
     }
 
+    func test_a_non_finite_price_does_not_crash_the_row_summary() {
+        // `Decimal(Double.infinity)` traps. Unreachable while every writer caps the pending
+        // values, but the guard is what keeps that true if a new writer appears.
+        let sut = makeSUT()
+        sut.pendingMinPrice = .infinity
+        XCTAssertNil(sut.priceSummary, "A non-finite bound contributes nothing rather than trapping")
+
+        sut.pendingMaxPrice = 500
+        XCTAssertNotNil(sut.priceSummary, "The finite side still summarises")
+    }
+
     func test_the_row_summary_is_currency_formatted_not_interpolated() {
         // Interpolating the glyph hardcodes symbol-before-amount, which is wrong where the locale
         // suffixes it, and disagrees with what the slider announces to VoiceOver.

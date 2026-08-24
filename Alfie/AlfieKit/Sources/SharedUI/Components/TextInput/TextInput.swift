@@ -84,9 +84,9 @@ public struct TextInput: View {
                 .tint(Theme.contentContentPrimary)
                 .keyboardType(configuration.keyboardType)
                 .focused($isFocused)
+                .accessibilityIdentifier(configuration.accessibilityIdentifier ?? "")
                 // Applied only when supplied — an empty override would silence the field's own
                 // announcement and leave an unlabelled input.
-                .accessibilityIdentifier(configuration.accessibilityIdentifier ?? "")
                 .modifier(
                     OptionalAccessibilityLabel(
                         label: configuration.accessibilityLabel ?? configuration.label

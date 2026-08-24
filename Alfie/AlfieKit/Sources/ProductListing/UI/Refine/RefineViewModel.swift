@@ -86,11 +86,15 @@ final class RefineViewModel: RefineViewModelProtocol {
     /// VoiceOver, so the row and the slider can no longer disagree.
     var priceSummary: String? {
         guard let currencyCode = priceBounds?.currencyCode, hasActiveFilters else { return nil }
-        let format = { (value: Double) in
-            CurrencyFormatter.string(amount: Decimal(value), currencyCode: currencyCode)
+        // `Decimal(Double.infinity)` traps. Unreachable while every writer of the pending values
+        // caps them, but guarded on the same terms as `RangeSliderStyle.fieldText` so the three
+        // consumers of these values share one threat model rather than one of them being armed.
+        let format = { (value: Double) -> String? in
+            guard value.isFinite else { return nil }
+            return CurrencyFormatter.string(amount: Decimal(value), currencyCode: currencyCode)
         }
-        let minimum = pendingMinPrice.map(format)
-        let maximum = pendingMaxPrice.map(format)
+        let minimum = pendingMinPrice.flatMap(format)
+        let maximum = pendingMaxPrice.flatMap(format)
         switch (minimum, maximum) {
         case (let minimum?, let maximum?):
             return L10n.Plp.Refine.Price.Summary.between(minimum, maximum)

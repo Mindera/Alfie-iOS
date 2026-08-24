@@ -2,6 +2,9 @@ import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
+// `hideKeyboard()` lives here. Imported explicitly rather than leaning on Swift 5 leaking
+// extension members through a transitive import — SE-0444 closes that and would break the build.
+import Utils
 
 /// Price sub-screen. Reached only when the category has bounds to filter within, so the slider
 /// always has a scale (see `ProductListingFilter.rows`).
@@ -19,7 +22,9 @@ struct RefinePriceView<ViewModel: RefineViewModelProtocol>: View {
                     lowerLabel: L10n.Plp.Refine.Price.Min.label,
                     upperLabel: L10n.Plp.Refine.Price.Max.label,
                     valueDescription: { value in
-                        CurrencyFormatter.string(amount: Decimal(value), currencyCode: bounds.currencyCode)
+                        // Same guard as `RefineViewModel.priceSummary` — `Decimal(.infinity)` traps.
+                        guard value.isFinite else { return "" }
+                        return CurrencyFormatter.string(amount: Decimal(value), currencyCode: bounds.currencyCode)
                     },
                     lowerUnboundedDescription: L10n.Plp.Refine.Price.NoMinimum.accessibilityValue,
                     upperUnboundedDescription: L10n.Plp.Refine.Price.NoMaximum.accessibilityValue,
