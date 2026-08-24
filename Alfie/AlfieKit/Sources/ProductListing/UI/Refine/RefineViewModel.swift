@@ -6,7 +6,7 @@ import SharedUI
 // MARK: - RefineViewModelProtocol
 
 protocol RefineViewModelProtocol: ObservableObject {
-    var priceBounds: PriceFilterBounds? { get }
+    var priceBounds: PriceFilterBounds? { get set }
     var pendingMinPrice: Double? { get set }
     var pendingMaxPrice: Double? { get set }
     var pendingSort: SortByType? { get set }
@@ -25,12 +25,20 @@ protocol RefineViewModelProtocol: ObservableObject {
 /// back-navigation between sub-screens never commits; only `apply()` reaches the listing
 /// (ALFMOB-476). Created fresh per presentation, so dismissing discards everything pending.
 final class RefineViewModel: RefineViewModelProtocol {
-    let priceBounds: PriceFilterBounds?
+    /// Settable because the bounds query races the product query, and the Refine button is live
+    /// while the listing is still loading. Opening the sheet first would otherwise snapshot `nil`
+    /// for the whole presentation and strand the Price row — the fetch is once-only, so it could
+    /// not recover without dismissing.
+    @Published var priceBounds: PriceFilterBounds?
 
     @Published var pendingMinPrice: Double?
     @Published var pendingMaxPrice: Double?
     @Published var pendingSort: SortByType?
 
+    /// Dimensions this sheet does not expose. Carried through untouched so applying Price or Sort
+    /// cannot silently drop a filter set elsewhere once a second dimension lands. Mutable only so
+    /// Remove All can clear them too.
+    private var carriedFilters: ProductFilterInput?
     private let onApply: (ProductFilterInput?, SortByType?) -> Void
 
     init(
@@ -40,6 +48,7 @@ final class RefineViewModel: RefineViewModelProtocol {
         onApply: @escaping (ProductFilterInput?, SortByType?) -> Void
     ) {
         self.priceBounds = priceBounds
+        carriedFilters = appliedFilters
         self.onApply = onApply
         pendingMinPrice = appliedFilters?.minPrice
         pendingMaxPrice = appliedFilters?.maxPrice
@@ -58,8 +67,9 @@ final class RefineViewModel: RefineViewModelProtocol {
     }
 
     /// Drives whether Remove All is shown at all — it is hidden while there is nothing to remove.
+    /// Counts dimensions this sheet cannot display, so Remove All still offers to clear them.
     var hasActiveFilters: Bool {
-        pendingMinPrice != nil || pendingMaxPrice != nil
+        pendingMinPrice != nil || pendingMaxPrice != nil || carriedFilters?.hasNonPriceDimension == true
     }
 
     /// The glyph the price fields show as their affix. Derived from the BFF's currency code, not
@@ -69,10 +79,18 @@ final class RefineViewModel: RefineViewModelProtocol {
     }
 
     /// Trailing summary on the Price row; nil when the dimension is unfiltered.
+    ///
+    /// Formatted through `CurrencyFormatter` rather than interpolating the glyph: interpolation
+    /// hardcodes symbol-before-amount, which is wrong in locales that suffix it, and `Int($0)`
+    /// traps for values the unbounded field can hold. This is also what the slider announces to
+    /// VoiceOver, so the row and the slider can no longer disagree.
     var priceSummary: String? {
-        guard let symbol = currencySymbol, hasActiveFilters else { return nil }
-        let minimum = pendingMinPrice.map { "\(symbol)\(Int($0))" }
-        let maximum = pendingMaxPrice.map { "\(symbol)\(Int($0))" }
+        guard let currencyCode = priceBounds?.currencyCode, hasActiveFilters else { return nil }
+        let format = { (value: Double) in
+            CurrencyFormatter.string(amount: Decimal(value), currencyCode: currencyCode)
+        }
+        let minimum = pendingMinPrice.map(format)
+        let maximum = pendingMaxPrice.map(format)
         switch (minimum, maximum) {
         case (let minimum?, let maximum?):
             return L10n.Plp.Refine.Price.Summary.between(minimum, maximum)
@@ -91,6 +109,8 @@ final class RefineViewModel: RefineViewModelProtocol {
     func removeAllFilters() {
         pendingMinPrice = nil
         pendingMaxPrice = nil
+        // "Every filter", per ALFMOB-486 — including dimensions this sheet cannot display.
+        carriedFilters = nil
     }
 
     func apply() {
@@ -99,9 +119,27 @@ final class RefineViewModel: RefineViewModelProtocol {
     }
 
     /// `nil` when no dimension is set, so the field is omitted from the request entirely rather
-    /// than sent as an empty filter object.
+    /// than sent as an empty filter object. Price is replaced from pending state; every other
+    /// dimension is carried through as applied.
     private var filterInput: ProductFilterInput? {
         guard hasActiveFilters else { return nil }
-        return ProductFilterInput(maxPrice: pendingMaxPrice, minPrice: pendingMinPrice)
+        return ProductFilterInput(
+            brandNames: carriedFilters?.brandNames,
+            inventory: carriedFilters?.inventory,
+            maxPrice: pendingMaxPrice,
+            metafields: carriedFilters?.metafields,
+            minPrice: pendingMinPrice,
+            productTypes: carriedFilters?.productTypes
+        )
+    }
+}
+
+private extension ProductFilterInput {
+    /// Dimensions the Refine sheet has no row for. Price is excluded because pending state owns it.
+    var hasNonPriceDimension: Bool {
+        brandNames?.isEmpty == false
+            || productTypes?.isEmpty == false
+            || metafields?.isEmpty == false
+            || inventory != nil
     }
 }

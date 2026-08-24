@@ -110,22 +110,34 @@ struct RangeSliderStyle {
 
     // MARK: - Text field round-trip
 
+    /// Ceiling applied to typed input. The bounds describe the category, not a cap on what may be
+    /// filtered, so typing above `bounds.upperBound` is allowed — but `Int(Double)` traps above
+    /// `Int.max`, and holding a key on a `.numberPad` reaches that in 19 keystrokes. Well beyond
+    /// any real price, and safely representable as an `Int`.
+    static let maximumFieldValue: Double = 999_999_999
+
     /// Whole-unit text for a field. A nil value renders empty — never `0`, which would read as a
     /// real bound (ALFMOB-481).
     func fieldText(for value: Double?) -> String {
-        guard let value else { return "" }
-        return String(Int(value.rounded()))
+        // `Int(exactly:)` rather than the trapping initialiser: `fieldValue(from:)` already caps
+        // typed input, so this is defence in depth against a value arriving from anywhere else.
+        guard let value, value.isFinite, let whole = Int(exactly: value.rounded()) else { return "" }
+        return String(whole)
     }
 
     /// Parses typed text back to a value. Empty (or unparseable) clears the bound to nil. The
-    /// result is snapped to the step grid but deliberately *not* clamped against the other thumb.
+    /// result is snapped to the step grid but deliberately *not* clamped against the other thumb —
+    /// a typed min above the max must surface as an inline error, not be clamped away.
     func fieldValue(from text: String, for thumb: Thumb) -> Double? {
         let digits = text.filter(\.isNumber)
         guard let parsed = Double(digits) else { return nil }
-        guard step > 0 else { return parsed }
-        let steps = parsed / step
+        // A long enough digit run overflows to `.infinity`; pin it to the ceiling rather than
+        // returning nil, so holding a key saturates the field instead of clearing it.
+        let capped = parsed.isFinite ? min(parsed, Self.maximumFieldValue) : Self.maximumFieldValue
+        guard step > 0 else { return capped }
+        let steps = capped / step
         let snapped = thumb == .lower ? steps.rounded(.down) : steps.rounded(.up)
-        return snapped * step
+        return min(snapped * step, Self.maximumFieldValue)
     }
 
     // MARK: - Colours

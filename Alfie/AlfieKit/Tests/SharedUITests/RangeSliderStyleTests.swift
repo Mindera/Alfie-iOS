@@ -160,6 +160,44 @@ final class RangeSliderStyleTests: XCTestCase {
         XCTAssertEqual(sut.fieldValue(from: "900", for: .upper), 900)
     }
 
+    // MARK: - Oversized input (regression: Int(Double) trap)
+
+    func test_a_value_too_large_for_Int_does_not_crash_the_field() {
+        // 19 digits exceeds Int.max as a Double, which the trapping Int() initialiser aborts on.
+        // Reachable by holding a key on the .numberPad field.
+        let huge = sut.fieldValue(from: String(repeating: "9", count: 19), for: .lower)
+        XCTAssertNotNil(huge)
+        XCTAssertFalse(sut.fieldText(for: huge).isEmpty)
+    }
+
+    func test_input_overflowing_to_infinity_does_not_crash_the_field() {
+        // A long enough digit run parses to .infinity, which traps identically.
+        let overflowed = sut.fieldValue(from: String(repeating: "9", count: 400), for: .upper)
+        XCTAssertEqual(overflowed, RangeSliderStyle.maximumFieldValue)
+        XCTAssertFalse(sut.fieldText(for: overflowed).isEmpty)
+    }
+
+    func test_oversized_input_saturates_rather_than_clearing_the_field() {
+        // Pinning at the ceiling keeps the field usable; returning nil would wipe what was typed.
+        XCTAssertEqual(
+            sut.fieldValue(from: String(repeating: "9", count: 19), for: .lower),
+            RangeSliderStyle.maximumFieldValue
+        )
+    }
+
+    func test_the_ceiling_survives_the_round_trip_through_text() {
+        let capped = sut.fieldValue(from: String(repeating: "9", count: 30), for: .upper)
+        let text = sut.fieldText(for: capped)
+        XCTAssertEqual(sut.fieldValue(from: text, for: .upper), capped)
+    }
+
+    func test_a_non_finite_value_renders_empty_rather_than_trapping() {
+        // Defence in depth: `fieldText` must survive a value that did not come through the parser.
+        XCTAssertEqual(sut.fieldText(for: .infinity), "")
+        XCTAssertEqual(sut.fieldText(for: .nan), "")
+        XCTAssertEqual(sut.fieldText(for: 1e19), "")
+    }
+
     // MARK: - Touch target
 
     func test_touch_target_meets_the_hig_minimum_without_growing_the_drawn_row() {

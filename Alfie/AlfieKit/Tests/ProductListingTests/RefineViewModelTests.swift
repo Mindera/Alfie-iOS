@@ -176,6 +176,73 @@ final class RefineViewModelTests: XCTestCase {
         XCTAssertFalse(sut.priceSummary?.contains("480") == true, "The unset side must not show a bound")
     }
 
+    // MARK: - Oversized values (regression: Int(Double) trap)
+
+    func test_a_price_too_large_for_Int_does_not_crash_the_row_summary() {
+        let sut = makeSUT()
+        sut.pendingMinPrice = 1e19
+        XCTAssertNotNil(sut.priceSummary)
+    }
+
+    func test_the_row_summary_is_currency_formatted_not_interpolated() {
+        // Interpolating the glyph hardcodes symbol-before-amount, which is wrong where the locale
+        // suffixes it, and disagrees with what the slider announces to VoiceOver.
+        let sut = makeSUT()
+        sut.pendingMinPrice = 40
+        let expected = CurrencyFormatter.string(amount: Decimal(40), currencyCode: "GBP")
+        XCTAssertEqual(sut.priceSummary?.contains(expected), true, "Got \(sut.priceSummary ?? "nil")")
+    }
+
+    // MARK: - Late-arriving bounds
+
+    func test_bounds_arriving_after_presentation_are_adopted() {
+        // The bounds query races the product query and Refine is tappable throughout, so a sheet
+        // opened first must still pick the bounds up rather than stranding the Price row.
+        let sut = makeSUT(bounds: nil)
+        XCTAssertNil(sut.currencySymbol)
+
+        sut.priceBounds = PriceFilterBounds(currencyCode: "GBP", minimum: 8, maximum: 480)
+
+        XCTAssertEqual(sut.currencySymbol, CurrencyFormatter.symbol(for: "GBP"))
+    }
+
+    // MARK: - Untouched filter dimensions
+
+    func test_applying_price_preserves_dimensions_the_sheet_cannot_show() {
+        var applied: ProductFilterInput?
+        let sut = makeSUT(
+            appliedFilters: .init(brandNames: ["Acme"], inventory: true, productTypes: ["Bags"]),
+            onApply: { filters, _ in applied = filters }
+        )
+        sut.pendingMinPrice = 40
+
+        sut.apply()
+
+        XCTAssertEqual(applied?.minPrice, 40)
+        XCTAssertEqual(applied?.brandNames, ["Acme"], "A price change must not drop an active brand filter")
+        XCTAssertEqual(applied?.productTypes, ["Bags"])
+        XCTAssertEqual(applied?.inventory, true)
+    }
+
+    func test_remove_all_clears_dimensions_the_sheet_cannot_show_too() {
+        // ALFMOB-486: Remove All clears *every* filter, not just the visible ones.
+        var applied: ProductFilterInput? = .init(minPrice: 1)
+        let sut = makeSUT(
+            appliedFilters: .init(brandNames: ["Acme"], minPrice: 40),
+            onApply: { filters, _ in applied = filters }
+        )
+
+        sut.removeAllFilters()
+        sut.apply()
+
+        XCTAssertNil(applied)
+    }
+
+    func test_an_unshown_dimension_still_offers_remove_all() {
+        let sut = makeSUT(appliedFilters: .init(brandNames: ["Acme"]))
+        XCTAssertTrue(sut.hasActiveFilters)
+    }
+
     // MARK: - Helpers
 
     private func makeSUT(
