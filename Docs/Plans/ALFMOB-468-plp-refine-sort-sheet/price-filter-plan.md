@@ -126,8 +126,24 @@ failed on the untouched branch too (verified by stashing). Re-recorded after con
 diff is the intended ALFMOB-467 chip row. Note this contradicts ALFMOB-488's "PLP has no snapshot
 coverage at all" — it does, added by 467 on this branch.
 
-### Not verified
-The sheet has not been exercised in the simulator — the tool needs device access the user has not
-granted. Build, unit tests and snapshots pass; gesture behaviour and the visual states of
-`RangeSlider` / `TextInput` are covered by neither unit tests nor snapshots (accepted by 488), so
-they remain unverified by anything but `#Preview`.
+### Verification
+`./Alfie/scripts/verify.sh` → FULL VERIFICATION PASSED (build + unit + 10 integration tests against
+a live local BFF; pass `ALFIE_BFF_PATH`, the script resolves the BFF as a sibling of the *worktree*).
+Exercised on iPhone 17 Pro against that BFF: bounds £20–£1300, a £500 max cut 12 items to 6,
+`min > max` showed the inline error and greyed the CTA, Remove All cleared without dismissing.
+
+Still unverified: keyboard dismissal on the price fields was **not** covered by that pass (text was
+injected rather than typed into a focused field), and slider gesture behaviour has neither unit nor
+snapshot coverage (accepted by ALFMOB-488).
+
+### PR review round 1
+
+One **crash** found and fixed: `Int(Double)` traps in `RangeSliderStyle.fieldText` and
+`RefineViewModel.priceSummary` for values the unbounded `.numberPad` field can produce (19 digits →
+`1e19`; 400 digits → `inf`). Reproduced at exit 133 before the fix. Typed input now saturates at
+`RangeSliderStyle.maximumFieldValue` and both sites use non-trapping conversions.
+
+Also fixed: late-arriving bounds are now adopted by an open sheet; a page in flight when filters
+change can no longer overwrite the filtered result; untouched filter dimensions survive an apply;
+the quick-filter chips are localised; the price fields gained keyboard dismissal; the duplicated
+"Sort By" heading, three VoiceOver gaps and the orphaned `sort_by.alpha_desc.title` are gone.

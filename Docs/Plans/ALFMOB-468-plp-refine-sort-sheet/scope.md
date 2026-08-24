@@ -1,5 +1,10 @@
 # Scope — ALFMOB-468 PLP Refine & Sort sheet restyle
 
+> **Superseded.** This describes only the original visual-only token migration, which is now the
+> first commit of a much larger change. ALFMOB-475 extended the ticket to deliver the whole Refine
+> architecture and a working Price filter — see `price-filter-plan.md` for the delivered scope.
+> Kept for the record of what the restyle itself touched.
+
 Visual-only token migration. Confirmed premise is **accurate** (legacy refs present).
 
 ## Files to change
