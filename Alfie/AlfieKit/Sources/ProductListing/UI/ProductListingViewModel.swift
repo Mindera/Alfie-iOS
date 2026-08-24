@@ -43,6 +43,11 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     // The bounds query is fired at most once per screen, whatever it returns.
     private var didRequestPriceBounds = false
 
+    // Bumped whenever the result set is redefined (a filter or sort change). A page fetch captures
+    // the value at entry and refuses to commit if it no longer matches — otherwise a load-more or
+    // refresh already in flight can land afterwards and restore the pre-filter products and cursor.
+    private var resultSetGeneration = 0
+
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
     }
@@ -146,6 +151,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         // Discard the cursor: an `after` from the previous query addresses a result set that no
         // longer exists, and would silently paginate into the old one (ALFMOB-487).
         pagination = nil
+        // Invalidate anything already in flight. The filter bar stays tappable during a load-more
+        // or refresh, so without this their responses can land after the reset and put the
+        // pre-filter products (and cursor) back.
+        resultSetGeneration += 1
         state = .loadingFirstPage(.init(title: "", products: []))
 
         Task {
@@ -163,6 +172,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         isFetching = true
         defer { isFetching = false }
         refreshError = nil
+        let generation = resultSetGeneration
 
         let productListing: ProductListing?
 
@@ -171,10 +181,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         } catch is CancellationError {
             return
         } catch {
+            guard generation == resultSetGeneration else { return }
             dependencies.log.error("Error refreshing product listing: \(error)")
             refreshError = ProductListingViewErrorType.from(error: error)
             return
         }
+
+        // A filter or sort change during the fetch redefined the result set; this response
+        // describes the old one.
+        guard generation == resultSetGeneration else { return }
 
         guard let productListing else {
             refreshError = .noResults
@@ -213,16 +228,20 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         guard !state.isSuccess else {
             return
         }
+        let generation = resultSetGeneration
 
         let productListing: ProductListing?
 
         do {
             productListing = try await fetchPage(after: nil)
         } catch {
+            guard generation == resultSetGeneration else { return }
             dependencies.log.error("Error fetching product listing (first page): \(error)")
             state = .error(ProductListingViewErrorType.from(error: error))
             return
         }
+
+        guard generation == resultSetGeneration else { return }
 
         guard let productListing else {
             state = .error(.noResults)
@@ -265,6 +284,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
         isFetching = true
         defer { isFetching = false }
+        let generation = resultSetGeneration
 
         state = .loadingNextPage(.init(title: title, products: products))
         let productListing: ProductListing?
@@ -272,10 +292,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         do {
             productListing = try await fetchPage(after: pagination?.endCursor)
         } catch {
+            guard generation == resultSetGeneration else { return }
             dependencies.log.error("Error fetching product listing (following page): \(error)")
             state = .error(ProductListingViewErrorType.from(error: error))
             return
         }
+
+        // The filter changed while this page was in flight — appending it would splice products
+        // from the old result set onto the new one.
+        guard generation == resultSetGeneration else { return }
 
         guard let productListing else {
             state = .error(.noResults)

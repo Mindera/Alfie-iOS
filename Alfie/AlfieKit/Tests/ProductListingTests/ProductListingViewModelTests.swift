@@ -830,6 +830,39 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertNil(sut.priceBounds)
     }
 
+    func test_a_page_in_flight_when_filters_change_cannot_overwrite_the_filtered_result() async {
+        // The filter bar stays tappable during a load-more, so its response can land after the
+        // filter has redefined the result set. Committing it would put the pre-filter products
+        // and cursor back over the newly filtered listing.
+        sut = makeSUT(category: "clothing")
+        let stale = Array(Product.fixtures.prefix(3))
+        let fresh = Array(Product.fixtures.suffix(2))
+        let gate = FetchGate()
+        let firstFetchStarted = expectation(description: "stale page in flight")
+
+        mockProductListing.onProductListPageCalled = { _, after, _, filters in
+            if filters == nil {
+                await gate.recordAndMaybeWait(signal: firstFetchStarted)
+                return ProductListing.fixture(
+                    pagination: .fixture(endCursor: "stale-cursor", hasNextPage: true),
+                    products: stale
+                )
+            }
+            XCTAssertNil(after, "The filtered fetch must start from page 1")
+            return ProductListing.fixture(pagination: .fixture(hasNextPage: false), products: fresh)
+        }
+
+        sut.viewDidAppear()
+        await fulfillment(of: [firstFetchStarted], timeout: 1)
+
+        // Redefine the result set while the first fetch is suspended, then let it complete.
+        sut.didApplyFilters(.init(minPrice: 40), sort: nil)
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { Task { await gate.open() } })
+
+        XCTAssertEqual(sut.products.map(\.id), fresh.map(\.id), "The stale page must not win")
+        XCTAssertEqual(sut.filters?.minPrice, 40)
+    }
+
     private func money(_ amount: Int) -> Money {
         Money(currencyCode: "GBP", amount: amount, amountFormatted: "")
     }

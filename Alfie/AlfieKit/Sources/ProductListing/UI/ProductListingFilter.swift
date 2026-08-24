@@ -17,6 +17,10 @@ struct ProductListingFilter: View {
     @Binding private var listStyle: ProductListingListStyle
     @Binding private var isVisible: Bool
     @State private var path: [RefineRoute] = []
+    /// Kept alongside the view model because `@StateObject`'s autoclosure runs once per
+    /// presentation: the bounds query races the product query and Refine is tappable throughout,
+    /// so a sheet opened first would otherwise hold `nil` bounds for its whole life.
+    private let priceBounds: PriceFilterBounds?
 
     init(
         isVisible: Binding<Bool>,
@@ -28,6 +32,7 @@ struct ProductListingFilter: View {
     ) {
         self._isVisible = isVisible
         self._listStyle = listStyle
+        self.priceBounds = priceBounds
         self._viewModel = StateObject(
             wrappedValue: RefineViewModel(
                 priceBounds: priceBounds,
@@ -52,6 +57,8 @@ struct ProductListingFilter: View {
         }
         .presentationDetents([.large])
         .accessibilityIdentifier(AccessibilityID.ProductListing.refineSheet)
+        // Bounds can land after the sheet is already open; adopt them when they do.
+        .onChange(of: priceBounds) { viewModel.priceBounds = $0 }
     }
 
     // MARK: - Root
@@ -194,9 +201,10 @@ struct ProductListingFilter: View {
                 }
 
             case .sort:
+                // No in-content heading — the navigation bar already reads "Sort By".
                 SortByView(
                     sortBy: $viewModel.pendingSort,
-                    title: L10n.Plp.SortBy.Option.title,
+                    title: nil,
                     options: SortByHelper.options
                 )
                 .padding(.top, theme.spacing.space300)
