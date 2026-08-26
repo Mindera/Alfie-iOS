@@ -100,7 +100,9 @@ This project uses [Apple String Catalog](https://developer.apple.com/documentati
 
 It is possible to initialise a localised string or a localised attributed string from a `LocalizedStringResource` beforehand or keep it to localise later when needed. The later approach enables having dynamic localisation on SwiftUI Previews by injecting different environment locales, while initialising a localised string/attributed string beforehand disables the ability to automatic lookup for a localisable resource in a different language.
 
-In this project is being used [SwiftGen](https://github.com/SwiftGen/SwiftGen) which generates strongly-typed accessors for string catalogues, providing several significant benefits. First and foremost, it eliminates the risk of runtime errors caused by typos or incorrect key usage in localized strings, as all keys are now referenced through a type-safe API. This ensures compile-time validation, meaning that if a string key is removed or changed, the compiler will catch the issue immediately, reducing the likelihood of bugs slipping into production. Additionally, the generated enums provide a clear and organized structure, making it easier for developers to find and use localized strings consistently across the app. This approach also enhances code readability and maintainability, as the usage of localized strings is self-documenting and less prone to human error. Overall, it streamlines the development process, improves localization reliability, and boosts developer confidence.
+This project uses [SwiftGen](https://github.com/SwiftGen/SwiftGen) to generate strongly-typed
+accessors for the string catalogue, so a removed or renamed key is a compile error rather than a
+runtime miss.
 
 #### How to use
 

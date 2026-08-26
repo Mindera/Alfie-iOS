@@ -7,24 +7,6 @@
   it runs against a real local BFF, not mocks, and only when `verify.sh` runs without
   `--skip-integration`.
 
-## Testing Pattern
-
-```swift
-final class FeatureServiceTests: XCTestCase {
-    func testFetchDataSuccess() async throws {
-        // Given
-        let mockBFFClient = MockBFFClientService()
-        let service = FeatureService(bffClient: mockBFFClient)
-        
-        // When
-        let result = try await service.fetchData()
-        
-        // Then
-        XCTAssertEqual(result.id, "expected-id")
-    }
-}
-```
-
 ## Mocking
 
 - **Mock ViewModels**: Located in `Alfie/AlfieKit/Sources/Mocks/Core/Features/`
@@ -35,10 +17,5 @@ final class FeatureServiceTests: XCTestCase {
 
 ## Snapshot Testing
 
-- Uses `swift-snapshot-testing` library
-- Record mode: Set `isRecording = true` temporarily
-- Verify mode: Default behavior
-- Tests live in the AlfieKit module test targets; shared helpers are in `TestUtils`
-- References are pinned to iOS major 26 and run as part of `./Alfie/scripts/verify.sh`
-
-See `Docs/SnapshotTesting.md` for the device/precision policy, the record loop, and where the tests live.
+Snapshot tests live in the module test targets and run as part of `verify.sh`. See
+`Docs/SnapshotTesting.md` for the device/OS pin, the precision policy, and the record loop.

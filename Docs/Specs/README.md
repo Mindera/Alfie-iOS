@@ -2,21 +2,6 @@
 
 This directory contains detailed specifications for all features in the Alfie iOS application.
 
-## Purpose
-
-Feature specs serve as:
-- **Single source of truth** for requirements
-- **Context for AI assistants** (GitHub Copilot, Cursor, etc.)
-- **Documentation** for developers
-- **Reference during code reviews**
-
-## Spec-Driven Development Process
-
-1. **Write Spec First** - Before any code, create a comprehensive spec
-2. **Break Into Tasks** - Extract small, independent tasks from the spec
-3. **Implement One Task at a Time** - Follow the implementation checklist
-4. **Update Spec if Requirements Change** - Keep specs in sync with reality
-
 ## How to Write a Spec
 
 Copy `TEMPLATE.md`. Its headings are the required sections — fill every one, and delete the
@@ -44,20 +29,6 @@ Use these status markers in your spec:
 Specs live in `Features/`, one file per feature, named `<FeatureName>.md`. `TEMPLATE.md` is the
 starting point (`ls Docs/Specs/Features/` for what exists today).
 
-## Tips for Good Specs
-
-✅ **Be Specific** - "User can sort by price" is better than "User can sort"
-✅ **Include Code** - Show actual Swift structs, not just descriptions
-✅ **Show Examples** - Include sample API responses, UI states
-✅ **Think About Errors** - What happens when things go wrong?
-✅ **Define Success** - Clear acceptance criteria prevent scope creep
-✅ **Link to Designs** - Reference visual mockups if available
-
-❌ **Avoid Vagueness** - "Nice UI" is not a requirement
-❌ **Don't Skip Edge Cases** - Empty states and errors matter
-❌ **Don't Forget Localization** - Every user-facing string needs a key
-❌ **Don't Ignore Analytics** - What metrics should we track?
-
-## Questions?
+## See also
 
 See `AGENTS.md` for the critical rules, and `Docs/Development.md` for the spec-to-implementation loop.

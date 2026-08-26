@@ -1,8 +1,6 @@
 # Feature Development Process
 
-## Spec-Driven Approach ⭐
-
-**ALWAYS follow a spec-driven development approach for new features:**
+## Spec-Driven Approach
 
 ### Phase 1: Write the Spec First
 
@@ -25,8 +23,6 @@ After the spec is complete:
 Tackle tasks **one by one**, following the implementation checklist below.
 
 **Always refer back to the spec** for requirements. If requirements change during implementation, **update the spec first**, then update code.
-
-**After implementation, EXECUTE the build command to verify - this is MANDATORY.**
 
 ## Feature Implementation Checklist
 

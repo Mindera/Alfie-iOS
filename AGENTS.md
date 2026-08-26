@@ -23,8 +23,6 @@
 
 ### ❌ NEVER
 
-These four have no positive phrasing — the correct action is on the right.
-
 | Never | Instead |
 |---|---|
 | Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh` |
