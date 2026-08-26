@@ -408,11 +408,12 @@ under Verified Facts.
 - [ ] Swipe to remove a line
 - [ ] Error state retry
 
-### Manual verification (blocking Story 7)
+### Merge behaviour (was blocking Story 7)
 
-- [ ] **Adding a variant already in the cart merges into one line with the quantity summed.** This is
-  documented platform behaviour but is covered by no test in the BFF. The whole quantity-increase
-  path depends on it.
+- [x] **Adding a variant already in the cart merges into one line with the quantity summed.**
+  Documented platform behaviour that no BFF test covered; proven against a live BFF by
+  `CartIntegrationTests.test_cart_round_trip_creates_merges_adds_removes_and_reads_back`, so the
+  quantity-increase path rests on a test rather than on a manual check.
 
 ---
 

@@ -168,12 +168,100 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func createCart(lines: [CartLineInput]) async throws -> Cart {
+        log.info("createCart → lines=\(lines.count)")
+
+        do {
+            let cart = try await executeMutation(
+                BFFGraphAPI.CreateCartMutation(
+                    input: BFFGraphAPI.CreateCartInput(lines: .some(lines.map(BFFGraphAPI.CartLineInput.init(domain:))))
+                )
+            ).createCart.fragments.cartFragment.convertToCart()
+
+            log.info("createCart ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            return cart
+        } catch {
+            log.error("createCart failed: \(error)")
+            throw error
+        }
+    }
+
+    public func addToCart(cartId: String, lines: [CartLineInput]) async throws -> Cart {
+        log.info("addToCart → cartId=\(cartId) lines=\(lines.count)")
+
+        do {
+            let cart = try await executeMutation(
+                BFFGraphAPI.AddToCartMutation(
+                    input: BFFGraphAPI.AddToCartInput(cartId: cartId, lines: lines.map(BFFGraphAPI.CartLineInput.init(domain:)))
+                )
+            ).addToCart.fragments.cartFragment.convertToCart()
+
+            log.info("addToCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            return cart
+        } catch {
+            log.error("addToCart failed: \(error)")
+            throw error
+        }
+    }
+
+    public func removeFromCart(cartId: String, lineId: String) async throws -> Cart {
+        log.info("removeFromCart → cartId=\(cartId) lineId=\(lineId)")
+
+        do {
+            let cart = try await executeMutation(
+                BFFGraphAPI.RemoveFromCartMutation(cartId: cartId, lineId: lineId)
+            ).removeFromCart.fragments.cartFragment.convertToCart()
+
+            log.info("removeFromCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            return cart
+        } catch {
+            log.error("removeFromCart failed: \(error)")
+            throw error
+        }
+    }
+
+    public func getCart(cartId: String) async throws -> Cart {
+        log.info("getCart → cartId=\(cartId)")
+
+        do {
+            // The cart never touches the cache, in either direction: a stale bag is worse than no
+            // bag, and every mutation already returns the authoritative cart. `Completely` rather
+            // than `.fetchIgnoringCacheData`, which skips the read but still writes — that write
+            // is one nobody reads, and it leaves a stale cart for the next caller to trip over.
+            let cart = try await executeFetch(
+                BFFGraphAPI.CartQuery(cartId: cartId),
+                cachePolicy: .fetchIgnoringCacheCompletely
+            ).cart.fragments.cartFragment.convertToCart()
+
+            log.info("getCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            return cart
+        } catch {
+            log.error("getCart failed: \(error)")
+            throw error
+        }
+    }
+
     // MARK: - Private
 
     private func executeFetch<Query: GraphQLQuery>(
         _ query: Query,
         cachePolicy: CachePolicy = .default
     ) async throws -> Query.Data {
+        try await execute(operationName: Query.operationName) { [apolloClient] resultHandler in
+            apolloClient.fetch(query: query, cachePolicy: cachePolicy, resultHandler: resultHandler)
+        }
+    }
+
+    private func executeMutation<Mutation: GraphQLMutation>(_ mutation: Mutation) async throws -> Mutation.Data {
+        try await execute(operationName: Mutation.operationName) { [apolloClient] resultHandler in
+            apolloClient.perform(mutation: mutation, resultHandler: resultHandler)
+        }
+    }
+
+    private func execute<Data: RootSelectionSet>(
+        operationName: String,
+        perform: @escaping (@escaping (Result<GraphQLResult<Data>, Error>) -> Void) -> Cancellable
+    ) async throws -> Data {
         try Task.checkCancellation()
 
         // Capture Apollo's `Cancellable` in a thread-safe box so the cancellation
@@ -183,9 +271,9 @@ public final class BFFClientService: BFFClientServiceProtocol {
         let box = CancellableBox()
         do {
             return try await withTaskCancellationHandler {
-                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Query.Data, Error>) in
+                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data, Error>) in
                     box.setResumeOnCancel { continuation.resume(throwing: CancellationError()) }
-                    let cancellable = apolloClient.fetch(query: query, cachePolicy: cachePolicy) { result in
+                    let cancellable = perform { result in
                         box.resumeOnce {
                             if let failure = Self.resultAsFailure(result) {
                                 continuation.resume(throwing: failure)
@@ -204,7 +292,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 box.cancel()
             }
         } catch let error as BFFRequestError {
-            reportError(error, operationName: Query.operationName)
+            reportError(error, operationName: operationName)
             throw error
         } catch {
             throw error

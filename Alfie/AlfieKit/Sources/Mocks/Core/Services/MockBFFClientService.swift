@@ -39,4 +39,36 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         }
         return config
     }
+
+    public var onCreateCartCalled: (([CartLineInput]) throws -> Cart)?
+    public func createCart(lines: [CartLineInput]) async throws -> Cart {
+        guard let cart = try onCreateCartCalled?(lines) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return cart
+    }
+
+    public var onAddToCartCalled: ((String, [CartLineInput]) throws -> Cart)?
+    public func addToCart(cartId: String, lines: [CartLineInput]) async throws -> Cart {
+        guard let cart = try onAddToCartCalled?(cartId, lines) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return cart
+    }
+
+    public var onRemoveFromCartCalled: ((String, String) throws -> Cart)?
+    public func removeFromCart(cartId: String, lineId: String) async throws -> Cart {
+        guard let cart = try onRemoveFromCartCalled?(cartId, lineId) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return cart
+    }
+
+    public var onGetCartCalled: ((String) throws -> Cart)?
+    public func getCart(cartId: String) async throws -> Cart {
+        guard let cart = try onGetCartCalled?(cartId) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return cart
+    }
 }

@@ -29,12 +29,16 @@ public extension BFFGraphAPI {
 
     public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
+      case "Cart": return BFFGraphAPI.Objects.Cart
+      case "CartItem": return BFFGraphAPI.Objects.CartItem
+      case "CartTotals": return BFFGraphAPI.Objects.CartTotals
       case "Image": return BFFGraphAPI.Objects.Image
       case "Inventory": return BFFGraphAPI.Objects.Inventory
       case "Menu": return BFFGraphAPI.Objects.Menu
       case "MenuItem": return BFFGraphAPI.Objects.MenuItem
       case "Money": return BFFGraphAPI.Objects.Money
       case "MoneyRange": return BFFGraphAPI.Objects.MoneyRange
+      case "Mutation": return BFFGraphAPI.Objects.Mutation
       case "OmniProduct": return BFFGraphAPI.Objects.OmniProduct
       case "PageInfo": return BFFGraphAPI.Objects.PageInfo
       case "ProductListResponse": return BFFGraphAPI.Objects.ProductListResponse

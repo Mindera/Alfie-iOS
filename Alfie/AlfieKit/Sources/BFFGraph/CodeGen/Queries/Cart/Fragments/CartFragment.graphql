@@ -1,0 +1,14 @@
+fragment CartFragment on Cart {
+    id
+    lineItems {
+        ...CartItemFragment
+    }
+    totals {
+        subtotal {
+            ...MoneyFragment
+        }
+        grandTotal {
+            ...MoneyFragment
+        }
+    }
+}

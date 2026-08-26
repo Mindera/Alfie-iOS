@@ -13,6 +13,7 @@ public extension BFFGraphAPI {
 
     public init(
       brandNames: GraphQLNullable<[String]> = nil,
+      facets: GraphQLNullable<[FacetFilterInput]> = nil,
       inventory: GraphQLNullable<Bool> = nil,
       maxPrice: GraphQLNullable<Double> = nil,
       metafields: GraphQLNullable<[MetafieldFilterInput]> = nil,
@@ -21,6 +22,7 @@ public extension BFFGraphAPI {
     ) {
       __data = InputDict([
         "brandNames": brandNames,
+        "facets": facets,
         "inventory": inventory,
         "maxPrice": maxPrice,
         "metafields": metafields,
@@ -32,6 +34,11 @@ public extension BFFGraphAPI {
     public var brandNames: GraphQLNullable<[String]> {
       get { __data["brandNames"] }
       set { __data["brandNames"] = newValue }
+    }
+
+    public var facets: GraphQLNullable<[FacetFilterInput]> {
+      get { __data["facets"] }
+      set { __data["facets"] = newValue }
     }
 
     public var inventory: GraphQLNullable<Bool> {

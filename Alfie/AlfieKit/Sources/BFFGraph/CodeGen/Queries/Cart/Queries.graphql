@@ -1,0 +1,23 @@
+query CartQuery($cartId: String!) {
+    cart(cartId: $cartId) {
+        ...CartFragment
+    }
+}
+
+mutation CreateCartMutation($input: CreateCartInput!) {
+    createCart(input: $input) {
+        ...CartFragment
+    }
+}
+
+mutation AddToCartMutation($input: AddToCartInput!) {
+    addToCart(input: $input) {
+        ...CartFragment
+    }
+}
+
+mutation RemoveFromCartMutation($cartId: String!, $lineId: String!) {
+    removeFromCart(cartId: $cartId, lineId: $lineId) {
+        ...CartFragment
+    }
+}

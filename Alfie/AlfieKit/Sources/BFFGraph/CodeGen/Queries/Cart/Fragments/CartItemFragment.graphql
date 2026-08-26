@@ -1,0 +1,18 @@
+fragment CartItemFragment on CartItem {
+    id
+    productId
+    variantId
+    sku
+    name
+    quantity
+    image {
+        url
+        altText
+    }
+    price {
+        ...MoneyFragment
+    }
+    lineTotal {
+        ...MoneyFragment
+    }
+}
