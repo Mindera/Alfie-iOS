@@ -1,51 +1,10 @@
-# Alfie iOS - AI Agent System
-
-This file follows the [AGENTS.md standard](https://agents.md/) and contains essential project context for AI coding assistants.
-
----
-
-## AI Agents
-
-Alfie uses specialized AI agents for different development tasks. All agents are defined in `.ai/agents/` using standard markdown with YAML frontmatter, making them compatible with any AI coding assistant.
-
-### Available Agents
-
-| Agent | Purpose | File |
-|-------|---------|------|
-| `feature-orchestrator` | Coordinate full feature development lifecycle | `.ai/agents/feature-orchestrator.agent.md` |
-| `spec-writer` | Create comprehensive feature specifications | `.ai/agents/spec-writer.agent.md` |
-| `graphql-specialist` | GraphQL queries, mutations, and Apollo codegen | `.ai/agents/graphql-specialist.agent.md` |
-| `feature-developer` | MVVM iOS feature implementation | `.ai/agents/feature-developer.agent.md` |
-| `localization-specialist` | L10n string catalog management | `.ai/agents/localization-specialist.agent.md` |
-| `testing-specialist` | Unit tests, snapshot tests, and test coverage | `.ai/agents/testing-specialist.agent.md` |
-| `security-specialist` | Security audits and vulnerability identification | `.ai/agents/security-specialist.agent.md` |
-
-### Usage
-
-AI tools should read the agent definition from `.ai/agents/<agent-name>.agent.md` and follow the instructions within.
-
-**Example:**
-```
-Acting as the feature-developer agent (see .ai/agents/feature-developer.agent.md),
-implement the Product Details feature following the spec in Docs/Specs/Features/ProductDetails.md
-```
-
----
-
-## Project Essentials
+# Alfie iOS
 
 **Alfie** is a native iOS e-commerce application built with:
 - **SwiftUI** (iOS 16+)
 - **MVVM Architecture** with Flow-based navigation
 - **Swift Package Manager** modular structure (`AlfieKit/`)
 - **GraphQL BFF API** (Apollo iOS client)
-
-### Core Technologies
-- Swift 5.9+
-- SwiftUI with `@StateObject` and `@Published`
-- Combine for reactive programming
-- Apollo iOS for GraphQL
-- Firebase (Analytics, Crashlytics, Remote Config)
 
 ---
 
@@ -54,23 +13,24 @@ implement the Product Details feature following the spec in Docs/Specs/Features/
 ### ✅ ALWAYS
 
 - Use `ViewState<Value, Error>` or `PaginatedViewState<Value, Error>` enums for state
-- Inject dependencies via `DependencyContainer` (never access `ServiceProvider` from ViewModels)
-- Use `L10n` for all user-facing strings (from `L10n.xcstrings`)
-- Define protocols for all ViewModels (for mockability)
-- Pass navigation closures from `FlowViewModel` to `ViewModel`
-- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier — never hardcode strings (see `Docs/Accessibility.md`)
-- Run `./Alfie/scripts/verify.sh` after every code change (build + unit + integration). Add `--skip-integration` for the fast, server-free unit-only run when the local BFF/Node isn't available
+- Inject dependencies via `DependencyContainer`; `ServiceProvider` is reached only by `ViewFactory` and app-level code
+- Use `L10n` for every user-facing string (keys live in `L10n.xcstrings`)
+- Define a protocol for every ViewModel, so it can be mocked
+- Route all navigation through `FlowViewModel` closures passed into the `ViewModel`
+- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier (see `Docs/Accessibility.md`)
+- Reach for existing `SharedUI` components before writing a new view
+- Run `./Alfie/scripts/verify.sh` after every code change, and finish on a pass
 
 ### ❌ NEVER
 
-- Access `ServiceProvider` directly from ViewModels
-- Hardcode user-facing strings
-- Bypass `FlowViewModel` for navigation
-- Edit auto-generated files (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`)
-- Use `fatalError` (use `queuedFatalError` instead)
-- Edit `Alfie.xcodeproj/project.pbxproj` directly
-- Skip build verification
-- Commit sensitive files unencrypted
+These four have no positive phrasing — the correct action is on the right.
+
+| Never | Instead |
+|---|---|
+| Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh` |
+| Call `fatalError` | Call `queuedFatalError` |
+| Edit `Alfie.xcodeproj/project.pbxproj` | Ask the user to add the file through Xcode |
+| Commit sensitive files unencrypted | `git secret add` then `git secret hide` |
 
 ---
 
@@ -92,62 +52,35 @@ the fast unit-only loop. Only mark work complete after **"✅ FULL VERIFICATION 
 
 ## Detailed Documentation
 
-When you need specific guidance, read the appropriate guide:
+Read the guide when its trigger fires:
 
-- **Architecture & MVVM** → `Docs/Architecture.md`
-- **GraphQL Integration** → `Docs/GraphQL.md`
-- **Localization (L10n)** → `Docs/Localization.md`
-- **Testing & Mocking** → `Docs/Testing.md`
-- **Snapshot Testing** → `Docs/SnapshotTesting.md`
-- **Accessibility Identifiers (UI tests)** → `Docs/Accessibility.md`
-- **Feature Development Process** → `Docs/Development.md`
-- **Code Style & Conventions** → `Docs/CodeStyle.md`
-- **Quick Reference (dirs, commands, deps)** → `Docs/QuickReference.md`
-- **Feature Spec Template** → `Docs/Specs/TEMPLATE.md`
-
----
-
-## How to Use This Documentation
-
-### For Developers
-
-**Quick start:**
-1. Read this file (AGENTS.md) for core rules
-2. Consult specific guides in `Docs/` as needed
-3. Use `Docs/QuickReference.md` for commands and directory structure
-
-**Common scenarios:**
-- **New to project?** Start with `Docs/Architecture.md`
-- **Implementing feature?** Follow `Docs/Development.md`
-- **Adding GraphQL?** See `Docs/GraphQL.md`
-- **Need quick lookup?** Use `Docs/QuickReference.md`
-
-### For AI Agents
-
-AI agents automatically read AGENTS.md and load detailed guides on-demand based on task context.
-
-**Agent workflow:**
-1. Load AGENTS.md (core rules)
-2. Identify task type
-3. Load relevant guide (e.g., GraphQL.md for API work)
-4. Execute task following guidelines
-
----
-
-**This minimal document provides core context. Read detailed guides only when needed for specific tasks.**
+| Read | When |
+|---|---|
+| `Docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module |
+| `Docs/Development.md` | Starting a feature from a spec |
+| `Docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
+| `Docs/Localization.md` | Adding or renaming an `L10n` key |
+| `Docs/Testing.md` | Writing unit tests, mocks or fixtures |
+| `Docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
+| `Docs/Accessibility.md` | Adding UI that a UI test will target |
+| `Docs/DesignTokens.md` | Picking a colour, spacing, radius or type value; refreshing tokens |
+| `Docs/Iconography.md` | Adding or re-mapping an icon |
+| `Docs/CodeStyle.md` | Naming and formatting questions |
+| `Docs/QuickReference.md` | Commands, directory layout, dependency versions |
+| `Docs/Specs/TEMPLATE.md` | Writing a new feature spec |
 
 ---
 
 ## Agent skills
 
-### Issue tracker
+| Topic | Guide |
+|---|---|
+| Jira (`ALFMOB`) for team tickets, GitHub Issues for agent-generated work | `Docs/agents/issue-tracker.md` |
+| The five canonical triage labels, applied on GitHub Issues | `Docs/agents/triage-labels.md` |
+| Domain vocabulary and ADRs (single-context repo; both created lazily) | `Docs/agents/domain.md` |
 
-Jira (`ALFMOB`) for team tickets; GitHub Issues for agent-generated work. See `Docs/agents/issue-tracker.md`.
+## Agent definitions
 
-### Triage labels
-
-The five canonical defaults, applied on GitHub Issues. See `Docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context: `CONTEXT.md` at the root, ADRs in `Docs/adr/`. See `Docs/agents/domain.md`.
+Role-scoped prompts live in `.ai/agents/<name>.agent.md` — `feature-orchestrator`, `spec-writer`,
+`graphql-specialist`, `feature-developer`, `localization-specialist`, `testing-specialist`,
+`security-specialist`. Read one when the user names it; they are not auto-loaded.
