@@ -8,23 +8,7 @@
 
 Create a comprehensive spec document in `Docs/Specs/Features/<FeatureName>.md`.
 
-**Spec Location**: `Docs/Specs/Features/` - This directory is automatically indexed by all AI tools and accessible to developers.
-
-**Required Sections in Every Spec:**
-- **Feature Overview** - High-level description and business goals
-- **User Stories** - Who needs this and why
-- **Acceptance Criteria** - Clear definition of "done"
-- **Data Models** - Structures and relationships (Swift code blocks)
-- **API Contracts** - GraphQL queries/mutations with expected response shapes
-- **UI/UX Flows** - Screen transitions and user interactions
-- **Navigation** - Entry points, exit points, Routes and FlowViewModel methods
-- **Localization** - All user-facing strings with their keys
-- **Analytics** - Events to track with parameters
-- **Edge Cases** - Error scenarios, empty states, loading states
-- **Dependencies** - Required services, APIs, other features
-- **Testing Strategy** - What tests are needed and where
-
-**See `Docs/Specs/TEMPLATE.md` for full example structure.**
+`Docs/Specs/TEMPLATE.md` defines the required sections — its headings are the checklist.
 
 ### Phase 2: Break Down Into Tasks
 
@@ -59,17 +43,8 @@ Use this checklist for systematic feature implementation:
 6. ✅ **Create Converters** in `Core/Services/BFFService/Converters/<Feature>+Converter.swift`
 7. ✅ **Implement Service** in `Core/Services/<Feature>/`
 8. ✅ **Register Service** in `Alfie/Alfie/Service/ServiceProvider.swift`
-9. ✅ **Create Feature Module** in `AlfieKit/Sources/<Feature>/`:
-   - Create `<Feature>DependencyContainer.swift` in `Models/`
-   - Create `<Feature>FlowDependencyContainer.swift` in `Models/`
-   - Create `<Feature>ViewModelProtocol.swift` in `Protocols/`
-   - Create `<Feature>FlowViewModelProtocol.swift` in `Protocols/`
-   - Create `<Feature>Route.swift` in `Navigation/`
-   - Create `<Feature>Route+Destination.swift` in `Navigation/`
-   - Create `<Feature>FlowView.swift` in `Navigation/`
-   - Create `<Feature>FlowViewModel.swift` in `Navigation/`
-   - Create `<Feature>View.swift` in `UI/`
-   - Create `<Feature>ViewModel.swift` in `UI/`
+9. ✅ **Create Feature Module** in `AlfieKit/Sources/<Feature>/` — the full file skeleton is in
+   [Architecture.md](Architecture.md#feature-module-structure)
 10. ✅ **Create Mock ViewModel** in `Mocks/Core/Features/Mock<Feature>ViewModel.swift`
 11. ✅ **Add to Package.swift**: Add new target and product in `AlfieKit/Package.swift`
 12. ✅ **Integrate with Navigation**: Add route to parent feature's Route enum

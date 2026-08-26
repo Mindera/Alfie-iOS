@@ -26,22 +26,7 @@ building bespoke views.
 
 ## Feature Module Structure
 
-```
-AlfieKit/Sources/<Feature>/
-├── Models/
-│   ├── <Feature>DependencyContainer.swift
-│   └── <Feature>FlowDependencyContainer.swift
-├── Navigation/
-│   ├── <Feature>FlowView.swift
-│   ├── <Feature>FlowViewModel.swift
-│   ├── <Feature>Route.swift
-│   └── <Feature>Route+Destination.swift
-├── Protocols/
-│   └── <Feature>ViewModelProtocol.swift
-└── UI/
-    ├── <Feature>View.swift
-    └── <Feature>ViewModel.swift
-```
+See [Architecture Guide](../../Docs/Architecture.md#feature-module-structure).
 
 ## Navigation Pattern
 

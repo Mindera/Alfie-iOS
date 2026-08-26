@@ -31,7 +31,7 @@ Alfie/
 │   │   ├── Utils/                  # Utilities
 │   │   ├── Web/                    # WebView feature module
 │   │   └── Wishlist/               # Wishlist feature module
-│   └── Tests/                      # Unit tests (per module)
+│   └── Tests/                      # Unit tests, one target per module
 └── scripts/                        # verify/build/test, Apollo codegen, design-token pipeline
 ```
 
@@ -65,30 +65,17 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 
 ## Key Dependencies
 
-`Alfie/AlfieKit/Package.resolved` is authoritative; these are the headline pins.
+`Alfie/AlfieKit/Package.resolved` is authoritative for versions. What each one is for:
 
-- **Apollo iOS**: GraphQL client (v1.19.0)
-- **Firebase**: Analytics, Crashlytics, Remote Config (v11.11.0)
-- **Braze**: Marketing automation (v11.9.0)
-- **Nuke**: Image loading/caching (v12.8.0)
-- **Alicerce**: Utilities, logging (v0.18.0)
-- **SwiftGen**: Code generation for resources (v6.6.4-mindera fork)
-- **Snapshot Testing**: UI testing (v1.18.3)
+- **Apollo iOS**: GraphQL client
+- **Firebase**: Analytics, Crashlytics, Remote Config
+- **Braze**: Marketing automation
+- **Nuke**: Image loading/caching
+- **Alicerce**: Utilities, logging
+- **SwiftGen**: Code generation for resources (Mindera fork)
+- **swift-snapshot-testing**: Snapshot tests
 
 ## Code Review Guidelines
-
-### PR Review Checklist
-
-- [ ] **Architecture**: MVVM pattern, DependencyContainer usage, FlowViewModel navigation
-- [ ] **Localization**: All strings use L10n
-- [ ] **State**: ViewState/PaginatedViewState used correctly
-- [ ] **Tests**: ViewModels have unit tests, protocols exist for mocking
-- [ ] **Accessibility IDs**: New UI elements use `AccessibilityID` from `AccessibilityIdentifiers` (see `Docs/Accessibility.md`)
-- [ ] **Security**: No credentials, Keychain for sensitive data, HTTPS only
-- [ ] **GraphQL**: Fragments used, codegen run, no edits to generated files
-- [ ] **SwiftLint**: No violations
-
-### Severity
 
 **Block merge** on any violation of the ✅ ALWAYS / ❌ NEVER lists in `AGENTS.md` §Critical Rules,
 plus credentials or secrets committed in code.
@@ -99,13 +86,8 @@ plus credentials or secrets committed in code.
 - GraphQL queries without fragments
 - Missing localization translations
 
-### Security Review Points
-
-- No API keys, tokens, passwords in code
-- Sensitive data uses Keychain, not UserDefaults
-- No PII in logs
-- git-secret for sensitive files
-- Input validation on deep links
+**Security**: no API keys/tokens/passwords in code, Keychain rather than UserDefaults for sensitive
+data, no PII in logs, input validation on deep links.
 
 ## Security & Sensitive Files
 

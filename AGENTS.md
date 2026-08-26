@@ -34,9 +34,7 @@ These four have no positive phrasing — the correct action is on the right.
 
 ---
 
-## Verification (MANDATORY)
-
-**Every code change MUST be verified:**
+## Verification
 
 ```bash
 ./Alfie/scripts/verify.sh                     # build + unit + integration (boots a local BFF)

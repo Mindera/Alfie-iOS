@@ -19,29 +19,8 @@ Feature specs serve as:
 
 ## How to Write a Spec
 
-Use `TEMPLATE.md` as your starting point. Every spec should include:
-
-### Required Sections
-
-- ✅ **Feature Overview** - What is this feature and why does it exist?
-- ✅ **User Stories** - Who needs this and what value does it provide?
-- ✅ **Acceptance Criteria** - What must be true for this to be "done"?
-- ✅ **Data Models** - Swift structs/classes with all properties
-- ✅ **API Contracts** - GraphQL queries with expected response shapes
-- ✅ **UI/UX Flows** - Step-by-step user interactions
-- ✅ **Navigation** - Entry/exit points, Routes and FlowViewModel methods
-- ✅ **Localization** - All user-facing strings with their L10n keys
-- ✅ **Analytics** - Events to track with parameters
-- ✅ **Edge Cases** - Errors, empty states, loading states
-- ✅ **Dependencies** - What services, features, or APIs are needed?
-- ✅ **Testing Strategy** - What tests to write and where
-
-### Optional Sections
-
-- 🔹 **Design Mockups** - Link to Figma/design files
-- 🔹 **Performance Considerations** - Any specific performance requirements
-- 🔹 **Accessibility** - VoiceOver labels, dynamic type support
-- 🔹 **Known Limitations** - What is explicitly out of scope
+Copy `TEMPLATE.md`. Its headings are the required sections — fill every one, and delete the
+optional sections you don't need rather than leaving them empty.
 
 ## Spec Lifecycle
 
