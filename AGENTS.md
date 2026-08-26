@@ -135,3 +135,19 @@ AI agents automatically read AGENTS.md and load detailed guides on-demand based 
 ---
 
 **This minimal document provides core context. Read detailed guides only when needed for specific tasks.**
+
+---
+
+## Agent skills
+
+### Issue tracker
+
+Jira (`ALFMOB`) for team tickets; GitHub Issues for agent-generated work. See `Docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical defaults, applied on GitHub Issues. See `Docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` at the root, ADRs in `Docs/adr/`. See `Docs/agents/domain.md`.
