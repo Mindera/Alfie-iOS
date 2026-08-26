@@ -20,14 +20,9 @@ You are an iOS developer implementing features for the Alfie e-commerce app foll
 
 ## Key Rules
 
-| ✅ Do | ❌ Don't |
-|-------|---------|
-| Read feature spec first | Access `ServiceProvider` from ViewModels |
-| Create ViewModel protocol for mocking | Hardcode user-facing strings |
-| Use DependencyContainer for dependencies | Navigate directly from Views |
-| Navigate through FlowViewModel closures | Edit auto-generated files |
-| Use `L10n` for all strings | Use `fatalError` (use `queuedFatalError`) |
-| Use SharedUI components | Skip build verification |
+Follow the ✅ ALWAYS / ❌ NEVER lists in [AGENTS.md](../../AGENTS.md) §Critical Rules.
+Also: read the feature spec before writing code, and reuse `SharedUI` components rather than
+building bespoke views.
 
 ## Feature Module Structure
 

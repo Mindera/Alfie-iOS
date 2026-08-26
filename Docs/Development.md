@@ -80,34 +80,22 @@ Use this checklist for systematic feature implementation:
 
 ## 🏗️ Verification
 
-**Every code change MUST be verified with build + tests.**
-
-### Verify Command
+`AGENTS.md` §Verification is authoritative for what `verify.sh` runs and which success string to
+wait for. The scripts below are for iterating mid-implementation:
 
 ```bash
-# Recommended: Run full verification (build + tests)
-./Alfie/scripts/verify.sh
-
-# Build only (if you need to iterate on compilation)
+# Build only (iterate on compilation)
 ./Alfie/scripts/build-for-verification.sh
 
-# Tests only (after successful build)
+# Tests only (after a successful build)
 ./Alfie/scripts/test-for-verification.sh --skip-build
 ```
 
-### Process
+Finish on a full `./Alfie/scripts/verify.sh` regardless — the partial scripts don't gate a task as
+complete.
 
-1. Execute `./Alfie/scripts/verify.sh` after completing implementation
-2. Wait for "✅ FULL VERIFICATION PASSED" message
-3. If build fails: fix errors, re-run
-4. If tests fail: fix logic, re-run
-5. Only mark task complete after full verification passes
-
-**Why use the script?**
-- Works on all developer machines (no hardcoded simulator IDs)
-- Automatically finds available simulator
-- Provides clear success/failure messages
-- Saves build log for debugging
+**Why the script rather than raw `xcodebuild`?** No hardcoded simulator IDs, finds an available
+simulator, clear pass/fail messages, and saves a build log for debugging.
 
 ### Common Build Errors
 

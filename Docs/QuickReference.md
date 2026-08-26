@@ -88,21 +88,16 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 - [ ] **GraphQL**: Fragments used, codegen run, no edits to generated files
 - [ ] **SwiftLint**: No violations
 
-### 🔴 Critical (Block Merge)
+### Severity
 
-- ViewModels accessing `ServiceProvider` directly
-- Hardcoded user-facing strings
-- Navigation bypassing FlowViewModel
-- Missing ViewModel protocols
-- Credentials/secrets in code
-- State not using `ViewState` enums
+**Block merge** on any violation of the ✅ ALWAYS / ❌ NEVER lists in `AGENTS.md` §Critical Rules,
+plus credentials or secrets committed in code.
 
-### 🟠 High Priority
+**High priority** (fix before merge, not a hard block):
 
 - Missing tests for ViewModels
 - GraphQL queries without fragments
 - Missing localization translations
-- Dependencies not via DependencyContainer
 
 ### Security Review Points
 
