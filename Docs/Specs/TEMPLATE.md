@@ -212,23 +212,27 @@ Example:
 - Tap back button → Previous screen
 - Tap wishlist icon → Wishlist View (if enabled)
 
-### Coordinator Methods
+### Routes and FlowViewModel Methods
 
 ```swift
-// Required navigation methods
+// Route cases this feature adds
+case [routeName]([Configuration])
+
+// FlowViewModel method the ViewModel calls through its navigate closure
 func [methodName](param: Type) {
-    navigationAdapter.[action](.screen(configuration: config))
+    navigate(.[routeName](config))
 }
 ```
 
 Example:
 ```swift
-func didTap(_ product: Product) {
-    navigationAdapter.push(.productDetails(configuration: .product(product)))
+public enum ProductListingRoute: Hashable {
+    case productDetails(ProductDetailsConfiguration)
+    case wishlist
 }
 
-func didTapWishlist() {
-    navigationAdapter.push(.wishlist)
+func didTap(_ product: Product) {
+    navigate(.productDetails(.product(product)))
 }
 ```
 
@@ -335,7 +339,7 @@ Example:
 
 ## Testing Strategy
 
-### Unit Tests (`AlfieTests`)
+### Unit Tests (`<Module>Tests`)
 
 - [ ] ViewModel state transitions (loading → success → error)
 - [ ] Pagination logic (load more when scrolled to bottom)

@@ -29,7 +29,7 @@ Use `TEMPLATE.md` as your starting point. Every spec should include:
 - ✅ **Data Models** - Swift structs/classes with all properties
 - ✅ **API Contracts** - GraphQL queries with expected response shapes
 - ✅ **UI/UX Flows** - Step-by-step user interactions
-- ✅ **Navigation** - Entry/exit points and Coordinator methods
+- ✅ **Navigation** - Entry/exit points, Routes and FlowViewModel methods
 - ✅ **Localization** - All user-facing strings with their L10n keys
 - ✅ **Analytics** - Events to track with parameters
 - ✅ **Edge Cases** - Errors, empty states, loading states
@@ -62,16 +62,8 @@ Use these status markers in your spec:
 
 ## File Organization
 
-```
-Docs/Specs/
-├── README.md                    # This file
-├── TEMPLATE.md                  # Spec template
-└── Features/
-    ├── ProductListing.md
-    ├── Search.md
-    ├── Wishlist.md
-    └── Bag.md
-```
+Specs live in `Features/`, one file per feature, named `<FeatureName>.md`. `TEMPLATE.md` is the
+starting point (`ls Docs/Specs/Features/` for what exists today).
 
 ## Tips for Good Specs
 
@@ -87,16 +79,6 @@ Docs/Specs/
 ❌ **Don't Forget Localization** - Every user-facing string needs a key
 ❌ **Don't Ignore Analytics** - What metrics should we track?
 
-## AI Assistant Integration
-
-This directory is automatically indexed by:
-- 🤖 GitHub Copilot
-- 🤖 Cursor
-- 🤖 Cline
-- 🤖 Other AI coding assistants
-
-When you ask an AI assistant to "implement the Product Listing feature", it will automatically reference the spec in `Features/ProductListing.md` for context.
-
 ## Questions?
 
-See `AGENTS.md` for the full development workflow and architecture patterns.
+See `AGENTS.md` for the critical rules, and `Docs/Development.md` for the spec-to-implementation loop.

@@ -327,33 +327,10 @@ public final class FeatureService: FeatureServiceProtocol {
 
 ## Style Guide & UI Components
 
-### Theme System
+Reusable views live under `Alfie/AlfieKit/Sources/SharedUI/` — `Components/` for feature-level
+composites (product cards, carousels, toolbars, snackbar) and `Theme/` for the themed primitives
+(`ThemedButton`, `ThemedSearchBarView`, `ThemedIcon`, `LoaderView`). Browse the directory before
+writing a new view.
 
-- **Colors**: Use themed colors from SharedUI (e.g., `ThemedColor.primary`)
-- **Typography**: Use `theme.font` with predefined styles (e.g., `theme.font.header.h3()`)
-- **Spacing**: Use `Spacing` enum values (e.g., `Spacing.space200`)
-- **Icons**: Use `Icon` enum (e.g., `Icon.home.image`)
-
-**Example**:
-```swift
-Text.build(theme.font.header.h3("Title"))
-Icon.home.image
-    .resizable()
-    .frame(width: 75)
-ThemedButton(text: "Action") {
-    viewModel.didTapButton()
-}
-.padding(.horizontal, Spacing.space200)
-```
-
-### Reusable Components
-
-Located in `Alfie/AlfieKit/Sources/SharedUI/Components/`:
-
-- **Buttons**: `ThemedButton`, various button styles
-- **Search**: `ThemedSearchBarView` with themes (`.soft`, etc.)
-- **Product Cards**: Product display components
-- **Toolbars**: `toolbarView` modifier for consistent navigation bars
-- **Loaders**: `LoaderView` with configurable sizes
-
-**Always use existing SharedUI components** instead of creating custom UI from scratch.
+For the design values those components consume — colour, spacing, radius, typography — see
+[`DesignTokens.md`](DesignTokens.md); for icons, [`Iconography.md`](Iconography.md).

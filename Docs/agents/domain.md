@@ -11,16 +11,8 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 
 ## File structure
 
-This is a single-context repo:
-
-```
-/
-├── CONTEXT.md
-├── Docs/adr/
-│   ├── 0001-mvvm-flow-navigation.md
-│   └── 0002-apollo-graphql-client.md
-└── Alfie/
-```
+This is a single-context repo: one `CONTEXT.md` at the root, one flat `Docs/adr/` beside it.
+Neither exists yet — `/domain-modeling` creates them on first use.
 
 ## Use the glossary's vocabulary
 

@@ -15,5 +15,3 @@ Only `wontfix` exists in the repo today; create the other four on first use with
 `gh label create <name> --description "..."`.
 
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
-
-Edit the right-hand column to match whatever vocabulary you actually use.

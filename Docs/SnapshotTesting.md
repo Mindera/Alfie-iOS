@@ -59,8 +59,6 @@ assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(precision: 0.9), 
 at `0.9` and covers only the static parts. Reach for an override only when the content is truly
 non-deterministic; prefer re-recording over loosening precision to chase a rendering diff.
 
-Prefer re-recording over loosening precision. Watch for override drift across the suite in review.
-
 ---
 
 ## Recording or updating a snapshot
@@ -88,13 +86,12 @@ of the build.
 |---|---|---|
 | `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
+| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error |
+| `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, both error states |
 
-The pre-existing suite — the six out-of-membership files under `AlfieTests/Snapshots/` (Categories,
-Shop, RecentSearches, Search, ProductDetails, ProductDetailsColorSheet) — was removed: those
-screens are mid Modern Design Rollout, so their references would churn on every rollout PR. They also never
-ran (excluded from the target, no references ever committed). Re-add them per screen once a design has
-settled; the state matrices they covered (loading / loaded / error / empty per screen) are worth restoring,
-not just the happy path.
+Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every
+rollout PR. Add them per screen once the design settles, covering the full state matrix
+(loading / loaded / error / empty), not just the happy path.
 
 ### Adding a snapshot test
 
@@ -106,8 +103,7 @@ not just the happy path.
 ## A test target must be in the test plan
 
 Being an SPM test target is not enough — `verify.sh` runs `Alfie.xctestplan`, so a target missing from it
-never runs. `HomeTests`, `ModelTests`, `MyAccountTests` and `UtilsTests` were all in this state (23 pre-existing test
-functions silently not running) and have been added.
+never runs silently. Add every new test target to it.
 
 `BFFIntegrationTests` is deliberately excluded: it has its own `AlfieIntegration.xctestplan`.
 
