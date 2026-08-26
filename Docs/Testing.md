@@ -2,24 +2,10 @@
 
 ## Test Structure
 
-- **Location**: `Alfie/AlfieKit/Tests/`
-- Test directories mirror feature modules:
-  - **AppFeatureTests**: App shell tests
-  - **CoreTests**: Core services tests
-  - **HomeTests**: Home feature tests
-  - **ProductListingTests**: Product listing tests
-  - **ProductDetailsTests**: Product details tests
-  - **SearchTests**: Search tests
-  - **CategorySelectorTests**: Category selector tests
-  - **WishlistTests**: Wishlist tests
-  - **BagTests**: Bag tests
-  - **SharedUITests**: Localization and UI tests
-  - **DeepLinkTests**: Deep link tests
-  - **DebugMenuTests**: Debug menu tests
-  - **WebTests**: Web view tests
-  - **MyAccountTests**: Account tests
-  - **BFFGraphTests**: GraphQL tests
-  - **UtilsTests**: Utility tests
+- **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
+  (`ls Alfie/AlfieKit/Tests/` for the current set). `BFFIntegrationTests` is the odd one out:
+  it runs against a real local BFF, not mocks, and only when `verify.sh` runs without
+  `--skip-integration`.
 
 ## Testing Pattern
 

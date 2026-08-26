@@ -11,6 +11,7 @@ Alfie/
 │   └── Configuration/              # App config, URLs, sensitive files
 ├── AlfieKit/                       # Swift Package (feature modules)
 │   ├── Sources/
+│   │   ├── AccessibilityIdentifiers/ # AccessibilityID enums for UI tests
 │   │   ├── AppFeature/             # App shell, tab bar, root navigation
 │   │   ├── BFFGraph/               # GraphQL (queries, schema, codegen)
 │   │   ├── Bag/                    # Bag feature module
@@ -31,7 +32,7 @@ Alfie/
 │   │   ├── Web/                    # WebView feature module
 │   │   └── Wishlist/               # Wishlist feature module
 │   └── Tests/                      # Unit tests (per module)
-└── scripts/                        # Build scripts (Apollo codegen)
+└── scripts/                        # verify/build/test, Apollo codegen, design-token pipeline
 ```
 
 ## Common Commands
@@ -57,9 +58,14 @@ cd Alfie/scripts && ./run-apollo-codegen.sh
 
 # Generate localization code (automatic on build, or manually)
 swift package --allow-writing-to-package-directory generate-code-for-resources
+
+# Refresh design tokens (pull upstream JSON, then regenerate the committed Swift)
+./Alfie/scripts/pull-design-tokens.sh && ./Alfie/scripts/generate-design-tokens.sh
 ```
 
 ## Key Dependencies
+
+`Alfie/AlfieKit/Package.resolved` is authoritative; these are the headline pins.
 
 - **Apollo iOS**: GraphQL client (v1.19.0)
 - **Firebase**: Analytics, Crashlytics, Remote Config (v11.11.0)
@@ -132,6 +138,5 @@ git secret hide
 
 - **Minimum iOS**: 16.0
 - **Swift Version**: 5.9+
-- **Mock Server**: Separate Alfie-Mocks repo runs locally on localhost:4000
-- **CI/CD**: Work in progress
-- **Release Process**: Work in progress
+- **Backend**: the BFF (`Alfie-BFF` repo) on `localhost:3000`. The older Alfie-Mocks server on
+  `localhost:4000` is legacy — reachable via the `dev` toggle in `ApiEndpointService`, not the default.

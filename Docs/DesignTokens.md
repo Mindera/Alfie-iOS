@@ -1,4 +1,4 @@
-# Design Tokens (ALFMOB-272)
+# Design Tokens
 
 Alfie's design values (colour, spacing, radius, typography) are generated from the shared
 [W3C DTCG](https://tr.designtokens.org/format/) token contract in
@@ -55,5 +55,7 @@ honours them **exhaustively** — an unlisted cycle / missing ref fails generati
   touch the generator or the tokens.
 - The generated `*+Generated.swift` files carry an `AUTO-GENERATED` + `// swiftlint:disable all`
   header and are excluded from SwiftLint; edit the tokens upstream, not the output.
-- Nothing consumes the generated tokens yet — wiring the existing theme types (`Colors`, `Spacing`,
-  typography) onto them is the follow-on work (ALFMOB-272 P2/P3a).
+- Call sites consume the generated tokens directly: use the semantic `Theme.*` / `Typography.*` /
+  `Sizing.*` symbols, and reach for `Primitives.*` only when no semantic token covers the value.
+  Migration off the legacy asset-catalog `Colors`/`Spacing` types is still in progress, so both
+  appear in the tree — new code targets the generated tokens.
