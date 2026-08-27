@@ -2,7 +2,8 @@ import Combine
 import Foundation
 
 /// The single owner of the shopper's cart. Callers read `cart` — or observe `cartPublisher` — and
-/// never fetch a copy of their own, so the bag screen and the tab badge cannot drift apart.
+/// never fetch a copy of their own, so no two of them can drift apart. The readers arrive with the
+/// bag screen (#117) and the tab badge (#118); today the cart is written here and read by tests.
 ///
 /// Every server write returns the complete cart, so each one replaces the held cart wholesale.
 public protocol CartServiceProtocol {

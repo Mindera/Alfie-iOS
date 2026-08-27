@@ -219,14 +219,20 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
+        // Cleared up front so a second write with the same outcome is still a change the View
+        // observes, rather than being swallowed as an unchanged value.
+        addToBagFeedback = nil
         isAddingToBag = true
         Task { @MainActor in
             defer { isAddingToBag = false }
             do {
+                // `product.id`, not `selectedProduct.id`: the latter is the composite
+                // "<productId>-<sku>" used for local identity, which no platform would resolve.
                 try await dependencies.cartService.add(
                     line: .init(productId: selectedProduct.product.id, variantId: variantId)
                 )
                 // Only once the cart holds the line — firing on the tap would count adds that failed.
+                // The composite id here is the pre-existing analytics shape, left alone per Q29.
                 dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
                 addToBagFeedback = .success
             } catch {

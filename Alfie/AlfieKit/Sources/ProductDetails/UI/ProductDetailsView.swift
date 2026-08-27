@@ -79,12 +79,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 return
             }
             addToBagSnackbarConfig = .init(
-                type: feedback == .success ? .success : .error,
-                text: feedback == .success
-                    ? L10n.Product.AddToBag.Success.message
-                    : L10n.Product.AddToBag.Error.message,
+                type: feedback.snackbarType,
+                text: feedback.snackbarText,
                 showCloseButton: true,
-                icon: feedback == .success ? Icon.checkmark.image : Icon.warning.image,
+                icon: feedback.snackbarIcon,
                 onDismiss: { viewModel.didDismissAddToBagFeedback() }
             )
         }
@@ -533,7 +531,10 @@ extension ProductDetailsView {
                 ThemedButton(
                     text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
                     isDisabled: .init(
-                        get: { !viewModel.isAddToBagEnabled },
+                        // Disabled for the duration of the write, not merely showing a spinner:
+                        // `ThemedButton` stays hit-testable while loading, and a tappable spinner
+                        // reads to VoiceOver as an ordinary button.
+                        get: { !viewModel.isAddToBagEnabled || viewModel.isAddingToBag },
                         set: { _ in }
                     ),
                     isLoading: .init(
@@ -691,3 +692,26 @@ private enum Constants {
     ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
 }
 #endif // swiftlint:disable:this file_length
+
+private extension AddToBagFeedback {
+    var snackbarType: SnackbarViewConfiguration.SnackbarViewType {
+        switch self {
+        case .success: .success
+        case .failure: .error
+        }
+    }
+
+    var snackbarText: String {
+        switch self {
+        case .success: L10n.Product.AddToBag.Success.message
+        case .failure: L10n.Product.AddToBag.Error.message
+        }
+    }
+
+    var snackbarIcon: Image {
+        switch self {
+        case .success: Icon.checkmark.image
+        case .failure: Icon.warning.image
+        }
+    }
+}

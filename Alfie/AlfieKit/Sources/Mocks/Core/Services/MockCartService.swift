@@ -10,7 +10,7 @@ public final class MockCartService: CartServiceProtocol {
 
     public var onAddCalled: ((CartLineInput) async throws -> Cart)?
 
-    public init() {}
+    public init() { }
 
     public func add(line: CartLineInput) async throws {
         guard let cart = try await onAddCalled?(line) else {

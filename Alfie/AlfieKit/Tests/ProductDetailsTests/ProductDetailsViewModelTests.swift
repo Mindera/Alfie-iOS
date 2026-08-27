@@ -1152,6 +1152,23 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertNil(sut.addToBagFeedback)
     }
 
+    func test_didTapAddToBag_clearsThePreviousOutcomeBeforeWriting_soASecondIdenticalOneReRegisters() {
+        // The View presents on a *change* of feedback, so a second success with the first still
+        // showing would present nothing without this.
+        mockCartService.onAddCalled = { _ in .fixture() }
+        initViewModel(configuration: .product(addableProduct()))
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+        XCTAssertEqual(sut.addToBagFeedback, .success)
+
+        var emitted: [AddToBagFeedback?] = []
+        let cancellable = sut.$addToBagFeedback.sink { emitted.append($0) }
+        defer { cancellable.cancel() }
+        XCTAssertEmitsValue(from: sut.$isAddingToBag.filter { !$0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        // .success -> nil -> .success, so the View sees a change rather than a repeat.
+        XCTAssertEqual(emitted, [.success, nil, .success])
+    }
+
     func test_isAddToBagEnabled_isFalse_whenTheVariantHasNoServerId() {
         // A variant synthesised locally has no server counterpart, so there is nothing to add.
         let variant = Product.Variant.fixture(id: nil, colour: .fixture(id: "1"), stock: 5)

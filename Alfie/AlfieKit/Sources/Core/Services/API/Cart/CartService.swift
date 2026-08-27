@@ -25,14 +25,19 @@ public actor CartService: CartServiceProtocol {
 
     public func add(line: CartLineInput) async throws {
         // The first add creates the cart carrying the line, so create-and-add costs one round trip
-        // rather than two. The id is persisted only on create — an append leaves it as it was.
+        // rather than two.
+        let cart: Cart
         if let cartId = storedCartId {
-            cartSubject.send(try await bffClient.addToCart(cartId: cartId, lines: [line]))
+            cart = try await bffClient.addToCart(cartId: cartId, lines: [line])
         } else {
-            let cart = try await bffClient.createCart(lines: [line])
-            userDefaults.set(cart.id, for: storageKey)
-            cartSubject.send(cart)
+            cart = try await bffClient.createCart(lines: [line])
         }
+
+        // Persisted from either branch: the returned cart is the truth, its id included. On
+        // BigCommerce an append can hand back a cart whose id is not the one we asked with, and a
+        // stored id that disagrees with the cart we hold is the next write aimed at the wrong one.
+        userDefaults.set(cart.id, for: storageKey)
+        cartSubject.send(cart)
     }
 
     /// The server's handle on a guest cart — a non-secret id, so `UserDefaults` is enough. There is

@@ -70,6 +70,19 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(createCallCount, 0)
     }
 
+    func test_add_persistsTheCartIdAnAppendReturns_evenWhenItDiffers() async throws {
+        // On BigCommerce a write can hand back a cart whose id is not the one it was asked with.
+        // The returned cart is the truth, so the stored id follows it rather than the request.
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "cart-1")
+        client.onAddToCartCalled = { _, _ in .fixture(id: "cart-2") }
+        var persisted: [String: String] = [:]
+        userDefaults.onSetCalled = { value, key in persisted[key] = value as? String }
+
+        try await sut.add(line: .init(productId: "p1", variantId: "v1"))
+
+        XCTAssertEqual(persisted[Self.storageKey], "cart-2")
+    }
+
     func test_add_replacesTheHeldCartWholesaleWithTheReturnedOne() async throws {
         // Every mutation returns the complete cart, so the response *is* the new truth. Nothing is
         // merged client-side, which is what stops two copies of the cart drifting apart.
