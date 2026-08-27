@@ -4,7 +4,7 @@
 **Created**: 2026-08-26
 **Last Updated**: 2026-08-26
 **Jira**: ALFMOB-491 (epic) · ALFMOB-498 (this spec)
-**Implementation PR**: _pending_
+**Implementation PR**: #121 (Story 1 — headless cart round-trip)
 
 > All seven team questions were answered on 26 Aug 2026 — see Questions & Decisions → Answered by
 > the team. Nothing in this spec is pending, and no story is blocked on another team.
