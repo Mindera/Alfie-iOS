@@ -12,6 +12,17 @@
         }
       }
     },
+    "accessibility.back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        }
+      }
+    },
     "accessibility.clearSearch" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -239,6 +250,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wishlist"
+          }
+        }
+      }
+    },
+    "general.done.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         }
       }
@@ -729,6 +751,83 @@
         }
       }
     },
+    "plp.quick_filter.wool.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wool"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.straight_fit.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Straight Fit"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.slim_fit.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slim Fit"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.silk.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silk"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.regular_fit.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regular Fit"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.linen.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linen"
+          }
+        }
+      }
+    },
+    "plp.quick_filter.cotton.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cotton"
+          }
+        }
+      }
+    },
     "plp.refine.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -736,6 +835,116 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refine"
+          }
+        }
+      }
+    },
+    "plp.refine.price.no_minimum.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No minimum"
+          }
+        }
+      }
+    },
+    "plp.refine.price.no_maximum.accessibility_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No maximum"
+          }
+        }
+      }
+    },
+    "plp.refine.price.summary.up_to" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to %@"
+          }
+        }
+      }
+    },
+    "plp.refine.price.summary.from" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ and up"
+          }
+        }
+      }
+    },
+    "plp.refine.price.summary.between" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "plp.refine.remove_all.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All"
+          }
+        }
+      }
+    },
+    "plp.refine.price.option.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Price"
+          }
+        }
+      }
+    },
+    "plp.refine.price.min.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min"
+          }
+        }
+      }
+    },
+    "plp.refine.price.max.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max"
+          }
+        }
+      }
+    },
+    "plp.refine.price.invalid_range.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The minimum must be lower than the maximum."
           }
         }
       }
@@ -1132,17 +1341,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A-Z"
-          }
-        }
-      }
-    },
-    "sort_by.alpha_desc.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Z-A"
           }
         }
       }

@@ -269,6 +269,7 @@ let package = Package(
                 "ProductDetails",
                 "Search",
                 "SharedUI",
+                "Utils",
             ]
         ),
 

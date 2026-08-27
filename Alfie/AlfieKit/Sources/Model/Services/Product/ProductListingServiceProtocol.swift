@@ -17,4 +17,8 @@ public protocol ProductListingServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing
+
+    /// Whole-collection price bounds for the Refine sheet's Price row. Fetched once on screen
+    /// entry: constant across pagination and independent of the active filters, mirroring web.
+    func categoryPriceRange(collectionHandle: String) async throws -> PriceRange?
 }

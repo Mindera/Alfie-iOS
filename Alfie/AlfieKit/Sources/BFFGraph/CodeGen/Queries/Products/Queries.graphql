@@ -47,3 +47,14 @@ query SearchProductsQuery(
         }
     }
 }
+
+query CategoryPriceRangeQuery($collectionHandle: String!) {
+    categoryPriceRange(collectionHandle: $collectionHandle) {
+        minVariantPrice {
+            ...MoneyFragment
+        }
+        maxVariantPrice {
+            ...MoneyFragment
+        }
+    }
+}

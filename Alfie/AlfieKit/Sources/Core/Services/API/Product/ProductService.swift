@@ -49,4 +49,12 @@ public final class ProductService: ProductServiceProtocol {
             throw BFFRequestError(type: .product(.generic))
         }
     }
+
+    public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
+        do {
+            return try await bffClient.categoryPriceRange(collectionHandle: collectionHandle)
+        } catch {
+            throw BFFRequestError(type: .product(.generic))
+        }
+    }
 }

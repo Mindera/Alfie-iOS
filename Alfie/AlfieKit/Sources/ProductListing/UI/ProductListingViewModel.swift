@@ -14,10 +14,13 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public var style: ProductListingListStyle
     @Published public var showRefine = false
     @Published public var sortOption: String?
-    // ALFMOB-331 AC 4: BFF `ProductFilterInput` shape is plumbed end-to-end. The Refine UI
-    // doesn't expose filter dimensions yet, so this stays `nil` until a follow-up wires the
-    // sheet to populate it (brandNames / productTypes / price range / inventory).
-    @Published public var filters: ProductFilterInput?
+    // Populated by the Refine sheet. Price is the only dimension the sheet exposes today; the
+    // rest of `ProductFilterInput` waits on a BFF facet API.
+    @Published public internal(set) var filters: ProductFilterInput?
+    // Whole-collection price bounds for the Refine sheet's Price row. A plain optional rather
+    // than a `ViewState`: the design has no loading or error affordance for it, and an absent
+    // range is a legitimate answer — both cases simply mean the Price row is not shown.
+    @Published public internal(set) var priceBounds: PriceFilterBounds?
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
     private let showSearch: () -> Void
@@ -36,6 +39,14 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     // True while a load-more or a refresh is in flight, so the two can't race and overwrite each
     // other (last-writer-wins).
     private var isFetching = false
+
+    // The bounds query is fired at most once per screen, whatever it returns.
+    private var didRequestPriceBounds = false
+
+    // Bumped whenever the result set is redefined (a filter or sort change). A page fetch captures
+    // the value at entry and refuses to commit if it no longer matches — otherwise a load-more or
+    // refresh already in flight can land afterwards and restore the pre-filter products and cursor.
+    private var resultSetGeneration = 0
 
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
@@ -91,6 +102,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         Task {
             await loadProductsIfNeeded()
         }
+        Task {
+            await loadPriceBoundsIfNeeded()
+        }
     }
 
     public func didDisplay(_ product: Product) {
@@ -130,8 +144,20 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
     }
 
-    public func didApplyFilters() {
+    public func didApplyFilters(_ filters: ProductFilterInput?, sort: String?) {
+        self.filters = filters
+        sortOption = sort
         showRefine = false
+        // Discard the cursor: an `after` from the previous query addresses a result set that no
+        // longer exists, and would silently paginate into the old one (ALFMOB-487).
+        pagination = nil
+        // A failed pull-to-refresh describes the previous result set; leaving its Snackbar up over
+        // a freshly filtered listing reads as the filter having failed.
+        refreshError = nil
+        // Invalidate anything already in flight. The filter bar stays tappable during a load-more
+        // or refresh, so without this their responses can land after the reset and put the
+        // pre-filter products (and cursor) back.
+        resultSetGeneration += 1
         state = .loadingFirstPage(.init(title: "", products: []))
 
         Task {
@@ -149,6 +175,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         isFetching = true
         defer { isFetching = false }
         refreshError = nil
+        let generation = resultSetGeneration
 
         let productListing: ProductListing?
 
@@ -157,10 +184,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         } catch is CancellationError {
             return
         } catch {
+            guard generation == resultSetGeneration else { return }
             dependencies.log.error("Error refreshing product listing: \(error)")
             refreshError = ProductListingViewErrorType.from(error: error)
             return
         }
+
+        // A filter or sort change during the fetch redefined the result set; this response
+        // describes the old one.
+        guard generation == resultSetGeneration else { return }
 
         guard let productListing else {
             refreshError = .noResults
@@ -199,16 +231,20 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         guard !state.isSuccess else {
             return
         }
+        let generation = resultSetGeneration
 
         let productListing: ProductListing?
 
         do {
             productListing = try await fetchPage(after: nil)
         } catch {
+            guard generation == resultSetGeneration else { return }
             dependencies.log.error("Error fetching product listing (first page): \(error)")
             state = .error(ProductListingViewErrorType.from(error: error))
             return
         }
+
+        guard generation == resultSetGeneration else { return }
 
         guard let productListing else {
             state = .error(.noResults)
@@ -217,6 +253,32 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
         pagination = productListing.pagination
         state = .success(.init(title: productListing.title, products: productListing.products))
+    }
+
+    /// Fetched once per screen. The bounds describe the whole collection: constant across
+    /// pagination and unaffected by the active filters, mirroring web (ALFMOB-472). A failure
+    /// is not surfaced — the Price row simply doesn't appear until the next `viewDidAppear`
+    /// re-fetches it.
+    @MainActor
+    private func loadPriceBoundsIfNeeded() async {
+        // Gated on "asked", not on "got a result": `viewDidAppear` fires again on every return
+        // from a PDP, and a category with no filterable range legitimately yields nil — keying
+        // off `priceBounds` would re-query it every time.
+        guard !didRequestPriceBounds, mode == .listing, let collectionHandle = category else { return }
+        didRequestPriceBounds = true
+
+        do {
+            let range = try await dependencies.productListingService.categoryPriceRange(
+                collectionHandle: collectionHandle
+            )
+            priceBounds = range.flatMap(PriceFilterBounds.init(priceRange:))
+        } catch {
+            // Only the nil result must not be re-queried — it is a legitimate answer. A throw is
+            // not, so release the latch: otherwise one transient failure hides the Price row for
+            // the life of the screen, with no path back to it.
+            didRequestPriceBounds = false
+            dependencies.log.error("Error fetching category price range: \(error)")
+        }
     }
 
     @MainActor
@@ -230,6 +292,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         }
         isFetching = true
         defer { isFetching = false }
+        let generation = resultSetGeneration
 
         state = .loadingNextPage(.init(title: title, products: products))
         let productListing: ProductListing?
@@ -237,10 +300,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         do {
             productListing = try await fetchPage(after: pagination?.endCursor)
         } catch {
+            guard generation == resultSetGeneration else { return }
             dependencies.log.error("Error fetching product listing (following page): \(error)")
             state = .error(ProductListingViewErrorType.from(error: error))
             return
         }
+
+        // The filter changed while this page was in flight — appending it would splice products
+        // from the old result set onto the new one.
+        guard generation == resultSetGeneration else { return }
 
         guard let productListing else {
             state = .error(.noResults)

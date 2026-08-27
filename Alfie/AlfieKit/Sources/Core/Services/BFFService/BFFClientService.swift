@@ -159,6 +159,23 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
+        log.info("categoryPriceRange → collectionHandle=\(collectionHandle)")
+
+        do {
+            let response = try await executeFetch(
+                BFFGraphAPI.CategoryPriceRangeQuery(collectionHandle: collectionHandle)
+            ).categoryPriceRange
+
+            log.info("categoryPriceRange ← \(response == nil ? "nil" : "range")")
+
+            return response?.convertToPriceRange()
+        } catch {
+            log.error("categoryPriceRange failed: \(error)")
+            throw error
+        }
+    }
+
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         let url = baseUrl.appending(path: BFFEndpoint.webviewConfig.rawValue)
         do {
