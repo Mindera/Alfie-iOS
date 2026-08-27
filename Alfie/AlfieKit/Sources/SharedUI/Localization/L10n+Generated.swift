@@ -287,6 +287,14 @@ public enum L10n {
         /// Add to bag
         public static let cta = L10n.tr("L10n", "product.add_to_bag.button.cta")
       }
+      public enum Error {
+        /// Couldn't add to bag
+        public static let message = L10n.tr("L10n", "product.add_to_bag.error.message")
+      }
+      public enum Success {
+        /// Added to bag
+        public static let message = L10n.tr("L10n", "product.add_to_bag.success.message")
+      }
     }
     public enum AddToWishlist {
       public enum Button {
@@ -613,6 +621,8 @@ public extension L10n {
       case plpShowResultsButtonCta = "plp.show_results.button.cta"
       case plpSortByOptionTitle = "plp.sort_by.option.title"
       case productAddToBagButtonCta = "product.add_to_bag.button.cta"
+      case productAddToBagErrorMessage = "product.add_to_bag.error.message"
+      case productAddToBagSuccessMessage = "product.add_to_bag.success.message"
       case productAddToWishlistButtonCta = "product.add_to_wishlist.button.cta"
       case productColorTitle = "product.color.title"
       case productOneSizeTitle = "product.one_size.title"

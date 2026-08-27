@@ -30,13 +30,15 @@ extension Product {
 }
 
 extension Product.Variant {
-    public static func fixture(sku: String = UUID().uuidString,
+    public static func fixture(id: String? = nil,
+                               sku: String = UUID().uuidString,
                                size: Product.ProductSize? = nil,
                                colour: Product.Colour? = nil,
                                attributes: AttributeCollection? = nil,
                                stock: Int = 1,
                                price: Price = .fixture()) -> Product.Variant {
-        .init(sku: sku,
+        .init(id: id,
+              sku: sku,
               size: size,
               colour: colour,
               attributes: attributes,

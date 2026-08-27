@@ -15,6 +15,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @State private var isMediaFullScreen = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var showFailureState: Bool
+    @State private var addToBagSnackbarConfig: SnackbarViewConfiguration?
 
     private var colourLayout: ProductDetailsLayoutRules.ColourLayout {
         ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.colorSelectionConfiguration.items.count)
@@ -68,6 +69,24 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         }
         .onChange(of: viewModel.state.didFail) { newValue in
             showFailureState = newValue
+        }
+        .snackbarView(configuration: $addToBagSnackbarConfig)
+        // The add-to-bag outcome is transient and never leaves the product page. Dismissing the
+        // Snackbar clears the outcome so an identical later one re-presents cleanly.
+        .onChange(of: viewModel.addToBagFeedback) { feedback in
+            guard let feedback else {
+                addToBagSnackbarConfig = nil
+                return
+            }
+            addToBagSnackbarConfig = .init(
+                type: feedback == .success ? .success : .error,
+                text: feedback == .success
+                    ? L10n.Product.AddToBag.Success.message
+                    : L10n.Product.AddToBag.Error.message,
+                showCloseButton: true,
+                icon: feedback == .success ? Icon.checkmark.image : Icon.warning.image,
+                onDismiss: { viewModel.didDismissAddToBagFeedback() }
+            )
         }
     }
 
@@ -515,6 +534,10 @@ extension ProductDetailsView {
                     text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
                     isDisabled: .init(
                         get: { !viewModel.isAddToBagEnabled },
+                        set: { _ in }
+                    ),
+                    isLoading: .init(
+                        get: { viewModel.isAddingToBag },
                         set: { _ in }
                     ),
                     isFullWidth: true,

@@ -12,9 +12,8 @@ extension BFFGraphAPI.ProductDetailsFragment {
             .map { [.image(MediaImage(alt: $0.1, mediaContentType: .image, url: $0.0))] } ?? []
         let domainVariants = fragmentVariants.map { $0.convertToVariant(fallbackMedia: fallbackMedia) }
 
-        // `defaultVariantId` is matched against the BFF variant `id`, which the domain
-        // `Product.Variant` does not carry — so resolve the default by index here, while we
-        // still have the fragment variants, then map to the converted domain variant.
+        // Resolved by index on the fragment variants, which carry the `inventory` the in-stock
+        // fallback needs, then mapped to the converted domain variant.
         let defaultVariant: Product.Variant
         if let index = defaultVariantIndex(in: fragmentVariants) {
             defaultVariant = domainVariants[index]
@@ -152,6 +151,7 @@ extension BFFGraphAPI.ProductDetailsFragment.Variant {
         let was: Money? = (compareAt?.amount ?? 0) > amount.amount ? compareAt : nil
 
         return Product.Variant(
+            id: id,
             sku: sku,
             size: size,
             colour: colour,

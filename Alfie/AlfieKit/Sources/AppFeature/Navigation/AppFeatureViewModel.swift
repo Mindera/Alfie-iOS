@@ -81,7 +81,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let productDetailsDependencyContainer = ProductDetailsDependencyContainer(
             productService: serviceProvider.productService,
             webUrlProvider: serviceProvider.webUrlProvider,
-            bagService: serviceProvider.bagService,
+            cartService: serviceProvider.cartService,
             wishlistService: serviceProvider.wishlistService,
             configurationService: serviceProvider.configurationService,
             analytics: serviceProvider.analytics,

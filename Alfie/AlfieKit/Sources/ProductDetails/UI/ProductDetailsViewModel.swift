@@ -16,6 +16,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published public private(set) var state: ViewState<
         ProductDetailsViewStateModel, ProductDetailsViewErrorType
     > = .loading
+    @Published public private(set) var isAddingToBag = false
+    @Published public private(set) var addToBagFeedback: AddToBagFeedback?
     public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
         items: []
     )
@@ -200,16 +202,44 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public var isAddToBagEnabled: Bool {
         productHasStock
+            && selectedVariant?.id != nil
             && colorSelectionConfiguration.selectedItem != nil
             && (!canShowSizeSelector || sizingSelectionConfiguration.selectedItem != nil)
     }
 
     public func didTapAddToBag() {
-        guard isAddToBagEnabled, let selectedProduct else { return }
-        Task {
-            await dependencies.bagService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
+        // `isAddingToBag` flips before the Task is started, so a second tap while the first write
+        // is still in flight is rejected here rather than becoming a second request.
+        guard
+            isAddToBagEnabled,
+            !isAddingToBag,
+            let selectedProduct,
+            let variantId = selectedVariant?.id
+        else {
+            return
         }
+
+        isAddingToBag = true
+        Task { @MainActor in
+            defer { isAddingToBag = false }
+            do {
+                try await dependencies.cartService.add(
+                    line: .init(productId: selectedProduct.product.id, variantId: variantId)
+                )
+                // Only once the cart holds the line — firing on the tap would count adds that failed.
+                dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
+                addToBagFeedback = .success
+            } catch {
+                dependencies.log.error("Error adding \(selectedProduct.id) to the cart: \(error)")
+                addToBagFeedback = .failure
+            }
+        }
+    }
+
+    public func didDismissAddToBagFeedback() {
+        // Cleared on dismissal so an identical later outcome re-presents rather than being
+        // swallowed as an unchanged value.
+        addToBagFeedback = nil
     }
 
     public func didTapAddToWishlist() {

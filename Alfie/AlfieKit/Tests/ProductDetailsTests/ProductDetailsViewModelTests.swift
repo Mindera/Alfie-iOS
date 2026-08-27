@@ -10,20 +10,24 @@ final class ProductDetailsViewModelTests: XCTestCase {
     private var sut: ProductDetailsViewModel!
     private var mockProductService: MockProductService!
     private var mockWebUrlProvider: MockWebUrlProvider!
+    private var mockCartService: MockCartService!
+    private var mockAnalytics: MockAnalyticsTracker!
     private var mockDependencies: ProductDetailsDependencyContainer!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockProductService = MockProductService()
         mockWebUrlProvider = MockWebUrlProvider()
+        mockCartService = MockCartService()
+        mockAnalytics = MockAnalyticsTracker()
         mockDependencies = ProductDetailsDependencyContainer(
             scheduler: .immediate,
             productService: mockProductService,
             webUrlProvider: mockWebUrlProvider,
-            bagService: MockBagService(),
+            cartService: mockCartService,
             wishlistService: MockWishlistService(),
             configurationService: MockConfigurationService(),
-            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
+            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
             log: Log.DummyLogger()
         )
     }
@@ -33,6 +37,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         mockDependencies = nil
         mockProductService = nil
         mockWebUrlProvider = nil
+        mockCartService = nil
+        mockAnalytics = nil
         try super.tearDownWithError()
     }
 
@@ -181,8 +187,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_isAddToBagEnabled_becomesTrue_afterSizeIsSelected_onMultiSizeProduct() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
-        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
+        let small = Product.Variant.fixture(id: "v1", size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
+        let medium = Product.Variant.fixture(id: "v2", size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
         initViewModel(configuration: .product(product))
 
@@ -207,9 +213,9 @@ final class ProductDetailsViewModelTests: XCTestCase {
         // Re-entering from Bag/Wishlist carries a persisted (stale) variant that was out of stock when
         // saved; after the re-fetch the gating must reflect the fresh product's stock, not the snapshot.
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let staleVariant = Product.Variant.fixture(sku: "v1", colour: color, stock: 0)
+        let staleVariant = Product.Variant.fixture(id: "v1", sku: "v1", colour: color, stock: 0)
         let staleProduct = Product.fixture(defaultVariant: staleVariant, variants: [staleVariant])
-        let freshVariant = Product.Variant.fixture(sku: "v1", colour: color, stock: 5)
+        let freshVariant = Product.Variant.fixture(id: "v1", sku: "v1", colour: color, stock: 5)
         let freshProduct = Product.fixture(defaultVariant: freshVariant, variants: [freshVariant])
         mockProductService.onGetProductCalled = { _ in freshProduct }
 
@@ -227,7 +233,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         // treat the size as implicitly selected.
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "m", value: "M")
-        let variant = Product.Variant.fixture(size: size, colour: color, stock: 5)
+        let variant = Product.Variant.fixture(id: "v1", size: size, colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
         initViewModel(configuration: .product(product))
 
@@ -237,7 +243,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_isAddToBagEnabled_isTrueOnInit_forSizelessProduct_withStock() {
         // Product has no size dimension at all (e.g. a necklace).
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let variant = Product.Variant.fixture(size: nil, colour: color, stock: 5)
+        let variant = Product.Variant.fixture(id: "v1", size: nil, colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
         initViewModel(configuration: .product(product))
 
@@ -270,28 +276,21 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertFalse(sut.productHasAnyStock)
     }
 
-    func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() async {
+    func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
-        let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
+        let small = Product.Variant.fixture(id: "v1", size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
+        let medium = Product.Variant.fixture(id: "v2", size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
-        let mockBagService = MockBagService()
-        mockDependencies = ProductDetailsDependencyContainer(
-            scheduler: .immediate,
-            productService: mockProductService,
-            webUrlProvider: mockWebUrlProvider,
-            bagService: mockBagService,
-            wishlistService: MockWishlistService(),
-            configurationService: MockConfigurationService(),
-            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-            log: Log.DummyLogger()
-        )
+        var addCallCount = 0
+        mockCartService.onAddCalled = { _ in
+            addCallCount += 1
+            return .fixture()
+        }
         initViewModel(configuration: .product(product))
 
         sut.didTapAddToBag()
 
-        let content = await mockBagService.getBagContent()
-        XCTAssertTrue(content.isEmpty)
+        XCTAssertEqual(addCallCount, 0)
     }
 
     func test_complementary_info_options_to_display_are_available() {
@@ -1061,6 +1060,133 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
 
         XCTAssertFalse(sut.shouldShow(section: .addToBag))
+    }
+
+    // MARK: - Add to bag
+
+    func test_didTapAddToBag_writesTheSelectedVariantToTheCart() {
+        var written: CartLineInput?
+        mockCartService.onAddCalled = { line in
+            written = line
+            return .fixture()
+        }
+        initViewModel(configuration: .product(addableProduct()))
+
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        XCTAssertEqual(written?.productId, "product-1")
+        XCTAssertEqual(written?.variantId, "variant-1")
+        XCTAssertEqual(written?.quantity, 1)
+    }
+
+    func test_didTapAddToBag_isInFlightForTheDurationOfTheWrite() {
+        mockCartService.onAddCalled = { _ in .fixture() }
+        initViewModel(configuration: .product(addableProduct()))
+
+        sut.didTapAddToBag()
+
+        // Set on the tap itself, not once the request lands — otherwise the CTA sits idle for the
+        // whole round trip, which is the feedback gap this ticket exists to close.
+        XCTAssertTrue(sut.isAddingToBag)
+        XCTAssertEmitsValueEqualTo(from: sut.$isAddingToBag, expectedValue: false)
+    }
+
+    func test_didTapAddToBag_twiceInARow_producesOneRequest() {
+        var addCallCount = 0
+        mockCartService.onAddCalled = { _ in
+            addCallCount += 1
+            return .fixture()
+        }
+        initViewModel(configuration: .product(addableProduct()))
+
+        sut.didTapAddToBag()
+        sut.didTapAddToBag()
+        XCTAssertEmitsValueEqualTo(from: sut.$isAddingToBag, expectedValue: false)
+
+        XCTAssertEqual(addCallCount, 1)
+    }
+
+    func test_didTapAddToBag_thatSucceeds_reportsSuccessAndTracksTheEvent() {
+        mockCartService.onAddCalled = { _ in .fixture() }
+        initViewModel(configuration: .product(addableProduct()))
+
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        XCTAssertEqual(sut.addToBagFeedback, .success)
+        XCTAssertEqual(mockAnalytics.trackedActions, [.addToBag])
+    }
+
+    func test_didTapAddToBag_thatFails_reportsFailureAndTracksNothing() {
+        // Writes can fail now, so firing on intent would inflate add-to-bag against real carts.
+        mockCartService.onAddCalled = { _ in throw BFFRequestError(type: .generic) }
+        initViewModel(configuration: .product(addableProduct()))
+
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        XCTAssertEqual(sut.addToBagFeedback, .failure)
+        XCTAssertTrue(mockAnalytics.trackedActions.isEmpty)
+    }
+
+    func test_didTapAddToBag_doesNotNavigateAway_onSuccessOrFailure() {
+        mockCartService.onAddCalled = { _ in .fixture() }
+        var didGoBack = false
+        sut = .init(
+            configuration: .product(addableProduct()),
+            dependencies: mockDependencies,
+            goBackAction: { didGoBack = true },
+            openWebfeatureAction: { _ in }
+        )
+
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        XCTAssertFalse(didGoBack)
+    }
+
+    func test_didDismissAddToBagFeedback_clearsIt_soAnIdenticalOutcomeRepresents() {
+        mockCartService.onAddCalled = { _ in .fixture() }
+        initViewModel(configuration: .product(addableProduct()))
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        sut.didDismissAddToBagFeedback()
+
+        XCTAssertNil(sut.addToBagFeedback)
+    }
+
+    func test_isAddToBagEnabled_isFalse_whenTheVariantHasNoServerId() {
+        // A variant synthesised locally has no server counterpart, so there is nothing to add.
+        let variant = Product.Variant.fixture(id: nil, colour: .fixture(id: "1"), stock: 5)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        XCTAssertFalse(sut.isAddToBagEnabled)
+    }
+
+    func test_didTapAddToBag_makesNoRequest_whenTheVariantHasNoServerId() {
+        var addCallCount = 0
+        mockCartService.onAddCalled = { _ in
+            addCallCount += 1
+            return .fixture()
+        }
+        let variant = Product.Variant.fixture(id: nil, colour: .fixture(id: "1"), stock: 5)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        initViewModel(configuration: .product(product))
+
+        sut.didTapAddToBag()
+
+        XCTAssertEqual(addCallCount, 0)
+        XCTAssertFalse(sut.isAddingToBag)
+    }
+
+    /// A single-size, in-stock product whose variant carries a server id — the shape for which
+    /// add-to-bag is enabled on entry, with no swatch tapping needed first.
+    private func addableProduct() -> Product {
+        let variant = Product.Variant.fixture(
+            id: "variant-1",
+            size: .fixture(id: "s", value: "S"),
+            colour: .fixture(id: "1", name: "Color 1"),
+            stock: 5
+        )
+        return Product.fixture(id: "product-1", defaultVariant: variant, variants: [variant])
     }
 
     // MARK: - Share

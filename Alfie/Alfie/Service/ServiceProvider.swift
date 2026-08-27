@@ -26,6 +26,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     let searchService: SearchServiceProtocol
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
     let bagService: BagServiceProtocol
+    let cartService: CartServiceProtocol
     let wishlistService: WishlistServiceProtocol
     let sessionService: SessionServiceProtocol
 
@@ -98,6 +99,11 @@ final class ServiceProvider: ServiceProviderProtocol {
                 userDefaults: userDefaults,
                 storageKey: StorageKey.bagItems.rawValue
             )
+        )
+        cartService = CartService(
+            bffClient: bffClient,
+            userDefaults: userDefaults,
+            storageKey: StorageKey.cartId.rawValue
         )
         wishlistService = WishlistService(
             store: UserDefaultsStore(
