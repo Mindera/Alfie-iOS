@@ -127,12 +127,17 @@ final class RefineViewModel: RefineViewModelProtocol {
     /// dimension is carried through as applied.
     private var filterInput: ProductFilterInput? {
         guard hasActiveFilters else { return nil }
+        // Guarded on the same terms as `priceSummary` and `RangeSliderStyle.fieldText`, so all
+        // consumers of the pending values share one threat model rather than three of four
+        // being armed. Unreachable while every writer caps them; a non-finite bound would
+        // otherwise go out as an unrepresentable number in the request.
+        let finite = { (value: Double) -> Double? in value.isFinite ? value : nil }
         return ProductFilterInput(
             brandNames: carriedFilters?.brandNames,
             inventory: carriedFilters?.inventory,
-            maxPrice: pendingMaxPrice,
+            maxPrice: pendingMaxPrice.flatMap(finite),
             metafields: carriedFilters?.metafields,
-            minPrice: pendingMinPrice,
+            minPrice: pendingMinPrice.flatMap(finite),
             productTypes: carriedFilters?.productTypes
         )
     }

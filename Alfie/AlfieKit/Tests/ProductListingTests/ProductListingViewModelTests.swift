@@ -830,6 +830,62 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertNil(sut.priceBounds)
     }
 
+    func test_a_thrown_bounds_fetch_is_retried_on_the_next_appearance() {
+        // The counterpart to the test above, and the distinction the latch has to make: a nil
+        // result is a legitimate answer and must not be re-queried, but a throw is not an answer.
+        // Latching on it would hide the Price row for the life of the screen with no path back.
+        sut = makeSUT(category: "clothing")
+        var boundsFetches = 0
+        let firstFetchFailed = expectation(description: "first bounds fetch threw")
+        mockProductListing.onCategoryPriceRangeCalled = { _ in
+            boundsFetches += 1
+            guard boundsFetches > 1 else {
+                firstFetchFailed.fulfill()
+                throw BFFRequestError(type: .product(.generic))
+            }
+            return PriceRange(low: self.money(1_023), high: self.money(48_000))
+        }
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+
+        sut.viewDidAppear()
+        wait(for: [firstFetchFailed], timeout: 1)
+        XCTAssertNil(sut.priceBounds)
+
+        XCTAssertEmitsValue(from: sut.$priceBounds, where: { $0 != nil }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(boundsFetches, 2)
+        XCTAssertEqual(sut.priceBounds?.minimum, 10)
+    }
+
+    func test_applying_filters_clears_a_stale_refresh_error() async {
+        // The Snackbar describes the previous result set; left up over a freshly filtered listing
+        // it reads as the filter having failed.
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+        await sut.refresh()
+        XCTAssertEqual(sut.refreshError, .serverError)
+
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
+        }
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.sut.didApplyFilters(.init(minPrice: 40), sort: nil) }
+        )
+
+        XCTAssertNil(sut.refreshError)
+    }
+
     func test_a_page_in_flight_when_filters_change_cannot_overwrite_the_filtered_result() async {
         // The filter bar stays tappable during a load-more, so its response can land after the
         // filter has redefined the result set. Committing it would put the pre-filter products

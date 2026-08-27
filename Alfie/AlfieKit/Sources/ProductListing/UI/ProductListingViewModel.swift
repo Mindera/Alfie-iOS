@@ -151,6 +151,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         // Discard the cursor: an `after` from the previous query addresses a result set that no
         // longer exists, and would silently paginate into the old one (ALFMOB-487).
         pagination = nil
+        // A failed pull-to-refresh describes the previous result set; leaving its Snackbar up over
+        // a freshly filtered listing reads as the filter having failed.
+        refreshError = nil
         // Invalidate anything already in flight. The filter bar stays tappable during a load-more
         // or refresh, so without this their responses can land after the reset and put the
         // pre-filter products (and cursor) back.
@@ -254,7 +257,8 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     /// Fetched once per screen. The bounds describe the whole collection: constant across
     /// pagination and unaffected by the active filters, mirroring web (ALFMOB-472). A failure
-    /// is not surfaced — the Price row simply doesn't appear.
+    /// is not surfaced — the Price row simply doesn't appear until the next `viewDidAppear`
+    /// re-fetches it.
     @MainActor
     private func loadPriceBoundsIfNeeded() async {
         // Gated on "asked", not on "got a result": `viewDidAppear` fires again on every return
@@ -269,6 +273,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             )
             priceBounds = range.flatMap(PriceFilterBounds.init(priceRange:))
         } catch {
+            // Only the nil result must not be re-queried — it is a legitimate answer. A throw is
+            // not, so release the latch: otherwise one transient failure hides the Price row for
+            // the life of the screen, with no path back to it.
+            didRequestPriceBounds = false
             dependencies.log.error("Error fetching category price range: \(error)")
         }
     }
