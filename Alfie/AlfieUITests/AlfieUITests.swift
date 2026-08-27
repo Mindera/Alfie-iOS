@@ -4,6 +4,8 @@ import XCTest
 final class AlfieUITests: XCTestCase {
     private var app: XCUIApplication!
     private let timeout: TimeInterval = 5
+    /// A cart write is a real round trip to the BFF, so it gets longer than a local UI transition.
+    private let writeTimeout: TimeInterval = 20
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -34,7 +36,14 @@ final class AlfieUITests: XCTestCase {
 
     // MARK: - Tests
 
-    /// End-to-end journey: Home → Shop → Brands → first brand → first product → add to bag → verify in bag.
+    /// End-to-end journey: Home → Shop → Brands → first brand → first product → add to bag →
+    /// success Snackbar.
+    ///
+    /// Needs a reachable BFF: add-to-bag is a server write now, so this asserts a real round trip
+    /// rather than a local append. The journey used to end by opening the Bag tab and matching the
+    /// product name. It no longer can — the write goes to the server cart while the Bag screen
+    /// still reads local storage, which is exactly the gap #116 left for #117 to close. Restore
+    /// the bag half there, against the cart.
     ///
     /// Locators outside PDP and Brands still use raw identifier strings
     /// (`shop-tab`, `segmented-option-brands`, `product-image`, `bag-tab`,
@@ -77,28 +86,25 @@ final class AlfieUITests: XCTestCase {
 
         XCTContext.runActivity(named: "Add to bag") { _ in
             waitFor(pdp.addToBagButton, "Add to bag button should exist")
+            XCTAssertTrue(pdp.addToBagButton.isEnabled, "Add to bag should be enabled for a purchasable variant")
             pdp.tapAddToBag()
         }
 
-        XCTContext.runActivity(named: "Pop back from PDP") { _ in
-            let backButton = app.navigationBars.buttons.firstMatch
-            waitFor(backButton, "Back button should exist on PDP")
-            backButton.tap()
+        XCTContext.runActivity(named: "The write is confirmed, on the PDP") { _ in
+            // The cart round trip has to land, so this waits longer than the standard timeout.
+            let snackbar = app.staticTexts[AccessibilityID.Snackbar.text]
+            XCTAssertTrue(
+                snackbar.waitForExistence(timeout: writeTimeout),
+                "A Snackbar should confirm the add — check a BFF is reachable at the dev endpoint"
+            )
+            XCTAssertEqual(snackbar.label, "Added to bag", "The add should succeed, not fail")
         }
 
-        XCTContext.runActivity(named: "Open the Bag tab") { _ in
-            let bagTab = app.otherElements[AccessibilityID.TabBar.bag]
-            waitFor(bagTab, "Bag tab should exist")
-            bagTab.tap()
-        }
-
-        XCTContext.runActivity(named: "Product in bag matches the product added") { _ in
-            let productNameInBag = app.staticTexts.matching(identifier: "product-name").firstMatch
-            waitFor(productNameInBag, "Product name should be visible in bag")
+        XCTContext.runActivity(named: "Adding does not navigate away from the PDP") { _ in
             XCTAssertEqual(
-                productNameInBag.label,
+                pdp.productName.label,
                 expectedProductName,
-                "Product in bag should match the product that was added"
+                "The PDP should still be showing the product that was added"
             )
         }
     }

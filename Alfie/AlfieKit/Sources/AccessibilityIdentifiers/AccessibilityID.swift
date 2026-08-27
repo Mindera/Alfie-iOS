@@ -63,6 +63,15 @@ public enum AccessibilityID {
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
     }
 
+    // MARK: - Snackbar
+
+    /// The transient feedback banner, shared by every screen that presents one. Matching on it by
+    /// identifier keeps UI tests off the user-facing copy, which is localised and changes freely.
+    public enum Snackbar {
+        public static let view = "snackbar.view"
+        public static let text = "snackbar.text"
+    }
+
     // MARK: - ProductListing
 
     public enum ProductListing {

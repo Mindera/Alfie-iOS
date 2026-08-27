@@ -83,6 +83,11 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 text: feedback.snackbarText,
                 showCloseButton: true,
                 icon: feedback.snackbarIcon,
+                // From the top: the PDP pins the add-to-bag CTA to the bottom, and the default
+                // bottom placement lands the Snackbar squarely on top of it — covering both the
+                // button and the price. `ProductListingView` can use the default; it has no
+                // sticky bottom bar.
+                showFromTop: true,
                 onDismiss: { viewModel.didDismissAddToBagFeedback() }
             )
         }
