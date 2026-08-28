@@ -52,7 +52,11 @@ public final class BagViewModel: BagViewModelProtocol {
     // MARK: - Private
 
     private func fetchCart() {
-        state = .loading
+        // Every return to the tab re-reads. A bag already on screen stays put while that happens —
+        // only a screen with nothing to show yet drops to the skeleton.
+        if !state.isSuccess {
+            state = .loading
+        }
         Task { @MainActor in
             do {
                 try await dependencies.cartService.fetch()

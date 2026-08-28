@@ -1,4 +1,5 @@
 import AlicerceLogging
+import Combine
 import Mocks
 import Model
 import TestUtils
@@ -65,6 +66,19 @@ final class BagViewModelTests: XCTestCase {
 
         let cart = sut.state.value ?? nil
         XCTAssertEqual(cart?.lines.map(\.id), ["line-1"])
+    }
+
+    func test_viewDidAppear_withACartAlreadyOnScreen_reReadsWithoutFlashingTheSkeleton() {
+        // Every switch back to the Bag tab re-reads. Dropping to `.loading` first would blink the
+        // skeleton over a bag the shopper is already looking at.
+        showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+        var sawLoading = false
+        let cancellable = sut.$state.sink { if $0.isLoading { sawLoading = true } }
+        defer { cancellable.cancel() }
+
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertFalse(sawLoading)
     }
 
     // MARK: - An empty bag

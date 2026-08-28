@@ -88,6 +88,7 @@ of the build.
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
 | `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error |
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, both error states |
+| `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one |
 
 Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every
 rollout PR. Add them per screen once the design settles, covering the full state matrix

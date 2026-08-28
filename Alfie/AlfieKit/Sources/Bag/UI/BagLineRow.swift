@@ -23,10 +23,10 @@ struct BagLineRow: View {
                         .lineLimit(Constants.nameLineLimit)
                 }
                 Text.build(theme.font.body.small(L10n.Bag.Quantity.label(line.quantity)))
-                    .foregroundStyle(Primitives.Colours.neutrals500)
+                    .foregroundStyle(Theme.contentContentTerciary)
                     .accessibilityIdentifier(AccessibilityID.Bag.lineItemQuantity(id: line.id))
                 Text.build(theme.font.body.small(line.unitPrice.amountFormatted))
-                    .foregroundStyle(Primitives.Colours.neutrals500)
+                    .foregroundStyle(Theme.contentContentTerciary)
             }
             Spacer()
             Text.build(theme.font.body.medium(lineTotalText))
@@ -39,22 +39,20 @@ struct BagLineRow: View {
     /// An em dash where the server sent a total that cannot be rendered. Printing the £0.00 that
     /// the money conversion's zero fallback would give reads as "this item is free" (Q36).
     private var lineTotalText: String {
-        line.lineTotal?.amountFormatted ?? Constants.unknownTotal
+        line.lineTotal?.amountFormatted ?? L10n.Bag.LineTotal.unavailable
     }
 
-    @ViewBuilder private var imageView: some View {
-        VStack {
-            RemoteImage(
-                url: line.imageURL,
-                success: { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                },
-                placeholder: { Primitives.Colours.neutrals100 },
-                failure: { _ in Primitives.Colours.neutrals100 }
-            )
-        }
+    private var imageView: some View {
+        RemoteImage(
+            url: line.imageURL,
+            success: { image in
+                image
+                    .resizable()
+                    .scaledToFit()
+            },
+            placeholder: { Theme.surfaceForegroundPrimary },
+            failure: { _ in Theme.surfaceForegroundPrimary }
+        )
         .frame(width: Constants.imageWidth, height: Constants.imageHeight)
         .accessibilityLabel(line.imageAltText ?? "")
     }
@@ -65,5 +63,4 @@ private enum Constants {
     static let imageRatio: CGFloat = 100 / 75
     static var imageHeight: CGFloat { imageWidth * imageRatio }
     static let nameLineLimit: Int = 2
-    static let unknownTotal = "—"
 }

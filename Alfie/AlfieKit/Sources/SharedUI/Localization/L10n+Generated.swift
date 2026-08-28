@@ -70,6 +70,10 @@ public enum L10n {
         public static let cta = L10n.tr("L10n", "bag.error_view.retry.cta")
       }
     }
+    public enum LineTotal {
+      /// —
+      public static let unavailable = L10n.tr("L10n", "bag.line_total.unavailable")
+    }
     public enum Quantity {
       /// Qty: %d
       public static func label(_ p1: Int) -> String {
@@ -698,6 +702,7 @@ public extension L10n {
       case bagErrorViewNoInternetMessage = "bag.error_view.no_internet.message"
       case bagErrorViewNoInternetTitle = "bag.error_view.no_internet.title"
       case bagErrorViewRetryCta = "bag.error_view.retry.cta"
+      case bagLineTotalUnavailable = "bag.line_total.unavailable"
       case bagQuantityLabel = "bag.quantity.label"
       case bagRemoveCta = "bag.remove.cta"
       case bagSubtotalTitle = "bag.subtotal.title"

@@ -52,9 +52,11 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets())
                     .padding(.horizontal, Primitives.Spacing.spacing16)
-                    .swipeActions(edge: .trailing) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         // Swipe is the only removal affordance this epic ships (Q27). A `Button`
-                        // rather than `.onDelete` so it can carry an accessibility identifier.
+                        // rather than `.onDelete` so it can carry an accessibility identifier, and
+                        // no full swipe: the removal is a server write, so it takes a deliberate
+                        // tap on Remove rather than firing off the end of a gesture.
                         Button(role: .destructive) {
                             viewModel.didSelectDelete(line)
                         } label: {
@@ -148,25 +150,25 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
     // MARK: - Loading
 
-    /// Skeleton rows rather than a spinner: the shimmer is driven by the view's own state, so it
-    /// renders identically every time a snapshot is taken.
+    /// Skeleton rows rather than a spinner, so the wait is shaped like the bag that follows it.
+    /// The shimmer is applied per row: it hides what it covers and overlays a single rectangle, so
+    /// wrapping the stack instead would wash the whole screen grey.
     private var loadingView: some View {
         VStack(spacing: Primitives.Spacing.spacing16) {
             ForEach(0 ..< Constants.skeletonRowCount, id: \.self) { _ in
-                RoundedRectangle(cornerRadius: Constants.skeletonCornerRadius)
+                Color.clear
                     .frame(height: Constants.skeletonRowHeight)
+                    .shimmering(while: .constant(true), cornerRadius: Sizing.radiusSoft)
             }
             Spacer()
         }
         .padding(Primitives.Spacing.spacing16)
-        .shimmering(while: .constant(true))
     }
 }
 
 private enum Constants {
     static let skeletonRowCount = 4
     static let skeletonRowHeight: CGFloat = 100
-    static let skeletonCornerRadius: CGFloat = 4
 }
 
 #if DEBUG

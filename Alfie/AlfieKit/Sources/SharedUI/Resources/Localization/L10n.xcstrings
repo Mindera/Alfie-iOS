@@ -265,6 +265,17 @@
         }
       }
     },
+    "bag.line_total.unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\u2014"
+          }
+        }
+      }
+    },
     "bag.quantity.label" : {
       "extractionState" : "manual",
       "localizations" : {

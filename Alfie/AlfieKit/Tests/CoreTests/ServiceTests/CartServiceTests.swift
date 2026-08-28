@@ -239,7 +239,7 @@ final class CartServiceTests: XCTestCase {
         // A remove is a write like any other. Left unordered, its response can arrive first and the
         // add's older cart then overwrites it — the row the shopper swiped away reappears.
         let (sut, client, _) = makeSUT(storedCartId: "cart-1")
-        let gate = AddGate()
+        let gate = WriteGate()
         let addInFlight = expectation(description: "the add is in-flight")
         let removeReachedServerDuringAdd = expectation(description: "the remove must wait for the add")
         removeReachedServerDuringAdd.isInverted = true
@@ -321,24 +321,6 @@ final class CartServiceTests: XCTestCase {
     }
 }
 
-/// Holds an add open so another write can be started while it is still in flight.
-private actor AddGate {
-    private var continuation: CheckedContinuation<Void, Never>?
-    private var opened = false
-
-    func holdOpen(signal: XCTestExpectation) async {
-        signal.fulfill()
-        guard !opened else { return }
-        await withCheckedContinuation { continuation = $0 }
-    }
-
-    func open() {
-        opened = true
-        continuation?.resume()
-        continuation = nil
-    }
-}
-
 /// Holds the first cart write open so a second one can be started against it, and records what the
 /// two of them asked the client for.
 private actor WriteGate {
@@ -360,6 +342,13 @@ private actor WriteGate {
 
     func recordAppend(toCartId cartId: String) {
         appendedCartIds.append(cartId)
+    }
+
+    /// Holds a write open, without counting it, so another can be started while it is in flight.
+    func holdOpen(signal: XCTestExpectation) async {
+        signal.fulfill()
+        guard !opened else { return }
+        await withCheckedContinuation { continuation = $0 }
     }
 
     func open() {
