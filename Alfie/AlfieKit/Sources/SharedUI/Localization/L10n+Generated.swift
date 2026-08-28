@@ -46,6 +46,48 @@ public enum L10n {
   public enum Bag {
     /// Bag
     public static let title = L10n.tr("L10n", "bag.title")
+    public enum Empty {
+      /// Items you add to your bag will appear here
+      public static let message = L10n.tr("L10n", "bag.empty.message")
+      /// Your bag is empty
+      public static let title = L10n.tr("L10n", "bag.empty.title")
+    }
+    public enum ErrorView {
+      /// Something went wrong
+      public static let title = L10n.tr("L10n", "bag.error_view.title")
+      public enum Generic {
+        /// Please try again later
+        public static let message = L10n.tr("L10n", "bag.error_view.generic.message")
+      }
+      public enum NoInternet {
+        /// Check your connection and try again
+        public static let message = L10n.tr("L10n", "bag.error_view.no_internet.message")
+        /// No connection
+        public static let title = L10n.tr("L10n", "bag.error_view.no_internet.title")
+      }
+      public enum Retry {
+        /// Retry
+        public static let cta = L10n.tr("L10n", "bag.error_view.retry.cta")
+      }
+    }
+    public enum Quantity {
+      /// Qty: %d
+      public static func label(_ p1: Int) -> String {
+        return L10n.tr("L10n", "bag.quantity.label", p1)
+      }
+    }
+    public enum Remove {
+      /// Remove
+      public static let cta = L10n.tr("L10n", "bag.remove.cta")
+    }
+    public enum Subtotal {
+      /// Subtotal
+      public static let title = L10n.tr("L10n", "bag.subtotal.title")
+    }
+    public enum Total {
+      /// Total
+      public static let title = L10n.tr("L10n", "bag.total.title")
+    }
   }
   public enum FeatureToggle {
     /// Feature Toggle
@@ -649,6 +691,17 @@ public extension L10n {
       case accountSettings = "account.settings"
       case accountTitle = "account.title"
       case bagTitle = "bag.title"
+      case bagEmptyMessage = "bag.empty.message"
+      case bagEmptyTitle = "bag.empty.title"
+      case bagErrorViewTitle = "bag.error_view.title"
+      case bagErrorViewGenericMessage = "bag.error_view.generic.message"
+      case bagErrorViewNoInternetMessage = "bag.error_view.no_internet.message"
+      case bagErrorViewNoInternetTitle = "bag.error_view.no_internet.title"
+      case bagErrorViewRetryCta = "bag.error_view.retry.cta"
+      case bagQuantityLabel = "bag.quantity.label"
+      case bagRemoveCta = "bag.remove.cta"
+      case bagSubtotalTitle = "bag.subtotal.title"
+      case bagTotalTitle = "bag.total.title"
       case featureToggleTitle = "feature_toggle.title"
       case featureToggleAppUpdateOptionTitle = "feature_toggle.app_update.option.title"
       case featureToggleDebugConfigurationOptionTitle = "feature_toggle.debug_configuration.option.title"

@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -13,30 +14,159 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     }
 
     var body: some View {
-        List {
-            ForEach(lines) { line in
-                Text(line.name ?? "")
-                    .listRowSeparator(.hidden)
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
+        content
+            .toolbarView(
+                isWishlistEnabled: viewModel.isWishlistEnabled,
+                openWishlistAction: viewModel.didTapWishlist,
+                myAccountAction: viewModel.didTapMyAccount
+            )
+            .onAppear {
+                viewModel.viewDidAppear()
             }
+    }
+
+    @ViewBuilder private var content: some View {
+        switch viewModel.state {
+        case .loading:
+            loadingView
+
+        case .success(let cart):
+            // A shopper with no cart and a cart with nothing left in it are the same empty bag.
+            if let cart, !cart.lines.isEmpty {
+                bagView(cart)
+            } else {
+                emptyView
+            }
+
+        case .error(let error):
+            errorView(error)
+        }
+    }
+
+    // MARK: - Content
+
+    private func bagView(_ cart: Cart) -> some View {
+        List {
+            ForEach(cart.lines) { line in
+                BagLineRow(line: line)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets())
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .swipeActions(edge: .trailing) {
+                        // Swipe is the only removal affordance this epic ships (Q27). A `Button`
+                        // rather than `.onDelete` so it can carry an accessibility identifier.
+                        Button(role: .destructive) {
+                            viewModel.didSelectDelete(line)
+                        } label: {
+                            Text(L10n.Bag.Remove.cta)
+                        }
+                        .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
+                    }
+            }
+            totalsView(cart)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+                .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .listStyle(.plain)
         .listRowSpacing(Primitives.Spacing.spacing16)
         .padding(.vertical, Primitives.Spacing.spacing16)
-        .toolbarView(
-            isWishlistEnabled: viewModel.isWishlistEnabled,
-            openWishlistAction: viewModel.didTapWishlist,
-            myAccountAction: viewModel.didTapMyAccount
-        )
-        .onAppear {
-            viewModel.viewDidAppear()
+    }
+
+    /// Subtotal and total, with no checkout CTA — the bag is a dead end by design this epic (Q32).
+    private func totalsView(_ cart: Cart) -> some View {
+        VStack(spacing: Primitives.Spacing.spacing8) {
+            Divider()
+                .padding(.bottom, Primitives.Spacing.spacing8)
+            totalRow(
+                title: L10n.Bag.Subtotal.title,
+                amount: cart.subtotal.amountFormatted,
+                accessibilityId: AccessibilityID.Bag.subtotal
+            )
+            totalRow(
+                title: L10n.Bag.Total.title,
+                amount: cart.grandTotal.amountFormatted,
+                accessibilityId: AccessibilityID.Bag.grandTotal,
+                isProminent: true
+            )
         }
     }
 
-    /// A shopper with no cart and a cart with no lines are the same empty bag to the view.
-    private var lines: [CartLine] {
-        (viewModel.state.value ?? nil)?.lines ?? []
+    private func totalRow(
+        title: String,
+        amount: String,
+        accessibilityId: String,
+        isProminent: Bool = false
+    ) -> some View {
+        HStack {
+            Text.build(isProminent ? theme.font.body.medium(title) : theme.font.body.small(title))
+            Spacer()
+            Text.build(isProminent ? theme.font.body.medium(amount) : theme.font.body.small(amount))
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(accessibilityId)
     }
+
+    // MARK: - Empty
+
+    /// Nothing has gone wrong, so there is no retry — title and message only (Q28/Q34).
+    private var emptyView: some View {
+        ErrorView(
+            icon: Icon.bag.image,
+            title: L10n.Bag.Empty.title,
+            message: L10n.Bag.Empty.message
+        )
+        .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
+    }
+
+    // MARK: - Error
+
+    private func errorView(_ error: BFFRequestError) -> some View {
+        let (title, message) = errorCopy(for: error)
+        return ErrorView(
+            title: title,
+            message: message,
+            buttons: [
+                .init(
+                    cta: L10n.Bag.ErrorView.Retry.cta,
+                    accessibilityId: AccessibilityID.Bag.errorRetryButton,
+                    action: viewModel.didTapRetry
+                ),
+            ]
+        )
+        .accessibilityIdentifier(AccessibilityID.Bag.errorView)
+    }
+
+    private func errorCopy(for error: BFFRequestError) -> (String, String) {
+        switch error.type {
+        case .noInternet:
+            return (L10n.Bag.ErrorView.NoInternet.title, L10n.Bag.ErrorView.NoInternet.message)
+        default:
+            return (L10n.Bag.ErrorView.title, L10n.Bag.ErrorView.Generic.message)
+        }
+    }
+
+    // MARK: - Loading
+
+    /// Skeleton rows rather than a spinner: the shimmer is driven by the view's own state, so it
+    /// renders identically every time a snapshot is taken.
+    private var loadingView: some View {
+        VStack(spacing: Primitives.Spacing.spacing16) {
+            ForEach(0 ..< Constants.skeletonRowCount, id: \.self) { _ in
+                RoundedRectangle(cornerRadius: Constants.skeletonCornerRadius)
+                    .frame(height: Constants.skeletonRowHeight)
+            }
+            Spacer()
+        }
+        .padding(Primitives.Spacing.spacing16)
+        .shimmering(while: .constant(true))
+    }
+}
+
+private enum Constants {
+    static let skeletonRowCount = 4
+    static let skeletonRowHeight: CGFloat = 100
+    static let skeletonCornerRadius: CGFloat = 4
 }
 
 #if DEBUG

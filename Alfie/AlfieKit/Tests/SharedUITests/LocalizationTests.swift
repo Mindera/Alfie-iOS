@@ -33,6 +33,13 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    func test_localizable_bagQuantityWithArgs() {
+        localizations.forEach { localization in
+            let resources = [1, 2].map { L10n.Bag.Quantity.label($0) }
+            XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
+        }
+    }
+
     func testLocalizableColourSummaryWithArgs() {
         // Two positional arguments across a plural — the singular branch is the two-colour product,
         // which is the commonest case.
