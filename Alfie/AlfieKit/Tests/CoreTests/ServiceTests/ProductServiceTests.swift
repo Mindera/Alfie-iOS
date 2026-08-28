@@ -63,6 +63,21 @@ final class ProductServiceTests: XCTestCase {
         }
     }
 
+    func test_get_product_rethrows_cancellation_unmapped() async {
+        mockClientService.onGetProductCalled = { _ in
+            throw CancellationError()
+        }
+
+        do {
+            _ = try await sut.getProduct(handle: "the-handle")
+            XCTFail("Expected getProduct to throw")
+        } catch is CancellationError {
+            // Expected: callers tell a cancelled fetch apart from a real failure.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     // MARK: - Product List
 
     func test_productList_maps_emptyResponse_to_noProducts() async {
@@ -98,6 +113,23 @@ final class ProductServiceTests: XCTestCase {
         }
     }
 
+    func test_productList_rethrows_cancellation_unmapped() async {
+        mockClientService.onProductListCalled = { _, _, _, _, _ in
+            throw CancellationError()
+        }
+
+        do {
+            _ = try await sut.productList(collectionHandle: "c", after: nil, limit: 1, sort: nil, filters: nil)
+            XCTFail("Expected productList to throw")
+        } catch is CancellationError {
+            // Expected: `ProductListingViewModel.refresh()` catches `CancellationError` to stay
+            // silent. Mapping it to a product error here made that guard unreachable, so every
+            // cancelled pull-to-refresh raised an error Snackbar over a perfectly good grid.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func test_productList_calls_bff_service() async throws {
         var captured: ProductListCall?
         mockClientService.onProductListCalled = { collectionHandle, after, limit, sort, filters in
@@ -120,6 +152,23 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(call.limit, 2)
         XCTAssertEqual(call.sort, "sort")
         XCTAssertEqual(call.filters, filters)
+    }
+
+    // MARK: - Category Price Range
+
+    func test_categoryPriceRange_rethrows_cancellation_unmapped() async {
+        mockClientService.onCategoryPriceRangeCalled = { _ in
+            throw CancellationError()
+        }
+
+        do {
+            _ = try await sut.categoryPriceRange(collectionHandle: "c")
+            XCTFail("Expected categoryPriceRange to throw")
+        } catch is CancellationError {
+            // Expected: callers tell a cancelled fetch apart from a real failure.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
     }
 }
 
