@@ -14,24 +14,11 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
     var body: some View {
         List {
-            ForEach(viewModel.products) { product in
-                Button(
-                    action: { viewModel.didTapProduct(product) },
-                    label: {
-                        HorizontalProductCard(viewModel: viewModel.productCardViewModel(for: product))
-                            .contentShape(Rectangle())
-                    }
-                )
-                .buttonStyle(.plain)
-                .listRowInsets(EdgeInsets())
+            ForEach(lines) { line in
+                Text(line.name ?? "")
+                    .listRowSeparator(.hidden)
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
             }
-            .onDelete { offsets in
-                for index in offsets.makeIterator() {
-                    viewModel.didSelectDelete(for: viewModel.products[index])
-                }
-            }
-            .listRowSeparator(.hidden)
-            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .listStyle(.plain)
         .listRowSpacing(Primitives.Spacing.spacing16)
@@ -45,16 +32,15 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             viewModel.viewDidAppear()
         }
     }
+
+    /// A shopper with no cart and a cart with no lines are the same empty bag to the view.
+    private var lines: [CartLine] {
+        (viewModel.state.value ?? nil)?.lines ?? []
+    }
 }
 
 #if DEBUG
 #Preview {
-    BagView(
-        viewModel: MockBagViewModel(
-            products: [
-                .init(product: Product.fixture())
-            ]
-        )
-    )
+    BagView(viewModel: MockBagViewModel(state: .success(.fixture(lines: [.fixture()]))))
 }
 #endif

@@ -60,9 +60,10 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         tabs.append(.account)
 
         let bagDependencyContainer = BagDependencyContainer(
-            bagService: serviceProvider.bagService,
+            cartService: serviceProvider.cartService,
             configurationService: serviceProvider.configurationService,
-            analytics: serviceProvider.analytics
+            analytics: serviceProvider.analytics,
+            log: log
         )
         let myAccountDependencyContainer = MyAccountDependencyContainer(
             configurationService: serviceProvider.configurationService,

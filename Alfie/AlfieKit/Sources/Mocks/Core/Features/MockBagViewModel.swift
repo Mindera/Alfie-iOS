@@ -1,11 +1,11 @@
 import Model
 
 public class MockBagViewModel: BagViewModelProtocol {
-    public var products: [SelectedProduct]
+    public var state: ViewState<Cart?, BFFRequestError>
     public var isWishlistEnabled: Bool = false
 
-    public init(products: [SelectedProduct] = []) {
-        self.products = products
+    public init(state: ViewState<Cart?, BFFRequestError> = .success(nil)) {
+        self.state = state
     }
 
     public var onViewDidAppearCalled: (() -> Void)?
@@ -13,14 +13,14 @@ public class MockBagViewModel: BagViewModelProtocol {
         onViewDidAppearCalled?()
     }
 
-    public var onDidTapProductCalled: ((SelectedProduct) -> Void)?
-    public func didTapProduct(_ selectedProduct: SelectedProduct) {
-        onDidTapProductCalled?(selectedProduct)
+    public var onDidTapRetryCalled: (() -> Void)?
+    public func didTapRetry() {
+        onDidTapRetryCalled?()
     }
 
-    public var onDidSelectDeleteCalled: ((SelectedProduct) -> Void)?
-    public func didSelectDelete(for selectedProduct: SelectedProduct) {
-        onDidSelectDeleteCalled?(selectedProduct)
+    public var onDidSelectDeleteCalled: ((CartLine) -> Void)?
+    public func didSelectDelete(_ line: CartLine) {
+        onDidSelectDeleteCalled?(line)
     }
 
     public var onDidTapMyAccountCalled: (() -> Void)?
@@ -31,19 +31,5 @@ public class MockBagViewModel: BagViewModelProtocol {
     public var onDidTapWishlistCalled: (() -> Void)?
     public func didTapWishlist() {
         onDidTapWishlistCalled?()
-    }
-
-    public var onProductCardViewModelCalled: ((SelectedProduct) -> HorizontalProductCardViewModel)?
-    public func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
-        onProductCardViewModelCalled?(selectedProduct) ?? .init(
-            image: nil,
-            designer: "Yves Saint Laurent",
-            name: "Rouge Pur Couture",
-            colorTitle: "Color:",
-            color: "104",
-            sizeTitle: "Size:",
-            size: "No size",
-            priceType: .default(price: "50€")
-        )
     }
 }
