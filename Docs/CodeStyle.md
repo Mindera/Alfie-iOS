@@ -24,22 +24,7 @@
 
 ## Code Organization (Feature Module)
 
-```
-<Feature>/
-├── Models/
-│   ├── <Feature>DependencyContainer.swift
-│   └── <Feature>FlowDependencyContainer.swift
-├── Navigation/
-│   ├── <Feature>FlowView.swift
-│   ├── <Feature>FlowViewModel.swift
-│   ├── <Feature>Route.swift
-│   └── <Feature>Route+Destination.swift
-├── Protocols/
-│   └── <Feature>ViewModelProtocol.swift
-└── UI/
-    ├── <Feature>View.swift
-    └── <Feature>ViewModel.swift
-```
+See [Architecture.md](Architecture.md#feature-module-structure).
 
 ## Preview Pattern
 
@@ -80,16 +65,3 @@ private func loadData() async {
     }
 }
 ```
-
-## Things to AVOID
-
-❌ Access `ServiceProvider` from ViewModels (use DependencyContainer)  
-❌ Hardcode user-facing strings (use `L10n`)  
-❌ Bypass FlowViewModel for navigation (pass navigation closures from FlowViewModel)  
-❌ Edit auto-generated files (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`)  
-❌ Use `fatalError` (use `queuedFatalError`)  
-❌ Commit sensitive files unencrypted  
-❌ Create custom UI without checking SharedUI first  
-❌ Create ViewModels without protocols  
-❌ Edit `project.pbxproj` directly  
-❌ Skip build verification

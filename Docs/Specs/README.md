@@ -2,46 +2,10 @@
 
 This directory contains detailed specifications for all features in the Alfie iOS application.
 
-## Purpose
-
-Feature specs serve as:
-- **Single source of truth** for requirements
-- **Context for AI assistants** (GitHub Copilot, Cursor, etc.)
-- **Documentation** for developers
-- **Reference during code reviews**
-
-## Spec-Driven Development Process
-
-1. **Write Spec First** - Before any code, create a comprehensive spec
-2. **Break Into Tasks** - Extract small, independent tasks from the spec
-3. **Implement One Task at a Time** - Follow the implementation checklist
-4. **Update Spec if Requirements Change** - Keep specs in sync with reality
-
 ## How to Write a Spec
 
-Use `TEMPLATE.md` as your starting point. Every spec should include:
-
-### Required Sections
-
-- ✅ **Feature Overview** - What is this feature and why does it exist?
-- ✅ **User Stories** - Who needs this and what value does it provide?
-- ✅ **Acceptance Criteria** - What must be true for this to be "done"?
-- ✅ **Data Models** - Swift structs/classes with all properties
-- ✅ **API Contracts** - GraphQL queries with expected response shapes
-- ✅ **UI/UX Flows** - Step-by-step user interactions
-- ✅ **Navigation** - Entry/exit points and Coordinator methods
-- ✅ **Localization** - All user-facing strings with their L10n keys
-- ✅ **Analytics** - Events to track with parameters
-- ✅ **Edge Cases** - Errors, empty states, loading states
-- ✅ **Dependencies** - What services, features, or APIs are needed?
-- ✅ **Testing Strategy** - What tests to write and where
-
-### Optional Sections
-
-- 🔹 **Design Mockups** - Link to Figma/design files
-- 🔹 **Performance Considerations** - Any specific performance requirements
-- 🔹 **Accessibility** - VoiceOver labels, dynamic type support
-- 🔹 **Known Limitations** - What is explicitly out of scope
+Copy `TEMPLATE.md`. Its headings are the required sections — fill every one, and delete the
+optional sections you don't need rather than leaving them empty.
 
 ## Spec Lifecycle
 
@@ -62,41 +26,9 @@ Use these status markers in your spec:
 
 ## File Organization
 
-```
-Docs/Specs/
-├── README.md                    # This file
-├── TEMPLATE.md                  # Spec template
-└── Features/
-    ├── ProductListing.md
-    ├── Search.md
-    ├── Wishlist.md
-    └── Bag.md
-```
+Specs live in `Features/`, one file per feature, named `<FeatureName>.md`. `TEMPLATE.md` is the
+starting point (`ls Docs/Specs/Features/` for what exists today).
 
-## Tips for Good Specs
+## See also
 
-✅ **Be Specific** - "User can sort by price" is better than "User can sort"
-✅ **Include Code** - Show actual Swift structs, not just descriptions
-✅ **Show Examples** - Include sample API responses, UI states
-✅ **Think About Errors** - What happens when things go wrong?
-✅ **Define Success** - Clear acceptance criteria prevent scope creep
-✅ **Link to Designs** - Reference visual mockups if available
-
-❌ **Avoid Vagueness** - "Nice UI" is not a requirement
-❌ **Don't Skip Edge Cases** - Empty states and errors matter
-❌ **Don't Forget Localization** - Every user-facing string needs a key
-❌ **Don't Ignore Analytics** - What metrics should we track?
-
-## AI Assistant Integration
-
-This directory is automatically indexed by:
-- 🤖 GitHub Copilot
-- 🤖 Cursor
-- 🤖 Cline
-- 🤖 Other AI coding assistants
-
-When you ask an AI assistant to "implement the Product Listing feature", it will automatically reference the spec in `Features/ProductListing.md` for context.
-
-## Questions?
-
-See `AGENTS.md` for the full development workflow and architecture patterns.
+See `AGENTS.md` for the critical rules, and `Docs/Development.md` for the spec-to-implementation loop.

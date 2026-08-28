@@ -32,5 +32,3 @@ Text(L10n.Plp.NumberOfResults.message(count))
 - Add test in `Alfie/AlfieKit/Tests/SharedUITests/LocalizationTests.swift`
 - Test all pluralization variations (one, other, etc.)
 - Validate all supported languages have translations
-
-**Important**: Never hardcode user-facing strings. Always use `L10n` generated enums.

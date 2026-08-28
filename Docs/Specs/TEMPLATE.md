@@ -212,23 +212,31 @@ Example:
 - Tap back button → Previous screen
 - Tap wishlist icon → Wishlist View (if enabled)
 
-### Coordinator Methods
+### Routes and FlowViewModel Methods
+
+List the `Route` cases this feature adds, and the destination each one reaches. A case that
+hands off to another feature carries that feature's own `Route`, not its configuration, so the
+`navigate` call nests one level per module it crosses — copy the shape from a real flow rather
+than guessing it.
+
+Worked example, from `Alfie/AlfieKit/Sources/`:
 
 ```swift
-// Required navigation methods
-func [methodName](param: Type) {
-    navigationAdapter.[action](.screen(configuration: config))
-}
-```
-
-Example:
-```swift
-func didTap(_ product: Product) {
-    navigationAdapter.push(.productDetails(configuration: .product(product)))
+// ProductListing/Navigation/ProductListingRoute.swift
+public enum ProductListingRoute: Hashable {
+    case productDetails(ProductDetailsRoute)
+    case productListing(ProductListingScreenConfiguration)
 }
 
-func didTapWishlist() {
-    navigationAdapter.push(.wishlist)
+// ProductDetails/Navigation/ProductDetailsRoute.swift — owned by the ProductDetails module
+public enum ProductDetailsRoute: Hashable {
+    case productDetails(ProductDetailsConfiguration)
+    case webFeature(WebFeature)
+}
+
+// ProductListing/UI/ProductListingViewModel.swift — the ViewModel calls its injected closure
+public func didSelect(_ product: Product) {
+    navigate(.productDetails(.productDetails(.product(product))))
 }
 ```
 
@@ -335,7 +343,7 @@ Example:
 
 ## Testing Strategy
 
-### Unit Tests (`AlfieTests`)
+### Unit Tests (`<Module>Tests`)
 
 - [ ] ViewModel state transitions (loading → success → error)
 - [ ] Pagination logic (load more when scrolled to bottom)

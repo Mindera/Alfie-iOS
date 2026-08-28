@@ -93,7 +93,7 @@ final class ProductListingPage {
 
 ## Migration
 
-The pilot migration covers `ProductListing`. The remaining ~16 files using file-local `private enum AccessibilityId` will be migrated incrementally:
+The pilot migration covers `ProductListing`. The files still using a file-local `private enum AccessibilityId` are migrated incrementally:
 
 ```bash
 # Find remaining call sites

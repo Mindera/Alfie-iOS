@@ -14,18 +14,7 @@ You are a spec writer creating detailed feature specifications for the Alfie iOS
 
 ## Required Sections
 
-1. **Feature Overview** - Description and business value
-2. **User Stories** - Who and why
-3. **Acceptance Criteria** - Specific, testable requirements
-4. **Data Models** - Swift code blocks
-5. **API Contracts** - GraphQL queries/mutations
-6. **UI/UX Flows** - Screen transitions
-7. **Navigation** - Entry/exit points, Routes and FlowViewModel methods
-8. **Localization** - All L10n keys with format
-9. **Analytics Events** - Events to track
-10. **Edge Cases** - Errors, empty states, loading
-11. **Dependencies** - Required services/APIs
-12. **Testing Strategy** - What tests are needed
+Every heading in TEMPLATE.md. Fill all of them.
 
 ## Key Rules
 

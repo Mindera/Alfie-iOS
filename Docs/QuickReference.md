@@ -11,6 +11,7 @@ Alfie/
 │   └── Configuration/              # App config, URLs, sensitive files
 ├── AlfieKit/                       # Swift Package (feature modules)
 │   ├── Sources/
+│   │   ├── AccessibilityIdentifiers/ # AccessibilityID enums for UI tests
 │   │   ├── AppFeature/             # App shell, tab bar, root navigation
 │   │   ├── BFFGraph/               # GraphQL (queries, schema, codegen)
 │   │   ├── Bag/                    # Bag feature module
@@ -30,8 +31,8 @@ Alfie/
 │   │   ├── Utils/                  # Utilities
 │   │   ├── Web/                    # WebView feature module
 │   │   └── Wishlist/               # Wishlist feature module
-│   └── Tests/                      # Unit tests (per module)
-└── scripts/                        # Build scripts (Apollo codegen)
+│   └── Tests/                      # Unit tests, one target per module
+└── scripts/                        # verify/build/test, Apollo codegen, design-token pipeline
 ```
 
 ## Common Commands
@@ -57,54 +58,36 @@ cd Alfie/scripts && ./run-apollo-codegen.sh
 
 # Generate localization code (automatic on build, or manually)
 swift package --allow-writing-to-package-directory generate-code-for-resources
+
+# Refresh design tokens (pull upstream JSON, then regenerate the committed Swift)
+./Alfie/scripts/pull-design-tokens.sh && ./Alfie/scripts/generate-design-tokens.sh
 ```
 
 ## Key Dependencies
 
-- **Apollo iOS**: GraphQL client (v1.19.0)
-- **Firebase**: Analytics, Crashlytics, Remote Config (v11.11.0)
-- **Braze**: Marketing automation (v11.9.0)
-- **Nuke**: Image loading/caching (v12.8.0)
-- **Alicerce**: Utilities, logging (v0.18.0)
-- **SwiftGen**: Code generation for resources (v6.6.4-mindera fork)
-- **Snapshot Testing**: UI testing (v1.18.3)
+`Alfie/AlfieKit/Package.resolved` is authoritative for versions. What each one is for:
+
+- **Apollo iOS**: GraphQL client
+- **Firebase**: Analytics, Crashlytics, Remote Config
+- **Braze**: Marketing automation
+- **Nuke**: Image loading/caching
+- **Alicerce**: Utilities, logging
+- **SwiftGen**: Code generation for resources (Mindera fork)
+- **swift-snapshot-testing**: Snapshot tests
 
 ## Code Review Guidelines
 
-### PR Review Checklist
+**Block merge** on any violation of the ✅ ALWAYS / ❌ NEVER lists in `AGENTS.md` §Critical Rules,
+plus credentials or secrets committed in code.
 
-- [ ] **Architecture**: MVVM pattern, DependencyContainer usage, FlowViewModel navigation
-- [ ] **Localization**: All strings use L10n
-- [ ] **State**: ViewState/PaginatedViewState used correctly
-- [ ] **Tests**: ViewModels have unit tests, protocols exist for mocking
-- [ ] **Accessibility IDs**: New UI elements use `AccessibilityID` from `AccessibilityIdentifiers` (see `Docs/Accessibility.md`)
-- [ ] **Security**: No credentials, Keychain for sensitive data, HTTPS only
-- [ ] **GraphQL**: Fragments used, codegen run, no edits to generated files
-- [ ] **SwiftLint**: No violations
-
-### 🔴 Critical (Block Merge)
-
-- ViewModels accessing `ServiceProvider` directly
-- Hardcoded user-facing strings
-- Navigation bypassing FlowViewModel
-- Missing ViewModel protocols
-- Credentials/secrets in code
-- State not using `ViewState` enums
-
-### 🟠 High Priority
+**High priority** (fix before merge, not a hard block):
 
 - Missing tests for ViewModels
 - GraphQL queries without fragments
 - Missing localization translations
-- Dependencies not via DependencyContainer
 
-### Security Review Points
-
-- No API keys, tokens, passwords in code
-- Sensitive data uses Keychain, not UserDefaults
-- No PII in logs
-- git-secret for sensitive files
-- Input validation on deep links
+**Security**: no API keys/tokens/passwords in code, Keychain rather than UserDefaults for sensitive
+data, no PII in logs, input validation on deep links.
 
 ## Security & Sensitive Files
 
@@ -132,6 +115,5 @@ git secret hide
 
 - **Minimum iOS**: 16.0
 - **Swift Version**: 5.9+
-- **Mock Server**: Separate Alfie-Mocks repo runs locally on localhost:4000
-- **CI/CD**: Work in progress
-- **Release Process**: Work in progress
+- **Backend**: the BFF (`Alfie-BFF` repo) on `localhost:3000`. The older Alfie-Mocks server on
+  `localhost:4000` is legacy — reachable via the `dev` toggle in `ApiEndpointService`, not the default.
