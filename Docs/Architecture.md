@@ -281,25 +281,13 @@ Each feature module follows this structure:
 
 - **Location**: `Alfie/Alfie/Service/ServiceProvider.swift`
 - **Purpose**: Central registry of all services
-- **Access**: Only ViewFactory and top-level app code should access directly
+- **Access**: Reached only by app-level code and the `AppFeature` ViewModels that wire the app graph
 - **Pattern**: Protocol-based services for testability
 
-**Key Services** (protocols defined in `Model/Services/`):
-- `ProductServiceProtocol`: Product data fetching
-- `BrandsServiceProtocol`: Brands data
-- `AuthenticationServiceProtocol`: User authentication
-- `WishlistServiceProtocol`: Wishlist management
-- `BagServiceProtocol`: Shopping bag
-- `SearchServiceProtocol`: Search functionality
-- `RecentsServiceProtocol`: Recent searches
-- `DeepLinkServiceProtocol`: Deep linking
-- `ConfigurationServiceProtocol`: Feature flags and remote config
-- `AlfieAnalyticsTracker`: Analytics events
-- `NavigationServiceProtocol`: Navigation state management
-- `SessionServiceProtocol`: User session management
-- `ReachabilityServiceProtocol`: Network connectivity
-- `WebURLProviderProtocol`: Web URL generation
-- `WebViewConfigurationServiceProtocol`: WebView configuration
+**Services**: `ServiceProviderProtocol` in `Model/Services/ServiceProviderProtocol.swift` declares the
+full set. Two carry more than their name suggests — `ConfigurationServiceProtocol` gates force and soft
+app updates as well as feature flags, and `RecentsServiceProtocol` stores recent *searches*, not
+recently viewed products.
 
 ### Service Implementation Pattern
 

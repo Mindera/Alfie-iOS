@@ -35,6 +35,35 @@ public enum CurrencyFormatter {
 
     private static let minorUnitDigitsCache = OSAllocatedUnfairLock<[String: Int]>(initialState: [:])
 
+    /// Symbol glyph for a currency (GBP → `£`, JPY → `¥`), for use as an affix beside a plain
+    /// numeric field. Unrecognised codes fall back to the code itself, which is what
+    /// `NumberFormatter` reports and is still readable.
+    ///
+    /// Memoised on the same grounds as `minorUnitDigits(for:)` — and keyed by locale too, since
+    /// the glyph for a foreign currency varies by locale (USD is `$` in en_US, `US$` in de_DE).
+    public static func symbol(for currencyCode: String, locale: Locale = .current) -> String {
+        let key = CacheKey(currencyCode: currencyCode, localeIdentifier: locale.identifier)
+        return symbolCache.withLock { cache in
+            if let cached = cache[key] {
+                return cached
+            }
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.locale = locale
+            formatter.currencyCode = currencyCode
+            let symbol = formatter.currencySymbol ?? currencyCode
+            cache[key] = symbol
+            return symbol
+        }
+    }
+
+    private struct CacheKey: Hashable {
+        let currencyCode: String
+        let localeIdentifier: String
+    }
+
+    private static let symbolCache = OSAllocatedUnfairLock<[CacheKey: String]>(initialState: [:])
+
     /// Scales a major-unit amount to its integer minor-unit value using the currency's
     /// exponent (GBP £10.23 → 1023, JPY ¥5000 → 5000, KWD 19.999 → 19999).
     public static func minorUnits(of amount: Decimal, currencyCode: String) -> Int {
