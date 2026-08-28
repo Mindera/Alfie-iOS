@@ -28,6 +28,7 @@ final class CartTests: XCTestCase {
             sku: "sku-\(id)",
             name: "Line \(id)",
             imageURL: nil,
+            imageAltText: nil,
             quantity: quantity,
             unitPrice: money(1000),
             lineTotal: money(1000 * quantity)

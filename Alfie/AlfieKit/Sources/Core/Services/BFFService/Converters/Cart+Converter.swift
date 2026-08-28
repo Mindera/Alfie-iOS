@@ -25,6 +25,7 @@ extension BFFGraphAPI.CartItemFragment {
             sku: sku,
             name: name,
             imageURL: image.flatMap { URL(string: $0.url) },
+            imageAltText: image?.altText,
             quantity: quantity,
             unitPrice: price.fragments.moneyFragment.toDomainMoney(),
             lineTotal: lineTotal.fragments.moneyFragment.toDomainMoney()

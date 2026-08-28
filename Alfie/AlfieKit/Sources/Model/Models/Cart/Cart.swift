@@ -27,6 +27,8 @@ public struct CartLine: Hashable, Identifiable {
     public let sku: String?
     public let name: String?
     public let imageURL: URL?
+    /// Alt text for `imageURL`, for the bag row's VoiceOver label.
+    public let imageAltText: String?
     public let quantity: Int
     public let unitPrice: Money
     public let lineTotal: Money
@@ -38,6 +40,7 @@ public struct CartLine: Hashable, Identifiable {
         sku: String?,
         name: String?,
         imageURL: URL?,
+        imageAltText: String?,
         quantity: Int,
         unitPrice: Money,
         lineTotal: Money
@@ -48,6 +51,7 @@ public struct CartLine: Hashable, Identifiable {
         self.sku = sku
         self.name = name
         self.imageURL = imageURL
+        self.imageAltText = imageAltText
         self.quantity = quantity
         self.unitPrice = unitPrice
         self.lineTotal = lineTotal
