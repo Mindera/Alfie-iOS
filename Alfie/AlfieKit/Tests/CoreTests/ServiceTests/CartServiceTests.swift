@@ -112,6 +112,62 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.lines.first?.quantity, 2)
     }
 
+    // MARK: - Concurrent adds
+
+    func test_add_whileAnotherAddIsInFlight_waitsForItRatherThanCreatingACartOfItsOwn() async throws {
+        // Two adds can be in flight at once: the CTA guard is `ProductDetailsViewModel`'s
+        // `isAddingToBag`, which covers one screen, and there is a view model per tab flow.
+        // Unserialised, both would see no stored id and create a cart apiece — leaving the first
+        // item in a cart whose id was overwritten before anything could read it back.
+        let (sut, client, userDefaults) = makeSUT()
+        // The mock does not serve its own writes back to reads, so mirror what `UserDefaults` does.
+        userDefaults.onSetCalled = { [weak userDefaults] value, key in
+            userDefaults?.forcedValueForKey[key] = value
+        }
+        let gate = WriteGate()
+        let firstCreateInFlight = expectation(description: "the first add's create is in-flight")
+        let secondCreateAttempted = expectation(description: "the second add must not create a cart")
+        secondCreateAttempted.isInverted = true
+        client.onCreateCartCalled = { _ in
+            await gate.recordCreateAndMaybeWait(signal: firstCreateInFlight, secondSignal: secondCreateAttempted)
+            return .fixture(id: "cart-1")
+        }
+        client.onAddToCartCalled = { cartId, _ in
+            await gate.recordAppend(toCartId: cartId)
+            return .fixture(id: "cart-1")
+        }
+
+        async let firstAdd: Void = sut.add(line: .init(productId: "p1", variantId: "v1"))
+        await fulfillment(of: [firstCreateInFlight], timeout: 1)
+
+        async let secondAdd: Void = sut.add(line: .init(productId: "p2", variantId: "v2"))
+        await fulfillment(of: [secondCreateAttempted], timeout: 0.5)
+
+        await gate.open()
+        try await firstAdd
+        try await secondAdd
+
+        let creates = await gate.creates
+        let appendedCartIds = await gate.appendedCartIds
+        XCTAssertEqual(creates, 1)
+        // The second add appended to the cart the first one created, rather than starting another.
+        XCTAssertEqual(appendedCartIds, ["cart-1"])
+    }
+
+    func test_add_afterAnAddThatFailed_stillRuns() async throws {
+        // Writes queue behind one another, so a failure must not take the next write down with it.
+        let (sut, client, _) = makeSUT()
+        client.onCreateCartCalled = { _ in throw BFFRequestError(type: .generic) }
+
+        async let failing: Void = sut.add(line: .init(productId: "p1", variantId: "v1"))
+        _ = try? await failing
+
+        client.onCreateCartCalled = { _ in .fixture(id: "cart-1") }
+        try await sut.add(line: .init(productId: "p2", variantId: "v2"))
+
+        XCTAssertEqual(sut.cart?.id, "cart-1")
+    }
+
     // MARK: - Observation
 
     func test_cart_isNilBeforeAnythingIsAdded() {
@@ -164,5 +220,35 @@ final class CartServiceTests: XCTestCase {
         }
         let sut = CartService(bffClient: client, userDefaults: userDefaults, storageKey: Self.storageKey)
         return (sut, client, userDefaults)
+    }
+}
+
+/// Holds the first cart write open so a second one can be started against it, and records what the
+/// two of them asked the client for.
+private actor WriteGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var opened = false
+    private(set) var creates = 0
+    private(set) var appendedCartIds: [String] = []
+
+    func recordCreateAndMaybeWait(signal: XCTestExpectation, secondSignal: XCTestExpectation) async {
+        creates += 1
+        guard creates == 1 else {
+            secondSignal.fulfill()
+            return
+        }
+        signal.fulfill()
+        guard !opened else { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func recordAppend(toCartId cartId: String) {
+        appendedCartIds.append(cartId)
+    }
+
+    func open() {
+        opened = true
+        continuation?.resume()
+        continuation = nil
     }
 }
