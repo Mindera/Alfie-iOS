@@ -93,7 +93,14 @@ final class CartIntegrationTests: IntegrationTestCase {
     // MARK: - Totals
 
     private func assertTotalsAreConsistent(_ cart: Cart, file: StaticString = #filePath, line: UInt = #line) {
-        let summedLines = cart.lines.reduce(0) { $0 + $1.lineTotal.amount }
+        // A missing line total is the non-finite case, which a real cart never sends. Asserting it
+        // separately stops a `nil` being summed as zero and quietly passing the subtotal check.
+        XCTAssertFalse(
+            cart.lines.contains { $0.lineTotal == nil },
+            "Every line of a real cart has a finite total",
+            file: file, line: line
+        )
+        let summedLines = cart.lines.reduce(0) { $0 + ($1.lineTotal?.amount ?? 0) }
         XCTAssertEqual(
             cart.subtotal.amount, summedLines,
             "Subtotal must equal the sum of the line totals",

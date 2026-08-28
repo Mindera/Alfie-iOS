@@ -33,7 +33,7 @@ final class CartConverterTests: XCTestCase {
         XCTAssertEqual(line.imageAltText, "Silk shirt, front view")
         XCTAssertEqual(line.quantity, 2)
         XCTAssertEqual(line.unitPrice.amount, 1999)
-        XCTAssertEqual(line.lineTotal.amount, 3998)
+        XCTAssertEqual(line.lineTotal?.amount, 3998)
     }
 
     func test_a_null_line_name_maps_to_nil_rather_than_dropping_the_line() throws {
@@ -58,6 +58,15 @@ final class CartConverterTests: XCTestCase {
 
         XCTAssertTrue(cart.lines.isEmpty)
         XCTAssertEqual(cart.totalQuantity, 0)
+    }
+
+    func test_a_non_finite_line_total_maps_to_no_total_rather_than_zero() throws {
+        // `Decimal(inf)` traps and `Decimal(nan)` overflows, so the shared money conversion falls
+        // back to zero. Zero here would print £0.00 — a price the shopper is not being charged,
+        // stated as though they were. The bag needs to know the total is unknown to say so.
+        let cart = makeFragment(lines: [makeLine(id: "line-1", lineTotalAmount: .nan)]).convertToCart()
+
+        XCTAssertNil(try XCTUnwrap(cart.lines.first).lineTotal)
     }
 
     // MARK: - Totals

@@ -14,4 +14,11 @@ public protocol CartServiceProtocol {
 
     /// Adds a line to the cart, creating the cart on the first add and persisting its id.
     func add(line: CartLineInput) async throws
+
+    /// Reads the cart behind the stored id into `cart`. With no stored id there is nothing on the
+    /// server to read, so this publishes `nil` without a round trip.
+    func fetch() async throws
+
+    /// Drops a line from the cart, taking the cart the server returns in its place.
+    func remove(lineId: String) async throws
 }

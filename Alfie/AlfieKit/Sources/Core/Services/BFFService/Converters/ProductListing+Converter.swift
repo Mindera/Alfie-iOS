@@ -93,4 +93,10 @@ extension BFFGraphAPI.MoneyFragment {
             amountFormatted: CurrencyFormatter.string(amount: decimal, currencyCode: currencyCode)
         )
     }
+
+    /// `toDomainMoney()` without its zero fallback: `nil` where the amount is non-finite, so a
+    /// caller that must not print a price the shopper does not owe can say "unknown" instead.
+    func toDomainMoneyIfRenderable() -> Money? {
+        amount.isFinite ? toDomainMoney() : nil
+    }
 }

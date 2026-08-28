@@ -23,7 +23,7 @@ extension CartLine {
                                imageAltText: String? = nil,
                                quantity: Int = 1,
                                unitPrice: Money = .fixture(),
-                               lineTotal: Money = .fixture()) -> CartLine {
+                               lineTotal: Money? = .fixture()) -> CartLine {
         .init(id: id,
               productId: productId,
               variantId: variantId,

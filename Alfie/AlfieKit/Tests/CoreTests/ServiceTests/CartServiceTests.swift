@@ -168,6 +168,104 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.id, "cart-1")
     }
 
+    // MARK: - Fetch
+
+    func test_fetch_withNoStoredCartId_publishesNoCartWithoutAskingTheServer() async throws {
+        // A shopper who has never added anything has no cart on the server to read. Asking for one
+        // anyway would be a round trip whose only possible answer is the empty bag we already know.
+        let (sut, client, _) = makeSUT()
+        var getCallCount = 0
+        client.onGetCartCalled = { _ in
+            getCallCount += 1
+            return .fixture(id: "cart-1")
+        }
+
+        try await sut.fetch()
+
+        XCTAssertEqual(getCallCount, 0)
+        XCTAssertNil(sut.cart)
+    }
+
+    func test_fetch_withAStoredCartId_readsThatCartAndPublishesIt() async throws {
+        let (sut, client, _) = makeSUT(storedCartId: "cart-1")
+        var requestedCartId: String?
+        client.onGetCartCalled = { cartId in
+            requestedCartId = cartId
+            return .fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 2)])
+        }
+
+        try await sut.fetch()
+
+        XCTAssertEqual(requestedCartId, "cart-1")
+        XCTAssertEqual(sut.cart?.lines.map(\.id), ["line-1"])
+        XCTAssertEqual(sut.cart?.totalQuantity, 2)
+    }
+
+    func test_fetch_thatFails_propagatesAndLeavesTheHeldCartUntouched() async throws {
+        // The bag turns a thrown error into its error state. Blanking the held cart on the way
+        // would also blank the tab badge, which has no reason to forget what it last knew.
+        let (sut, client, _) = makeSUT(storedCartId: "cart-1")
+        client.onAddToCartCalled = { _, _ in .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]) }
+        try await sut.add(line: .init(productId: "p1", variantId: "v1"))
+        client.onGetCartCalled = { _ in throw BFFRequestError(type: .noInternet) }
+
+        do {
+            try await sut.fetch()
+            XCTFail("Expected the failure to propagate")
+        } catch {
+            XCTAssertEqual((error as? BFFRequestError)?.type, .noInternet)
+            XCTAssertEqual(sut.cart?.lines.map(\.id), ["line-1"])
+        }
+    }
+
+    // MARK: - Remove
+
+    func test_remove_asksTheServerToDropTheLineAndTakesTheCartItReturns() async throws {
+        let (sut, client, _) = makeSUT(storedCartId: "cart-1")
+        var request: (cartId: String, lineId: String)?
+        client.onRemoveFromCartCalled = { cartId, lineId in
+            request = (cartId, lineId)
+            return .fixture(id: "cart-1", lines: [.fixture(id: "line-2")])
+        }
+
+        try await sut.remove(lineId: "line-1")
+
+        XCTAssertEqual(request?.cartId, "cart-1")
+        XCTAssertEqual(request?.lineId, "line-1")
+        XCTAssertEqual(sut.cart?.lines.map(\.id), ["line-2"])
+    }
+
+    func test_remove_whileAnAddIsInFlight_landsAfterItRatherThanBeingOverwrittenByIt() async throws {
+        // A remove is a write like any other. Left unordered, its response can arrive first and the
+        // add's older cart then overwrites it — the row the shopper swiped away reappears.
+        let (sut, client, _) = makeSUT(storedCartId: "cart-1")
+        let gate = AddGate()
+        let addInFlight = expectation(description: "the add is in-flight")
+        let removeReachedServerDuringAdd = expectation(description: "the remove must wait for the add")
+        removeReachedServerDuringAdd.isInverted = true
+        client.onAddToCartCalled = { _, _ in
+            await gate.holdOpen(signal: addInFlight)
+            return .fixture(id: "cart-1", lines: [.fixture(id: "line-1"), .fixture(id: "line-2")])
+        }
+        client.onRemoveFromCartCalled = { _, _ in
+            removeReachedServerDuringAdd.fulfill()
+            return .fixture(id: "cart-1", lines: [.fixture(id: "line-2")])
+        }
+
+        async let add: Void = sut.add(line: .init(productId: "p1", variantId: "v1"))
+        await fulfillment(of: [addInFlight], timeout: 1)
+        async let removal: Void = sut.remove(lineId: "line-1")
+        // The add is still held here, so any request the remove makes in this window is one that
+        // jumped the queue.
+        await fulfillment(of: [removeReachedServerDuringAdd], timeout: 0.5)
+
+        await gate.open()
+        try await add
+        try await removal
+
+        XCTAssertEqual(sut.cart?.lines.map(\.id), ["line-2"])
+    }
+
     // MARK: - Observation
 
     func test_cart_isNilBeforeAnythingIsAdded() {
@@ -220,6 +318,24 @@ final class CartServiceTests: XCTestCase {
         }
         let sut = CartService(bffClient: client, userDefaults: userDefaults, storageKey: Self.storageKey)
         return (sut, client, userDefaults)
+    }
+}
+
+/// Holds an add open so another write can be started while it is still in flight.
+private actor AddGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var opened = false
+
+    func holdOpen(signal: XCTestExpectation) async {
+        signal.fulfill()
+        guard !opened else { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func open() {
+        opened = true
+        continuation?.resume()
+        continuation = nil
     }
 }
 

@@ -31,7 +31,9 @@ public struct CartLine: Hashable, Identifiable {
     public let imageAltText: String?
     public let quantity: Int
     public let unitPrice: Money
-    public let lineTotal: Money
+    /// `nil` when the server sent a non-finite amount. Rendered as an em dash, never as £0.00 —
+    /// a fabricated zero would state a price the shopper is not being charged.
+    public let lineTotal: Money?
 
     public init(
         id: String,
@@ -43,7 +45,7 @@ public struct CartLine: Hashable, Identifiable {
         imageAltText: String?,
         quantity: Int,
         unitPrice: Money,
-        lineTotal: Money
+        lineTotal: Money?
     ) {
         self.id = id
         self.productId = productId

@@ -29,20 +29,44 @@ public actor CartService: CartServiceProtocol {
     }
 
     public func add(line: CartLineInput) async throws {
-        // Writes run one at a time. An actor is reentrant, so two adds that both suspend on the
-        // network would otherwise each see no stored id and create a cart apiece — the shopper's
-        // first item left in an orphan whose id the app never kept. Nothing outside stops that:
-        // the CTA guard is `ProductDetailsViewModel.isAddingToBag`, which is per screen, and a PDP
-        // can sit on the stack of more than one tab at a time.
+        try await serialised { try await self.write(line: line) }
+    }
+
+    /// Runs `write` after every write already queued. An actor is reentrant, so unordered writes
+    /// interleave in two ways that both cost the shopper an item: two adds each see no stored id
+    /// and create a cart apiece, leaving the first item in an orphan whose id the app never kept;
+    /// and a remove that overtakes an add has its cart overwritten by the add's older one, putting
+    /// the swiped-away row back on screen. Nothing outside stops either — the CTA guard is
+    /// `ProductDetailsViewModel.isAddingToBag`, which covers one screen, and a PDP can sit on the
+    /// stack of more than one tab at a time.
+    private func serialised(_ write: @escaping @Sendable () async throws -> Void) async throws {
         let previous = lastWrite
-        let write = Task<Void, Error> {
+        let task = Task<Void, Error> {
             // A write that fails must not fail the one queued behind it, so its result is dropped.
             _ = await previous?.result
-            try await self.write(line: line)
+            try await write()
         }
-        lastWrite = write
+        lastWrite = task
 
-        try await write.value
+        try await task.value
+    }
+
+    public func fetch() async throws {
+        guard let cartId = storedCartId else {
+            cartSubject.send(nil)
+            return
+        }
+        cartSubject.send(try await bffClient.getCart(cartId: cartId))
+    }
+
+    public func remove(lineId: String) async throws {
+        try await serialised { try await self.dropLine(id: lineId) }
+    }
+
+    private func dropLine(id lineId: String) async throws {
+        // No stored id means no cart on the server, so there is no line there to drop.
+        guard let cartId = storedCartId else { return }
+        cartSubject.send(try await bffClient.removeFromCart(cartId: cartId, lineId: lineId))
     }
 
     private func write(line: CartLineInput) async throws {

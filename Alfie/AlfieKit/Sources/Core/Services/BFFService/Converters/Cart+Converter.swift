@@ -28,7 +28,7 @@ extension BFFGraphAPI.CartItemFragment {
             imageAltText: image?.altText,
             quantity: quantity,
             unitPrice: price.fragments.moneyFragment.toDomainMoney(),
-            lineTotal: lineTotal.fragments.moneyFragment.toDomainMoney()
+            lineTotal: lineTotal.fragments.moneyFragment.toDomainMoneyIfRenderable()
         )
     }
 }
