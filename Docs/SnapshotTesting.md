@@ -103,7 +103,7 @@ rollout PR. Add them per screen once the design settles, covering the full state
 ## A test target must be in the test plan
 
 Being an SPM test target is not enough — `verify.sh` runs `Alfie.xctestplan`, so a target missing from it
-never runs silently. Add every new test target to it.
+is skipped silently and still reports a green run. Add every new test target to the plan.
 
 `BFFIntegrationTests` is deliberately excluded: it has its own `AlfieIntegration.xctestplan`.
 

@@ -11,6 +11,7 @@ class Query: MockObject {
 
   struct MockFields {
     @Field<Cart>("cart") public var cart
+    @Field<CategoryPriceRange>("categoryPriceRange") public var categoryPriceRange
     @Field<Menu>("menu") public var menu
     @Field<OmniProduct>("productDetails") public var productDetails
     @Field<ProductListResponse>("productList") public var productList
@@ -21,6 +22,7 @@ class Query: MockObject {
 extension Mock where O == Query {
   convenience init(
     cart: Mock<Cart>? = nil,
+    categoryPriceRange: Mock<CategoryPriceRange>? = nil,
     menu: Mock<Menu>? = nil,
     productDetails: Mock<OmniProduct>? = nil,
     productList: Mock<ProductListResponse>? = nil,
@@ -28,6 +30,7 @@ extension Mock where O == Query {
   ) {
     self.init()
     _setEntity(cart, for: \.cart)
+    _setEntity(categoryPriceRange, for: \.categoryPriceRange)
     _setEntity(menu, for: \.menu)
     _setEntity(productDetails, for: \.productDetails)
     _setEntity(productList, for: \.productList)

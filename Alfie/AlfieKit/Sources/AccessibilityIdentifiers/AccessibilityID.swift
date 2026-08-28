@@ -81,6 +81,24 @@ public enum AccessibilityID {
         public static let listStyleGridButton = "productListing.listStyle.grid.button"
         public static let listStyleListButton = "productListing.listStyle.list.button"
         public static let retryButton = "productListing.retry.button"
+        public static let filterChips = "productListing.filterChips"
+        public static func filterChip(index: Int) -> String { "productListing.filterChip.\(index).button" }
+
+        // MARK: Refine sheet
+
+        public static let refineSheet = "productListing.refine.sheet"
+        public static let refineCloseButton = "productListing.refine.close.button"
+        public static let refineRemoveAllButton = "productListing.refine.removeAll.button"
+        /// The sub-screen header's Remove All. Same behaviour as the panel's, but a distinct id —
+        /// both are in the hierarchy while a sub-screen is pushed.
+        public static let refineSubscreenRemoveAllButton = "productListing.refine.subscreen.removeAll.button"
+        public static let refineApplyButton = "productListing.refine.apply.button"
+        public static let refineBackButton = "productListing.refine.back.button"
+        public static let refinePriceRow = "productListing.refine.price.row"
+        public static let refineSortRow = "productListing.refine.sort.row"
+        public static let refinePriceMinInput = "productListing.refine.price.min.input"
+        public static let refinePriceMaxInput = "productListing.refine.price.max.input"
+        public static let refinePriceError = "productListing.refine.price.error"
 
         /// Returns a row-scoped prefix for composing element identifiers within a listing row.
         /// Append a type suffix for specific elements: `row(id:) + ".image"`, `row(id:) + ".button"`, etc.

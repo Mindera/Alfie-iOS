@@ -13,7 +13,7 @@
 ### ✅ ALWAYS
 
 - Use `ViewState<Value, Error>` or `PaginatedViewState<Value, Error>` enums for state
-- Inject dependencies via `DependencyContainer`; `ServiceProvider` is reached only by `ViewFactory` and app-level code
+- Inject dependencies via `DependencyContainer`; `ServiceProvider` is reached only by app-level code and the `AppFeature` ViewModels that wire the app graph
 - Use `L10n` for every user-facing string (keys live in `L10n.xcstrings`)
 - Define a protocol for every ViewModel, so it can be mocked
 - Route all navigation through `FlowViewModel` closures passed into the `ViewModel`

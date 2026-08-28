@@ -16,6 +16,7 @@ final class CartConverterTests: XCTestCase {
                 name: "Silk Shirt",
                 quantity: 2,
                 imageURL: "https://cdn.alfie.test/shirt.jpg",
+                imageAltText: "Silk shirt, front view",
                 unitAmount: 19.99,
                 lineTotalAmount: 39.98
             ),
@@ -29,6 +30,7 @@ final class CartConverterTests: XCTestCase {
         XCTAssertEqual(line.sku, "SKU-1")
         XCTAssertEqual(line.name, "Silk Shirt")
         XCTAssertEqual(line.imageURL, URL(string: "https://cdn.alfie.test/shirt.jpg"))
+        XCTAssertEqual(line.imageAltText, "Silk shirt, front view")
         XCTAssertEqual(line.quantity, 2)
         XCTAssertEqual(line.unitPrice.amount, 1999)
         XCTAssertEqual(line.lineTotal.amount, 3998)
@@ -46,7 +48,9 @@ final class CartConverterTests: XCTestCase {
     func test_a_null_line_image_maps_to_nil_url() throws {
         let cart = makeFragment(lines: [makeLine(id: "line-1", imageURL: nil)]).convertToCart()
 
-        XCTAssertNil(try XCTUnwrap(cart.lines.first).imageURL)
+        let line = try XCTUnwrap(cart.lines.first)
+        XCTAssertNil(line.imageURL)
+        XCTAssertNil(line.imageAltText)
     }
 
     func test_an_empty_cart_maps_to_no_lines() {
@@ -118,6 +122,7 @@ private extension CartConverterTests {
         name: String? = "Line",
         quantity: Int = 1,
         imageURL: String? = "https://cdn.alfie.test/line.jpg",
+        imageAltText: String? = "Line image",
         unitAmount: Double = 5.00,
         lineTotalAmount: Double = 5.00,
         currencyCode: String = "GBP"
@@ -129,7 +134,7 @@ private extension CartConverterTests {
         line.sku = sku
         line.name = name
         line.quantity = quantity
-        line.image = imageURL.map { Mock<Image>(altText: nil, url: $0) }
+        line.image = imageURL.map { Mock<Image>(altText: imageAltText, url: $0) }
         line.price = Mock<Money>(amount: unitAmount, currencyCode: currencyCode)
         line.lineTotal = Mock<Money>(amount: lineTotalAmount, currencyCode: currencyCode)
         return line

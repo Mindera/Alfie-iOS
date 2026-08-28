@@ -214,25 +214,29 @@ Example:
 
 ### Routes and FlowViewModel Methods
 
-```swift
-// Route cases this feature adds
-case [routeName]([Configuration])
+List the `Route` cases this feature adds, and the destination each one reaches. A case that
+hands off to another feature carries that feature's own `Route`, not its configuration, so the
+`navigate` call nests one level per module it crosses — copy the shape from a real flow rather
+than guessing it.
 
-// FlowViewModel method the ViewModel calls through its navigate closure
-func [methodName](param: Type) {
-    navigate(.[routeName](config))
-}
-```
+Worked example, from `Alfie/AlfieKit/Sources/`:
 
-Example:
 ```swift
+// ProductListing/Navigation/ProductListingRoute.swift
 public enum ProductListingRoute: Hashable {
-    case productDetails(ProductDetailsConfiguration)
-    case wishlist
+    case productDetails(ProductDetailsRoute)
+    case productListing(ProductListingScreenConfiguration)
 }
 
-func didTap(_ product: Product) {
-    navigate(.productDetails(.product(product)))
+// ProductDetails/Navigation/ProductDetailsRoute.swift — owned by the ProductDetails module
+public enum ProductDetailsRoute: Hashable {
+    case productDetails(ProductDetailsConfiguration)
+    case webFeature(WebFeature)
+}
+
+// ProductListing/UI/ProductListingViewModel.swift — the ViewModel calls its injected closure
+public func didSelect(_ product: Product) {
+    navigate(.productDetails(.productDetails(.product(product))))
 }
 ```
 

@@ -32,6 +32,7 @@ public extension BFFGraphAPI {
       case "Cart": return BFFGraphAPI.Objects.Cart
       case "CartItem": return BFFGraphAPI.Objects.CartItem
       case "CartTotals": return BFFGraphAPI.Objects.CartTotals
+      case "CategoryPriceRange": return BFFGraphAPI.Objects.CategoryPriceRange
       case "Image": return BFFGraphAPI.Objects.Image
       case "Inventory": return BFFGraphAPI.Objects.Inventory
       case "Menu": return BFFGraphAPI.Objects.Menu

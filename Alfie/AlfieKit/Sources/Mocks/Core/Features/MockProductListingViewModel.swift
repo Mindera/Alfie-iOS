@@ -12,6 +12,8 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
     public var sortOption: String?
+    public var filters: ProductFilterInput?
+    public var priceBounds: PriceFilterBounds?
     public var showSearchButton = false
     public var showRefine: Bool = false
     public var isWishlistEnabled: Bool = false
@@ -62,9 +64,9 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
         onDidTapAddToWishlistCalled?(product, isFavorite)
     }
 
-    public var onDidApplyFiltersCalled: (() -> Void)?
-    public func didApplyFilters() {
-        onDidApplyFiltersCalled?()
+    public var onDidApplyFiltersCalled: ((ProductFilterInput?, String?) -> Void)?
+    public func didApplyFilters(_ filters: ProductFilterInput?, sort: String?) {
+        onDidApplyFiltersCalled?(filters, sort)
     }
 
     public var onRefreshCalled: (() -> Void)?

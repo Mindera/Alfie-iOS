@@ -20,6 +20,7 @@ extension CartLine {
                                sku: String? = "sku-1",
                                name: String? = "Product",
                                imageURL: URL? = nil,
+                               imageAltText: String? = nil,
                                quantity: Int = 1,
                                unitPrice: Money = .fixture(),
                                lineTotal: Money = .fixture()) -> CartLine {
@@ -29,6 +30,7 @@ extension CartLine {
               sku: sku,
               name: name,
               imageURL: imageURL,
+              imageAltText: imageAltText,
               quantity: quantity,
               unitPrice: unitPrice,
               lineTotal: lineTotal)

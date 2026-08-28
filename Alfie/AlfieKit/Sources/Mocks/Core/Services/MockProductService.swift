@@ -25,4 +25,9 @@ public final class MockProductService: ProductServiceProtocol {
         }
         return productListing
     }
+
+    public var onCategoryPriceRangeCalled: ((String) throws -> PriceRange?)?
+    public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
+        try onCategoryPriceRangeCalled?(collectionHandle)
+    }
 }

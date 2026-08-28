@@ -61,7 +61,15 @@ final class MutationInterceptorChainTests: XCTestCase {
     }
 
     func test_a_query_chain_keeps_cache_read_and_write() {
-        let chain = makeProvider().interceptors(for: BFFGraphAPI.CartQuery(cartId: "cart-1"))
+        // Deliberately a query the app really does cache. `CartQuery` also keeps both interceptors
+        // — the chain gates on operation type, not cache policy — but `getCart` issues it with
+        // `.fetchIgnoringCacheCompletely`, so it would prove the rule with an inert example.
+        let chain = makeProvider().interceptors(for: BFFGraphAPI.ProductListQuery(
+            collectionHandle: "test",
+            after: .none,
+            limit: 1,
+            filters: .none
+        ))
 
         XCTAssertTrue(chain.contains { $0 is CacheReadInterceptor })
         XCTAssertTrue(chain.contains { $0 is CacheWriteInterceptor })
