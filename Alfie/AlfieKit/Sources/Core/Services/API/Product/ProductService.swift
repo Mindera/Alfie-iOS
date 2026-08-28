@@ -14,10 +14,10 @@ public final class ProductService: ProductServiceProtocol {
         do {
             return try await bffClient.getProduct(handle: handle)
         } catch let error as CancellationError {
-            // A cancelled request is not a domain failure. Callers guard on `CancellationError` to
-            // stay silent when a screen is dismissed mid-fetch or a pull-to-refresh is superseded;
-            // flattening it into a product error below makes those guards unreachable and shows the
-            // user an error for a request that never actually failed.
+            // Cancellation is a control-flow signal, not a domain failure — every method here
+            // rethrows it unmapped. Callers guard on it to stay silent when a screen is dismissed
+            // mid-fetch or a pull-to-refresh is superseded; flattening it into a product error makes
+            // those guards unreachable and shows an error for a request that never failed.
             throw error
         } catch let error as BFFRequestError where error.isNotFound {
             throw BFFRequestError(type: .product(.noProduct))
@@ -42,6 +42,8 @@ public final class ProductService: ProductServiceProtocol {
                 filters: filters
             )
         } catch let error as CancellationError {
+            // SwiftUI cancels the `.refreshable` task routinely; mapping that here is what raised an
+            // error Snackbar over a perfectly good grid. See the note in `getProduct`.
             throw error
         } catch let error as BFFRequestError {
             // Only "no data" responses should surface as a noProducts state; genuine

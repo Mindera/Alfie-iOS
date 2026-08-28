@@ -26,6 +26,8 @@ public final class SearchService: SearchServiceProtocol {
                 filters: filters
             )
         } catch let error as CancellationError {
+            // The PLP attaches `.refreshable` in search-results mode too, so a cancelled refresh
+            // lands here rather than in `ProductService`. Same rule: rethrow unmapped.
             throw error
         } catch let error as BFFRequestError {
             // Only "no data" responses should surface as a noProducts state; genuine

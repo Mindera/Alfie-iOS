@@ -476,9 +476,10 @@ final class ProductListingViewModelTests: XCTestCase {
         }
         await sut.refresh()
 
-        // SwiftUI cancels the `.refreshable` task routinely; nothing failed, so the grid stays and
-        // no Snackbar is raised. This only holds while the service layer rethrows `CancellationError`
-        // unmapped — see `ProductServiceTests.test_productList_rethrows_cancellation_unmapped`.
+        // Guards the ViewModel half of the contract: given a service that rethrows `CancellationError`
+        // unmapped, `refresh()` must swallow it — grid intact, no Snackbar. It stubs
+        // `MockProductListingService`, a layer above the fix, so it cannot fail for the service half;
+        // `ProductServiceTests.test_productList_rethrows_cancellation_unmapped` covers that.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
         XCTAssertNil(sut.refreshError)
