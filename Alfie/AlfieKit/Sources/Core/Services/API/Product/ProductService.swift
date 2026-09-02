@@ -15,9 +15,11 @@ public final class ProductService: ProductServiceProtocol {
             return try await bffClient.getProduct(handle: handle)
         } catch let error as CancellationError {
             // Cancellation is a control-flow signal, not a domain failure — every method here
-            // rethrows it unmapped. Callers guard on it to stay silent when a screen is dismissed
-            // mid-fetch or a pull-to-refresh is superseded; flattening it into a product error makes
-            // those guards unreachable and shows an error for a request that never failed.
+            // rethrows it unmapped. `productList` and `searchProducts` have callers that guard on it
+            // to stay silent when a pull-to-refresh is superseded; flattening it into a product error
+            // made those guards unreachable and showed an error for a request that never failed.
+            // `getProduct` and `categoryPriceRange` have no such caller today and rethrow for
+            // consistency, so the rule has no hole for the next method added here.
             throw error
         } catch let error as BFFRequestError where error.isNotFound {
             throw BFFRequestError(type: .product(.noProduct))
