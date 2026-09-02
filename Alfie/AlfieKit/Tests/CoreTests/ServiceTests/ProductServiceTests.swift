@@ -72,7 +72,8 @@ final class ProductServiceTests: XCTestCase {
             _ = try await sut.getProduct(handle: "the-handle")
             XCTFail("Expected getProduct to throw")
         } catch is CancellationError {
-            // Expected: callers tell a cancelled fetch apart from a real failure.
+            // Expected. No caller of this method guards on cancellation today; the rule is
+            // service-wide so the next one can. See `ProductService.getProduct`.
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -165,7 +166,8 @@ final class ProductServiceTests: XCTestCase {
             _ = try await sut.categoryPriceRange(collectionHandle: "c")
             XCTFail("Expected categoryPriceRange to throw")
         } catch is CancellationError {
-            // Expected: callers tell a cancelled fetch apart from a real failure.
+            // Expected. No caller of this method guards on cancellation today; the rule is
+            // service-wide so the next one can. See `ProductService.getProduct`.
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
