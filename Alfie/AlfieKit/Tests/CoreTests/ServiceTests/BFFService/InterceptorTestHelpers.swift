@@ -41,3 +41,36 @@ enum InterceptorTestHelpers {
         )
     }
 }
+
+extension InterceptorTestHelpers {
+    static func makeMutationRequest() -> HTTPRequest<BFFGraphAPI.AddToCartMutation> {
+        let operation = BFFGraphAPI.AddToCartMutation(
+            input: BFFGraphAPI.AddToCartInput(
+                cartId: "cart-1",
+                lines: [BFFGraphAPI.CartLineInput(productId: .some("prod-1"), variantId: "var-1")]
+            )
+        )
+        return HTTPRequest<BFFGraphAPI.AddToCartMutation>(
+            graphQLEndpoint: endpoint,
+            operation: operation,
+            contentType: "application/json",
+            clientName: "test",
+            clientVersion: "test",
+            additionalHeaders: [:]
+        )
+    }
+
+    static func makeMutationResponse(status: Int) -> HTTPResponse<BFFGraphAPI.AddToCartMutation> {
+        let http = HTTPURLResponse(
+            url: endpoint,
+            statusCode: status,
+            httpVersion: "HTTP/1.1",
+            headerFields: [:]
+        )!
+        return HTTPResponse<BFFGraphAPI.AddToCartMutation>(
+            response: http,
+            rawData: Data(),
+            parsedResponse: nil
+        )
+    }
+}

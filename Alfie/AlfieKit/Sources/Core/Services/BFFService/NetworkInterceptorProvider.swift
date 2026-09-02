@@ -36,7 +36,16 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         // without anyone needing to remember to bump a separate constant.
         let retryInterceptor = RetryInterceptor() // Custom
         interceptors.append(MaxRetryInterceptor(maxRetriesAllowed: retryInterceptor.configuration.chainSafetyCap))
-        interceptors.append(CacheReadInterceptor(store: self.store))
+        // Only queries are cacheable. Apollo's CacheReadInterceptor already skips mutations, so
+        // the read side is belt-and-braces; the write side is not — CacheWriteInterceptor gates
+        // only on `.fetchIgnoringCacheCompletely`, so without this a mutation's response would be
+        // written to the store. That is harmless while `SchemaConfiguration.cacheKeyInfo` returns
+        // nil and records key by field path, but the moment anything normalises by `id` a
+        // mutation's cart would merge into the record a CartQuery reads.
+        let isCacheable = Operation.isQuery
+        if isCacheable {
+            interceptors.append(CacheReadInterceptor(store: self.store))
+        }
         interceptors.append(NetworkPreConditionInterceptor(reachabilityService: self.reachabilityService)) // Custom
         interceptors.append(AuthorizationInterceptor()) // Custom
         if logRequests {
@@ -54,7 +63,9 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         interceptors.append(MultipartResponseParsingInterceptor())
         interceptors.append(JSONResponseParsingInterceptor())
         interceptors.append(AutomaticPersistedQueryInterceptor())
-        interceptors.append(CacheWriteInterceptor(store: self.store))
+        if isCacheable {
+            interceptors.append(CacheWriteInterceptor(store: self.store))
+        }
 
         return interceptors
     }

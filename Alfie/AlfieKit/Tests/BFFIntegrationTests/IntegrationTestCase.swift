@@ -86,7 +86,7 @@ class IntegrationTestCase: XCTestCase {
 
     /// The probe must derive `/graphql` exactly as `BFFClientService` does, so the readiness check
     /// and the real requests target the same URL.
-    private var graphQLEndpoint: URL {
+    var graphQLEndpoint: URL {
         baseURL.appending(path: "graphql")
     }
 }

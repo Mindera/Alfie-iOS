@@ -76,6 +76,23 @@ type Dimensions {
   width: Float
 }
 
+type Facet {
+  id: String!
+  label: String!
+  values: [FacetValue!]!
+}
+
+input FacetFilterInput {
+  facetId: String!
+  value: String!
+}
+
+type FacetValue {
+  count: Int!
+  label: String!
+  value: String!
+}
+
 type Image {
   altText: String
   url: String!
@@ -167,6 +184,7 @@ type PageInfo {
 
 input ProductFilterInput {
   brandNames: [String!]
+  facets: [FacetFilterInput!]
   inventory: Boolean
   maxPrice: Float
   metafields: [MetafieldFilterInput!]
@@ -175,6 +193,10 @@ input ProductFilterInput {
 }
 
 type ProductListResponse {
+  """
+  Facets available for this result set, narrowed by active filters. Excludes price — use categoryPriceRange for price bounds. Empty when the platform provides no facets.
+  """
+  filters: [Facet!]!
   pageInfo: PageInfo
   products: [OmniProduct!]!
   totalCount: Int
