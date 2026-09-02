@@ -44,6 +44,9 @@ By default this runs build + unit tests (mocked BFF) + integration tests against
 the fast unit-only loop. Only mark work complete after **"✅ FULL VERIFICATION PASSED"** (or
 **"✅ VERIFICATION PASSED (... integration skipped)"** when skipped).
 
+An unfiltered run leaves a coverage bundle at `/tmp/alfie_test.xcresult`, with a sidecar recording
+which commit it describes — see `Docs/Testing.md` §Code Coverage before reading it.
+
 ---
 
 ## Detailed Documentation
