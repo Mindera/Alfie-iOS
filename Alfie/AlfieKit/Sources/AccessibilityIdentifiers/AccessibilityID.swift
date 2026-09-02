@@ -16,15 +16,20 @@ public enum AccessibilityID {
     // MARK: - Bag
 
     public enum Bag {
+        public static let bagView = "bag.view"
         public static let subtotal = "bag.subtotal.label"
         public static let grandTotal = "bag.grandTotal.label"
         public static let emptyState = "bag.emptyState.view"
         public static let errorView = "bag.errorView.view"
         public static let errorRetryButton = "bag.errorView.retry.button"
 
+        /// The part of a row identifier a test can know in advance. Line ids are assigned by the
+        /// server, so a UI test finds rows by matching this prefix rather than a whole identifier.
+        public static let lineItemPrefix = "bag.lineItem."
+
         /// Returns a line-scoped prefix, keyed on the server-assigned line id rather than a row
         /// index so removing a line does not renumber the rows a UI test is holding on to.
-        public static func lineItem(id: String) -> String { "bag.lineItem.\(id)" }
+        public static func lineItem(id: String) -> String { lineItemPrefix + id }
         public static func lineItemQuantity(id: String) -> String { lineItem(id: id) + ".quantity" }
         public static func lineItemTotal(id: String) -> String { lineItem(id: id) + ".total" }
         public static func lineItemRemoveButton(id: String) -> String { lineItem(id: id) + ".remove.button" }

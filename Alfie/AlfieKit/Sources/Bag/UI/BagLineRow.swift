@@ -14,7 +14,12 @@ struct BagLineRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: Primitives.Spacing.spacing16) {
-            imageView
+            // A line with no image renders without one, rather than reserving an empty grey slot.
+            // `RemoteImage`'s placeholder is for a URL that is still loading, not for a line that
+            // never had a URL to load.
+            if line.imageURL != nil {
+                imageView
+            }
             VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
                 // A line with no name is still a line the shopper is being charged for, so the row
                 // renders without it rather than being dropped.

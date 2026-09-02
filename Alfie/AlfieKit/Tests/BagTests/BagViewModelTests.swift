@@ -6,6 +6,12 @@ import TestUtils
 import XCTest
 @testable import Bag
 
+private extension ViewState where Value == Cart?, StateError == BFFRequestError {
+    /// Flattens the `Cart??` that `value` returns: the outer optional is "not loaded yet", the
+    /// inner one is "no cart on the server". A test asserting on the bag only cares about the cart.
+    var cart: Cart? { value ?? nil }
+}
+
 final class BagViewModelTests: XCTestCase {
     private var sut: BagViewModel!
     private var mockCartService: MockCartService!
@@ -42,7 +48,7 @@ final class BagViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
 
-        let cart = sut.state.value ?? nil
+        let cart = sut.state.cart
         XCTAssertEqual(cart?.lines.map(\.id), ["line-1"])
         XCTAssertEqual(cart?.totalQuantity, 2)
     }
@@ -64,7 +70,7 @@ final class BagViewModelTests: XCTestCase {
         mockCartService.onFetchCalled = { .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]) }
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.didTapRetry() })
 
-        let cart = sut.state.value ?? nil
+        let cart = sut.state.cart
         XCTAssertEqual(cart?.lines.map(\.id), ["line-1"])
     }
 
@@ -90,7 +96,7 @@ final class BagViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertNil(sut.state.value ?? nil)
+        XCTAssertNil(sut.state.cart)
         XCTAssertFalse(sut.state.didFail)
     }
 
@@ -101,7 +107,7 @@ final class BagViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual((sut.state.value ?? nil)?.lines, [])
+        XCTAssertEqual(sut.state.cart?.lines, [])
         XCTAssertFalse(sut.state.didFail)
     }
 
@@ -130,12 +136,12 @@ final class BagViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            where: { ($0.value ?? nil)?.lines.count == 1 },
+            where: { $0.cart?.lines.count == 1 },
             afterTrigger: { self.sut.didSelectDelete(line) }
         )
 
         XCTAssertEqual(removedLineId, "line-1")
-        let cart = sut.state.value ?? nil
+        let cart = sut.state.cart
         XCTAssertEqual(cart?.lines.map(\.id), ["line-2"])
         XCTAssertEqual(cart?.subtotal.amount, 2000)
         XCTAssertEqual(cart?.grandTotal.amount, 2000)
@@ -148,7 +154,7 @@ final class BagViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(
             from: sut.$state,
-            where: { ($0.value ?? nil)?.lines.isEmpty == true },
+            where: { $0.cart?.lines.isEmpty == true },
             afterTrigger: { self.sut.didSelectDelete(line) }
         )
 
@@ -165,7 +171,7 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertNoEmit(from: sut.$state, afterTrigger: { self.sut.didSelectDelete(line) })
 
         XCTAssertEqual(mockAnalytics.trackedActions, [])
-        XCTAssertEqual((sut.state.value ?? nil)?.lines.map(\.id), ["line-1", "line-2"])
+        XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1", "line-2"])
     }
 
     // MARK: - Helpers

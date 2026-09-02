@@ -194,7 +194,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Items you add to your bag will appear here"
+            "value" : "Items you add will appear here"
           }
         }
       }
@@ -216,7 +216,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please try again later"
+            "value" : "Something went wrong"
           }
         }
       }
@@ -227,18 +227,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Check your connection and try again"
-          }
-        }
-      }
-    },
-    "bag.error_view.no_internet.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No connection"
+            "value" : "Check your connection"
           }
         }
       }
@@ -249,7 +238,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retry"
+            "value" : "Try again"
           }
         }
       }
@@ -260,7 +249,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Something went wrong"
+            "value" : "Oops!"
           }
         }
       }

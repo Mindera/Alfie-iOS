@@ -21,11 +21,9 @@ final class BagPage {
     /// Every line currently rendered. `BagLineRow` is an accessibility container, so the rows are
     /// `otherElements`.
     var lineItems: XCUIElementQuery {
-        app.otherElements.matching(NSPredicate(format: "identifier BEGINSWITH %@", "bag.lineItem."))
-    }
-
-    var emptyState: XCUIElement {
-        app.otherElements[AccessibilityID.Bag.emptyState]
+        app.otherElements.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", AccessibilityID.Bag.lineItemPrefix)
+        )
     }
 
     var subtotal: XCUIElement {
@@ -34,10 +32,6 @@ final class BagPage {
 
     var grandTotal: XCUIElement {
         app.otherElements[AccessibilityID.Bag.grandTotal]
-    }
-
-    var errorRetryButton: XCUIElement {
-        app.buttons[AccessibilityID.Bag.errorRetryButton]
     }
 
     // MARK: - Actions
@@ -52,20 +46,11 @@ final class BagPage {
     /// required rather than optional.
     @discardableResult
     func removeLine(_ line: XCUIElement) -> Self {
-        let lineId = String(line.identifier.dropFirst("bag.lineItem.".count))
+        let lineId = String(line.identifier.dropFirst(AccessibilityID.Bag.lineItemPrefix.count))
         line.swipeLeft()
         let remove = app.buttons[AccessibilityID.Bag.lineItemRemoveButton(id: lineId)]
         XCTAssertTrue(remove.waitForExistence(timeout: 5), "Swiping a bag row should reveal Remove")
         remove.tap()
         return self
-    }
-
-    // MARK: - Assertions
-
-    func assertVisible(timeout: TimeInterval = 5) {
-        XCTAssertTrue(
-            lineItems.element(boundBy: 0).waitForExistence(timeout: timeout) || emptyState.exists,
-            "The Bag should show either at least one line or the empty state"
-        )
     }
 }

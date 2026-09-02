@@ -73,6 +73,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .listStyle(.plain)
         .listRowSpacing(Primitives.Spacing.spacing16)
         .padding(.vertical, Primitives.Spacing.spacing16)
+        .accessibilityIdentifier(AccessibilityID.Bag.bagView)
     }
 
     /// Subtotal and total, with no checkout CTA — the bag is a dead end by design this epic (Q32).
@@ -139,11 +140,14 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .accessibilityIdentifier(AccessibilityID.Bag.errorView)
     }
 
+    /// Switched exhaustively rather than with a `default`, so a new `BFFRequestErrorType` has to
+    /// come here and choose its copy instead of silently inheriting the generic message.
     private func errorCopy(for error: BFFRequestError) -> (String, String) {
         switch error.type {
         case .noInternet:
-            return (L10n.Bag.ErrorView.NoInternet.title, L10n.Bag.ErrorView.NoInternet.message)
-        default:
+            return (L10n.Bag.ErrorView.title, L10n.Bag.ErrorView.NoInternet.message)
+
+        case .generic, .emptyResponse, .product, .rateLimited, .timeout, .serverError:
             return (L10n.Bag.ErrorView.title, L10n.Bag.ErrorView.Generic.message)
         }
     }
@@ -163,6 +167,10 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             Spacer()
         }
         .padding(Primitives.Spacing.spacing16)
+        // The skeleton is decorative. VoiceOver gets one element announcing the fetch rather than
+        // four unlabelled shapes it would otherwise read as blank.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(L10n.Loading.title)
     }
 }
 
@@ -172,7 +180,19 @@ private enum Constants {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Success") {
     BagView(viewModel: MockBagViewModel(state: .success(.fixture(lines: [.fixture()]))))
+}
+
+#Preview("Empty") {
+    BagView(viewModel: MockBagViewModel(state: .success(nil)))
+}
+
+#Preview("Loading") {
+    BagView(viewModel: MockBagViewModel(state: .loading))
+}
+
+#Preview("Error") {
+    BagView(viewModel: MockBagViewModel(state: .error(.init(type: .generic))))
 }
 #endif

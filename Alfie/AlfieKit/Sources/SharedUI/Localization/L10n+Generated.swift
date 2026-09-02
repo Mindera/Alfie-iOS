@@ -47,26 +47,24 @@ public enum L10n {
     /// Bag
     public static let title = L10n.tr("L10n", "bag.title")
     public enum Empty {
-      /// Items you add to your bag will appear here
+      /// Items you add will appear here
       public static let message = L10n.tr("L10n", "bag.empty.message")
       /// Your bag is empty
       public static let title = L10n.tr("L10n", "bag.empty.title")
     }
     public enum ErrorView {
-      /// Something went wrong
+      /// Oops!
       public static let title = L10n.tr("L10n", "bag.error_view.title")
       public enum Generic {
-        /// Please try again later
+        /// Something went wrong
         public static let message = L10n.tr("L10n", "bag.error_view.generic.message")
       }
       public enum NoInternet {
-        /// Check your connection and try again
+        /// Check your connection
         public static let message = L10n.tr("L10n", "bag.error_view.no_internet.message")
-        /// No connection
-        public static let title = L10n.tr("L10n", "bag.error_view.no_internet.title")
       }
       public enum Retry {
-        /// Retry
+        /// Try again
         public static let cta = L10n.tr("L10n", "bag.error_view.retry.cta")
       }
     }
@@ -700,7 +698,6 @@ public extension L10n {
       case bagErrorViewTitle = "bag.error_view.title"
       case bagErrorViewGenericMessage = "bag.error_view.generic.message"
       case bagErrorViewNoInternetMessage = "bag.error_view.no_internet.message"
-      case bagErrorViewNoInternetTitle = "bag.error_view.no_internet.title"
       case bagErrorViewRetryCta = "bag.error_view.retry.cta"
       case bagLineTotalUnavailable = "bag.line_total.unavailable"
       case bagQuantityLabel = "bag.quantity.label"

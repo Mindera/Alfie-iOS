@@ -8,6 +8,7 @@ import XCTest
 
 /// No line carries an image URL. `RemoteImage` races between its placeholder and failure branches,
 /// and `defaultImage()` compares at full precision — the same reason the listing suite avoids them.
+/// A line with no URL renders with no image slot at all, so these references show the text-only row.
 final class BagViewSnapshotTests: XCTestCase {
     private let isRecording = false
 
@@ -38,7 +39,8 @@ final class BagViewSnapshotTests: XCTestCase {
     }
 
     func test_bagView_withALineTheServerCouldNotName() {
-        // `CartItem.name` is nullable. The row renders without a name rather than disappearing.
+        // `CartItem.name` and `CartItem.image` are both nullable, and this fixture has neither:
+        // the row renders without them rather than disappearing or holding an empty grey slot.
         let sut = BagView(viewModel: makeViewModel(state: .success(.fixture(
             id: "cart-1",
             lines: [.fixture(id: "line-1", name: nil, quantity: 1, unitPrice: money("£29.50"), lineTotal: money("£29.50"))],
