@@ -42,9 +42,9 @@ extension BFFGraphAPI.CartLineInput {
 // MARK: - Diagnostics
 
 extension Cart {
-    /// The field paths carrying an amount the BFF sent in a form this app cannot represent — either
-    /// non-finite or outside `Decimal`'s range (see `MoneyFragment.decimalAmount`). Empty for a
-    /// healthy cart, which is every real one.
+    /// The field paths carrying an amount the BFF sent in a form this app cannot represent — not
+    /// finite, outside `Decimal`'s range, or overflowing `Int64` once scaled to minor units (see
+    /// `MoneyFragment.representableAmount`). Empty for a healthy cart, which is every real one.
     ///
     /// The bag renders `—` for these rather than the fabricated £0.00 a zero fallback would print.
     /// That is right for the shopper and invisible to us: nobody reports a dash, so without this the
