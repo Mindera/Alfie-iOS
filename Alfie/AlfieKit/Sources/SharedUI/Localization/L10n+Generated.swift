@@ -46,6 +46,10 @@ public enum L10n {
   public enum Bag {
     /// Bag
     public static let title = L10n.tr("L10n", "bag.title")
+    public enum Amount {
+      /// —
+      public static let unavailable = L10n.tr("L10n", "bag.amount.unavailable")
+    }
     public enum Empty {
       /// Items you add will appear here
       public static let message = L10n.tr("L10n", "bag.empty.message")
@@ -67,10 +71,6 @@ public enum L10n {
         /// Try again
         public static let cta = L10n.tr("L10n", "bag.error_view.retry.cta")
       }
-    }
-    public enum LineTotal {
-      /// —
-      public static let unavailable = L10n.tr("L10n", "bag.line_total.unavailable")
     }
     public enum Quantity {
       /// Qty: %d
@@ -693,13 +693,13 @@ public extension L10n {
       case accountSettings = "account.settings"
       case accountTitle = "account.title"
       case bagTitle = "bag.title"
+      case bagAmountUnavailable = "bag.amount.unavailable"
       case bagEmptyMessage = "bag.empty.message"
       case bagEmptyTitle = "bag.empty.title"
       case bagErrorViewTitle = "bag.error_view.title"
       case bagErrorViewGenericMessage = "bag.error_view.generic.message"
       case bagErrorViewNoInternetMessage = "bag.error_view.no_internet.message"
       case bagErrorViewRetryCta = "bag.error_view.retry.cta"
-      case bagLineTotalUnavailable = "bag.line_total.unavailable"
       case bagQuantityLabel = "bag.quantity.label"
       case bagRemoveCta = "bag.remove.cta"
       case bagSubtotalTitle = "bag.subtotal.title"

@@ -188,6 +188,17 @@
         }
       }
     },
+    "bag.amount.unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "—"
+          }
+        }
+      }
+    },
     "bag.empty.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -250,17 +261,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oops!"
-          }
-        }
-      }
-    },
-    "bag.line_total.unavailable" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "\u2014"
           }
         }
       }

@@ -8,6 +8,6 @@ extension Optional where Wrapped == Money {
     /// shopper is not being charged: on a line it reads as "this item is free", and on the grand
     /// total it misstates what they are about to pay (Q36).
     var amountFormattedOrUnavailable: String {
-        self?.amountFormatted ?? L10n.Bag.LineTotal.unavailable
+        self?.amountFormatted ?? L10n.Bag.Amount.unavailable
     }
 }
