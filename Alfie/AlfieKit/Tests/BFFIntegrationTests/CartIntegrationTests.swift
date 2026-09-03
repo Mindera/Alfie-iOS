@@ -15,7 +15,7 @@ final class CartIntegrationTests: IntegrationTestCase {
         XCTAssertFalse(created.id.isEmpty, "createCart must return a usable cart id")
         XCTAssertEqual(created.lines.count, 1, "The create input carried one line")
         XCTAssertEqual(created.totalQuantity, 1)
-        assertTotalsAreConsistent(created)
+        try assertTotalsAreConsistent(created)
 
         // Re-adding the same variant must merge, not append.
         let merged = try await sut.addToCart(cartId: created.id, lines: [first])
@@ -27,7 +27,7 @@ final class CartIntegrationTests: IntegrationTestCase {
         let twoLines = try await sut.addToCart(cartId: created.id, lines: [second])
         XCTAssertEqual(twoLines.lines.count, 2, "A different variant must open its own line")
         XCTAssertEqual(twoLines.totalQuantity, 3)
-        assertTotalsAreConsistent(twoLines)
+        try assertTotalsAreConsistent(twoLines)
 
         let secondLine = try XCTUnwrap(
             twoLines.lines.first { $0.variantId == second.variantId },
@@ -36,14 +36,14 @@ final class CartIntegrationTests: IntegrationTestCase {
         let afterRemoval = try await sut.removeFromCart(cartId: created.id, lineId: secondLine.id)
         XCTAssertEqual(afterRemoval.lines.count, 1)
         XCTAssertEqual(afterRemoval.totalQuantity, 2)
-        assertTotalsAreConsistent(afterRemoval)
+        try assertTotalsAreConsistent(afterRemoval)
 
         let readBack = try await sut.getCart(cartId: created.id)
         XCTAssertEqual(readBack.id, created.id)
         XCTAssertEqual(readBack.lines.count, 1, "The removal must survive a fresh read")
         XCTAssertEqual(readBack.lines.first?.variantId, first.variantId)
         XCTAssertEqual(readBack.totalQuantity, 2)
-        assertTotalsAreConsistent(readBack)
+        try assertTotalsAreConsistent(readBack)
     }
 
     func test_every_line_carries_both_a_product_id_and_a_variant_id() async throws {
@@ -92,7 +92,7 @@ final class CartIntegrationTests: IntegrationTestCase {
 
     // MARK: - Totals
 
-    private func assertTotalsAreConsistent(_ cart: Cart, file: StaticString = #filePath, line: UInt = #line) {
+    private func assertTotalsAreConsistent(_ cart: Cart, file: StaticString = #filePath, line: UInt = #line) throws {
         // A missing line total is the non-finite case, which a real cart never sends. Asserting it
         // separately stops a `nil` being summed as zero and quietly passing the subtotal check.
         XCTAssertFalse(
@@ -100,14 +100,18 @@ final class CartIntegrationTests: IntegrationTestCase {
             "Every line of a real cart has a finite total",
             file: file, line: line
         )
+        // Totals are optional for the same non-finite reason, and a real cart never sends one.
+        // Unwrapping rather than defaulting stops a `nil` passing the comparisons below as zero.
+        let subtotal = try XCTUnwrap(cart.subtotal, "A real cart has a finite subtotal", file: file, line: line)
+        let grandTotal = try XCTUnwrap(cart.grandTotal, "A real cart has a finite grand total", file: file, line: line)
         let summedLines = cart.lines.reduce(0) { $0 + ($1.lineTotal?.amount ?? 0) }
         XCTAssertEqual(
-            cart.subtotal.amount, summedLines,
+            subtotal.amount, summedLines,
             "Subtotal must equal the sum of the line totals",
             file: file, line: line
         )
         XCTAssertGreaterThanOrEqual(
-            cart.grandTotal.amount, cart.subtotal.amount,
+            grandTotal.amount, subtotal.amount,
             "Grand total may add tax or shipping but never subtracts from the subtotal",
             file: file, line: line
         )

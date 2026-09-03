@@ -4,8 +4,8 @@ import Model
 extension Cart {
     public static func fixture(id: String = "cart-1",
                                lines: [CartLine] = [],
-                               subtotal: Money = .fixture(),
-                               grandTotal: Money = .fixture()) -> Cart {
+                               subtotal: Money? = .fixture(),
+                               grandTotal: Money? = .fixture()) -> Cart {
         .init(id: id,
               lines: lines,
               subtotal: subtotal,
@@ -22,7 +22,7 @@ extension CartLine {
                                imageURL: URL? = nil,
                                imageAltText: String? = nil,
                                quantity: Int = 1,
-                               unitPrice: Money = .fixture(),
+                               unitPrice: Money? = .fixture(),
                                lineTotal: Money? = .fixture()) -> CartLine {
         .init(id: id,
               productId: productId,

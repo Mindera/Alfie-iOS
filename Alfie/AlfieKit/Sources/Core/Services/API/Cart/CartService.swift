@@ -15,9 +15,9 @@ public actor CartService: CartServiceProtocol {
     private let userDefaults: UserDefaultsProtocol
     private let storageKey: String
     private let cartSubject = CurrentValueSubject<Cart?, Never>(nil)
-    /// The most recently started write. Each new one waits on it, so writes run in the order they
-    /// arrive rather than concurrently. See `add(line:)`.
-    private var lastWrite: Task<Void, Error>?
+    /// The most recently started cart operation. Each new one waits on it, so operations run in
+    /// the order they arrive rather than concurrently. See `add(line:)`.
+    private var lastOperation: Task<Void, Error>?
 
     public nonisolated var cart: Cart? { cartSubject.value }
     public nonisolated var cartPublisher: AnyPublisher<Cart?, Never> { cartSubject.eraseToAnyPublisher() }
@@ -32,26 +32,36 @@ public actor CartService: CartServiceProtocol {
         try await serialised { try await self.write(line: line) }
     }
 
-    /// Runs `write` after every write already queued. An actor is reentrant, so unordered writes
-    /// interleave in two ways that both cost the shopper an item: two adds each see no stored id
-    /// and create a cart apiece, leaving the first item in an orphan whose id the app never kept;
-    /// and a remove that overtakes an add has its cart overwritten by the add's older one, putting
-    /// the swiped-away row back on screen. Nothing outside stops either — the CTA guard is
-    /// `ProductDetailsViewModel.isAddingToBag`, which covers one screen, and a PDP can sit on the
-    /// stack of more than one tab at a time.
-    private func serialised(_ write: @escaping @Sendable () async throws -> Void) async throws {
-        let previous = lastWrite
+    /// Runs `operation` after every cart operation already queued. An actor is reentrant, so
+    /// unordered operations interleave in ways that cost the shopper an item: two adds each see no
+    /// stored id and create a cart apiece, leaving the first item in an orphan whose id the app
+    /// never kept; and a remove that overtakes an add has its cart overwritten by the add's older
+    /// one, putting the swiped-away row back on screen. Nothing outside stops either — the CTA
+    /// guard is `ProductDetailsViewModel.isAddingToBag`, which covers one screen, and a PDP can sit
+    /// on the stack of more than one tab at a time.
+    ///
+    /// Reads queue here too, for read-after-write ordering. A `getCart` issued while a remove is
+    /// still in flight can be answered from the pre-removal cart — arriving later does not make a
+    /// response newer, since it may have been *sent* before the write was applied — and publishing
+    /// it puts the swiped-away row back on screen. The cost is that a slow read delays the write
+    /// behind it, which is the right trade at one screen and one cart.
+    private func serialised(_ operation: @escaping @Sendable () async throws -> Void) async throws {
+        let previous = lastOperation
         let task = Task<Void, Error> {
-            // A write that fails must not fail the one queued behind it, so its result is dropped.
+            // One that fails must not fail the one queued behind it, so its result is dropped.
             _ = await previous?.result
-            try await write()
+            try await operation()
         }
-        lastWrite = task
+        lastOperation = task
 
         try await task.value
     }
 
     public func fetch() async throws {
+        try await serialised { try await self.read() }
+    }
+
+    private func read() async throws {
         guard let cartId = storedCartId else {
             cartSubject.send(nil)
             return
@@ -64,9 +74,19 @@ public actor CartService: CartServiceProtocol {
     }
 
     private func dropLine(id lineId: String) async throws {
-        // No stored id means no cart on the server, so there is no line there to drop.
-        guard let cartId = storedCartId else { return }
-        cartSubject.send(try await bffClient.removeFromCart(cartId: cartId, lineId: lineId))
+        // No stored id means no cart on the server, so the line cannot be dropped. This throws
+        // rather than returning: a silent success would have the caller fire `remove_from_bag` and
+        // republish an unchanged cart for a removal that never happened.
+        guard let cartId = storedCartId else {
+            throw BFFRequestError(type: .generic)
+        }
+
+        let cart = try await bffClient.removeFromCart(cartId: cartId, lineId: lineId)
+        // Persisted for the same reason `write(line:)` does it: every mutation returns the complete
+        // cart, id included, and a stored id that disagrees with the cart we hold is the next
+        // operation aimed at the wrong one.
+        userDefaults.set(cart.id, for: storageKey)
+        cartSubject.send(cart)
     }
 
     private func write(line: CartLineInput) async throws {

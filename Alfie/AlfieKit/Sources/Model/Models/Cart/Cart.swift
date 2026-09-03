@@ -3,15 +3,18 @@ import Foundation
 public struct Cart: Hashable {
     public let id: String
     public let lines: [CartLine]
-    public let subtotal: Money
-    public let grandTotal: Money
+    /// `nil` when the server sent a non-finite amount — see `CartLine.lineTotal`. A total is the
+    /// number a shopper checks before checking out, so a fabricated £0.00 is the worst place of
+    /// all to state a price they are not being charged.
+    public let subtotal: Money?
+    public let grandTotal: Money?
 
     /// Total quantity across all lines — the tab badge value, not `lines.count`.
     public var totalQuantity: Int {
         lines.reduce(0) { $0 + $1.quantity }
     }
 
-    public init(id: String, lines: [CartLine], subtotal: Money, grandTotal: Money) {
+    public init(id: String, lines: [CartLine], subtotal: Money?, grandTotal: Money?) {
         self.id = id
         self.lines = lines
         self.subtotal = subtotal
@@ -30,7 +33,8 @@ public struct CartLine: Hashable, Identifiable {
     /// Alt text for `imageURL`, for the bag row's VoiceOver label.
     public let imageAltText: String?
     public let quantity: Int
-    public let unitPrice: Money
+    /// `nil` when the server sent a non-finite amount — see `lineTotal`.
+    public let unitPrice: Money?
     /// `nil` when the server sent a non-finite amount. Rendered as an em dash, never as £0.00 —
     /// a fabricated zero would state a price the shopper is not being charged.
     public let lineTotal: Money?
@@ -44,7 +48,7 @@ public struct CartLine: Hashable, Identifiable {
         imageURL: URL?,
         imageAltText: String?,
         quantity: Int,
-        unitPrice: Money,
+        unitPrice: Money?,
         lineTotal: Money?
     ) {
         self.id = id

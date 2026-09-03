@@ -30,21 +30,15 @@ struct BagLineRow: View {
                 Text.build(theme.font.body.small(L10n.Bag.Quantity.label(line.quantity)))
                     .foregroundStyle(Theme.contentContentTerciary)
                     .accessibilityIdentifier(AccessibilityID.Bag.lineItemQuantity(id: line.id))
-                Text.build(theme.font.body.small(line.unitPrice.amountFormatted))
+                Text.build(theme.font.body.small(line.unitPrice.amountFormattedOrUnavailable))
                     .foregroundStyle(Theme.contentContentTerciary)
             }
             Spacer()
-            Text.build(theme.font.body.medium(lineTotalText))
+            Text.build(theme.font.body.medium(line.lineTotal.amountFormattedOrUnavailable))
                 .accessibilityIdentifier(AccessibilityID.Bag.lineItemTotal(id: line.id))
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityID.Bag.lineItem(id: line.id))
-    }
-
-    /// An em dash where the server sent a total that cannot be rendered. Printing the £0.00 that
-    /// the money conversion's zero fallback would give reads as "this item is free" (Q36).
-    private var lineTotalText: String {
-        line.lineTotal?.amountFormatted ?? L10n.Bag.LineTotal.unavailable
     }
 
     private var imageView: some View {

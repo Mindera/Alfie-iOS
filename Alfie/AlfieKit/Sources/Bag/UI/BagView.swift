@@ -8,6 +8,7 @@ import Mocks
 
 struct BagView<ViewModel: BagViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
+    @State private var removalSnackbarConfiguration: SnackbarViewConfiguration?
 
     init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -22,6 +23,22 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             )
             .onAppear {
                 viewModel.viewDidAppear()
+            }
+            .snackbarView(configuration: $removalSnackbarConfiguration)
+            // A failed removal is transient and never leaves the bag. Dismissing the Snackbar
+            // clears the outcome so an identical later one re-presents cleanly.
+            .onChange(of: viewModel.removalFailure) { failure in
+                guard let failure else {
+                    removalSnackbarConfiguration = nil
+                    return
+                }
+                removalSnackbarConfiguration = .init(
+                    type: .error,
+                    text: Self.errorMessage(for: failure),
+                    showCloseButton: true,
+                    icon: Icon.warning.image,
+                    onDismiss: { viewModel.didDismissRemovalFailure() }
+                )
             }
     }
 
@@ -83,12 +100,12 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 .padding(.bottom, Primitives.Spacing.spacing8)
             totalRow(
                 title: L10n.Bag.Subtotal.title,
-                amount: cart.subtotal.amountFormatted,
+                amount: cart.subtotal.amountFormattedOrUnavailable,
                 accessibilityId: AccessibilityID.Bag.subtotal
             )
             totalRow(
                 title: L10n.Bag.Total.title,
-                amount: cart.grandTotal.amountFormatted,
+                amount: cart.grandTotal.amountFormattedOrUnavailable,
                 accessibilityId: AccessibilityID.Bag.grandTotal,
                 isProminent: true
             )
@@ -125,10 +142,9 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     // MARK: - Error
 
     private func errorView(_ error: BFFRequestError) -> some View {
-        let (title, message) = errorCopy(for: error)
-        return ErrorView(
-            title: title,
-            message: message,
+        ErrorView(
+            title: L10n.Bag.ErrorView.title,
+            message: Self.errorMessage(for: error.type),
             buttons: [
                 .init(
                     cta: L10n.Bag.ErrorView.Retry.cta,
@@ -140,15 +156,19 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         .accessibilityIdentifier(AccessibilityID.Bag.errorView)
     }
 
-    /// Switched exhaustively rather than with a `default`, so a new `BFFRequestErrorType` has to
-    /// come here and choose its copy instead of silently inheriting the generic message.
-    private func errorCopy(for error: BFFRequestError) -> (String, String) {
-        switch error.type {
+    /// The title is the same for every error, so only the message varies. Switched exhaustively
+    /// rather than with a `default`, so a new `BFFRequestErrorType` has to come here and choose its
+    /// copy instead of silently inheriting the generic message.
+    ///
+    /// Shared with the removal-failure Snackbar, so a failed read and a failed write tell the
+    /// shopper the same thing about the same cause.
+    static func errorMessage(for type: BFFRequestError.BFFRequestErrorType) -> String {
+        switch type {
         case .noInternet:
-            return (L10n.Bag.ErrorView.title, L10n.Bag.ErrorView.NoInternet.message)
+            return L10n.Bag.ErrorView.NoInternet.message
 
         case .generic, .emptyResponse, .product, .rateLimited, .timeout, .serverError:
-            return (L10n.Bag.ErrorView.title, L10n.Bag.ErrorView.Generic.message)
+            return L10n.Bag.ErrorView.Generic.message
         }
     }
 

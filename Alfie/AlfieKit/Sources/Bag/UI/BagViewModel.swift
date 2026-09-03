@@ -3,6 +3,7 @@ import Model
 
 public final class BagViewModel: BagViewModelProtocol {
     @Published public private(set) var state: ViewState<Cart?, BFFRequestError> = .loading
+    @Published public private(set) var removalFailure: BFFRequestError.BFFRequestErrorType?
     public var isWishlistEnabled: Bool
 
     private let dependencies: BagDependencyContainer
@@ -37,8 +38,15 @@ public final class BagViewModel: BagViewModelProtocol {
                 state = .success(dependencies.cartService.cart)
             } catch {
                 dependencies.log.error("Error removing line \(line.id) from the cart: \(error)")
+                // The bag is left exactly as it was, so without this the row just snaps back and
+                // the shopper is told nothing (Q25).
+                removalFailure = (error as? BFFRequestError)?.type ?? .generic
             }
         }
+    }
+
+    public func didDismissRemovalFailure() {
+        removalFailure = nil
     }
 
     public func didTapMyAccount() {

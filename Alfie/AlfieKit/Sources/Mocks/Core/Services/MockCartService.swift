@@ -21,13 +21,22 @@ public final class MockCartService: CartServiceProtocol {
         cartSubject.send(cart)
     }
 
+    /// An unset closure throws rather than publishing `nil`, matching `add(line:)`. A silent
+    /// success would let a test assert an empty bag while the mock was never configured at all;
+    /// a closure that returns `nil` is still how a shopper with no server cart is modelled.
     public func fetch() async throws {
-        cartSubject.send(try await onFetchCalled?())
+        guard let onFetchCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        cartSubject.send(try await onFetchCalled())
     }
 
     public var onRemoveCalled: ((String) async throws -> Cart?)?
 
     public func remove(lineId: String) async throws {
-        cartSubject.send(try await onRemoveCalled?(lineId))
+        guard let onRemoveCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        cartSubject.send(try await onRemoveCalled(lineId))
     }
 }

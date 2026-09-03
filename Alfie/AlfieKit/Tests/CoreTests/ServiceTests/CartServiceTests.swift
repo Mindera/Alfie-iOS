@@ -266,6 +266,77 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.lines.map(\.id), ["line-2"])
     }
 
+    func test_remove_persistsTheCartIdItReturns_evenWhenItDiffers() async throws {
+        // Same reason as an append: every mutation returns the complete cart, id included, and a
+        // stored id that disagrees with the cart we hold is the next operation aimed at the wrong one.
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "cart-1")
+        client.onRemoveFromCartCalled = { _, _ in .fixture(id: "cart-2") }
+        var persisted: [String: String] = [:]
+        userDefaults.onSetCalled = { value, key in persisted[key] = value as? String }
+
+        try await sut.remove(lineId: "line-1")
+
+        XCTAssertEqual(persisted[Self.storageKey], "cart-2")
+    }
+
+    func test_remove_withNoStoredCartId_throwsRatherThanReportingARemovalThatNeverHappened() async throws {
+        // Returning quietly would read as success: the caller then fires `remove_from_bag` and
+        // republishes an unchanged cart for a line the server was never asked to drop.
+        let (sut, client, _) = makeSUT()
+        var askedTheServer = false
+        client.onRemoveFromCartCalled = { _, _ in
+            askedTheServer = true
+            return .fixture(id: "cart-1")
+        }
+
+        do {
+            try await sut.remove(lineId: "line-1")
+            XCTFail("A removal with no cart to remove from must throw")
+        } catch {
+            // Expected.
+        }
+
+        XCTAssertFalse(askedTheServer)
+        XCTAssertNil(sut.cart)
+    }
+
+    // MARK: - Ordering reads against writes
+
+    func test_remove_whileAReadIsInFlight_isNotUndoneByTheReadsOlderCart() async throws {
+        // Arriving later does not make a response newer. A `getCart` sent before a removal was
+        // applied answers with the pre-removal cart, so publishing it after the removal has landed
+        // puts the row the shopper swiped away back on screen. Reads queue with writes to stop it.
+        let (sut, client, _) = makeSUT(storedCartId: "cart-1")
+        let gate = WriteGate()
+        let readInFlight = expectation(description: "the read is in-flight")
+        let removeReachedServerDuringRead = expectation(description: "the remove must wait for the read")
+        removeReachedServerDuringRead.isInverted = true
+        client.onGetCartCalled = { _ in
+            // The cart as it stood when the read was sent — before any removal.
+            await gate.holdOpen(signal: readInFlight)
+            return .fixture(id: "cart-1", lines: [.fixture(id: "line-1"), .fixture(id: "line-2")])
+        }
+        client.onRemoveFromCartCalled = { _, _ in
+            removeReachedServerDuringRead.fulfill()
+            return .fixture(id: "cart-1", lines: [.fixture(id: "line-2")])
+        }
+
+        async let read: Void = sut.fetch()
+        await fulfillment(of: [readInFlight], timeout: 1)
+        async let removal: Void = sut.remove(lineId: "line-1")
+        // The read is still held here, so any request the remove makes in this window jumped the queue.
+        await fulfillment(of: [removeReachedServerDuringRead], timeout: 0.5)
+
+        await gate.open()
+        try await read
+        try await removal
+
+        XCTAssertEqual(
+            sut.cart?.lines.map(\.id), ["line-2"],
+            "The removal must be the last word, not the older read"
+        )
+    }
+
     // MARK: - Observation
 
     func test_cart_isNilBeforeAnythingIsAdded() {

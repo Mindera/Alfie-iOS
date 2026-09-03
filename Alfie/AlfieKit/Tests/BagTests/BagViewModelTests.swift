@@ -143,8 +143,8 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertEqual(removedLineId, "line-1")
         let cart = sut.state.cart
         XCTAssertEqual(cart?.lines.map(\.id), ["line-2"])
-        XCTAssertEqual(cart?.subtotal.amount, 2000)
-        XCTAssertEqual(cart?.grandTotal.amount, 2000)
+        XCTAssertEqual(cart?.subtotal?.amount, 2000)
+        XCTAssertEqual(cart?.grandTotal?.amount, 2000)
     }
 
     func test_didSelectDelete_tracksTheRemovalOnceTheServerHasConfirmedIt() {
@@ -172,6 +172,37 @@ final class BagViewModelTests: XCTestCase {
 
         XCTAssertEqual(mockAnalytics.trackedActions, [])
         XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1", "line-2"])
+    }
+
+    func test_didSelectDelete_thatFails_reportsWhyRatherThanFailingInSilence() {
+        // The bag is left standing, so without this the row snaps back and the shopper is told
+        // nothing. The type has to survive so the Snackbar can tell offline from a server fault.
+        let line = CartLine.fixture(id: "line-1")
+        showCart(.fixture(id: "cart-1", lines: [line]))
+        mockCartService.onRemoveCalled = { _ in throw BFFRequestError(type: .noInternet) }
+
+        XCTAssertEmitsValue(
+            from: sut.$removalFailure,
+            where: { $0 == .noInternet },
+            afterTrigger: { self.sut.didSelectDelete(line) }
+        )
+    }
+
+    func test_didDismissRemovalFailure_clearsIt() {
+        // Cleared on dismissal so an identical later failure re-presents rather than being
+        // swallowed as an unchanged value.
+        let line = CartLine.fixture(id: "line-1")
+        showCart(.fixture(id: "cart-1", lines: [line]))
+        mockCartService.onRemoveCalled = { _ in throw BFFRequestError(type: .noInternet) }
+        XCTAssertEmitsValue(
+            from: sut.$removalFailure,
+            where: { $0 != nil },
+            afterTrigger: { self.sut.didSelectDelete(line) }
+        )
+
+        sut.didDismissRemovalFailure()
+
+        XCTAssertNil(sut.removalFailure)
     }
 
     // MARK: - Helpers

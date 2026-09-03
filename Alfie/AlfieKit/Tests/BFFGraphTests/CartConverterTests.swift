@@ -32,7 +32,7 @@ final class CartConverterTests: XCTestCase {
         XCTAssertEqual(line.imageURL, URL(string: "https://cdn.alfie.test/shirt.jpg"))
         XCTAssertEqual(line.imageAltText, "Silk shirt, front view")
         XCTAssertEqual(line.quantity, 2)
-        XCTAssertEqual(line.unitPrice.amount, 1999)
+        XCTAssertEqual(line.unitPrice?.amount, 1999)
         XCTAssertEqual(line.lineTotal?.amount, 3998)
     }
 
@@ -69,14 +69,31 @@ final class CartConverterTests: XCTestCase {
         XCTAssertNil(try XCTUnwrap(cart.lines.first).lineTotal)
     }
 
+    func test_a_non_finite_unit_price_maps_to_no_price_rather_than_zero() throws {
+        // Same reasoning as the line total: £0.00 beside a real line states a price the shopper is
+        // not being charged.
+        let cart = makeFragment(lines: [makeLine(id: "line-1", unitAmount: .nan)]).convertToCart()
+
+        XCTAssertNil(try XCTUnwrap(cart.lines.first).unitPrice)
+    }
+
     // MARK: - Totals
+
+    func test_non_finite_totals_map_to_no_total_rather_than_zero() {
+        // The grand total is the number a shopper checks before checking out, so a fabricated
+        // £0.00 is the worst place of all to state a price they are not being charged (Q36).
+        let cart = makeFragment(lines: [], subtotal: .nan, grandTotal: .infinity).convertToCart()
+
+        XCTAssertNil(cart.subtotal)
+        XCTAssertNil(cart.grandTotal)
+    }
 
     func test_maps_subtotal_and_grand_total() {
         let cart = makeFragment(lines: [], subtotal: 19.99, grandTotal: 24.99).convertToCart()
 
-        XCTAssertEqual(cart.subtotal.amount, 1999)
-        XCTAssertEqual(cart.grandTotal.amount, 2499)
-        XCTAssertEqual(cart.grandTotal.currencyCode, "GBP")
+        XCTAssertEqual(cart.subtotal?.amount, 1999)
+        XCTAssertEqual(cart.grandTotal?.amount, 2499)
+        XCTAssertEqual(cart.grandTotal?.currencyCode, "GBP")
     }
 
     // MARK: - Money
@@ -93,8 +110,8 @@ final class CartConverterTests: XCTestCase {
         for (amount, expected) in cases {
             let cart = makeFragment(lines: [], subtotal: amount, grandTotal: amount).convertToCart()
             XCTAssertEqual(
-                cart.subtotal.amount, expected,
-                "amount \(amount) should convert to \(expected) minor units, got \(cart.subtotal.amount)"
+                cart.subtotal?.amount, expected,
+                "amount \(amount) should convert to \(expected) minor units, got \(String(describing: cart.subtotal?.amount))"
             )
         }
     }

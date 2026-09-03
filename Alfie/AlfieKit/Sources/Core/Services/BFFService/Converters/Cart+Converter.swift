@@ -7,8 +7,8 @@ extension BFFGraphAPI.CartFragment {
         Cart(
             id: id,
             lines: lineItems.map { $0.fragments.cartItemFragment.convertToCartLine() },
-            subtotal: totals.subtotal.fragments.moneyFragment.toDomainMoney(),
-            grandTotal: totals.grandTotal.fragments.moneyFragment.toDomainMoney()
+            subtotal: totals.subtotal.fragments.moneyFragment.toDomainMoneyIfRenderable(),
+            grandTotal: totals.grandTotal.fragments.moneyFragment.toDomainMoneyIfRenderable()
         )
     }
 }
@@ -27,7 +27,7 @@ extension BFFGraphAPI.CartItemFragment {
             imageURL: image.flatMap { URL(string: $0.url) },
             imageAltText: image?.altText,
             quantity: quantity,
-            unitPrice: price.fragments.moneyFragment.toDomainMoney(),
+            unitPrice: price.fragments.moneyFragment.toDomainMoneyIfRenderable(),
             lineTotal: lineTotal.fragments.moneyFragment.toDomainMoneyIfRenderable()
         )
     }
