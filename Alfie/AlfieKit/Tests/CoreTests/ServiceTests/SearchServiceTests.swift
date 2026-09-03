@@ -52,6 +52,23 @@ final class SearchServiceTests: XCTestCase {
         }
     }
 
+    func test_searchProducts_rethrows_cancellation_unmapped() async {
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
+            throw CancellationError()
+        }
+
+        do {
+            _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
+            XCTFail("Expected searchProducts to throw")
+        } catch is CancellationError {
+            // The PLP attaches `.refreshable` in both modes, so a search-results refresh reaches
+            // here rather than `ProductService`. Without this the cancellation guard in
+            // `ProductListingViewModel.refresh()` is just as unreachable as it was for `.listing`.
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func test_searchProducts_calls_bff_service() async throws {
         var captured: SearchCall?
         mockClientService.onSearchProductsCalled = { searchTerm, after, limit, sort, filters in

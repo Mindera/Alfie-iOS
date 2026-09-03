@@ -462,6 +462,29 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.refreshError, .serverError)
     }
 
+    func test_refresh_cancellation_keeps_grid_and_emits_no_error() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        XCTAssertTrue(sut.state.isSuccess)
+        let seeded = sut.products.map(\.id)
+
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw CancellationError()
+        }
+        await sut.refresh()
+
+        // Guards the ViewModel half of the contract: given a service that rethrows `CancellationError`
+        // unmapped, `refresh()` must swallow it — grid intact, no Snackbar. It stubs
+        // `MockProductListingService`, a layer above the fix, so it cannot fail for the service half;
+        // `ProductServiceTests.test_productList_rethrows_cancellation_unmapped` covers that.
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.products.map(\.id), seeded)
+        XCTAssertNil(sut.refreshError)
+    }
+
     func test_load_more_appends_next_page_and_stops_when_no_next_page() {
         sut = makeSUT(category: "clothing")
         let page1 = Array(Product.fixtures.prefix(3))
