@@ -167,7 +167,10 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         case .noInternet:
             return L10n.Bag.ErrorView.NoInternet.message
 
-        case .generic, .emptyResponse, .product, .rateLimited, .timeout, .serverError:
+        // A read recovers from `.cart(.cartNotFound)` before it reaches here, so this is the
+        // removal path: the shopper swiped a row on a cart the server has since forgotten. The
+        // generic message fits — the next read shows them the empty bag.
+        case .generic, .emptyResponse, .product, .cart, .rateLimited, .timeout, .serverError:
             return L10n.Bag.ErrorView.Generic.message
         }
     }

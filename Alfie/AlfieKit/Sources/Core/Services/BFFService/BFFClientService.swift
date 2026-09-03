@@ -219,7 +219,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             return cart
         } catch {
             log.error("addToCart failed: \(error)")
-            throw error
+            throw Self.asCartError(error)
         }
     }
 
@@ -236,7 +236,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             return cart
         } catch {
             log.error("removeFromCart failed: \(error)")
-            throw error
+            throw Self.asCartError(error)
         }
     }
 
@@ -258,11 +258,19 @@ public final class BFFClientService: BFFClientServiceProtocol {
             return cart
         } catch {
             log.error("getCart failed: \(error)")
-            throw error
+            throw Self.asCartError(error)
         }
     }
 
     // MARK: - Private
+
+    /// Applied by the three operations that carry a cart id — a 404 from one of them means that
+    /// cart is gone, which `CartService` recovers from. `createCart` names no cart, so it is
+    /// deliberately not mapped: a 404 from it would mean something else entirely.
+    private static func asCartError(_ error: Error) -> Error {
+        guard let error = error as? BFFRequestError else { return error }
+        return error.mappingCartNotFound()
+    }
 
     /// Reports any amount the BFF sent in a form this app cannot represent. Logged at `error`
     /// because it means the BFF has a defect: the shopper only sees a `—` in place of the price,
@@ -356,6 +364,9 @@ public final class BFFClientService: BFFClientServiceProtocol {
             }
 
             let code = errors.first?.extensions?["code"] as? String
+            // Carried on every failure but interpreted by nobody here: what a status means depends
+            // on the operation, so the cart operations map their own 404 (see `mappingCartNotFound`).
+            let status = errors.first?.extensions?["status"] as? Int
             let message = errors.first?.message
             let type: BFFRequestError.BFFRequestErrorType = {
                 if let code, graphqlRateLimitedCodes.contains(code) {
@@ -363,7 +374,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 }
                 return .generic
             }()
-            return BFFRequestError(type: type, message: message, graphqlErrorCode: code)
+            return BFFRequestError(type: type, message: message, graphqlErrorCode: code, graphqlErrorStatus: status)
 
         case .failure(let error):
             if let bffError = error as? BFFRequestError { return bffError }

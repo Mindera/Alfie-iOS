@@ -1,3 +1,4 @@
+import Combine
 import Core
 import DeepLink
 import Firebase
@@ -30,6 +31,8 @@ final class ServiceProvider: ServiceProviderProtocol {
     let sessionService: SessionServiceProtocol
 
     private(set) var authenticationService: AuthenticationServiceProtocol
+
+    private var subscriptions: Set<AnyCancellable> = []
 
     init() {
         self.userDefaults = UserDefaults.standard
@@ -105,6 +108,20 @@ final class ServiceProvider: ServiceProviderProtocol {
             )
         )
         sessionService = SessionService(analytics: analytics)
+
+        // A shared device must not hand the next shopper the previous one's bag. Wired here rather
+        // than at the two sign-out buttons so a third one cannot forget to do it.
+        //
+        // `dropFirst` because the publisher replays its current value on subscribe: without it the
+        // "signed out" every cold launch begins with would empty the bag before it was ever shown.
+        sessionService.isUserSignedInPublisher
+            .removeDuplicates()
+            .dropFirst()
+            .filter { !$0 }
+            .sink { [cartService] _ in
+                Task { await cartService.signOut() }
+            }
+            .store(in: &subscriptions)
     }
 
     public func resetServices() {

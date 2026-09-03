@@ -1,5 +1,5 @@
 @testable import Core
-import Mocks
+@testable import Mocks
 import Model
 import TestUtils
 import XCTest
@@ -375,7 +375,125 @@ final class CartServiceTests: XCTestCase {
         }
     }
 
+    // MARK: - An expired cart
+
+    func test_fetch_ofACartTheServerHasForgotten_showsAnEmptyBagRatherThanAnError() async throws {
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "dead-cart")
+        client.onGetCartCalled = { _ in throw BFFRequestError(type: .cart(.cartNotFound)) }
+
+        // Deliberately not `XCTAssertThrowsError`: the bag turns a thrown error into an ErrorView,
+        // and a cart that is gone is an empty bag, not a failure the shopper can retry out of.
+        try await sut.fetch()
+
+        XCTAssertNil(sut.cart)
+        XCTAssertEqual(userDefaults.keysRemoved, [Self.storageKey], "The dead id must not survive the read")
+    }
+
+    func test_fetch_thatFailsForAnyOtherReason_keepsTheStoredCartId() async {
+        // A server having a bad day is not a reason to throw away a live cart.
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "cart-1")
+        client.onGetCartCalled = { _ in throw BFFRequestError(type: .serverError(status: 500)) }
+
+        do {
+            try await sut.fetch()
+            XCTFail("Expected the failure to propagate")
+        } catch {
+            XCTAssertEqual((error as? BFFRequestError)?.type, .serverError(status: 500))
+            XCTAssertTrue(userDefaults.keysRemoved.isEmpty, "Only a cart-not-found discards the id")
+        }
+    }
+
+    func test_add_toACartTheServerHasForgotten_startsAFreshOneCarryingTheSameLine() async throws {
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "dead-cart")
+        mirrorWritesBackToReads(userDefaults)
+        var createdLines: [CartLineInput] = []
+        client.onAddToCartCalled = { _, _ in throw BFFRequestError(type: .cart(.cartNotFound)) }
+        client.onCreateCartCalled = { lines in
+            createdLines = lines
+            return .fixture(id: "fresh-cart", lines: [.fixture(id: "line-1")])
+        }
+
+        // The whole recovery happens inside the shopper's one tap — this call does not throw, so
+        // the PDP shows the ordinary success snackbar.
+        try await sut.add(line: .init(productId: "p1", variantId: "v1"))
+
+        XCTAssertEqual(createdLines.map(\.variantId), ["v1"], "The line that was being added must survive the recovery")
+        XCTAssertEqual(sut.cart?.id, "fresh-cart")
+        XCTAssertEqual(userDefaults.keysRemoved, [Self.storageKey])
+        XCTAssertEqual(
+            userDefaults.forcedValueForKey[Self.storageKey] as? String, "fresh-cart",
+            "The new cart id must be persisted, or the next add starts yet another cart"
+        )
+    }
+
+    func test_add_thatFailsForAnyOtherReason_keepsTheStoredCartIdAndSurfacesTheError() async {
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "cart-1")
+        client.onAddToCartCalled = { _, _ in throw BFFRequestError(type: .serverError(status: 500)) }
+        client.onCreateCartCalled = { _ in
+            XCTFail("A non-404 must not start a new cart")
+            return .fixture()
+        }
+
+        do {
+            try await sut.add(line: .init(productId: "p1", variantId: "v1"))
+            XCTFail("Expected the failure to propagate")
+        } catch {
+            XCTAssertEqual((error as? BFFRequestError)?.type, .serverError(status: 500))
+            XCTAssertTrue(userDefaults.keysRemoved.isEmpty)
+        }
+    }
+
+    // MARK: - Signing out
+
+    func test_signOut_discardsTheStoredCartIdAndTheHeldCart() async throws {
+        let (sut, client, userDefaults) = makeSUT()
+        mirrorWritesBackToReads(userDefaults)
+        client.onCreateCartCalled = { _ in .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]) }
+        try await sut.add(line: .init(productId: "p1", variantId: "v1"))
+        XCTAssertNotNil(sut.cart)
+
+        await sut.signOut()
+
+        XCTAssertNil(sut.cart, "The next shopper must not be handed the previous one's bag")
+        XCTAssertEqual(userDefaults.keysRemoved, [Self.storageKey])
+    }
+
+    func test_signOut_landsAfterAWriteAlreadyInFlightRatherThanBeingUndoneByIt() async throws {
+        // Signing out mid-add must win. Unqueued, the add would complete afterwards and re-persist
+        // a cart id — handing the next shopper exactly the bag this is meant to take away.
+        let (sut, client, userDefaults) = makeSUT()
+        mirrorWritesBackToReads(userDefaults)
+        let gate = WriteGate()
+        let createInFlight = expectation(description: "the add's create is in-flight")
+        client.onCreateCartCalled = { _ in
+            await gate.holdOpen(signal: createInFlight)
+            return .fixture(id: "cart-1")
+        }
+
+        async let add: Void = sut.add(line: .init(productId: "p1", variantId: "v1"))
+        await fulfillment(of: [createInFlight], timeout: 1)
+
+        async let signOut: Void = sut.signOut()
+        await gate.open()
+        try await add
+        await signOut
+
+        XCTAssertNil(sut.cart)
+        XCTAssertNil(userDefaults.forcedValueForKey[Self.storageKey], "The add must not outlive the sign-out")
+    }
+
     // MARK: - Helpers
+
+    /// The mock does not serve its own writes back to reads, so mirror what `UserDefaults` does.
+    /// Recovery and sign-out both turn on a second read seeing the first one's removal.
+    private func mirrorWritesBackToReads(_ userDefaults: MockUserDefaults) {
+        userDefaults.onSetCalled = { [weak userDefaults] value, key in
+            userDefaults?.forcedValueForKey[key] = value
+        }
+        userDefaults.onRemoveCalled = { [weak userDefaults] key in
+            userDefaults?.forcedValueForKey[key] = nil
+        }
+    }
 
     private static let storageKey = "cartId"
 
