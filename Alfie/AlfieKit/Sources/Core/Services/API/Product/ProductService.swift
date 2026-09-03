@@ -13,6 +13,11 @@ public final class ProductService: ProductServiceProtocol {
     public func getProduct(handle: String) async throws -> Product {
         do {
             return try await bffClient.getProduct(handle: handle)
+        } catch let error as CancellationError {
+            // Cancellation is a control-flow signal, not a domain failure: flattening it into a
+            // product error shows an error state for a request that never failed. Every method
+            // here rethrows it unmapped so a caller that guards on it can stay silent.
+            throw error
         } catch let error as BFFRequestError where error.isNotFound {
             throw BFFRequestError(type: .product(.noProduct))
         } catch {
@@ -35,6 +40,10 @@ public final class ProductService: ProductServiceProtocol {
                 sort: sort,
                 filters: filters
             )
+        } catch let error as CancellationError {
+            // SwiftUI cancels the `.refreshable` task routinely; mapping that here is what raised an
+            // error Snackbar over a perfectly good grid. See the note in `getProduct`.
+            throw error
         } catch let error as BFFRequestError {
             // Only "no data" responses should surface as a noProducts state; genuine
             // failures (network, decoding, server errors) get the generic product error so
@@ -53,6 +62,9 @@ public final class ProductService: ProductServiceProtocol {
     public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
         do {
             return try await bffClient.categoryPriceRange(collectionHandle: collectionHandle)
+        } catch let error as CancellationError {
+            // See the note in `getProduct`.
+            throw error
         } catch {
             throw BFFRequestError(type: .product(.generic))
         }
