@@ -39,4 +39,13 @@ public final class MockCartService: CartServiceProtocol {
         }
         cartSubject.send(try await onRemoveCalled(lineId))
     }
+
+    public private(set) var discardCartCount = 0
+
+    /// Unlike the operations above this needs no stub: it cannot fail and asks the server nothing,
+    /// so dropping the held cart is the whole behaviour.
+    public func discardCart() async {
+        discardCartCount += 1
+        cartSubject.send(nil)
+    }
 }

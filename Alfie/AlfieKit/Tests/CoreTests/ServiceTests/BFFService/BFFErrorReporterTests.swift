@@ -17,6 +17,7 @@ final class BFFErrorReporterTests: XCTestCase {
             (.product(.noProduct), "graphql"),
             (.product(.generic), "graphql"),
             (.emptyResponse, "graphql"),
+            (.cart(.cartNotFound), "graphql"),
             (.generic, "generic"),
         ]
 
@@ -38,6 +39,10 @@ final class BFFErrorReporterTests: XCTestCase {
             (.product(.generic), false),
             (.product(.noProduct), false),
             (.emptyResponse, false),
+            // An expired cart is recovered from without the shopper ever seeing it, so it is an
+            // empty state rather than a fault. This only holds end-to-end because the cart
+            // operations re-label their 404 *before* the reporter sees it — see `execute`.
+            (.cart(.cartNotFound), false),
             (.rateLimited(retryAfter: nil), false),
             (.timeout, false),
             (.noInternet, false),

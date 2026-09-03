@@ -79,6 +79,43 @@ final class CartIntegrationTests: IntegrationTestCase {
         )
     }
 
+    /// The premise above, carried all the way through the typed client — which is what the recovery
+    /// in `CartService` actually consumes. The raw assertion pins only the response *body*, and two
+    /// things sit between that body and a `.cart(.cartNotFound)`: the BFF has to answer HTTP 200
+    /// (`ResponseCodeInterceptor` throws on any non-2xx before the GraphQL errors are ever read),
+    /// and `getCart` has to apply the mapping. Neither is visible from the raw shape, and a unit
+    /// test cannot see them either — it stubs the error it wants at the client boundary.
+    func test_getCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        let unknownId = try await unknownButWellFormedCartId()
+
+        do {
+            _ = try await sut.getCart(cartId: unknownId)
+            XCTFail("Expected a cart-not-found for an unknown cart id")
+        } catch {
+            XCTAssertEqual(
+                (error as? BFFRequestError)?.type, .cart(.cartNotFound),
+                "The bag renders empty off this exact type; got \(error)"
+            )
+        }
+    }
+
+    /// The same for the add path, which recovers differently: it starts a fresh cart carrying the
+    /// line rather than emptying the bag, so it needs the same type to arrive.
+    func test_addToCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        let (first, _) = try await twoAddableVariants()
+        let unknownId = try await unknownButWellFormedCartId()
+
+        do {
+            _ = try await sut.addToCart(cartId: unknownId, lines: [first])
+            XCTFail("Expected a cart-not-found for an unknown cart id")
+        } catch {
+            XCTAssertEqual(
+                (error as? BFFRequestError)?.type, .cart(.cartNotFound),
+                "The add-time recovery turns on this exact type; got \(error)"
+            )
+        }
+    }
+
     /// A real cart id with its token perturbed — same shape, no such cart.
     private func unknownButWellFormedCartId() async throws -> String {
         let (first, _) = try await twoAddableVariants()

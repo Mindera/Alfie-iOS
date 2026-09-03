@@ -54,7 +54,7 @@ public final class BFFErrorReporter: BFFErrorReporterProtocol {
         case .timeout: return "timeout"
         case .serverError: return "server_error"
         case .noInternet: return "network"
-        case .product, .emptyResponse: return "graphql"
+        case .product, .cart, .emptyResponse: return "graphql"
         case .generic: return "generic"
         }
     }
@@ -63,9 +63,9 @@ public final class BFFErrorReporter: BFFErrorReporterProtocol {
         switch type {
         case .serverError, .generic:
             return true
-        case .product, .emptyResponse, .rateLimited, .timeout, .noInternet:
-            // "No products" and similar GraphQL-level signals are legitimate empty
-            // states, not failures — keep them out of Crashlytics. Rate-limit /
+        case .product, .cart, .emptyResponse, .rateLimited, .timeout, .noInternet:
+            // "No products", an expired cart and similar GraphQL-level signals are legitimate
+            // empty states, not failures — keep them out of Crashlytics. Rate-limit /
             // timeout / network are operational signals tracked via Analytics only.
             return false
         }

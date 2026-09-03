@@ -66,7 +66,16 @@ public actor CartService: CartServiceProtocol {
             cartSubject.send(nil)
             return
         }
-        cartSubject.send(try await bffClient.getCart(cartId: cartId))
+
+        do {
+            cartSubject.send(try await bffClient.getCart(cartId: cartId))
+        } catch let error as BFFRequestError where error.type == .cart(.cartNotFound) {
+            // The bag opens empty rather than erroring. The cart is genuinely gone, so an ErrorView
+            // offering a retry would only fail the same way, and the shopper cannot act on it.
+            // Every other failure propagates with the id intact — a server having a bad day is not
+            // a reason to throw away a live cart.
+            forgetCart()
+        }
     }
 
     public func remove(lineId: String) async throws {
@@ -94,7 +103,7 @@ public actor CartService: CartServiceProtocol {
         // rather than two.
         let cart: Cart
         if let cartId = storedCartId {
-            cart = try await bffClient.addToCart(cartId: cartId, lines: [line])
+            cart = try await append(line: line, to: cartId)
         } else {
             cart = try await bffClient.createCart(lines: [line])
         }
@@ -104,6 +113,42 @@ public actor CartService: CartServiceProtocol {
         // stored id that disagrees with the cart we hold is the next write aimed at the wrong one.
         userDefaults.set(cart.id, for: storageKey)
         cartSubject.send(cart)
+    }
+
+    /// Appends to the stored cart, and starts a fresh one carrying the same line if the server no
+    /// longer knows it. Both happen inside the shopper's single tap, so a cart that expired between
+    /// visits costs them one extra round trip and nothing else — they see the ordinary success
+    /// snackbar and never learn anything went wrong.
+    ///
+    /// The dead id is dropped before the retry rather than after it: the server has already told us
+    /// that cart is gone, so keeping it through a `createCart` that then fails would leave the next
+    /// add aimed at a cart we know does not exist.
+    private func append(line: CartLineInput, to cartId: String) async throws -> Cart {
+        do {
+            return try await bffClient.addToCart(cartId: cartId, lines: [line])
+        } catch let error as BFFRequestError where error.type == .cart(.cartNotFound) {
+            discardStoredCartId()
+            return try await bffClient.createCart(lines: [line])
+        }
+    }
+
+    /// Drops the stored id and the held cart. Called on sign-out, so a shared device does not hand
+    /// the next shopper the previous one's bag; the server does not bind a guest cart to an account,
+    /// so this side simply stops pointing at it.
+    ///
+    /// Queued like every other operation, so a write already in flight cannot re-persist the id
+    /// this is dropping. Nothing here can fail, hence the discarded error.
+    public func discardCart() async {
+        try? await serialised { await self.forgetCart() }
+    }
+
+    private func forgetCart() {
+        discardStoredCartId()
+        cartSubject.send(nil)
+    }
+
+    private func discardStoredCartId() {
+        userDefaults.remove(for: storageKey)
     }
 
     /// The server's handle on a guest cart — a non-secret id, so `UserDefaults` is enough. There is

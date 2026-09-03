@@ -14,7 +14,7 @@ public enum ProductListingViewErrorType: Error, CaseIterable {
         case .serverError: return .serverError
         case .noInternet: return .noInternet
         case .product(.noProduct), .product(.noProducts), .emptyResponse: return .noResults
-        case .timeout, .product(.generic), .generic: return .generic
+        case .timeout, .product(.generic), .cart, .generic: return .generic
         }
     }
 }
