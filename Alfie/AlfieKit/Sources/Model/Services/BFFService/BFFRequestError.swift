@@ -81,7 +81,7 @@ public struct BFFRequestError: Error {
     /// mapping, because a 404 only means "this cart is gone" when the request carried a cart id to
     /// begin with. `createCart` carries none, so a 404 from it means something else entirely.
     public func mappingCartNotFound() -> BFFRequestError {
-        guard graphqlErrorStatus == 404 else { return self }
+        guard graphqlErrorStatus == GraphQLErrorStatus.notFound else { return self }
 
         return BFFRequestError(
             type: .cart(.cartNotFound),
@@ -92,4 +92,10 @@ public struct BFFRequestError: Error {
             graphqlErrorStatus: graphqlErrorStatus
         )
     }
+}
+
+/// Values the BFF sends in a GraphQL error's `extensions.status`. Named because the number alone
+/// says nothing about which resource was not found — the operation supplies that.
+private enum GraphQLErrorStatus {
+    static let notFound = 404
 }

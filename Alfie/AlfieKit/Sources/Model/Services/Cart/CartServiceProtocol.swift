@@ -25,5 +25,5 @@ public protocol CartServiceProtocol {
     /// Discards the stored cart id and the held cart, so a shared device does not hand the next
     /// shopper the previous one's bag. Nothing is asked of the server: a guest cart is not bound to
     /// an account, so the cart lives on until it expires — this side just stops pointing at it.
-    func signOut() async
+    func discardCart() async
 }

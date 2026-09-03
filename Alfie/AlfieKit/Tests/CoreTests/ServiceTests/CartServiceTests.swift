@@ -443,22 +443,39 @@ final class CartServiceTests: XCTestCase {
         }
     }
 
+    func test_remove_fromACartTheServerHasForgotten_surfacesTheErrorRatherThanRecovering() async {
+        // Unlike a read or an add, a removal has nothing to recover *to*: there is no cart to drop
+        // the line from and re-creating one would resurrect the bag the shopper was emptying. So it
+        // surfaces, `BagView` shows the generic message, and the next read discards the dead id and
+        // renders the empty bag. Keeping the id here is what lets that read do the cleaning up.
+        let (sut, client, userDefaults) = makeSUT(storedCartId: "dead-cart")
+        client.onRemoveFromCartCalled = { _, _ in throw BFFRequestError(type: .cart(.cartNotFound)) }
+
+        do {
+            try await sut.remove(lineId: "line-1")
+            XCTFail("Expected the failure to propagate")
+        } catch {
+            XCTAssertEqual((error as? BFFRequestError)?.type, .cart(.cartNotFound))
+            XCTAssertTrue(userDefaults.keysRemoved.isEmpty, "The next read is what discards the dead id")
+        }
+    }
+
     // MARK: - Signing out
 
-    func test_signOut_discardsTheStoredCartIdAndTheHeldCart() async throws {
+    func test_discardCart_dropsTheStoredCartIdAndTheHeldCart() async throws {
         let (sut, client, userDefaults) = makeSUT()
         mirrorWritesBackToReads(userDefaults)
         client.onCreateCartCalled = { _ in .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]) }
         try await sut.add(line: .init(productId: "p1", variantId: "v1"))
         XCTAssertNotNil(sut.cart)
 
-        await sut.signOut()
+        await sut.discardCart()
 
         XCTAssertNil(sut.cart, "The next shopper must not be handed the previous one's bag")
         XCTAssertEqual(userDefaults.keysRemoved, [Self.storageKey])
     }
 
-    func test_signOut_landsAfterAWriteAlreadyInFlightRatherThanBeingUndoneByIt() async throws {
+    func test_discardCart_landsAfterAWriteAlreadyInFlightRatherThanBeingUndoneByIt() async throws {
         // Signing out mid-add must win. Unqueued, the add would complete afterwards and re-persist
         // a cart id — handing the next shopper exactly the bag this is meant to take away.
         let (sut, client, userDefaults) = makeSUT()
@@ -473,10 +490,10 @@ final class CartServiceTests: XCTestCase {
         async let add: Void = sut.add(line: .init(productId: "p1", variantId: "v1"))
         await fulfillment(of: [createInFlight], timeout: 1)
 
-        async let signOut: Void = sut.signOut()
+        async let discard: Void = sut.discardCart()
         await gate.open()
         try await add
-        await signOut
+        await discard
 
         XCTAssertNil(sut.cart)
         XCTAssertNil(userDefaults.forcedValueForKey[Self.storageKey], "The add must not outlive the sign-out")

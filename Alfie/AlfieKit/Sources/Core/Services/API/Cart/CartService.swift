@@ -74,8 +74,7 @@ public actor CartService: CartServiceProtocol {
             // offering a retry would only fail the same way, and the shopper cannot act on it.
             // Every other failure propagates with the id intact — a server having a bad day is not
             // a reason to throw away a live cart.
-            discardStoredCartId()
-            cartSubject.send(nil)
+            forgetCart()
         }
     }
 
@@ -133,13 +132,13 @@ public actor CartService: CartServiceProtocol {
         }
     }
 
-    /// Drops the cart on signing out, so a shared device does not hand the next shopper the
-    /// previous one's bag. The server does not bind a guest cart to an account — this is the only
-    /// thing that separates the two.
+    /// Drops the stored id and the held cart. Called on sign-out, so a shared device does not hand
+    /// the next shopper the previous one's bag; the server does not bind a guest cart to an account,
+    /// so this side simply stops pointing at it.
     ///
     /// Queued like every other operation, so a write already in flight cannot re-persist the id
     /// this is dropping. Nothing here can fail, hence the discarded error.
-    public func signOut() async {
+    public func discardCart() async {
         try? await serialised { await self.forgetCart() }
     }
 
