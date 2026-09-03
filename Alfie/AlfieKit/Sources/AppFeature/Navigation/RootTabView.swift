@@ -55,7 +55,8 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
             if !viewModel.isOverlayVisible {
                 CustomTabBarView(
                     tabs: viewModel.tabs,
-                    currentTab: $viewModel.selectedTab
+                    currentTab: $viewModel.selectedTab,
+                    bagBadgeValue: viewModel.bagBadgeValue
                 ) {
                     viewModel.popToRoot(in: $0)
                 }

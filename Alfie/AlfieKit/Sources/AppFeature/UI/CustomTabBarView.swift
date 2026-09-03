@@ -5,16 +5,18 @@ import SwiftUI
 struct CustomTabBarView: View {
     private let tabs: [Model.Tab]
     @Binding private var currentTab: Model.Tab
-    @State private var badgeNumbers: [Model.Tab: Int?] = [:]
+    private let bagBadgeValue: Int?
     private let popToRootAction: (Model.Tab) -> Void
 
     init(
         tabs: [Model.Tab],
         currentTab: Binding<Model.Tab>,
+        bagBadgeValue: Int?,
         popToRootAction: @escaping (Model.Tab) -> Void
     ) {
         self.tabs = tabs
         _currentTab = currentTab
+        self.bagBadgeValue = bagBadgeValue
         self.popToRootAction = popToRootAction
     }
 
@@ -27,10 +29,9 @@ struct CustomTabBarView: View {
                     TabBarItemView(
                         tab: tab,
                         currentTab: $currentTab,
-                        badgeValue: .init(get: { badgeValueFor(tab) }, set: { _ in }),
+                        badgeValue: .constant(badgeValueFor(tab)),
                         popToRootAction: popToRootAction
                     )
-                    .simultaneousGesture(TapGesture().onEnded { _ in badgeNumbers[tab] = nil })
                 }
             }
         }
@@ -38,10 +39,8 @@ struct CustomTabBarView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // The bag is the only tab carrying a badge today.
     private func badgeValueFor(_ tab: Model.Tab) -> Int? {
-        guard let value = badgeNumbers[tab] else {
-            return nil
-        }
-        return value
+        tab == .bag ? bagBadgeValue : nil
     }
 }
