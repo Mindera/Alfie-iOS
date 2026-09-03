@@ -133,6 +133,39 @@ final class CartConverterTests: XCTestCase {
         XCTAssertEqual(cart.grandTotal?.currencyCode, "GBP")
     }
 
+    // MARK: - Diagnostics
+
+    func test_a_healthy_cart_reports_no_unrepresentable_amounts() {
+        // Guards the other direction: a log that cried wolf on every real cart would be ignored,
+        // and then the one that matters would be too.
+        let cart = makeFragment(
+            lines: [makeLine(id: "line-1")],
+            subtotal: 19.99,
+            grandTotal: 24.99
+        ).convertToCart()
+
+        XCTAssertEqual(cart.unrepresentableAmountFields, [])
+    }
+
+    func test_unrepresentable_amounts_are_reported_by_field_path() {
+        // Driven from the fragment rather than a hand-built `Cart`, so the detector stays pinned to
+        // what the converter actually discards. This is what `BFFClientService` logs: the bag shows
+        // `—`, nobody reports a dash, so without the log the BFF defect never surfaces.
+        //
+        // `grandTotal` is deliberately sound here — a detector that named every field would be no
+        // more useful than one that named none.
+        let cart = makeFragment(
+            lines: [makeLine(id: "line-1", unitAmount: 1e300, lineTotalAmount: -.infinity)],
+            subtotal: .nan,
+            grandTotal: 24.99
+        ).convertToCart()
+
+        XCTAssertEqual(
+            cart.unrepresentableAmountFields,
+            ["subtotal", "line[line-1].unitPrice", "line[line-1].lineTotal"]
+        )
+    }
+
     // MARK: - Money
 
     func test_money_conversion_is_pinned_for_cart_totals() {
