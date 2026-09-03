@@ -1,5 +1,6 @@
 import Mocks
 import Model
+import SharedUI
 import SnapshotTesting
 import SwiftUI
 import TestUtils
@@ -38,15 +39,32 @@ final class BagViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
     }
 
-    func test_bagView_withALineTheServerCouldNotName() {
-        // `CartItem.name` and `CartItem.image` are both nullable, and this fixture has neither:
-        // the row renders without them rather than disappearing or holding an empty grey slot.
-        let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
-            id: "cart-1",
-            lines: [.fixture(id: "line-1", name: nil, quantity: 1, unitPrice: money("£29.50"), lineTotal: money("£29.50"))],
-            subtotal: money("£29.50"),
-            grandTotal: money("£29.50")
-        ))))
+    /// `CartItem.name` and `CartItem.image` are both nullable, and this fixture has neither:
+    /// the row renders without them rather than disappearing or holding an empty grey slot.
+    ///
+    /// The only case here snapshotted outside `BagView`. Without a name this is the suite's only
+    /// two-line row, and `List` resolved its height 1pt differently on CI than on the machine that
+    /// recorded the reference — shifting every row below it and failing the comparison on glyphs
+    /// that were pixel-identical. The claim above is about the row, and the row on its own lays out
+    /// deterministically, so the `List` is not part of what this asserts. `test_bagView_withLines`
+    /// still covers a row in situ.
+    func test_bagLineRow_withALineTheServerCouldNotName() {
+        let row = BagLineRow(line: .fixture(
+            id: "line-1",
+            name: nil,
+            quantity: 1,
+            unitPrice: money("£29.50"),
+            lineTotal: money("£29.50")
+        ))
+        // `BagLineRow` carries no padding of its own — `BagView` clears the row insets and applies
+        // this same `spacing16` itself, so the reference frames the row as the bag really draws it
+        // rather than flush against both edges. The `Spacer` only pins it to the top of the
+        // container; neither modifier is part of what's asserted.
+        let sut = VStack(spacing: 0) {
+            row
+                .padding(.horizontal, Primitives.Spacing.spacing16)
+            Spacer()
+        }
 
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
     }
