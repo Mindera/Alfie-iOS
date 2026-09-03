@@ -88,6 +88,43 @@ final class CartConverterTests: XCTestCase {
         XCTAssertNil(cart.grandTotal)
     }
 
+    func test_an_amount_outside_decimals_range_maps_to_no_total_rather_than_zero() throws {
+        // `1e300` is *finite*, so a guard that only tests `isFinite` lets it through — but it is
+        // outside `Decimal`'s range (the limit sits between 1e120 and 1e140), `Decimal(string:)`
+        // returns nil, and the zero fallback prints £0.00. Reachable from legal JSON: Apollo
+        // deserialises with `JSONSerialization`, which has no Infinity literal but accepts a large
+        // exponent.
+        let cart = makeFragment(
+            lines: [makeLine(id: "line-1", unitAmount: 1e300, lineTotalAmount: 1e300)],
+            subtotal: 1e300,
+            grandTotal: 1e300
+        ).convertToCart()
+
+        XCTAssertNil(cart.subtotal)
+        XCTAssertNil(cart.grandTotal)
+        let line = try XCTUnwrap(cart.lines.first)
+        XCTAssertNil(line.unitPrice)
+        XCTAssertNil(line.lineTotal)
+    }
+
+    func test_a_negative_infinity_amount_maps_to_no_total_rather_than_zero() throws {
+        // The reachable non-finite case: `-1e400` is legal JSON that `JSONSerialization` parses to
+        // `-inf` (it rejects the positive overflow, which is a Foundation asymmetry rather than a
+        // rule to rely on). Pinned apart from `.nan` because `Decimal(string: "-inf")` returns 0,
+        // not nil — so a guard that only tested the Decimal conversion would print £0.00 here.
+        let cart = makeFragment(
+            lines: [makeLine(id: "line-1", unitAmount: -.infinity, lineTotalAmount: -.infinity)],
+            subtotal: -.infinity,
+            grandTotal: -.infinity
+        ).convertToCart()
+
+        XCTAssertNil(cart.subtotal)
+        XCTAssertNil(cart.grandTotal)
+        let line = try XCTUnwrap(cart.lines.first)
+        XCTAssertNil(line.unitPrice)
+        XCTAssertNil(line.lineTotal)
+    }
+
     func test_maps_subtotal_and_grand_total() {
         let cart = makeFragment(lines: [], subtotal: 19.99, grandTotal: 24.99).convertToCart()
 

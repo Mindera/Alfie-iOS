@@ -82,21 +82,41 @@ extension BFFGraphAPI.ProductListItemFragment {
 }
 
 extension BFFGraphAPI.MoneyFragment {
+    /// The amount as a `Decimal`, or `nil` where the BFF sent one this app cannot represent.
+    ///
+    /// Both tests are load-bearing, because each one misses what the other catches, and both inputs
+    /// are reachable from *legal* JSON — Apollo deserialises with `JSONSerialization`, which has no
+    /// `NaN` or `Infinity` literal but still overflows a large exponent into one:
+    ///
+    /// - `-1e400` parses to `-inf`. `Decimal(string: "-inf")` returns **0**, not `nil`, so without
+    ///   the `isFinite` test an infinite amount would quietly become £0.00.
+    /// - `1e300` is finite, so `isFinite` passes it, but it is outside `Decimal`'s range (the limit
+    ///   sits between `1e120` and `1e140`) and `Decimal(string:)` returns `nil`.
+    ///
+    /// Parsed via the string form rather than `Decimal(_: Double)` to avoid binary-float noise.
+    private var decimalAmount: Decimal? {
+        guard amount.isFinite else { return nil }
+        return Decimal(string: String(amount))
+    }
+
     func toDomainMoney() -> Money {
-        // BFF amount is a major-unit Double; parse once to a clean Decimal (via its string form, to
-        // avoid binary-float noise), then derive both the minor-unit amount and the formatted string.
-        // Non-finite input (NaN/±inf) falls back to zero — Decimal(inf) traps and Decimal(nan) overflows.
-        let decimal = amount.isFinite ? (Decimal(string: String(amount)) ?? .zero) : .zero
-        return Money(
+        // BFF amount is a major-unit Double; parse once to a clean Decimal, then derive both the
+        // minor-unit amount and the formatted string. An unrepresentable amount falls back to zero,
+        // which Q36 keeps for listings — the bag uses `toDomainMoneyIfRenderable()` instead.
+        makeMoney(decimalAmount ?? .zero)
+    }
+
+    /// `toDomainMoney()` without its zero fallback: `nil` where the amount cannot be represented, so
+    /// a caller that must not print a price the shopper does not owe can say "unknown" instead.
+    func toDomainMoneyIfRenderable() -> Money? {
+        decimalAmount.map(makeMoney)
+    }
+
+    private func makeMoney(_ decimal: Decimal) -> Money {
+        Money(
             currencyCode: currencyCode,
             amount: CurrencyFormatter.minorUnits(of: decimal, currencyCode: currencyCode),
             amountFormatted: CurrencyFormatter.string(amount: decimal, currencyCode: currencyCode)
         )
-    }
-
-    /// `toDomainMoney()` without its zero fallback: `nil` where the amount is non-finite, so a
-    /// caller that must not print a price the shopper does not owe can say "unknown" instead.
-    func toDomainMoneyIfRenderable() -> Money? {
-        amount.isFinite ? toDomainMoney() : nil
     }
 }
