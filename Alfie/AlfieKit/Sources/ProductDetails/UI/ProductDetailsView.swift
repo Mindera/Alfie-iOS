@@ -15,6 +15,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @State private var isMediaFullScreen = false
     @State private var shouldAnimateCurrentMediaIndex = true
     @State private var showFailureState: Bool
+    @State private var addToBagSnackbarConfig: SnackbarViewConfiguration?
 
     private var colourLayout: ProductDetailsLayoutRules.ColourLayout {
         ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.colorSelectionConfiguration.items.count)
@@ -68,6 +69,27 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         }
         .onChange(of: viewModel.state.didFail) { newValue in
             showFailureState = newValue
+        }
+        .snackbarView(configuration: $addToBagSnackbarConfig)
+        // The add-to-bag outcome is transient and never leaves the product page. Dismissing the
+        // Snackbar clears the outcome so an identical later one re-presents cleanly.
+        .onChange(of: viewModel.addToBagFeedback) { feedback in
+            guard let feedback else {
+                addToBagSnackbarConfig = nil
+                return
+            }
+            addToBagSnackbarConfig = .init(
+                type: feedback.snackbarType,
+                text: feedback.snackbarText,
+                showCloseButton: true,
+                icon: feedback.snackbarIcon,
+                // From the top: the PDP pins the add-to-bag CTA to the bottom, and the default
+                // bottom placement lands the Snackbar squarely on top of it — covering both the
+                // button and the price. `ProductListingView` can use the default; it has no
+                // sticky bottom bar.
+                showFromTop: true,
+                onDismiss: { viewModel.didDismissAddToBagFeedback() }
+            )
         }
     }
 
@@ -514,7 +536,14 @@ extension ProductDetailsView {
                 ThemedButton(
                     text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
                     isDisabled: .init(
-                        get: { !viewModel.isAddToBagEnabled },
+                        // Disabled for the duration of the write, not merely showing a spinner:
+                        // `ThemedButton` stays hit-testable while loading, and a tappable spinner
+                        // reads to VoiceOver as an ordinary button.
+                        get: { !viewModel.isAddToBagEnabled || viewModel.isAddingToBag },
+                        set: { _ in }
+                    ),
+                    isLoading: .init(
+                        get: { viewModel.isAddingToBag },
                         set: { _ in }
                     ),
                     isFullWidth: true,
@@ -668,3 +697,26 @@ private enum Constants {
     ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
 }
 #endif // swiftlint:disable:this file_length
+
+private extension AddToBagFeedback {
+    var snackbarType: SnackbarViewConfiguration.SnackbarViewType {
+        switch self {
+        case .success: .success
+        case .failure: .error
+        }
+    }
+
+    var snackbarText: String {
+        switch self {
+        case .success: L10n.Product.AddToBag.Success.message
+        case .failure: L10n.Product.AddToBag.Error.message
+        }
+    }
+
+    var snackbarIcon: Image {
+        switch self {
+        case .success: Icon.checkmark.image
+        case .failure: Icon.warning.image
+        }
+    }
+}

@@ -10,6 +10,8 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var productHasStock: Bool = true
     public var productHasAnyStock: Bool = true
     public var isAddToBagEnabled: Bool = true
+    public var isAddingToBag: Bool = false
+    public var addToBagFeedback: AddToBagFeedback?
     public var canShowSizeSelector: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
@@ -74,6 +76,11 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var onDidTapAddToBagCalled: (() -> Void)?
     public func didTapAddToBag() {
         onDidTapAddToBagCalled?()
+    }
+
+    public var onDidDismissAddToBagFeedbackCalled: (() -> Void)?
+    public func didDismissAddToBagFeedback() {
+        onDidDismissAddToBagFeedbackCalled?()
     }
 
     public var onDidTapAddToWishlistCalled: (() -> Void)?

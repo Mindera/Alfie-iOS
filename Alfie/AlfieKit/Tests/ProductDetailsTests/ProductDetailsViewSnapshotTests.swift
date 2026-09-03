@@ -166,6 +166,18 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    /// The add-to-bag CTA mid-write. The in-flight state is the whole point of the ticket that
+    /// introduced it, and it is the one CTA state no other snapshot reaches.
+    func test_productDetailsView_addingToBag() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.isAddingToBag = true
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)

@@ -45,17 +45,17 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return config
     }
 
-    public var onCreateCartCalled: (([CartLineInput]) throws -> Cart)?
+    public var onCreateCartCalled: (([CartLineInput]) async throws -> Cart)?
     public func createCart(lines: [CartLineInput]) async throws -> Cart {
-        guard let cart = try onCreateCartCalled?(lines) else {
+        guard let cart = try await onCreateCartCalled?(lines) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return cart
     }
 
-    public var onAddToCartCalled: ((String, [CartLineInput]) throws -> Cart)?
+    public var onAddToCartCalled: ((String, [CartLineInput]) async throws -> Cart)?
     public func addToCart(cartId: String, lines: [CartLineInput]) async throws -> Cart {
-        guard let cart = try onAddToCartCalled?(cartId, lines) else {
+        guard let cart = try await onAddToCartCalled?(cartId, lines) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return cart

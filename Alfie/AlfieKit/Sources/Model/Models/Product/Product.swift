@@ -60,6 +60,9 @@ public struct Product: Identifiable, Hashable {
 
 extension Product {
     public struct Variant: Hashable {
+        /// The platform variant id, required by every cart write. `nil` for a variant synthesised
+        /// from product-level fields, which has no server counterpart and so cannot be added.
+        public let id: String?
         /// A unique identifier for the variant.
         public let sku: String
         /// Size, if applicable.
@@ -79,6 +82,7 @@ extension Product {
         }
 
         public init(
+            id: String? = nil,
             sku: String,
             size: ProductSize?,
             colour: Colour?,
@@ -86,6 +90,7 @@ extension Product {
             stock: Int,
             price: Price
         ) {
+            self.id = id
             self.sku = sku
             self.size = size
             self.colour = colour

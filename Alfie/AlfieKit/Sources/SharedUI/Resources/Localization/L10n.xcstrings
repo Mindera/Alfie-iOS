@@ -1004,6 +1004,28 @@
         }
       }
     },
+    "product.add_to_bag.error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't add to bag"
+          }
+        }
+      }
+    },
+    "product.add_to_bag.success.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added to bag"
+          }
+        }
+      }
+    },
     "product.add_to_wishlist.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {

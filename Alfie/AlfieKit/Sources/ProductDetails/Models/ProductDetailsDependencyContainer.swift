@@ -7,7 +7,7 @@ public final class ProductDetailsDependencyContainer {
     let scheduler: AnySchedulerOf<DispatchQueue>
     let productService: ProductServiceProtocol
     let webUrlProvider: WebURLProviderProtocol
-    let bagService: BagServiceProtocol
+    let cartService: CartServiceProtocol
     let wishlistService: WishlistServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let analytics: AlfieAnalyticsTracker
@@ -17,7 +17,7 @@ public final class ProductDetailsDependencyContainer {
         scheduler: AnySchedulerOf<DispatchQueue> = .main,
         productService: ProductServiceProtocol,
         webUrlProvider: WebURLProviderProtocol,
-        bagService: BagServiceProtocol,
+        cartService: CartServiceProtocol,
         wishlistService: WishlistServiceProtocol,
         configurationService: ConfigurationServiceProtocol,
         analytics: AlfieAnalyticsTracker,
@@ -26,7 +26,7 @@ public final class ProductDetailsDependencyContainer {
         self.scheduler = scheduler
         self.productService = productService
         self.webUrlProvider = webUrlProvider
-        self.bagService = bagService
+        self.cartService = cartService
         self.wishlistService = wishlistService
         self.configurationService = configurationService
         self.analytics = analytics

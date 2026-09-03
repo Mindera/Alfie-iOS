@@ -20,6 +20,7 @@ public protocol ServiceProviderProtocol: AnyObject {
     var productService: ProductServiceProtocol { get }
     var searchService: SearchServiceProtocol { get }
     var bagService: BagServiceProtocol { get }
+    var cartService: CartServiceProtocol { get }
     var wishlistService: WishlistServiceProtocol { get }
     var sessionService: SessionServiceProtocol { get }
 

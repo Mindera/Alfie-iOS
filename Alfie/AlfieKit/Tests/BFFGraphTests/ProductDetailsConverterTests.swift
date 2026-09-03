@@ -139,6 +139,26 @@ final class ProductDetailsConverterTests: XCTestCase {
         XCTAssertEqual(product.variants.first?.stock, 0)
     }
 
+    // MARK: - Variant id
+
+    func test_maps_the_platform_variant_id_onto_every_variant() {
+        // Every cart write needs this id, so a variant that reaches the PDP without one is not
+        // addable. The BFF sends it for every real variant and the converter used to discard it.
+        let product = makeFragment(
+            variants: [makeVariant(id: "v1"), makeVariant(id: "v2")]
+        ).convertToProduct()
+
+        XCTAssertEqual(product.variants.map(\.id), ["v1", "v2"])
+    }
+
+    func test_the_synthesised_default_variant_carries_no_id() {
+        // With no variants the converter fabricates one from product-level fields. It has no
+        // server counterpart, so a fake id would turn "not addable" into a round trip that fails.
+        let product = makeFragment(variants: []).convertToProduct()
+
+        XCTAssertNil(product.defaultVariant.id)
+    }
+
     // MARK: - Scalar fields
 
     func test_maps_brand_name_and_strips_html_description() {

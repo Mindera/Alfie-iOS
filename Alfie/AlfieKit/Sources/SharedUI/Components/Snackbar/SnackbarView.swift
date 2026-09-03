@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import SwiftUI
 
 /// Defines a configuration for displaying a Snackbar.
@@ -102,6 +103,7 @@ public struct SnackbarView: View {
                     .foregroundStyle(foregroundColor)
                     .padding(Primitives.Spacing.spacing16)
                     .lineLimit(configuration.lineLimit)
+                    .accessibilityIdentifier(AccessibilityID.Snackbar.text)
                 Spacer()
                 if let actionButtonLabel = configuration.actionButtonLabel {
                     Button(action: {
