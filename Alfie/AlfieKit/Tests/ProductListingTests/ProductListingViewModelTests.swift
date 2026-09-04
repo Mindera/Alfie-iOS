@@ -9,7 +9,7 @@ final class ProductListingViewModelTests: XCTestCase {
     private var sut: ProductListingViewModel!
     private var mockProductListing: MockProductListingService!
     private var mockWishlistService: MockWishlistService!
-    private let log = Log.DummyLogger()
+    private let log = SpyLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -859,11 +859,17 @@ final class ProductListingViewModelTests: XCTestCase {
         // Latching on it would hide the Price row for the life of the screen with no path back.
         sut = makeSUT(category: "clothing")
         var boundsFetches = 0
-        let firstFetchFailed = expectation(description: "first bounds fetch threw")
+        // The failure is deliberately silent, so the error log is the only signal that happens
+        // *after* the latch is released. Waiting on the throw itself only proves the fetch was
+        // attempted, and lets the second appearance reach the latch first and be swallowed.
+        let firstFailureHandled = expectation(description: "first bounds failure handled")
+        log.onLogCalled = { level, message in
+            guard level == .error, message.contains("category price range") else { return }
+            firstFailureHandled.fulfill()
+        }
         mockProductListing.onCategoryPriceRangeCalled = { _ in
             boundsFetches += 1
             guard boundsFetches > 1 else {
-                firstFetchFailed.fulfill()
                 throw BFFRequestError(type: .product(.generic))
             }
             return PriceRange(low: self.money(1_023), high: self.money(48_000))
@@ -873,7 +879,7 @@ final class ProductListingViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [firstFetchFailed], timeout: 1)
+        wait(for: [firstFailureHandled], timeout: 1)
         XCTAssertNil(sut.priceBounds)
 
         XCTAssertEmitsValue(from: sut.$priceBounds, where: { $0 != nil }, afterTrigger: { self.sut.viewDidAppear() })
@@ -944,6 +950,25 @@ final class ProductListingViewModelTests: XCTestCase {
 
     private func money(_ amount: Int) -> Money {
         Money(currencyCode: "GBP", amount: amount, amountFormatted: "")
+    }
+}
+
+/// Records log calls so a test can wait on one. `loadPriceBoundsIfNeeded` releases its latch and
+/// then logs, in the same synchronous block, which makes the log the one observable point
+/// guaranteed to happen after a swallowed bounds failure has been handled.
+private final class SpyLogger: Logger {
+    var onLogCalled: ((Log.Level, String) -> Void)?
+
+    func log(
+        level: Log.Level,
+        message: @autoclosure () -> String,
+        file: StaticString,
+        line: Int,
+        function: StaticString
+    ) {
+        // Evaluated unconditionally, as `Log.DummyLogger` does, so interpolation still runs.
+        let text = message()
+        onLogCalled?(level, text)
     }
 }
 
