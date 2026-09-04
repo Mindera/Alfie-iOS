@@ -1,17 +1,21 @@
+import AlicerceLogging
 import Model
 
 public final class BagDependencyContainer {
-    let bagService: BagServiceProtocol
+    let cartService: CartServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let analytics: AlfieAnalyticsTracker
+    let log: Logger
 
     public init(
-        bagService: BagServiceProtocol,
+        cartService: CartServiceProtocol,
         configurationService: ConfigurationServiceProtocol,
-        analytics: AlfieAnalyticsTracker
+        analytics: AlfieAnalyticsTracker,
+        log: Logger
     ) {
-        self.bagService = bagService
+        self.cartService = cartService
         self.configurationService = configurationService
         self.analytics = analytics
+        self.log = log
     }
 }

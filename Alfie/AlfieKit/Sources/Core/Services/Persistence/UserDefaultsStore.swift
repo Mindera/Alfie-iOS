@@ -1,7 +1,7 @@
 import Foundation
 import Model
 
-public final class UserDefaultsStore: WishlistStoreProtocol, BagStoreProtocol {
+public final class UserDefaultsStore: WishlistStoreProtocol {
     private let userDefaults: UserDefaultsProtocol
     private let storageKey: String
 

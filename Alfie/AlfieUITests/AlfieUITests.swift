@@ -39,11 +39,12 @@ final class AlfieUITests: XCTestCase {
     /// End-to-end journey: Home → Shop → Brands → first brand → first product → add to bag →
     /// success Snackbar.
     ///
-    /// Needs a reachable BFF: add-to-bag is a server write now, so this asserts a real round trip
-    /// rather than a local append. The journey used to end by opening the Bag tab and matching the
-    /// product name. It no longer can — the write goes to the server cart while the Bag screen
-    /// still reads local storage, which is exactly the gap #116 left for #117 to close. Restore
-    /// the bag half there, against the cart.
+    /// …then Bag tab → the line is there with totals → swipe → Remove → it is gone.
+    ///
+    /// Needs a reachable BFF: both the add and the removal are real round trips, not local
+    /// appends. The bag half was dropped by #116, when the write moved to the server cart while
+    /// the Bag screen still read local storage; #117 pointed the screen at the cart and restores
+    /// it here.
     ///
     /// Locators outside PDP and Brands still use raw identifier strings
     /// (`shop-tab`, `segmented-option-brands`, `product-image`, `bag-tab`,
@@ -106,6 +107,34 @@ final class AlfieUITests: XCTestCase {
                 expectedProductName,
                 "The PDP should still be showing the product that was added"
             )
+        }
+
+        let bag = BagPage(app: app)
+        var lineCountAfterAdd = 0
+
+        XCTContext.runActivity(named: "The bag shows the line that was added, with totals") { _ in
+            bag.open()
+            XCTAssertTrue(
+                bag.lineItems.element(boundBy: 0).waitForExistence(timeout: writeTimeout),
+                "The bag should render the line just added — check a BFF is reachable"
+            )
+            lineCountAfterAdd = bag.lineItems.count
+            XCTAssertGreaterThan(lineCountAfterAdd, 0, "The bag should hold at least the line just added")
+            XCTAssertTrue(bag.subtotal.exists, "A bag with lines shows a subtotal")
+            XCTAssertTrue(bag.grandTotal.exists, "A bag with lines shows a total")
+        }
+
+        XCTContext.runActivity(named: "Swiping a line and tapping Remove drops it on the server") { _ in
+            // The cart id persists across launches, so the bag may hold lines from earlier runs.
+            // Asserting the count fell by one is stable where asserting it reached zero is not.
+            bag.removeLine(bag.lineItems.element(boundBy: 0))
+
+            let expected = lineCountAfterAdd - 1
+            let dropped = NSPredicate(format: "count == %d", expected)
+            expectation(for: dropped, evaluatedWith: bag.lineItems)
+            waitForExpectations(timeout: writeTimeout) { error in
+                XCTAssertNil(error, "Removing a line should leave \(expected) — the removal is a server write")
+            }
         }
     }
 

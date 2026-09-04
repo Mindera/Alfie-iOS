@@ -353,6 +353,7 @@ let package = Package(
             dependencies: [
                 "Bag",
                 "Mocks",
+                "TestUtils",
             ]
         ),
 

@@ -1,9 +1,9 @@
 import Foundation
 import Model
-import SharedUI
 
 public final class BagViewModel: BagViewModelProtocol {
-    @Published public private(set) var products: [SelectedProduct]
+    @Published public private(set) var state: ViewState<Cart?, BFFRequestError> = .loading
+    @Published public private(set) var removalFailure: BFFRequestError.BFFRequestErrorType?
     public var isWishlistEnabled: Bool
 
     private let dependencies: BagDependencyContainer
@@ -16,27 +16,37 @@ public final class BagViewModel: BagViewModelProtocol {
         self.isWishlistEnabled = dependencies.configurationService.isFeatureEnabled(.wishlist)
         self.dependencies = dependencies
         self.navigate = navigate
-        products = []
     }
 
     // MARK: - BagViewModelProtocol
 
     public func viewDidAppear() {
+        fetchCart()
+    }
+
+    public func didTapRetry() {
+        fetchCart()
+    }
+
+    public func didSelectDelete(_ line: CartLine) {
         Task { @MainActor in
-            products = await dependencies.bagService.getBagContent()
+            do {
+                try await dependencies.cartService.remove(lineId: line.id)
+                // Only once the server has dropped the line. Firing on the swipe would count
+                // removals that failed.
+                dependencies.analytics.trackRemoveFromBag(productID: line.productId)
+                state = .success(dependencies.cartService.cart)
+            } catch {
+                dependencies.log.error("Error removing line \(line.id) from the cart: \(error)")
+                // The bag is left exactly as it was, so without this the row just snaps back and
+                // the shopper is told nothing (Q25).
+                removalFailure = (error as? BFFRequestError)?.type ?? .generic
+            }
         }
     }
 
-    public func didTapProduct(_ selectedProduct: SelectedProduct) {
-        navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
-    }
-
-    public func didSelectDelete(for selectedProduct: SelectedProduct) {
-        Task { @MainActor in
-            await dependencies.bagService.removeProduct(selectedProduct)
-            products = await dependencies.bagService.getBagContent()
-            dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.product.id)
-        }
+    public func didDismissRemovalFailure() {
+        removalFailure = nil
     }
 
     public func didTapMyAccount() {
@@ -47,16 +57,22 @@ public final class BagViewModel: BagViewModelProtocol {
         navigate(.wishlist(.wishlist))
     }
 
-    public func productCardViewModel(for selectedProduct: SelectedProduct) -> HorizontalProductCardViewModel {
-        .init(
-            image: selectedProduct.media.first?.asImage?.url,
-            designer: selectedProduct.brand.name,
-            name: selectedProduct.name,
-            colorTitle: L10n.Product.Color.title + ":",
-            color: selectedProduct.colour?.name ?? "",
-            sizeTitle: L10n.Product.Size.title + ":",
-            size: selectedProduct.size == nil ? L10n.Product.OneSize.title : selectedProduct.sizeText,
-            priceType: selectedProduct.priceType
-        )
+    // MARK: - Private
+
+    private func fetchCart() {
+        // Every return to the tab re-reads. A bag already on screen stays put while that happens —
+        // only a screen with nothing to show yet drops to the skeleton.
+        if !state.isSuccess {
+            state = .loading
+        }
+        Task { @MainActor in
+            do {
+                try await dependencies.cartService.fetch()
+                state = .success(dependencies.cartService.cart)
+            } catch {
+                dependencies.log.error("Error fetching the cart: \(error)")
+                state = .error(error as? BFFRequestError ?? BFFRequestError(type: .generic, error: error))
+            }
+        }
     }
 }

@@ -82,12 +82,53 @@ extension BFFGraphAPI.ProductListItemFragment {
 }
 
 extension BFFGraphAPI.MoneyFragment {
+    /// The amount as a `Decimal`, or `nil` where the BFF sent one this app cannot represent.
+    ///
+    /// All three tests are load-bearing, because each one misses what the others catch, and every
+    /// input below is reachable from *legal* JSON. Apollo deserialises with `JSONSerialization` and
+    /// converts with a bare `number.doubleValue`, neither of which tests finiteness; JSON has no
+    /// `NaN` or `Infinity` literal, but a large exponent still overflows into one.
+    ///
+    /// - `-1e400` parses to `-inf`. `Decimal(string: "-inf")` returns **0**, not `nil`, so without
+    ///   the `isFinite` test an infinite amount would quietly become £0.00.
+    /// - `1e300` is finite, so `isFinite` passes it, but it is outside `Decimal`'s range (the limit
+    ///   sits between `1e120` and `1e140`) and `Decimal(string:)` returns `nil`.
+    /// - `1e17` is finite *and* a clean `Decimal`, so it clears both tests above — but scaling it to
+    ///   minor units overflows `Int64`. `CurrencyFormatter.minorUnits` scales through
+    ///   `NSDecimalNumber.int64Value` with `raiseOnOverflow: false`, so it wraps silently and
+    ///   returns a **negative** amount for a positive price. That flips the "was price" test in
+    ///   `ProductDetails+Converter` and corrupts `PriceFilterBounds`, both of which read
+    ///   `Money.amount`, and it leaves `amount` disagreeing with `amountFormatted`.
+    ///
+    /// The bound is checked rather than the round trip, because rounding makes the round trip
+    /// inexact by design: GBP `0.005` scales to `0.5` and correctly lands on `1`.
+    ///
+    /// Parsed via the string form rather than `Decimal(_: Double)` to avoid binary-float noise.
+    private var representableAmount: Decimal? {
+        guard amount.isFinite, let decimal = Decimal(string: String(amount)) else { return nil }
+
+        let digits = CurrencyFormatter.minorUnitDigits(for: currencyCode)
+        let scaled = decimal * pow(Decimal(10), digits)
+        guard scaled.magnitude <= Decimal(Int64.max) else { return nil }
+
+        return decimal
+    }
+
     func toDomainMoney() -> Money {
-        // BFF amount is a major-unit Double; parse once to a clean Decimal (via its string form, to
-        // avoid binary-float noise), then derive both the minor-unit amount and the formatted string.
-        // Non-finite input (NaN/±inf) falls back to zero — Decimal(inf) traps and Decimal(nan) overflows.
-        let decimal = amount.isFinite ? (Decimal(string: String(amount)) ?? .zero) : .zero
-        return Money(
+        // BFF amount is a major-unit Double; parse once to a clean Decimal, then derive both the
+        // minor-unit amount and the formatted string. An unrepresentable amount falls back to zero,
+        // which Q36 keeps for listings — the bag uses `toDomainMoneyIfRenderable()` instead.
+        makeMoney(representableAmount ?? .zero)
+    }
+
+    /// `toDomainMoney()` without its zero fallback: `nil` where the amount cannot be represented, so
+    /// a caller that must not print a price the shopper does not owe can say "unknown" instead.
+    func toDomainMoneyIfRenderable() -> Money? {
+        representableAmount.map(makeMoney)
+    }
+
+    private func makeMoney(_ decimal: Decimal) -> Money {
+        Money(
             currencyCode: currencyCode,
             amount: CurrencyFormatter.minorUnits(of: decimal, currencyCode: currencyCode),
             amountFormatted: CurrencyFormatter.string(amount: decimal, currencyCode: currencyCode)

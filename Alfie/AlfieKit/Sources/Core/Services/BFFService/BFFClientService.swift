@@ -196,6 +196,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             ).createCart.fragments.cartFragment.convertToCart()
 
             log.info("createCart ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "createCart")
             return cart
         } catch {
             log.error("createCart failed: \(error)")
@@ -214,6 +215,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             ).addToCart.fragments.cartFragment.convertToCart()
 
             log.info("addToCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "addToCart")
             return cart
         } catch {
             log.error("addToCart failed: \(error)")
@@ -230,6 +232,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             ).removeFromCart.fragments.cartFragment.convertToCart()
 
             log.info("removeFromCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "removeFromCart")
             return cart
         } catch {
             log.error("removeFromCart failed: \(error)")
@@ -251,6 +254,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             ).cart.fragments.cartFragment.convertToCart()
 
             log.info("getCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "getCart")
             return cart
         } catch {
             log.error("getCart failed: \(error)")
@@ -259,6 +263,15 @@ public final class BFFClientService: BFFClientServiceProtocol {
     }
 
     // MARK: - Private
+
+    /// Reports any amount the BFF sent in a form this app cannot represent. Logged at `error`
+    /// because it means the BFF has a defect: the shopper only sees a `—` in place of the price,
+    /// which nobody reports, so this log is the only way we find out.
+    private func logUnrepresentableAmounts(in cart: Cart, operation: String) {
+        let fields = cart.unrepresentableAmountFields
+        guard !fields.isEmpty else { return }
+        log.error("\(operation) ← unrepresentable amount(s) cartId=\(cart.id) fields=\(fields.joined(separator: ","))")
+    }
 
     private func executeFetch<Query: GraphQLQuery>(
         _ query: Query,
