@@ -1,4 +1,3 @@
-import AlicerceLogging
 import Mocks
 import Model
 import TestUtils
@@ -9,7 +8,7 @@ final class ProductListingViewModelTests: XCTestCase {
     private var sut: ProductListingViewModel!
     private var mockProductListing: MockProductListingService!
     private var mockWishlistService: MockWishlistService!
-    private let log = Log.DummyLogger()
+    private let log = MockLogger()
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -859,11 +858,19 @@ final class ProductListingViewModelTests: XCTestCase {
         // Latching on it would hide the Price row for the life of the screen with no path back.
         sut = makeSUT(category: "clothing")
         var boundsFetches = 0
-        let firstFetchFailed = expectation(description: "first bounds fetch threw")
+        // The failure is deliberately silent, so the error log is the only signal that happens
+        // *after* the latch is released. Waiting on the throw itself only proves the fetch was
+        // attempted, and lets the second appearance reach the latch first and be swallowed.
+        let firstFailureHandled = expectation(description: "first bounds failure handled")
+        var loggedErrors: [String] = []
+        log.onLogCalled = { level, message in
+            guard level == .error else { return }
+            loggedErrors.append(message)
+            firstFailureHandled.fulfill()
+        }
         mockProductListing.onCategoryPriceRangeCalled = { _ in
             boundsFetches += 1
             guard boundsFetches > 1 else {
-                firstFetchFailed.fulfill()
                 throw BFFRequestError(type: .product(.generic))
             }
             return PriceRange(low: self.money(1_023), high: self.money(48_000))
@@ -873,7 +880,15 @@ final class ProductListingViewModelTests: XCTestCase {
         }
 
         sut.viewDidAppear()
-        wait(for: [firstFetchFailed], timeout: 1)
+        wait(for: [firstFailureHandled], timeout: 1)
+        // Waiting on any `.error` keeps the wait off the exact log wording; asserting here instead
+        // means a reworded or unexpected log fails by name, rather than as an opaque timeout on
+        // the retry below. Only the bounds fetch can fail in this test.
+        XCTAssertEqual(loggedErrors.count, 1, "Expected only the bounds failure to be logged")
+        XCTAssertTrue(
+            loggedErrors.first?.contains("price range") == true,
+            "Expected the bounds failure log; got: \(loggedErrors)"
+        )
         XCTAssertNil(sut.priceBounds)
 
         XCTAssertEmitsValue(from: sut.$priceBounds, where: { $0 != nil }, afterTrigger: { self.sut.viewDidAppear() })
