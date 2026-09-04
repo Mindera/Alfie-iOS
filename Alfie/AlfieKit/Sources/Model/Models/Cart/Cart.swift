@@ -9,7 +9,8 @@ public struct Cart: Hashable {
     public let subtotal: Money?
     public let grandTotal: Money?
 
-    /// Total quantity across all lines — the tab badge value, not `lines.count`.
+    /// Total quantity across all lines, not `lines.count`. What the bag tab makes of it is
+    /// `BagBadge`'s business, not this type's.
     public var totalQuantity: Int {
         lines.reduce(0) { $0 + $1.quantity }
     }

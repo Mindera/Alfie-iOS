@@ -5,18 +5,18 @@ import SwiftUI
 struct TabBarItemView: View {
     private let tab: Model.Tab
     @Binding private var currentTab: Model.Tab
-    @Binding private var badgeValue: Int?
+    private let badgeValue: Int?
     private let popToRootAction: (Model.Tab) -> Void
 
     init(
         tab: Model.Tab,
         currentTab: Binding<Model.Tab>,
-        badgeValue: Binding<Int?>,
+        badgeValue: Int?,
         popToRootAction: @escaping (Model.Tab) -> Void
     ) {
         self.tab = tab
         _currentTab = currentTab
-        _badgeValue = badgeValue
+        self.badgeValue = badgeValue
         self.popToRootAction = popToRootAction
     }
 
@@ -29,7 +29,7 @@ struct TabBarItemView: View {
                 .scaledToFit()
                 .frame(size: Constants.iconSize)
                 .foregroundStyle(Style.iconColour(isSelected: isSelected))
-                .badgeView(badgeValue: $badgeValue)
+                .badgeView(badgeValue: .constant(badgeValue))
             Text.build(Style.labelStyle(isSelected: isSelected)(tab.title))
                 .foregroundStyle(Style.labelColour(isSelected: isSelected))
         }
@@ -38,6 +38,8 @@ struct TabBarItemView: View {
         .contentShape(Rectangle())
         .accessibilityElement()
         .accessibilityIdentifier(tab.accessibilityId)
+        .accessibilityLabel(tab.title)
+        .accessibilityValue(badgeAccessibilityValue)
         .onTapGesture {
             if currentTab != tab {
                 currentTab = tab
@@ -46,6 +48,13 @@ struct TabBarItemView: View {
             }
         }
         .animation(.emphasizedDecelerate, value: currentTab)
+    }
+
+    /// The badge is drawn inside an element that ignores its children, so its `Text` is invisible
+    /// to VoiceOver and unreachable to XCUITest. Carrying the count as the element's value puts it
+    /// back within reach of both without splitting the tab into several elements.
+    private var badgeAccessibilityValue: String {
+        badgeValue.map(L10n.Accessibility.bagBadge) ?? ""
     }
 
     enum Style {
