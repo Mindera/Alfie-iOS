@@ -28,6 +28,7 @@ WishlistFlowVM.Route == WishlistRoute {
     public let wishlistFlowViewModel: WishlistFlowVM
     public let myAccountFlowViewModel: MyAccountFlowViewModel
     @Published public private(set) var overlayView: AnyView?
+    @Published public private(set) var bagBadgeValue: Int?
     @Published public var isOverlayVisible = false
     @Published public var isReadyForNavigation = false
     private var subscriptions = Set<AnyCancellable>()
@@ -112,6 +113,15 @@ WishlistFlowVM.Route == WishlistRoute {
         $overlayView
             .map { $0 != nil }
             .assignWeakly(to: \.isOverlayVisible, on: self)
+            .store(in: &subscriptions)
+
+        // The cart service is the cart's single owner, so the badge follows every add, remove and
+        // fetch it publishes without a request of its own. It emits from the service's actor, hence
+        // the hop to main.
+        serviceProvider.cartService.cartPublisher
+            .map { BagBadge.value(for: $0) }
+            .receive(on: DispatchQueue.main)
+            .assignWeakly(to: \.bagBadgeValue, on: self)
             .store(in: &subscriptions)
 
         $isReadyForNavigation

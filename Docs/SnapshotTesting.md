@@ -85,6 +85,7 @@ of the build.
 | Test file | Target | Covers |
 |---|---|---|
 | `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
+| `CustomTabBarViewSnapshotTests` | `AppFeatureTests` | Bag tab badge: absent, single digit, summed multi-line, overflow |
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
 | `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error |
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, both error states |
