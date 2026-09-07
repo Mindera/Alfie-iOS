@@ -885,12 +885,14 @@ final class ProductListingViewModelTests: XCTestCase {
 
         sut.viewDidAppear()
         wait(for: [firstFailureHandled], timeout: 1)
-        // Waiting on any `.error` keeps the wait off the exact log wording; asserting here instead
-        // means a reworded or unexpected log fails by name, rather than as an opaque timeout on
-        // the retry below. Only the bounds fetch can fail in this test.
+        // Waiting on any `.error` keeps the wait off the log wording; pinning the wording here
+        // instead means a reworded or unexpected log fails by name, quoting what was actually
+        // logged, rather than as an opaque timeout on the retry below. Anchoring on the prefix
+        // rather than a substring keeps the interpolated error out of the match, so only a
+        // deliberate reword of `:280` breaks it. Only the bounds fetch can fail in this test.
         XCTAssertEqual(loggedErrors.count, 1, "Expected only the bounds failure to be logged")
         XCTAssertTrue(
-            loggedErrors.first?.contains("price range") == true,
+            loggedErrors.first?.hasPrefix("Error fetching category price range:") == true,
             "Expected the bounds failure log; got: \(loggedErrors)"
         )
         XCTAssertNil(sut.priceBounds)
