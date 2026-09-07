@@ -10,6 +10,10 @@ public enum L10n {
     public static let account = L10n.tr("L10n", "accessibility.account")
     /// Back
     public static let back = L10n.tr("L10n", "accessibility.back")
+    /// Plural format key: accessibility.bag_badge
+    public static func bagBadge(_ p1: Int) -> String {
+      return L10n.tr("L10n", "accessibility.bag_badge", p1)
+    }
     /// Clear search
     public static let clearSearch = L10n.tr("L10n", "accessibility.clearSearch")
     /// Close
@@ -46,6 +50,50 @@ public enum L10n {
   public enum Bag {
     /// Bag
     public static let title = L10n.tr("L10n", "bag.title")
+    public enum Amount {
+      /// —
+      public static let unavailable = L10n.tr("L10n", "bag.amount.unavailable")
+    }
+    public enum Empty {
+      /// Items you add will appear here
+      public static let message = L10n.tr("L10n", "bag.empty.message")
+      /// Your bag is empty
+      public static let title = L10n.tr("L10n", "bag.empty.title")
+    }
+    public enum ErrorView {
+      /// Oops!
+      public static let title = L10n.tr("L10n", "bag.error_view.title")
+      public enum Generic {
+        /// Something went wrong
+        public static let message = L10n.tr("L10n", "bag.error_view.generic.message")
+      }
+      public enum NoInternet {
+        /// Check your connection
+        public static let message = L10n.tr("L10n", "bag.error_view.no_internet.message")
+      }
+      public enum Retry {
+        /// Try again
+        public static let cta = L10n.tr("L10n", "bag.error_view.retry.cta")
+      }
+    }
+    public enum Quantity {
+      /// Qty: %d
+      public static func label(_ p1: Int) -> String {
+        return L10n.tr("L10n", "bag.quantity.label", p1)
+      }
+    }
+    public enum Remove {
+      /// Remove
+      public static let cta = L10n.tr("L10n", "bag.remove.cta")
+    }
+    public enum Subtotal {
+      /// Subtotal
+      public static let title = L10n.tr("L10n", "bag.subtotal.title")
+    }
+    public enum Total {
+      /// Total
+      public static let title = L10n.tr("L10n", "bag.total.title")
+    }
   }
   public enum FeatureToggle {
     /// Feature Toggle
@@ -633,6 +681,7 @@ public extension L10n {
 
       case accessibilityAccount = "accessibility.account"
       case accessibilityBack = "accessibility.back"
+      case accessibilityBagBadge = "accessibility.bag_badge"
       case accessibilityClearSearch = "accessibility.clearSearch"
       case accessibilityClose = "accessibility.close"
       case accessibilityGridView = "accessibility.gridView"
@@ -649,6 +698,17 @@ public extension L10n {
       case accountSettings = "account.settings"
       case accountTitle = "account.title"
       case bagTitle = "bag.title"
+      case bagAmountUnavailable = "bag.amount.unavailable"
+      case bagEmptyMessage = "bag.empty.message"
+      case bagEmptyTitle = "bag.empty.title"
+      case bagErrorViewTitle = "bag.error_view.title"
+      case bagErrorViewGenericMessage = "bag.error_view.generic.message"
+      case bagErrorViewNoInternetMessage = "bag.error_view.no_internet.message"
+      case bagErrorViewRetryCta = "bag.error_view.retry.cta"
+      case bagQuantityLabel = "bag.quantity.label"
+      case bagRemoveCta = "bag.remove.cta"
+      case bagSubtotalTitle = "bag.subtotal.title"
+      case bagTotalTitle = "bag.total.title"
       case featureToggleTitle = "feature_toggle.title"
       case featureToggleAppUpdateOptionTitle = "feature_toggle.app_update.option.title"
       case featureToggleDebugConfigurationOptionTitle = "feature_toggle.debug_configuration.option.title"

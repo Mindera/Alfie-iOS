@@ -12,10 +12,43 @@ public final class MockCartService: CartServiceProtocol {
 
     public init() { }
 
+    public var onFetchCalled: (() async throws -> Cart?)?
+
     public func add(line: CartLineInput) async throws {
         guard let cart = try await onAddCalled?(line) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         cartSubject.send(cart)
+    }
+
+    /// An unset closure throws rather than publishing `nil`, matching `add(line:)`. A silent
+    /// success would let a test assert an empty bag while the mock was never configured at all;
+    /// a closure that returns `nil` is still how a shopper with no server cart is modelled.
+    public func fetch() async throws {
+        guard let onFetchCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        cartSubject.send(try await onFetchCalled())
+    }
+
+    public var onRemoveCalled: ((String) async throws -> Cart?)?
+
+    public func remove(lineId: String) async throws {
+        guard let onRemoveCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        cartSubject.send(try await onRemoveCalled(lineId))
+    }
+
+    /// Unlike the closures above this does not stand in for a result — `discardCart()` cannot fail
+    /// and asks the server nothing — it is how a test observes that the call arrived. It has to be
+    /// a callback rather than a counter the test polls: `discardCart()` is a `nonisolated async`
+    /// method, so it runs on the cooperative pool rather than the thread the sign-out came in on,
+    /// and a counter written there and read from the test thread is an unsynchronised access.
+    public var onDiscardCartCalled: (() -> Void)?
+
+    public func discardCart() async {
+        onDiscardCartCalled?()
+        cartSubject.send(nil)
     }
 }

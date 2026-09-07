@@ -20,7 +20,6 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var webUrlProvider: WebURLProviderProtocol
     public var notificationsService: NotificationsServiceProtocol
     public var webViewConfigurationService: WebViewConfigurationServiceProtocol
-    public var bagService: BagServiceProtocol
     public var cartService: CartServiceProtocol
     public var wishlistService: WishlistServiceProtocol
     public var sessionService: SessionServiceProtocol
@@ -42,7 +41,6 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         webUrlProvider: WebURLProviderProtocol = MockWebUrlProvider(),
         notificationsService: NotificationsServiceProtocol = MockNotificationsServiceProtocol(),
         webViewConfigurationService: WebViewConfigurationServiceProtocol = MockWebViewConfigurationService(),
-        bagService: BagServiceProtocol = MockBagService(),
         cartService: CartServiceProtocol = MockCartService(),
         wishlistService: WishlistServiceProtocol = MockWishlistService(),
         sessionService: SessionServiceProtocol = MockSessionService()
@@ -63,7 +61,6 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         self.webUrlProvider = webUrlProvider
         self.notificationsService = notificationsService
         self.webViewConfigurationService = webViewConfigurationService
-        self.bagService = bagService
         self.cartService = cartService
         self.wishlistService = wishlistService
         self.sessionService = sessionService

@@ -25,7 +25,6 @@ final class ServiceProvider: ServiceProviderProtocol {
     let notificationsService: NotificationsServiceProtocol
     let searchService: SearchServiceProtocol
     let webViewConfigurationService: WebViewConfigurationServiceProtocol
-    let bagService: BagServiceProtocol
     let cartService: CartServiceProtocol
     let wishlistService: WishlistServiceProtocol
     let sessionService: SessionServiceProtocol
@@ -94,12 +93,6 @@ final class ServiceProvider: ServiceProviderProtocol {
         productService = ProductService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
-        bagService = BagService(
-            store: UserDefaultsStore(
-                userDefaults: userDefaults,
-                storageKey: StorageKey.bagItems.rawValue
-            )
-        )
         cartService = CartService(
             bffClient: bffClient,
             userDefaults: userDefaults,

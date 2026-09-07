@@ -185,6 +185,9 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    /// Alone among the cart operations this does not map a not-found to `.cart(.cartNotFound)`: it
+    /// names no cart, so a 404 from it cannot mean "that cart is gone" and would send `CartService`
+    /// into a recovery that has nothing to recover.
     public func createCart(lines: [CartLineInput]) async throws -> Cart {
         log.info("createCart → lines=\(lines.count)")
 
@@ -196,6 +199,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             ).createCart.fragments.cartFragment.convertToCart()
 
             log.info("createCart ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "createCart")
             return cart
         } catch {
             log.error("createCart failed: \(error)")
@@ -210,10 +214,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
             let cart = try await executeMutation(
                 BFFGraphAPI.AddToCartMutation(
                     input: BFFGraphAPI.AddToCartInput(cartId: cartId, lines: lines.map(BFFGraphAPI.CartLineInput.init(domain:)))
-                )
+                ),
+                mapError: { $0.mappingCartNotFound() }
             ).addToCart.fragments.cartFragment.convertToCart()
 
             log.info("addToCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "addToCart")
             return cart
         } catch {
             log.error("addToCart failed: \(error)")
@@ -226,10 +232,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
         do {
             let cart = try await executeMutation(
-                BFFGraphAPI.RemoveFromCartMutation(cartId: cartId, lineId: lineId)
+                BFFGraphAPI.RemoveFromCartMutation(cartId: cartId, lineId: lineId),
+                mapError: { $0.mappingCartNotFound() }
             ).removeFromCart.fragments.cartFragment.convertToCart()
 
             log.info("removeFromCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "removeFromCart")
             return cart
         } catch {
             log.error("removeFromCart failed: \(error)")
@@ -247,10 +255,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
             // is one nobody reads, and it leaves a stale cart for the next caller to trip over.
             let cart = try await executeFetch(
                 BFFGraphAPI.CartQuery(cartId: cartId),
-                cachePolicy: .fetchIgnoringCacheCompletely
+                cachePolicy: .fetchIgnoringCacheCompletely,
+                mapError: { $0.mappingCartNotFound() }
             ).cart.fragments.cartFragment.convertToCart()
 
             log.info("getCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "getCart")
             return cart
         } catch {
             log.error("getCart failed: \(error)")
@@ -260,23 +270,40 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     // MARK: - Private
 
+    /// Reports any amount the BFF sent in a form this app cannot represent. Logged at `error`
+    /// because it means the BFF has a defect: the shopper only sees a `—` in place of the price,
+    /// which nobody reports, so this log is the only way we find out.
+    private func logUnrepresentableAmounts(in cart: Cart, operation: String) {
+        let fields = cart.unrepresentableAmountFields
+        guard !fields.isEmpty else { return }
+        log.error("\(operation) ← unrepresentable amount(s) cartId=\(cart.id) fields=\(fields.joined(separator: ","))")
+    }
+
     private func executeFetch<Query: GraphQLQuery>(
         _ query: Query,
-        cachePolicy: CachePolicy = .default
+        cachePolicy: CachePolicy = .default,
+        mapError: (BFFRequestError) -> BFFRequestError = { $0 }
     ) async throws -> Query.Data {
-        try await execute(operationName: Query.operationName) { [apolloClient] resultHandler in
+        try await execute(operationName: Query.operationName, mapError: mapError) { [apolloClient] resultHandler in
             apolloClient.fetch(query: query, cachePolicy: cachePolicy, resultHandler: resultHandler)
         }
     }
 
-    private func executeMutation<Mutation: GraphQLMutation>(_ mutation: Mutation) async throws -> Mutation.Data {
-        try await execute(operationName: Mutation.operationName) { [apolloClient] resultHandler in
+    private func executeMutation<Mutation: GraphQLMutation>(
+        _ mutation: Mutation,
+        mapError: (BFFRequestError) -> BFFRequestError = { $0 }
+    ) async throws -> Mutation.Data {
+        try await execute(operationName: Mutation.operationName, mapError: mapError) { [apolloClient] resultHandler in
             apolloClient.perform(mutation: mutation, resultHandler: resultHandler)
         }
     }
 
+    /// `mapError` re-labels a failure in terms only the calling operation knows — what a GraphQL
+    /// status means depends on what was asked for. It defaults to identity, so an operation with
+    /// nothing to add passes failures through untouched.
     private func execute<Data: RootSelectionSet>(
         operationName: String,
+        mapError: (BFFRequestError) -> BFFRequestError = { $0 },
         perform: @escaping (@escaping (Result<GraphQLResult<Data>, Error>) -> Void) -> Cancellable
     ) async throws -> Data {
         try Task.checkCancellation()
@@ -309,6 +336,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 box.cancel()
             }
         } catch let error as BFFRequestError {
+            // Mapped before reporting rather than by the caller afterwards: the reporter decides
+            // what reaches Crashlytics from the error's type, so an operation that re-labels its own
+            // failures has to do it first or the reporter judges a type nobody ends up seeing. An
+            // expired cart is a routine empty state, and reporting it as `.generic` filed a
+            // non-fatal for it every time.
+            let error = mapError(error)
             reportError(error, operationName: operationName)
             throw error
         } catch {
@@ -343,6 +376,9 @@ public final class BFFClientService: BFFClientServiceProtocol {
             }
 
             let code = errors.first?.extensions?["code"] as? String
+            // Carried on every failure but interpreted by nobody here: what a status means depends
+            // on the operation, so the cart operations map their own 404 (see `mappingCartNotFound`).
+            let status = errors.first?.extensions?["status"] as? Int
             let message = errors.first?.message
             let type: BFFRequestError.BFFRequestErrorType = {
                 if let code, graphqlRateLimitedCodes.contains(code) {
@@ -350,7 +386,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 }
                 return .generic
             }()
-            return BFFRequestError(type: type, message: message, graphqlErrorCode: code)
+            return BFFRequestError(type: type, message: message, graphqlErrorCode: code, graphqlErrorStatus: status)
 
         case .failure(let error):
             if let bffError = error as? BFFRequestError { return bffError }

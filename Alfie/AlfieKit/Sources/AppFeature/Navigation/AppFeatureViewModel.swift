@@ -60,9 +60,10 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         tabs.append(.account)
 
         let bagDependencyContainer = BagDependencyContainer(
-            bagService: serviceProvider.bagService,
+            cartService: serviceProvider.cartService,
             configurationService: serviceProvider.configurationService,
-            analytics: serviceProvider.analytics
+            analytics: serviceProvider.analytics,
+            log: log
         )
         let myAccountDependencyContainer = MyAccountDependencyContainer(
             configurationService: serviceProvider.configurationService,
@@ -192,6 +193,11 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         }
 
         setupSubscriptions()
+        discardCartOnSignOut(
+            sessionService: serviceProvider.sessionService,
+            cartService: serviceProvider.cartService
+        )
+        loadStoredCartAtLaunch(cartService: serviceProvider.cartService)
         WebViewPreload.preloadWebView {
             log.debug("Preloaded WebView")
         }
@@ -199,6 +205,37 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)
         }
+    }
+
+    /// A shared device must not hand the next shopper the previous one's bag. Wired once here rather
+    /// than at each sign-out button so a third one cannot forget to do it.
+    ///
+    /// `dropFirst` because the publisher replays its current value on subscribe: without it the
+    /// "signed out" every cold launch begins with would empty the bag before it was ever shown.
+    private func discardCartOnSignOut(
+        sessionService: SessionServiceProtocol,
+        cartService: CartServiceProtocol
+    ) {
+        sessionService.isUserSignedInPublisher
+            .removeDuplicates()
+            .dropFirst()
+            .filter { !$0 }
+            .sink { _ in
+                Task { await cartService.discardCart() }
+            }
+            .store(in: &subscriptions)
+    }
+
+    /// Reads the cart the last session left behind, so the bag tab's badge is right before the
+    /// shopper goes looking. The cart id outlives the process in `UserDefaults` but the cart it
+    /// names does not, so without this a shopper who adds items, kills the app and comes back sees
+    /// no badge until they open the Bag tab — the one screen that already shows them the count.
+    ///
+    /// Costs nothing when there is no stored id: `fetch()` publishes `nil` without asking the
+    /// server. A failure is dropped rather than surfaced — startup is the wrong moment to raise it,
+    /// and the bag screen's own fetch reports it when the shopper actually goes to the bag.
+    private func loadStoredCartAtLaunch(cartService: CartServiceProtocol) {
+        Task { try? await cartService.fetch() }
     }
 
     private func setupSubscriptions() {
