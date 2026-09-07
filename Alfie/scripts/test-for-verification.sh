@@ -9,6 +9,12 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 TEST_LOG="/tmp/alfie_test.log"
+# Coverage bundle at a fixed path, so tooling can find it without parsing this script. xcodebuild
+# refuses to overwrite an existing bundle, so it is removed before each run. The sidecar records
+# which commit the coverage describes, and whether snapshot tests ran (they are what cover SwiftUI
+# view bodies) -- without that line an unexercised body is indistinguishable from a skipped suite.
+RESULT_BUNDLE="/tmp/alfie_test.xcresult"
+RESULT_BUNDLE_SHA="$RESULT_BUNDLE.sha"
 # Snapshot references are recorded on this exact iOS version. A major-only pin is not enough: glyph
 # antialiasing differs between minors (26.2 vs 26.4 drifts ~24 px/screen, enough to fail precision 1.0),
 # so a machine holding several 26.x runtimes could otherwise record against one and assert on another.
@@ -52,6 +58,13 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# A filtered run covers a subset of the suite, so it gets its own bundle rather than destroying a
+# stamped full-run one. The sidecar here is never written: the stamp is guarded on an unfiltered run.
+if [ -n "$TEST_FILTER" ]; then
+    RESULT_BUNDLE="/tmp/alfie_test_filtered.xcresult"
+    RESULT_BUNDLE_SHA="$RESULT_BUNDLE.sha"
+fi
 
 echo "🧪 Running Alfie iOS tests..."
 echo "📂 Project: $PROJECT_FILE"
@@ -177,9 +190,12 @@ SIMULATOR_NAME=$(xcrun simctl list devices available | \
 echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — $SIMULATOR_OS_LABEL"
 echo ""
 
+rm -rf "$RESULT_BUNDLE" "$RESULT_BUNDLE_SHA"
+
 xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination "id=$SIMULATOR_ID" \
+    -resultBundlePath "$RESULT_BUNDLE" \
     $FILTER_ARG \
     "${SNAPSHOT_SKIP_ARGS[@]}" \
     $TEST_ACTION 2>&1 | tee "$TEST_LOG"
@@ -187,6 +203,18 @@ xcodebuild -project "$PROJECT_FILE" \
 TEST_RESULT=${PIPESTATUS[0]}
 
 if [ $TEST_RESULT -eq 0 ]; then
+    # Only stamp the bundle for an unfiltered run: a filtered run's coverage describes a subset of
+    # the suite, and a consumer keying off the commit alone would read it as complete.
+    if [ -z "$TEST_FILTER" ] && [ -d "$RESULT_BUNDLE" ]; then
+        {
+            git -C "$PROJECT_DIR" rev-parse HEAD
+            if [ ${#SNAPSHOT_SKIP_ARGS[@]} -gt 0 ]; then
+                echo "snapshots=skipped"
+            else
+                echo "snapshots=included"
+            fi
+        } > "$RESULT_BUNDLE_SHA"
+    fi
     echo ""
     echo "✅ TESTS PASSED"
     exit 0

@@ -29,7 +29,7 @@ struct CustomTabBarView: View {
                     TabBarItemView(
                         tab: tab,
                         currentTab: $currentTab,
-                        badgeValue: .constant(badgeValueFor(tab)),
+                        badgeValue: badgeValueFor(tab),
                         popToRootAction: popToRootAction
                     )
                 }
