@@ -26,6 +26,35 @@ Design and decisions: `Docs/Plans/mutation-testing-pr-coverage/design.md`.
 
 Arm B's numbers are not a bad score. They are **not a score at all** — see below.
 
+## Cross-arm comparison — which arm is wrong
+
+The two arms did **not** run the same tests. Both were instructed to run `CoreTests` +
+`BFFGraphTests`; Arm A did (278 tests, green baseline, 15 s), Arm B could not (13 integration
+tests, all skipped — see below). The mutant sets also differ: 29 semantic mutants against 11
+syntactic ones. So the arms are not two measurements of one quantity.
+
+They overlap enough to settle which one is wrong.
+
+| Arm B's 11 "survivors" | Arm A's verdict | |
+|---|---|---|
+| `CartService.swift:66` — `cartSubject.send(nil)` | **SURVIVED** | agree — the one real gap |
+| `Cart+Converter.swift:58,59,61,62` — `== nil` | **KILLED** by `test_a_healthy_cart_reports_no_unrepresentable_amounts` | **B is wrong ×4** |
+| `ProductListing+Converter.swift:112` — `Int64.max` bound | **KILLED** by the overflow test | **B is wrong** |
+| `BFFClientService.swift` ×4 — `logUnrepresentableAmounts` | excluded as arid | B mutates logging |
+| `CartService.swift:54` — `Task` block | skipped as structural | not comparable |
+
+Six of Arm B's eleven are directly contradicted by Arm A, which applied the mutation, watched the
+build recompile, and recorded a **named failing test**. That is positive evidence, not opinion.
+
+Muter did flag `CartService.swift:66` — the same line Arm A found. **This is a stopped clock, not
+a hit.** A detector that marks every mutant as survived is automatically correct on whatever
+genuinely survives, and carries no information. Marking all 11 is what makes the 1 worthless.
+
+**Note for the general case:** even two *working* mutation tools would not agree exactly. Arm A
+wrote semantic mutants (drop a guard, swap an argument, defeat a bound); Muter has four syntactic
+operators and no others. Mutation score is not an objective scalar the way line coverage is —
+it is defined relative to an operator set. Comparisons are only meaningful within one tool.
+
 ## Arm B — Muter
 
 Muter built, ran, exited 0, and printed a mutation score. The score is meaningless, for two
