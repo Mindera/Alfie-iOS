@@ -866,7 +866,11 @@ final class ProductListingViewModelTests: XCTestCase {
         log.onLogCalled = { level, message in
             guard level == .error else { return }
             loggedErrors.append(message)
-            firstFailureHandled.fulfill()
+            // Only the first `.error` releases the wait. The closure stays installed for the rest
+            // of the test, and a second `fulfill()` is an XCTest API violation — an opaque failure of
+            // exactly the kind this test was rewritten to avoid. A stray log is caught by name by
+            // the `loggedErrors.count` assertion below instead.
+            if loggedErrors.count == 1 { firstFailureHandled.fulfill() }
         }
         mockProductListing.onCategoryPriceRangeCalled = { _ in
             boundsFetches += 1
