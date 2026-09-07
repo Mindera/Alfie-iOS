@@ -79,12 +79,18 @@ final class ProductDetailsPage {
 
     /// Pops back to whatever pushed the PDP. The PDP's own toolbar has no leading item
     /// (`ProductDetails+Toolbar.swift` passes `EmptyView()`), so this is the navigation stack's
-    /// system back button — there is no app-set identifier to look it up by, hence the positional
-    /// query, scoped to a single bar so it cannot pick a button out of another screen's toolbar.
-    /// Callers assert where they landed rather than trusting the tap.
+    /// system back button, which carries no app-set identifier to look it up by.
+    ///
+    /// It is found by elimination rather than by position: the bar's only other button is the
+    /// share item, so ruling that out leaves back whatever order the two are laid out in. Scoped
+    /// to a single bar so it cannot reach into another screen's toolbar. Callers assert where they
+    /// landed rather than trusting the tap.
     @discardableResult
     func tapBack() -> Self {
-        app.navigationBars.firstMatch.buttons.firstMatch.tap()
+        app.navigationBars.firstMatch.buttons
+            .matching(NSPredicate(format: "identifier != %@", AccessibilityID.ProductDetails.shareButton))
+            .firstMatch
+            .tap()
         return self
     }
 

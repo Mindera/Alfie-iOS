@@ -11,6 +11,13 @@ import SwiftUI
 /// The whole row opens the line's product. A line the BFF sent without a slug has no handle to
 /// fetch a product page by, so it stays the plain row it has always been rather than offering a
 /// press it could not honour — which is also what keeps VoiceOver from announcing it as a button.
+///
+/// The two branches differ in how they read to assistive technology, and deliberately so. The
+/// inert row is a container: `children: .contain` keeps the quantity and total addressable by
+/// their own identifiers. The tappable row is a single element carrying the button trait, which
+/// is what makes it one VoiceOver stop that can be activated — so the identifiers inside it are
+/// not separately queryable. That is the correct shape for a row whose whole area is one action,
+/// and it is why the count in `BagPage.lineItems` is a count of rows, not of labels.
 struct BagLineRow: View {
     let line: CartLine
     let onTap: () -> Void
@@ -19,17 +26,27 @@ struct BagLineRow: View {
         if line.slug == nil {
             content
                 .accessibilityElement(children: .contain)
-                .accessibilityIdentifier(AccessibilityID.Bag.lineItem(id: line.id))
+                .accessibilityIdentifier(rowIdentifier)
         } else {
             // `.plain` so the row looks exactly as it did before it became tappable: the press
             // highlight is the whole affordance, and a tinted or bordered style would restyle every
             // label inside it.
             Button(action: onTap) {
+                // The row is a `.top`-aligned `HStack` with a `Spacer`, so its drawn content leaves
+                // transparent gaps — beside the total, and below the shorter text column. Without a
+                // content shape those gaps are not hit-tested and "tap anywhere on the row" would be
+                // false for a good part of the row's area.
                 content
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.Bag.lineItem(id: line.id))
+            .accessibilityIdentifier(rowIdentifier)
         }
+    }
+
+    /// Both branches are the same row to a UI test, so they answer to the same identifier.
+    private var rowIdentifier: String {
+        AccessibilityID.Bag.lineItem(id: line.id)
     }
 
     /// The row as drawn, identical either way — only what wraps it changes.

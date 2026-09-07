@@ -88,6 +88,13 @@ public enum AccessibilityID {
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
+        /// The toolbar's share item. Keeps its original string because the value is what UI tests
+        /// and any recorded runs already match on; only where it is declared has changed. Lives
+        /// here rather than in a shared toolbar namespace because the PDP is the only screen that
+        /// asks `ToolbarItemProvider` for a share item. It is exposed because the PDP's back
+        /// button is the system one and carries no identifier of its own, so a test finds back by
+        /// ruling this out — the toolbar's only other button.
+        public static let shareButton = "share-btn"
     }
 
     // MARK: - Snackbar
