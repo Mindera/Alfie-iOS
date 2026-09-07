@@ -193,6 +193,10 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         }
 
         setupSubscriptions()
+        discardCartOnSignOut(
+            sessionService: serviceProvider.sessionService,
+            cartService: serviceProvider.cartService
+        )
         loadStoredCartAtLaunch(cartService: serviceProvider.cartService)
         WebViewPreload.preloadWebView {
             log.debug("Preloaded WebView")
@@ -201,6 +205,25 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)
         }
+    }
+
+    /// A shared device must not hand the next shopper the previous one's bag. Wired once here rather
+    /// than at each sign-out button so a third one cannot forget to do it.
+    ///
+    /// `dropFirst` because the publisher replays its current value on subscribe: without it the
+    /// "signed out" every cold launch begins with would empty the bag before it was ever shown.
+    private func discardCartOnSignOut(
+        sessionService: SessionServiceProtocol,
+        cartService: CartServiceProtocol
+    ) {
+        sessionService.isUserSignedInPublisher
+            .removeDuplicates()
+            .dropFirst()
+            .filter { !$0 }
+            .sink { _ in
+                Task { await cartService.discardCart() }
+            }
+            .store(in: &subscriptions)
     }
 
     /// Reads the cart the last session left behind, so the bag tab's badge is right before the

@@ -92,4 +92,56 @@ final class BFFRequestErrorTests: XCTestCase {
         let sut = BFFRequestError(type: .rateLimited(retryAfter: nil), graphqlErrorCode: "RATE_LIMITED")
         XCTAssertEqual(sut.graphqlErrorCode, "RATE_LIMITED")
     }
+
+    func test_bffrequesterror_default_graphql_error_status_is_nil() {
+        let sut = BFFRequestError(type: .generic)
+        XCTAssertNil(sut.graphqlErrorStatus)
+    }
+
+    func test_bffrequesterror_carries_graphql_error_status() {
+        let sut = BFFRequestError(type: .generic, graphqlErrorStatus: 404)
+        XCTAssertEqual(sut.graphqlErrorStatus, 404)
+    }
+
+    // MARK: - Cart not found
+
+    func test_a_404_status_maps_to_the_cart_not_found_error() {
+        let sut = BFFRequestError(type: .generic, graphqlErrorStatus: 404).mappingCartNotFound()
+        XCTAssertEqual(sut.type, .cart(.cartNotFound))
+    }
+
+    // The stored cart id is only discarded for a 404. A server having a bad day must keep it, or a
+    // live cart is thrown away over a transient failure.
+    func test_a_500_status_is_left_alone_so_the_stored_cart_id_survives_it() {
+        let sut = BFFRequestError(type: .generic, graphqlErrorStatus: 500).mappingCartNotFound()
+        XCTAssertEqual(sut.type, .generic)
+    }
+
+    func test_a_failure_carrying_no_status_at_all_is_left_alone() {
+        // Transport failures — no internet, timeouts — never reach a GraphQL error body.
+        let sut = BFFRequestError(type: .noInternet).mappingCartNotFound()
+        XCTAssertEqual(sut.type, .noInternet)
+    }
+
+    func test_mapping_a_cart_not_found_keeps_the_context_the_original_carried() {
+        let sut = BFFRequestError(
+            type: .generic,
+            message: "Cart not found",
+            retryCount: 2,
+            graphqlErrorCode: "NOT_FOUND",
+            graphqlErrorStatus: 404
+        ).mappingCartNotFound()
+
+        XCTAssertEqual(sut.errorMessage, "Cart not found")
+        XCTAssertEqual(sut.retryCount, 2)
+        XCTAssertEqual(sut.graphqlErrorCode, "NOT_FOUND")
+        XCTAssertEqual(sut.graphqlErrorStatus, 404)
+    }
+
+    func test_bffrequesterror_is_not_notfound_for_cart_not_found() {
+        // `isNotFound` drives the product screens' "no such product" copy. A dead cart is recovered
+        // from rather than shown, so it deliberately stays out.
+        let sut = BFFRequestError(type: .cart(.cartNotFound))
+        XCTAssertFalse(sut.isNotFound)
+    }
 }
