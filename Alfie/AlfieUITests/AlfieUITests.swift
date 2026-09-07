@@ -36,7 +36,7 @@ final class AlfieUITests: XCTestCase {
 
     // MARK: - Tests
 
-    /// End-to-end journey: Home → Shop → Brands → first brand → first product → add to bag →
+    /// End-to-end journey: Home → Shop → first category → first product → add to bag →
     /// success Snackbar.
     ///
     /// …then Bag tab → the line is there with totals → tap it → its PDP opens → back → swipe →
@@ -47,8 +47,8 @@ final class AlfieUITests: XCTestCase {
     /// the Bag screen still read local storage; #117 pointed the screen at the cart and restores
     /// it here.
     ///
-    /// Locators outside PDP and Brands still use raw identifier strings
-    /// (`shop-tab`, `segmented-option-brands`, `product-image`, `bag-tab`,
+    /// Locators outside PDP still use raw identifier strings
+    /// (`shop-tab`, `category-item`, `product-image`, `bag-tab`,
     /// `product-name`). Migrating the remainder into the
     /// `AccessibilityIdentifiers` module is tracked as a separate follow-up.
     func testAddToBagFullFlow() throws {
@@ -61,16 +61,13 @@ final class AlfieUITests: XCTestCase {
             shopTab.tap()
         }
 
-        XCTContext.runActivity(named: "Select the Brands segment") { _ in
-            let brandsSegment = app.buttons["segmented-option-brands"]
-            waitFor(brandsSegment, "Brands segment should exist")
-            brandsSegment.tap()
-        }
-
-        XCTContext.runActivity(named: "Open the first available brand") { _ in
-            let firstBrand = app.buttons.matching(identifier: AccessibilityID.Brands.item).element(boundBy: 0)
-            waitFor(firstBrand, "At least one brand should be available")
-            firstBrand.tap()
+        XCTContext.runActivity(named: "Open the first category in the Shop menu") { _ in
+            // Shop reached the PDP through a Brands segment until #104 replaced the segmented
+            // control with a plain category list read from the BFF menu. Every item that menu
+            // returns is a leaf, so one tap opens that collection's listing directly.
+            let firstCategory = app.buttons.matching(identifier: "category-item").element(boundBy: 0)
+            waitFor(firstCategory, "At least one category should be available")
+            firstCategory.tap()
         }
 
         XCTContext.runActivity(named: "Open the first product in the listing") { _ in
@@ -156,6 +153,137 @@ final class AlfieUITests: XCTestCase {
                 XCTAssertNil(error, "Removing a line should leave \(expected) — the removal is a server write")
             }
         }
+    }
+
+    /// The bag half of #129 on its own: tapping a line opens that line's product, and coming back
+    /// leaves the bag as it was.
+    ///
+    /// `testAddToBagFullFlow` covers the same ground but only reaches it through Add to Bag, which
+    /// the PDP disables for anything the BFF reports as out of stock. Whether the catalogue behind
+    /// the BFF happens to carry stock is not a fact about this behaviour, so this test seeds the
+    /// cart on the server instead and hands the app the id through `-cartId`. That lands in
+    /// `UserDefaults`' argument domain, which is where `CartService` reads its stored id from — so
+    /// the app needs no test-only branch to accept it.
+    func testTappingABagLineOpensItsProduct() throws {
+        let cartId = try seedServerCartWithOneLine()
+
+        app.terminate()
+        app.launchArguments += ["-cartId", cartId]
+        app.launch()
+
+        let bag = BagPage(app: app)
+        let pdp = ProductDetailsPage(app: app)
+        var lineCount = 0
+
+        XCTContext.runActivity(named: "The bag renders the seeded line") { _ in
+            bag.open()
+            XCTAssertTrue(
+                bag.lineItems.element(boundBy: 0).waitForExistence(timeout: writeTimeout),
+                "The seeded cart should render a line — check a BFF is reachable"
+            )
+            lineCount = bag.lineItems.count
+        }
+
+        XCTContext.runActivity(named: "Tapping the line opens its product, and back returns") { _ in
+            bag.tapLine(bag.lineItems.element(boundBy: 0))
+            pdp.assertVisible(timeout: timeout)
+
+            pdp.tapBack()
+
+            XCTAssertTrue(
+                bag.lineItems.element(boundBy: 0).waitForExistence(timeout: timeout),
+                "Back from the PDP should return to the bag"
+            )
+            XCTAssertEqual(
+                bag.lineItems.count, lineCount,
+                "Coming back from a product must leave the bag exactly as it was"
+            )
+        }
+    }
+
+    // MARK: - Cart seeding
+
+    private enum SeedError: Error {
+        case badResponse(String)
+        case badOrigin(String)
+    }
+
+    /// Creates a cart on the BFF holding the first variant of the first product of the first
+    /// collection, and returns its id. Nothing about the catalogue is hard-coded: the collection is
+    /// read from the same menu the Shop screen reads, so this follows whichever store the BFF is
+    /// pointed at.
+    private func seedServerCartWithOneLine() throws -> String {
+        let menu = try bffQuery(
+            """
+            { menu(handle: "main-menu") { items { url } } }
+            """
+        )
+        guard
+            let items = (menu["menu"] as? [String: Any])?["items"] as? [[String: Any]],
+            let url = items.first?["url"] as? String
+        else {
+            throw SeedError.badResponse("no menu items: \(menu)")
+        }
+        let collectionHandle = url.hasPrefix("/") ? String(url.dropFirst()) : url
+
+        let listing = try bffQuery(
+            """
+            { productList(collectionHandle: "\(collectionHandle)", limit: 1) \
+            { products { id variants { id } } } }
+            """
+        )
+        guard
+            let products = (listing["productList"] as? [String: Any])?["products"] as? [[String: Any]],
+            let product = products.first,
+            let productId = product["id"] as? String,
+            let variantId = (product["variants"] as? [[String: Any]])?.first?["id"] as? String
+        else {
+            throw SeedError.badResponse("no products in \(collectionHandle): \(listing)")
+        }
+
+        let created = try bffQuery(
+            """
+            mutation { createCart(input: { lines: [{ productId: "\(productId)", \
+            variantId: "\(variantId)", quantity: 1 }] }) { id } }
+            """
+        )
+        guard let cartId = (created["createCart"] as? [String: Any])?["id"] as? String else {
+            throw SeedError.badResponse("no cart id: \(created)")
+        }
+        return cartId
+    }
+
+    /// Posts one GraphQL document to the BFF and returns its `data` object. Synchronous because a
+    /// seed has to be finished before the app launches, not racing it.
+    private func bffQuery(_ document: String) throws -> [String: Any] {
+        let origin = ProcessInfo.processInfo.environment["ALFIE_BFF_BASE_URL"] ?? "http://localhost:3000"
+        guard let url = URL(string: origin + "/graphql") else {
+            throw SeedError.badOrigin(origin)
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: ["query": document])
+
+        var payload: [String: Any]?
+        var transportError: Error?
+        let replied = expectation(description: "The BFF replies")
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            transportError = error
+            payload = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+            replied.fulfill()
+        }
+        .resume()
+        wait(for: [replied], timeout: writeTimeout)
+
+        if let transportError {
+            throw transportError
+        }
+        guard let data = payload?["data"] as? [String: Any] else {
+            throw SeedError.badResponse(String(describing: payload))
+        }
+        return data
     }
 
     func testLaunchPerformance() throws {
