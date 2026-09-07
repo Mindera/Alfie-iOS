@@ -19,7 +19,11 @@ public struct BFFRequestError: Error {
     }
 
     public enum BFFCartRequestErrorType: Equatable {
-        /// The stored cart id is unknown or expired. Discard it and start a new cart.
+        /// The server does not know the cart the operation named: the stored id is unknown or has
+        /// expired. What to do about it is the caller's to decide, and the three callers differ —
+        /// a read forgets the id and shows an empty bag, an add starts a fresh cart carrying the
+        /// same line, and a remove surfaces the error, because that removal genuinely did not
+        /// happen.
         case cartNotFound
     }
 

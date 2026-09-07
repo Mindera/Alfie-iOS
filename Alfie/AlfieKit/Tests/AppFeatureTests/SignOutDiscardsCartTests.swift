@@ -16,14 +16,6 @@ final class SignOutDiscardsCartTests: XCTestCase {
         try super.setUpWithError()
         cartService = .init()
         sessionService = .init()
-        sut = AppFeatureViewModel(
-            serviceProvider: MockServiceProvider(
-                cartService: cartService,
-                sessionService: sessionService
-            ),
-            log: Log.DummyLogger(),
-            startupCompletionDelay: 0
-        )
     }
 
     override func tearDownWithError() throws {
@@ -34,50 +26,60 @@ final class SignOutDiscardsCartTests: XCTestCase {
     }
 
     func test_signingOut_discardsTheCart() {
+        let discarded = expectation(description: "the sign-out reaches the cart")
+        cartService.onDiscardCartCalled = { discarded.fulfill() }
+        makeSUT()
         sessionService.signInUser()
 
         sessionService.signOutUser()
 
-        wait(for: self.cartService.discardCartCount == 1, "A sign-out must discard the cart")
+        wait(for: [discarded], timeout: 1)
     }
 
     /// The publisher replays its current value on subscribe, and that value is "signed out" on every
     /// cold launch. Without the `dropFirst` this test pins, the bag would be emptied before it was
     /// ever shown — a shopper who added something, killed the app and came back would find it gone.
     func test_launchingSignedOut_leavesTheCartAlone() {
-        settle()
+        let discarded = notDiscarded()
 
-        XCTAssertEqual(cartService.discardCartCount, 0, "Starting up signed out is not a sign-out")
+        makeSUT()
+
+        wait(for: [discarded], timeout: 0.2)
     }
 
     /// Signing in must not take the bag away either — a guest cart carries over into the session.
     func test_signingIn_leavesTheCartAlone() {
-        sessionService.signInUser()
-        settle()
+        let discarded = notDiscarded()
+        makeSUT()
 
-        XCTAssertEqual(cartService.discardCartCount, 0, "Signing in is not a sign-out")
+        sessionService.signInUser()
+
+        wait(for: [discarded], timeout: 0.2)
     }
 
     // MARK: - Helpers
 
-    /// `discardCart` is reached through a `Task`, so the assertion has to outlast a hop off this
-    /// thread. Polls rather than sleeping a fixed interval, so the passing case stays fast.
-    private func wait(
-        for condition: @autoclosure @escaping () -> Bool,
-        _ message: String,
-        file: StaticString = #filePath,
-        line: UInt = #line
-    ) {
-        let deadline = Date().addingTimeInterval(1)
-        while !condition(), Date() < deadline {
-            RunLoop.current.run(until: Date().addingTimeInterval(0.01))
-        }
-        XCTAssertTrue(condition(), message, file: file, line: line)
+    /// Built here rather than in `setUp` so a test can install its expectation before the graph
+    /// subscribes. Constructing the SUT first would leave the negative tests unable to fail: the
+    /// discard they forbid could land in the gap before the callback was set.
+    private func makeSUT() {
+        sut = AppFeatureViewModel(
+            serviceProvider: MockServiceProvider(
+                cartService: cartService,
+                sessionService: sessionService
+            ),
+            log: Log.DummyLogger(),
+            startupCompletionDelay: 0
+        )
     }
 
-    /// Gives a discard that should *not* happen every chance to happen anyway. A negative assertion
-    /// made without this would pass before the `Task` had a chance to run, and so would never fail.
-    private func settle() {
-        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+    /// An inverted expectation, so a discard that should not happen is given every chance to happen
+    /// anyway and fails the test when it does. A plain assertion made after the fact would run
+    /// before the `Task` behind `discardCart()` had a chance to, and so would never fail.
+    private func notDiscarded() -> XCTestExpectation {
+        let discarded = expectation(description: "the cart is left alone")
+        discarded.isInverted = true
+        cartService.onDiscardCartCalled = { discarded.fulfill() }
+        return discarded
     }
 }

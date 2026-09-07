@@ -40,12 +40,15 @@ public final class MockCartService: CartServiceProtocol {
         cartSubject.send(try await onRemoveCalled(lineId))
     }
 
-    public private(set) var discardCartCount = 0
+    /// Unlike the closures above this does not stand in for a result — `discardCart()` cannot fail
+    /// and asks the server nothing — it is how a test observes that the call arrived. It has to be
+    /// a callback rather than a counter the test polls: `discardCart()` is a `nonisolated async`
+    /// method, so it runs on the cooperative pool rather than the thread the sign-out came in on,
+    /// and a counter written there and read from the test thread is an unsynchronised access.
+    public var onDiscardCartCalled: (() -> Void)?
 
-    /// Unlike the operations above this needs no stub: it cannot fail and asks the server nothing,
-    /// so dropping the held cart is the whole behaviour.
     public func discardCart() async {
-        discardCartCount += 1
+        onDiscardCartCalled?()
         cartSubject.send(nil)
     }
 }
