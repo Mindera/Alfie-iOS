@@ -61,6 +61,7 @@ All measured on this machine, 2026-09-07, Xcode 26.6 / Swift 6.3.3.
 | `Core` module | 55 files / 3,491 lines; only 4 files use SwiftUI | `find` / `grep` |
 | Source files | 585 total, 520 hand-written (65 generated) | `find` |
 | Test framework | 100% XCTest, zero `import Testing` | `grep` |
+| Test target ≠ source module | `Core` converters are tested by `BFFGraphTests` | bake-off setup |
 
 The ~26s figure matters: it means the per-mutant recompile penalty on Alfie is about 8 seconds,
 so **Muter's schemata advantage — the entire engineering reason that tool exists — is small at
@@ -169,7 +170,12 @@ phase-two gap rather than papered over.
 - CI integration, and any `verify.sh` hook. `verify.sh` is the fast feedback loop that
   `CLAUDE.md` tells every agent to run after every change; a 10-minute mutation pass would wreck it.
 - Per-mutant `-only-testing:` scoping. It is the piece most likely to produce wrong results —
-  a mutant only another module's tests would kill scores as survived.
+  a mutant only another module's tests would kill scores as survived. **This is no longer
+  hypothetical:** setting up the bake-off showed the `Core` converters changed by `5d90a4b` are
+  exercised by `BFFGraphTests`, not `CoreTests`. Scoping to the module whose source changed —
+  the obvious heuristic — would have reported every converter mutant as survived. Module name
+  does not predict test target here, so any future scoping must be derived from coverage data,
+  never from the file's path.
 - `CONTEXT.md`. Mutation-testing terms are engineering-process vocabulary and would dilute a
   product glossary that should describe bags, wishlists and PDPs. Vocabulary goes to
   `Docs/Testing.md` once there is a winner.
