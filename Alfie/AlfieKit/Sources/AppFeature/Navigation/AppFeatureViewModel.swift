@@ -193,6 +193,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         }
 
         setupSubscriptions()
+        loadStoredCartAtLaunch(cartService: serviceProvider.cartService)
         WebViewPreload.preloadWebView {
             log.debug("Preloaded WebView")
         }
@@ -200,6 +201,18 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)
         }
+    }
+
+    /// Reads the cart the last session left behind, so the bag tab's badge is right before the
+    /// shopper goes looking. The cart id outlives the process in `UserDefaults` but the cart it
+    /// names does not, so without this a shopper who adds items, kills the app and comes back sees
+    /// no badge until they open the Bag tab — the one screen that already shows them the count.
+    ///
+    /// Costs nothing when there is no stored id: `fetch()` publishes `nil` without asking the
+    /// server. A failure is dropped rather than surfaced — startup is the wrong moment to raise it,
+    /// and the bag screen's own fetch reports it when the shopper actually goes to the bag.
+    private func loadStoredCartAtLaunch(cartService: CartServiceProtocol) {
+        Task { try? await cartService.fetch() }
     }
 
     private func setupSubscriptions() {

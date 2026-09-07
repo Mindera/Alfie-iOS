@@ -40,6 +40,20 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    func test_localizable_bagBadgeWithArgs() {
+        localizations.forEach { localization in
+            let resources = [1, 2].map { L10n.Accessibility.bagBadge($0) }
+            XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
+        }
+    }
+
+    /// The badge count only ever reaches a shopper through VoiceOver, so a plural bound to the wrong
+    /// branch would go unheard by everyone reviewing the screen. Pin the resolved text.
+    func test_bagBadge_pluralSelectsOnTheCount() {
+        XCTAssertEqual(L10n.Accessibility.bagBadge(1), "1 item")
+        XCTAssertEqual(L10n.Accessibility.bagBadge(2), "2 items")
+    }
+
     func testLocalizableColourSummaryWithArgs() {
         // Two positional arguments across a plural — the singular branch is the two-colour product,
         // which is the commonest case.

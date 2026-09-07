@@ -10,6 +10,10 @@ public enum L10n {
     public static let account = L10n.tr("L10n", "accessibility.account")
     /// Back
     public static let back = L10n.tr("L10n", "accessibility.back")
+    /// Plural format key: accessibility.bag_badge
+    public static func bagBadge(_ p1: Int) -> String {
+      return L10n.tr("L10n", "accessibility.bag_badge", p1)
+    }
     /// Clear search
     public static let clearSearch = L10n.tr("L10n", "accessibility.clearSearch")
     /// Close
@@ -677,6 +681,7 @@ public extension L10n {
 
       case accessibilityAccount = "accessibility.account"
       case accessibilityBack = "accessibility.back"
+      case accessibilityBagBadge = "accessibility.bag_badge"
       case accessibilityClearSearch = "accessibility.clearSearch"
       case accessibilityClose = "accessibility.close"
       case accessibilityGridView = "accessibility.gridView"
