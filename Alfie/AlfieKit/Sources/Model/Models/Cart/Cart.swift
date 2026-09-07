@@ -29,6 +29,10 @@ public struct CartLine: Hashable, Identifiable {
     public let productId: String
     public let variantId: String
     public let sku: String?
+    /// The product's handle, which is what the product detail page is fetched by. `nil` on a line
+    /// the server sent without one, and a row with no slug has nowhere to navigate to — there is no
+    /// fetch-by-id path to fall back on.
+    public let slug: String?
     public let name: String?
     public let imageURL: URL?
     /// Alt text for `imageURL`, for the bag row's VoiceOver label.
@@ -45,6 +49,7 @@ public struct CartLine: Hashable, Identifiable {
         productId: String,
         variantId: String,
         sku: String?,
+        slug: String?,
         name: String?,
         imageURL: URL?,
         imageAltText: String?,
@@ -56,6 +61,7 @@ public struct CartLine: Hashable, Identifiable {
         self.productId = productId
         self.variantId = variantId
         self.sku = sku
+        self.slug = slug
         self.name = name
         self.imageURL = imageURL
         self.imageAltText = imageAltText

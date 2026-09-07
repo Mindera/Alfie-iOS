@@ -65,7 +65,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     private func bagView(_ cart: Cart) -> some View {
         List {
             ForEach(cart.lines) { line in
-                BagLineRow(line: line)
+                BagLineRow(line: line) { viewModel.didSelectLine(line) }
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets())
                     .padding(.horizontal, Primitives.Spacing.spacing16)

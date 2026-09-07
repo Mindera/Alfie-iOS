@@ -39,7 +39,8 @@ final class AlfieUITests: XCTestCase {
     /// End-to-end journey: Home → Shop → Brands → first brand → first product → add to bag →
     /// success Snackbar.
     ///
-    /// …then Bag tab → the line is there with totals → swipe → Remove → it is gone.
+    /// …then Bag tab → the line is there with totals → tap it → its PDP opens → back → swipe →
+    /// Remove → it is gone.
     ///
     /// Needs a reachable BFF: both the add and the removal are real round trips, not local
     /// appends. The bag half was dropped by #116, when the write moved to the server cart while
@@ -122,6 +123,25 @@ final class AlfieUITests: XCTestCase {
             XCTAssertGreaterThan(lineCountAfterAdd, 0, "The bag should hold at least the line just added")
             XCTAssertTrue(bag.subtotal.exists, "A bag with lines shows a subtotal")
             XCTAssertTrue(bag.grandTotal.exists, "A bag with lines shows a total")
+        }
+
+        XCTContext.runActivity(named: "Tapping a line opens its product, and back returns to the bag") { _ in
+            // The row tapped is whichever line is first, which need not be the one just added — the
+            // cart id persists across launches. That the PDP opens at all is the claim; which
+            // product it lands on is the view model's business and is pinned by its unit tests.
+            bag.tapLine(bag.lineItems.element(boundBy: 0))
+            pdp.assertVisible(timeout: timeout)
+
+            pdp.tapBack()
+
+            XCTAssertTrue(
+                bag.lineItems.element(boundBy: 0).waitForExistence(timeout: timeout),
+                "Back from the PDP should return to the bag"
+            )
+            XCTAssertEqual(
+                bag.lineItems.count, lineCountAfterAdd,
+                "Coming back from a product must leave the bag exactly as it was"
+            )
         }
 
         XCTContext.runActivity(named: "Swiping a line and tapping Remove drops it on the server") { _ in

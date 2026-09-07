@@ -14,6 +14,11 @@ public protocol BagViewModelProtocol: ObservableObject {
     func viewDidAppear()
     func didTapRetry()
     func didSelectDelete(_ line: CartLine)
+    /// Opens the line's product detail page. A line with no slug has nowhere to go and does
+    /// nothing — the row renders inert for the same reason, so a tap can only ever arrive for a
+    /// line that carries one. The guard here is what makes that a contract of the type rather than
+    /// a promise the view happens to keep.
+    func didSelectLine(_ line: CartLine)
     func didDismissRemovalFailure()
     func didTapMyAccount()
     func didTapWishlist()

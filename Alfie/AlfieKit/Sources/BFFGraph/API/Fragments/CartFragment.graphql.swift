@@ -41,6 +41,7 @@ public extension BFFGraphAPI {
       public var productId: String? { __data["productId"] }
       public var variantId: String? { __data["variantId"] }
       public var sku: String? { __data["sku"] }
+      public var slug: String? { __data["slug"] }
       public var name: String? { __data["name"] }
       public var quantity: Int { __data["quantity"] }
       public var image: Image? { __data["image"] }

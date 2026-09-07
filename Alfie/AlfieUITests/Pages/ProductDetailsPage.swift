@@ -77,6 +77,17 @@ final class ProductDetailsPage {
         return self
     }
 
+    /// Pops back to whatever pushed the PDP. The PDP's own toolbar has no leading item
+    /// (`ProductDetails+Toolbar.swift` passes `EmptyView()`), so this is the navigation stack's
+    /// system back button — there is no app-set identifier to look it up by, hence the positional
+    /// query, scoped to a single bar so it cannot pick a button out of another screen's toolbar.
+    /// Callers assert where they landed rather than trusting the tap.
+    @discardableResult
+    func tapBack() -> Self {
+        app.navigationBars.firstMatch.buttons.firstMatch.tap()
+        return self
+    }
+
     /// The sheet opens from the summary, never from `colourSelector` — tapping that picks a colour.
     /// Only rendered for multi-colour products, so callers must check `exists` first.
     @discardableResult

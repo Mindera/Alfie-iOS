@@ -58,6 +58,19 @@ final class CartIntegrationTests: IntegrationTestCase {
         XCTAssertEqual(line.variantId, first.variantId)
     }
 
+    func test_every_line_carries_the_product_slug_the_bag_opens_its_product_by() async throws {
+        // `slug` is nullable on the schema, and a bag row without one is inert by design — so only
+        // a real cart can tell us the BFF actually populates it. If this ever goes quiet, every bag
+        // row silently stops opening its product and no unit test would notice.
+        let (first, _) = try await twoAddableVariants()
+
+        let cart = try await sut.createCart(lines: [first])
+
+        let line = try XCTUnwrap(cart.lines.first)
+        let slug = try XCTUnwrap(line.slug, "A real cart line must carry the product slug")
+        XCTAssertFalse(slug.isEmpty, "An empty slug is a handle the product detail page cannot fetch")
+    }
+
     /// Pins the wire shape of a cart-not-found so the recovery work (ticket 5) starts from a
     /// verified premise. Deliberately asserted on the raw response — mapping it to a typed error is
     /// not this ticket's job.

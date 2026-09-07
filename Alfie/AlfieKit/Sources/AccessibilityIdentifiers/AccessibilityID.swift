@@ -32,7 +32,12 @@ public enum AccessibilityID {
         public static func lineItem(id: String) -> String { lineItemPrefix + id }
         public static func lineItemQuantity(id: String) -> String { lineItem(id: id) + ".quantity.label" }
         public static func lineItemTotal(id: String) -> String { lineItem(id: id) + ".total.label" }
-        public static func lineItemRemoveButton(id: String) -> String { lineItem(id: id) + ".remove.button" }
+        /// Exposed as well as composed: a row's Remove button is nested under the row's own
+        /// identifier, so this is the part that tells the two apart.
+        public static let lineItemRemoveButtonSuffix = ".remove.button"
+        public static func lineItemRemoveButton(id: String) -> String {
+            lineItem(id: id) + lineItemRemoveButtonSuffix
+        }
     }
 
     // MARK: - Categories

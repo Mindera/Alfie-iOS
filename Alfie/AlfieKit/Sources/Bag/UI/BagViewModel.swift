@@ -45,6 +45,17 @@ public final class BagViewModel: BagViewModelProtocol {
         }
     }
 
+    public func didSelectLine(_ line: CartLine) {
+        // The slug is the product handle the PDP is fetched by, and there is no fetch-by-id path to
+        // fall back on — so a line without one goes nowhere rather than to a handle that cannot
+        // resolve. `deepLink` is the fetch-by-handle case; the name is the deep link's, not a
+        // restriction on who may use it.
+        guard let slug = line.slug else {
+            return
+        }
+        navigate(.productDetails(.productDetails(.deepLink(handle: slug))))
+    }
+
     public func didDismissRemovalFailure() {
         removalFailure = nil
     }

@@ -23,6 +23,7 @@ extension BFFGraphAPI.CartItemFragment {
             productId: productId ?? "",
             variantId: variantId ?? "",
             sku: sku,
+            slug: slug,
             name: name,
             imageURL: image.flatMap { URL(string: $0.url) },
             imageAltText: image?.altText,
