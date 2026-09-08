@@ -56,6 +56,15 @@ final class CartConverterTests: XCTestCase {
         XCTAssertNil(try XCTUnwrap(cart.lines.first).slug)
     }
 
+    func test_an_empty_line_slug_maps_to_nil_rather_than_an_unfetchable_handle() throws {
+        // An empty slug is nullable-adjacent: it survives a `!= nil` check but resolves to no
+        // product, so a row keyed on it would offer a press it cannot honour. It collapses at the
+        // boundary rather than at each reader.
+        let cart = makeFragment(lines: [makeLine(id: "line-1", slug: "")]).convertToCart()
+
+        XCTAssertNil(try XCTUnwrap(cart.lines.first).slug)
+    }
+
     func test_a_null_line_image_maps_to_nil_url() throws {
         let cart = makeFragment(lines: [makeLine(id: "line-1", imageURL: nil)]).convertToCart()
 
