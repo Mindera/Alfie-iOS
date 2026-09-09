@@ -14,13 +14,19 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
 
     // MARK: Regex Components
 
-    /// Captures the single `/product/<slug>` path segment as the BFF handle. The slug is used as-is — the
-    /// BFF resolves a product by its slug, so there is nothing else to extract. `/` is excluded so deeper
-    /// paths (e.g. `/product/<slug>/reviews`) are not mistaken for a PDP link and fall through to the web view.
+    /// Captures everything after the `/product/` prefix as the Handle, used as-is — the BFF resolves a
+    /// product by its Handle, so there is nothing else to extract. Handles are platform-shaped: a Shopify
+    /// Handle is a single segment, whereas a BigCommerce Handle is a site route path and routinely contains
+    /// `/`. Capturing the whole remaining path keeps both kinds intact, with no segments dropped.
+    ///
+    /// The cost is that a deeper path under `/product/` is no longer distinguishable from a multi-segment
+    /// Handle, so a sub-resource page (e.g. `/product/<handle>/reviews`) now resolves as a Handle rather
+    /// than falling through to the web view. That ambiguity is inherent once a Handle may contain `/`; the
+    /// BFF failing to resolve the Handle is the backstop.
     private let urlRegex = Regex {
         Constants.urlPrefixRegex
         Capture {
-            OneOrMore(.anyNonNewline.subtracting(.anyOf("/")))
+            OneOrMore(.anyNonNewline)
         } transform: {
             String($0)
         }
@@ -45,20 +51,37 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
             return nil
         }
 
-        guard let productMatch = url.path().wholeMatch(of: urlRegex) else {
+        guard
+            let productMatch = url.path().wholeMatch(of: urlRegex),
+            let handle = Self.handle(from: productMatch.output.1)
+        else {
             return nil
         }
-        let slug = productMatch.output.1
         let navigationRoute = url.query().flatMap { extractRoute(from: $0) }
         let normalisedWebUrl = url.httpSecureUrl(using: configuration)
         return .init(
             type: .productDetail(
-                slug: slug,
+                // `slug` is the pre-existing label; the value is a Handle. The spec for this work holds
+                // `DeepLink.LinkType` unchanged, so renaming the label is deliberately left out of scope.
+                slug: handle,
                 route: navigationRoute,
                 query: url.queryParameters
             ),
             fullUrl: normalisedWebUrl
         )
+    }
+
+    /// Drops every trailing separator, so `/product/<handle>/` now resolves to the same Handle as
+    /// `/product/<handle>` — previously such a link fell through to the web view. Without this, the trailing
+    /// `/` would travel to the BFF as part of the Handle: the BFF prepends a leading separator when one is
+    /// missing but never trims a trailing one, so the lookup would simply fail to resolve.
+    /// Returns `nil` when only separators follow the prefix, so such a link still falls through to the web view.
+    private static func handle(from capturedPath: String) -> String? {
+        var handle = capturedPath
+        while handle.hasSuffix("/") {
+            handle.removeLast()
+        }
+        return handle.isEmpty ? nil : handle
     }
 
     /// Returns optional navigation route

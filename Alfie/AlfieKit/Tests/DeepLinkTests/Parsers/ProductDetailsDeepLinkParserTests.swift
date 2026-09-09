@@ -45,8 +45,8 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
             "\(Self.httpUrl)/products",
             "\(Self.httpUrl)/products/polo-26146503?nav=885035/",
             "\(Self.httpUrl)/product/",
-            // A deeper path under /product/ is not a PDP link — the slug is a single path segment.
-            "\(Self.httpUrl)/product/t-shirt/reviews",
+            // Only separators after the prefix, so there is no Handle to resolve.
+            "\(Self.httpUrl)/product//",
         ]
 
         try assertNoParse(testLinks)
@@ -111,8 +111,8 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
     }
 
     func test_parses_bare_handle_links_as_pdp() throws {
-        // Real BFF slugs are bare handles with no trailing numeric id: the whole `/product/<slug>`
-        // segment is the slug, used as-is as the BFF handle.
+        // Real Handles are bare, with no trailing numeric id: the whole path after the `/product/`
+        // prefix is the Handle, used as-is.
         try assertParse("\(Self.httpUrl)/product/t-shirt",
                         slug: "t-shirt",
                         route: nil)
@@ -121,6 +121,60 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
                         route: nil)
         try assertParse("\(Self.httpUrl)/product/polo-short-product-id-12345",
                         slug: "polo-short-product-id-12345",
+                        route: nil)
+    }
+
+    func test_parses_product_links_with_multi_segment_handle_as_pdp() throws {
+        // A Handle is platform-shaped: on BigCommerce it is a site route path and routinely contains
+        // slashes, so everything after the `/product/` prefix is the Handle.
+        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress",
+                        slug: "women/dresses/red-midi-dress",
+                        route: nil)
+        try assertParse("\(Self.httpUrl)/product/t-shirt/reviews",
+                        slug: "t-shirt/reviews",
+                        route: nil)
+        try assertParse("\(Self.httpUrl)/PRODUCT/women/dresses/red-midi-dress",
+                        slug: "women/dresses/red-midi-dress",
+                        route: nil)
+    }
+
+    func test_parses_multi_segment_handle_with_route_and_unknown_query_parameters() throws {
+        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress?nav=885035",
+                        slug: "women/dresses/red-midi-dress",
+                        route: "885035")
+        try assertParse("\(Self.httpUrl)/product/beauty/lanc%C3%B4me-absolue-the-serum-30ml?unknown=1&nav=927986",
+                        slug: "beauty/lanc%C3%B4me-absolue-the-serum-30ml",
+                        route: "927986")
+        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress?unknown=1",
+                        slug: "women/dresses/red-midi-dress",
+                        route: nil)
+    }
+
+    func test_preserves_an_unknown_sku_query_parameter_when_parsing() throws {
+        // A scanned Alfie code carries the Variant's SKU alongside the Handle. The parser does not
+        // interpret it, but it must neither choke on it nor drop it from the parsed query.
+        let testUrl = try XCTUnwrap(URL(string: "\(Self.httpUrl)/product/mens/jeans/slim-indigo?sku=12345"))
+
+        guard case .productDetail(let handle, let route, let query) = sut.parseUrl(testUrl)?.type else {
+            XCTFail("Expected \(testUrl) to parse as a product detail link")
+            return
+        }
+
+        XCTAssertEqual(handle, "mens/jeans/slim-indigo")
+        XCTAssertNil(route)
+        XCTAssertEqual(query?["sku"], "12345")
+    }
+
+    func test_ignores_trailing_slash_when_parsing_handles() throws {
+        try assertParse("\(Self.httpUrl)/product/t-shirt/",
+                        slug: "t-shirt",
+                        route: nil)
+        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress/?nav=885035",
+                        slug: "women/dresses/red-midi-dress",
+                        route: "885035")
+        // However many separators trail the Handle.
+        try assertParse("\(Self.httpUrl)/product/t-shirt///",
+                        slug: "t-shirt",
                         route: nil)
     }
 
