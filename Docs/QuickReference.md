@@ -33,6 +33,10 @@ Alfie/
 │   │   └── Wishlist/               # Wishlist feature module
 │   └── Tests/                      # Unit tests, one target per module
 └── scripts/                        # verify/build/test, Apollo codegen, design-token pipeline
+
+Tools/                              # Standalone SwiftPM tools, outside the AlfieKit graph
+├── AlfieCodeGen/                   # Printable Alfie codes (QR) for the in-store scan demo
+└── DesignTokenGen/                 # Design-token → Swift code generator
 ```
 
 ## Common Commands
@@ -61,6 +65,9 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 
 # Refresh design tokens (pull upstream JSON, then regenerate the committed Swift)
 ./Alfie/scripts/pull-design-tokens.sh && ./Alfie/scripts/generate-design-tokens.sh
+
+# Print Alfie codes for the in-store scan demo (see Tools/AlfieCodeGen/README.md)
+./Alfie/scripts/generate-alfie-codes.sh <handles.txt> [output-dir]
 ```
 
 ## Key Dependencies
