@@ -1,0 +1,12 @@
+# Example handle list. Copy this, do not print it — these handles are placeholders and resolve to
+# nothing in the catalogue.
+#
+# One product handle per line. Add a SKU after a comma when the tag belongs to a specific variant —
+# the app ignores the SKU today, but printing it now means these tags survive variant preselection.
+#
+# Pick five to eight products, including at least two with an out-of-stock size and one with an
+# unavailable colour, and check their stock against the running BFF before printing: the catalogue
+# is a real store and its stock moves.
+
+mens-jeans-slim-indigo
+womens-coat-wool-camel, SKU-8842
