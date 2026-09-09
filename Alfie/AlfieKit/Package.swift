@@ -225,6 +225,7 @@ let package = Package(
             dependencies: [
                 "Model",
                 "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
             ]
         ),
         
