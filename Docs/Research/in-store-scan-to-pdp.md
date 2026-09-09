@@ -1,7 +1,14 @@
 # Research: in-store scan → open Alfie iOS on the right PDP
 
-**Status:** research / no approach committed to yet
+**Status:** superseded — an approach was chosen on 2026-09-09
 **Date:** 2026-09-09
+
+> **Superseded by `Docs/Specs/Features/InStoreScanToPDP.md` and `Docs/adr/0001-print-our-own-alfie-code.md`.**
+> §2.1 below recommended adding a `productByBarcode` query to the BFF. **That recommendation was
+> wrong**: neither commerce platform can resolve a barcode with the credentials the BFF holds, so
+> the chosen approach prints our own QR code carrying the handle and does no lookup at all. The
+> correction is recorded inline in §2.1. The rest of the document — the inventory of existing
+> deep-link machinery, and the comparison of scan mechanisms — still stands.
 **Scenario:** a customer in a physical store picks up a garment (jeans, shorts), scans the code on
 its swing tag / care label with a phone, and lands on that exact product's PDP inside the Alfie iOS
 app.
@@ -71,17 +78,25 @@ type Query {
 The data exists on the variant, but **no query looks a product up by barcode or SKU**. Options,
 best first:
 
-1. **New BFF query** — `productByBarcode(value: String!, type: String)`, or an optional `barcode:`
-   argument on `productDetails`, returning the `OmniProduct` plus the matching `variantId`. One
-   round trip, and the BFF owns the platform differences (Shopify vs BigCommerce barcode indexing).
-   **Recommended.**
+1. ~~**New BFF query**~~ — `productByBarcode(value: String!, type: String)`, or an optional
+   `barcode:` argument on `productDetails`. **Ruled out.** This was originally recommended here, and
+   it is not achievable with the BFF's credentials. Shopify's Storefront API — the only Shopify
+   credential the BFF holds — has no `barcode:` or `sku:` filter on `products(query:)`, and
+   `search(query:)` is free-text only; the documented route is Shopify's **Admin** GraphQL
+   `productVariants(query: "barcode:…")`, needing an Admin-scoped token. BigCommerce could use
+   `GET /v3/catalog/products?upc=…`, but its adapter hardcodes `barcodes: []` and the conformance
+   harness would require both platforms to implement the capability.
 2. **Reuse `searchProducts(searchTerm: <barcode>)`** — zero BFF work *if* the commerce platform
    indexes barcodes in search. Shopify's storefront search does not reliably match barcodes; treat
    this as a spike, not a plan.
-3. **Put the slug in the tag instead** — print a QR containing
-   `https://<host>/product/<slug>?variant=<variantId>` alongside the existing EAN. No BFF change at
-   all, but it needs a change to tag artwork and the print pipeline: a retail-ops project, not an
-   app project.
+3. **Put the handle in a code we print** — a QR containing
+   `https://<host>/product/<handle>?sku=<sku>`. No BFF change, no new credential, no lookup.
+   **This is the option that was chosen** (ADR-0001). Ranked last here on the assumption that
+   changing tag artwork was expensive; for a demo with printed codes it is by far the cheapest, and
+   for the other two options it turned out to be the only one that works at all.
+
+   Note the query parameter is `sku`, not `variantId`: the app's existing preselection matcher
+   (`ProductDetailsViewModel.resolvedSelectedVariant`) keys on SKU.
 
 Side note: the PDP fragment already requests `variants { sku }` but **not** `variants { barcodes }`
 (`Queries/Products/Details/Fragments/ProductDetailsFragment.graphql`). Worth adding either way, then
