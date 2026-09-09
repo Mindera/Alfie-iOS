@@ -280,9 +280,9 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 )
             )
 
-        case .productDetail(let slug, _, _):
-            // The BFF resolves a product by its slug, which is exactly the `/product/<slug>` path segment.
-            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.deepLink(handle: slug)))))
+        case .productDetail(let handle, _, _):
+            // The BFF resolves a product by its Handle, which is the whole path after the `/product/` prefix.
+            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.deepLink(handle: handle)))))
 
         case .webView(let url):
             rootTabViewModel.navigate(.shop(.web(url: url, title: "")))
