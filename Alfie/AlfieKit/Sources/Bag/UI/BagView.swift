@@ -68,7 +68,6 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 BagLineRow(line: line) { viewModel.didSelectLine(line) }
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets())
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         // Swipe is the only removal affordance this epic ships (Q27). A `Button`
                         // rather than `.onDelete` so it can carry an accessibility identifier, and

@@ -30,8 +30,6 @@ public enum AccessibilityID {
         /// Returns a line-scoped prefix, keyed on the server-assigned line id rather than a row
         /// index so removing a line does not renumber the rows a UI test is holding on to.
         public static func lineItem(id: String) -> String { lineItemPrefix + id }
-        public static func lineItemQuantity(id: String) -> String { lineItem(id: id) + ".quantity.label" }
-        public static func lineItemTotal(id: String) -> String { lineItem(id: id) + ".total.label" }
         /// Exposed as well as composed: a row's Remove button is nested under the row's own
         /// identifier, so this is the part that tells the two apart.
         public static let lineItemRemoveButtonSuffix = ".remove.button"
@@ -88,8 +86,9 @@ public enum AccessibilityID {
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
-        /// The toolbar's share item. Keeps its original string because the value is what UI tests
-        /// and any recorded runs already match on; only where it is declared has changed. Lives
+        /// The toolbar's share item. The string is the private constant this moved out of
+        /// `ToolbarItemProvider`, kept rather than churned — it predates the dotted convention its
+        /// siblings follow, and nothing matched it before #129 added the matcher below. Lives
         /// here rather than in a shared toolbar namespace because the PDP is the only screen that
         /// asks `ToolbarItemProvider` for a share item. It is exposed because the PDP's back
         /// button is the system one and carries no identifier of its own, so a test finds back by

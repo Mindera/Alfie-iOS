@@ -59,13 +59,11 @@ final class BagViewSnapshotTests: XCTestCase {
             ),
             onTap: {}
         )
-        // `BagLineRow` carries no padding of its own — `BagView` clears the row insets and applies
-        // this same `spacing16` itself, so the reference frames the row as the bag really draws it
-        // rather than flush against both edges. The `Spacer` only pins it to the top of the
-        // container; neither modifier is part of what's asserted.
+        // `BagLineRow` carries its own horizontal inset, so the reference frames the row exactly as
+        // the bag draws it. The `Spacer` only pins it to the top of the container and is not part of
+        // what this asserts.
         let sut = VStack(spacing: 0) {
             row
-                .padding(.horizontal, Primitives.Spacing.spacing16)
             Spacer()
         }
 

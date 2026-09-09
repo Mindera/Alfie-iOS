@@ -13,11 +13,15 @@ import SwiftUI
 /// press it could not honour — which is also what keeps VoiceOver from announcing it as a button.
 ///
 /// The two branches differ in how they read to assistive technology, and deliberately so. The
-/// inert row is a container: `children: .contain` keeps the quantity and total addressable by
-/// their own identifiers. The tappable row is a single element carrying the button trait, which
-/// is what makes it one VoiceOver stop that can be activated — so the identifiers inside it are
-/// not separately queryable. That is the correct shape for a row whose whole area is one action,
-/// and it is why the count in `BagPage.lineItems` is a count of rows, not of labels.
+/// inert row is a container; the tappable row is a single element carrying the button trait, which
+/// is what makes it one VoiceOver stop that can be activated. Either way the labels inside carry no
+/// identifiers of their own: a `Button` merges its children, so a per-label identifier would be
+/// unmatchable on every row a real cart holds, and one that only ever matched a slug-less row would
+/// be a trap for the next test author. The count in `BagPage.lineItems` is a count of rows.
+///
+/// The row owns its horizontal inset rather than taking it from `BagView`. Applied from outside it
+/// would wrap the `Button` instead of sitting inside its label, leaving a 16pt strip down both
+/// edges of every row where a tap lands on the `List` and nothing happens.
 struct BagLineRow: View {
     let line: CartLine
     let onTap: () -> Void
@@ -67,14 +71,13 @@ struct BagLineRow: View {
                 }
                 Text.build(theme.font.body.small(L10n.Bag.Quantity.label(line.quantity)))
                     .foregroundStyle(Theme.contentContentTerciary)
-                    .accessibilityIdentifier(AccessibilityID.Bag.lineItemQuantity(id: line.id))
                 Text.build(theme.font.body.small(line.unitPrice.amountFormattedOrUnavailable))
                     .foregroundStyle(Theme.contentContentTerciary)
             }
             Spacer()
             Text.build(theme.font.body.medium(line.lineTotal.amountFormattedOrUnavailable))
-                .accessibilityIdentifier(AccessibilityID.Bag.lineItemTotal(id: line.id))
         }
+        .padding(.horizontal, Primitives.Spacing.spacing16)
     }
 
     private var imageView: some View {
