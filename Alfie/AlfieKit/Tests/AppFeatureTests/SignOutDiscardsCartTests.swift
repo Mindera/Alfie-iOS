@@ -33,7 +33,10 @@ final class SignOutDiscardsCartTests: XCTestCase {
 
         sessionService.signOutUser()
 
-        wait(for: [discarded], timeout: 1)
+        // `.default` rather than a literal: the discard is a `Task` hop, so what is being waited on
+        // is the scheduler, not the work. It lands in a millisecond on a quiet machine and blew
+        // through a one-second bound on a loaded CI runner, which is a false failure about nothing.
+        wait(for: [discarded], timeout: .default)
     }
 
     /// The publisher replays its current value on subscribe, and that value is "signed out" on every
