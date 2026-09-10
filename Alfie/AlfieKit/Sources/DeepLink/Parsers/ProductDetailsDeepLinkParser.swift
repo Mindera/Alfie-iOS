@@ -51,6 +51,11 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
             return nil
         }
 
+        // `path()` keeps percent-encoding, so the Handle travels onward exactly as it appeared in the link
+        // and reaches the BFF verbatim. Sibling parsers use `cleanPathComponents`, which decodes; the two
+        // only diverge for a non-ASCII Handle, and matching the link byte-for-byte is what a lookup by
+        // route path wants. The corollary is that a Handle carrying a literal `%2F` is not representable —
+        // it would arrive as a separator. Nothing needs one, now that a Handle may contain `/` unescaped.
         guard
             let productMatch = url.path().wholeMatch(of: urlRegex),
             let handle = Self.handle(from: productMatch.output.1)
@@ -61,9 +66,7 @@ final class ProductDetailsDeepLinkParser: DeepLinkParserProtocol {
         let normalisedWebUrl = url.httpSecureUrl(using: configuration)
         return .init(
             type: .productDetail(
-                // `slug` is the pre-existing label; the value is a Handle. The spec for this work holds
-                // `DeepLink.LinkType` unchanged, so renaming the label is deliberately left out of scope.
-                slug: handle,
+                handle: handle,
                 route: navigationRoute,
                 query: url.queryParameters
             ),

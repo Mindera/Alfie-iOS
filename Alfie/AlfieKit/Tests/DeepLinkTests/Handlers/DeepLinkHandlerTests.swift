@@ -212,15 +212,15 @@ final class DeepLinkHandlerTests: XCTestCase {
         }
         sut.isReadyToHandleLinks = true
 
-        let slug = "123456"
+        let handle = "123456"
         let deepLink = DeepLink(
-            type: .productDetail(slug: slug, route: nil, query: nil),
+            type: .productDetail(handle: handle, route: nil, query: nil),
             fullUrl: testUrl
         )
         sut.handleDeepLink(deepLink)
 
         wait(for: [expectation], timeout: .default)
-        XCTAssertEqual(receivedLinkType, .productDetail(slug: slug, route: nil, query: nil))
+        XCTAssertEqual(receivedLinkType, .productDetail(handle: handle, route: nil, query: nil))
     }
 
     func test_handles_bag_links() {
