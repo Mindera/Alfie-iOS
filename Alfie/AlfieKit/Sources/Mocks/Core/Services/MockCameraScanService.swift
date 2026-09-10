@@ -34,8 +34,9 @@ public final class MockCameraScanService: CameraScanServiceProtocol {
         recognise([payload])
     }
 
-    /// Stands in for the camera seeing several codes at once — a Swing tag showing its Barcode and
-    /// its Alfie code in the same frame.
+    /// Stands in for everything the camera is holding — a Swing tag showing its Barcode and its
+    /// Alfie code at once. Call it again with a longer list to stand in for a code joining the ones
+    /// already tracked, which is how the real scanner acquires the second of a pair.
     public func recognise(_ payloads: [String]) {
         subject.send(payloads)
     }
