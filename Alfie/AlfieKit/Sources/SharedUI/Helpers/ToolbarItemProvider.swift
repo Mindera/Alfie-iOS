@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SwiftUI
 
@@ -13,7 +14,12 @@ public enum ToolbarItemProvider {
         ),
         permittedArrowDirections: UIPopoverArrowDirection = []
     ) -> some View {
-        ThemedToolbarButton(icon: .share, accessibilityId: AccessibilityId.shareBtn, accessibilityLabel: L10n.Accessibility.share, toolBarButtonSize: buttonSize) {
+        ThemedToolbarButton(
+            icon: .share,
+            accessibilityId: AccessibilityID.ProductDetails.shareButton,
+            accessibilityLabel: L10n.Accessibility.share,
+            toolBarButtonSize: buttonSize
+        ) {
             if let configuration {
                 let activityVC = UIActivityViewController(
                     activityItems: [
@@ -107,7 +113,6 @@ private enum AccessibilityId {
     static let accountBtn = "account-btn"
     static let titleHeader = "title-header"
     static let backBtn = "back-btn"
-    static let shareBtn = "share-btn"
 }
 
 // MARK: - Constants

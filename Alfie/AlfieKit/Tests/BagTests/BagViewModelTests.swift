@@ -2,6 +2,7 @@ import AlicerceLogging
 import Combine
 import Mocks
 import Model
+import ProductDetails
 import TestUtils
 import XCTest
 @testable import Bag
@@ -17,6 +18,7 @@ final class BagViewModelTests: XCTestCase {
     private var mockCartService: MockCartService!
     private var mockAnalytics: MockAnalyticsTracker!
     private var mockDependencies: BagDependencyContainer!
+    private var capturedRoutes: [BagRoute]!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -28,7 +30,8 @@ final class BagViewModelTests: XCTestCase {
             analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
             log: Log.DummyLogger()
         )
-        sut = .init(dependencies: mockDependencies) { _ in }
+        capturedRoutes = []
+        sut = .init(dependencies: mockDependencies) { [weak self] in self?.capturedRoutes.append($0) }
     }
 
     override func tearDownWithError() throws {
@@ -36,6 +39,7 @@ final class BagViewModelTests: XCTestCase {
         mockCartService = nil
         mockAnalytics = nil
         mockDependencies = nil
+        capturedRoutes = nil
         try super.tearDownWithError()
     }
 
@@ -203,6 +207,28 @@ final class BagViewModelTests: XCTestCase {
         sut.didDismissRemovalFailure()
 
         XCTAssertNil(sut.removalFailure)
+    }
+
+    // MARK: - Opening a line's product
+
+    func test_didSelectLine_opensTheProductDetailsPageForThatLinesSlug() {
+        // The slug is the product handle, which is the only key a product detail page can be
+        // fetched by — the line's product id has no fetch path anywhere in the product service.
+        let line = CartLine.fixture(id: "line-1", slug: "silk-shirt")
+
+        sut.didSelectLine(line)
+
+        XCTAssertEqual(capturedRoutes, [.productDetails(.productDetails(.deepLink(handle: "silk-shirt")))])
+    }
+
+    func test_didSelectLine_withNoSlug_goesNowhereRatherThanToADeadHandle() {
+        // A cart can outlive the product on it, and the BFF sends the line either way. Navigating
+        // on an empty handle would land the shopper on a product page that can never resolve.
+        let line = CartLine.fixture(id: "line-1", slug: nil)
+
+        sut.didSelectLine(line)
+
+        XCTAssertEqual(capturedRoutes, [])
     }
 
     // MARK: - Helpers

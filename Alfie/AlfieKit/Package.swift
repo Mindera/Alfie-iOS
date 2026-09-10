@@ -354,6 +354,9 @@ let package = Package(
             dependencies: [
                 "Bag",
                 "Mocks",
+                // The bag's routes are `ProductDetails` types, so asserting where a row navigates
+                // names them directly rather than relying on `Bag` re-exporting them.
+                "ProductDetails",
                 "TestUtils",
             ]
         ),

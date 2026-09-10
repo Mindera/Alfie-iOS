@@ -164,6 +164,8 @@ public struct CartLine: Hashable, Identifiable {
     public let productId: String
     public let variantId: String
     public let sku: String?
+    /// The product handle the PDP is fetched by. Added by #129; see Exit Points.
+    public let slug: String?
     public let name: String?
     public let imageURL: URL?
     public let quantity: Int
@@ -236,6 +238,7 @@ fragment CartItemFragment on CartItem {
     productId
     variantId
     sku
+    slug
     name
     quantity
     image { url altText }
@@ -269,13 +272,16 @@ stock-aware — the cart exposes no inventory, so an over-order fails at the pla
 
 - Tap back / switch tab → Previous screen
 - Toolbar → Account, Wishlist (unchanged)
-- **Tapping a bag row does nothing.** Bag → PDP navigation is dropped by team decision (T6), so
-  `CartItem` needs no product handle and no enrichment. See Q13.
+- **Tapping a bag row opens that line's product detail page** (#129), pushed on the Bag tab's own
+  stack, so back returns to the bag. Keyed on `CartItem.slug`, which AF-114 added after this epic
+  shipped; a line without one is not tappable and renders exactly as before. This supersedes T6 and
+  Q13, which dropped the navigation on the premise that no product handle was available.
 
 ### Routes and FlowViewModel Methods
 
-This feature adds **no new routes**. `BagRoute` is unchanged, and the empty state has no call to
-action (Q34), so no cross-tab navigation is introduced.
+This feature adds **no new routes**. `BagRoute` is unchanged — its `productDetails` case and
+`BagFlowViewModel.makeProductDetailsViewModel` already existed unused, and #129 wires the bag into
+them. The empty state has no call to action (Q34), so no cross-tab navigation is introduced.
 
 ---
 
@@ -443,9 +449,18 @@ and a loading announcement for the cart fetch.
 
 - **Checkout is not wired.** `cartCheckoutUrl` stays unused and `WebFeature.checkout` untouched. The
   bag is a dead end by design. (`cartCheckoutUrl` also throws a bare `Error` on Shopify.)
-- **A bag row is not tappable and does not reach the PDP.** Decided, not a temporary gap: the team
-  dropped bag → PDP navigation (T6), so no `handle` is requested on `CartItem` and no cross-repo
-  ticket is raised.
+- ~~**A bag row is not tappable and does not reach the PDP.**~~ **Superseded by #129.** AF-114 added
+  `slug` to `CartItem`, which removed the premise behind T6, and the row now opens its product.
+  What remains limited:
+  - **The product opens on its default variant, not the one in the bag.** Colour preselection
+    matches on SKU and size is never auto-selected by design, so Add to bag starts disabled until a
+    size is picked. Passing the line's variant through would need a new `ProductDetailsConfiguration`
+    case and a variant-resolution change in the PDP; deliberately out of scope.
+  - **A stale slug is a dead end.** A cart can outlive a product by up to 30 days, and the
+    product-details error screen offers only Go back — no retry, which could never resolve a
+    not-found handle anyway. Accepted; #130 pins those error states under test.
+  - **A line the BFF sends without a slug is inert.** It renders as before and does nothing when
+    tapped. There is no fetch-by-id path in the product service to fall back on.
 - **The bag row shows no brand, colour, size or was-price.** `CartItem` carries none of them and no
   enrichment is asked for.
 - **Quantity is display-only.** There is no stepper, so reducing a quantity means removing the line
@@ -507,7 +522,7 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q9 | **Cart lands before ALFMOB-443** (Bag visual redesign). | 443's own Out of Scope excludes "bag/cart logic, pricing, or data changes", so it is written to sit on top of whatever data layer exists. Redesign-first means resnapshotting twice. |
 | Q10 | **ALFMOB-492 is reopened.** ALFMOB-493 stays Done — the server-side auth bypass was the agreed outcome. | 492 is unrelated to auth: it threads the BFF variant id into `Product.Variant` and `PersistedProductDTO`. Its code exists on no branch, and `CartLineInput.variantId` is `ID!` and required — so no cart write can be constructed today. ALFMOB-499 is also written on the premise that 492 landed, which is currently false. |
 | Q11 | **Regenerate the cart codegen from scratch** against the current BFF schema; the uncommitted worktree cut is discarded. Implementation tickets are raised as **GitHub Issues**, not Jira. | The worktree's `schema.graphqls` was hand-modified; regenerating is the only way to know the result matches the real schema. GitHub Issues per `Docs/agents/issue-tracker.md` (Jira `ALFMOB` for team tickets, GitHub for agent-generated work). |
-| Q13 | **The bag row ships on `CartItem` as it stands** — name, image, quantity, unit price, line total (web's ALFMOB-463 scope). **No enrichment is requested and the row is not tappable.** | Resolved by T6: the team dropped bag → PDP navigation, so the one field that would have been needed — a product `handle` — is not worth a cross-repo ticket. `productDetails(handle:)` is slug-keyed on both platforms (`product.service.ts:82`), so `CartItem.productId` could never have substituted for it. Brand, colour, size and compare-at fall away with it: the PDP fetched those itself. |
+| Q13 | ~~**The bag row ships on `CartItem` as it stands** — name, image, quantity, unit price, line total (web's ALFMOB-463 scope). **No enrichment is requested and the row is not tappable.**~~ **Partly superseded by #129: the row is tappable.** | Was resolved by T6: the team dropped bag → PDP navigation, so the one field that would have been needed — a product `handle` — was not worth a cross-repo ticket. `productDetails(handle:)` is slug-keyed on both platforms (`product.service.ts:82`), so `CartItem.productId` could never have substituted for it. **That premise is dead:** AF-114 shipped `slug` on `CartItem` from the existing cart request, at no extra round trip, and #129 keys the row's navigation on it. The rest of Q13 stands — brand, colour, size and compare-at are still not requested, because the PDP fetches those itself. |
 | Q14 | **Both Shopify and BigCommerce are in scope.** | Both are fully implemented on the BFF — the epic's doubt was stale. See the two BigCommerce caveats under Verified Facts; they are handled, not excluded. |
 | Q17 | **`CartLine.id` is the server line id** (`CartItem.id`) — use what the BFF gives us. | It is what `removeFromCart(cartId:lineId:)` takes, and the only id guaranteed unique per line. A product+variant composite breaks when the same variant appears twice and yields an id we cannot remove with. |
 | Q18 | **Trust the nested `Money.currencyCode`; `CartTotals.currency` is not modelled in the domain.** | Domain `Money` already carries `currencyCode` and `toDomainMoney()` already reads it. Consuming the outer field would mean a second code path and a disagreement nobody wants to reconcile. |
@@ -548,7 +563,7 @@ still outstanding.
 | T3 | Are user-owned carts on the roadmap? | **Yes, after authentication.** Out of scope here. | Guest-only stands; the id must also be dropped on sign-*in* once auth lands (Q3 covers sign-out) |
 | T4 | One observable cart, or fetched per caller? | **One.** The badge comes from the same cart the bag screen renders, so it updates on every write. | Q5 |
 | T5 | Canonical major→minor money rule, and what a malformed line total renders? | **No rule needed** (iOS does no cart-side arithmetic); malformed renders **`—`**. | Q36 |
-| T6 | `CartItem` enrichment — brand, colour, size, compare-at, handle? | **None.** Bag → PDP navigation is dropped, which removes the need for a `handle`. | Q13; no AF ticket raised |
+| T6 | `CartItem` enrichment — brand, colour, size, compare-at, handle? | ~~**None.** Bag → PDP navigation is dropped, which removes the need for a `handle`.~~ **Superseded:** AF-114 added `slug`, and #129 restored the navigation. Brand, colour, size and compare-at are still not requested. | Q13; AF-114 (done) · web ALFMOB-506 (done) |
 | T7 | A distinguishable error code for "cart not found"? | **No — keep 404.** | Q12, Q22 |
 
 ### Still open

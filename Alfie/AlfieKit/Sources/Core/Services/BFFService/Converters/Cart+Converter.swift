@@ -1,6 +1,7 @@
 import BFFGraph
 import Foundation
 import Model
+import Utils
 
 extension BFFGraphAPI.CartFragment {
     func convertToCart() -> Cart {
@@ -23,6 +24,11 @@ extension BFFGraphAPI.CartItemFragment {
             productId: productId ?? "",
             variantId: variantId ?? "",
             sku: sku,
+            // `""` passes a `!= nil` check but is not a handle the PDP can be fetched by, so it
+            // would make the bag row tappable and then take the shopper nowhere. Collapsing it
+            // here, where server data enters, keeps `CartLine.slug`'s contract true for every
+            // reader: a handle you can fetch by, or nothing to navigate to.
+            slug: slug.isNilOrEmpty ? nil : slug,
             name: name,
             imageURL: image.flatMap { URL(string: $0.url) },
             imageAltText: image?.altText,

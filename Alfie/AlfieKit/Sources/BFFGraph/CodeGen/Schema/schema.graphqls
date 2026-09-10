@@ -39,6 +39,7 @@ type CartItem {
   productId: String
   quantity: Int!
   sku: String
+  slug: String
   variantId: String
 }
 
@@ -118,6 +119,7 @@ type MenuItem {
 
 type Metafield {
   key: String!
+  namespace: String
   value: String!
 }
 
@@ -245,6 +247,7 @@ type Query {
   menu(handle: String! = "main-menu"): Menu!
   productDetails(handle: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
   productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, sort: ProductSortEnum! = NEWEST): ProductListResponse!
+  relatedProducts(handle: String!, limit: Int! = 8): [OmniProduct!]!
   searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
 }
 

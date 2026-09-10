@@ -13,6 +13,7 @@ final class CartConverterTests: XCTestCase {
                 productId: "prod-1",
                 variantId: "var-1",
                 sku: "SKU-1",
+                slug: "silk-shirt",
                 name: "Silk Shirt",
                 quantity: 2,
                 imageURL: "https://cdn.alfie.test/shirt.jpg",
@@ -28,6 +29,7 @@ final class CartConverterTests: XCTestCase {
         XCTAssertEqual(line.productId, "prod-1")
         XCTAssertEqual(line.variantId, "var-1")
         XCTAssertEqual(line.sku, "SKU-1")
+        XCTAssertEqual(line.slug, "silk-shirt")
         XCTAssertEqual(line.name, "Silk Shirt")
         XCTAssertEqual(line.imageURL, URL(string: "https://cdn.alfie.test/shirt.jpg"))
         XCTAssertEqual(line.imageAltText, "Silk shirt, front view")
@@ -43,6 +45,24 @@ final class CartConverterTests: XCTestCase {
 
         XCTAssertEqual(cart.lines.count, 1)
         XCTAssertNil(try XCTUnwrap(cart.lines.first).name)
+    }
+
+    func test_a_null_line_slug_maps_to_nil_rather_than_an_empty_handle() throws {
+        // `CartItem.slug` is nullable on the BFF. The bag row keys its PDP navigation on it, so an
+        // empty-string fallback would send the shopper to a handle that cannot resolve — `nil` is
+        // what makes the row correctly inert.
+        let cart = makeFragment(lines: [makeLine(id: "line-1", slug: nil)]).convertToCart()
+
+        XCTAssertNil(try XCTUnwrap(cart.lines.first).slug)
+    }
+
+    func test_an_empty_line_slug_maps_to_nil_rather_than_an_unfetchable_handle() throws {
+        // An empty slug is nullable-adjacent: it survives a `!= nil` check but resolves to no
+        // product, so a row keyed on it would offer a press it cannot honour. It collapses at the
+        // boundary rather than at each reader.
+        let cart = makeFragment(lines: [makeLine(id: "line-1", slug: "")]).convertToCart()
+
+        XCTAssertNil(try XCTUnwrap(cart.lines.first).slug)
     }
 
     func test_a_null_line_image_maps_to_nil_url() throws {
@@ -244,6 +264,7 @@ private extension CartConverterTests {
         productId: String? = "prod-1",
         variantId: String? = "var-1",
         sku: String? = "SKU-1",
+        slug: String? = "line-slug",
         name: String? = "Line",
         quantity: Int = 1,
         imageURL: String? = "https://cdn.alfie.test/line.jpg",
@@ -257,6 +278,7 @@ private extension CartConverterTests {
         line.productId = productId
         line.variantId = variantId
         line.sku = sku
+        line.slug = slug
         line.name = name
         line.quantity = quantity
         line.image = imageURL.map { Mock<Image>(altText: imageAltText, url: $0) }

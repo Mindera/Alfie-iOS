@@ -26,6 +26,7 @@ final class CartTests: XCTestCase {
             productId: "product-1",
             variantId: "variant-\(id)",
             sku: "sku-\(id)",
+            slug: "slug-\(id)",
             name: "Line \(id)",
             imageURL: nil,
             imageAltText: nil,

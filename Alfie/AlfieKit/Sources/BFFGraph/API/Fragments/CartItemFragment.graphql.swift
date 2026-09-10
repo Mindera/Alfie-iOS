@@ -6,7 +6,7 @@
 public extension BFFGraphAPI {
   struct CartItemFragment: BFFGraphAPI.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      #"fragment CartItemFragment on CartItem { __typename id productId variantId sku name quantity image { __typename url altText } price { __typename ...MoneyFragment } lineTotal { __typename ...MoneyFragment } }"#
+      #"fragment CartItemFragment on CartItem { __typename id productId variantId sku slug name quantity image { __typename url altText } price { __typename ...MoneyFragment } lineTotal { __typename ...MoneyFragment } }"#
     }
 
     public let __data: DataDict
@@ -19,6 +19,7 @@ public extension BFFGraphAPI {
       .field("productId", String?.self),
       .field("variantId", String?.self),
       .field("sku", String?.self),
+      .field("slug", String?.self),
       .field("name", String?.self),
       .field("quantity", Int.self),
       .field("image", Image?.self),
@@ -30,6 +31,7 @@ public extension BFFGraphAPI {
     public var productId: String? { __data["productId"] }
     public var variantId: String? { __data["variantId"] }
     public var sku: String? { __data["sku"] }
+    public var slug: String? { __data["slug"] }
     public var name: String? { __data["name"] }
     public var quantity: Int { __data["quantity"] }
     public var image: Image? { __data["image"] }

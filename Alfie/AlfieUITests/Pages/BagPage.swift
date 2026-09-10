@@ -18,11 +18,21 @@ final class BagPage {
         app.otherElements[AccessibilityID.TabBar.bag]
     }
 
-    /// Every line currently rendered. `BagLineRow` is an accessibility container, so the rows are
-    /// `otherElements`.
+    /// Every *tappable* line currently rendered. A row is a `Button` — the whole row opens the
+    /// line's product — so rows are `buttons`, and the suffix exclusion keeps a revealed Remove
+    /// button, whose identifier is nested under the row's, from counting as a line.
+    ///
+    /// The narrowing is deliberate but not free: a line the BFF sent without a slug stays a plain
+    /// container and is invisible here, so counts taken from this query are counts of openable
+    /// rows. Every line of a real cart carries a slug — `CartIntegrationTests` asserts exactly
+    /// that — so against a live BFF this is every line.
     var lineItems: XCUIElementQuery {
-        app.otherElements.matching(
-            NSPredicate(format: "identifier BEGINSWITH %@", AccessibilityID.Bag.lineItemPrefix)
+        app.buttons.matching(
+            NSPredicate(
+                format: "identifier BEGINSWITH %@ AND NOT identifier ENDSWITH %@",
+                AccessibilityID.Bag.lineItemPrefix,
+                AccessibilityID.Bag.lineItemRemoveButtonSuffix
+            )
         )
     }
 
@@ -39,6 +49,13 @@ final class BagPage {
     @discardableResult
     func open() -> Self {
         tab.tap()
+        return self
+    }
+
+    /// Opens the line's product detail page. The whole row is the tap target.
+    @discardableResult
+    func tapLine(_ line: XCUIElement) -> Self {
+        line.tap()
         return self
     }
 

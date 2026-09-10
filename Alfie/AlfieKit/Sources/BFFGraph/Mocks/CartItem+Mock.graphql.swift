@@ -18,6 +18,7 @@ class CartItem: MockObject {
     @Field<String>("productId") public var productId
     @Field<Int>("quantity") public var quantity
     @Field<String>("sku") public var sku
+    @Field<String>("slug") public var slug
     @Field<String>("variantId") public var variantId
   }
 }
@@ -32,6 +33,7 @@ extension Mock where O == CartItem {
     productId: String? = nil,
     quantity: Int? = nil,
     sku: String? = nil,
+    slug: String? = nil,
     variantId: String? = nil
   ) {
     self.init()
@@ -43,6 +45,7 @@ extension Mock where O == CartItem {
     _setScalar(productId, for: \.productId)
     _setScalar(quantity, for: \.quantity)
     _setScalar(sku, for: \.sku)
+    _setScalar(slug, for: \.slug)
     _setScalar(variantId, for: \.variantId)
   }
 }

@@ -3,6 +3,7 @@ fragment CartItemFragment on CartItem {
     productId
     variantId
     sku
+    slug
     name
     quantity
     image {

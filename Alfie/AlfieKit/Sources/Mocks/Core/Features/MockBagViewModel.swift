@@ -28,6 +28,11 @@ public class MockBagViewModel: BagViewModelProtocol {
         onDidSelectDeleteCalled?(line)
     }
 
+    public var onDidSelectLineCalled: ((CartLine) -> Void)?
+    public func didSelectLine(_ line: CartLine) {
+        onDidSelectLineCalled?(line)
+    }
+
     public var onDidDismissRemovalFailureCalled: (() -> Void)?
     public func didDismissRemovalFailure() {
         onDidDismissRemovalFailureCalled?()
