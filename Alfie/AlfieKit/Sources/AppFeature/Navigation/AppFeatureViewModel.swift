@@ -114,10 +114,12 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             configurationService: serviceProvider.configurationService,
             log: log
         )
-        // The scanner routes through the deep-link service rather than a route of its own, so the
-        // service is the whole of its wiring — see ADR-0001.
+        // The scanner routes through the deep-link service rather than a route of its own, so that
+        // service plus a camera is the whole of its wiring. A fresh scan service per presentation:
+        // each one owns a camera session that is released with the screen that opened it.
         let scannerDependencyContainer = ScannerDependencyContainer(
             deepLinkService: serviceProvider.deepLinkService,
+            makeScanService: { CameraScanService() },
             log: log
         )
         let searchDependencyContainer = SearchDependencyContainer(
@@ -149,7 +151,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productListingDependencyContainer: productListingDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
-                scannerDependencyContainer: scannerDependencyContainer,
                 log: log
             )
         )
@@ -162,7 +163,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 webDependencyContainer: webDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
-                scannerDependencyContainer: scannerDependencyContainer
+                scannerDependencyContainer: scannerDependencyContainer,
+                deepLinkService: serviceProvider.deepLinkService
             )
         )
         let wishlistFlowViewModel = WishlistFlowViewModel(

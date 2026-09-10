@@ -158,7 +158,6 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
-                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -288,7 +287,6 @@ let package = Package(
                 "Mocks",
                 "Model",
                 "SharedUI",
-                "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
             ]
         ),
@@ -501,7 +499,14 @@ let package = Package(
             dependencies: [
                 "Home",
                 "Mocks",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "Scanner",
+                "Search",
                 "TestUtils",
+                "Web",
+                "Wishlist",
             ]
         ),
 

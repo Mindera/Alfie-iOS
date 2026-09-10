@@ -45,7 +45,6 @@ public enum AccessibilityID {
 
     public enum Shop {
         public static let searchInput = "shop.search.input"
-        public static let scanButton = "shop.scan.button"
     }
 
     // MARK: - Scanner
