@@ -73,6 +73,20 @@ final class HomeFlowViewModelTests: XCTestCase {
         XCTAssertEqual(overlayViews.count, 3)
     }
 
+    // MARK: - Search results
+
+    /// A listing opened from a search result keeps its own way back to search, and that way back is
+    /// the tab's overlay — the same single value the scanner uses. This is the one line of this
+    /// builder the scanner work changed, and nothing reached it before: the builder is handed to
+    /// `SearchFlowViewModel` inside a closure that no unit test drives.
+    func test_aListingOpenedFromSearchCanOpenSearchAgain() {
+        let listing = sut.makeProductListingViewModelForSearch(searchTerm: "jeans", category: nil)
+
+        listing.didTapSearch()
+
+        XCTAssertNotNil(overlayViews.last ?? nil)
+    }
+
     // MARK: - Helpers
 
     private static func makeDependencies(serviceProvider: MockServiceProvider) -> HomeFlowDependencyContainer {
