@@ -36,6 +36,9 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     /// Numbers the notices, so that the same words said twice are two notices rather than one. See
     /// ``ScannerNotice``.
     private var noticeCount = 0
+    /// What the camera was holding when it last reported, so a code already answered is not answered
+    /// again as the set grows around it. See ``hasAnswered(_:whenHolding:nowHolding:)``.
+    private var lastHeldPayloads: Set<String> = []
     private var subscriptions = Set<AnyCancellable>()
 
     public var title: String { L10n.Scanner.title }
@@ -142,6 +145,9 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             // over from the last one would outlive the camera access the shopper has just granted
             // in Settings, and a notice would outlive the code it was about.
             state = Self.initialState
+            // The camera tracks nothing across a stop, so neither does this: a code answered before
+            // the screen went away has to be answerable again when it comes back.
+            lastHeldPayloads = []
             scanService.startScanning()
         } else {
             scanService.stopScanning()
@@ -160,16 +166,22 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private func didRecognise(payloads: [String]) {
         guard !hasOpenedLink else { return }
 
+        let previouslyHeld = lastHeldPayloads
+        let nowHeld = Set(payloads)
+        lastHeldPayloads = nowHeld
+
         switch payloads.map(classify(payload:)).codeToActOn {
         case .alfieCode(let url):
             open(url)
 
         case .barcode(let value):
+            guard !hasAnswered(value, whenHolding: previouslyHeld, nowHolding: nowHeld) else { return }
             log.debug("Scanned the manufacturer's Barcode, which Alfie cannot resolve: \(value)")
             analytics.trackScanFailed(reason: .barcode)
             show(notice: L10n.Scanner.BarcodeDetected.message)
 
         case .unrecognised(let payload):
+            guard !hasAnswered(payload, whenHolding: previouslyHeld, nowHolding: nowHeld) else { return }
             log.debug("Scanned code opens nothing in Alfie: \(payload)")
             analytics.trackScanFailed(reason: .unrecognised)
             show(notice: L10n.Scanner.Unrecognised.message)
@@ -177,6 +189,24 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         case .none:
             break
         }
+    }
+
+    /// Whether this code has been answered already, and so should be left alone.
+    ///
+    /// The camera republishes everything it is holding each time that set grows. A Barcode still in
+    /// view while another code joins it would otherwise be answered a second time for one physical
+    /// code — a repeated notice, and a second `scan_failed` inflating the very breakdown this
+    /// feature added.
+    ///
+    /// An identical report is not a republish and is deliberately not suppressed: the camera only
+    /// repeats a set once the code has left tracking and come back, which is the shopper presenting
+    /// it again — and being told again is the point. See ``ScannerNotice``.
+    private func hasAnswered(
+        _ payload: String,
+        whenHolding previouslyHeld: Set<String>,
+        nowHolding nowHeld: Set<String>
+    ) -> Bool {
+        nowHeld != previouslyHeld && previouslyHeld.contains(payload)
     }
 
     /// The deep-link service is asked what the code is, not asked to open it: classifying the

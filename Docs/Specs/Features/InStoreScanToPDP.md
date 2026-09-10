@@ -334,10 +334,18 @@ The developer will verify the camera path manually on device.
 - **Manufacturer Barcodes are not resolvable.** Only Alfie codes work.
 - **A Barcode acquired alone can flash its notice before the Alfie code is picked up.** The scanner
   ranks everything the camera is *holding* (`allItems`), so once both codes on a tag are tracked the
-  Alfie code wins. But a 1D Barcode locks on faster than a QR, and in the moment when it is the only
-  thing tracked there is nothing to tell the scanner an Alfie code is a frame away: the notice shows
-  and one `scan_failed reason=barcode` is recorded, then the Product opens. Suppressing that would
-  mean holding every notice back behind a delay, which costs the honest cases their immediacy.
+  Alfie code wins, and a code already answered is not answered twice as the set grows around it. But
+  a 1D Barcode locks on faster than a QR, and in the moment when it is the only thing tracked there
+  is nothing to tell the scanner an Alfie code is a frame away: the notice shows and one
+  `scan_failed reason=barcode` is recorded, then the Product opens.
+
+  Note this sits outside Scenario 4, which is conditioned on recognising a Barcode *instead of* an
+  Alfie code — here the shopper scanned correctly and is briefly told they did not.
+
+  Closing it would mean holding the Barcode notice behind a short grace period and cancelling it if
+  an Alfie code joins. That is deliberately not done: it delays the honest Scenario 4 message, the
+  one case the ticket exists for, and puts a timer inside a ViewModel that is otherwise synchronous
+  and therefore deterministic under test. Revisit if the demo shows the flash actually reads badly.
 - **The printed URL does not resolve in a browser.** It points at `localhost:4000`, which is the
   configured host. Scanning an Alfie code with the iOS Camera app will not open Alfie.
 - **The Variant is not preselected.** The scanned SKU is carried in the code but ignored; the

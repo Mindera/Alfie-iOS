@@ -339,6 +339,30 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(closeCount, 1)
     }
 
+    /// The camera republishes everything it holds each time that set grows, so a Barcode still in
+    /// view as another code joins it arrives twice. It is one physical code and gets one answer —
+    /// otherwise the `scan_failed` breakdown this feature added counts a single mistake twice.
+    func test_aBarcodeStillInViewAsAnotherCodeJoinsIsAnsweredOnce() {
+        sut.viewDidAppear()
+
+        scanService.recognise([Self.barcode])
+        scanService.recognise([Self.barcode, "https://example.com/not-an-alfie-code"])
+
+        XCTAssertEqual(reportedScanFailures, ["barcode"])
+    }
+
+    /// The suppression above must not swallow a genuine second look. The camera only reports the
+    /// same set twice once the code has left tracking and returned — the shopper presenting it
+    /// again — and being told again is exactly the point.
+    func test_aBarcodePresentedAgainIsAnsweredAgain() {
+        sut.viewDidAppear()
+
+        scanService.recognise([Self.barcode])
+        scanService.recognise([Self.barcode])
+
+        XCTAssertEqual(reportedScanFailures, ["barcode", "barcode"])
+    }
+
     /// A UPC-A reaches the app as an EAN-13 with a leading zero, which is the only form the scanner
     /// ever reports. It is the same mistake and gets the same answer.
     func test_aUpcABarcodeGetsTheSameAnswer() {
