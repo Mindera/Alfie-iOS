@@ -497,6 +497,18 @@
         }
       }
     },
+    "pdp.availability.online_note" : {
+      "comment" : "Shown beneath the PDP colour and size selectors. The availability those selectors show is an online aggregate with no per-store dimension, so this stops a shopper standing in a store reading a crossed-out size as \"not in this shop\".",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Availability shown is online stock"
+          }
+        }
+      }
+    },
     "pdp.colour.out_of_stock.accessibility_value" : {
       "extractionState" : "manual",
       "localizations" : {
