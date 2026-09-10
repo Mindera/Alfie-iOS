@@ -1272,6 +1272,17 @@
         }
       }
     },
+    "scanner.barcode_detected.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That's the product barcode. Scan the Alfie code on the tag instead."
+          }
+        }
+      }
+    },
     "scanner.error.generic.message" : {
       "extractionState" : "manual",
       "localizations" : {

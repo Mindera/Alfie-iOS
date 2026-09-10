@@ -52,6 +52,24 @@ final class ScannerViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    /// The longest thing the scanner says, and the one most likely to be read in a hurry over a live
+    /// camera: it names what was scanned *and* what to scan instead, so it wraps where the shorter
+    /// notice does not.
+    func test_scannerView_withBarcodeNotice() {
+        let viewModel = MockScannerViewModel(
+            state: .success(
+                .init(
+                    guidance: Self.guidance,
+                    notice: .init(id: 1, message: "That's the product barcode. Scan the Alfie code on the tag instead.")
+                )
+            )
+        )
+        let sut = ScannerView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_scannerView_withPermissionDenied() {
         let sut = ScannerView(viewModel: MockScannerViewModel(state: .error(.cameraPermissionDenied)))
         assertSnapshot(of: sut.embededInContainer(),

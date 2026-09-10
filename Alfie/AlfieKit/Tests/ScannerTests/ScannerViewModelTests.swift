@@ -26,6 +26,9 @@ final class ScannerViewModelTests: XCTestCase {
     private static let alfieCode = "https://localhost:4000/product/slim-indigo-jean"
     private static let alfieCodeWithSku = "https://localhost:4000/product/slim-indigo-jean?sku=SKU-42"
     private static let multiSegmentAlfieCode = "https://localhost:4000/product/mens/jeans/slim-indigo"
+    /// A real EAN-13, check digit and all — the kind already printed on the Swing tag beside the
+    /// Alfie code.
+    private static let barcode = "5901234123457"
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -181,7 +184,8 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise("https://example.com/not-an-alfie-code")
-        scanService.recognise("5901234123457")
+        // Thirteen digits, but the check digit does not hold: digits alone are not a Barcode.
+        scanService.recognise("5901234123456")
         scanService.recognise("")
 
         XCTAssertTrue(handledDeepLinks.isEmpty)
@@ -267,6 +271,66 @@ final class ScannerViewModelTests: XCTestCase {
 
         XCTAssertNil(sut.state.value?.notice)
         XCTAssertEqual(sut.state.value?.guidance, L10n.Scanner.Guidance.message)
+    }
+
+    // MARK: - Scanning the manufacturer's Barcode
+
+    /// The Barcode is the obvious thing to point a camera at, and in a demo somebody will. Alfie
+    /// cannot resolve one — ADR-0001 — so the only useful thing recognising it buys is being able to
+    /// name the code that does work.
+    func test_aBarcodeSaysWhichCodeToScanInstead() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.barcode)
+
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.BarcodeDetected.message)
+    }
+
+    /// Recognition exists to produce a message and nothing else: there is no catalogue lookup by
+    /// Barcode to attempt, so none is attempted. The deep-link handler records everything the app was
+    /// asked to open, and it stays empty.
+    func test_aBarcodeIsNeverLookedUpAndOpensNothing() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.barcode)
+
+        XCTAssertTrue(handledDeepLinks.isEmpty)
+        XCTAssertEqual(closeCount, 0)
+    }
+
+    /// The camera never stops, so the tag the shopper is already holding is the next thing it reads
+    /// — which is the whole point of saying "scan the Alfie code instead".
+    func test_anAlfieCodeIsStillRecognisedAfterABarcode() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.barcode)
+        XCTAssertTrue(scanService.isScanning)
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+    }
+
+    /// Both codes are printed on the same Swing tag, so a camera held over one sees both. Correcting
+    /// a shopper who scanned correctly — a frame before the Product opens anyway — would read as the
+    /// app arguing with itself.
+    func test_anAlfieCodeInTheSameFrameAsABarcodeIsTheOneOpened() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise([Self.barcode, Self.alfieCode])
+
+        XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+        XCTAssertNil(sut.state.value?.notice)
+    }
+
+    /// A UPC-A reaches the app as an EAN-13 with a leading zero, which is the only form the scanner
+    /// ever reports. It is the same mistake and gets the same answer.
+    func test_aUpcABarcodeGetsTheSameAnswer() {
+        sut.viewDidAppear()
+
+        scanService.recognise("0012345678905")
+
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.BarcodeDetected.message)
     }
 
     // MARK: - When recognition runs
@@ -397,6 +461,26 @@ final class ScannerViewModelTests: XCTestCase {
         scanService.recognise("https://example.com/not-an-alfie-code")
 
         XCTAssertEqual(reportedScanFailures, ["unrecognised"])
+    }
+
+    /// Under its own name, not under `unrecognised`: a run of these says the printed Alfie codes are
+    /// being missed on tags that carry them, which is a demo to fix rather than a catalogue gap.
+    func test_aBarcodeIsReportedAsBarcode() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.barcode)
+
+        XCTAssertEqual(reportedScanFailures, ["barcode"])
+    }
+
+    /// An Alfie code that won the frame is not also a Barcode failure. Reporting the loser would
+    /// count a scan that worked as one that did not.
+    func test_aBarcodeInTheSameFrameAsAnAlfieCodeIsNotReported() {
+        sut.viewDidAppear()
+
+        scanService.recognise([Self.barcode, Self.alfieCode])
+
+        XCTAssertTrue(reportedScanFailures.isEmpty)
     }
 
     func test_aRefusedCameraIsReportedAsPermissionDenied() {
