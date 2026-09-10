@@ -19,6 +19,7 @@ final class ScannerViewModelTests: XCTestCase {
     private var handledDeepLinks: [DeepLink]!
     private var closeCount: Int!
     private var openSettingsCount: Int!
+    private var mockAnalytics: MockAnalyticsTracker!
     private var sut: ScannerViewModel!
 
     /// The format the generator prints — see `Tools/AlfieCodeGen` and ADR-0001.
@@ -32,6 +33,7 @@ final class ScannerViewModelTests: XCTestCase {
         handledDeepLinks = []
         closeCount = 0
         openSettingsCount = 0
+        mockAnalytics = MockAnalyticsTracker()
         scanService = MockCameraScanService()
 
         let handler = MockDeepLinkHandler()
@@ -46,12 +48,14 @@ final class ScannerViewModelTests: XCTestCase {
             dependencies: .init(
                 deepLinkService: deepLinkService,
                 makeScanService: { scanService },
-                openAppSettings: { [weak self] in self?.openSettingsCount += 1 },
+                analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 log: MockLogger()
             ),
-            // The flow's closure, standing in for HomeFlowViewModel: it hands the scanned link to
-            // the real deep-link service, so these tests still assert on the link the app routes.
+            // The flow's closures, standing in for HomeFlowViewModel: the first hands the scanned
+            // link to the real deep-link service, so these tests still assert on the link the app
+            // routes.
             openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
+            openAppSettings: { [weak self] in self?.openSettingsCount += 1 },
             close: { [weak self] in self?.closeCount += 1 }
         )
     }
@@ -63,6 +67,7 @@ final class ScannerViewModelTests: XCTestCase {
         handledDeepLinks = nil
         closeCount = nil
         openSettingsCount = nil
+        mockAnalytics = nil
         try super.tearDownWithError()
     }
 
@@ -91,10 +96,11 @@ final class ScannerViewModelTests: XCTestCase {
             dependencies: .init(
                 deepLinkService: deepLinkService,
                 makeScanService: { scanService },
-                openAppSettings: { },
+                analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 log: MockLogger()
             ),
             openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
+            openAppSettings: { },
             close: { eventsInOrder.append("close") }
         )
         sut.viewDidAppear()
@@ -191,16 +197,39 @@ final class ScannerViewModelTests: XCTestCase {
 
         scanService.recognise("https://example.com/not-an-alfie-code")
 
-        XCTAssertEqual(sut.state.value?.notice, L10n.Scanner.Unrecognised.message)
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.Unrecognised.message)
     }
 
+    /// The scanner has to still be *open* for the next code to reach it. Asserting only that the
+    /// good code opened its Product would pass on a scanner that had closed and been reopened,
+    /// which is not what the shopper standing at the rail experiences.
     func test_aValidAlfieCodeIsStillRecognisedAfterAnUnrecognisedOne() throws {
         sut.viewDidAppear()
 
         scanService.recognise("https://example.com/not-an-alfie-code")
+
+        XCTAssertTrue(scanService.isScanning)
+        XCTAssertEqual(closeCount, 0)
+
         scanService.recognise(Self.alfieCode)
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+    }
+
+    /// A second bad code in a row says exactly what the first one said. It still has to count as a
+    /// new notice: the screen announces on change, so words alone would leave VoiceOver silent at
+    /// the moment the shopper has just failed again. See ``ScannerNotice``.
+    func test_theSameUnrecognisedCodeTwiceIsTwoDistinctNotices() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        let first = try XCTUnwrap(sut.state.value?.notice)
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        let second = try XCTUnwrap(sut.state.value?.notice)
+
+        XCTAssertEqual(first.message, second.message)
+        XCTAssertNotEqual(first, second)
     }
 
     func test_dismissingTheNoticeLeavesTheGuidanceInPlace() {
@@ -315,6 +344,52 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertTrue(scanService.isScanning)
     }
 
+    // MARK: - Reporting why a scan failed
+
+    /// Every way a scan ends without a Product reports under one event, distinguished by reason —
+    /// the reasons are read against each other, so each has to arrive under its own name.
+    func test_anUnrecognisedCodeIsReportedAsUnrecognised() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        XCTAssertEqual(reportedScanFailures, ["unrecognised"])
+    }
+
+    func test_aRefusedCameraIsReportedAsPermissionDenied() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .permissionDenied)
+
+        XCTAssertEqual(reportedScanFailures, ["permission_denied"])
+    }
+
+    func test_aDeviceThatCannotScanIsReportedAsUnsupported() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .deviceNotSupported)
+
+        XCTAssertEqual(reportedScanFailures, ["unsupported"])
+    }
+
+    func test_aCameraThatWillNotStartIsReportedAsGeneric() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .unavailable)
+
+        XCTAssertEqual(reportedScanFailures, ["generic"])
+    }
+
+    /// A scan that works is not a failure. Without this the event would count openings as well as
+    /// failures and the breakdown would describe nothing.
+    func test_aScanThatOpensAProductIsNotReported() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertTrue(reportedScanFailures.isEmpty)
+    }
+
     // MARK: - Closing
 
     func test_closingDismissesWithoutOpeningAProduct() {
@@ -327,6 +402,11 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    /// The `reason` carried by each `scan_failed` event, in order.
+    private var reportedScanFailures: [String] {
+        mockAnalytics.trackedValues(of: .reason, for: .scanFailed)
+    }
 
     private func handledHandle() throws -> String {
         let deepLink = try XCTUnwrap(handledDeepLinks.first)

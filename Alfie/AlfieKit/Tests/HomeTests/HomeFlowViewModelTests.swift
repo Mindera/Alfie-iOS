@@ -137,7 +137,7 @@ final class HomeFlowViewModelTests: XCTestCase {
             scannerDependencyContainer: ScannerDependencyContainer(
                 deepLinkService: serviceProvider.deepLinkService,
                 makeScanService: { MockCameraScanService() },
-                openAppSettings: { },
+                analytics: serviceProvider.analytics,
                 log: log
             ),
             deepLinkService: serviceProvider.deepLinkService

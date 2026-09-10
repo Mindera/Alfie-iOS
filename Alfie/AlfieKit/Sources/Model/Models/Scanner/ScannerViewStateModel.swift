@@ -8,16 +8,16 @@ import Foundation
 public struct ScannerViewStateModel: Equatable {
     /// What to point the camera at. Always present.
     public let guidance: String
-    /// A message about the last code recognised, or `nil` when there is nothing to say. Shown
-    /// without closing the camera: a notice is a correction, not a dead end.
-    public let notice: String?
+    /// What the last recognised code prompted, or `nil` when there is nothing to say. Shown without
+    /// closing the camera: a notice is a correction, not a dead end.
+    public let notice: ScannerNotice?
 
-    public init(guidance: String, notice: String? = nil) {
+    public init(guidance: String, notice: ScannerNotice? = nil) {
         self.guidance = guidance
         self.notice = notice
     }
 
-    public func with(notice: String?) -> Self {
+    public func with(notice: ScannerNotice?) -> Self {
         .init(guidance: guidance, notice: notice)
     }
 }

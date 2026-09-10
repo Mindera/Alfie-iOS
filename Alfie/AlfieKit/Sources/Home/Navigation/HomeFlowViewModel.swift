@@ -7,6 +7,7 @@ import ProductListing
 import Scanner
 import Search
 import SwiftUI
+import Utils
 import Web
 import Wishlist
 
@@ -70,6 +71,10 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             openScannedLink: { [weak self] url in
                 self?.dependencies.deepLinkService.openUrls([url])
             },
+            // A refused camera can only be granted outside the app, so the one recovery the scanner
+            // can offer is the door out to Settings — routed from here, like every other way off
+            // this screen.
+            openAppSettings: { ExternalAppLauncher.openAppSettings() },
             close: { [weak self] in self?.overlay = nil }
         )
     }

@@ -1,5 +1,6 @@
 import AlicerceLogging
 import Combine
+import Core
 import Model
 import SharedUI
 import SwiftUI
@@ -21,6 +22,7 @@ import SwiftUI
 public final class ScannerViewModel: ScannerViewModelProtocol {
     private let scanService: CameraScanServiceProtocol
     private let deepLinkService: DeepLinkServiceProtocol
+    private let analytics: AlfieAnalyticsTracker
     private let openScannedLink: (URL) -> Void
     private let openAppSettings: () -> Void
     private let close: () -> Void
@@ -30,6 +32,9 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private var isAppActive = true
     private var hasOpenedProduct = false
     private var isScanning = false
+    /// Numbers the notices, so that the same words said twice are two notices rather than one. See
+    /// ``ScannerNotice``.
+    private var noticeCount = 0
     private var subscriptions = Set<AnyCancellable>()
 
     public var title: String { L10n.Scanner.title }
@@ -37,16 +42,21 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType>
         = .success(.init(guidance: L10n.Scanner.Guidance.message))
 
+    /// `openAppSettings` arrives as a closure from the flow, like `openScannedLink` and `close`:
+    /// everything that takes the shopper off this screen — including out of the app entirely —
+    /// leaves through the same seam, rather than half of it through the dependency container.
     public init(
         dependencies: ScannerDependencyContainer,
         openScannedLink: @escaping (URL) -> Void,
+        openAppSettings: @escaping () -> Void,
         close: @escaping () -> Void
     ) {
         self.scanService = dependencies.makeScanService()
         self.deepLinkService = dependencies.deepLinkService
-        self.openAppSettings = dependencies.openAppSettings
+        self.analytics = dependencies.analytics
         self.log = dependencies.log
         self.openScannedLink = openScannedLink
+        self.openAppSettings = openAppSettings
         self.close = close
         setupBindings()
     }
@@ -83,7 +93,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     }
 
     public func didDismissNotice() {
-        show(notice: nil)
+        guard let model = state.value else { return }
+        state = .success(model.with(notice: nil))
     }
 
     public func didTapOpenSettings() {
@@ -94,16 +105,20 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     private func didFailToScan(with failure: CameraScanFailure) {
         log.error("Camera scanning is unavailable: \(failure)")
+        let error = ScannerViewErrorType.from(failure: failure)
+        analytics.trackScanFailed(reason: error.analyticsReason)
         // Replaces the whole state rather than joining it: there is no camera behind this, so the
         // guidance about what to point one at has nothing left to describe.
-        state = .error(.from(failure))
+        state = .error(error)
     }
 
     /// A notice only exists over a running camera, so it is written into the success state rather
-    /// than replacing it — an error state has no guidance to put it beside.
-    private func show(notice: String?) {
+    /// than replacing it — an error state has no guidance to put it beside. Each one is numbered,
+    /// so that a repeat is a new notice and gets announced again.
+    private func show(notice message: String) {
         guard let model = state.value else { return }
-        state = .success(model.with(notice: notice))
+        noticeCount += 1
+        state = .success(model.with(notice: .init(id: noticeCount, message: message)))
     }
 
     private func updateScanning() {
@@ -133,6 +148,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             case .productDetail = deepLinkService.deepLinkType(url)
         else {
             log.debug("Scanned code is not an Alfie code: \(payload)")
+            analytics.trackScanFailed(reason: .unrecognised)
             // Said over the camera rather than instead of it: the shopper is standing in front of
             // the rail and the next tag is the fix, so the scanner has to still be running when
             // they find it.

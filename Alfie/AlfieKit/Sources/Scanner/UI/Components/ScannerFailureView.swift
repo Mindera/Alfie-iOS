@@ -14,40 +14,44 @@ struct ScannerFailureView: View {
     let openSettings: () -> Void
 
     var body: some View {
-        ErrorView(title: title, message: message, buttons: buttons)
+        ErrorView(title: copy.title, message: copy.message, buttons: buttons)
             .accessibilityIdentifier(AccessibilityID.Scanner.failure)
     }
 
-    private var title: String? {
-        switch error {
-        case .cameraPermissionDenied:
-            return L10n.Scanner.Error.PermissionDenied.title
-
-        case .deviceNotSupported, .generic:
-            // No title: neither has a headline that says more than its message already does, and an
-            // invented one would be noise for a shopper reading the screen aloud.
-            return nil
-        }
+    /// Everything the screen says about one failure, decided in one place. Whether a case has a
+    /// title and whether it has a way out are part of what that case *is*, so they are answered
+    /// together rather than by three switches that could disagree.
+    private struct Copy {
+        /// Absent where a headline would say no more than the message already does, and an invented
+        /// one would be noise for a shopper reading the screen aloud.
+        let title: String?
+        let message: String
+        /// Absent where there is nothing the shopper can do about it.
+        let action: String?
     }
 
-    private var message: String {
+    private var copy: Copy {
         switch error {
         case .cameraPermissionDenied:
-            return L10n.Scanner.Error.PermissionDenied.message
+            return .init(
+                title: L10n.Scanner.Error.PermissionDenied.title,
+                message: L10n.Scanner.Error.PermissionDenied.message,
+                action: L10n.Scanner.Error.PermissionDenied.action
+            )
 
         case .deviceNotSupported:
-            return L10n.Scanner.Error.Unsupported.message
+            return .init(title: nil, message: L10n.Scanner.Error.Unsupported.message, action: nil)
 
         case .generic:
-            return L10n.Scanner.Error.Generic.message
+            return .init(title: nil, message: L10n.Scanner.Error.Generic.message, action: nil)
         }
     }
 
     private var buttons: [ErrorView.ButtonConfiguration] {
-        guard case .cameraPermissionDenied = error else { return [] }
+        guard let action = copy.action else { return [] }
         return [
             .init(
-                cta: L10n.Scanner.Error.PermissionDenied.action,
+                cta: action,
                 accessibilityId: AccessibilityID.Scanner.openSettings,
                 action: openSettings
             ),
@@ -56,10 +60,15 @@ struct ScannerFailureView: View {
 }
 
 #if DEBUG
-#Preview {
-    VStack {
-        ScannerFailureView(error: .cameraPermissionDenied, openSettings: { })
-        ScannerFailureView(error: .deviceNotSupported, openSettings: { })
-    }
+#Preview("Permission denied") {
+    ScannerFailureView(error: .cameraPermissionDenied, openSettings: { })
+}
+
+#Preview("Device not supported") {
+    ScannerFailureView(error: .deviceNotSupported, openSettings: { })
+}
+
+#Preview("Generic") {
+    ScannerFailureView(error: .generic, openSettings: { })
 }
 #endif

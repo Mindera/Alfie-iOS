@@ -8,4 +8,5 @@ public enum AnalyticsParameter: String, AnalyticsParameterKey {
     case graphqlErrorCode = "graphql_error_code"
     case retryCount = "retry_count"
     case errorCategory = "error_category"
+    case reason = "reason"
 }

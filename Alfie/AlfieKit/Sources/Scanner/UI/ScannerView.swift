@@ -43,9 +43,13 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         }
         // A notice arrives while the shopper is looking through the camera, not at the text, so
         // seeing it is not the same as being told it. VoiceOver has to be spoken to directly.
+        //
+        // Keyed on the whole notice rather than its words: a second bad code in a row says the same
+        // thing, and it is exactly then that the shopper most needs telling. ``ScannerNotice``
+        // carries an identity so that repeat still reads as a change.
         .onChange(of: viewModel.state.value?.notice) { notice in
             guard let notice else { return }
-            UIAccessibility.post(notification: .announcement, argument: notice)
+            UIAccessibility.post(notification: .announcement, argument: notice.message)
         }
     }
 
@@ -101,7 +105,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 SnackbarView(
                     configuration: .init(
                         type: .error,
-                        text: notice,
+                        text: notice.message,
                         showCloseButton: true,
                         icon: Icon.warning.image,
                         autoDismissTime: nil
@@ -152,7 +156,28 @@ private enum Constants {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Scanning") {
     ScannerView(viewModel: MockScannerViewModel())
+}
+
+#Preview("Unrecognised code") {
+    ScannerView(
+        viewModel: MockScannerViewModel(
+            state: .success(
+                .init(
+                    guidance: "Point the camera at the Alfie code on the tag",
+                    notice: .init(id: 1, message: "That code isn't from Alfie.")
+                )
+            )
+        )
+    )
+}
+
+#Preview("Permission denied") {
+    ScannerView(viewModel: MockScannerViewModel(state: .error(.cameraPermissionDenied)))
+}
+
+#Preview("Device not supported") {
+    ScannerView(viewModel: MockScannerViewModel(state: .error(.deviceNotSupported)))
 }
 #endif
