@@ -493,7 +493,7 @@ public enum L10n {
       public static let message = L10n.tr("L10n", "scanner.guidance.message")
     }
     public enum Unrecognised {
-      /// That code isn't from Alfie.
+      /// That code doesn't open anything in Alfie.
       public static let message = L10n.tr("L10n", "scanner.unrecognised.message")
     }
   }
