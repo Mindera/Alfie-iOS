@@ -11,6 +11,10 @@ import Mocks
 ///
 /// Presented modally rather than pushed — it adds no navigation route, because a successful scan
 /// leaves through the deep-link path instead of a route of its own.
+///
+/// Nothing here is ever blank. A code that is not ours puts a notice over a camera that keeps
+/// running, and a camera that cannot run at all is replaced by ``ScannerFailureView`` — the header
+/// and its way out survive both, and invert with whatever ends up behind them.
 public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     @Environment(\.scenePhase) private var scenePhase
@@ -21,24 +25,44 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
 
     public var body: some View {
         ZStack(alignment: .top) {
-            viewModel.preview
-                .ignoresSafeArea()
-                .accessibilityHidden(true)
+            if let error = viewModel.state.failure {
+                ScannerFailureView(error: error, openSettings: { viewModel.didTapOpenSettings() })
+            } else {
+                camera
+            }
 
             header
                 .padding(theme.spacing.space200)
-
-            guidance
-                .frame(maxHeight: .infinity, alignment: .bottom)
-                .padding(.horizontal, theme.spacing.space400)
-                .padding(.bottom, theme.spacing.space600)
         }
-        .background(Theme.surfaceBackgroundInvertedPrimary)
+        .background(isShowingCamera ? Theme.surfaceBackgroundInvertedPrimary : Theme.surfaceBackgroundPrimary)
         .accessibilityIdentifier(AccessibilityID.Scanner.screen)
         .onAppear { viewModel.viewDidAppear() }
         .onDisappear { viewModel.viewDidDisappear() }
         .onChange(of: scenePhase) { phase in
             viewModel.didChangeScenePhase(isActive: phase == .active)
+        }
+        // A notice arrives while the shopper is looking through the camera, not at the text, so
+        // seeing it is not the same as being told it. VoiceOver has to be spoken to directly.
+        .onChange(of: viewModel.state.value?.notice) { notice in
+            guard let notice else { return }
+            UIAccessibility.post(notification: .announcement, argument: notice)
+        }
+    }
+
+    private var isShowingCamera: Bool {
+        viewModel.state.failure == nil
+    }
+
+    private var camera: some View {
+        ZStack(alignment: .top) {
+            viewModel.preview
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+
+            messages
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .padding(.horizontal, theme.spacing.space400)
+                .padding(.bottom, theme.spacing.space600)
         }
     }
 
@@ -47,7 +71,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     private var header: some View {
         ZStack {
             Text.build(theme.font.heading.medium(viewModel.title))
-                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .foregroundStyle(chromeForeground)
                 .accessibilityIdentifier(AccessibilityID.Scanner.title)
                 .accessibilityAddTraits(.isHeader)
 
@@ -60,28 +84,65 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         Button {
             viewModel.didTapClose()
         } label: {
-            ThemedIcon(.close, size: .medium, tint: Theme.contentContentInvertedPrimary)
+            ThemedIcon(.close, size: .medium, tint: chromeForeground)
                 .padding(theme.spacing.space150)
-                .background(Circle().fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity)))
+                .background(chromeBackground)
         }
         .accessibilityIdentifier(AccessibilityID.Scanner.close)
         .accessibilityLabel(Text(L10n.Accessibility.close))
     }
 
+    /// The guidance, and the notice about the last code when there is one. Both sit at the bottom
+    /// rather than one replacing the other: a shopper who has just scanned the wrong thing needs
+    /// telling *and* still needs to know what to point at.
+    @ViewBuilder private var messages: some View {
+        VStack(spacing: theme.spacing.space200) {
+            if let notice = viewModel.state.value?.notice {
+                SnackbarView(
+                    configuration: .init(
+                        type: .error,
+                        text: notice,
+                        showCloseButton: true,
+                        icon: Icon.warning.image,
+                        autoDismissTime: nil
+                    ),
+                    onCloseTap: { viewModel.didDismissNotice() }
+                )
+                .accessibilityIdentifier(AccessibilityID.Scanner.notice)
+            }
+
+            guidance
+        }
+    }
+
     /// Left as plain text in reading order: a shopper using VoiceOver cannot see what the camera is
     /// being asked to look at, so the guidance has to be reached on the way through the screen
     /// rather than hidden behind the preview.
-    private var guidance: some View {
-        Text.build(theme.font.body.medium(viewModel.guidance))
-            .foregroundStyle(Theme.contentContentInvertedPrimary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, theme.spacing.space300)
-            .padding(.vertical, theme.spacing.space200)
-            .background(
-                RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                    .fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity))
-            )
-            .accessibilityIdentifier(AccessibilityID.Scanner.guidance)
+    @ViewBuilder private var guidance: some View {
+        if let guidance = viewModel.state.value?.guidance {
+            Text.build(theme.font.body.medium(guidance))
+                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, theme.spacing.space300)
+                .padding(.vertical, theme.spacing.space200)
+                .background(
+                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
+                        .fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity))
+                )
+                .accessibilityIdentifier(AccessibilityID.Scanner.guidance)
+        }
+    }
+
+    /// The chrome sits over a live camera in the ordinary case and over a plain background in the
+    /// failure cases, so it inverts with what is behind it.
+    private var chromeForeground: Color {
+        isShowingCamera ? Theme.contentContentInvertedPrimary : Theme.contentContentPrimary
+    }
+
+    @ViewBuilder private var chromeBackground: some View {
+        if isShowingCamera {
+            Circle().fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity))
+        }
     }
 }
 

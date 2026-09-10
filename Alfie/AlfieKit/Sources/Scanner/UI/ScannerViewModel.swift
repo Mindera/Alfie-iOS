@@ -12,10 +12,17 @@ import SwiftUI
 /// this possible: it puts the Handle inside the code, so there is nothing to look up and no new
 /// route to add. The Product opens on its default Variant — the SKU the code carries is parsed and
 /// ignored until Variant preselection is implemented.
+///
+/// It does own what the shopper is told when that does not happen, and the distinction it draws is
+/// between a scan that failed and a camera that cannot run. A code that is not ours is the first:
+/// the camera keeps running underneath a notice, because the fix is the next tag along. A refused
+/// or missing camera is the second: it replaces the screen, because there is no scan to retry until
+/// something outside this app changes — which is why every start clears whatever the last one said.
 public final class ScannerViewModel: ScannerViewModelProtocol {
     private let scanService: CameraScanServiceProtocol
     private let deepLinkService: DeepLinkServiceProtocol
     private let openScannedLink: (URL) -> Void
+    private let openAppSettings: () -> Void
     private let close: () -> Void
     private let log: Logger
 
@@ -26,8 +33,9 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private var subscriptions = Set<AnyCancellable>()
 
     public var title: String { L10n.Scanner.title }
-    public var guidance: String { L10n.Scanner.Guidance.message }
     public var preview: AnyView { scanService.makePreview() }
+    @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType>
+        = .success(.init(guidance: L10n.Scanner.Guidance.message))
 
     public init(
         dependencies: ScannerDependencyContainer,
@@ -36,6 +44,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     ) {
         self.scanService = dependencies.makeScanService()
         self.deepLinkService = dependencies.deepLinkService
+        self.openAppSettings = dependencies.openAppSettings
         self.log = dependencies.log
         self.openScannedLink = openScannedLink
         self.close = close
@@ -45,6 +54,10 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private func setupBindings() {
         scanService.recognisedPayloadPublisher
             .sink { [weak self] in self?.didRecognise(payload: $0) }
+            .store(in: &subscriptions)
+
+        scanService.failurePublisher
+            .sink { [weak self] in self?.didFailToScan(with: $0) }
             .store(in: &subscriptions)
     }
 
@@ -69,7 +82,29 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         close()
     }
 
+    public func didDismissNotice() {
+        show(notice: nil)
+    }
+
+    public func didTapOpenSettings() {
+        openAppSettings()
+    }
+
     // MARK: - Private
+
+    private func didFailToScan(with failure: CameraScanFailure) {
+        log.error("Camera scanning is unavailable: \(failure)")
+        // Replaces the whole state rather than joining it: there is no camera behind this, so the
+        // guidance about what to point one at has nothing left to describe.
+        state = .error(.from(failure))
+    }
+
+    /// A notice only exists over a running camera, so it is written into the success state rather
+    /// than replacing it — an error state has no guidance to put it beside.
+    private func show(notice: String?) {
+        guard let model = state.value else { return }
+        state = .success(model.with(notice: notice))
+    }
 
     private func updateScanning() {
         let shouldScan = isOnScreen && isAppActive && !hasOpenedProduct
@@ -77,6 +112,10 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         isScanning = shouldScan
 
         if shouldScan {
+            // Every start is a fresh attempt, so it starts from a fresh screen: an explanation left
+            // over from the last one would outlive the camera access the shopper has just granted
+            // in Settings, and a notice would outlive the code it was about.
+            state = .success(.init(guidance: L10n.Scanner.Guidance.message))
             scanService.startScanning()
         } else {
             scanService.stopScanning()
@@ -93,7 +132,11 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             let url = URL(string: payload),
             case .productDetail = deepLinkService.deepLinkType(url)
         else {
-            log.debug("Scanned code is not an Alfie code, ignoring: \(payload)")
+            log.debug("Scanned code is not an Alfie code: \(payload)")
+            // Said over the camera rather than instead of it: the shopper is standing in front of
+            // the rail and the next tag is the fix, so the scanner has to still be running when
+            // they find it.
+            show(notice: L10n.Scanner.Unrecognised.message)
             return
         }
 
