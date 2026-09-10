@@ -435,6 +435,9 @@ extension ProductDetailsView {
                             columns: Constants.colourGridColumns
                         )
                     }
+                    // Carried by every card, not just stated once below the grid: a shopper who
+                    // touches a dimmed colour directly, or moves by rotor, never passes the note.
+                    .accessibilityHint(L10n.Pdp.Availability.onlineNote)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
 
                 case .summaryOnly:
@@ -464,6 +467,9 @@ extension ProductDetailsView {
                 }
             }
             .shimmering(while: shimmeringBinding(for: .sizeSelector), animateOnStateTransition: false)
+            // The crossed-out chip is the availability signal most likely to be misread in a store,
+            // so the qualification travels with each chip rather than only with the note below.
+            .accessibilityHint(L10n.Pdp.Availability.onlineNote)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeSelector)
         }
     }
@@ -487,11 +493,12 @@ extension ProductDetailsView {
     /// The availability the colour and size selectors show is an **online** aggregate: the BFF exposes
     /// `Inventory { available: Int }` with no location dimension, and neither commerce adapter queries
     /// location-scoped inventory. Without this line a shopper standing in a store reads a crossed-out
-    /// size as "not in this shop" — which is not what it means, and not something the stack can say.
+    /// size chip as "not in this shop" — which is not what it means, and not something the stack can say.
     /// See `Docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
     ///
-    /// It closes the availability block rather than sitting elsewhere on the page, so assistive
-    /// technology reads it straight after the colour cards and size chips it qualifies.
+    /// This is the visible half. Reading order alone would only reach a VoiceOver user who swipes
+    /// linearly past every swatch, so the same string is also the accessibility hint on both
+    /// selectors — a shopper who touches a crossed-out chip directly hears the qualification with it.
     @ViewBuilder private var availabilityNote: some View {
         if viewModel.shouldShow(section: .availabilityNote) {
             Text.build(theme.font.label.small(L10n.Pdp.Availability.onlineNote))
