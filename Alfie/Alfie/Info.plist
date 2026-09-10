@@ -6,6 +6,8 @@
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Alfie uses the camera to scan the Alfie code on a product's swing tag, so it can open that product's page.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

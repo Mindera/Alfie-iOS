@@ -58,6 +58,10 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case refund
     case reload
     case scanBarcode = "scan-barcode"
+    /// Not on the Figma Iconography page yet — the scan-to-PDP demo needed a glyph the set does not
+    /// carry, so this is the Tabler `scan` form the rest of the set is built on. Replace it with the
+    /// Figma export when Iconography gains one.
+    case scan
     case search
     case settings
     case share

@@ -65,6 +65,10 @@ let package = Package(
             targets: ["ProductListing"]
         ),
         .library(
+            name: "Scanner",
+            targets: ["Scanner"]
+        ),
+        .library(
             name: "Search",
             targets: ["Search"]
         ),
@@ -116,6 +120,7 @@ let package = Package(
                 "Home",
                 "Mocks",
                 "Model",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -154,6 +159,7 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -211,6 +217,7 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Web",
@@ -272,6 +279,17 @@ let package = Package(
                 "Search",
                 "SharedUI",
                 "Utils",
+            ]
+        ),
+
+        .target(
+            name: "Scanner",
+            dependencies: [
+                "AccessibilityIdentifiers",
+                "Model",
+                "SharedUI",
+                "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
             ]
         ),
 
@@ -438,6 +456,17 @@ let package = Package(
             dependencies: [
                 "ProductListing",
                 "Mocks",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
+            name: "ScannerTests",
+            dependencies: [
+                "Core",
+                "DeepLink",
+                "Mocks",
+                "Scanner",
                 "TestUtils",
             ]
         ),

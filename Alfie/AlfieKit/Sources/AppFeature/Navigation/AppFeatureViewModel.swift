@@ -11,6 +11,7 @@ import MyAccount
 import OrderedCollections
 import ProductDetails
 import ProductListing
+import Scanner
 import Search
 import SwiftUI
 import Utils
@@ -115,6 +116,12 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             configurationService: serviceProvider.configurationService,
             log: log
         )
+        // The scanner routes through the deep-link service rather than a route of its own, so the
+        // service is the whole of its wiring — see ADR-0001.
+        let scannerDependencyContainer = ScannerDependencyContainer(
+            deepLinkService: serviceProvider.deepLinkService,
+            log: log
+        )
         let searchDependencyContainer = SearchDependencyContainer(
             recentsService: serviceProvider.recentsService,
             analytics: serviceProvider.analytics,
@@ -144,6 +151,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productListingDependencyContainer: productListingDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
+                scannerDependencyContainer: scannerDependencyContainer,
                 log: log
             )
         )
@@ -155,7 +163,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productDetailsDependencyContainer: productDetailsDependencyContainer,
                 webDependencyContainer: webDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
-                searchDependencyContainer: searchDependencyContainer
+                searchDependencyContainer: searchDependencyContainer,
+                scannerDependencyContainer: scannerDependencyContainer
             )
         )
         let wishlistFlowViewModel = WishlistFlowViewModel(
