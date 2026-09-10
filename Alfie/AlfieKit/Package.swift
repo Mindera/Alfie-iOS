@@ -286,6 +286,7 @@ let package = Package(
             name: "Scanner",
             dependencies: [
                 "AccessibilityIdentifiers",
+                "Mocks",
                 "Model",
                 "SharedUI",
                 "Utils",

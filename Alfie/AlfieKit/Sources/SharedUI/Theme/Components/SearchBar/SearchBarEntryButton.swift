@@ -74,7 +74,7 @@ public struct SearchBarEntryButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(scan.accessibilityIdentifier)
-        .accessibilityLabel(L10n.Search.ScanButton.accessibilityLabel)
+        .accessibilityLabel(L10n.Accessibility.scan)
     }
 
     private enum Constants {
