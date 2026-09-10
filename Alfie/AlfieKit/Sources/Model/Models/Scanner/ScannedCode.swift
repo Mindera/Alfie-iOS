@@ -64,7 +64,7 @@ public extension Collection where Element == ScannedCode {
     ///
     /// Ties keep the order the camera reported, so a frame holding two codes of equal standing
     /// reports the one it saw first rather than an arbitrary pick.
-    var actionable: ScannedCode? {
+    var codeToActOn: ScannedCode? {
         self.min { $0.precedence < $1.precedence }
     }
 }

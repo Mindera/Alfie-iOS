@@ -160,7 +160,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private func didRecognise(payloads: [String]) {
         guard !hasOpenedLink else { return }
 
-        switch payloads.map(classify(payload:)).actionable {
+        switch payloads.map(classify(payload:)).codeToActOn {
         case .alfieCode(let url):
             open(url)
 

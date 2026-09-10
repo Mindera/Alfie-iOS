@@ -2,7 +2,7 @@
 
 **Status**: Draft
 **Created**: 2026-09-09
-**Last Updated**: 2026-09-09
+**Last Updated**: 2026-09-10
 **Implementation PR**: _(link when implemented)_
 
 ---
@@ -129,6 +129,12 @@ public enum ScannedCode: Equatable {
     /// Thirteen digits with a valid EAN-13 check digit. The check digit is tested and not merely the
     /// shape, so a QR code holding thirteen digits is not answered with "that's the product barcode".
     public static func isBarcode(_ payload: String) -> Bool { ... }
+}
+
+public extension Collection where Element == ScannedCode {
+    /// The one code the scanner acts on out of everything the camera is holding. Ties keep the
+    /// camera's own order. This is what `ScannerViewModel` calls.
+    var codeToActOn: ScannedCode? { ... }
 }
 // Built by #139. #138 needed only Alfie-code-or-not, which one `guard` expressed; the manufacturer
 // Barcode is what made the third case real.
@@ -326,6 +332,12 @@ The developer will verify the camera path manually on device.
   tell a shopper whether a size is in the store they are standing in. Scenario 3 states this
   explicitly on screen so nobody in the demo infers a capability that does not exist.
 - **Manufacturer Barcodes are not resolvable.** Only Alfie codes work.
+- **A Barcode acquired alone can flash its notice before the Alfie code is picked up.** The scanner
+  ranks everything the camera is *holding* (`allItems`), so once both codes on a tag are tracked the
+  Alfie code wins. But a 1D Barcode locks on faster than a QR, and in the moment when it is the only
+  thing tracked there is nothing to tell the scanner an Alfie code is a frame away: the notice shows
+  and one `scan_failed reason=barcode` is recorded, then the Product opens. Suppressing that would
+  mean holding every notice back behind a delay, which costs the honest cases their immediacy.
 - **The printed URL does not resolve in a browser.** It points at `localhost:4000`, which is the
   configured host. Scanning an Alfie code with the iOS Camera app will not open Alfie.
 - **The Variant is not preselected.** The scanned SKU is carried in the code but ignored; the
@@ -382,3 +394,4 @@ The developer will verify the camera path manually on device.
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-09-09 | Initial spec created from `/grill-with-docs` session | Khoi Nguyen |
+| 2026-09-10 | #139: `ScannedCode` built with `precedence`; two-codes-at-once edge case amended; Barcode-notice snapshot added | Khoi Nguyen |

@@ -47,7 +47,7 @@ final class ScannedCodeTests: XCTestCase {
         let url = try XCTUnwrap(URL(string: "https://localhost:4000/product/slim-indigo-jean"))
         let codes: [ScannedCode] = [.barcode(value: "5901234123457"), .alfieCode(url)]
 
-        XCTAssertEqual(codes.actionable, .alfieCode(url))
+        XCTAssertEqual(codes.codeToActOn, .alfieCode(url))
     }
 
     /// "Scan the other code on this tag" is more use than "that opens nothing", so when neither is
@@ -55,7 +55,7 @@ final class ScannedCodeTests: XCTestCase {
     func test_aBarcodeReadAlongsideAnUnrecognisedCodeIsTheOneActedOn() {
         let codes: [ScannedCode] = [.unrecognised(payload: "hello"), .barcode(value: "5901234123457")]
 
-        XCTAssertEqual(codes.actionable, .barcode(value: "5901234123457"))
+        XCTAssertEqual(codes.codeToActOn, .barcode(value: "5901234123457"))
     }
 
     /// Between equals the camera's own order stands, so a frame of two strangers' codes reports the
@@ -63,10 +63,10 @@ final class ScannedCodeTests: XCTestCase {
     func test_equallyRankedCodesKeepTheOrderTheCameraReportedThem() {
         let codes: [ScannedCode] = [.unrecognised(payload: "first"), .unrecognised(payload: "second")]
 
-        XCTAssertEqual(codes.actionable, .unrecognised(payload: "first"))
+        XCTAssertEqual(codes.codeToActOn, .unrecognised(payload: "first"))
     }
 
     func test_aFrameWithNoCodesInItHasNothingToActOn() {
-        XCTAssertNil([ScannedCode]().actionable)
+        XCTAssertNil([ScannedCode]().codeToActOn)
     }
 }

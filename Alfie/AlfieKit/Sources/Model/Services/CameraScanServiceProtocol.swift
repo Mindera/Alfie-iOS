@@ -11,10 +11,11 @@ public protocol CameraScanServiceProtocol: AnyObject {
     /// Every code the camera recognises, as the raw string it carries. A QR code emits its contents;
     /// interpreting them is the ViewModel's job, not the camera's.
     ///
-    /// Delivered a frame at a time rather than a code at a time, because a Swing tag prints the
-    /// Barcode and the Alfie code side by side and which of the two the scanner acts on is a choice
-    /// that needs both of them in hand. Published one by one, the Alfie code would win or lose by
-    /// whichever the camera happened to report first.
+    /// Each emission is everything the camera is holding at that moment, not the one code that has
+    /// just arrived, and it is republished whenever that set grows. A Swing tag prints the Barcode
+    /// and the Alfie code side by side, so which of the two the scanner acts on is a choice that
+    /// needs both in hand; published one at a time, the Alfie code would win or lose by whichever
+    /// the camera happened to acquire first — and it acquires the Barcode first.
     var recognisedPayloadsPublisher: AnyPublisher<[String], Never> { get }
 
     /// Emitted in place of the recognitions a ``startScanning()`` was expected to produce, when
