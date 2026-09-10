@@ -145,6 +145,17 @@
         }
       }
     },
+    "accessibility.scan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan a tag"
+          }
+        }
+      }
+    },
     "accessibility.search" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1265,17 +1276,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scan"
-          }
-        }
-      }
-    },
-    "search.scan_button.accessibility_label" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan a tag"
           }
         }
       }
