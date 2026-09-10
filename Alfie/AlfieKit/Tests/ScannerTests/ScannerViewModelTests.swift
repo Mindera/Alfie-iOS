@@ -5,7 +5,7 @@ import Model
 import XCTest
 @testable import Scanner
 
-/// The scanner's behaviour, driven through the ``ScanSourceProtocol`` seam rather than a camera.
+/// The scanner's behaviour, driven through the ``CameraScanServiceProtocol`` seam rather than a camera.
 ///
 /// The deep-link service under test is the **real** one, wired with the parser chain the app
 /// installs, so a test payload here is the same string the printed Alfie code carries and the
@@ -109,9 +109,15 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     /// The printed code carries a SKU so that reprinting is not needed when Variant preselection
-    /// lands. Until then it must neither be honoured nor get in the way: the Product opens on its
-    /// default Variant, which is what the Product Details page does when given a Handle alone.
-    func test_aSkuInTheCodeIsCarriedButDoesNotSelectAVariant() throws {
+    /// lands. Until then it must neither be honoured nor get in the way.
+    ///
+    /// What this test can show is the first half: the SKU survives the scanner and reaches the deep
+    /// link intact, rather than being stripped or making the code unrecognisable. The Product then
+    /// opening on its *default* Variant is not this module's doing — the SKU is discarded downstream
+    /// in `TabRoute`'s `case .productDetail(let handle, _, _)`, which is pre-existing routing already
+    /// covered by `DeepLinkRoutingTests`. Naming that half here would claim an assertion this test
+    /// does not make.
+    func test_aSkuInTheCodeIsCarriedIntoTheDeepLink() throws {
         sut.viewDidAppear()
 
         scanService.recognise(Self.alfieCodeWithSku)
