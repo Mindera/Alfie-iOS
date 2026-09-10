@@ -497,13 +497,26 @@
         }
       }
     },
-    "pdp.colour.out_of_stock.accessibility_value" : {
+    "pdp.availability.online_note" : {
+      "comment" : "Shown beneath the PDP colour and size selectors. The availability those selectors show is an online aggregate with no per-store dimension, so this stops a shopper standing in a store reading a crossed-out size as \"not in this shop\".",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Out of stock"
+            "value" : "Availability shown is online stock"
+          }
+        }
+      }
+    },
+    "pdp.colour.out_of_stock.accessibility_value" : {
+      "comment" : "VoiceOver value for a dimmed colour card. Says \"online\" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Out of stock online"
           }
         }
       }
@@ -1226,12 +1239,13 @@
       }
     },
     "product.size.out_of_stock.accessibility_value" : {
+      "comment" : "VoiceOver value for a crossed-out size swatch. Says \"online\" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Out of stock"
+            "value" : "Out of stock online"
           }
         }
       }

@@ -263,6 +263,8 @@ extension ProductDetailsView {
                 sizeSelector
             }
 
+            availabilityNote
+
             descriptionSection
                 .padding(.vertical, theme.spacing.space200)
 
@@ -479,6 +481,25 @@ extension ProductDetailsView {
                 .foregroundStyle(Theme.linkLinkPrimaryDefault)
                 .allowsHitTesting(false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeGuideLink)
+        }
+    }
+
+    /// The availability the colour and size selectors show is an **online** aggregate: the BFF exposes
+    /// `Inventory { available: Int }` with no location dimension, and neither commerce adapter queries
+    /// location-scoped inventory. Without this line a shopper standing in a store reads a crossed-out
+    /// size chip as "not in this shop" — which is not what it means, and not something the stack can say.
+    /// See `Docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
+    ///
+    /// This is the visible half. The spoken half rides on the swatches' own out-of-stock
+    /// `accessibilityValue` — "Out of stock online" — rather than an `accessibilityHint` here: Speak
+    /// Hints is user-toggleable, and Braille and Switch Control never surface hints at all, so a hint
+    /// is the first thing dropped. A value is always announced, and it lands on the one element whose
+    /// availability actually needs qualifying.
+    @ViewBuilder private var availabilityNote: some View {
+        if viewModel.shouldShow(section: .availabilityNote) {
+            Text.build(theme.font.label.small(L10n.Pdp.Availability.onlineNote))
+                .foregroundStyle(Theme.contentContentTerciary)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.availabilityNote)
         }
     }
 
