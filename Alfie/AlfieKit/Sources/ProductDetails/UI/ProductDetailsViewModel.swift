@@ -145,7 +145,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading
         case .productDescription,
              .addToBag, // swiftlint:disable:this indentation_width
-             .addToWishlist:
+             .addToWishlist,
+             .availabilityNote:
             return false
         }
     }
@@ -164,6 +165,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         case .productDescription:
             return !productDescription.isEmpty
         case .addToBag:
+            return state.isSuccess
+        case .availabilityNote:
+            // The note qualifies what the selectors' availability means, so it only belongs on
+            // screen once there is real availability to qualify: while loading the swatches are
+            // shimmer placeholders, and a failure draws no selectors at all.
             return state.isSuccess
         case .addToWishlist:
             return state.isSuccess && dependencies.configurationService.isFeatureEnabled(.wishlist)

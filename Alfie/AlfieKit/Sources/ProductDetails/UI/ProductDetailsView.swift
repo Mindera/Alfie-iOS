@@ -263,6 +263,8 @@ extension ProductDetailsView {
                 sizeSelector
             }
 
+            availabilityNote
+
             descriptionSection
                 .padding(.vertical, theme.spacing.space200)
 
@@ -479,6 +481,22 @@ extension ProductDetailsView {
                 .foregroundStyle(Theme.linkLinkPrimaryDefault)
                 .allowsHitTesting(false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeGuideLink)
+        }
+    }
+
+    /// The availability the colour and size selectors show is an **online** aggregate: the BFF exposes
+    /// `Inventory { available: Int }` with no location dimension, and neither commerce adapter queries
+    /// location-scoped inventory. Without this line a shopper standing in a store reads a crossed-out
+    /// size as "not in this shop" — which is not what it means, and not something the stack can say.
+    /// See `Docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
+    ///
+    /// It closes the availability block rather than sitting elsewhere on the page, so assistive
+    /// technology reads it straight after the colour cards and size chips it qualifies.
+    @ViewBuilder private var availabilityNote: some View {
+        if viewModel.shouldShow(section: .availabilityNote) {
+            Text.build(theme.font.label.small(L10n.Pdp.Availability.onlineNote))
+                .foregroundStyle(Theme.contentContentTerciary)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.availabilityNote)
         }
     }
 
