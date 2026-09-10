@@ -1366,7 +1366,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That code isn't from Alfie."
+            "value" : "That code doesn't open anything in Alfie."
           }
         }
       }

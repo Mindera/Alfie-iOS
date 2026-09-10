@@ -47,7 +47,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         // Keyed on the whole notice rather than its words: a second bad code in a row says the same
         // thing, and it is exactly then that the shopper most needs telling. ``ScannerNotice``
         // carries an identity so that repeat still reads as a change.
-        .onChange(of: viewModel.state.value?.notice) { notice in
+        .onChange(of: notice) { notice in
             guard let notice else { return }
             UIAccessibility.post(notification: .announcement, argument: notice.message)
         }
@@ -55,6 +55,16 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
 
     private var isShowingCamera: Bool {
         viewModel.state.failure == nil
+    }
+
+    /// What the shopper was last told about a code, if anything. Read in three places, so the walk
+    /// into the state is done once here rather than repeated at each of them.
+    private var notice: ScannerNotice? {
+        viewModel.state.value?.notice
+    }
+
+    private var guidanceText: String? {
+        viewModel.state.value?.guidance
     }
 
     private var camera: some View {
@@ -101,7 +111,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// telling *and* still needs to know what to point at.
     @ViewBuilder private var messages: some View {
         VStack(spacing: theme.spacing.space200) {
-            if let notice = viewModel.state.value?.notice {
+            if let notice {
                 SnackbarView(
                     configuration: .init(
                         type: .error,
@@ -123,7 +133,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// being asked to look at, so the guidance has to be reached on the way through the screen
     /// rather than hidden behind the preview.
     @ViewBuilder private var guidance: some View {
-        if let guidance = viewModel.state.value?.guidance {
+        if let guidance = guidanceText {
             Text.build(theme.font.body.medium(guidance))
                 .foregroundStyle(Theme.contentContentInvertedPrimary)
                 .multilineTextAlignment(.center)
@@ -166,7 +176,7 @@ private enum Constants {
             state: .success(
                 .init(
                     guidance: "Point the camera at the Alfie code on the tag",
-                    notice: .init(id: 1, message: "That code isn't from Alfie.")
+                    notice: .init(id: 1, message: "That code doesn't open anything in Alfie.")
                 )
             )
         )
@@ -179,5 +189,9 @@ private enum Constants {
 
 #Preview("Device not supported") {
     ScannerView(viewModel: MockScannerViewModel(state: .error(.deviceNotSupported)))
+}
+
+#Preview("Camera unavailable") {
+    ScannerView(viewModel: MockScannerViewModel(state: .error(.generic)))
 }
 #endif

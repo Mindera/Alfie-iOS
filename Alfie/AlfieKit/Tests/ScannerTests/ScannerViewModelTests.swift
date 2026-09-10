@@ -177,7 +177,7 @@ final class ScannerViewModelTests: XCTestCase {
 
     // MARK: - Codes that are not Alfie codes
 
-    func test_aCodeThatIsNotAProductLinkOpensNothingAndKeepsScanning() {
+    func test_aCodeThatReachesNothingInAlfieOpensNothingAndKeepsScanning() {
         sut.viewDidAppear()
 
         scanService.recognise("https://example.com/not-an-alfie-code")
@@ -214,6 +214,33 @@ final class ScannerViewModelTests: XCTestCase {
         scanService.recognise(Self.alfieCode)
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+    }
+
+    /// An Alfie code carries an Alfie link, and the flow's deep-link path decides where it lands.
+    /// Judging the code on "is it a Product?" would tell a shopper holding a real Alfie code that it
+    /// is not from Alfie — false, and it would strand a link the app can open perfectly well.
+    func test_anAlfieCodeThatIsNotAProductIsStillOpened() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://localhost:4000/wishlist")
+
+        XCTAssertEqual(try XCTUnwrap(handledDeepLinks.last).type, .wishlist)
+        XCTAssertEqual(closeCount, 1)
+        XCTAssertNil(sut.state.value?.notice)
+    }
+
+    /// The one Alfie URL that must *not* be opened: nothing in the app answers to it, so the
+    /// deep-link path would fall back to a web view — the blank screen this ticket exists to
+    /// prevent. It gets the same notice as a stranger's code, because it reaches the shopper the
+    /// same way: nothing happened.
+    func test_anAlfieUrlWithNoScreenOfItsOwnIsNotOpenedInAWebView() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://localhost:4000/help/returns")
+
+        XCTAssertTrue(handledDeepLinks.isEmpty)
+        XCTAssertEqual(closeCount, 0)
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.Unrecognised.message)
     }
 
     /// A second bad code in a row says exactly what the first one said. It still has to count as a
@@ -344,6 +371,22 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertTrue(scanService.isScanning)
     }
 
+    /// A failure leaves nothing running, and the service says so by clearing its own start request.
+    /// This screen has to agree with it: while it still believed a camera was running, the next
+    /// start was declined as redundant and the shopper stayed on the explanation.
+    ///
+    /// Asserted without a backgrounding step on purpose — the scene-phase round trip hides the bug
+    /// by stopping first, which is why the case above passed either way.
+    func test_aFailedStartCanBeStartedAgainWithoutLeavingTheApp() {
+        sut.viewDidAppear()
+        scanService.fail(with: .permissionDenied)
+
+        sut.viewDidAppear()
+
+        XCTAssertEqual(scanService.startCount, 2)
+        XCTAssertNil(sut.state.failure)
+    }
+
     // MARK: - Reporting why a scan failed
 
     /// Every way a scan ends without a Product reports under one event, distinguished by reason —
@@ -386,6 +429,16 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise(Self.alfieCode)
+
+        XCTAssertTrue(reportedScanFailures.isEmpty)
+    }
+
+    /// Nor is an Alfie code that opens something other than a Product. Counting it would inflate
+    /// `unrecognised` with codes that worked.
+    func test_anAlfieCodeThatOpensAnotherScreenIsNotReported() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://localhost:4000/wishlist")
 
         XCTAssertTrue(reportedScanFailures.isEmpty)
     }

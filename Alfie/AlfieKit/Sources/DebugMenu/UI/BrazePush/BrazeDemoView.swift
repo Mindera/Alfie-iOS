@@ -2,7 +2,6 @@ import Core
 import Model
 import SharedUI
 import SwiftUI
-import Utils
 
 // MARK: - BrazeDemoView
 
@@ -44,7 +43,9 @@ struct BrazeDemoView: View {
                     return
                 }
 
-                ExternalAppLauncher.openAppSettings()
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
             }, label: {
                 Text("OK")
             })

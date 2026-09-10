@@ -42,7 +42,7 @@ final class ScannerViewSnapshotTests: XCTestCase {
             state: .success(
                 .init(
                     guidance: Self.guidance,
-                    notice: .init(id: 1, message: "That code isn't from Alfie.")
+                    notice: .init(id: 1, message: "That code doesn't open anything in Alfie.")
                 )
             )
         )
@@ -61,6 +61,15 @@ final class ScannerViewSnapshotTests: XCTestCase {
 
     func test_scannerView_withDeviceNotSupported() {
         let sut = ScannerView(viewModel: MockScannerViewModel(state: .error(.deviceNotSupported)))
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// The camera exists and is permitted, but would not start. It has no headline and no way out,
+    /// so it renders a shorter panel than the other two — which is exactly what a reference is for.
+    func test_scannerView_withGenericFailure() {
+        let sut = ScannerView(viewModel: MockScannerViewModel(state: .error(.generic)))
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)

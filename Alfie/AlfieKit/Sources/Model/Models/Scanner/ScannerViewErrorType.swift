@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Distinct from a notice: a notice is shown *over* a running camera and the shopper can try again
 /// straight away, whereas each of these replaces the preview, because there is nothing to preview.
-public enum ScannerViewErrorType: Error, Equatable, CaseIterable {
+public enum ScannerViewErrorType: Error, Equatable {
     /// The shopper has refused camera access, or it is switched off in Settings. Recoverable, and
     /// the only case that offers a way out of the screen other than closing it.
     case cameraPermissionDenied
