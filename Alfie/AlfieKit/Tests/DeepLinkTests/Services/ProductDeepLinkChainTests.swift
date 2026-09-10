@@ -22,12 +22,11 @@ final class ProductDeepLinkChainTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_multi_segment_handle_opens_product_details() throws {
+    /// Both shapes, because the parser ahead of `ProductDetailsDeepLinkParser` in the chain claims links
+    /// by first path component: a multi-segment Handle is the shape at risk of being claimed early.
+    func test_product_links_open_product_details_whatever_the_handle_shape() throws {
         try assertProductDetail("\(Self.httpUrl)/product/women/dresses/red-midi-dress",
                                 handle: "women/dresses/red-midi-dress")
-    }
-
-    func test_single_segment_handle_opens_product_details() throws {
         try assertProductDetail("\(Self.httpUrl)/product/t-shirt", handle: "t-shirt")
     }
 
@@ -42,7 +41,6 @@ final class ProductDeepLinkChainTests: XCTestCase {
 
     // MARK: - Helpers
 
-    /// The `slug` label is the pre-existing one on `LinkType`; the value it carries is a Handle.
     private func assertProductDetail(_ link: String, handle expectedHandle: String) throws {
         let testUrl = try XCTUnwrap(URL(string: link))
 
