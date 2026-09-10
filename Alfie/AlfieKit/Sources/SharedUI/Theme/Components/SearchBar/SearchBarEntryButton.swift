@@ -68,7 +68,7 @@ public struct SearchBarEntryButton: View {
 
     private func scanButton(_ scan: ScanConfiguration) -> some View {
         Button(action: scan.action) {
-            ThemedIcon(.scan, size: .medium, tint: Primitives.Colours.neutrals800)
+            ThemedIcon(.scan, size: .medium, tint: Theme.contentContentPrimary)
                 .frame(width: Constants.scanTapTarget, height: Constants.scanTapTarget)
                 .contentShape(Rectangle())
         }
