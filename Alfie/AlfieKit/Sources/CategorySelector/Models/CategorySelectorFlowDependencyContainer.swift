@@ -3,7 +3,6 @@ import Model
 import MyAccount
 import ProductDetails
 import ProductListing
-import Scanner
 import Search
 import Web
 import Wishlist
@@ -16,7 +15,6 @@ public final class CategorySelectorFlowDependencyContainer {
     let productListingDependencyContainer: ProductListingDependencyContainer
     let wishlistDependencyContainer: WishlistDependencyContainer
     let searchDependencyContainer: SearchDependencyContainer
-    let scannerDependencyContainer: ScannerDependencyContainer
     let log: Logger
 
     public init(
@@ -27,7 +25,6 @@ public final class CategorySelectorFlowDependencyContainer {
         productListingDependencyContainer: ProductListingDependencyContainer,
         wishlistDependencyContainer: WishlistDependencyContainer,
         searchDependencyContainer: SearchDependencyContainer,
-        scannerDependencyContainer: ScannerDependencyContainer,
         log: Logger
     ) {
         self.categorySelectorDependencyContainer = categorySelectorDependencyContainer
@@ -37,7 +34,6 @@ public final class CategorySelectorFlowDependencyContainer {
         self.productListingDependencyContainer = productListingDependencyContainer
         self.wishlistDependencyContainer = wishlistDependencyContainer
         self.searchDependencyContainer = searchDependencyContainer
-        self.scannerDependencyContainer = scannerDependencyContainer
         self.log = log
     }
 }

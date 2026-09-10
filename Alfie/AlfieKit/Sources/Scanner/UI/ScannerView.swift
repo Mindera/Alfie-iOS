@@ -33,7 +33,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 .padding(.horizontal, theme.spacing.space400)
                 .padding(.bottom, theme.spacing.space600)
         }
-        .background(Primitives.Colours.neutrals900)
+        .background(Theme.surfaceBackgroundInvertedPrimary)
         .accessibilityIdentifier(AccessibilityID.Scanner.screen)
         .onAppear { viewModel.viewDidAppear() }
         .onDisappear { viewModel.viewDidDisappear() }
@@ -47,7 +47,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     private var header: some View {
         ZStack {
             Text.build(theme.font.heading.medium(viewModel.title))
-                .foregroundStyle(Primitives.Colours.neutrals0)
+                .foregroundStyle(Theme.contentContentInvertedPrimary)
                 .accessibilityIdentifier(AccessibilityID.Scanner.title)
                 .accessibilityAddTraits(.isHeader)
 
@@ -60,9 +60,9 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         Button {
             viewModel.didTapClose()
         } label: {
-            ThemedIcon(.close, size: .medium, tint: Primitives.Colours.neutrals0)
+            ThemedIcon(.close, size: .medium, tint: Theme.contentContentInvertedPrimary)
                 .padding(theme.spacing.space150)
-                .background(Circle().fill(Primitives.Colours.neutrals900.opacity(Constants.chromeOpacity)))
+                .background(Circle().fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity)))
         }
         .accessibilityIdentifier(AccessibilityID.Scanner.close)
         .accessibilityLabel(Text(L10n.Accessibility.close))
@@ -73,13 +73,13 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// rather than hidden behind the preview.
     private var guidance: some View {
         Text.build(theme.font.body.medium(viewModel.guidance))
-            .foregroundStyle(Primitives.Colours.neutrals0)
+            .foregroundStyle(Theme.contentContentInvertedPrimary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, theme.spacing.space300)
             .padding(.vertical, theme.spacing.space200)
             .background(
                 RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                    .fill(Primitives.Colours.neutrals900.opacity(Constants.chromeOpacity))
+                    .fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity))
             )
             .accessibilityIdentifier(AccessibilityID.Scanner.guidance)
     }

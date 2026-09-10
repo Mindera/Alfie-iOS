@@ -11,8 +11,7 @@ public struct CategorySelectorFlowView<ViewModel: CategorySelectorFlowViewModelP
         NavigationStack(path: $viewModel.path) {
             ShopView(
                 categoriesViewModel: viewModel.makeCategoriesViewModel(),
-                didTapSearch: { viewModel.presentSearch() },
-                didTapScan: { viewModel.presentScanner() }
+                didTapSearch: { viewModel.presentSearch() }
             )
             .navigationDestination(for: CategorySelectorRoute.self) { route in
                 route.destination(

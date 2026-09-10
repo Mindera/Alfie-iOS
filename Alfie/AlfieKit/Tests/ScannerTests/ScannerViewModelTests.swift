@@ -13,7 +13,7 @@ import XCTest
 /// leave the one thing this feature depends on — that an Alfie code resolves to a product link —
 /// asserted nowhere.
 final class ScannerViewModelTests: XCTestCase {
-    private var scanSource: MockScanSource!
+    private var scanService: MockCameraScanService!
     private var deepLinkService: DeepLinkService!
     private var handledDeepLinks: [DeepLink]!
     private var closeCount: Int!
@@ -29,7 +29,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         handledDeepLinks = []
         closeCount = 0
-        scanSource = MockScanSource()
+        scanService = MockCameraScanService()
 
         let handler = MockDeepLinkHandler()
         handler.onCanHandleDeepLinkCalled = { _ in true }
@@ -38,13 +38,16 @@ final class ScannerViewModelTests: XCTestCase {
         deepLinkService = DeepLinkService(configuration: LinkConfiguration(), log: MockLogger())
         deepLinkService.update(handlers: [handler])
 
-        let scanSource = try XCTUnwrap(scanSource)
+        let scanService = try XCTUnwrap(scanService)
         sut = ScannerViewModel(
             dependencies: .init(
                 deepLinkService: deepLinkService,
-                makeScanSource: { scanSource },
+                makeScanService: { scanService },
                 log: MockLogger()
             ),
+            // The flow's closure, standing in for HomeFlowViewModel: it hands the scanned link to
+            // the real deep-link service, so these tests still assert on the link the app routes.
+            openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
             close: { [weak self] in self?.closeCount += 1 }
         )
     }
@@ -52,7 +55,7 @@ final class ScannerViewModelTests: XCTestCase {
     override func tearDownWithError() throws {
         sut = nil
         deepLinkService = nil
-        scanSource = nil
+        scanService = nil
         handledDeepLinks = nil
         closeCount = nil
         try super.tearDownWithError()
@@ -63,7 +66,7 @@ final class ScannerViewModelTests: XCTestCase {
     func test_scanningAnAlfieCodeOpensItsProductAndClosesTheScanner() throws {
         sut.viewDidAppear()
 
-        scanSource.recognise(Self.alfieCode)
+        scanService.recognise(Self.alfieCode)
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
         XCTAssertEqual(closeCount, 1)
@@ -78,18 +81,19 @@ final class ScannerViewModelTests: XCTestCase {
         handler.onHandleDeepLinkCalled = { _ in eventsInOrder.append("open") }
         deepLinkService.update(handlers: [handler])
 
-        let scanSource = MockScanSource()
+        let scanService = MockCameraScanService()
         let sut = ScannerViewModel(
             dependencies: .init(
                 deepLinkService: deepLinkService,
-                makeScanSource: { scanSource },
+                makeScanService: { scanService },
                 log: MockLogger()
             ),
+            openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
             close: { eventsInOrder.append("close") }
         )
         sut.viewDidAppear()
 
-        scanSource.recognise(Self.alfieCode)
+        scanService.recognise(Self.alfieCode)
 
         XCTAssertEqual(eventsInOrder, ["close", "open"])
     }
@@ -99,7 +103,7 @@ final class ScannerViewModelTests: XCTestCase {
     func test_aMultiSegmentHandleReachesTheProductIntact() throws {
         sut.viewDidAppear()
 
-        scanSource.recognise(Self.multiSegmentAlfieCode)
+        scanService.recognise(Self.multiSegmentAlfieCode)
 
         XCTAssertEqual(try handledHandle(), "mens/jeans/slim-indigo")
     }
@@ -110,7 +114,7 @@ final class ScannerViewModelTests: XCTestCase {
     func test_aSkuInTheCodeIsCarriedButDoesNotSelectAVariant() throws {
         sut.viewDidAppear()
 
-        scanSource.recognise(Self.alfieCodeWithSku)
+        scanService.recognise(Self.alfieCodeWithSku)
 
         let deepLink = try XCTUnwrap(handledDeepLinks.first)
         guard case .productDetail(let handle, _, let query) = deepLink.type else {
@@ -125,8 +129,8 @@ final class ScannerViewModelTests: XCTestCase {
     func test_theSameCodeSeenTwiceOpensOneProduct() {
         sut.viewDidAppear()
 
-        scanSource.recognise(Self.alfieCode)
-        scanSource.recognise(Self.alfieCode)
+        scanService.recognise(Self.alfieCode)
+        scanService.recognise(Self.alfieCode)
 
         XCTAssertEqual(handledDeepLinks.count, 1)
         XCTAssertEqual(closeCount, 1)
@@ -134,23 +138,23 @@ final class ScannerViewModelTests: XCTestCase {
 
     func test_recognitionStopsOnceAProductIsOpened() {
         sut.viewDidAppear()
-        XCTAssertTrue(scanSource.isScanning)
+        XCTAssertTrue(scanService.isScanning)
 
-        scanSource.recognise(Self.alfieCode)
+        scanService.recognise(Self.alfieCode)
 
-        XCTAssertFalse(scanSource.isScanning)
+        XCTAssertFalse(scanService.isScanning)
     }
 
     /// A scan that has already navigated must not be undone by the screen going away and coming
     /// back — which is exactly what happens as the Product Details page is pushed.
     func test_recognitionDoesNotResumeAfterAProductIsOpened() {
         sut.viewDidAppear()
-        scanSource.recognise(Self.alfieCode)
+        scanService.recognise(Self.alfieCode)
 
         sut.viewDidDisappear()
         sut.viewDidAppear()
 
-        XCTAssertFalse(scanSource.isScanning)
+        XCTAssertFalse(scanService.isScanning)
     }
 
     // MARK: - Codes that are not Alfie codes
@@ -158,35 +162,35 @@ final class ScannerViewModelTests: XCTestCase {
     func test_aCodeThatIsNotAProductLinkOpensNothingAndKeepsScanning() {
         sut.viewDidAppear()
 
-        scanSource.recognise("https://example.com/not-an-alfie-code")
-        scanSource.recognise("5901234123457")
-        scanSource.recognise("")
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        scanService.recognise("5901234123457")
+        scanService.recognise("")
 
         XCTAssertTrue(handledDeepLinks.isEmpty)
         XCTAssertEqual(closeCount, 0)
-        XCTAssertTrue(scanSource.isScanning)
+        XCTAssertTrue(scanService.isScanning)
     }
 
     // MARK: - When recognition runs
 
     func test_recognitionRunsOnlyWhileTheScreenIsOnScreen() {
-        XCTAssertFalse(scanSource.isScanning)
+        XCTAssertFalse(scanService.isScanning)
 
         sut.viewDidAppear()
-        XCTAssertTrue(scanSource.isScanning)
+        XCTAssertTrue(scanService.isScanning)
 
         sut.viewDidDisappear()
-        XCTAssertFalse(scanSource.isScanning)
+        XCTAssertFalse(scanService.isScanning)
     }
 
     func test_backgroundingStopsRecognitionAndReturningResumesIt() {
         sut.viewDidAppear()
 
         sut.didChangeScenePhase(isActive: false)
-        XCTAssertFalse(scanSource.isScanning)
+        XCTAssertFalse(scanService.isScanning)
 
         sut.didChangeScenePhase(isActive: true)
-        XCTAssertTrue(scanSource.isScanning)
+        XCTAssertTrue(scanService.isScanning)
     }
 
     /// Coming back to the foreground while the scanner is *not* the visible screen must not switch
@@ -197,7 +201,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.didChangeScenePhase(isActive: true)
 
-        XCTAssertFalse(scanSource.isScanning)
+        XCTAssertFalse(scanService.isScanning)
     }
 
     /// Repeated appearances do not stack camera sessions.
@@ -206,7 +210,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
         sut.didChangeScenePhase(isActive: true)
 
-        XCTAssertEqual(scanSource.startCount, 1)
+        XCTAssertEqual(scanService.startCount, 1)
     }
 
     // MARK: - Closing

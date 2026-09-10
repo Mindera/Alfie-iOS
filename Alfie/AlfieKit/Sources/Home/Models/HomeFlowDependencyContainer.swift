@@ -16,6 +16,9 @@ public final class HomeFlowDependencyContainer {
     let wishlistDependencyContainer: WishlistDependencyContainer
     let searchDependencyContainer: SearchDependencyContainer
     let scannerDependencyContainer: ScannerDependencyContainer
+    /// The flow opens a scanned link itself rather than letting the scanner do it, so the
+    /// navigation stays where every other route in this flow is decided.
+    let deepLinkService: DeepLinkServiceProtocol
 
     public init(
         homeDependencyContainer: HomeDependencyContainer,
@@ -25,7 +28,8 @@ public final class HomeFlowDependencyContainer {
         webDependencyContainer: WebDependencyContainer,
         wishlistDependencyContainer: WishlistDependencyContainer,
         searchDependencyContainer: SearchDependencyContainer,
-        scannerDependencyContainer: ScannerDependencyContainer
+        scannerDependencyContainer: ScannerDependencyContainer,
+        deepLinkService: DeepLinkServiceProtocol
     ) {
         self.homeDependencyContainer = homeDependencyContainer
         self.myAccountDependencyContainer = myAccountDependencyContainer
@@ -35,5 +39,6 @@ public final class HomeFlowDependencyContainer {
         self.wishlistDependencyContainer = wishlistDependencyContainer
         self.searchDependencyContainer = searchDependencyContainer
         self.scannerDependencyContainer = scannerDependencyContainer
+        self.deepLinkService = deepLinkService
     }
 }
