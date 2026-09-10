@@ -5,4 +5,5 @@ public enum AnalyticsAction: String {
     case removeFromWishlist = "remove_from_wishlist"
     case search = "search"
     case bffError = "bff_error"
+    case scanFailed = "scan_failed"
 }
