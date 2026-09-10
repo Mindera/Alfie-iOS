@@ -1,6 +1,10 @@
 import AccessibilityIdentifiers
+import Model
 import SharedUI
 import SwiftUI
+#if DEBUG
+import Mocks
+#endif
 
 /// The scanner screen: a full-bleed camera preview, the guidance that tells the shopper what to
 /// point it at, and a way out.
@@ -45,6 +49,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
             Text.build(theme.font.heading.medium(viewModel.title))
                 .foregroundStyle(Primitives.Colours.neutrals0)
                 .accessibilityIdentifier(AccessibilityID.Scanner.title)
+                .accessibilityAddTraits(.isHeader)
 
             closeButton
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,8 +68,9 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         .accessibilityLabel(Text(L10n.Accessibility.close))
     }
 
-    /// Announced on appearance, not merely drawn: a shopper using VoiceOver cannot see what the
-    /// camera is being asked to look at.
+    /// Left as plain text in reading order: a shopper using VoiceOver cannot see what the camera is
+    /// being asked to look at, so the guidance has to be reached on the way through the screen
+    /// rather than hidden behind the preview.
     private var guidance: some View {
         Text.build(theme.font.body.medium(viewModel.guidance))
             .foregroundStyle(Primitives.Colours.neutrals0)
@@ -76,7 +82,6 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                     .fill(Primitives.Colours.neutrals900.opacity(Constants.chromeOpacity))
             )
             .accessibilityIdentifier(AccessibilityID.Scanner.guidance)
-            .accessibilityAddTraits(.isHeader)
     }
 }
 
@@ -84,3 +89,9 @@ private enum Constants {
     /// The chrome sits over a live preview, so it is legible without hiding what the camera sees.
     static let chromeOpacity: Double = 0.6
 }
+
+#if DEBUG
+#Preview {
+    ScannerView(viewModel: MockScannerViewModel())
+}
+#endif

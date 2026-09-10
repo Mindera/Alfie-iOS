@@ -52,8 +52,8 @@ public enum AccessibilityID {
 
     public enum Scanner {
         public static let screen = "scanner.screen"
-        public static let title = "scanner.title"
-        public static let guidance = "scanner.guidance"
+        public static let title = "scanner.title.label"
+        public static let guidance = "scanner.guidance.label"
         public static let close = "scanner.close.button"
     }
 
