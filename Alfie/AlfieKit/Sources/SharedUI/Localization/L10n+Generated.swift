@@ -470,9 +470,31 @@ public enum L10n {
   public enum Scanner {
     /// Scan
     public static let title = L10n.tr("L10n", "scanner.title")
+    public enum Error {
+      public enum Generic {
+        /// Something went wrong.
+        public static let message = L10n.tr("L10n", "scanner.error.generic.message")
+      }
+      public enum PermissionDenied {
+        /// Open Settings
+        public static let action = L10n.tr("L10n", "scanner.error.permission_denied.action")
+        /// Turn on camera access in Settings to scan tags.
+        public static let message = L10n.tr("L10n", "scanner.error.permission_denied.message")
+        /// Camera access is off
+        public static let title = L10n.tr("L10n", "scanner.error.permission_denied.title")
+      }
+      public enum Unsupported {
+        /// This device can't scan codes.
+        public static let message = L10n.tr("L10n", "scanner.error.unsupported.message")
+      }
+    }
     public enum Guidance {
       /// Point the camera at the Alfie code on the tag
       public static let message = L10n.tr("L10n", "scanner.guidance.message")
+    }
+    public enum Unrecognised {
+      /// That code isn't from Alfie.
+      public static let message = L10n.tr("L10n", "scanner.unrecognised.message")
     }
   }
   public enum Search {
@@ -806,7 +828,13 @@ public extension L10n {
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
       case scannerTitle = "scanner.title"
+      case scannerErrorGenericMessage = "scanner.error.generic.message"
+      case scannerErrorPermissionDeniedAction = "scanner.error.permission_denied.action"
+      case scannerErrorPermissionDeniedMessage = "scanner.error.permission_denied.message"
+      case scannerErrorPermissionDeniedTitle = "scanner.error.permission_denied.title"
+      case scannerErrorUnsupportedMessage = "scanner.error.unsupported.message"
       case scannerGuidanceMessage = "scanner.guidance.message"
+      case scannerUnrecognisedMessage = "scanner.unrecognised.message"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"
