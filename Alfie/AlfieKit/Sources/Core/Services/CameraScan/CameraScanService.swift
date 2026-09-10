@@ -190,7 +190,12 @@ extension CameraScanService: DataScannerViewControllerDelegate {
         didAdd addedItems: [RecognizedItem],
         allItems: [RecognizedItem]
     ) {
-        let payloads = addedItems.compactMap { item -> String? in
+        // `allItems`, not `addedItems`: what the camera is *holding* is the question the ViewModel
+        // has to answer, and this callback reports only what has just joined. A 1D Barcode is
+        // usually acquired before the QR beside it, so ranking the additions alone would answer the
+        // tag with "that's the product barcode" on the strength of the half of it that arrived
+        // first — then open the Product a moment later anyway.
+        let payloads = allItems.compactMap { item -> String? in
             guard case .barcode(let barcode) = item else { return nil }
             return barcode.payloadStringValue
         }

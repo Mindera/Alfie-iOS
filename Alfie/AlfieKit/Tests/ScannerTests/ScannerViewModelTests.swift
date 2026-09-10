@@ -323,6 +323,22 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertNil(sut.state.value?.notice)
     }
 
+    /// The order the camera really acquires a tag in: the 1D Barcode locks on first, and the Alfie
+    /// code joins it a moment later. The scanner is told everything being held, not just what has
+    /// arrived, so the second reading ranks both and opens the Product.
+    ///
+    /// Handing both over in one call — as `test_anAlfieCodeInTheSameFrameAsABarcodeIsTheOneOpened`
+    /// does — would assume away exactly the sequence that makes this hard.
+    func test_anAlfieCodeThatJoinsAnAlreadyTrackedBarcodeIsTheOneOpened() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise([Self.barcode])
+        scanService.recognise([Self.barcode, Self.alfieCode])
+
+        XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+        XCTAssertEqual(closeCount, 1)
+    }
+
     /// A UPC-A reaches the app as an EAN-13 with a leading zero, which is the only form the scanner
     /// ever reports. It is the same mistake and gets the same answer.
     func test_aUpcABarcodeGetsTheSameAnswer() {
