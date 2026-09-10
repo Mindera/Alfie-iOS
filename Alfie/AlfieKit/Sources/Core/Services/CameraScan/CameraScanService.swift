@@ -1,3 +1,4 @@
+import AlicerceLogging
 import AVFoundation
 import Combine
 import Model
@@ -40,13 +41,20 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
     /// token both requests would resume past the `await` and start the controller twice.
     private var startToken = 0
 
-    override public init() {
+    private let log: Logger
+
+    public init(log: Logger) {
+        self.log = log
         super.init()
     }
 
     deinit {
         // The controller holds the camera, so releasing this service has to release that too — the
         // screen may have gone away without a matching `stopScanning()`.
+        //
+        // `controller` is written only on the main actor, and this is the one read that happens off
+        // it. It is safe for a reason `deinit` alone provides: the last reference has already gone,
+        // so no other code can be touching the property while this runs.
         guard let controller else { return }
         Task { @MainActor in controller.stopScanning() }
     }
@@ -80,7 +88,16 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
                     return
                 }
 
-                try? self.makeControllerIfNeeded().startScanning()
+                do {
+                    try self.makeControllerIfNeeded().startScanning()
+                } catch {
+                    // A throw leaves exactly the state a refusal does: nothing is scanning, and not
+                    // because anyone asked it to stop. So it is cleared the same way — otherwise
+                    // the request flag stays raised over a session that never started, and every
+                    // later `startScanning()` returns at the guard against a camera that is dead.
+                    self.isStartRequested = false
+                    self.log.error("Camera scanning failed to start: \(error)")
+                }
             }
         }
     }
