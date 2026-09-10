@@ -164,12 +164,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag:
-            return state.isSuccess
-        case .availabilityNote:
-            // The note qualifies what the selectors' availability means, so it only belongs on
-            // screen once there is real availability to qualify: while loading the swatches are
-            // shimmer placeholders, and a failure draws no selectors at all.
+        // The note qualifies what the selectors' availability means, so it only belongs on screen
+        // once there is real availability to qualify: while loading the swatches are shimmer
+        // placeholders, and a failure draws no selectors at all. Same gate as the CTA.
+        case .addToBag,
+             .availabilityNote: // swiftlint:disable:this indentation_width
             return state.isSuccess
         case .addToWishlist:
             return state.isSuccess && dependencies.configurationService.isFeatureEnabled(.wishlist)
