@@ -154,7 +154,9 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         }
     }
 
-    private func makeProductListingViewModelForSearch(
+    /// Internal rather than private so a test can reach it: it is otherwise only called from inside
+    /// a closure handed to `SearchFlowViewModel`, which no unit test drives.
+    func makeProductListingViewModelForSearch(
         searchTerm: String?,
         category: String?
     ) -> some ProductListingViewModelProtocol {
