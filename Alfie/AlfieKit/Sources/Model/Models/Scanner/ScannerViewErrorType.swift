@@ -13,11 +13,22 @@ public enum ScannerViewErrorType: Error, Equatable, CaseIterable {
     /// The camera exists and is permitted, but the session would not start.
     case generic
 
-    public static func from(_ failure: CameraScanFailure) -> Self {
+    public static func from(failure: CameraScanFailure) -> Self {
         switch failure {
         case .permissionDenied: return .cameraPermissionDenied
         case .deviceNotSupported: return .deviceNotSupported
         case .unavailable: return .generic
+        }
+    }
+
+    /// Derived from the explanation rather than from ``CameraScanFailure``, so that one switch and
+    /// not two decides what a camera failure means: what the shopper is told and what is reported
+    /// cannot drift apart.
+    public var analyticsReason: ScanFailureReason {
+        switch self {
+        case .cameraPermissionDenied: return .permissionDenied
+        case .deviceNotSupported: return .unsupported
+        case .generic: return .generic
         }
     }
 }

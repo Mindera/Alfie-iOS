@@ -120,12 +120,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let scannerDependencyContainer = ScannerDependencyContainer(
             deepLinkService: serviceProvider.deepLinkService,
             makeScanService: { CameraScanService(log: log) },
-            // A refused camera can only be granted outside the app, so the one recovery the scanner
-            // can offer is the door out to Settings.
-            openAppSettings: {
-                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-                ExternalAppLauncher.open(url: url)
-            },
+            analytics: serviceProvider.analytics,
             log: log
         )
         let searchDependencyContainer = SearchDependencyContainer(
