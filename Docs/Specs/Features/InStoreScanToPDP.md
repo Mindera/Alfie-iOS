@@ -246,7 +246,7 @@ deep links land in the Shop tab.
 
 ## Testing Strategy
 
-The seam is `ScanSourceProtocol`: the ViewModel receives recognised payload strings and is tested
+The seam is `CameraScanServiceProtocol`: the ViewModel receives recognised payload strings and is tested
 without a camera. Everything downstream of the payload is existing, already-tested code.
 
 ### Unit Tests (`ScannerTests`)

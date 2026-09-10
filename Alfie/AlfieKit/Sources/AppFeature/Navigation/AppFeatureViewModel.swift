@@ -119,7 +119,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         // each one owns a camera session that is released with the screen that opened it.
         let scannerDependencyContainer = ScannerDependencyContainer(
             deepLinkService: serviceProvider.deepLinkService,
-            makeScanService: { CameraScanService() },
+            makeScanService: { CameraScanService(log: log) },
             log: log
         )
         let searchDependencyContainer = SearchDependencyContainer(
