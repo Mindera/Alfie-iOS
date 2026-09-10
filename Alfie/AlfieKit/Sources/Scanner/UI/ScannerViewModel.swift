@@ -15,10 +15,11 @@ import SwiftUI
 /// ignored until Variant preselection is implemented.
 ///
 /// It does own what the shopper is told when that does not happen, and the distinction it draws is
-/// between a scan that failed and a camera that cannot run. A code that is not ours is the first:
-/// the camera keeps running underneath a notice, because the fix is the next tag along. A refused
-/// or missing camera is the second: it replaces the screen, because there is no scan to retry until
-/// something outside this app changes — which is why every start clears whatever the last one said.
+/// between a scan that failed and a camera that cannot run. A code that opens nothing in Alfie is
+/// the first: the camera keeps running underneath a notice, because the fix is the next tag along.
+/// A refused or missing camera is the second: it replaces the screen, because there is no scan to
+/// retry until something outside this app changes — which is why every start clears whatever the
+/// last one said.
 public final class ScannerViewModel: ScannerViewModelProtocol {
     private let scanService: CameraScanServiceProtocol
     private let deepLinkService: DeepLinkServiceProtocol
@@ -30,7 +31,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     private var isOnScreen = false
     private var isAppActive = true
-    private var hasOpenedProduct = false
+    private var hasOpenedLink = false
     private var isScanning = false
     /// Numbers the notices, so that the same words said twice are two notices rather than one. See
     /// ``ScannerNotice``.
@@ -39,8 +40,14 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     public var title: String { L10n.Scanner.title }
     public var preview: AnyView { scanService.makePreview() }
-    @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType>
-        = .success(.init(guidance: L10n.Scanner.Guidance.message))
+    @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = initialState
+
+    /// What the screen shows whenever a scan is starting: the guidance, and nothing said yet about
+    /// a code. Named once, because a start after a failure has to arrive at exactly the state a
+    /// first start does.
+    private static var initialState: ViewState<ScannerViewStateModel, ScannerViewErrorType> {
+        .success(.init(guidance: L10n.Scanner.Guidance.message))
+    }
 
     /// `openAppSettings` arrives as a closure from the flow, like `openScannedLink` and `close`:
     /// everything that takes the shopper off this screen — including out of the app entirely —
@@ -107,6 +114,10 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         log.error("Camera scanning is unavailable: \(failure)")
         let error = ScannerViewErrorType.from(failure: failure)
         analytics.trackScanFailed(reason: error.analyticsReason)
+        // The service has already cleared its own start request — nothing is running, and not
+        // because anyone asked it to stop — so this has to agree with it. Left `true`, the next
+        // `updateScanning()` would believe a camera was already running and decline to start one.
+        isScanning = false
         // Replaces the whole state rather than joining it: there is no camera behind this, so the
         // guidance about what to point one at has nothing left to describe.
         state = .error(error)
@@ -122,7 +133,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     }
 
     private func updateScanning() {
-        let shouldScan = isOnScreen && isAppActive && !hasOpenedProduct
+        let shouldScan = isOnScreen && isAppActive && !hasOpenedLink
         guard shouldScan != isScanning else { return }
         isScanning = shouldScan
 
@@ -130,7 +141,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             // Every start is a fresh attempt, so it starts from a fresh screen: an explanation left
             // over from the last one would outlive the camera access the shopper has just granted
             // in Settings, and a notice would outlive the code it was about.
-            state = .success(.init(guidance: L10n.Scanner.Guidance.message))
+            state = Self.initialState
             scanService.startScanning()
         } else {
             scanService.stopScanning()
@@ -141,13 +152,13 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     /// payload is the scanner's job — an unrecognised code must leave the camera running — while
     /// opening the page belongs to the flow.
     private func didRecognise(payload: String) {
-        guard !hasOpenedProduct else { return }
+        guard !hasOpenedLink else { return }
 
         guard
             let url = URL(string: payload),
-            case .productDetail = deepLinkService.deepLinkType(url)
+            opensInApp(deepLinkService.deepLinkType(url))
         else {
-            log.debug("Scanned code is not an Alfie code: \(payload)")
+            log.debug("Scanned code opens nothing in Alfie: \(payload)")
             analytics.trackScanFailed(reason: .unrecognised)
             // Said over the camera rather than instead of it: the shopper is standing in front of
             // the rail and the next tag is the fix, so the scanner has to still be running when
@@ -156,11 +167,31 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             return
         }
 
-        hasOpenedProduct = true
+        hasOpenedLink = true
         updateScanning()
         // Dismissed before the product opens, not left behind it: the deep-link path pushes onto a
         // tab that the scanner is covering.
         close()
         openScannedLink(url)
+    }
+
+    /// Whether a scanned link reaches somewhere in the app.
+    ///
+    /// An Alfie code carries an Alfie link and the flow's deep-link path decides where it lands, so
+    /// anything that path can reach counts as recognised — not only a Product. Judging it on
+    /// ``DeepLink/LinkType/productDetail`` alone would tell a shopper holding a real Alfie code that
+    /// it "isn't from Alfie", which is both false and unhelpful.
+    ///
+    /// The three that reach nothing are the notice cases: `nil` and
+    /// ``DeepLink/LinkType/unknown`` are not our links at all, and ``DeepLink/LinkType/webView`` is
+    /// the fallback that would open the blank web view this screen exists to prevent. Switched
+    /// exhaustively on purpose, so a new link type has to decide which side it is on.
+    private func opensInApp(_ linkType: DeepLink.LinkType?) -> Bool {
+        switch linkType {
+        case .none, .unknown, .webView:
+            return false
+        case .home, .shop, .bag, .wishlist, .account, .productList, .productDetail:
+            return true
+        }
     }
 }
