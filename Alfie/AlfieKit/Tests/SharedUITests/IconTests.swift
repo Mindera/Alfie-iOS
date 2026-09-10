@@ -29,7 +29,7 @@ final class IconTests: XCTestCase {
     }
 
     func test_iconSetCount() {
-        XCTAssertEqual(Icon.allCases.count, 61)
+        XCTAssertEqual(Icon.allCases.count, 62)
     }
 
     // MARK: - ThemedIcon size tokens

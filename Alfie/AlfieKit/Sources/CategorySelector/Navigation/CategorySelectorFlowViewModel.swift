@@ -4,6 +4,7 @@ import Model
 import MyAccount
 import ProductDetails
 import ProductListing
+import Scanner
 import Search
 import SwiftUI
 import Web
@@ -13,7 +14,14 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     public typealias Route = CategorySelectorRoute
     @Published public var path = NavigationPath()
     private let dependencies: CategorySelectorFlowDependencyContainer
-    @Published private var isSearchPresented = false
+    /// Which screen, if any, is covering the tab. One value rather than a flag per screen, so a
+    /// second overlay cannot open behind the first and so `overlayView` has a single writer.
+    private enum Overlay {
+        case search
+        case scanner
+    }
+
+    @Published private var overlay: Overlay?
     @Published private var overlayView: AnyView?
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
@@ -24,7 +32,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
             intentViewBuilder: { [weak self] in
                 self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
             },
-            closeSearchAction: { [weak self] in self?.isSearchPresented = false }
+            closeSearchAction: { [weak self] in self?.overlay = nil }
         )
     }()
 
@@ -34,17 +42,33 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     }
 
     private func setupBindings() {
-        $isSearchPresented
-            .sink { [weak self] isSearchPresented in
+        $overlay
+            .sink { [weak self] overlay in
                 guard let self else { return }
 
-                if isSearchPresented {
+                switch overlay {
+                case .search:
                     overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
-                } else {
+
+                case .scanner:
+                    overlayView = AnyView(ScannerView(viewModel: makeScannerViewModel()))
+
+                case nil:
                     overlayView = nil
                 }
             }
             .store(in: &subscriptions)
+    }
+
+    /// A fresh ViewModel — and so a fresh camera session — for each presentation. `close` clears the
+    /// overlay here as well as dismissing the screen: a successful scan hands over to the deep-link
+    /// path, which clears the tab's overlay itself, and this flow would otherwise still believe the
+    /// scanner was up and refuse to present it a second time.
+    private func makeScannerViewModel() -> ScannerViewModel {
+        ScannerViewModel(
+            dependencies: dependencies.scannerDependencyContainer,
+            close: { [weak self] in self?.overlay = nil }
+        )
     }
 
     // MARK: - View Models for CategorySelectorRoute
@@ -98,7 +122,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.overlay = .search }
         )
     }
 
@@ -207,7 +231,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
                     )
                 }
             },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.overlay = .search }
         )
     }
 
@@ -240,7 +264,13 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     // MARK: - Search
 
     public func presentSearch() {
-        isSearchPresented = true
+        overlay = .search
+    }
+
+    // MARK: - Scanner
+
+    public func presentScanner() {
+        overlay = .scanner
     }
 
     // MARK: - FlowViewModelProtocol
