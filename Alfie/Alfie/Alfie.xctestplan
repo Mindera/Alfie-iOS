@@ -29,6 +29,13 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
+        "identifier" : "ScannerTests",
+        "name" : "ScannerTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
         "identifier" : "SearchTests",
         "name" : "SearchTests"
       }

@@ -24,5 +24,6 @@ public protocol CategorySelectorFlowViewModelProtocol: ObservableObject, FlowVie
     func makeWishlistViewModel() -> WishlistViewModel
 
     func presentSearch()
+    func presentScanner()
     func navigate(_ route: CategorySelectorRoute)
 }

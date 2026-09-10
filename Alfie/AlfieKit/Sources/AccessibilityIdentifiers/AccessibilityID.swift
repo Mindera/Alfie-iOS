@@ -48,6 +48,16 @@ public enum AccessibilityID {
 
     public enum Shop {
         public static let searchInput = "shop.search.input"
+        public static let scanButton = "shop.scan.button"
+    }
+
+    // MARK: - Scanner
+
+    public enum Scanner {
+        public static let screen = "scanner.screen"
+        public static let title = "scanner.title"
+        public static let guidance = "scanner.guidance"
+        public static let close = "scanner.close.button"
     }
 
     // MARK: - Splash
@@ -145,6 +155,7 @@ public enum AccessibilityID {
     public enum Home {
         public static let titleHeader = "home.title.header"
         public static let searchInput = "home.search.input"
+        public static let scanButton = "home.scan.button"
     }
 
     // MARK: - Account

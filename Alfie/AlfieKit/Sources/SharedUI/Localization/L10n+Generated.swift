@@ -461,7 +461,19 @@ public enum L10n {
       }
     }
   }
+  public enum Scanner {
+    /// Scan
+    public static let title = L10n.tr("L10n", "scanner.title")
+    public enum Guidance {
+      /// Point the camera at the Alfie code on the tag
+      public static let message = L10n.tr("L10n", "scanner.guidance.message")
+    }
+  }
   public enum Search {
+    public enum ScanButton {
+      /// Scan a tag
+      public static let accessibilityLabel = L10n.tr("L10n", "search.scan_button.accessibility_label")
+    }
     public enum Screen {
       public enum EmptyView {
         /// Search for designers, categories and products
@@ -789,6 +801,9 @@ public extension L10n {
       case productSizeSelected = "product.size.selected"
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
+      case scannerTitle = "scanner.title"
+      case scannerGuidanceMessage = "scanner.guidance.message"
+      case searchScanButtonAccessibilityLabel = "search.scan_button.accessibility_label"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"

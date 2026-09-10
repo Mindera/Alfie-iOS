@@ -20,6 +20,10 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
             SearchBarEntryButton(
                 placeholder: L10n.Home.SearchBar.placeholder,
                 accessibilityIdentifier: AccessibilityID.Home.searchInput,
+                scan: .init(
+                    accessibilityIdentifier: AccessibilityID.Home.scanButton,
+                    action: { viewModel.didTapScan() }
+                ),
                 action: { viewModel.didTapSearch() }
             )
             .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)

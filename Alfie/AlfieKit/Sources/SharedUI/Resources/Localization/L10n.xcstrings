@@ -1247,6 +1247,39 @@
         }
       }
     },
+    "scanner.guidance.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Point the camera at the Alfie code on the tag"
+          }
+        }
+      }
+    },
+    "scanner.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan"
+          }
+        }
+      }
+    },
+    "search.scan_button.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan a tag"
+          }
+        }
+      }
+    },
     "search.screen.empty_view.message" : {
       "extractionState" : "manual",
       "localizations" : {
