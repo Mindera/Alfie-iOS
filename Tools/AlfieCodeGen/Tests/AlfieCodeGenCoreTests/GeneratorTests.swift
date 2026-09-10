@@ -19,7 +19,6 @@ struct GeneratorTests {
         let result = try Generator.run(
             list: "mens-jeans-slim-indigo\nwomens-coat-wool-camel, SKU-8842",
             outputDirectory: output,
-            baseURL: AlfieCode.defaultBaseURL,
             size: .swingTag
         )
 
@@ -40,7 +39,6 @@ struct GeneratorTests {
         let result = try Generator.run(
             list: "mens/jeans/slim-indigo, SKU-8842",
             outputDirectory: output,
-            baseURL: AlfieCode.defaultBaseURL,
             size: .swingTag
         )
 
@@ -60,7 +58,6 @@ struct GeneratorTests {
         let result = try Generator.run(
             list: "mens-jeans",
             outputDirectory: output,
-            baseURL: AlfieCode.defaultBaseURL,
             size: .swingTag
         )
 
@@ -76,7 +73,6 @@ struct GeneratorTests {
             try Generator.run(
                 list: "mens-jeans\nnot a handle",
                 outputDirectory: output,
-                baseURL: AlfieCode.defaultBaseURL,
                 size: .swingTag
             )
         }
@@ -94,7 +90,6 @@ struct GeneratorTests {
             try Generator.run(
                 list: "# only a comment\n",
                 outputDirectory: output,
-                baseURL: AlfieCode.defaultBaseURL,
                 size: .swingTag
             )
         }
@@ -110,7 +105,6 @@ struct GeneratorTests {
             try Generator.run(
                 inputFile: missing,
                 outputDirectory: output,
-                baseURL: AlfieCode.defaultBaseURL,
                 size: .swingTag
             )
         }
@@ -131,7 +125,6 @@ struct GeneratorTests {
         let result = try Generator.run(
             inputFile: example,
             outputDirectory: output,
-            baseURL: AlfieCode.defaultBaseURL,
             size: .swingTag
         )
 

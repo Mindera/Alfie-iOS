@@ -20,17 +20,13 @@ in `build/AlfieCodes` by default, which is git-ignored — nothing generated her
 The handle list is required rather than defaulted: which Products get printed changes per demo, and
 a default list would quietly print codes for Products that are not in the catalogue.
 
-For flags the script does not expose (a different host, a different tag size):
+There are no flags. The link host and the printed size are both fixed, because both have exactly one
+right answer (below), and a flag that can be typed wrong is a sheet of codes that can come out
+wrong. To skip the script's test gate and run the tool directly:
 
 ```bash
-swift run --package-path Tools/AlfieCodeGen AlfieCodeGen \
-  --input handles.txt --output out/ \
-  --base-url https://localhost:4000 --size-mm 30 --dpi 300
+swift run --package-path Tools/AlfieCodeGen AlfieCodeGen my-handles.txt out/
 ```
-
-`--base-url` must be `https`, because that is the payload format the app parses. `--size-mm` is the
-exact printed width; `--dpi` is only a resolution floor. A non-numeric value for either stops the
-run rather than falling back to a default.
 
 ## The handle list
 
@@ -61,18 +57,20 @@ https://localhost:4000/product/<handle>?sku=<sku>
 ```
 
 `localhost:4000` is the host `LinkConfiguration` already accepts, so a scan needs no app config
-change. The consequence is that these links do **not** resolve in a browser, and the iOS Camera app
-will not open Alfie from one — scan from inside the app.
+change — and it is not configurable for the same reason: a code carrying any other host is a code
+the app refuses to route. The consequence is that these links do **not** resolve in a browser, and
+the iOS Camera app will not open Alfie from one — scan from inside the app.
 
-The PNGs are greyscale, with a 4-module quiet zone, scaled by whole modules so the print stays
-crisp. Each carries the DPI (300 or better) that makes the code come out **exactly 30mm square at
-100% scale**, whatever QR version the link needs, plus about 5mm of caption below it. Print at
-100% — "fit to page" will resize them and the measurements stop meaning anything.
+The PNGs are greyscale, with a 5-module quiet zone (the QR spec's minimum is four; CoreImage
+contributes one of them), scaled by whole modules so the print stays crisp. Each carries the DPI
+(300 or better) that makes the code come out **exactly 30mm square at 100% scale**, whatever QR
+version the link needs, plus about 5mm of caption below it. Print at 100% — "fit to page" will
+resize them and the measurements stop meaning anything.
 
 ## Before a demo
 
 - Pick five to eight Products, at least two with an out-of-stock size and one with an unavailable
-  colour, or the availability story shows nothing.
+  colour, or the availability story shows nothing. `handles.example.txt` is laid out in that shape.
 - Check stock against the running BFF on the day: the catalogue is a real store.
 - Scan one printed tag with the app before the meeting.
 

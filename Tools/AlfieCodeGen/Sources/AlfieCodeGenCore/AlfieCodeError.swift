@@ -15,8 +15,8 @@ public enum AlfieCodeError: Error, Equatable, CustomStringConvertible {
     case unwritableOutput(path: String, reason: String)
     /// CoreImage declined to encode the link — in practice, a payload too long for a QR code.
     case renderFailed(link: String)
-    /// The supplied base URL cannot carry a path, so no product link can be built from it.
-    case invalidBaseURL(String)
+    /// No URL could be assembled for this Handle, so there is nothing to encode.
+    case invalidLink(handle: String)
 
     public var description: String {
         switch self {
@@ -34,11 +34,8 @@ public enum AlfieCodeError: Error, Equatable, CustomStringConvertible {
             return "Could not write to \(path): \(reason)."
         case .renderFailed(let link):
             return "Could not encode \(link) as a QR code — the link is probably too long."
-        case .invalidBaseURL(let url):
-            return "\(url) cannot be used as a base URL. Expected something like "
-                + "https://localhost:4000."
+        case .invalidLink(let handle):
+            return "No product link could be built for \"\(handle)\"."
         }
     }
-
-    public var localizedDescription: String { description }
 }
