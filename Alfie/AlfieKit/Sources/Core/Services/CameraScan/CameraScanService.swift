@@ -7,8 +7,9 @@ import VisionKit
 
 /// The real camera, via VisionKit's `DataScannerViewController`.
 ///
-/// Only QR codes are recognised: the Alfie code is a QR code, and reading the manufacturer's
-/// Barcode is a separate ticket that will widen this list. Everything the scanner sees is published
+/// Two symbologies are recognised: QR, which is what an Alfie code is, and EAN-13, which is what
+/// the manufacturer prints beside it. The Barcode is read only so that the shopper can be told it
+/// is the wrong code — nothing is ever looked up by one. Everything the scanner sees is published
 /// verbatim — deciding what a payload means belongs to `ScannerViewModel`.
 ///
 /// A device that cannot scan, and a shopper who has refused the camera, are both reported through
@@ -22,9 +23,9 @@ import VisionKit
 /// every call arrives from the ViewModel, which SwiftUI drives from `body`, `onAppear` and
 /// `onChange` — all on the main thread — so the assumption is one the caller already guarantees.
 public final class CameraScanService: NSObject, CameraScanServiceProtocol {
-    private let payloadSubject = PassthroughSubject<String, Never>()
-    public var recognisedPayloadPublisher: AnyPublisher<String, Never> {
-        payloadSubject.eraseToAnyPublisher()
+    private let payloadsSubject = PassthroughSubject<[String], Never>()
+    public var recognisedPayloadsPublisher: AnyPublisher<[String], Never> {
+        payloadsSubject.eraseToAnyPublisher()
     }
 
     private let failureSubject = PassthroughSubject<CameraScanFailure, Never>()
@@ -162,9 +163,13 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
         }
 
         let controller = DataScannerViewController(
-            recognizedDataTypes: [.barcode(symbologies: [.qr])],
+            recognizedDataTypes: [.barcode(symbologies: [.qr, .ean13])],
             qualityLevel: .balanced,
-            recognizesMultipleItems: false,
+            // On, so that a tag showing both its codes at once is reported as both. Tracking a
+            // single item would hand over whichever the scanner happened to pick, and the choice
+            // that belongs to `ScannerViewModel` — the Alfie code wins — would be made here by
+            // accident.
+            recognizesMultipleItems: true,
             isHighFrameRateTrackingEnabled: false,
             isPinchToZoomEnabled: true,
             isGuidanceEnabled: true,
@@ -185,10 +190,12 @@ extension CameraScanService: DataScannerViewControllerDelegate {
         didAdd addedItems: [RecognizedItem],
         allItems: [RecognizedItem]
     ) {
-        for item in addedItems {
-            guard case .barcode(let barcode) = item, let payload = barcode.payloadStringValue else { continue }
-            payloadSubject.send(payload)
+        let payloads = addedItems.compactMap { item -> String? in
+            guard case .barcode(let barcode) = item else { return nil }
+            return barcode.payloadStringValue
         }
+        guard !payloads.isEmpty else { return }
+        payloadsSubject.send(payloads)
     }
 }
 

@@ -118,7 +118,13 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                         text: notice.message,
                         showCloseButton: true,
                         icon: Icon.warning.image,
-                        autoDismissTime: nil
+                        autoDismissTime: nil,
+                        // Above the component's default of two, which cuts the Barcode notice at
+                        // "Scan the Alfie…" — losing the half that names the code to scan instead,
+                        // which is the only reason the notice exists. A notice here is the screen's
+                        // whole answer to a failed scan, not a toast over content it must not
+                        // cover, so it is given the room to finish its sentence.
+                        lineLimit: Constants.noticeLineLimit
                     ),
                     onCloseTap: { viewModel.didDismissNotice() }
                 )
@@ -163,6 +169,9 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
 private enum Constants {
     /// The chrome sits over a live preview, so it is legible without hiding what the camera sees.
     static let chromeOpacity: Double = 0.6
+    /// Enough for the longest notice — the Barcode one needs three lines at the default text size —
+    /// with one spare for larger type.
+    static let noticeLineLimit = 4
 }
 
 #if DEBUG
@@ -177,6 +186,19 @@ private enum Constants {
                 .init(
                     guidance: "Point the camera at the Alfie code on the tag",
                     notice: .init(id: 1, message: "That code doesn't open anything in Alfie.")
+                )
+            )
+        )
+    )
+}
+
+#Preview("Manufacturer barcode") {
+    ScannerView(
+        viewModel: MockScannerViewModel(
+            state: .success(
+                .init(
+                    guidance: "Point the camera at the Alfie code on the tag",
+                    notice: .init(id: 1, message: "That's the product barcode. Scan the Alfie code on the tag instead.")
                 )
             )
         )

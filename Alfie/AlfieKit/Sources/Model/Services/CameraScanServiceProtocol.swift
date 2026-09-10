@@ -10,7 +10,12 @@ import SwiftUI
 public protocol CameraScanServiceProtocol: AnyObject {
     /// Every code the camera recognises, as the raw string it carries. A QR code emits its contents;
     /// interpreting them is the ViewModel's job, not the camera's.
-    var recognisedPayloadPublisher: AnyPublisher<String, Never> { get }
+    ///
+    /// Delivered a frame at a time rather than a code at a time, because a Swing tag prints the
+    /// Barcode and the Alfie code side by side and which of the two the scanner acts on is a choice
+    /// that needs both of them in hand. Published one by one, the Alfie code would win or lose by
+    /// whichever the camera happened to report first.
+    var recognisedPayloadsPublisher: AnyPublisher<[String], Never> { get }
 
     /// Emitted in place of the recognitions a ``startScanning()`` was expected to produce, when
     /// there turns out to be no camera to produce them. Silence means the camera is running: a

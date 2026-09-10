@@ -121,9 +121,17 @@ public enum ScannedCode: Equatable {
     case barcode(value: String)
     /// Anything else the camera recognised
     case unrecognised(payload: String)
+
+    /// Which of several codes read in one frame is acted on — lower first. A Swing tag prints both
+    /// codes side by side, so both are routinely read at once and the Alfie code has to win.
+    public var precedence: Int { ... }
+
+    /// Thirteen digits with a valid EAN-13 check digit. The check digit is tested and not merely the
+    /// shape, so a QR code holding thirteen digits is not answered with "that's the product barcode".
+    public static func isBarcode(_ payload: String) -> Bool { ... }
 }
-// Not yet built. #138 needs only Alfie-code-or-not, which one `guard` expresses; the manufacturer
-// Barcode ticket is what makes the third case real.
+// Built by #139. #138 needed only Alfie-code-or-not, which one `guard` expressed; the manufacturer
+// Barcode is what made the third case real.
 
 // ViewModel State Model
 public struct ScannerViewStateModel: Equatable {
@@ -239,7 +247,7 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 | Alfie code carries a Handle the catalogue does not have | Existing Product Details error state handles it |
 | Alfie code carries a `sku` parameter | Parsed and ignored; the default Variant is selected |
 | Handle contains `/` (BigCommerce route path) | Parsed correctly — requires the parser fix below |
-| Camera recognises two codes at once | First recognised code wins; scanner then stops recognising |
+| Camera recognises two codes at once | The Alfie code wins, then a Barcode, then anything else; scanner stops recognising once one opens. Amended by #139: a Swing tag prints the Barcode beside the Alfie code, so "first wins" would correct a shopper who scanned correctly. The scanner reads a frame at a time and ranks what it holds — see `ScannedCode.precedence` |
 | Shopper scans while offline | Product Details shows its existing no-connection error state |
 | Shopper scans the same code twice quickly | Second scan is ignored while navigation is in flight |
 | App is backgrounded mid-scan | Scanning stops and resumes when the screen reappears |

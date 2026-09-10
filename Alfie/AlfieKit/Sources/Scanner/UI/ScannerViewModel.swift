@@ -69,8 +69,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     }
 
     private func setupBindings() {
-        scanService.recognisedPayloadPublisher
-            .sink { [weak self] in self?.didRecognise(payload: $0) }
+        scanService.recognisedPayloadsPublisher
+            .sink { [weak self] in self?.didRecognise(payloads: $0) }
             .store(in: &subscriptions)
 
         scanService.failurePublisher
@@ -148,25 +148,56 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         }
     }
 
-    /// The deep-link service is asked what the code is, not asked to open it: classifying the
-    /// payload is the scanner's job — an unrecognised code must leave the camera running — while
-    /// opening the page belongs to the flow.
-    private func didRecognise(payload: String) {
+    /// Acts on one code per frame, and on the one the shopper meant. A Swing tag prints the Barcode
+    /// beside the Alfie code, so both are routinely read at once; ``ScannedCode/precedence`` is what
+    /// settles which is answered.
+    ///
+    /// Neither thing said here goes near the network. A code that is not ours is not looked up
+    /// because nothing in Alfie answers to it, and a Barcode is not looked up because nothing *can*
+    /// — the credentials to resolve one do not exist, which is the reason Alfie prints its own code
+    /// (ADR-0001). Both are said over a camera that keeps running: the shopper is standing at the
+    /// rail, and the fix is the next code along.
+    private func didRecognise(payloads: [String]) {
         guard !hasOpenedLink else { return }
 
-        guard
-            let url = URL(string: payload),
-            opensInApp(deepLinkService.deepLinkType(url))
-        else {
+        switch payloads.map(classify(payload:)).actionable {
+        case .alfieCode(let url):
+            open(url)
+
+        case .barcode(let value):
+            log.debug("Scanned the manufacturer's Barcode, which Alfie cannot resolve: \(value)")
+            analytics.trackScanFailed(reason: .barcode)
+            show(notice: L10n.Scanner.BarcodeDetected.message)
+
+        case .unrecognised(let payload):
             log.debug("Scanned code opens nothing in Alfie: \(payload)")
             analytics.trackScanFailed(reason: .unrecognised)
-            // Said over the camera rather than instead of it: the shopper is standing in front of
-            // the rail and the next tag is the fix, so the scanner has to still be running when
-            // they find it.
             show(notice: L10n.Scanner.Unrecognised.message)
-            return
+
+        case .none:
+            break
+        }
+    }
+
+    /// The deep-link service is asked what the code is, not asked to open it: classifying the
+    /// payload is the scanner's job — a code that opens nothing must leave the camera running —
+    /// while opening the page belongs to the flow.
+    ///
+    /// Tried as an Alfie link first, so the one code that is worth resolving is never mistaken for
+    /// one of the two that are not.
+    private func classify(payload: String) -> ScannedCode {
+        if let url = URL(string: payload), opensInApp(deepLinkService.deepLinkType(url)) {
+            return .alfieCode(url)
         }
 
+        if ScannedCode.isBarcode(payload) {
+            return .barcode(value: payload)
+        }
+
+        return .unrecognised(payload: payload)
+    }
+
+    private func open(_ url: URL) {
         hasOpenedLink = true
         updateScanning()
         // Dismissed before the product opens, not left behind it: the deep-link path pushes onto a
