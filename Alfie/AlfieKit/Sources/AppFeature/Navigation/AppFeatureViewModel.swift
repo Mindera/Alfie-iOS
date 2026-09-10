@@ -249,46 +249,13 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             .store(in: &subscriptions)
     }
 
+    /// A link that names no destination is ignored, leaving the app where it stands. Which link
+    /// leads where is `TabRoute.init(deepLinkType:)`.
     public func navigate(for deepLinkType: DeepLink.LinkType) {
-        switch deepLinkType {
-        case .home:
-            rootTabViewModel.navigate(.home(.home))
-
-        case .shop:
-            rootTabViewModel.navigate(.shop(.categorySelector))
-
-        case .bag:
-            rootTabViewModel.navigate(.bag(.bag))
-
-        case .wishlist:
-            rootTabViewModel.navigate(.wishlist(.wishlist))
-
-        case .account:
-            rootTabViewModel.navigate(.home(.myAccount(.myAccount)))
-
-        case .productList(let paths, let searchText, let urlQueryParameters):
-            rootTabViewModel.navigate(
-                .shop(
-                    .productListing(
-                        .productListing(.init(
-                            category: paths,
-                            searchText: searchText,
-                            urlQueryParameters: urlQueryParameters,
-                            mode: .listing
-                        ))
-                    )
-                )
-            )
-
-        case .productDetail(let handle, _, _):
-            // The BFF resolves a product by its Handle, which is the whole path after the `/product/` prefix.
-            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.deepLink(handle: handle)))))
-
-        case .webView(let url):
-            rootTabViewModel.navigate(.shop(.web(url: url, title: "")))
-
-        case .unknown:
+        guard let route = TabRoute(deepLinkType: deepLinkType) else {
             return
         }
+
+        rootTabViewModel.navigate(route)
     }
 }
