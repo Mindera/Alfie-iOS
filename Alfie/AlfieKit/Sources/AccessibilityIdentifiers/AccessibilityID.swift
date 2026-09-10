@@ -81,6 +81,8 @@ public enum AccessibilityID {
         public static let sizeSelector = "productDetails.size.selector"
         /// Drawn by the design with no destination behind it — rendered, but not interactive.
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
+        /// The line below the selectors stating that the availability they show is online stock.
+        public static let availabilityNote = "productDetails.availability.label"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
     }

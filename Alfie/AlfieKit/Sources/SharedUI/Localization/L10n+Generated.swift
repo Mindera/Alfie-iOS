@@ -164,9 +164,13 @@ public enum L10n {
     public static let title = L10n.tr("L10n", "loading.title")
   }
   public enum Pdp {
+    public enum Availability {
+      /// Shown beneath the PDP colour and size selectors. The availability those selectors show is an online aggregate with no per-store dimension, so this stops a shopper standing in a store reading a crossed-out size as "not in this shop".
+      public static let onlineNote = L10n.tr("L10n", "pdp.availability.online_note")
+    }
     public enum Colour {
       public enum OutOfStock {
-        /// Out of stock
+        /// VoiceOver value for a dimmed colour card. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "pdp.colour.out_of_stock.accessibility_value")
       }
     }
@@ -456,7 +460,7 @@ public enum L10n {
       /// Size
       public static let title = L10n.tr("L10n", "product.size.title")
       public enum OutOfStock {
-        /// Out of stock
+        /// VoiceOver value for a crossed-out size swatch. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "product.size.out_of_stock.accessibility_value")
       }
     }
@@ -722,6 +726,7 @@ public extension L10n {
       case homeSignInButtonCta = "home.sign_in.button.cta"
       case homeSignOutButtonCta = "home.sign_out.button.cta"
       case loadingTitle = "loading.title"
+      case pdpAvailabilityOnlineNote = "pdp.availability.online_note"
       case pdpColourOutOfStockAccessibilityValue = "pdp.colour.out_of_stock.accessibility_value"
       case pdpColourSelectorTitle = "pdp.colour_selector.title"
       case pdpColourSummaryAccessibilityHint = "pdp.colour_summary.accessibility_hint"

@@ -46,6 +46,9 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         // placeholder slot: a solid square, no network, no animation, so the full-bleed band and
         // everything positioned below it are covered deterministically.
         // Still NOT covered: the pagination indicators, which need one image per dot.
+        //
+        // This is also the reference that pins the availability note below the size chips: at
+        // `precision: 1.0` the case cannot pass with that line missing.
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
@@ -137,10 +140,14 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     }
 
     /// Every section shimmering at once — the state a shopper sees before the product resolves.
+    /// The availability note is absent: it qualifies availability, and until the product resolves the
+    /// swatches are shimmer placeholders with no availability to qualify. The mock defaults every
+    /// section to visible, so the real view model's gating has to be restated here.
     func test_productDetailsView_loadingState() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.onShouldShowLoadingForSectionCalled = { _ in true }
+        viewModel.onShouldShowSectionCalled = { $0 != .availabilityNote }
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
