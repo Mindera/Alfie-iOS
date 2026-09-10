@@ -12,58 +12,75 @@ public struct AlfieCode: Equatable {
         self.sku = sku
     }
 
-    /// The host the app already accepts in `LinkConfiguration`, so a scan needs no config change.
-    public static let defaultBaseURL = URL(string: "https://localhost:4000")!
-
     // MARK: - Validity
+
+    /// Why a Handle cannot be printed. Typed rather than stringly, so a caller can react to the
+    /// rule that fired and a test can name it.
+    public enum Problem: Equatable, CustomStringConvertible {
+        case noHandle
+        case disallowedCharacter(Character)
+        case slashAtEdge
+        case emptyPathSegment
+
+        public var description: String {
+            switch self {
+            case .noHandle:
+                return "there is no handle"
+            case .disallowedCharacter(let character):
+                return "it contains \"\(character)\", which is not allowed in a handle"
+            case .slashAtEdge:
+                return "a handle does not start or end with \"/\""
+            case .emptyPathSegment:
+                return "it has an empty path segment (\"//\")"
+            }
+        }
+    }
 
     /// Why this code cannot be printed, in words a reader can act on — or `nil` when it is fine.
     ///
     /// A Handle has to survive into a URL path untouched: anything else is a typo, an
     /// already-encoded string, or a whole URL pasted in by mistake, and each of those prints a code
     /// that fails silently in the meeting room.
-    public var problem: String? {
+    public var problem: Problem? {
         if handle.isEmpty {
-            return "there is no handle"
+            return .noHandle
         }
         if let scalar = handle.unicodeScalars.first(where: { !Self.handleCharacters.contains($0) }) {
-            return "it contains \"\(Character(scalar))\", which is not allowed in a handle"
+            return .disallowedCharacter(Character(scalar))
         }
         if handle.hasPrefix("/") || handle.hasSuffix("/") {
-            return "a handle does not start or end with \"/\""
+            return .slashAtEdge
         }
         if handle.contains("//") {
-            return "it has an empty path segment (\"//\")"
-        }
-        if let sku, sku.isEmpty {
-            return "there is a comma but no SKU after it"
+            return .emptyPathSegment
         }
         return nil
     }
 
     // MARK: - Output
 
-    /// The link encoded into the printed code: `<base>/product/<handle>[?sku=<sku>]`.
+    /// The link encoded into the printed code: `https://localhost:4000/product/<handle>[?sku=<sku>]`.
+    ///
+    /// The host is not configurable, and deliberately so: it is the one `LinkConfiguration` already
+    /// accepts, so a scan needs no app config change — and a code carrying any other host is a code
+    /// the app refuses to route. It is assembled from parts rather than parsed from a literal, so
+    /// there is no string here to force-unwrap.
     ///
     /// The Handle goes in as path segments — a BigCommerce Handle legitimately contains `/` — while
     /// the SKU is percent-encoded, because it is a supplier's string and we do not control it.
-    public func url(baseURL: URL) throws -> URL {
-        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
-            throw AlfieCodeError.invalidBaseURL(baseURL.absoluteString)
-        }
-
-        var path = components.path
-        if path.hasSuffix("/") {
-            path.removeLast()
-        }
-        components.path = path + "/product/" + handle
+    public func url() throws -> URL {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "localhost"
+        components.port = 4000
+        components.path = "/product/" + handle
 
         if let sku {
             components.percentEncodedQuery = "sku=" + Self.percentEncoded(sku)
         }
 
         guard let url = components.url else {
-            throw AlfieCodeError.invalidBaseURL(baseURL.absoluteString)
+            throw AlfieCodeError.invalidLink(handle: handle)
         }
         return url
     }

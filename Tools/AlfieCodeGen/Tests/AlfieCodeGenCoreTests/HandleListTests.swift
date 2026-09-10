@@ -43,28 +43,40 @@ struct HandleListTests {
         }
     }
 
-    @Test("a malformed line names its line number and what was wrong", arguments: [
-        "mens jeans slim",           // whitespace inside a handle
-        "mens-jeans?sku=1",          // URL punctuation
-        "/mens-jeans",               // leading slash
-        "mens-jeans/",               // trailing slash
-        "mens//jeans",               // empty path segment
-        "mens-jeans,",               // comma with no SKU
-        "mens-jeans,SKU-1,extra",    // a third field
-        ",SKU-1",                    // no handle
-    ])
-    func malformedLineThrows(line: String) {
+    @Test("a malformed line names its line number and what was wrong", arguments: zip(
+        [
+            "mens jeans slim",           // whitespace inside a handle
+            "mens-jeans?sku=1",          // URL punctuation
+            "/mens-jeans",               // leading slash
+            "mens-jeans/",               // trailing slash
+            "mens//jeans",               // empty path segment
+            "mens-jeans,",               // comma with no SKU
+            "mens-jeans,SKU-1,extra",    // a third field
+            ",SKU-1",                    // no handle
+        ],
+        [
+            "it contains \" \"",
+            "it contains \"?\"",
+            "does not start or end with \"/\"",
+            "does not start or end with \"/\"",
+            "empty path segment",
+            "comma but no SKU",
+            "3 comma-separated fields",
+            "there is no handle",
+        ]
+    ))
+    func malformedLineThrows(line: String, expectedReason: String) {
         do {
             _ = try HandleList.parse("ok-handle\n\(line)")
             Issue.record("expected a failure for \(line)")
         } catch let error as AlfieCodeError {
-            guard case .malformedLine(let number, let text, _) = error else {
+            guard case .malformedLine(let number, let text, let reason) = error else {
                 Issue.record("expected .malformedLine, got \(error)")
                 return
             }
             #expect(number == 2)
             #expect(text == line)
-            #expect(!error.description.isEmpty)
+            #expect(reason.contains(expectedReason), "\(reason) does not mention \(expectedReason)")
         } catch {
             Issue.record("unexpected error \(error)")
         }

@@ -36,7 +36,7 @@ echo "🧪 Testing generator (not covered by verify.sh)…"
 swift test --package-path "$GENERATOR"
 
 echo "⚙️  Generating Alfie codes from $INPUT → $OUTPUT"
-swift run --package-path "$GENERATOR" AlfieCodeGen --input "$INPUT" --output "$OUTPUT"
+swift run --package-path "$GENERATOR" AlfieCodeGen "$INPUT" "$OUTPUT"
 
 echo "🖨  Print at 100% scale — each code carries the DPI that lands it at 30mm square."
 echo "   Check one with your phone camera before printing the sheet."

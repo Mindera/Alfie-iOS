@@ -12,28 +12,18 @@ public enum Generator {
         public let links: [URL]
     }
 
-    public static func run(
-        inputFile: URL,
-        outputDirectory: URL,
-        baseURL: URL,
-        size: PrintSize
-    ) throws -> Result {
+    public static func run(inputFile: URL, outputDirectory: URL, size: PrintSize) throws -> Result {
         guard let text = try? String(contentsOf: inputFile, encoding: .utf8) else {
             throw AlfieCodeError.unreadableInput(path: inputFile.path)
         }
-        return try run(list: text, outputDirectory: outputDirectory, baseURL: baseURL, size: size)
+        return try run(list: text, outputDirectory: outputDirectory, size: size)
     }
 
-    public static func run(
-        list: String,
-        outputDirectory: URL,
-        baseURL: URL,
-        size: PrintSize
-    ) throws -> Result {
+    public static func run(list: String, outputDirectory: URL, size: PrintSize) throws -> Result {
         let codes = try HandleList.parse(list)
 
         let rendered = try codes.map { code -> (file: URL, link: URL, png: Data) in
-            let link = try code.url(baseURL: baseURL)
+            let link = try code.url()
             return (
                 file: outputDirectory.appendingPathComponent(code.fileName),
                 link: link,
