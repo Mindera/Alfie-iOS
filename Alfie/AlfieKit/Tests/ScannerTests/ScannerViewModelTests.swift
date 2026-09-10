@@ -2,6 +2,7 @@ import Core
 import DeepLink
 import Mocks
 import Model
+import SharedUI
 import XCTest
 @testable import Scanner
 
@@ -17,6 +18,8 @@ final class ScannerViewModelTests: XCTestCase {
     private var deepLinkService: DeepLinkService!
     private var handledDeepLinks: [DeepLink]!
     private var closeCount: Int!
+    private var openSettingsCount: Int!
+    private var mockAnalytics: MockAnalyticsTracker!
     private var sut: ScannerViewModel!
 
     /// The format the generator prints — see `Tools/AlfieCodeGen` and ADR-0001.
@@ -29,6 +32,8 @@ final class ScannerViewModelTests: XCTestCase {
 
         handledDeepLinks = []
         closeCount = 0
+        openSettingsCount = 0
+        mockAnalytics = MockAnalyticsTracker()
         scanService = MockCameraScanService()
 
         let handler = MockDeepLinkHandler()
@@ -43,11 +48,14 @@ final class ScannerViewModelTests: XCTestCase {
             dependencies: .init(
                 deepLinkService: deepLinkService,
                 makeScanService: { scanService },
+                analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 log: MockLogger()
             ),
-            // The flow's closure, standing in for HomeFlowViewModel: it hands the scanned link to
-            // the real deep-link service, so these tests still assert on the link the app routes.
+            // The flow's closures, standing in for HomeFlowViewModel: the first hands the scanned
+            // link to the real deep-link service, so these tests still assert on the link the app
+            // routes.
             openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
+            openAppSettings: { [weak self] in self?.openSettingsCount += 1 },
             close: { [weak self] in self?.closeCount += 1 }
         )
     }
@@ -58,6 +66,8 @@ final class ScannerViewModelTests: XCTestCase {
         scanService = nil
         handledDeepLinks = nil
         closeCount = nil
+        openSettingsCount = nil
+        mockAnalytics = nil
         try super.tearDownWithError()
     }
 
@@ -86,9 +96,11 @@ final class ScannerViewModelTests: XCTestCase {
             dependencies: .init(
                 deepLinkService: deepLinkService,
                 makeScanService: { scanService },
+                analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 log: MockLogger()
             ),
             openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
+            openAppSettings: { },
             close: { eventsInOrder.append("close") }
         )
         sut.viewDidAppear()
@@ -165,7 +177,7 @@ final class ScannerViewModelTests: XCTestCase {
 
     // MARK: - Codes that are not Alfie codes
 
-    func test_aCodeThatIsNotAProductLinkOpensNothingAndKeepsScanning() {
+    func test_aCodeThatReachesNothingInAlfieOpensNothingAndKeepsScanning() {
         sut.viewDidAppear()
 
         scanService.recognise("https://example.com/not-an-alfie-code")
@@ -175,6 +187,86 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertTrue(handledDeepLinks.isEmpty)
         XCTAssertEqual(closeCount, 0)
         XCTAssertTrue(scanService.isScanning)
+    }
+
+    /// Silence would read as a broken scanner: the shopper is holding the camera over something and
+    /// nothing is happening. Saying the code is not ours is what tells them to look for a different
+    /// one — and it is said over the running camera, not instead of it.
+    func test_aCodeThatIsNotAnAlfieCodeSaysSo() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.Unrecognised.message)
+    }
+
+    /// The scanner has to still be *open* for the next code to reach it. Asserting only that the
+    /// good code opened its Product would pass on a scanner that had closed and been reopened,
+    /// which is not what the shopper standing at the rail experiences.
+    func test_aValidAlfieCodeIsStillRecognisedAfterAnUnrecognisedOne() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        XCTAssertTrue(scanService.isScanning)
+        XCTAssertEqual(closeCount, 0)
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+    }
+
+    /// An Alfie code carries an Alfie link, and the flow's deep-link path decides where it lands.
+    /// Judging the code on "is it a Product?" would tell a shopper holding a real Alfie code that it
+    /// is not from Alfie — false, and it would strand a link the app can open perfectly well.
+    func test_anAlfieCodeThatIsNotAProductIsStillOpened() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://localhost:4000/wishlist")
+
+        XCTAssertEqual(try XCTUnwrap(handledDeepLinks.last).type, .wishlist)
+        XCTAssertEqual(closeCount, 1)
+        XCTAssertNil(sut.state.value?.notice)
+    }
+
+    /// The one Alfie URL that must *not* be opened: nothing in the app answers to it, so the
+    /// deep-link path would fall back to a web view — the blank screen this ticket exists to
+    /// prevent. It gets the same notice as a stranger's code, because it reaches the shopper the
+    /// same way: nothing happened.
+    func test_anAlfieUrlWithNoScreenOfItsOwnIsNotOpenedInAWebView() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://localhost:4000/help/returns")
+
+        XCTAssertTrue(handledDeepLinks.isEmpty)
+        XCTAssertEqual(closeCount, 0)
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.Unrecognised.message)
+    }
+
+    /// A second bad code in a row says exactly what the first one said. It still has to count as a
+    /// new notice: the screen announces on change, so words alone would leave VoiceOver silent at
+    /// the moment the shopper has just failed again. See ``ScannerNotice``.
+    func test_theSameUnrecognisedCodeTwiceIsTwoDistinctNotices() throws {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        let first = try XCTUnwrap(sut.state.value?.notice)
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        let second = try XCTUnwrap(sut.state.value?.notice)
+
+        XCTAssertEqual(first.message, second.message)
+        XCTAssertNotEqual(first, second)
+    }
+
+    func test_dismissingTheNoticeLeavesTheGuidanceInPlace() {
+        sut.viewDidAppear()
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        sut.didDismissNotice()
+
+        XCTAssertNil(sut.state.value?.notice)
+        XCTAssertEqual(sut.state.value?.guidance, L10n.Scanner.Guidance.message)
     }
 
     // MARK: - When recognition runs
@@ -219,6 +311,138 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(scanService.startCount, 1)
     }
 
+    // MARK: - When there is no camera to look through
+
+    func test_aRefusedCameraIsExplained() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .permissionDenied)
+
+        XCTAssertEqual(sut.state.failure, .cameraPermissionDenied)
+    }
+
+    func test_aDeviceThatCannotScanIsExplained() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .deviceNotSupported)
+
+        XCTAssertEqual(sut.state.failure, .deviceNotSupported)
+    }
+
+    func test_aCameraThatWillNotStartFallsBackToTheGenericExplanation() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .unavailable)
+
+        XCTAssertEqual(sut.state.failure, .generic)
+    }
+
+    /// The explanation replaces the screen, so anything that was being said over the camera goes
+    /// with it — a notice about the last code read is meaningless once there is no camera.
+    func test_anExplanationReplacesTheNoticeAndTheGuidance() {
+        sut.viewDidAppear()
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        scanService.fail(with: .permissionDenied)
+
+        XCTAssertNil(sut.state.value)
+    }
+
+    func test_aRefusedCameraOffersTheWayToSettings() {
+        sut.viewDidAppear()
+        scanService.fail(with: .permissionDenied)
+
+        sut.didTapOpenSettings()
+
+        XCTAssertEqual(openSettingsCount, 1)
+    }
+
+    /// Settings is reached by leaving the app, so the fix always arrives as a return to the
+    /// foreground. The camera is asked again on the way back rather than leaving the shopper looking
+    /// at an explanation of a permission they have just granted.
+    func test_returningToTheForegroundAsksTheCameraAgainAfterAFailure() {
+        sut.viewDidAppear()
+        scanService.fail(with: .permissionDenied)
+
+        sut.didChangeScenePhase(isActive: false)
+        sut.didChangeScenePhase(isActive: true)
+
+        XCTAssertNil(sut.state.failure)
+        XCTAssertTrue(scanService.isScanning)
+    }
+
+    /// A failure leaves nothing running, and the service says so by clearing its own start request.
+    /// This screen has to agree with it: while it still believed a camera was running, the next
+    /// start was declined as redundant and the shopper stayed on the explanation.
+    ///
+    /// Asserted without a backgrounding step on purpose — the scene-phase round trip hides the bug
+    /// by stopping first, which is why the case above passed either way.
+    func test_aFailedStartCanBeStartedAgainWithoutLeavingTheApp() {
+        sut.viewDidAppear()
+        scanService.fail(with: .permissionDenied)
+
+        sut.viewDidAppear()
+
+        XCTAssertEqual(scanService.startCount, 2)
+        XCTAssertNil(sut.state.failure)
+    }
+
+    // MARK: - Reporting why a scan failed
+
+    /// Every way a scan ends without a Product reports under one event, distinguished by reason —
+    /// the reasons are read against each other, so each has to arrive under its own name.
+    func test_anUnrecognisedCodeIsReportedAsUnrecognised() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        XCTAssertEqual(reportedScanFailures, ["unrecognised"])
+    }
+
+    func test_aRefusedCameraIsReportedAsPermissionDenied() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .permissionDenied)
+
+        XCTAssertEqual(reportedScanFailures, ["permission_denied"])
+    }
+
+    func test_aDeviceThatCannotScanIsReportedAsUnsupported() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .deviceNotSupported)
+
+        XCTAssertEqual(reportedScanFailures, ["unsupported"])
+    }
+
+    func test_aCameraThatWillNotStartIsReportedAsGeneric() {
+        sut.viewDidAppear()
+
+        scanService.fail(with: .unavailable)
+
+        XCTAssertEqual(reportedScanFailures, ["generic"])
+    }
+
+    /// A scan that works is not a failure. Without this the event would count openings as well as
+    /// failures and the breakdown would describe nothing.
+    func test_aScanThatOpensAProductIsNotReported() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertTrue(reportedScanFailures.isEmpty)
+    }
+
+    /// Nor is an Alfie code that opens something other than a Product. Counting it would inflate
+    /// `unrecognised` with codes that worked.
+    func test_anAlfieCodeThatOpensAnotherScreenIsNotReported() {
+        sut.viewDidAppear()
+
+        scanService.recognise("https://localhost:4000/wishlist")
+
+        XCTAssertTrue(reportedScanFailures.isEmpty)
+    }
+
     // MARK: - Closing
 
     func test_closingDismissesWithoutOpeningAProduct() {
@@ -231,6 +455,11 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    /// The `reason` carried by each `scan_failed` event, in order.
+    private var reportedScanFailures: [String] {
+        mockAnalytics.trackedValues(of: .reason, for: .scanFailed)
+    }
 
     private func handledHandle() throws -> String {
         let deepLink = try XCTUnwrap(handledDeepLinks.first)

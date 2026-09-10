@@ -218,6 +218,7 @@ let package = Package(
                 "Scanner",
                 "Search",
                 "SharedUI",
+                "Utils",
                 "Web",
                 "Wishlist",
             ],
@@ -284,6 +285,7 @@ let package = Package(
             name: "Scanner",
             dependencies: [
                 "AccessibilityIdentifiers",
+                "Core",
                 "Mocks",
                 "Model",
                 "SharedUI",

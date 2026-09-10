@@ -120,6 +120,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let scannerDependencyContainer = ScannerDependencyContainer(
             deepLinkService: serviceProvider.deepLinkService,
             makeScanService: { CameraScanService(log: log) },
+            analytics: serviceProvider.analytics,
             log: log
         )
         let searchDependencyContainer = SearchDependencyContainer(

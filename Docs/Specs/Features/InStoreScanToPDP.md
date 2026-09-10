@@ -81,9 +81,18 @@ instead
 ### Scenario 5: Shopper scans an unrelated code
 
 **GIVEN** the shopper is on the _Scanner screen_
-**WHEN** the camera recognises a QR code that is not an Alfie code
-**THEN** the existing deep-link fallback handles the URL
+**WHEN** the camera recognises a QR code that opens nothing in Alfie
+**THEN** the scanner stays open and a notice says so
 AND a Product Details screen is not opened
+
+> Amended by #138. This scenario originally handed the URL to the existing deep-link fallback, which
+> would open an arbitrary scanned link in a web view — a stranger's QR code deciding what the app
+> shows. The scanner now classifies the payload and says so instead.
+>
+> "Opens nothing" is the test, not "is not a Product". An Alfie code carries an Alfie link and the
+> deep-link path decides where it lands, so a code resolving to any in-app destination is opened
+> normally. The notice is for the three that reach nothing: a link that is not ours, one we cannot
+> parse, and one whose only route is the web-view fallback this scenario exists to prevent.
 
 ### Scenario 6: Camera permission is refused
 
@@ -113,11 +122,20 @@ public enum ScannedCode: Equatable {
     /// Anything else the camera recognised
     case unrecognised(payload: String)
 }
+// Not yet built. #138 needs only Alfie-code-or-not, which one `guard` expresses; the manufacturer
+// Barcode ticket is what makes the third case real.
 
 // ViewModel State Model
 public struct ScannerViewStateModel: Equatable {
     let guidance: String
-    let notice: String?
+    let notice: ScannerNotice?
+}
+
+// A notice carries an identity as well as its words, because it is an event rather than a state:
+// a second bad code says what the first one said, and the screen announces on change.
+public struct ScannerNotice: Equatable, Identifiable {
+    public let id: Int
+    public let message: String
 }
 
 // Error Types
@@ -177,11 +195,12 @@ deep links land in the Shop tab.
 | `scanner.title` | "Scan" | Screen title |
 | `scanner.guidance.message` | "Point the camera at the Alfie code on the tag" | Shown under the preview |
 | `scanner.barcode_detected.message` | "That's the product barcode. Scan the Alfie code on the tag instead." | Scenario 4 |
-| `scanner.unrecognised.message` | "That code isn't from Alfie." | Scenario 5 |
+| `scanner.unrecognised.message` | "That code doesn't open anything in Alfie." | Scenario 5 |
 | `scanner.error.permission_denied.title` | "Camera access is off" | Scenario 6 |
 | `scanner.error.permission_denied.message` | "Turn on camera access in Settings to scan tags." | Scenario 6 |
 | `scanner.error.permission_denied.action` | "Open Settings" | Scenario 6 |
 | `scanner.error.unsupported.message` | "This device can't scan codes." | Scenario 7 |
+| `scanner.error.generic.message` | "Something went wrong." | A permitted camera that will not start |
 | `search.scan_button.accessibility_label` | "Scan a tag" | Search bar control |
 | `pdp.availability.online_note` | "Availability shown is online stock" | Scenario 3 |
 
@@ -204,9 +223,12 @@ deep links land in the Shop tab.
 
 ### Event: `scan_failed`
 
-**When**: A code is recognised but cannot open a Product
+**When**: A scan does not open a Product — a code that is not ours, or a camera that cannot run
 **Parameters**:
-- `reason`: String - "barcode" | "unrecognised" | "permission_denied" | "unsupported"
+- `reason`: String - "barcode" | "unrecognised" | "permission_denied" | "unsupported" | "generic"
+
+`generic` covers a camera that exists and is permitted but will not start; `barcode` arrives with the
+manufacturer-Barcode ticket. See `ScanFailureReason`.
 
 ---
 

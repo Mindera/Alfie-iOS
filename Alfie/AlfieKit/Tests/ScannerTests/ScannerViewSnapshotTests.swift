@@ -10,23 +10,15 @@ import XCTest
 ///
 /// The preview comes from the scan service, so `MockCameraScanService` renders a blank one and the
 /// snapshot covers what this screen actually owns: the title, the close button and the guidance,
-/// laid out over the preview rather than beside it.
+/// laid out over the preview rather than beside it. The failure cases cover the opposite — the
+/// chrome over a plain background, where there is no camera to invert against.
 final class ScannerViewSnapshotTests: XCTestCase {
     private let isRecording = false
-    private var mockViewModel: MockScannerViewModel!
 
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        mockViewModel = .init()
-    }
-
-    override func tearDownWithError() throws {
-        mockViewModel = nil
-        try super.tearDownWithError()
-    }
+    private static let guidance = "Point the camera at the Alfie code on the tag"
 
     func test_scannerView() {
-        let sut = ScannerView(viewModel: mockViewModel)
+        let sut = ScannerView(viewModel: MockScannerViewModel(state: .success(.init(guidance: Self.guidance))))
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
@@ -34,8 +26,50 @@ final class ScannerViewSnapshotTests: XCTestCase {
 
     /// Guidance long enough to wrap: the panel grows with the text rather than clipping it.
     func test_scannerView_withLongGuidance() {
-        mockViewModel.guidance = String(repeating: "Point the camera at the Alfie code on the tag. ", count: 3)
-        let sut = ScannerView(viewModel: mockViewModel)
+        let viewModel = MockScannerViewModel(
+            state: .success(.init(guidance: String(repeating: "\(Self.guidance). ", count: 3)))
+        )
+        let sut = ScannerView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// The notice sits above the guidance rather than replacing it: what went wrong and what to do
+    /// next are both on screen, over a camera that never stopped.
+    func test_scannerView_withNotice() {
+        let viewModel = MockScannerViewModel(
+            state: .success(
+                .init(
+                    guidance: Self.guidance,
+                    notice: .init(id: 1, message: "That code doesn't open anything in Alfie.")
+                )
+            )
+        )
+        let sut = ScannerView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_scannerView_withPermissionDenied() {
+        let sut = ScannerView(viewModel: MockScannerViewModel(state: .error(.cameraPermissionDenied)))
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_scannerView_withDeviceNotSupported() {
+        let sut = ScannerView(viewModel: MockScannerViewModel(state: .error(.deviceNotSupported)))
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// The camera exists and is permitted, but would not start. It has no headline and no way out,
+    /// so it renders a shorter panel than the other two — which is exactly what a reference is for.
+    func test_scannerView_withGenericFailure() {
+        let sut = ScannerView(viewModel: MockScannerViewModel(state: .error(.generic)))
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
