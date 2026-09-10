@@ -32,6 +32,8 @@ public enum L10n {
     public static let removeFromWishlist = L10n.tr("L10n", "accessibility.removeFromWishlist")
     /// Remove recent search
     public static let removeRecentSearch = L10n.tr("L10n", "accessibility.removeRecentSearch")
+    /// Scan a tag
+    public static let scan = L10n.tr("L10n", "accessibility.scan")
     /// Search
     public static let search = L10n.tr("L10n", "accessibility.search")
     /// Settings
@@ -465,6 +467,14 @@ public enum L10n {
       }
     }
   }
+  public enum Scanner {
+    /// Scan
+    public static let title = L10n.tr("L10n", "scanner.title")
+    public enum Guidance {
+      /// Point the camera at the Alfie code on the tag
+      public static let message = L10n.tr("L10n", "scanner.guidance.message")
+    }
+  }
   public enum Search {
     public enum Screen {
       public enum EmptyView {
@@ -695,6 +705,7 @@ public extension L10n {
       case accessibilityPreviousPage = "accessibility.previousPage"
       case accessibilityRemoveFromWishlist = "accessibility.removeFromWishlist"
       case accessibilityRemoveRecentSearch = "accessibility.removeRecentSearch"
+      case accessibilityScan = "accessibility.scan"
       case accessibilitySearch = "accessibility.search"
       case accessibilitySettings = "accessibility.settings"
       case accessibilityShare = "accessibility.share"
@@ -794,6 +805,8 @@ public extension L10n {
       case productSizeSelected = "product.size.selected"
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
+      case scannerTitle = "scanner.title"
+      case scannerGuidanceMessage = "scanner.guidance.message"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"
