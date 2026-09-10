@@ -435,9 +435,6 @@ extension ProductDetailsView {
                             columns: Constants.colourGridColumns
                         )
                     }
-                    // Carried by every card, not just stated once below the grid: a shopper who
-                    // touches a dimmed colour directly, or moves by rotor, never passes the note.
-                    .accessibilityHint(L10n.Pdp.Availability.onlineNote)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSelector)
 
                 case .summaryOnly:
@@ -467,9 +464,6 @@ extension ProductDetailsView {
                 }
             }
             .shimmering(while: shimmeringBinding(for: .sizeSelector), animateOnStateTransition: false)
-            // The crossed-out chip is the availability signal most likely to be misread in a store,
-            // so the qualification travels with each chip rather than only with the note below.
-            .accessibilityHint(L10n.Pdp.Availability.onlineNote)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeSelector)
         }
     }
@@ -496,9 +490,11 @@ extension ProductDetailsView {
     /// size chip as "not in this shop" — which is not what it means, and not something the stack can say.
     /// See `Docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
     ///
-    /// This is the visible half. Reading order alone would only reach a VoiceOver user who swipes
-    /// linearly past every swatch, so the same string is also the accessibility hint on both
-    /// selectors — a shopper who touches a crossed-out chip directly hears the qualification with it.
+    /// This is the visible half. The spoken half rides on the swatches' own out-of-stock
+    /// `accessibilityValue` — "Out of stock online" — rather than an `accessibilityHint` here: Speak
+    /// Hints is user-toggleable, and Braille and Switch Control never surface hints at all, so a hint
+    /// is the first thing dropped. A value is always announced, and it lands on the one element whose
+    /// availability actually needs qualifying.
     @ViewBuilder private var availabilityNote: some View {
         if viewModel.shouldShow(section: .availabilityNote) {
             Text.build(theme.font.label.small(L10n.Pdp.Availability.onlineNote))

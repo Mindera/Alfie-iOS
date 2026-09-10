@@ -172,7 +172,7 @@ public enum L10n {
     }
     public enum Colour {
       public enum OutOfStock {
-        /// Out of stock
+        /// VoiceOver value for a dimmed colour card. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "pdp.colour.out_of_stock.accessibility_value")
       }
     }
@@ -462,7 +462,7 @@ public enum L10n {
       /// Size
       public static let title = L10n.tr("L10n", "product.size.title")
       public enum OutOfStock {
-        /// Out of stock
+        /// VoiceOver value for a crossed-out size swatch. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "product.size.out_of_stock.accessibility_value")
       }
     }
