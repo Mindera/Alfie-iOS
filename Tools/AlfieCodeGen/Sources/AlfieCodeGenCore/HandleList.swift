@@ -35,20 +35,29 @@ public enum HandleList {
 
     // MARK: - One line
 
-    /// The parser owns line numbers; `AlfieCode` owns what makes a code printable.
+    /// The parser owns line numbers and the comma syntax; `AlfieCode` owns what makes a Handle
+    /// printable.
     private static func parseEntry(_ line: String, number: Int) throws -> AlfieCode {
-        let fields = line.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-        guard fields.count <= 2 else {
-            throw AlfieCodeError.malformedLine(
-                number: number,
-                line: line,
-                reason: "it has \(fields.count) comma-separated fields"
-            )
+        func malformed(_ reason: String) -> AlfieCodeError {
+            AlfieCodeError.malformedLine(number: number, line: line, reason: reason)
         }
 
-        let code = AlfieCode(handle: fields[0], sku: fields.count == 2 ? fields[1] : nil)
+        let fields = line.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        guard fields.count <= 2 else {
+            throw malformed("it has \(fields.count) comma-separated fields")
+        }
+
+        var sku: String?
+        if fields.count == 2 {
+            guard !fields[1].isEmpty else {
+                throw malformed("there is a comma but no SKU after it")
+            }
+            sku = fields[1]
+        }
+
+        let code = AlfieCode(handle: fields[0], sku: sku)
         if let problem = code.problem {
-            throw AlfieCodeError.malformedLine(number: number, line: line, reason: problem)
+            throw malformed(problem.description)
         }
         return code
     }
