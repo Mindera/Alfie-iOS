@@ -470,6 +470,10 @@ public enum L10n {
   public enum Scanner {
     /// Scan
     public static let title = L10n.tr("L10n", "scanner.title")
+    public enum BarcodeDetected {
+      /// That's the product barcode. Scan the Alfie code on the tag instead.
+      public static let message = L10n.tr("L10n", "scanner.barcode_detected.message")
+    }
     public enum Error {
       public enum Generic {
         /// Something went wrong.
@@ -828,6 +832,7 @@ public extension L10n {
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
       case scannerTitle = "scanner.title"
+      case scannerBarcodeDetectedMessage = "scanner.barcode_detected.message"
       case scannerErrorGenericMessage = "scanner.error.generic.message"
       case scannerErrorPermissionDeniedAction = "scanner.error.permission_denied.action"
       case scannerErrorPermissionDeniedMessage = "scanner.error.permission_denied.message"
