@@ -17,9 +17,12 @@ public enum TokenLoader {
     static let modeForCollection: [String: String] = [
         "system": "ios",
         "screen-size": "small-(s)",
-        "theme": "alfie-theme",
-        // Upstream added a second `new-theme` mode; iOS still ships the Alfie brand, and
-        // pull-design-tokens.sh only copies the alfie-theme file.
+        // iOS ships the new brand palette: primary buttons go from black-on-white to the brand
+        // yellow with dark content. Set this back to `alfie-theme` to return to the original brand.
+        "theme": "new-brand-theme",
+        // `.primitives` also carries a second mode, but the two primitive files hold the same tokens
+        // with the same values — the palettes differ only in which primitives `theme` points at. So
+        // this pin stays on `alfie-theme` regardless of the theme above.
         ".primitives": "alfie-theme",
     ]
     static let documentationPrefix = "~~doc-"
