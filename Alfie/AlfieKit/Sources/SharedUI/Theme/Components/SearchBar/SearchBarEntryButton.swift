@@ -8,9 +8,10 @@ import SwiftUI
 /// single accessible element (its label/id come from the parameters). Callers own outer layout
 /// (padding, `matchedGeometryEffect`, …).
 ///
-/// A `scan` configuration adds a second control alongside the bar, opening the tag scanner. It is a
-/// sibling of the bar rather than an icon inside it, so it is its own accessible element and the
-/// bar's own trailing icon slot stays free for the magnifying glass.
+/// A `scan` configuration puts a second control inside the bar, at its trailing edge, opening the
+/// tag scanner — the design's "Scan Barcode" search variant, where the magnifying glass leads and
+/// the scan glyph trails. It stays its own accessible element, so VoiceOver still offers search and
+/// scan separately.
 public struct SearchBarEntryButton: View {
     /// The Scan control's identity and action. Absent on a search bar that has no scanner behind it.
     public struct ScanConfiguration {
@@ -41,16 +42,12 @@ public struct SearchBarEntryButton: View {
     }
 
     public var body: some View {
-        // The scan control carries ~10pt of its own padding either side (a 24pt glyph centred in a
-        // 44pt tap target), so the gap reads wider than the token. Keep the token tight and let the
-        // tap target supply the rest.
-        HStack(spacing: theme.spacing.space050) {
-            searchButton
-
-            if let scan {
-                scanButton(scan)
+        searchButton
+            .overlay(alignment: .trailing) {
+                if let scan {
+                    scanTapTarget(scan)
+                }
             }
-        }
     }
 
     private var searchButton: some View {
@@ -59,7 +56,8 @@ public struct SearchBarEntryButton: View {
                 searchText: .constant(""),
                 placeholder: placeholder,
                 theme: .soft,
-                dismissConfiguration: .init(type: .hidden)
+                dismissConfiguration: .init(type: .hidden),
+                trailingAccessory: scan.map { _ in AnyView(scanGlyph) }
             )
             .allowsHitTesting(false)
             .accessibilityHidden(true)
@@ -69,10 +67,19 @@ public struct SearchBarEntryButton: View {
         .accessibilityLabel(placeholder)
     }
 
-    private func scanButton(_ scan: ScanConfiguration) -> some View {
+    /// Matches the bar's own magnifying glass, so the pair bracketing the text reads as one set.
+    private var scanGlyph: some View {
+        ThemedIcon(.scanBarcode, size: .small, tint: Theme.contentContentPrimary)
+    }
+
+    /// The tap target is an overlay rather than a `Button` handed to the bar: the bar is drawn
+    /// inside the search `Button` with hit testing off, which a nested button would inherit. It is
+    /// wider than the glyph so the control stays comfortable to hit — it can only reach the bar's
+    /// 32pt height, so the width is what is left to give.
+    private func scanTapTarget(_ scan: ScanConfiguration) -> some View {
         Button(action: scan.action) {
-            ThemedIcon(.scanBarcode, size: .medium, tint: Theme.contentContentPrimary)
-                .frame(width: Constants.scanTapTarget, height: Constants.scanTapTarget)
+            Color.clear
+                .frame(width: Constants.scanTapTargetWidth)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -81,8 +88,6 @@ public struct SearchBarEntryButton: View {
     }
 
     private enum Constants {
-        /// The glyph is icon-sized; the tap target is not, so the control still meets the HIG
-        /// minimum next to a 32pt search bar.
-        static let scanTapTarget: CGFloat = 44
+        static let scanTapTargetWidth: CGFloat = 44
     }
 }
