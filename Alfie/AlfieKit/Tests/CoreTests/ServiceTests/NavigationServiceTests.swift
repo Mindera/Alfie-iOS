@@ -21,17 +21,26 @@ final class NavigationServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_get_navigation_items_calls_bff_service() {
-        let expectation = expectation(description: "Wait for service call")
-        mockClientService.onGetHeaderNavCalled = { handle in
-            XCTAssertEqual(handle, .header)
-            expectation.fulfill()
+    // The menu is hardcoded for the demo, so these assert the fixed list rather than a BFF call.
+    // Restore an `onGetHeaderNavCalled` expectation here when the service goes back to the real menu.
+    func test_get_navigation_items_returns_hardcoded_categories() async throws {
+        let items = try await sut.getNavigationItems(for: .shop)
+
+        XCTAssertEqual(items.map(\.id), ["women-1", "men-2"])
+        XCTAssertEqual(items.map(\.title), ["Women's clothes", "Men's"])
+        XCTAssertEqual(items.map(\.url), ["/women-1", "/men-2"])
+        XCTAssertTrue(items.allSatisfy { $0.type == .listing })
+    }
+
+    func test_get_navigation_items_does_not_call_bff_service() async throws {
+        var didCallBFF = false
+        mockClientService.onGetHeaderNavCalled = { _ in
+            didCallBFF = true
             return []
         }
 
-        Task {
-            _ = try await sut.getNavigationItems(for: .shop)
-        }
-        wait(for: [expectation], timeout: .default)
+        _ = try await sut.getNavigationItems(for: .shop)
+
+        XCTAssertFalse(didCallBFF)
     }
 }
