@@ -58,6 +58,17 @@ struct TokenLoaderTests {
         _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
     }
 
+    @Test("`.primitives` is pinned to alfie-theme, skipping the file-less new-theme mode")
+    func primitivesModeSelection() throws {
+        // Upstream added a second "new-theme" primitives mode; the fixture mirrors it with no
+        // backing file. If .primitives ever stops being pinned, selectedFiles would include
+        // .primitives.new-theme.tokens.json and load() would throw fileNotFound.
+        let files = try TokenLoader.selectedFiles(manifestURL: miniURL().appendingPathComponent("manifest.json"))
+        #expect(files.contains(".primitives.alfie-theme.tokens.json"))
+        #expect(!files.contains(".primitives.new-theme.tokens.json"))
+        _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
+    }
+
     @Test("an unpinned collection that gains a second mode fails fast with an actionable message")
     func unpinnedMultiModeFailsFast() throws {
         // A future collection gaining a second mode without a pin must be caught here, not crash

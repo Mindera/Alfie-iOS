@@ -34,19 +34,45 @@ Commit the generated Swift **only when tokens actually changed**. Output is dete
 
 ## How the generator works
 
-`Tools/DesignTokenGen` reads `manifest.json`, loads the **iOS mode** of each multi-mode collection
-(System = `ios`, Screen Size = `small-(s)` per the contract), and resolves `{reference}` chains into a
-single name→token graph. It then emits Swift that **preserves the reference graph**: primitives hold
-concrete literals; semantic (`Theme`), `Sizing` and `Typography` tokens emit as references to
-`Primitives.*` symbols (no hardcoded hex). Generated API mirrors the Figma names verbatim, e.g.
-`Theme.buttonPrimaryBackgroundPrimaryDefault`, `Typography.display.large`, `Sizing.radiusSoft`.
+`Tools/DesignTokenGen` reads `manifest.json`, loads the **iOS mode** of each multi-mode collection,
+and resolves `{reference}` chains into a single name→token graph. It then emits Swift that
+**preserves the reference graph**: primitives hold concrete literals; semantic (`Theme`), `Sizing`
+and `Typography` tokens emit as references to `Primitives.*` symbols (no hardcoded hex). Generated
+API mirrors the Figma names verbatim, e.g. `Theme.buttonPrimaryBackgroundPrimaryDefault`,
+`Typography.display.large`, `Sizing.radiusSoft`.
+
+### Mode pinning
+
+Every collection with more than one mode **must** be pinned in `TokenLoader.modeForCollection`, which
+picks the single mode iOS ships:
+
+| Collection | Pinned mode | Why |
+|---|---|---|
+| `system` | `ios` | skip android/web |
+| `screen-size` | `small-(s)` | mobile uses Small at codegen |
+| `theme` | `alfie-theme` | skip the Selfridges brand |
+| `.primitives` | `alfie-theme` | skip the `new-theme` brand |
+
+An **unpinned** multi-mode collection fails generation with `unpinnedMultiModeCollection` rather than
+silently loading every mode's file. So when upstream adds a mode (as it did for `.primitives`), the
+fix is a new row here plus a pin — and `pull-design-tokens.sh`'s `TOKEN_FILES` must ship the file the
+pin selects. Each pin is guarded by a test whose fixture declares the *unpinned* mode with no backing
+file, so deleting a pin breaks the suite (see `GeneratorTests.themeModeSelection` /
+`primitivesModeSelection`).
 
 ### Allow-lists
 
 The token export ships two allow-lists (`.cycle-allowlist.json`, `.broken-ref-allowlist.json`) for
-known Figma-plugin artefacts (7 font-family cycles, 2 filtered font-weight primitives). The generator
-honours them **exhaustively** — an unlisted cycle / missing ref fails generation, and a stale entry
-(scoped to the loaded iOS files) also fails — so the exceptions can't silently rot.
+known export artefacts: **9 cycles** (7 font-family, plus `border-border-weight-{default,heavy}` in
+`sizing.alfie-theme.tokens.json`, where a sizing token aliases an identically-named primitive) and
+**2 filtered font-weight primitives**. The generator honours them **exhaustively** — an unlisted
+cycle / missing ref fails generation, and a stale entry (scoped to the loaded iOS files) also fails
+— so the exceptions can't silently rot. Each allow-listed cycle prints a `⚠️ cycle on …` line on every
+run; those warnings are expected, and the entry resolves to the primitive's concrete value.
+
+Note the `upstream_issue` field on `.cycle-allowlist.json` names the Figma exporter plugin, which
+is accurate for the font-family cycles but not for the two border-weight ones — those are a
+same-name collision between the `sizing` and `.primitives` collections.
 
 ## Important
 

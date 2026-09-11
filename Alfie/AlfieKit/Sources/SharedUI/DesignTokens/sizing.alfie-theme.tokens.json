@@ -1,4 +1,12 @@
 {
+  "border-border-weight-default": {
+    "$type": "dimension",
+    "$value": "{border-border-weight-default}"
+  },
+  "border-border-weight-heavy": {
+    "$type": "dimension",
+    "$value": "{border-border-weight-heavy}"
+  },
   "icons-icon-large": {
     "$type": "dimension",
     "$value": "{spacing-spacing-32}"
@@ -37,5 +45,41 @@
   "radius-strong": {
     "$type": "dimension",
     "$value": "{spacing-spacing-16}"
+  },
+  "spacing-spacing-2xl": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-40}"
+  },
+  "spacing-spacing-2xs": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-4}"
+  },
+  "spacing-spacing-3xs": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-2}"
+  },
+  "spacing-spacing-lg": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-24}"
+  },
+  "spacing-spacing-md": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-16}"
+  },
+  "spacing-spacing-none": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-0}"
+  },
+  "spacing-spacing-sm": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-12}"
+  },
+  "spacing-spacing-xl": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-32}"
+  },
+  "spacing-spacing-xs": {
+    "$type": "dimension",
+    "$value": "{spacing-spacing-8}"
   }
 }
