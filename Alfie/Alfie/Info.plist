@@ -27,5 +27,14 @@
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
+	<!-- A device build cannot reach the BFF at `localhost:3000` — on the phone that is the phone.
+	     Pointing the Debug Menu at the Mac's LAN address needs plain HTTP to a private-range IP,
+	     which ATS blocks by default. This permits local networking only; HTTP to the public
+	     internet stays blocked. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
