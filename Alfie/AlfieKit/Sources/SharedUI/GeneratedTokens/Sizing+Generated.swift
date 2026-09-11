@@ -4,6 +4,8 @@
 import CoreGraphics
 
 public enum Sizing {
+    public static let borderBorderWeightDefault: CGFloat = Primitives.Border.borderWeightDefault
+    public static let borderBorderWeightHeavy: CGFloat = Primitives.Border.borderWeightHeavy
     public static let iconsIconLarge: CGFloat = Primitives.Spacing.spacing32
     public static let iconsIconMedium: CGFloat = Primitives.Spacing.spacing24
     public static let iconsIconSmall: CGFloat = Primitives.Spacing.spacing16
@@ -13,4 +15,13 @@ public enum Sizing {
     public static let radiusRounded: CGFloat = CGFloat(1000.0)
     public static let radiusSoft: CGFloat = Primitives.Spacing.spacing4
     public static let radiusStrong: CGFloat = Primitives.Spacing.spacing16
+    public static let spacingSpacing2xl: CGFloat = Primitives.Spacing.spacing40
+    public static let spacingSpacing2xs: CGFloat = Primitives.Spacing.spacing4
+    public static let spacingSpacing3xs: CGFloat = Primitives.Spacing.spacing2
+    public static let spacingSpacingLg: CGFloat = Primitives.Spacing.spacing24
+    public static let spacingSpacingMd: CGFloat = Primitives.Spacing.spacing16
+    public static let spacingSpacingNone: CGFloat = Primitives.Spacing.spacing0
+    public static let spacingSpacingSm: CGFloat = Primitives.Spacing.spacing12
+    public static let spacingSpacingXl: CGFloat = Primitives.Spacing.spacing32
+    public static let spacingSpacingXs: CGFloat = Primitives.Spacing.spacing8
 }

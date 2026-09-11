@@ -1,11 +1,15 @@
 {
   "border-medium": {
     "$type": "color",
-    "$value": "{colours-neutrals-400}"
+    "$value": "{colours-neutrals-300}"
   },
   "border-soft": {
     "$type": "color",
     "$value": "{colours-neutrals-200}"
+  },
+  "border-strong": {
+    "$type": "color",
+    "$value": "{colours-neutrals-400}"
   },
   "button-destructive-background-destructive-default": {
     "$type": "color",

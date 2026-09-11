@@ -4,8 +4,9 @@
 import SwiftUI
 
 public enum Theme {
-    public static let borderMedium = Primitives.Colours.neutrals400
+    public static let borderMedium = Primitives.Colours.neutrals300
     public static let borderSoft = Primitives.Colours.neutrals200
+    public static let borderStrong = Primitives.Colours.neutrals400
     public static let buttonDestructiveBackgroundDestructiveDefault = Primitives.Colours.semanticError600
     public static let buttonDestructiveBackgroundDestructiveDisabled = Primitives.Colours.neutrals300
     public static let buttonDestructiveContentDestructiveDefault = Primitives.Colours.neutrals0
