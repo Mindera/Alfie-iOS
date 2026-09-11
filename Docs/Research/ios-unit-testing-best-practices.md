@@ -45,71 +45,11 @@ functions, 84 `XCTestCase` subclasses), `Alfie/AlfieKit/Sources/Mocks/` (51 file
 
 ---
 
-# TL;DR — the proposed ruleset (superseded)
+# The ruleset
 
-*This draft shipped as `Docs/Testing.md` §Rules, pruned on the way: stale counts and file paths the
-repo already answers, rules the compiler or a competent author applies by default, and the
-`CODING-STANDARD.md` framing all came out. **`Docs/Testing.md` is the authority; this is the draft
-it came from.** Each rule's evidence is below; the repo's status for each is in the
-[gap analysis](#repo-gap-analysis).*
-
-## Testing
-
-Tests live in `Alfie/AlfieKit/Tests/<Module>Tests`, must be listed in `Alfie/Alfie/Alfie.xctestplan`,
-and must pass under `./Alfie/scripts/verify.sh`.
-
-### ✅ ALWAYS
-
-- Write the test **before** fixing a bug — the failing test is the proof the bug existed.
-- Name tests `test_<trigger>_<condition>_<expectation>` in snake_case, phrased as a claim about
-  behaviour. If you cannot name it shortly, the test covers too much.
-- Give each test one **act**: one call on the SUT, then assertions about its outcome.
-- Build the SUT in `setUpWithError()` (or a `makeSUT(...)` helper) and nil every stored reference in
-  `tearDownWithError()`. A test must not depend on any other test, in any order.
-- Inject every collaborator as a protocol through the feature's `DependencyContainer`, constructed in
-  the test from the hand-written `Mock<Service>` types in
-  `Alfie/AlfieKit/Sources/Mocks/Core/Services/`.
-- Stub a mock by assigning its `on<Method>Called` closure. Capture arguments inside that closure, and
-  navigation into a `capturedRoutes` array — that is how this repo spies.
-- Leave a mock's unset closure **throwing**, never silently succeeding: an unconfigured mock must fail
-  the test, not pass it.
-- Build domain values with the `.fixture(...)` factories in `Alfie/AlfieKit/Sources/Mocks/Fixtures/`,
-  naming only the field the test is about.
-- Assert `ViewState` / `PaginatedViewState` transitions with the `XCTAssertEmitsValue*` helpers in
-  `TestUtils`, and use the named timeouts `.default` (2.0s) and `.inverted` (0.01s).
-- Use the narrowest assertion available: `XCTAssertEqual` over `XCTAssertTrue(a == b)`,
-  `XCTAssertNil` over `XCTAssertTrue(x == nil)`, `try XCTUnwrap` over force-unwrap.
-- Compare `Double` / `Float` with `XCTAssertEqual(_:_:accuracy:)`.
-- Forward `file: StaticString = #filePath, line: UInt = #line` from every assertion helper, so the
-  failure lands on the test, not the helper.
-- Cover the full state matrix — loading, success, **empty**, error — not just the happy path.
-- Gate genuinely concurrent behaviour with an `actor` gate and `fulfillment(of:)`, the way
-  `ProductListingViewModelTests.FetchGate` does — never with a sleep.
-- Inject `Date`, `UUID` and schedulers as parameters (default to the real thing in production, pass a
-  fixture or `AnySchedulerOf`/`TestScheduler` in tests).
-- Comment *why* a non-obvious behaviour matters, not what the code does.
-- Treat test code as production code: same review bar, same naming, same lint rules.
-
-### ❌ NEVER
-
-| Never | Instead |
-|---|---|
-| Branch inside a test (`if`, `switch`, `for`, `do/catch`) | Split into separate tests, or drive a table of cases |
-| `Task.sleep`, `Thread.sleep`, or `asyncAfter` to wait for async work | `await` the call, use the `TestUtils` publisher helpers, or an `actor` gate |
-| Test a `private` method, or widen access just to test | Assert the public behaviour that calls it |
-| Hit the network, disk, real `UserDefaults`, or the real BFF in a unit test | Use a mock; real-BFF coverage belongs in `BFFIntegrationTests` |
-| `XCTAssert(x == y)` | `XCTAssertEqual(x, y)` |
-| Comment out, delete, or placeholder (`XCTAssertTrue(true)`) a test | Fix it, or `XCTSkip("reason")` with a linked issue |
-| Chase a coverage number | Cover the behaviours that would hurt if they broke |
-| Loosen snapshot `precision` to hide a rendering diff | Re-record the reference (`Docs/SnapshotTesting.md`) |
-| Assert screen *content* only through a snapshot | Snapshot the layout; unit-test the content |
-| Leave a test target out of `Alfie.xctestplan` | Add it — an absent target is silently skipped and still reports green |
-
-### Framework
-
-`XCTest` is the house framework. Swift Testing (`@Test` / `#expect`) is **not** adopted here — do not
-introduce it in a feature PR. Adopting it is a deliberate, separate migration; the cost and blockers
-are in `Docs/Research/ios-unit-testing-best-practices.md` §9.
+The rules distilled from this research live in **`Docs/Testing.md` §Rules**. That file is the
+authority and the only place they are stated; this one carries the evidence behind each rule, the
+contradictions weighed on the way, and what was considered and rejected.
 
 ---
 
@@ -494,10 +434,12 @@ so Swift 5 language mode throughout (the app target is `SWIFT_VERSION = 5.0`).
 
 **Migration blockers specific to this repo, in order of severity:**
 
-1. **Every shared helper is an `XCTestCase` extension.** `XCTAssertEmitsValue` and friends
-   (129 + 11 + 8 call sites), `trackForMemoryLeak`, and the named `.default` / `.inverted` timeouts all
-   hang off `XCTestCase`. A Swift Testing test is not an `XCTestCase`, so none of them are reachable.
-   `TestUtils` must be ported first, or half the suite loses its idiom.
+1. **The assertion helpers are `XCTestCase` extensions.** `XCTAssertEmitsValue` and friends
+   (140 call sites) and `trackForMemoryLeak` hang off `XCTestCase`, in `XCTestCase+Combine.swift` and
+   `XCTestCase+MemoryLeak.swift`. A Swift Testing test is not an `XCTestCase`, so neither is
+   reachable, and those two files must be ported first or the suite loses its idiom. The other three
+   `TestUtils` files extend `TimeInterval` (the named `.default` / `.inverted` timeouts), `View` and
+   `Snapshotting`, and carry over untouched.
 2. **`swift-tools-version: 5.9`.**
    > ⚠️ **Unverified.** I could not confirm from a primary source whether SwiftPM enables Swift Testing
    > for a package declaring tools-version 5.9. Apple documents availability in terms of the *toolchain
@@ -724,11 +666,13 @@ threshold and should be the standard.
 
 **Judgement: do not adopt piecemeal.** A standard saying "prefer Swift Testing for new tests" would,
 in this repo, immediately produce a suite where the new half cannot use `XCTAssertEmitsValue`,
-`XCTAssertNoEmit`, `trackForMemoryLeak` or the named timeout constants at all — every shared helper in
-`TestUtils` is an `XCTestCase` extension (§9). Swift 6.4's interop modes soften but do not remove
-that. The honest options are (a) stay on XCTest and write the standard against it, or (b) fund a
-migration that ports `TestUtils` first and answers the tools-version question. Option (a) is what the
-TL;DR above assumes.
+`XCTAssertNoEmit` or `trackForMemoryLeak` at all — `XCTestCase+Combine.swift` and
+`XCTestCase+MemoryLeak.swift` are `XCTestCase` extensions (§9). The other three `TestUtils` files
+extend `TimeInterval`, `View` and `Snapshotting`, so the named timeouts and the snapshot helpers
+would carry over untouched. Swift 6.4's interop modes soften but do not remove the gap. The honest
+options are (a) stay on XCTest and write the standard against it, or (b) fund a migration that ports
+the two `XCTestCase` extensions first and answers the tools-version question. `Docs/Testing.md`
+assumes (a).
 
 ### 5. AAA comments
 
@@ -794,7 +738,7 @@ lowercase). The intent (name the significant input) is sound; the style is not i
 | Parameterized tests | **No** — XCTest has no equivalent; table `for` loops are the workaround | Blocked on Swift Testing adoption |
 | Traits / tags for CI filtering | **No** — Swift Testing only | Blocked on Swift Testing adoption |
 | `withKnownIssue` for temporary known failures | **No** — Swift Testing only; XCTest's `XCTExpectFailure` is unused | Low if wanted on XCTest today |
-| Swift Testing (`@Test` / `#expect`) | **No** — 0 of 97 files | **High.** Four blockers in §9: every `TestUtils` helper is an `XCTestCase` extension; `swift-tools-version: 5.9` is unverified; `XCTAssertEqual(_:_:accuracy:)` has no equivalent; Swift 5 language mode with no strict-concurrency opt-in. Not a per-PR decision |
+| Swift Testing (`@Test` / `#expect`) | **No** — 0 of 97 files | **High.** Four blockers in §9: the `TestUtils` assertion helpers are `XCTestCase` extensions; `swift-tools-version: 5.9` is unverified; `XCTAssertEqual(_:_:accuracy:)` has no equivalent; Swift 5 language mode with no strict-concurrency opt-in. Not a per-PR decision |
 
 ---
 

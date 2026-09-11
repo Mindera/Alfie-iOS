@@ -29,11 +29,16 @@ checked against the diff.
 - **Gate** concurrent behaviour: an `actor` that suspends the first call until the test releases it,
   driven with `async let` plus `fulfillment(of:)`. `ProductListingViewModelTests.FetchGate` is the
   reference implementation.
-- Give anything ambient — `Date`, `UUID`, schedulers — the same seam: a parameter defaulting to the
-  real thing, so a test passes a fixed value.
+- Give anything ambient — `Date`, `UUID`, schedulers, `Locale`, `TimeZone` — the same seam: a
+  parameter defaulting to the real thing, so a test passes a fixed value. `CurrencyFormatter` is the
+  reference: it takes `locale:`, so its tests pin `en_GB` and `de_DE` rather than inheriting whatever
+  the simulator is set to.
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`.
-- Forward `file: StaticString = #filePath, line: UInt = #line` through every assertion helper, so a
-  failure lands on the test rather than on the helper.
+- Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
+  failure lands on the test rather than on the helper. `trackForMemoryLeak` does this; the
+  `XCTAssertEmitsValue*` family does **not**, so its failures report against `XCTestCase+Combine.swift`
+  and you read the call site from the stack trace. Adding the two parameters there is a wanted fix,
+  and source-compatible across all 140 call sites.
 - Cover every state the screen can reach: loading, success, empty, error.
 - Write the expected value as a literal. Deriving it from the code under test yields a test that
   passes while both sides share the same bug.
@@ -59,11 +64,12 @@ checked against the diff.
 (`@Test` / `#expect`) is **not** adopted, and introducing it is a funded migration rather than a
 per-PR choice. Four things block it:
 
-1. Every shared helper in `TestUtils` — `XCTAssertEmitsValue*`, `trackForMemoryLeak`, the named
-   timeout constants — is an `XCTestCase` extension, so a `@Test` function cannot reach any of them.
-   Porting `TestUtils` is the first move in any migration.
-2. `XCTAssertEqual(_:_:accuracy:)` has no Swift Testing equivalent; the typography and range-slider
-   tests depend on it.
+1. The assertion helpers — `XCTAssertEmitsValue*` (140 call sites) and `trackForMemoryLeak` — are
+   `XCTestCase` extensions, so a `@Test` function cannot reach them. Porting
+   `XCTestCase+Combine.swift` and `XCTestCase+MemoryLeak.swift` is the first move in any migration.
+   The rest of `TestUtils` extends `TimeInterval`, `View` and `Snapshotting`, and carries over as is.
+2. `XCTAssertEqual(_:_:accuracy:)` has no Swift Testing equivalent, and 23 assertions depend on it —
+   most of them in `SnapCarouselHeightTests` and the typography tests.
 3. `Package.swift` declares `swift-tools-version: 5.9`. Whether SwiftPM enables Swift Testing below
    6.0 is unresolved — settle that before proposing adoption.
 4. The package builds in Swift 5 language mode with no strict-concurrency opt-in. Swift Testing runs
@@ -84,6 +90,7 @@ Treat them as correct, in review and when writing.
 | `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. One test in the suite uses `XCTAssertThrowsError`; the typed form is the house idiom. |
 | No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the acceptance criterion (`(AC 5)`, `(Q36)`). |
 | No CI test retries | Retries suit unreliable external services; CI runs the unit plan only, so a flake there is a real bug. |
+| Test code is held to this document, not to SwiftLint | `Alfie/.swiftlint.yml` excludes `AlfieKit/Tests` and `AlfieKit/Sources/Mocks`, so no lint runs on either. Review test code against the rules above — naming, seams, the state matrix — and leave formatting alone. Lifting the exclusion is a repo-wide call, not a per-PR one. |
 
 
 ## Test Structure
