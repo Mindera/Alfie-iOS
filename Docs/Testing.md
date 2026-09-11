@@ -12,8 +12,9 @@ checked against the diff.
   guards against a specific wrong outcome, name that outcome:
   `test_aShopperWithNoCartSeesAnEmptyBagRatherThanAnError`. A name that will not stay short means the
   test covers too much.
-- Give each test one **act**: one call on the SUT, then assertions about its outcome. Several
-  assertions after a single act is right, not a smell.
+- Structure every test **arrange → act → assert**, the three phases separated by blank lines. One
+  **act** per test: a single call on the SUT, then assertions about its outcome. Several assertions
+  after one act is right, not a smell.
 - Build a fresh SUT in `setUpWithError()`, or in a `makeSUT(...)` helper where configurations differ,
   and nil every stored reference in `tearDownWithError()`. Each test passes alone and in any order.
 - Reach every collaborator through a **seam**: the feature's `DependencyContainer`, built in the test
@@ -41,7 +42,7 @@ checked against the diff.
 
 | Never | Instead |
 |---|---|
-| Branch in a test the way the implementation branches | Split into separate tests, or drive a table of cases with a per-row failure message |
+| Branch in the assert phase — an `if` wrapping an assertion reports green on the run where the branch never fires | Split into separate tests, or drive a table of cases with a per-row failure message. Branching *inside a mock closure* to route on its argument is the stub doing its job, not logic in the test |
 | `Task.sleep`, `Thread.sleep` or `asyncAfter` to wait for async work | `await` the call, use the `TestUtils` publisher helpers, or gate it |
 | Test a `private` method, or widen access to reach one | Assert the public behaviour that calls it |
 | Touch the network, disk, real `UserDefaults` or the real BFF in a unit test | Use a mock; real-BFF coverage belongs in `BFFIntegrationTests` |
