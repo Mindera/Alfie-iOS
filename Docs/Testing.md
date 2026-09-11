@@ -34,9 +34,7 @@ checked against the diff.
   reference: it takes `locale:`, so its tests pin `en_GB` and `de_DE` rather than inheriting whatever
   the simulator is set to.
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`, at the tightest tolerance the
-  maths genuinely needs — `0.001` for a computed ratio, not `1`. The tolerance is a budget for
-  floating-point error only. Widening one so a failing test goes quiet hides the regression it just
-  caught; fix the code, or justify the wider budget in a comment.
+  maths genuinely needs — see §Tolerances.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
   failure lands on the test rather than on the helper. `trackForMemoryLeak` does this; the
   `XCTAssertEmitsValue*` family does **not**, so its failures report against `XCTestCase+Combine.swift`
@@ -57,9 +55,32 @@ checked against the diff.
 | `zip` two collections to pair test inputs | Pair them in one array of tuples — `zip` truncates to the shorter side and drops cases silently |
 | Comment out, delete or placeholder (`XCTAssertTrue(true)`) a failing test | Fix it, or `XCTSkip("reason")` with a linked issue |
 | Chase a coverage number | Cover the behaviours that would hurt if they broke |
+| Set an `accuracy:` looser than the maths needs, or widen one so a failing test goes quiet | Use the tightest value that passes, and name the constant when it budgets something physical. A loose tolerance **blocks the review** — see §Tolerances |
 | Loosen snapshot `precision` to absorb a diff | Re-record the reference (`Docs/SnapshotTesting.md`) |
 | Assert screen *content* through a snapshot | Snapshot the layout; unit-test the content |
 | Leave a test target out of `Alfie.xctestplan` | Add it — an absent target is skipped silently and still reports green |
+
+### Tolerances
+
+An `accuracy:` is a budget for floating-point error and nothing else. Anything wider silently absorbs
+the regression the assertion exists to catch, so **a tolerance looser than the maths needs fails
+review** — treat it as a defect in the diff, not a style preference. Two shapes:
+
+- **Computed arithmetic** — `0.001` or tighter. The expected value is exact, so the budget covers
+  representation error alone.
+- **Measured SwiftUI layout** — the pixel grid, and say so in a named constant. Resolved sizes snap
+  to the grid, so a height lands up to half a pixel off the arithmetic: at `displayScale` 3,
+  `300 / 0.77` resolves to 389.667, not 389.610. `SnapCarouselHeightTests.layoutGrid` (0.2pt) is the
+  reference.
+
+That carousel file sat at `accuracy: 1` — roughly 6× wider than the grid requires, enough to hide a
+real layout regression. Read any bare literal above `0.001` as unexamined until someone shows the
+maths behind it.
+
+**Unswept, and not precedent.** The five colour-channel assertions in `SnapCarouselHeightTests` still
+use `accuracy: 0.1` against a 0–1 channel. Pixel sampling carries genuine noise, so the right budget
+has to be measured rather than guessed. They are known debt pending a suite-wide tolerance review;
+match the rule above in new code rather than copying them.
 
 ### Framework
 
