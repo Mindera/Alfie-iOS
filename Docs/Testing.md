@@ -16,8 +16,8 @@ checked against the diff.
   assertions after a single act is right, not a smell.
 - Build a fresh SUT in `setUpWithError()`, or in a `makeSUT(...)` helper where configurations differ,
   and nil every stored reference in `tearDownWithError()`. Each test passes alone and in any order.
-- Inject collaborators as protocols through the feature's `DependencyContainer`, built from the
-  `Mock<Service>` types — construct the container rather than bypassing it.
+- Reach every collaborator through a **seam**: the feature's `DependencyContainer`, built in the test
+  from the `Mock<Service>` types. Construct the container rather than bypassing it.
 - Stub a mock by assigning its `on<Method>Called` closure, and **spy** by capturing the arguments
   inside that same closure (navigation into a `capturedRoutes` array).
 - Leave an unset mock closure throwing. A silent success lets a test assert an empty result while the
@@ -28,8 +28,8 @@ checked against the diff.
 - **Gate** concurrent behaviour: an `actor` that suspends the first call until the test releases it,
   driven with `async let` plus `fulfillment(of:)`. `ProductListingViewModelTests.FetchGate` is the
   reference implementation.
-- Take a **seam** for anything ambient — `Date`, `UUID`, schedulers — as a parameter defaulting to the
-  real thing, so a test can pass a fixed value.
+- Give anything ambient — `Date`, `UUID`, schedulers — the same seam: a parameter defaulting to the
+  real thing, so a test passes a fixed value.
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through every assertion helper, so a
   failure lands on the test rather than on the helper.
@@ -78,12 +78,10 @@ Treat them as correct, in review and when writing.
 
 | Choice | Why it stands |
 |---|---|
-| Mocks are hand-written, never generated | They double as `#Preview` fixtures, so they live in a production target. A generator would add a third codegen step and make them un-hand-tunable — losing the throwing unset closure. Call counts come from capturing inside the closure. |
-| Several assertions after one act | Asserting `lines` and `totalQuantity` after a single `viewDidAppear()` covers one behaviour, not three tests' worth. |
-| Table-driven `for` loops over cases | XCTest has no parameterized tests. The loop is the workaround; a per-row interpolated failure message recovers the diagnostics that a parameterized test would give. |
+| Mocks are hand-written, never generated | They double as `#Preview` fixtures, so they live in a production target. A generator would add a third codegen step and make them un-hand-tunable, losing the throwing unset closure. Spying inside the closure already gives call counts. |
+| Table-driven `for` loops over cases | XCTest has no parameterized tests; the loop is the workaround. |
 | `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. One test in the suite uses `XCTAssertThrowsError`; the typed form is the house idiom. |
 | No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the acceptance criterion (`(AC 5)`, `(Q36)`). |
-| No coverage threshold | Coverage is a diagnostic here, and its measurement gaps are documented under Code Coverage below. |
 | No CI test retries | Retries suit unreliable external services; CI runs the unit plan only, so a flake there is a real bug. |
 
 
@@ -94,13 +92,14 @@ Treat them as correct, in review and when writing.
   it runs against a real local BFF, not mocks, and only when `verify.sh` runs without
   `--skip-integration`.
 
-## Mocking
+## Mocks and fixtures
 
-- **Mock ViewModels**: Located in `Alfie/AlfieKit/Sources/Mocks/Core/Features/`
-- **Mock Services**: Located in `Alfie/AlfieKit/Sources/Mocks/Core/Services/`
-- **BFF Mocks**: Located in `Alfie/AlfieKit/Sources/BFFGraph/Mocks/` (Apollo-generated)
-- **Fixtures**: Located in `Alfie/AlfieKit/Sources/Mocks/Fixtures/`
-- **Pattern**: Conform to same protocol as real implementation
+Under `Alfie/AlfieKit/Sources/Mocks/`: `Core/Features/` for mock ViewModels, `Core/Services/` for
+mock services, `Fixtures/` for the `.fixture(...)` builders. BFF mocks are Apollo-generated under
+`Sources/BFFGraph/Mocks/` — regenerate them rather than editing.
+
+`Mocks` is a production `.target`, not a test target: `AppFeature` and `DebugMenu` depend on it for
+`#Preview`s, so anything added there ships in the app binary.
 
 ## Snapshot Testing
 
@@ -108,6 +107,8 @@ Snapshot tests live in the module test targets and run as part of `verify.sh`. S
 `Docs/SnapshotTesting.md` for the device/OS pin, the precision policy, and the record loop.
 
 ## Code Coverage
+
+Coverage is a diagnostic, never a target: read it to find a behaviour nobody exercised.
 
 An unfiltered `verify.sh` run leaves a coverage bundle at `/tmp/alfie_test.xcresult`. Read it with:
 
