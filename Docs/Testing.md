@@ -33,7 +33,10 @@ checked against the diff.
   parameter defaulting to the real thing, so a test passes a fixed value. `CurrencyFormatter` is the
   reference: it takes `locale:`, so its tests pin `en_GB` and `de_DE` rather than inheriting whatever
   the simulator is set to.
-- Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`.
+- Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`, at the tightest tolerance the
+  maths genuinely needs — `0.001` for a computed ratio, not `1`. The tolerance is a budget for
+  floating-point error only. Widening one so a failing test goes quiet hides the regression it just
+  caught; fix the code, or justify the wider budget in a comment.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
   failure lands on the test rather than on the helper. `trackForMemoryLeak` does this; the
   `XCTAssertEmitsValue*` family does **not**, so its failures report against `XCTestCase+Combine.swift`
@@ -68,8 +71,8 @@ per-PR choice. Four things block it:
    `XCTestCase` extensions, so a `@Test` function cannot reach them. Porting
    `XCTestCase+Combine.swift` and `XCTestCase+MemoryLeak.swift` is the first move in any migration.
    The rest of `TestUtils` extends `TimeInterval`, `View` and `Snapshotting`, and carries over as is.
-2. `XCTAssertEqual(_:_:accuracy:)` has no Swift Testing equivalent, and 23 assertions depend on it —
-   most of them in `SnapCarouselHeightTests` and the typography tests.
+2. `XCTAssertEqual(_:_:accuracy:)` has no Swift Testing equivalent, and the carousel-geometry and
+   typography tests depend on it throughout.
 3. `Package.swift` declares `swift-tools-version: 5.9`. Whether SwiftPM enables Swift Testing below
    6.0 is unresolved — settle that before proposing adoption.
 4. The package builds in Swift 5 language mode with no strict-concurrency opt-in. Swift Testing runs
