@@ -26,9 +26,9 @@ final class NavigationServiceTests: XCTestCase {
     func test_get_navigation_items_returns_hardcoded_categories() async throws {
         let items = try await sut.getNavigationItems(for: .shop)
 
-        XCTAssertEqual(items.map(\.id), ["women-1", "men-2"])
-        XCTAssertEqual(items.map(\.title), ["Women's clothes", "Men's"])
-        XCTAssertEqual(items.map(\.url), ["/women-1", "/men-2"])
+        XCTAssertEqual(items.map(\.id), ["women-1", "men-2", "shoes-76", "sale-23"])
+        XCTAssertEqual(items.map(\.title), ["Women", "Men", "Shoes", "Sale"])
+        XCTAssertEqual(items.map(\.url), ["/women-1", "/men-2", "/shoes-76", "/sale-23"])
         XCTAssertTrue(items.allSatisfy { $0.type == .listing })
     }
 
