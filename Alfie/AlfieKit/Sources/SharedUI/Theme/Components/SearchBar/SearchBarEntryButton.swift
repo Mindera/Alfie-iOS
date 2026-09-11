@@ -55,7 +55,7 @@ public struct SearchBarEntryButton: View {
             ThemedSearchBarView(
                 searchText: .constant(""),
                 placeholder: placeholder,
-                theme: .soft,
+                theme: Constants.barTheme,
                 dismissConfiguration: .init(type: .hidden),
                 trailingAccessory: scan.map { _ in AnyView(scanGlyph) }
             )
@@ -74,12 +74,12 @@ public struct SearchBarEntryButton: View {
 
     /// The tap target is an overlay rather than a `Button` handed to the bar: the bar is drawn
     /// inside the search `Button` with hit testing off, which a nested button would inherit. It is
-    /// wider than the glyph so the control stays comfortable to hit — it can only reach the bar's
-    /// 32pt height, so the width is what is left to give.
+    /// square on the bar's height, so it stays centred on the glyph instead of reaching further
+    /// across the text than the icon it covers.
     private func scanTapTarget(_ scan: ScanConfiguration) -> some View {
         Button(action: scan.action) {
             Color.clear
-                .frame(width: Constants.scanTapTargetWidth)
+                .frame(size: Constants.scanTapTargetSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -88,6 +88,8 @@ public struct SearchBarEntryButton: View {
     }
 
     private enum Constants {
-        static let scanTapTargetWidth: CGFloat = 44
+        static let barTheme: ThemedSearchBarView.Theme = .soft
+        /// Taken from the bar rather than copied, so the square tracks the bar's height.
+        static let scanTapTargetSize = barTheme.searchBarHeight
     }
 }
