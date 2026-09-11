@@ -57,6 +57,7 @@ public enum Icon: String, IconRepresentable, CaseIterable {
     case refresh = "loading"
     case refund
     case reload
+    case scanBarcode = "scan-barcode"
     case search
     case settings
     case share

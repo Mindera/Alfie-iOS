@@ -86,7 +86,7 @@ Asset name → Figma component node id (file `PWVgEoKrIw9Hv7QlOCcUoq`).
 `loading` 3231:7857 · `help` 3024:3555 · `alert-fill` 3640:28755 · `fast-delivery` 3659:55100 ·
 `refund` 3659:55138 · `credit-card` 3659:55139 · `return` 3659:55140 · `package` 3659:55141 ·
 `profile-id` 3914:106950 · `star` 4612:41206 · `star-fill` 4612:41205 · `star-half-fill` 4612:41204 ·
-`gift` 5963:4795 · `pencil` 5966:6779.
+`gift` 5963:4795 · `pencil` 5966:6779 · `scan-barcode` 7339:10292.
 
 ### SF Symbol - iOS
 Dedicated glyphs for the icons that previously fell back to Apple SF Symbols (section frame `6951:616`).
