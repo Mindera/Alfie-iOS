@@ -41,7 +41,10 @@ public struct SearchBarEntryButton: View {
     }
 
     public var body: some View {
-        HStack(spacing: theme.spacing.space150) {
+        // The scan control carries ~10pt of its own padding either side (a 24pt glyph centred in a
+        // 44pt tap target), so the gap reads wider than the token. Keep the token tight and let the
+        // tap target supply the rest.
+        HStack(spacing: theme.spacing.space050) {
             searchButton
 
             if let scan {
