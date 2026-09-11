@@ -10,6 +10,13 @@
       "value": 1
     }
   },
+  "border-border-weight-heavy": {
+    "$type": "dimension",
+    "$value": {
+      "unit": "px",
+      "value": 4
+    }
+  },
   "colours-brand-0": {
     "$type": "color",
     "$value": {
@@ -18,17 +25,6 @@
         1,
         1,
         1
-      ]
-    }
-  },
-  "colours-brand-02-color-3": {
-    "$type": "color",
-    "$value": {
-      "colorSpace": "srgb",
-      "components": [
-        0.478431,
-        0.356863,
-        0
       ]
     }
   },

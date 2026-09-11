@@ -7,10 +7,10 @@ public enum Primitives {
     public enum Border {
         public static let borderStyleSolid: String = "solid"
         public static let borderWeightDefault: CGFloat = CGFloat(1.0)
+        public static let borderWeightHeavy: CGFloat = CGFloat(4.0)
     }
     public enum Colours {
         public static let brand0 = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)
-        public static let brand02Color3 = Color(.sRGB, red: 0.478431, green: 0.356863, blue: 0.0, opacity: 1.0)
         public static let brand100 = Color(.sRGB, red: 0.97, green: 0.97, blue: 0.97, opacity: 1.0)
         public static let brand200 = Color(.sRGB, red: 0.913725, green: 0.913725, blue: 0.913725, opacity: 1.0)
         public static let brand300 = Color(.sRGB, red: 0.803922, green: 0.803922, blue: 0.803922, opacity: 1.0)
