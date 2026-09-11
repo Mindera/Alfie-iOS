@@ -171,6 +171,10 @@ public struct ThemedSearchBarView: View {
     private let autoFocusWhenAppearing: AutoFocusSetting
     private let inputAccessibilityId: String
     private let clearAccessibilityId: String
+    /// Drawn inside the bar, at its trailing edge. Present only on a bar that has a second control
+    /// behind it — today, Scan. Supplying one also moves the magnifying glass to the leading edge,
+    /// so the two icons bracket the text instead of crowding the same corner.
+    private let trailingAccessory: AnyView?
     public let onCancelTap: (() -> Void)?
     public let onClearTap: (() -> Void)?
     public let onSubmitTap: (() -> Void)?
@@ -192,6 +196,7 @@ public struct ThemedSearchBarView: View {
         autoFocusWhenAppearing: AutoFocusSetting = .off,
         inputAccessibilityId: String? = nil,
         clearAccessibilityId: String? = nil,
+        trailingAccessory: AnyView? = nil,
         onCancelTap: (() -> Void)? = nil,
         onClearTap: (() -> Void)? = nil,
         onSubmitTap: (() -> Void)? = nil,
@@ -208,6 +213,7 @@ public struct ThemedSearchBarView: View {
         self.autoFocusWhenAppearing = autoFocusWhenAppearing
         self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityId.inputAccessibilityId
         self.clearAccessibilityId = clearAccessibilityId ?? AccessibilityId.clearAccessibilityId
+        self.trailingAccessory = trailingAccessory
         self.onCancelTap = onCancelTap
         self.onClearTap = onClearTap
         self.onSubmitTap = onSubmitTap
@@ -228,7 +234,11 @@ public struct ThemedSearchBarView: View {
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
-            HStack {
+            HStack(spacing: trailingAccessory == nil ? 0 : theme.horizontalContentPadding) {
+                if trailingAccessory != nil {
+                    magnifyingGlassIcon
+                }
+
                 TextField(
                     "",
                     text: $text,
@@ -271,6 +281,8 @@ public struct ThemedSearchBarView: View {
                 .onSubmit {
                     onSubmitTap?()
                 }
+
+                trailingAccessory
             }
             .padding(.horizontal, theme.horizontalContentPadding)
             .padding(.vertical, Primitives.Spacing.spacing16)
@@ -317,10 +329,12 @@ public struct ThemedSearchBarView: View {
             .accessibilityHidden(true)
     }
 
+    /// The clear button always overlays the text. The magnifying glass only joins it here on a bar
+    /// with no trailing accessory — otherwise it has already been placed at the leading edge.
     @ViewBuilder private var textFieldOverlayIcon: some View {
         if isClearButtonVisible {
             clearButton
-        } else {
+        } else if trailingAccessory == nil {
             magnifyingGlassIcon
         }
     }
