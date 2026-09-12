@@ -8,27 +8,36 @@ checked against the diff.
 ### ✅ ALWAYS
 
 - Write the failing test before the bugfix — it is the proof the bug existed.
-- Name the test as a claim about behaviour: `test_<trigger>_<condition>_<expectation>`. Where the test
-  guards against a specific wrong outcome, name that outcome:
-  `test_aShopperWithNoCartSeesAnEmptyBagRatherThanAnError`. A name that will not stay short means the
-  test covers too much.
+- Name the test as a claim about behaviour, in lower_snake segments:
+  `test_<trigger>_<condition>_<expectation>`, as in
+  `test_state_is_generic_error_when_webview_reports_failure`. Where the test guards against a
+  specific wrong outcome, name that outcome:
+  `test_non_finite_totals_map_to_no_total_rather_than_zero`. A name that will not stay
+  short means the test covers too much. Two small groups of legacy names predate this — `testExample`
+  with no prefix, and `test_` on a single camelCase sentence — and are to be renamed, not copied.
 - Structure every test **arrange → act → assert**, the three phases separated by blank lines. One
   **act** per test: a single call on the SUT, then assertions about its outcome. Several assertions
   after one act is right, not a smell.
 - Build a fresh SUT in `setUpWithError()`, or in a `makeSUT(...)` helper where configurations differ,
-  and nil every stored reference in `tearDownWithError()`. Each test passes alone and in any order.
-- Reach every collaborator through a **seam**: the feature's `DependencyContainer`, built in the test
-  from the `Mock<Service>` types. Construct the container rather than bypassing it.
+  and nil every stored `var` in `tearDownWithError()`. Each test passes alone and in any order. An
+  immutable `let` collaborator needs no teardown — XCTest builds a fresh test instance per test.
+- Reach every collaborator through a **seam**, never a singleton or a type the SUT constructs itself.
+  In a feature or ViewModel test that seam is the feature's `DependencyContainer`, built from the
+  `Mock<Service>` types — construct the container rather than bypassing it. A `Core` service test has
+  no container: inject the protocol collaborators straight into the initialiser, as
+  `ProductListingServiceTests` does.
 - Stub a mock by assigning its `on<Method>Called` closure, and **spy** by capturing the arguments
   inside that same closure (navigation into a `capturedRoutes` array).
-- Leave an unset mock closure throwing. A silent success lets a test assert an empty result while the
-  mock was never configured at all.
+- Leave an unset mock closure throwing — `guard let x = try onFooCalled?(…) else { throw … }`. A silent
+  success lets a test assert an empty result while the mock was never configured at all. The exception
+  is an operation whose empty answer is a real answer: `categoryPriceRange` returns `nil` and
+  `getHeaderNav` returns `[]` when unset, because absence there is a legitimate outcome.
 - Build domain values with `.fixture(...)`, naming only the field the test is about.
 - Assert `ViewState` / `PaginatedViewState` transitions with the `XCTAssertEmitsValue*` helpers and
   the named timeout constants in `TestUtils`.
 - **Gate** concurrent behaviour: an `actor` that suspends the first call until the test releases it,
-  driven with `async let` plus `fulfillment(of:)`. `ProductListingViewModelTests.FetchGate` is the
-  reference implementation.
+  driven with `async let` plus `fulfillment(of:)`. The file-scoped `FetchGate` at the foot of
+  `ProductListingViewModelTests.swift` is the reference implementation.
 - Give anything ambient — `Date`, `UUID`, schedulers, `Locale`, `TimeZone` — the same seam: a
   parameter defaulting to the real thing, so a test passes a fixed value. `CurrencyFormatter` is the
   reference: it takes `locale:`, so its tests pin `en_GB` and `de_DE` rather than inheriting whatever
@@ -51,14 +60,14 @@ checked against the diff.
 | Branch in the assert phase — an `if` wrapping an assertion reports green on the run where the branch never fires | Split into separate tests, or drive a table of cases with a per-row failure message. Branching *inside a mock closure* to route on its argument is the stub doing its job, not logic in the test |
 | `Task.sleep`, `Thread.sleep` or `asyncAfter` to wait for async work | `await` the call, use the `TestUtils` publisher helpers, or gate it |
 | Test a `private` method, or widen access to reach one | Assert the public behaviour that calls it |
-| Touch the network, disk, real `UserDefaults` or the real BFF in a unit test | Use a mock; real-BFF coverage belongs in `BFFIntegrationTests` |
+| Touch the network, disk, real `UserDefaults` or the real BFF in a unit test | Use a mock — `MockUserDefaults` for defaults; real-BFF coverage belongs in `BFFIntegrationTests`. `ProductListingStyleProviderTests` still drives a real suite and tears it down: debt, not precedent |
 | `zip` two collections to pair test inputs | Pair them in one array of tuples — `zip` truncates to the shorter side and drops cases silently |
 | Comment out, delete or placeholder (`XCTAssertTrue(true)`) a failing test | Fix it, or `XCTSkip("reason")` with a linked issue |
 | Chase a coverage number | Cover the behaviours that would hurt if they broke |
 | Set an `accuracy:` looser than the maths needs, or widen one so a failing test goes quiet | Use the tightest value that passes, and name the constant when it budgets something physical. A loose tolerance **blocks the review** — see §Tolerances |
 | Loosen snapshot `precision` to absorb a diff | Re-record the reference (`Docs/SnapshotTesting.md`) |
 | Assert screen *content* through a snapshot | Snapshot the layout; unit-test the content |
-| Leave a test target out of `Alfie.xctestplan` | Add it — an absent target is skipped silently and still reports green |
+| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan` (18 of them); `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone |
 
 ### Tolerances
 
@@ -110,7 +119,7 @@ Treat them as correct, in review and when writing.
 
 | Choice | Why it stands |
 |---|---|
-| Mocks are hand-written, never generated | They double as `#Preview` fixtures, so they live in a production target. A generator would add a third codegen step and make them un-hand-tunable, losing the throwing unset closure. Spying inside the closure already gives call counts. |
+| Feature and service mocks are hand-written, never generated | They double as `#Preview` fixtures, so they live in a production target. A generator would add a third codegen step and make them un-hand-tunable, losing the throwing unset closure. Spying inside the closure already gives call counts. |
 | Table-driven `for` loops over cases | XCTest has no parameterized tests; the loop is the workaround. |
 | `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. One test in the suite uses `XCTAssertThrowsError`; the typed form is the house idiom. |
 | No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the acceptance criterion (`(AC 5)`, `(Q36)`). |

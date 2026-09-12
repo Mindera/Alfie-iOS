@@ -68,12 +68,14 @@ the `test` prefix for discovery ([XCTest](https://developer.apple.com/documentat
 Testing removes even that, identifying tests by the `@Test` attribute
 ([DefiningTests.md](https://github.com/swiftlang/swift-testing/blob/main/Sources/Testing/Testing.docc/DefiningTests.md)).
 
-**Repo:** already strong, in two coexisting dialects. 912 of 919 test functions use `test_…`
-snake/camel hybrid; 7 are camelCase legacy (`testExample`, `testLocalizationTables`, `testTable`,
-`testFixture`). Dialect (a) is a full behavioural sentence
-(`test_aShopperWithNoCartSeesAnEmptyBagRatherThanAnError`,
-`test_non_finite_totals_map_to_no_total_rather_than_zero`); dialect (b) is
-`test_<method>_<condition>_<expectation>` (`test_viewDidAppear_whenTheReadFails_showsTheError`). The
+**Repo:** already strong, in two coexisting dialects. 904 of the 911 test functions in
+`AlfieKit/Tests` carry the `test_` prefix; the other 7 are camelCase legacy with no prefix
+(`testExample`, `testLocalizationTables`, `testTable`, `testFixture`). Within the 904, dialect (a)
+is one camelCase sentence after the prefix
+(`test_aShopperWithNoCartSeesAnEmptyBagRatherThanAnError`) — just 7 names; dialect (b) splits the
+claim into underscore-separated segments, `test_<trigger>_<condition>_<expectation>`
+(`test_non_finite_totals_map_to_no_total_rather_than_zero`,
+`test_viewDidAppear_whenTheReadFails_showsTheError`) — the other 897, so the settled convention. The
 "X rather than Y" form that names the failure being guarded against is a genuinely good local
 invention. The convention is *de facto* and undocumented.
 
@@ -148,8 +150,10 @@ recommending hand-written in-memory fakes
 van der Lee does not discuss mocking at all in the named article. **Apple documents no mocking
 facility — there is no primary source here. It is a team choice.**
 
-**Repo:** 51 hand-written files under `Alfie/AlfieKit/Sources/Mocks/` — 30 service mocks, 11 mock
-ViewModels, 10 fixture files. No Sourcery, Mockolo, swift-mocking or `.stencil` anywhere in the tree.
+**Repo:** 51 hand-written files under `Alfie/AlfieKit/Sources/Mocks/` — 30 service mocks, 11 feature
+doubles (8 mock ViewModels, plus `MockDeepLinkHandler`, `MockDeepLinkParser` and
+`MockLinkConfiguration`), 10 fixture files. No Sourcery, Mockolo, swift-mocking or `.stencil`
+anywhere in the tree.
 Naming is `Mock<Protocol>`, never `<Protocol>Mock`. The idiom is a **closure stub that doubles as a
 spy**:
 
@@ -177,9 +181,9 @@ easy to break:
    `MockWishlistService` a `[SelectedProduct]`), so publisher plumbing is genuinely exercised — these
    are *fakes*, not stubs, in the taxonomy above.
 
-Fixtures are `Type+Fixture.swift` with `static func fixture(…)` and every parameter defaulted —
-textbook test-data builders. `Mocks` is a **production `.target`**, depended on by `AppFeature`,
-`DebugMenu` and `SharedUI` for SwiftUI previews. That is fine for XCTest, but flags a constraint for
+Fixtures are `Type+Fixture.swift` with `static func fixture(…)` and all but one parameter in the
+package defaulted (`ConfigurationAppUpdate.fixture` requires `requirements:`) — textbook test-data
+builders. `Mocks` is a **production `.target`**, depended on by `AppFeature`, `DebugMenu` and `SharedUI` for SwiftUI previews. That is fine for XCTest, but flags a constraint for
 any Swift Testing migration:
 
 > "Only import the testing library into a test target or library meant for test targets… Test
@@ -425,9 +429,9 @@ boundary.
 
 That last row is a real migration cost for numeric tests, and is stated by Apple, not inferred.
 
-**Repo:** 100% XCTest. 97 files `import XCTest` (91 in `AlfieKit/Tests`, plus `AlfieTests`,
-`AlfieUITests`, `TestUtils`, `Mocks`); 84 `final class …: XCTestCase`. **Zero** `import Testing`, and
-zero occurrences of `@Test`, `#expect`, `#require`, `@Suite`, `confirmation`, `withKnownIssue`,
+**Repo:** 100% XCTest. 97 files `import XCTest` (88 of the 91 in `AlfieKit/Tests`, plus `AlfieTests`,
+`AlfieUITests` and `TestUtils`; `Mocks` imports none); 87 `final class …: XCTestCase`, 84 of them in
+`AlfieKit/Tests`. **Zero** `import Testing`, and zero occurrences of `@Test`, `#expect`, `#require`, `@Suite`, `confirmation`, `withKnownIssue`,
 `.serialized` or Swift Testing `Tag`. `Package.swift` declares `// swift-tools-version: 5.9`,
 `platforms: [.iOS(.v16)]`, no `swiftLanguageMode`, no `StrictConcurrency`, no upcoming-feature flags —
 so Swift 5 language mode throughout (the app target is `SWIFT_VERSION = 5.0`).
@@ -705,7 +709,7 @@ lowercase). The intent (name the significant input) is sound; the style is not i
 
 | Rule | Repo status | Migration cost |
 |---|---|---|
-| Descriptive `test_…` naming convention | **Already** (912/919) — but undocumented | None to document; ~7 camelCase stragglers to rename |
+| Descriptive `test_…` naming convention | **Already** (904/911) — but undocumented | None to document; ~14 legacy names to rename (7 unprefixed, 7 camelCase sentences) |
 | One act per test | **Already** in every file sampled | None |
 | No branching that mirrors the implementation | **Partial** — table `for` loops in `ModelTests`, `do/catch` error idiom (911 tests) | None if scoped as in Contradictions §6; high if written as a blanket ban |
 | No sleeps in tests | **Already** — zero `Task.sleep` / `Thread.sleep` / test-side `asyncAfter` | None |
@@ -730,7 +734,7 @@ lowercase). The intent (name the significant input) is sound; the style is not i
 | Locale / time-zone pinning | **No** — not set anywhere | Low; set on the simulator in `test-for-verification.sh` |
 | Test code linted like production code | **No** — `.swiftlint.yml` excludes `AlfieKit/Tests` and `Sources/Mocks` | Medium — one lint run over 911 tests, then fix the fallout. Decide deliberately either way |
 | Snapshot = layout, unit test = content | **Already** — snapshot views always driven by Mock ViewModels holding a literal `ViewState`; empirically justified in `Docs/SnapshotTesting.md` | None |
-| Every test target in `Alfie.xctestplan` | **Already** — 18 targets; the silent-skip failure mode is documented | None |
+| Every unit test target in `Alfie.xctestplan` | **Already** — 18 targets; the silent-skip failure mode is documented | None |
 | No disabled or placeholder tests | **Partial** — all 11 `XCTSkip` are legitimate env gates in `BFFIntegrationTests`; but `UtilsTests` is an `XCTAssertTrue(true)` placeholder and `DeepLinkHandlerTests` carries 3 commented-out properties | Trivial cleanup |
 | Parallel test execution | **No** for AlfieKit — scheme sets `parallelizable = "YES"` only on `AlfieTests` / `AlfieUITests`; neither test plan sets it, and 911 of 923 tests arrive via the plans | Low to try (suite is already independent); must verify the 6 snapshot classes against the pinned simulator |
 | Test timeout / execution time allowance in the plan | **No** — unset, so Apple's 600s default applies | Trivial |
