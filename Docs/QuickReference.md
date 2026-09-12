@@ -25,6 +25,7 @@ Alfie/
 │   │   ├── MyAccount/              # Account feature module
 │   │   ├── ProductDetails/         # Product details feature module
 │   │   ├── ProductListing/         # Product listing feature module
+│   │   ├── Scanner/                # Scan feature module (Alfie code on a swing tag)
 │   │   ├── Search/                 # Search feature module
 │   │   ├── SharedUI/               # Localization, theme, components
 │   │   ├── TestUtils/              # Test helpers

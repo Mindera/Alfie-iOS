@@ -96,14 +96,6 @@ Figma labels them by SF Symbol name; asset names are the kebab-cased form.
 `ipad-and-arrow-forward` 6951:607 · `storefront` 6951:611 · `xmark-circle-fill` 6951:606 ·
 `info-circle` 6951:730 · `list-bullet` 6951:729.
 
-### Not from Figma
-One icon has no Figma node, and is the documented exception to everything above:
-
-`scan` — hand-authored in the Tabler style the set follows (24dp, 1.5 stroke, round caps), for the
-in-store scan control (#137). The Iconography page had no scan glyph when the feature landed.
-**Replace it with the Figma export as soon as one exists**, and move it into the E-commerce list;
-`Icon.scan` carries the same note.
-
 ## Accessibility
 
 Bundled asset `Image`s expose their raw asset name to VoiceOver. So: icon-only buttons set an explicit
