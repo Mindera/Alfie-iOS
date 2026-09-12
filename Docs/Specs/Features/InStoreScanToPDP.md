@@ -215,7 +215,7 @@ deep links land in the Shop tab.
 | `scanner.error.permission_denied.action` | "Open Settings" | Scenario 6 |
 | `scanner.error.unsupported.message` | "This device can't scan codes." | Scenario 7 |
 | `scanner.error.generic.message` | "Something went wrong." | A permitted camera that will not start |
-| `search.scan_button.accessibility_label` | "Scan a tag" | Search bar control |
+| `accessibility.scan` | "Scan a tag" | Search bar control. Shipped under the `accessibility.*` namespace every other VoiceOver label uses, rather than the `search.scan_button.accessibility_label` first drafted here |
 | `pdp.availability.online_note` | "Availability shown is online stock" | Scenario 3 |
 
 ---
@@ -276,7 +276,9 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 
 - ViewState: `ViewState<ScannerViewStateModel, ScannerViewErrorType>`
 - `AccessibilityID` entries for the Scan button and the Scanner screen
-- No new `Route` case, and no change to `DeepLink.LinkType`
+- No new `Route` case. `DeepLink.LinkType` keeps its cases, but `productDetail`'s associated value was
+  renamed `slug:` → `handle:` while building this: the scanner made the glossary term load-bearing, and
+  the parser it feeds had to be fixed for multi-segment Handles anyway (#134). No behaviour changed.
 
 ---
 
