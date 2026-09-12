@@ -290,6 +290,7 @@ let package = Package(
                 "Mocks",
                 "Model",
                 "SharedUI",
+                "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
             ]
         ),

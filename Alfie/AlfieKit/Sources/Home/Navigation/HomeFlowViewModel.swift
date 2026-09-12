@@ -7,7 +7,6 @@ import ProductListing
 import Scanner
 import Search
 import SwiftUI
-import Utils
 import Web
 import Wishlist
 
@@ -61,21 +60,13 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             .store(in: &subscriptions)
     }
 
-    /// A fresh ViewModel — and so a fresh camera session — for each presentation. `close` clears the
-    /// overlay here as well as dismissing the screen: a successful scan hands over to the deep-link
-    /// path, which clears the tab's overlay itself, and this flow would otherwise still believe the
-    /// scanner was up and refuse to present it a second time.
+    /// Closing clears the overlay as well as dismissing the screen, so the flow does not go on
+    /// believing the scanner is up and refuse to present it a second time. The rest of the wiring is
+    /// the same on every tab — see ``ScannerPresentation``.
     private func makeScannerViewModel() -> ScannerViewModel {
-        ScannerViewModel(
+        ScannerPresentation.makeViewModel(
             dependencies: dependencies.scannerDependencyContainer,
             source: .searchBar,
-            openScannedLink: { [weak self] url in
-                self?.dependencies.deepLinkService.openUrls([url])
-            },
-            // A refused camera can only be granted outside the app, so the one recovery the scanner
-            // can offer is the door out to Settings — routed from here, like every other way off
-            // this screen.
-            openAppSettings: { ExternalAppLauncher.openAppSettings() },
             close: { [weak self] in self?.overlay = nil }
         )
     }
