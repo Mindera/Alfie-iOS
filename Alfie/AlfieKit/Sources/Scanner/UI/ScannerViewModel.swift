@@ -24,11 +24,16 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private let scanService: CameraScanServiceProtocol
     private let deepLinkService: DeepLinkServiceProtocol
     private let analytics: AlfieAnalyticsTracker
+    private let source: ScanEntryPoint
     private let openScannedLink: (URL) -> Void
     private let openAppSettings: () -> Void
     private let close: () -> Void
     private let log: Logger
 
+    /// `scan_started` counts presentations, not appearances. The screen appears again whenever the
+    /// app returns to the foreground, and counting those would inflate the denominator the other two
+    /// scan events are read against.
+    private var hasTrackedStart = false
     private var isOnScreen = false
     private var isAppActive = true
     private var hasOpenedLink = false
@@ -43,6 +48,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     public var title: String { L10n.Scanner.title }
     public var preview: AnyView { scanService.makePreview() }
+    public var guidance: String? { state.value?.guidance }
+    public var notice: ScannerNotice? { state.value?.notice }
     @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = initialState
 
     /// What the screen shows whenever a scan is starting: the guidance, and nothing said yet about
@@ -57,6 +64,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     /// leaves through the same seam, rather than half of it through the dependency container.
     public init(
         dependencies: ScannerDependencyContainer,
+        source: ScanEntryPoint,
         openScannedLink: @escaping (URL) -> Void,
         openAppSettings: @escaping () -> Void,
         close: @escaping () -> Void
@@ -65,6 +73,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         self.deepLinkService = dependencies.deepLinkService
         self.analytics = dependencies.analytics
         self.log = dependencies.log
+        self.source = source
         self.openScannedLink = openScannedLink
         self.openAppSettings = openAppSettings
         self.close = close
@@ -84,6 +93,10 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     // MARK: - ScannerViewModelProtocol
 
     public func viewDidAppear() {
+        if !hasTrackedStart {
+            hasTrackedStart = true
+            analytics.trackScanStarted(source: source)
+        }
         isOnScreen = true
         updateScanning()
     }
@@ -229,11 +242,28 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     private func open(_ url: URL) {
         hasOpenedLink = true
+        trackSucceeded(for: url)
         updateScanning()
         // Dismissed before the product opens, not left behind it: the deep-link path pushes onto a
         // tab that the scanner is covering.
         close()
         openScannedLink(url)
+    }
+
+    /// `scan_succeeded` reports the Handle the code named, so it is raised for the one link type that
+    /// carries one. An Alfie code pointing anywhere else in the app is still a recognised code — it
+    /// gets no notice and no `scan_failed` — but there is no Product to name, and inventing one would
+    /// put a value in the event that no printed code produced.
+    private func trackSucceeded(for url: URL) {
+        guard case .productDetail(let handle, _, let query) = deepLinkService.deepLinkType(url) else {
+            return
+        }
+        analytics.trackScanSucceeded(handle: handle, hasSku: query?[Constants.skuQueryItem] != nil)
+    }
+
+    private enum Constants {
+        /// The query item `AlfieCode` writes into the printed link. See `Tools/AlfieCodeGen`.
+        static let skuQueryItem = "sku"
     }
 
     /// Whether a scanned link reaches somewhere in the app.

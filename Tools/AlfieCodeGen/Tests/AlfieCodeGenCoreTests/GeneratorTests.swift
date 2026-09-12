@@ -18,16 +18,15 @@ struct GeneratorTests {
 
         let result = try Generator.run(
             list: "mens-jeans-slim-indigo\nwomens-coat-wool-camel, SKU-8842",
-            outputDirectory: output,
-            size: .swingTag
+            outputDirectory: output
         )
 
-        #expect(result.files.map(\.lastPathComponent) == [
+        #expect(result.codes.map(\.file.lastPathComponent) == [
             "mens-jeans-slim-indigo.png",
             "womens-coat-wool-camel--sku-SKU-8842.png",
         ])
-        for file in result.files {
-            #expect(FileManager.default.fileExists(atPath: file.path))
+        for code in result.codes {
+            #expect(FileManager.default.fileExists(atPath: code.file.path))
         }
     }
 
@@ -38,11 +37,10 @@ struct GeneratorTests {
 
         let result = try Generator.run(
             list: "mens/jeans/slim-indigo, SKU-8842",
-            outputDirectory: output,
-            size: .swingTag
+            outputDirectory: output
         )
 
-        let data = try Data(contentsOf: try #require(result.files.first))
+        let data = try Data(contentsOf: try #require(result.codes.first).file)
         #expect(
             try PNGProbe.decodedMessage(in: data)
                 == "https://localhost:4000/product/mens/jeans/slim-indigo?sku=SKU-8842"
@@ -57,11 +55,10 @@ struct GeneratorTests {
 
         let result = try Generator.run(
             list: "mens-jeans",
-            outputDirectory: output,
-            size: .swingTag
+            outputDirectory: output
         )
 
-        #expect(result.files.count == 1)
+        #expect(result.codes.count == 1)
     }
 
     @Test("a malformed list writes nothing at all")
@@ -72,8 +69,7 @@ struct GeneratorTests {
         #expect(throws: AlfieCodeError.self) {
             try Generator.run(
                 list: "mens-jeans\nnot a handle",
-                outputDirectory: output,
-                size: .swingTag
+                outputDirectory: output
             )
         }
 
@@ -89,8 +85,7 @@ struct GeneratorTests {
         #expect(throws: AlfieCodeError.emptyList) {
             try Generator.run(
                 list: "# only a comment\n",
-                outputDirectory: output,
-                size: .swingTag
+                outputDirectory: output
             )
         }
     }
@@ -104,8 +99,7 @@ struct GeneratorTests {
         #expect(throws: AlfieCodeError.self) {
             try Generator.run(
                 inputFile: missing,
-                outputDirectory: output,
-                size: .swingTag
+                outputDirectory: output
             )
         }
     }
@@ -124,13 +118,12 @@ struct GeneratorTests {
 
         let result = try Generator.run(
             inputFile: example,
-            outputDirectory: output,
-            size: .swingTag
+            outputDirectory: output
         )
 
-        #expect(!result.files.isEmpty)
-        for link in result.links {
-            #expect(link.absoluteString.hasPrefix("https://localhost:4000/product/"))
+        #expect(!result.codes.isEmpty)
+        for code in result.codes {
+            #expect(code.link.absoluteString.hasPrefix("https://localhost:4000/product/"))
         }
     }
 }

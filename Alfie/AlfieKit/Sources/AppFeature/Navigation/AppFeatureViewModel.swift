@@ -152,6 +152,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productListingDependencyContainer: productListingDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
+                scannerDependencyContainer: scannerDependencyContainer,
+                deepLinkService: serviceProvider.deepLinkService,
                 log: log
             )
         )

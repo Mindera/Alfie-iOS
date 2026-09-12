@@ -8,6 +8,13 @@ public protocol ScannerViewModelProtocol: ObservableObject {
     var state: ViewState<ScannerViewStateModel, ScannerViewErrorType> { get }
     /// The camera preview supplied by the scan source.
     var preview: AnyView { get }
+    /// What to point the camera at, while there is a camera to point it with.
+    ///
+    /// Read off ``state`` here rather than in the View: the walk into the state model belongs on
+    /// this side of the seam, as it does for every other screen.
+    var guidance: String? { get }
+    /// What the shopper was last told about a code, if anything.
+    var notice: ScannerNotice? { get }
 
     func viewDidAppear()
     func viewDidDisappear()

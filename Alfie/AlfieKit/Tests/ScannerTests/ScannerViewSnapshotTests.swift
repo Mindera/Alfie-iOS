@@ -1,5 +1,6 @@
 import Mocks
 import Model
+import SharedUI
 import SnapshotTesting
 import SwiftUI
 import TestUtils
@@ -15,7 +16,9 @@ import XCTest
 final class ScannerViewSnapshotTests: XCTestCase {
     private let isRecording = false
 
-    private static let guidance = "Point the camera at the Alfie code on the tag"
+    /// The shipped copy, not a copy of it: an edit to the wording has to reach these snapshots, or
+    /// the suite goes on asserting a layout for text the app no longer shows.
+    private static let guidance = L10n.Scanner.Guidance.message
 
     func test_scannerView() {
         let sut = ScannerView(viewModel: MockScannerViewModel(state: .success(.init(guidance: Self.guidance))))
@@ -42,7 +45,7 @@ final class ScannerViewSnapshotTests: XCTestCase {
             state: .success(
                 .init(
                     guidance: Self.guidance,
-                    notice: .init(id: 1, message: "That code doesn't open anything in Alfie.")
+                    notice: .init(id: 1, message: L10n.Scanner.Unrecognised.message)
                 )
             )
         )
@@ -60,7 +63,7 @@ final class ScannerViewSnapshotTests: XCTestCase {
             state: .success(
                 .init(
                     guidance: Self.guidance,
-                    notice: .init(id: 1, message: "That's the product barcode. Scan the Alfie code on the tag instead.")
+                    notice: .init(id: 1, message: L10n.Scanner.BarcodeDetected.message)
                 )
             )
         )
