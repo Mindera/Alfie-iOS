@@ -50,7 +50,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         // Keyed on the whole notice rather than its words: a second bad code in a row says the same
         // thing, and it is exactly then that the shopper most needs telling. ``ScannerNotice``
         // carries an identity so that repeat still reads as a change.
-        .onChange(of: notice) { notice in
+        .onChange(of: viewModel.notice) { notice in
             guard let notice else { return }
             UIAccessibility.post(notification: .announcement, argument: notice.message)
         }
@@ -60,16 +60,6 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         viewModel.state.failure == nil
     }
 
-    /// What the shopper was last told about a code, if anything. Read in three places, so it is named
-    /// once here rather than repeated at each of them.
-    private var notice: ScannerNotice? {
-        viewModel.notice
-    }
-
-    private var guidanceText: String? {
-        viewModel.guidance
-    }
-
     /// The screen opens straight onto a live camera, so a shopper using VoiceOver has nothing to read
     /// and no reason to know what to point it at unless they are told.
     ///
@@ -77,8 +67,8 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// moment, and a plain announcement made into that moment is routinely dropped in favour of the
     /// focus change that follows it. `.screenChanged` is that focus change, and speaks its argument.
     private func announceGuidance() {
-        guard let guidanceText else { return }
-        UIAccessibility.post(notification: .screenChanged, argument: guidanceText)
+        guard let guidance = viewModel.guidance else { return }
+        UIAccessibility.post(notification: .screenChanged, argument: guidance)
     }
 
     private var camera: some View {
@@ -125,7 +115,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// telling *and* still needs to know what to point at.
     @ViewBuilder private var messages: some View {
         VStack(spacing: theme.spacing.space200) {
-            if let notice {
+            if let notice = viewModel.notice {
                 SnackbarView(
                     configuration: .init(
                         type: .error,
@@ -153,7 +143,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// being asked to look at, so the guidance has to be reached on the way through the screen
     /// rather than hidden behind the preview.
     @ViewBuilder private var guidance: some View {
-        if let guidance = guidanceText {
+        if let guidance = viewModel.guidance {
             Text.build(theme.font.body.medium(guidance))
                 .foregroundStyle(Theme.contentContentInvertedPrimary)
                 .multilineTextAlignment(.center)

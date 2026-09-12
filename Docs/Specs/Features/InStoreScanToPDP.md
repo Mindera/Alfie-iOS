@@ -1,9 +1,9 @@
 # Feature: In-Store Scan to Product Details
 
-**Status**: Draft
+**Status**: Implemented
 **Created**: 2026-09-09
-**Last Updated**: 2026-09-10
-**Implementation PR**: _(link when implemented)_
+**Last Updated**: 2026-09-12
+**Implementation PR**: #146 (`feature/gh-133-in-store-scan-to-pdp` → `main`)
 
 ---
 
@@ -186,13 +186,21 @@ Handle travels inside the Alfie code, and the Product is then fetched by the exi
 
 ### Routes and FlowViewModel Methods
 
-The Scanner is **presented modally** and adds no `Route` case. On a successful scan it hands the URL
-to the existing deep-link path:
+The Scanner is **presented modally** and adds no `Route` case. The ViewModel owns no navigation of
+its own: on recognising an Alfie code it hands the URL back over the `openScannedLink` closure it was
+built with, and the wiring behind that closure passes it to the existing deep-link path. Classifying
+the payload is the scanner's job — a code that opens nothing must leave the camera running — while
+opening the page is not.
 
 ```swift
-// ScannerViewModel, on recognising an Alfie code
-deepLinkService.openUrls([url])
+// ScannerPresentation.makeViewModel, shared by every tab that offers Scan
+openScannedLink: { deepLinkService.openUrls([$0]) }
 ```
+
+That construction lives in one place rather than in each tab's `FlowViewModel`: the three decisions
+behind it — where a recognised link goes, that Settings is the one recovery a refused camera has,
+and that closing clears the tab's overlay — are the same wherever the Scan control appears. Only the
+last is supplied by the tab, because only the tab knows what it is covering.
 
 `DeepLinkService` parses it with the existing `ProductDetailsDeepLinkParser`, and
 `AppFeatureViewModel.navigate(for:)` routes it to
@@ -279,6 +287,14 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 - No new `Route` case. `DeepLink.LinkType` keeps its cases, but `productDetail`'s associated value was
   renamed `slug:` → `handle:` while building this: the scanner made the glossary term load-bearing, and
   the parser it feeds had to be fixed for multi-segment Handles anyway (#134). No behaviour changed.
+- `TabRoute.init(deepLinkType:)` was extracted from `AppFeatureViewModel.navigate(for:)`, which is
+  more than the rename above. The scan path's correctness rests entirely on that mapping, and inside
+  a `navigate` method that also mutates the tab it could not be asserted; `DeepLinkRoutingTests` now
+  covers the table directly. The mapping itself is unchanged, case for case.
+- `ThemedSearchBarView.IconLayout` is a new `SharedUI` API. Putting a second control inside the bar
+  is not a thing the bar could previously do, and the design's "Scan Barcode" variant moves the
+  magnifier to the leading edge so the two bracket the text — one layout decision rather than a
+  caller-supplied view, so the bar keeps control of its own chrome.
 
 ---
 
@@ -348,6 +364,18 @@ The developer will verify the camera path manually on device.
   an Alfie code joins. That is deliberately not done: it delays the honest Scenario 4 message, the
   one case the ticket exists for, and puts a timer inside a ViewModel that is otherwise synchronous
   and therefore deterministic under test. Revisit if the demo shows the flash actually reads badly.
+- **A code arriving beside an already-answered Barcode gets no notice of its own.** The scanner
+  answers one code per frame and suppresses a code it has already answered. When a Barcode is still
+  in view and an unrecognised QR joins it, the Barcode wins on precedence and is then suppressed as
+  a repeat, so the frame is answered with silence: the shopper sees the earlier Barcode notice,
+  which is still on screen and still true, but nothing is said about the new code. Covered by
+  `test_aBarcodeStillInViewAsAnotherCodeJoinsIsAnsweredOnce`.
+
+  This is the cost of the rule that stops one physical code producing two notices and two
+  `scan_failed` events, and it is paid in the case that matters least — the shopper is holding a
+  Swing tag whose Barcode has already been named, and the advice on screen ("scan the Alfie code on
+  the tag instead") is the advice the new code would also have earned. Answering per code rather
+  than per frame would fix it and reopen the double-notice it was written to close.
 - **The printed URL does not resolve in a browser.** It points at `localhost:4000`, which is the
   configured host. Scanning an Alfie code with the iOS Camera app will not open Alfie.
 - **The Variant is not preselected.** The scanned SKU is carried in the code but ignored; the
@@ -366,6 +394,14 @@ The developer will verify the camera path manually on device.
 - `ProductDetailsDeepLinkParser` currently captures a single path segment, so a Handle containing
   `/` fails to parse and falls through to the web view. This is a pre-existing defect that affects
   BigCommerce Handles generally, not only scanning. Fix it as part of this work.
+  - Widening the capture changes two things beyond accepting a slash, both deliberate. A trailing
+    `/` is now trimmed, so `/product/<handle>/` names the same Product as `/product/<handle>` rather
+    than a Handle ending in a separator no catalogue contains. And anything under `/product/` now
+    reads as a multi-segment Handle, so a path like `/product/<handle>/reviews` is looked up as a
+    Product instead of falling through to the web view. Nothing in Alfie emits such a path, and the
+    parser cannot tell a route suffix from a Handle segment without a catalogue to ask — this is the
+    same trade BigCommerce route paths force. Worth revisiting if a `/product/` sub-route is ever
+    added.
 - A generator script lives in `Tools/`: it takes a list of Handles and writes print-ready PNG files.
 - New Swift files must be added to the Xcode project by a human — agents must not edit
   `project.pbxproj`.
@@ -405,3 +441,4 @@ The developer will verify the camera path manually on device.
 |------|--------|--------|
 | 2026-09-09 | Initial spec created from `/grill-with-docs` session | Khoi Nguyen |
 | 2026-09-10 | #139: `ScannedCode` built with `precedence`; two-codes-at-once edge case amended; Barcode-notice snapshot added | Khoi Nguyen |
+| 2026-09-12 | Spec squared with the shipped code after review: Navigation block corrected to the `openScannedLink` seam, parser scope and the `TabRoute`/`IconLayout` additions recorded, per-frame notice limitation documented, status set to Implemented | Khoi Nguyen |

@@ -155,7 +155,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
                 scannerDependencyContainer: scannerDependencyContainer,
-                deepLinkService: serviceProvider.deepLinkService,
                 log: log
             )
         )
@@ -168,8 +167,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 webDependencyContainer: webDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
-                scannerDependencyContainer: scannerDependencyContainer,
-                deepLinkService: serviceProvider.deepLinkService
+                scannerDependencyContainer: scannerDependencyContainer
             )
         )
         let wishlistFlowViewModel = WishlistFlowViewModel(

@@ -68,15 +68,10 @@ public struct SearchBarEntryButton: View {
     }
 
     /// A Scan control moves the magnifier to the leading edge so the two bracket the text; without
-    /// one the bar keeps its default single trailing icon.
+    /// one the bar keeps its default single trailing icon. The bar draws the glyph itself — this
+    /// side owns only the tap target over it.
     private var iconLayout: ThemedSearchBarView.IconLayout {
-        guard scan != nil else { return .magnifierOnly }
-        return .magnifierLeading(accessory: AnyView(scanGlyph))
-    }
-
-    /// Matches the bar's own magnifying glass, so the pair bracketing the text reads as one set.
-    private var scanGlyph: some View {
-        ThemedIcon(.scanBarcode, size: .small, tint: Theme.contentContentPrimary)
+        scan == nil ? .magnifierOnly : .magnifierLeadingScanTrailing
     }
 
     /// The tap target is an overlay rather than a `Button` handed to the bar: the bar is drawn
