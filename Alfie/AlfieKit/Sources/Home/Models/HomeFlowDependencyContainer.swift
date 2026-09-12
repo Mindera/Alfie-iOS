@@ -2,6 +2,7 @@ import Model
 import MyAccount
 import ProductDetails
 import ProductListing
+import Scanner
 import Search
 import Web
 import Wishlist
@@ -14,6 +15,7 @@ public final class HomeFlowDependencyContainer {
     let webDependencyContainer: WebDependencyContainer
     let wishlistDependencyContainer: WishlistDependencyContainer
     let searchDependencyContainer: SearchDependencyContainer
+    let scannerDependencyContainer: ScannerDependencyContainer
 
     public init(
         homeDependencyContainer: HomeDependencyContainer,
@@ -22,7 +24,8 @@ public final class HomeFlowDependencyContainer {
         productDetailsDependencyContainer: ProductDetailsDependencyContainer,
         webDependencyContainer: WebDependencyContainer,
         wishlistDependencyContainer: WishlistDependencyContainer,
-        searchDependencyContainer: SearchDependencyContainer
+        searchDependencyContainer: SearchDependencyContainer,
+        scannerDependencyContainer: ScannerDependencyContainer,
     ) {
         self.homeDependencyContainer = homeDependencyContainer
         self.myAccountDependencyContainer = myAccountDependencyContainer
@@ -31,5 +34,6 @@ public final class HomeFlowDependencyContainer {
         self.webDependencyContainer = webDependencyContainer
         self.wishlistDependencyContainer = wishlistDependencyContainer
         self.searchDependencyContainer = searchDependencyContainer
+        self.scannerDependencyContainer = scannerDependencyContainer
     }
 }

@@ -1269,6 +1269,56 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertFalse(swatchesSearchResult.map(\.name).contains(expectedNonMatchedColors.map(\.name)))
     }
 
+    // MARK: - Availability note
+
+    /// The note qualifies what the selectors' availability means, so it must not appear before there
+    /// is any availability on screen — while loading, the swatches are shimmer placeholders.
+    func test_availabilityNote_isHidden_whileTheProductIsLoading() {
+        initViewModel()
+
+        XCTAssertFalse(sut.shouldShow(section: .availabilityNote))
+    }
+
+    func test_availabilityNote_isShown_onceTheProductHasLoaded() {
+        initViewModel()
+
+        mockProductService.onGetProductCalled = { _ in
+            .fixture()
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertTrue(sut.shouldShow(section: .availabilityNote))
+    }
+
+    /// An error state draws no selectors, so there is nothing for the note to qualify.
+    func test_availabilityNote_isHidden_whenTheProductFailedToLoad() {
+        initViewModel()
+
+        mockProductService.onGetProductCalled = { _ in
+            throw BFFRequestError(type: .generic)
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertFalse(sut.shouldShow(section: .availabilityNote))
+    }
+
+    /// Static copy: it is either on screen or absent, and never shimmers in as placeholder content.
+    func test_availabilityNote_neverShimmers() {
+        initViewModel()
+
+        XCTAssertFalse(sut.shouldShowLoading(for: .availabilityNote))
+
+        mockProductService.onGetProductCalled = { _ in
+            .fixture()
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertFalse(sut.shouldShowLoading(for: .availabilityNote))
+    }
+
     // MARK: - Helper methods
 
     private func initViewModel(configuration: ProductDetailsConfiguration = .id("")) {

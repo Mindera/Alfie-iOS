@@ -32,6 +32,8 @@ public enum L10n {
     public static let removeFromWishlist = L10n.tr("L10n", "accessibility.removeFromWishlist")
     /// Remove recent search
     public static let removeRecentSearch = L10n.tr("L10n", "accessibility.removeRecentSearch")
+    /// Scan a tag
+    public static let scan = L10n.tr("L10n", "accessibility.scan")
     /// Search
     public static let search = L10n.tr("L10n", "accessibility.search")
     /// Settings
@@ -164,9 +166,13 @@ public enum L10n {
     public static let title = L10n.tr("L10n", "loading.title")
   }
   public enum Pdp {
+    public enum Availability {
+      /// Shown beneath the PDP colour and size selectors. The availability those selectors show is an online aggregate with no per-store dimension, so this stops a shopper standing in a store reading a crossed-out size as "not in this shop".
+      public static let onlineNote = L10n.tr("L10n", "pdp.availability.online_note")
+    }
     public enum Colour {
       public enum OutOfStock {
-        /// Out of stock
+        /// VoiceOver value for a dimmed colour card. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "pdp.colour.out_of_stock.accessibility_value")
       }
     }
@@ -456,9 +462,43 @@ public enum L10n {
       /// Size
       public static let title = L10n.tr("L10n", "product.size.title")
       public enum OutOfStock {
-        /// Out of stock
+        /// VoiceOver value for a crossed-out size swatch. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "product.size.out_of_stock.accessibility_value")
       }
+    }
+  }
+  public enum Scanner {
+    /// Scan
+    public static let title = L10n.tr("L10n", "scanner.title")
+    public enum BarcodeDetected {
+      /// That's the product barcode. Scan the Alfie code on the tag instead.
+      public static let message = L10n.tr("L10n", "scanner.barcode_detected.message")
+    }
+    public enum Error {
+      public enum Generic {
+        /// Something went wrong.
+        public static let message = L10n.tr("L10n", "scanner.error.generic.message")
+      }
+      public enum PermissionDenied {
+        /// Open Settings
+        public static let action = L10n.tr("L10n", "scanner.error.permission_denied.action")
+        /// Turn on camera access in Settings to scan tags.
+        public static let message = L10n.tr("L10n", "scanner.error.permission_denied.message")
+        /// Camera access is off
+        public static let title = L10n.tr("L10n", "scanner.error.permission_denied.title")
+      }
+      public enum Unsupported {
+        /// This device can't scan codes.
+        public static let message = L10n.tr("L10n", "scanner.error.unsupported.message")
+      }
+    }
+    public enum Guidance {
+      /// Point the camera at the Alfie code on the tag
+      public static let message = L10n.tr("L10n", "scanner.guidance.message")
+    }
+    public enum Unrecognised {
+      /// That code doesn't open anything in Alfie.
+      public static let message = L10n.tr("L10n", "scanner.unrecognised.message")
     }
   }
   public enum Search {
@@ -691,6 +731,7 @@ public extension L10n {
       case accessibilityPreviousPage = "accessibility.previousPage"
       case accessibilityRemoveFromWishlist = "accessibility.removeFromWishlist"
       case accessibilityRemoveRecentSearch = "accessibility.removeRecentSearch"
+      case accessibilityScan = "accessibility.scan"
       case accessibilitySearch = "accessibility.search"
       case accessibilitySettings = "accessibility.settings"
       case accessibilityShare = "accessibility.share"
@@ -722,6 +763,7 @@ public extension L10n {
       case homeSignInButtonCta = "home.sign_in.button.cta"
       case homeSignOutButtonCta = "home.sign_out.button.cta"
       case loadingTitle = "loading.title"
+      case pdpAvailabilityOnlineNote = "pdp.availability.online_note"
       case pdpColourOutOfStockAccessibilityValue = "pdp.colour.out_of_stock.accessibility_value"
       case pdpColourSelectorTitle = "pdp.colour_selector.title"
       case pdpColourSummaryAccessibilityHint = "pdp.colour_summary.accessibility_hint"
@@ -789,6 +831,15 @@ public extension L10n {
       case productSizeSelected = "product.size.selected"
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
+      case scannerTitle = "scanner.title"
+      case scannerBarcodeDetectedMessage = "scanner.barcode_detected.message"
+      case scannerErrorGenericMessage = "scanner.error.generic.message"
+      case scannerErrorPermissionDeniedAction = "scanner.error.permission_denied.action"
+      case scannerErrorPermissionDeniedMessage = "scanner.error.permission_denied.message"
+      case scannerErrorPermissionDeniedTitle = "scanner.error.permission_denied.title"
+      case scannerErrorUnsupportedMessage = "scanner.error.unsupported.message"
+      case scannerGuidanceMessage = "scanner.guidance.message"
+      case scannerUnrecognisedMessage = "scanner.unrecognised.message"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"

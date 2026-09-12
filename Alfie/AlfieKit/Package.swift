@@ -65,6 +65,10 @@ let package = Package(
             targets: ["ProductListing"]
         ),
         .library(
+            name: "Scanner",
+            targets: ["Scanner"]
+        ),
+        .library(
             name: "Search",
             targets: ["Search"]
         ),
@@ -116,6 +120,7 @@ let package = Package(
                 "Home",
                 "Mocks",
                 "Model",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -153,6 +158,7 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -210,8 +216,10 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
+                "Utils",
                 "Web",
                 "Wishlist",
             ],
@@ -271,6 +279,19 @@ let package = Package(
                 "Search",
                 "SharedUI",
                 "Utils",
+            ]
+        ),
+
+        .target(
+            name: "Scanner",
+            dependencies: [
+                "AccessibilityIdentifiers",
+                "Core",
+                "Mocks",
+                "Model",
+                "SharedUI",
+                "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
             ]
         ),
 
@@ -441,6 +462,18 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "ScannerTests",
+            dependencies: [
+                "Core",
+                "DeepLink",
+                "Mocks",
+                "Scanner",
+                "SharedUI",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "SearchTests",
             dependencies: [
                 "Core",
@@ -474,7 +507,14 @@ let package = Package(
             dependencies: [
                 "Home",
                 "Mocks",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "Scanner",
+                "Search",
                 "TestUtils",
+                "Web",
+                "Wishlist",
             ]
         ),
 

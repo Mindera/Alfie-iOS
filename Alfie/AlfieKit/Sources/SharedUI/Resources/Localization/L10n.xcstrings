@@ -145,6 +145,17 @@
         }
       }
     },
+    "accessibility.scan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan a tag"
+          }
+        }
+      }
+    },
     "accessibility.search" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -486,13 +497,26 @@
         }
       }
     },
-    "pdp.colour.out_of_stock.accessibility_value" : {
+    "pdp.availability.online_note" : {
+      "comment" : "Shown beneath the PDP colour and size selectors. The availability those selectors show is an online aggregate with no per-store dimension, so this stops a shopper standing in a store reading a crossed-out size as \"not in this shop\".",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Out of stock"
+            "value" : "Availability shown is online stock"
+          }
+        }
+      }
+    },
+    "pdp.colour.out_of_stock.accessibility_value" : {
+      "comment" : "VoiceOver value for a dimmed colour card. Says \"online\" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Out of stock online"
           }
         }
       }
@@ -1215,12 +1239,13 @@
       }
     },
     "product.size.out_of_stock.accessibility_value" : {
+      "comment" : "VoiceOver value for a crossed-out size swatch. Says \"online\" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Out of stock"
+            "value" : "Out of stock online"
           }
         }
       }
@@ -1243,6 +1268,105 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Size"
+          }
+        }
+      }
+    },
+    "scanner.barcode_detected.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That's the product barcode. Scan the Alfie code on the tag instead."
+          }
+        }
+      }
+    },
+    "scanner.error.generic.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong."
+          }
+        }
+      }
+    },
+    "scanner.error.permission_denied.action" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        }
+      }
+    },
+    "scanner.error.permission_denied.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on camera access in Settings to scan tags."
+          }
+        }
+      }
+    },
+    "scanner.error.permission_denied.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera access is off"
+          }
+        }
+      }
+    },
+    "scanner.error.unsupported.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device can't scan codes."
+          }
+        }
+      }
+    },
+    "scanner.guidance.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Point the camera at the Alfie code on the tag"
+          }
+        }
+      }
+    },
+    "scanner.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan"
+          }
+        }
+      }
+    },
+    "scanner.unrecognised.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That code doesn't open anything in Alfie."
           }
         }
       }

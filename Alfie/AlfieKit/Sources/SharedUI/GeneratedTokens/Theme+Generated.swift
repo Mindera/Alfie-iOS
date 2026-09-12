@@ -13,11 +13,11 @@ public enum Theme {
     public static let buttonDestructiveContentDestructiveDisabled = Primitives.Colours.neutrals500
     public static let buttonDestructiveStrokeDestructiveDefault = Primitives.Colours.semanticError600
     public static let buttonDestructiveStrokeDestructiveDisabled = Primitives.Colours.neutrals300
-    public static let buttonPrimaryBackgroundPrimaryDefault = Primitives.Colours.brand500
+    public static let buttonPrimaryBackgroundPrimaryDefault = Primitives.Colours.brandNewBrand500
     public static let buttonPrimaryBackgroundPrimaryDisabled = Primitives.Colours.neutrals300
-    public static let buttonPrimaryContentPrimaryDefault = Primitives.Colours.neutrals0
+    public static let buttonPrimaryContentPrimaryDefault = Primitives.Colours.neutrals800
     public static let buttonPrimaryContentPrimaryDisabled = Primitives.Colours.neutrals500
-    public static let buttonPrimaryStrokePrimaryDefault = Primitives.Colours.brand500
+    public static let buttonPrimaryStrokePrimaryDefault = Primitives.Colours.brandNewBrand500
     public static let buttonPrimaryStrokePrimaryDisabled = Primitives.Colours.neutrals300
     public static let buttonSecondaryBackgroundSecondaryDefault = Primitives.Colours.transparentTransparent
     public static let buttonSecondaryBackgroundSecondaryDisabled = Primitives.Colours.transparentTransparent

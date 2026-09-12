@@ -48,6 +48,19 @@ public enum AccessibilityID {
 
     public enum Shop {
         public static let searchInput = "shop.search.input"
+        public static let scanButton = "shop.scan.button"
+    }
+
+    // MARK: - Scanner
+
+    public enum Scanner {
+        public static let screen = "scanner.screen"
+        public static let title = "scanner.title.label"
+        public static let guidance = "scanner.guidance.label"
+        public static let close = "scanner.close.button"
+        public static let notice = "scanner.notice.label"
+        public static let failure = "scanner.failure.view"
+        public static let openSettings = "scanner.openSettings.button"
     }
 
     // MARK: - Splash
@@ -84,6 +97,8 @@ public enum AccessibilityID {
         public static let sizeSelector = "productDetails.size.selector"
         /// Drawn by the design with no destination behind it — rendered, but not interactive.
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
+        /// The line below the selectors stating that the availability they show is online stock.
+        public static let availabilityNote = "productDetails.availability.label"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
         /// The toolbar's share item. The string is the private constant this moved out of
@@ -145,6 +160,7 @@ public enum AccessibilityID {
     public enum Home {
         public static let titleHeader = "home.title.header"
         public static let searchInput = "home.search.input"
+        public static let scanButton = "home.scan.button"
     }
 
     // MARK: - Account

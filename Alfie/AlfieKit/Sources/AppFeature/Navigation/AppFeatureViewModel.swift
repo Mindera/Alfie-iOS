@@ -10,6 +10,7 @@ import MyAccount
 import OrderedCollections
 import ProductDetails
 import ProductListing
+import Scanner
 import Search
 import SwiftUI
 import Utils
@@ -113,6 +114,15 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             configurationService: serviceProvider.configurationService,
             log: log
         )
+        // The scanner routes through the deep-link service rather than a route of its own, so that
+        // service plus a camera is the whole of its wiring. A fresh scan service per presentation:
+        // each one owns a camera session that is released with the screen that opened it.
+        let scannerDependencyContainer = ScannerDependencyContainer(
+            deepLinkService: serviceProvider.deepLinkService,
+            makeScanService: { CameraScanService(log: log) },
+            analytics: serviceProvider.analytics,
+            log: log
+        )
         let searchDependencyContainer = SearchDependencyContainer(
             recentsService: serviceProvider.recentsService,
             analytics: serviceProvider.analytics,
@@ -142,6 +152,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productListingDependencyContainer: productListingDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
                 searchDependencyContainer: searchDependencyContainer,
+                scannerDependencyContainer: scannerDependencyContainer,
                 log: log
             )
         )
@@ -153,7 +164,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
                 productDetailsDependencyContainer: productDetailsDependencyContainer,
                 webDependencyContainer: webDependencyContainer,
                 wishlistDependencyContainer: wishlistDependencyContainer,
-                searchDependencyContainer: searchDependencyContainer
+                searchDependencyContainer: searchDependencyContainer,
+                scannerDependencyContainer: scannerDependencyContainer
             )
         )
         let wishlistFlowViewModel = WishlistFlowViewModel(
@@ -249,46 +261,13 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             .store(in: &subscriptions)
     }
 
+    /// A link that names no destination is ignored, leaving the app where it stands. Which link
+    /// leads where is `TabRoute.init(deepLinkType:)`.
     public func navigate(for deepLinkType: DeepLink.LinkType) {
-        switch deepLinkType {
-        case .home:
-            rootTabViewModel.navigate(.home(.home))
-
-        case .shop:
-            rootTabViewModel.navigate(.shop(.categorySelector))
-
-        case .bag:
-            rootTabViewModel.navigate(.bag(.bag))
-
-        case .wishlist:
-            rootTabViewModel.navigate(.wishlist(.wishlist))
-
-        case .account:
-            rootTabViewModel.navigate(.home(.myAccount(.myAccount)))
-
-        case .productList(let paths, let searchText, let urlQueryParameters):
-            rootTabViewModel.navigate(
-                .shop(
-                    .productListing(
-                        .productListing(.init(
-                            category: paths,
-                            searchText: searchText,
-                            urlQueryParameters: urlQueryParameters,
-                            mode: .listing
-                        ))
-                    )
-                )
-            )
-
-        case .productDetail(let slug, _, _):
-            // The BFF resolves a product by its slug, which is exactly the `/product/<slug>` path segment.
-            rootTabViewModel.navigate(.shop(.productDetails(.productDetails(.deepLink(handle: slug)))))
-
-        case .webView(let url):
-            rootTabViewModel.navigate(.shop(.web(url: url, title: "")))
-
-        case .unknown:
+        guard let route = TabRoute(deepLinkType: deepLinkType) else {
             return
         }
+
+        rootTabViewModel.navigate(route)
     }
 }

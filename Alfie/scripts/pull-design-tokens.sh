@@ -26,7 +26,7 @@ TOKENS_REMOTE="${DESIGN_TOKENS_REMOTE:-git@github.com:Mindera/Alfie-Mobile-Desig
 TOKEN_FILES=(
   "manifest.json"
   ".primitives.alfie-theme.tokens.json"
-  "theme.alfie-theme.tokens.json"
+  "theme.new-brand-theme.tokens.json"
   "sizing.alfie-theme.tokens.json"
   "typography.alfie-theme.tokens.json"
   "typography.styles.tokens.json"

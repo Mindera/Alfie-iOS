@@ -47,8 +47,8 @@
     },
     "theme": {
       "modes": {
-        "alfie-theme": [
-          "theme.alfie-theme.tokens.json"
+        "new-brand-theme": [
+          "theme.new-brand-theme.tokens.json"
         ],
         "selfridges": [
           "theme.selfridges.tokens.json"

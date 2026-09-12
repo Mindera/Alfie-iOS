@@ -47,13 +47,13 @@ struct TokenLoaderTests {
         }
     }
 
-    @Test("theme is pinned to alfie-theme, skipping the file-less selfridges mode (regression: dual-mode theme used to load every mode's file)")
+    @Test("theme is pinned to new-brand-theme, skipping the file-less selfridges mode (regression: dual-mode theme used to load every mode's file)")
     func themeModeSelection() throws {
         // The fixture's manifest lists a "selfridges" theme mode with no backing file. If theme
         // ever stops being pinned, selectedFiles would include theme.selfridges.tokens.json and
         // load() would throw fileNotFound.
         let files = try TokenLoader.selectedFiles(manifestURL: miniURL().appendingPathComponent("manifest.json"))
-        #expect(files.contains("theme.alfie-theme.tokens.json"))
+        #expect(files.contains("theme.new-brand-theme.tokens.json"))
         #expect(!files.contains("theme.selfridges.tokens.json"))
         _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
     }
