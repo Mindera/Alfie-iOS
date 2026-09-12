@@ -5,21 +5,31 @@ import Foundation
 /// Everything is rendered before anything is written, so a bad line halfway down the list leaves no
 /// half-finished print run behind.
 public enum Generator {
+    /// The size every code is rendered at. There is one printed artefact — the swing tag — so this
+    /// is a fact about the tool rather than a choice offered to its callers. Exposed so a caller can
+    /// report it without having to pick it.
+    public static let printSize: PrintSize = .swingTag
+
     public struct Result: Equatable {
-        /// The files written, in list order.
-        public let files: [URL]
-        /// The link encoded into each file, for the run summary.
-        public let links: [URL]
+        /// One written file and the link encoded into it. Kept together rather than returned as two
+        /// arrays the caller has to zip back up, which only works while both stay in list order.
+        public struct Code: Equatable {
+            public let file: URL
+            public let link: URL
+        }
+
+        /// The codes written, in list order.
+        public let codes: [Code]
     }
 
-    public static func run(inputFile: URL, outputDirectory: URL, size: PrintSize) throws -> Result {
+    public static func run(inputFile: URL, outputDirectory: URL) throws -> Result {
         guard let text = try? String(contentsOf: inputFile, encoding: .utf8) else {
             throw AlfieCodeError.unreadableInput(path: inputFile.path)
         }
-        return try run(list: text, outputDirectory: outputDirectory, size: size)
+        return try run(list: text, outputDirectory: outputDirectory)
     }
 
-    public static func run(list: String, outputDirectory: URL, size: PrintSize) throws -> Result {
+    public static func run(list: String, outputDirectory: URL) throws -> Result {
         let codes = try HandleList.parse(list)
 
         let rendered = try codes.map { code -> (file: URL, link: URL, png: Data) in
@@ -27,7 +37,7 @@ public enum Generator {
             return (
                 file: outputDirectory.appendingPathComponent(code.fileName),
                 link: link,
-                png: try AlfieCodeImage.png(link: link, caption: code.caption, size: size)
+                png: try AlfieCodeImage.png(link: link, caption: code.caption, size: printSize)
             )
         }
 
@@ -43,6 +53,6 @@ public enum Generator {
             )
         }
 
-        return Result(files: rendered.map(\.file), links: rendered.map(\.link))
+        return Result(codes: rendered.map { .init(file: $0.file, link: $0.link) })
     }
 }

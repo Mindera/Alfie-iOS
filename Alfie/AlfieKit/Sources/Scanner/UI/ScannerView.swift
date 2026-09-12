@@ -36,7 +36,10 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         }
         .background(isShowingCamera ? Theme.surfaceBackgroundInvertedPrimary : Theme.surfaceBackgroundPrimary)
         .accessibilityIdentifier(AccessibilityID.Scanner.screen)
-        .onAppear { viewModel.viewDidAppear() }
+        .onAppear {
+            viewModel.viewDidAppear()
+            announceGuidance()
+        }
         .onDisappear { viewModel.viewDidDisappear() }
         .onChange(of: scenePhase) { phase in
             viewModel.didChangeScenePhase(isActive: phase == .active)
@@ -57,14 +60,25 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         viewModel.state.failure == nil
     }
 
-    /// What the shopper was last told about a code, if anything. Read in three places, so the walk
-    /// into the state is done once here rather than repeated at each of them.
+    /// What the shopper was last told about a code, if anything. Read in three places, so it is named
+    /// once here rather than repeated at each of them.
     private var notice: ScannerNotice? {
-        viewModel.state.value?.notice
+        viewModel.notice
     }
 
     private var guidanceText: String? {
-        viewModel.state.value?.guidance
+        viewModel.guidance
+    }
+
+    /// The screen opens straight onto a live camera, so a shopper using VoiceOver has nothing to read
+    /// and no reason to know what to point it at unless they are told.
+    ///
+    /// Posted as `.screenChanged` rather than `.announcement`: the screen is being presented at this
+    /// moment, and a plain announcement made into that moment is routinely dropped in favour of the
+    /// focus change that follows it. `.screenChanged` is that focus change, and speaks its argument.
+    private func announceGuidance() {
+        guard let guidanceText else { return }
+        UIAccessibility.post(notification: .screenChanged, argument: guidanceText)
     }
 
     private var camera: some View {
@@ -184,8 +198,8 @@ private enum Constants {
         viewModel: MockScannerViewModel(
             state: .success(
                 .init(
-                    guidance: "Point the camera at the Alfie code on the tag",
-                    notice: .init(id: 1, message: "That code doesn't open anything in Alfie.")
+                    guidance: L10n.Scanner.Guidance.message,
+                    notice: .init(id: 1, message: L10n.Scanner.Unrecognised.message)
                 )
             )
         )
@@ -197,8 +211,8 @@ private enum Constants {
         viewModel: MockScannerViewModel(
             state: .success(
                 .init(
-                    guidance: "Point the camera at the Alfie code on the tag",
-                    notice: .init(id: 1, message: "That's the product barcode. Scan the Alfie code on the tag instead.")
+                    guidance: L10n.Scanner.Guidance.message,
+                    notice: .init(id: 1, message: L10n.Scanner.BarcodeDetected.message)
                 )
             )
         )

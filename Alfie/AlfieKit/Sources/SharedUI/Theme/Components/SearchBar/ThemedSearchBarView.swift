@@ -171,10 +171,28 @@ public struct ThemedSearchBarView: View {
     private let autoFocusWhenAppearing: AutoFocusSetting
     private let inputAccessibilityId: String
     private let clearAccessibilityId: String
-    /// Drawn inside the bar, at its trailing edge. Present only on a bar that has a second control
-    /// behind it — today, Scan. Supplying one also moves the magnifying glass to the leading edge,
-    /// so the two icons bracket the text instead of crowding the same corner.
-    private let trailingAccessory: AnyView?
+    /// Where the magnifying glass sits, and what — if anything — shares the bar with it.
+    ///
+    /// One choice rather than two, because it is one decision: a bar with a second control needs the
+    /// magnifier out of that control's corner, and a bar without one has nothing to make room for.
+    public enum IconLayout {
+        /// The magnifying glass overlays the trailing end of the text. The bar's default.
+        case magnifierOnly
+        /// The magnifying glass leads and `accessory` trails, the two bracketing the text. For a bar
+        /// that has a second control behind it — today, Scan.
+        case magnifierLeading(accessory: AnyView)
+
+        var accessory: AnyView? {
+            switch self {
+            case .magnifierOnly:
+                return nil
+            case .magnifierLeading(let accessory):
+                return accessory
+            }
+        }
+    }
+
+    private let iconLayout: IconLayout
     public let onCancelTap: (() -> Void)?
     public let onClearTap: (() -> Void)?
     public let onSubmitTap: (() -> Void)?
@@ -196,7 +214,7 @@ public struct ThemedSearchBarView: View {
         autoFocusWhenAppearing: AutoFocusSetting = .off,
         inputAccessibilityId: String? = nil,
         clearAccessibilityId: String? = nil,
-        trailingAccessory: AnyView? = nil,
+        iconLayout: IconLayout = .magnifierOnly,
         onCancelTap: (() -> Void)? = nil,
         onClearTap: (() -> Void)? = nil,
         onSubmitTap: (() -> Void)? = nil,
@@ -213,7 +231,7 @@ public struct ThemedSearchBarView: View {
         self.autoFocusWhenAppearing = autoFocusWhenAppearing
         self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityId.inputAccessibilityId
         self.clearAccessibilityId = clearAccessibilityId ?? AccessibilityId.clearAccessibilityId
-        self.trailingAccessory = trailingAccessory
+        self.iconLayout = iconLayout
         self.onCancelTap = onCancelTap
         self.onClearTap = onClearTap
         self.onSubmitTap = onSubmitTap
@@ -234,8 +252,8 @@ public struct ThemedSearchBarView: View {
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
-            HStack(spacing: trailingAccessory == nil ? 0 : theme.horizontalContentPadding) {
-                if trailingAccessory != nil {
+            HStack(spacing: iconLayout.accessory == nil ? 0 : theme.horizontalContentPadding) {
+                if iconLayout.accessory != nil {
                     magnifyingGlassIcon
                 }
 
@@ -282,7 +300,7 @@ public struct ThemedSearchBarView: View {
                     onSubmitTap?()
                 }
 
-                trailingAccessory
+                iconLayout.accessory
             }
             .padding(.horizontal, theme.horizontalContentPadding)
             .padding(.vertical, Primitives.Spacing.spacing16)
@@ -329,12 +347,12 @@ public struct ThemedSearchBarView: View {
             .accessibilityHidden(true)
     }
 
-    /// The clear button always overlays the text. The magnifying glass only joins it here on a bar
-    /// with no trailing accessory — otherwise it has already been placed at the leading edge.
+    /// The clear button always overlays the text. The magnifying glass only joins it here under
+    /// ``IconLayout/magnifierOnly`` — otherwise it has already been placed at the leading edge.
     @ViewBuilder private var textFieldOverlayIcon: some View {
         if isClearButtonVisible {
             clearButton
-        } else if trailingAccessory == nil {
+        } else if iconLayout.accessory == nil {
             magnifyingGlassIcon
         }
     }

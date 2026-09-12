@@ -27,20 +27,17 @@ guard arguments.count == 2, let input = arguments.first, let output = arguments.
     fail(usage, code: 2)
 }
 
-let size = PrintSize.swingTag
-
 do {
     let result = try Generator.run(
         inputFile: URL(fileURLWithPath: input),
-        outputDirectory: URL(fileURLWithPath: output, isDirectory: true),
-        size: size
+        outputDirectory: URL(fileURLWithPath: output, isDirectory: true)
     )
-    for (file, link) in zip(result.files, result.links) {
-        print("  \(file.lastPathComponent)  →  \(link.absoluteString)")
+    for code in result.codes {
+        print("  \(code.file.lastPathComponent)  →  \(code.link.absoluteString)")
     }
     print(
-        "✅ Wrote \(result.files.count) Alfie code(s) to \(output), "
-            + "each printing \(Int(size.millimetres))mm square at 100% scale."
+        "✅ Wrote \(result.codes.count) Alfie code(s) to \(output), "
+            + "each printing \(Int(Generator.printSize.millimetres))mm square at 100% scale."
     )
 } catch let error as AlfieCodeError {
     fail("❌ \(error.description)", code: 1)

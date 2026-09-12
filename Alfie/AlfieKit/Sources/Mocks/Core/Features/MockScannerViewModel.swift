@@ -8,6 +8,8 @@ public class MockScannerViewModel: ScannerViewModelProtocol {
     /// A stand-in for the camera feed, so a preview or a test renders the chrome over something
     /// solid rather than over nothing.
     public var preview: AnyView
+    public var guidance: String? { state.value?.guidance }
+    public var notice: ScannerNotice? { state.value?.notice }
 
     public init(
         state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = .success(

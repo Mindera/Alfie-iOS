@@ -54,6 +54,7 @@ final class ScannerViewModelTests: XCTestCase {
                 analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 log: MockLogger()
             ),
+            source: .searchBar,
             // The flow's closures, standing in for HomeFlowViewModel: the first hands the scanned
             // link to the real deep-link service, so these tests still assert on the link the app
             // routes.
@@ -102,6 +103,7 @@ final class ScannerViewModelTests: XCTestCase {
                 analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 log: MockLogger()
             ),
+            source: .searchBar,
             openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
             openAppSettings: { },
             close: { eventsInOrder.append("close") }
@@ -567,6 +569,58 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertTrue(reportedScanFailures.isEmpty)
     }
 
+    // MARK: - Reporting a scan that started, and one that worked
+
+    /// `scan_started` is the denominator the other two scan events are read against, so it carries
+    /// the door the shopper came in through.
+    func test_openingTheScannerIsReportedAsStarted() {
+        sut.viewDidAppear()
+
+        XCTAssertEqual(reportedScanStarts, ["search_bar"])
+    }
+
+    /// Presentations, not appearances. The screen appears again every time the app returns to the
+    /// foreground, and counting those would inflate the denominator against which the other two
+    /// events are read.
+    func test_theScannerIsReportedStartedOncePerPresentation() {
+        sut.viewDidAppear()
+        sut.didChangeScenePhase(isActive: false)
+        sut.didChangeScenePhase(isActive: true)
+        sut.viewDidAppear()
+
+        XCTAssertEqual(reportedScanStarts, ["search_bar"])
+    }
+
+    func test_aScannedAlfieCodeIsReportedAsSucceededWithItsHandle() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertEqual(reportedScanSuccessHandles, ["slim-indigo-jean"])
+        XCTAssertEqual(reportedScanSuccessSkuFlags, [false])
+    }
+
+    /// The codes are printed both with and without a SKU, and the SKU is parsed but not yet acted
+    /// on. This flag is how we see how much would change once it is.
+    func test_aScannedAlfieCodeCarryingASkuRecordsThat() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.alfieCodeWithSku)
+
+        XCTAssertEqual(reportedScanSuccessHandles, ["slim-indigo-jean"])
+        XCTAssertEqual(reportedScanSuccessSkuFlags, [true])
+    }
+
+    /// A code that opens nothing is a failure, and must not also appear as a success — the two are
+    /// read as a pair.
+    func test_aBarcodeIsNotReportedAsSucceeded() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.barcode)
+
+        XCTAssertTrue(reportedScanSuccessHandles.isEmpty)
+    }
+
     // MARK: - Closing
 
     func test_closingDismissesWithoutOpeningAProduct() {
@@ -583,6 +637,25 @@ final class ScannerViewModelTests: XCTestCase {
     /// The `reason` carried by each `scan_failed` event, in order.
     private var reportedScanFailures: [String] {
         mockAnalytics.trackedValues(of: .reason, for: .scanFailed)
+    }
+
+    /// The `source` carried by each `scan_started` event, in order.
+    private var reportedScanStarts: [String] {
+        mockAnalytics.trackedValues(of: .source, for: .scanStarted)
+    }
+
+    /// The `handle` carried by each `scan_succeeded` event, in order.
+    private var reportedScanSuccessHandles: [String] {
+        mockAnalytics.trackedValues(of: .handle, for: .scanSucceeded)
+    }
+
+    /// The `has_sku` flag carried by each `scan_succeeded` event, in order. Read off the events
+    /// directly rather than through `trackedValues(of:for:)`, which only reads String parameters.
+    private var reportedScanSuccessSkuFlags: [Bool] {
+        mockAnalytics.trackedEvents.compactMap { event in
+            guard case .action(.scanSucceeded, let parameters) = event else { return nil }
+            return parameters?[.hasSku] as? Bool
+        }
     }
 
     private func handledHandle() throws -> String {

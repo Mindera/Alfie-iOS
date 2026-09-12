@@ -57,7 +57,7 @@ public struct SearchBarEntryButton: View {
                 placeholder: placeholder,
                 theme: Constants.barTheme,
                 dismissConfiguration: .init(type: .hidden),
-                trailingAccessory: scan.map { _ in AnyView(scanGlyph) }
+                iconLayout: iconLayout
             )
             .allowsHitTesting(false)
             .accessibilityHidden(true)
@@ -65,6 +65,13 @@ public struct SearchBarEntryButton: View {
         .buttonStyle(.plain)
         .accessibilityIdentifier(accessibilityIdentifier)
         .accessibilityLabel(placeholder)
+    }
+
+    /// A Scan control moves the magnifier to the leading edge so the two bracket the text; without
+    /// one the bar keeps its default single trailing icon.
+    private var iconLayout: ThemedSearchBarView.IconLayout {
+        guard scan != nil else { return .magnifierOnly }
+        return .magnifierLeading(accessory: AnyView(scanGlyph))
     }
 
     /// Matches the bar's own magnifying glass, so the pair bracketing the text reads as one set.

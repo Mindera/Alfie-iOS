@@ -159,6 +159,7 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -468,6 +469,7 @@ let package = Package(
                 "DeepLink",
                 "Mocks",
                 "Scanner",
+                "SharedUI",
                 "TestUtils",
             ]
         ),

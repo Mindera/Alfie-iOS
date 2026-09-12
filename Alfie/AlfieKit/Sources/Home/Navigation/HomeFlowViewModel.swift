@@ -68,6 +68,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     private func makeScannerViewModel() -> ScannerViewModel {
         ScannerViewModel(
             dependencies: dependencies.scannerDependencyContainer,
+            source: .searchBar,
             openScannedLink: { [weak self] url in
                 self?.dependencies.deepLinkService.openUrls([url])
             },
