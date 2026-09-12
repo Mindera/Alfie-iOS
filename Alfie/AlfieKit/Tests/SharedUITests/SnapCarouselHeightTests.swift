@@ -7,19 +7,12 @@ import XCTest
 final class SnapCarouselHeightTests: XCTestCase {
     private let width: CGFloat = 300
 
-
-    /// SwiftUI snaps resolved sizes to the pixel grid, so a measured height can sit up to half a
-    /// pixel from the arithmetic. At `displayScale` 3 that is 1/6pt — `300 / 0.77` resolves to
-    /// 389.667, not 389.610. This is the budget for that rounding and nothing else: a real layout
-    /// regression moves whole points.
-    private let layoutGrid: CGFloat = 0.2
-
     func test_hugMode_adoptsTheHeightOfItsContent() {
         // A 1:1 item in a 300pt-wide carousel is 300pt tall.
         let height = resolvedHeight(itemAspectRatio: nil) {
             [AnyView(Color.red.aspectRatio(1, contentMode: .fit))]
         }
-        XCTAssertEqual(height, width, accuracy: layoutGrid)
+        XCTAssertEqual(height, width, accuracy: 1)
     }
 
     func test_hugMode_adoptsATallerContentHeight() {
@@ -27,7 +20,7 @@ final class SnapCarouselHeightTests: XCTestCase {
         let height = resolvedHeight(itemAspectRatio: nil) {
             [AnyView(Color.red.aspectRatio(0.75, contentMode: .fit))]
         }
-        XCTAssertEqual(height, width / 0.75, accuracy: layoutGrid)
+        XCTAssertEqual(height, width / 0.75, accuracy: 1)
     }
 
     /// The PDP gallery item is not a shape with a declared ratio — it is a `resizable()` image with
@@ -39,7 +32,7 @@ final class SnapCarouselHeightTests: XCTestCase {
         let height = resolvedHeight(itemAspectRatio: nil) {
             [AnyView(Image(uiImage: portrait).resizable().aspectRatio(contentMode: .fit))]
         }
-        XCTAssertEqual(height, width * 300 / 200, accuracy: layoutGrid)
+        XCTAssertEqual(height, width * 300 / 200, accuracy: 1)
     }
 
     private static func solidImage(width: CGFloat, height: CGFloat) -> UIImage {
@@ -51,14 +44,14 @@ final class SnapCarouselHeightTests: XCTestCase {
 
     func test_hugMode_collapsesWhenThereIsNothingToShow() {
         let height = resolvedHeight(itemAspectRatio: nil) { [] }
-        XCTAssertEqual(height, 0, accuracy: layoutGrid)
+        XCTAssertEqual(height, 0, accuracy: 1)
     }
 
     func test_fixedRatio_isUnaffectedByTheHugPath() {
         let height = resolvedHeight(itemAspectRatio: 0.77) {
             [AnyView(Color.red)]
         }
-        XCTAssertEqual(height, width / 0.77, accuracy: layoutGrid)
+        XCTAssertEqual(height, width / 0.77, accuracy: 1)
     }
 
     /// A carousel first built around one reserved placeholder and then handed the real image set
@@ -110,13 +103,13 @@ final class SnapCarouselHeightTests: XCTestCase {
         settle(host)
 
         let reserved = host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height
-        XCTAssertEqual(reserved, width, accuracy: layoutGrid, "the placeholder reserves a square")
+        XCTAssertEqual(reserved, width, accuracy: 1, "the placeholder reserves a square")
 
         host.rootView = carousel(items: images)
         settle(host)
 
         let grown = host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height
-        XCTAssertEqual(grown, width * 300 / 200, accuracy: layoutGrid, "the carousel must adopt the taller image's height")
+        XCTAssertEqual(grown, width * 300 / 200, accuracy: 1, "the carousel must adopt the taller image's height")
     }
 
     /// `RemoteImage` does not swap the item set — it keeps one item whose *content* changes from the
@@ -139,7 +132,7 @@ final class SnapCarouselHeightTests: XCTestCase {
         XCTAssertEqual(
             host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height,
             width,
-            accuracy: layoutGrid,
+            accuracy: 1,
             "the reserved placeholder is square"
         )
 
@@ -149,7 +142,7 @@ final class SnapCarouselHeightTests: XCTestCase {
         XCTAssertEqual(
             host.sizeThatFits(in: .init(width: width, height: .greatestFiniteMagnitude)).height,
             width / 0.75,
-            accuracy: layoutGrid,
+            accuracy: 1,
             "the carousel must adopt the loaded image's 3:4 height"
         )
     }

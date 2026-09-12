@@ -68,19 +68,20 @@ review** — treat it as a defect in the diff, not a style preference. Two shape
 
 - **Computed arithmetic** — `0.001` or tighter. The expected value is exact, so the budget covers
   representation error alone.
-- **Measured SwiftUI layout** — the pixel grid, and say so in a named constant. Resolved sizes snap
-  to the grid, so a height lands up to half a pixel off the arithmetic: at `displayScale` 3,
-  `300 / 0.77` resolves to 389.667, not 389.610. `SnapCarouselHeightTests.layoutGrid` (0.2pt) is the
-  reference.
+- **Measured SwiftUI layout** — the pixel grid, named in a constant so the number is traceable.
+  Resolved sizes snap to the grid, so a height lands up to half a pixel off the arithmetic: at
+  `displayScale` 3, `300 / 0.77` resolves to 389.667, not 389.610. That makes the budget 1/6pt, so
+  `0.2` covers it with headroom.
 
-That carousel file sat at `accuracy: 1` — roughly 6× wider than the grid requires, enough to hide a
-real layout regression. Read any bare literal above `0.001` as unexamined until someone shows the
-maths behind it.
+Read any bare literal above `0.001` as unexamined until someone shows the maths behind it.
 
-**Unswept, and not precedent.** The five colour-channel assertions in `SnapCarouselHeightTests` still
-use `accuracy: 0.1` against a 0–1 channel. Pixel sampling carries genuine noise, so the right budget
-has to be measured rather than guessed. They are known debt pending a suite-wide tolerance review;
-match the rule above in new code rather than copying them.
+**Unswept, and not precedent.** `SnapCarouselHeightTests` is the known case: nine layout assertions
+at `accuracy: 1`, roughly 6× wider than the grid requires and enough to hide a real regression, plus
+five colour-channel assertions at `accuracy: 0.1` against a 0–1 channel. Tightening the layout nine
+to `0.001` was measured: eight still pass, and the ninth exposes a 0.056pt gap that `1` was absorbing
+— the grid rounding above. The colour budget needs measuring rather than guessing, since pixel
+sampling carries real noise. All fourteen are debt pending a suite-wide tolerance review; match the
+rule above in new code rather than copying them.
 
 ### Framework
 
