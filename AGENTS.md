@@ -59,7 +59,7 @@ Read the guide when its trigger fires:
 | `Docs/Development.md` | Starting a feature from a spec |
 | `Docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
 | `Docs/Localization.md` | Adding or renaming an `L10n` key |
-| `Docs/Testing.md` | Writing unit tests, mocks or fixtures |
+| `Docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures |
 | `Docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
 | `Docs/Accessibility.md` | Adding UI that a UI test will target |
 | `Docs/DesignTokens.md` | Picking a colour, spacing, radius or type value; refreshing tokens |
