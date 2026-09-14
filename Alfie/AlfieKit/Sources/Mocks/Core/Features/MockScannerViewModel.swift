@@ -14,17 +14,20 @@ public class MockScannerViewModel: ScannerViewModelProtocol {
     public var guidance: String? { state.value?.guidance }
     public var notice: ScannerNotice? { state.value?.notice }
     public var isRecognised: Bool { state.value?.isRecognised ?? false }
+    @Published public var isExplainingCameraAccess: Bool
 
     public init(
         title: String = "Scan",
         state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = .success(
             .init(guidance: "Point the camera at the Alfie code on the tag")
         ),
-        preview: AnyView = AnyView(Color.gray)
+        preview: AnyView = AnyView(Color.gray),
+        isExplainingCameraAccess: Bool = false
     ) {
         self.title = title
         self.state = state
         self.preview = preview
+        self.isExplainingCameraAccess = isExplainingCameraAccess
     }
 
     public var onViewDidAppearCalled: (() -> Void)?
@@ -45,6 +48,16 @@ public class MockScannerViewModel: ScannerViewModelProtocol {
     public var onDidTapCloseCalled: (() -> Void)?
     public func didTapClose() {
         onDidTapCloseCalled?()
+    }
+
+    public var onDidTapContinueToCameraCalled: (() -> Void)?
+    public func didTapContinueToCamera() {
+        onDidTapContinueToCameraCalled?()
+    }
+
+    public var onDidDeclineCameraAccessCalled: (() -> Void)?
+    public func didDeclineCameraAccess() {
+        onDidDeclineCameraAccessCalled?()
     }
 
     public var onDidDismissNoticeCalled: (() -> Void)?

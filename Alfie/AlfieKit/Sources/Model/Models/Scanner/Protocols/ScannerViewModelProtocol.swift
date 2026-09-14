@@ -15,8 +15,8 @@ public protocol ScannerViewModelProtocol: ObservableObject {
     var guidance: String? { get }
     /// What the shopper was last told about a code, if anything.
     var notice: ScannerNotice? { get }
-    /// An Alfie code has been recognised and its page is about to open.
     var isRecognised: Bool { get }
+    var isExplainingCameraAccess: Bool { get }
 
     func viewDidAppear()
     func viewDidDisappear()
@@ -24,6 +24,8 @@ public protocol ScannerViewModelProtocol: ObservableObject {
     /// backgrounded app is both a battery cost and a privacy one.
     func didChangeScenePhase(isActive: Bool)
     func didTapClose()
+    func didTapContinueToCamera()
+    func didDeclineCameraAccess()
     /// The notice has been read and dismissed. The camera never stopped, so there is nothing to resume.
     func didDismissNotice()
     /// Only offered for ``ScannerViewErrorType/cameraPermissionDenied``: it is the one failure the

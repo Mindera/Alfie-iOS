@@ -16,13 +16,12 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     private let dependencies: CategorySelectorFlowDependencyContainer
     /// Which screen, if any, is covering the tab. One value rather than a flag per screen, so a
     /// second overlay cannot open behind the first and so `overlayView` has a single writer.
-    enum Overlay {
+    private enum Overlay {
         case search
-        case scannerIntro
         case scanner
     }
 
-    @Published private(set) var overlay: Overlay?
+    @Published private var overlay: Overlay?
     @Published private var overlayView: AnyView?
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
@@ -50,14 +49,6 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
                 switch overlay {
                 case .search:
                     overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
-
-                case .scannerIntro:
-                    overlayView = AnyView(
-                        ScannerPresentation.makeIntroView(
-                            onContinue: { [weak self] in self?.overlay = .scanner },
-                            onNotNow: { [weak self] in self?.overlay = nil }
-                        )
-                    )
 
                 case .scanner:
                     overlayView = AnyView(ScannerView(viewModel: makeScannerViewModel()))
@@ -279,9 +270,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     }
 
     public func presentScanner() {
-        overlay = ScannerPresentation.needsIntro(dependencies: dependencies.scannerDependencyContainer)
-            ? .scannerIntro
-            : .scanner
+        overlay = .scanner
     }
 
     // MARK: - FlowViewModelProtocol

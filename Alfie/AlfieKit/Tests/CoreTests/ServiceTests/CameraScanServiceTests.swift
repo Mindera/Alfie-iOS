@@ -1,3 +1,4 @@
+import AVFoundation
 import Combine
 import Mocks
 import Model
@@ -92,13 +93,30 @@ final class CameraScanServiceTests: XCTestCase {
         XCTAssertEqual(failures, [.unavailable])
     }
 
+    // MARK: - Camera access explainer
+
+    @MainActor
+    func test_cameraAccessCanBeAskedForOnlyBeforeIOSHasAsked() {
+        XCTAssertTrue(makeSut(isDeviceSupported: true, isAccessGranted: false, status: .notDetermined).canAskForCameraAccess)
+        XCTAssertFalse(makeSut(isDeviceSupported: true, isAccessGranted: false, status: .denied).canAskForCameraAccess)
+        XCTAssertFalse(makeSut(isDeviceSupported: true, isAccessGranted: true, status: .authorized).canAskForCameraAccess)
+    }
+
+    @MainActor
+    func test_aDeviceThatCannotScanIsNeverOfferedCameraAccess() {
+        let sut = makeSut(isDeviceSupported: false, isAccessGranted: false, status: .notDetermined)
+
+        XCTAssertFalse(sut.canAskForCameraAccess)
+    }
+
     // MARK: - Helpers
 
     @MainActor
     private func makeSut(
         isDeviceSupported: Bool,
         isAccessGranted: Bool,
-        isScanningAvailable: Bool = true
+        isScanningAvailable: Bool = true,
+        status: AVAuthorizationStatus = .notDetermined
     ) -> CameraScanService {
         let sut = CameraScanService(
             log: MockLogger(),
@@ -109,7 +127,8 @@ final class CameraScanServiceTests: XCTestCase {
             requestCameraAccess: { [weak self] in
                 self?.accessRequestCount += 1
                 return isAccessGranted
-            }
+            },
+            cameraAuthorizationStatus: { status }
         )
         sut.failurePublisher
             .sink { [weak self] in self?.failures.append($0) }

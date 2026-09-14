@@ -22,6 +22,7 @@ final class ScannerViewModelTests: XCTestCase {
     private var mockAnalytics: MockAnalyticsTracker!
     private var mockHaptics: MockHapticsService!
     private var triggeredHaptics: [HapticType]!
+    private var scheduler: TestScheduler!
     private var sut: ScannerViewModel!
 
     /// The format the generator prints — see `Tools/AlfieCodeGen` and ADR-0001.
@@ -40,6 +41,7 @@ final class ScannerViewModelTests: XCTestCase {
         openSettingsCount = 0
         mockAnalytics = MockAnalyticsTracker()
         triggeredHaptics = []
+        scheduler = TestScheduler()
         mockHaptics = MockHapticsService()
         mockHaptics.onTriggerCalled = { [weak self] in self?.triggeredHaptics.append($0) }
         scanService = MockCameraScanService()
@@ -68,6 +70,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut = nil
         mockHaptics = nil
         triggeredHaptics = nil
+        scheduler = nil
         deepLinkService = nil
         scanService = nil
         handledDeepLinks = nil
@@ -83,6 +86,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise(Self.alfieCode)
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
         XCTAssertEqual(closeCount, 1)
@@ -108,22 +112,12 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise(Self.alfieCode)
+        finishRecognitionFeedback()
 
         XCTAssertEqual(eventsInOrder, ["close", "open"])
     }
 
-    /// The shopper is shown that the code worked — a success haptic and the frame turning green —
-    /// before the scanner gives way to the product.
     func test_anAlfieCodeIsConfirmedBeforeItsProductOpens() throws {
-        var handOff: (() -> Void)?
-        let scanService = MockCameraScanService()
-        let sut = ScannerViewModel(
-            dependencies: makeDependencies(scanService: scanService, afterRecognitionFeedback: { handOff = $0 }),
-            source: .searchBar,
-            openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
-            openAppSettings: { },
-            close: { [weak self] in self?.closeCount += 1 }
-        )
         sut.viewDidAppear()
 
         scanService.recognise(Self.alfieCode)
@@ -136,10 +130,21 @@ final class ScannerViewModelTests: XCTestCase {
             return XCTFail("Expected a success haptic, got \(triggeredHaptics ?? [])")
         }
 
-        try XCTUnwrap(handOff)()
+        finishRecognitionFeedback()
 
         XCTAssertEqual(closeCount, 1)
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+    }
+
+    func test_goingBackWhileTheCodeIsConfirmedOpensNothing() {
+        sut.viewDidAppear()
+        scanService.recognise(Self.alfieCode)
+
+        sut.didTapClose()
+        finishRecognitionFeedback()
+
+        XCTAssertEqual(closeCount, 1)
+        XCTAssertTrue(handledDeepLinks.isEmpty)
     }
 
     func test_aCodeThatIsNotAnAlfieCodeIsNotConfirmed() {
@@ -158,17 +163,16 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise(Self.multiSegmentAlfieCode)
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try handledHandle(), "mens/jeans/slim-indigo")
     }
 
-    /// The SKU has to survive the scanner intact for the Product to open on the scanned Variant.
-    /// Preselecting it is `TabRoute` and the Product Details page's doing, covered by
-    /// `DeepLinkRoutingTests` and `ProductDetailsViewModelTests`.
     func test_aSkuInTheCodeIsCarriedIntoTheDeepLink() throws {
         sut.viewDidAppear()
 
         scanService.recognise(Self.alfieCodeWithSku)
+        finishRecognitionFeedback()
 
         let deepLink = try XCTUnwrap(handledDeepLinks.first)
         guard case .productDetail(let handle, _, let query) = deepLink.type else {
@@ -185,6 +189,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         scanService.recognise(Self.alfieCode)
         scanService.recognise(Self.alfieCode)
+        finishRecognitionFeedback()
 
         XCTAssertEqual(handledDeepLinks.count, 1)
         XCTAssertEqual(closeCount, 1)
@@ -249,6 +254,7 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(closeCount, 0)
 
         scanService.recognise(Self.alfieCode)
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
     }
@@ -260,6 +266,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise("https://localhost:4000/wishlist")
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try XCTUnwrap(handledDeepLinks.last).type, .wishlist)
         XCTAssertEqual(closeCount, 1)
@@ -306,6 +313,75 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.value?.guidance, L10n.Scanner.Guidance.message)
     }
 
+    func test_aNoticeDismissesItself() {
+        sut.viewDidAppear()
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        scheduler.advance(by: ScannerViewModel.noticeDuration - 1)
+        XCTAssertNotNil(sut.state.value?.notice)
+
+        scheduler.advance(by: 1)
+        XCTAssertNil(sut.state.value?.notice)
+        XCTAssertTrue(scanService.isScanning)
+    }
+
+    func test_aRepeatedNoticeStaysForItsOwnFullDuration() {
+        sut.viewDidAppear()
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        scheduler.advance(by: ScannerViewModel.noticeDuration / 2)
+
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        scheduler.advance(by: ScannerViewModel.noticeDuration / 2)
+        XCTAssertNotNil(sut.state.value?.notice)
+
+        scheduler.advance(by: ScannerViewModel.noticeDuration / 2)
+        XCTAssertNil(sut.state.value?.notice)
+    }
+
+    // MARK: - Explaining camera access
+
+    func test_cameraAccessIsExplainedBeforeIOSAsksForIt() {
+        let sut = makeSut(canAskForCameraAccess: true)
+
+        sut.viewDidAppear()
+
+        XCTAssertTrue(sut.isExplainingCameraAccess)
+        XCTAssertFalse(scanService.isScanning)
+    }
+
+    func test_cameraAccessIsNotExplainedOnceIOSHasAsked() {
+        XCTAssertFalse(sut.isExplainingCameraAccess)
+    }
+
+    func test_continuingFromTheExplanationStartsTheCamera() {
+        let sut = makeSut(canAskForCameraAccess: true)
+
+        sut.didTapContinueToCamera()
+        sut.viewDidAppear()
+
+        XCTAssertFalse(sut.isExplainingCameraAccess)
+        XCTAssertTrue(scanService.isScanning)
+        XCTAssertEqual(closeCount, 0)
+    }
+
+    func test_decliningTheExplanationClosesTheScanner() {
+        let sut = makeSut(canAskForCameraAccess: true)
+
+        sut.didDeclineCameraAccess()
+
+        XCTAssertEqual(closeCount, 1)
+        XCTAssertEqual(scanService.startCount, 0)
+    }
+
+    func test_theExplanationGoingAwayAfterContinuingDoesNotClose() {
+        let sut = makeSut(canAskForCameraAccess: true)
+
+        sut.didTapContinueToCamera()
+        sut.didDeclineCameraAccess()
+
+        XCTAssertEqual(closeCount, 0)
+    }
+
     // MARK: - Scanning the manufacturer's Barcode
 
     /// The Barcode is the obvious thing to point a camera at, and in a demo somebody will. Alfie
@@ -340,6 +416,7 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertTrue(scanService.isScanning)
 
         scanService.recognise(Self.alfieCode)
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
     }
@@ -351,6 +428,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         scanService.recognise([Self.barcode, Self.alfieCode])
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
         XCTAssertNil(sut.state.value?.notice)
@@ -367,6 +445,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         scanService.recognise([Self.barcode])
         scanService.recognise([Self.barcode, Self.alfieCode])
+        finishRecognitionFeedback()
 
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
         XCTAssertEqual(closeCount, 1)
@@ -631,8 +710,6 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(reportedScanSuccessSkuFlags, [false])
     }
 
-    /// The codes are printed both with and without a SKU, and the SKU is parsed but not yet acted
-    /// on. This flag is how we see how much would change once it is.
     func test_aScannedAlfieCodeCarryingASkuRecordsThat() {
         sut.viewDidAppear()
 
@@ -665,19 +742,30 @@ final class ScannerViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeDependencies(
-        scanService: MockCameraScanService,
-        afterRecognitionFeedback: @escaping (@escaping () -> Void) -> Void = { $0() }
-    ) -> ScannerDependencyContainer {
+    private func makeDependencies(scanService: MockCameraScanService) -> ScannerDependencyContainer {
         .init(
             deepLinkService: deepLinkService,
             makeScanService: { scanService },
             analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
             haptics: mockHaptics,
-            isCameraAccessUndetermined: { false },
-            afterRecognitionFeedback: afterRecognitionFeedback,
+            schedule: { [scheduler] in scheduler?.schedule(after: $0, $1) },
             log: MockLogger()
         )
+    }
+
+    private func makeSut(canAskForCameraAccess: Bool) -> ScannerViewModel {
+        scanService.canAskForCameraAccess = canAskForCameraAccess
+        return ScannerViewModel(
+            dependencies: makeDependencies(scanService: scanService),
+            source: .searchBar,
+            openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
+            openAppSettings: { },
+            close: { [weak self] in self?.closeCount += 1 }
+        )
+    }
+
+    private func finishRecognitionFeedback() {
+        scheduler.advance(by: ScannerViewModel.recognitionFeedbackDuration)
     }
 
     /// The `reason` carried by each `scan_failed` event, in order.
@@ -711,5 +799,24 @@ final class ScannerViewModelTests: XCTestCase {
             return ""
         }
         return handle
+    }
+}
+
+private final class TestScheduler {
+    private var now: TimeInterval = 0
+    private var pending: [(due: TimeInterval, work: () -> Void)] = []
+
+    func schedule(after delay: TimeInterval, _ work: @escaping () -> Void) {
+        pending.append((now + delay, work))
+    }
+
+    func advance(by interval: TimeInterval) {
+        let target = now + interval
+        while let index = pending.indices.filter({ pending[$0].due <= target }).min(by: { pending[$0].due < pending[$1].due }) {
+            let item = pending.remove(at: index)
+            now = item.due
+            item.work()
+        }
+        now = target
     }
 }

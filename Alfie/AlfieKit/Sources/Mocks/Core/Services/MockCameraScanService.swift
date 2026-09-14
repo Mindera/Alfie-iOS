@@ -9,6 +9,7 @@ public final class MockCameraScanService: CameraScanServiceProtocol {
     private let failureSubject = PassthroughSubject<CameraScanFailure, Never>()
     public var failurePublisher: AnyPublisher<CameraScanFailure, Never> { failureSubject.eraseToAnyPublisher() }
 
+    public var canAskForCameraAccess = false
     public private(set) var startCount = 0
     public private(set) var stopCount = 0
     /// What the camera would be doing, inferred from the calls made rather than tracked separately,

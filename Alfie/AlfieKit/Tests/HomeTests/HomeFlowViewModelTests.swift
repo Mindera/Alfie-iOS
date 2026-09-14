@@ -51,18 +51,7 @@ final class HomeFlowViewModelTests: XCTestCase {
     func test_tappingScanPresentsTheScanner() {
         sut.makeHomeViewModel().didTapScan()
 
-        XCTAssertEqual(sut.overlay, .scanner)
         XCTAssertNotNil(overlayViews.last ?? nil)
-    }
-
-    func test_tappingScanBeforeCameraAccessIsAskedExplainsItFirst() {
-        sut = HomeFlowViewModel(
-            dependencies: Self.makeDependencies(serviceProvider: serviceProvider, isCameraAccessUndetermined: true)
-        )
-
-        sut.makeHomeViewModel().didTapScan()
-
-        XCTAssertEqual(sut.overlay, .scannerIntro)
     }
 
     func test_tappingSearchPresentsAnOverlayToo() {
@@ -100,10 +89,7 @@ final class HomeFlowViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private static func makeDependencies(
-        serviceProvider: MockServiceProvider,
-        isCameraAccessUndetermined: Bool = false
-    ) -> HomeFlowDependencyContainer {
+    private static func makeDependencies(serviceProvider: MockServiceProvider) -> HomeFlowDependencyContainer {
         let log = MockLogger()
 
         return HomeFlowDependencyContainer(
@@ -153,7 +139,6 @@ final class HomeFlowViewModelTests: XCTestCase {
                 makeScanService: { MockCameraScanService() },
                 analytics: serviceProvider.analytics,
                 haptics: serviceProvider.hapticsService,
-                isCameraAccessUndetermined: { isCameraAccessUndetermined },
                 log: log
             )
         )

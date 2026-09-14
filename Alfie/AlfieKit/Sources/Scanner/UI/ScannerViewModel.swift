@@ -11,7 +11,7 @@ import SwiftUI
 /// a recognised code is handed back to the flow, which passes it to the deep-link path the app
 /// already uses for a tapped link, and that path decides where it lands. ADR-0001 is what makes
 /// this possible: it puts the Handle inside the code, so there is nothing to look up and no new
-/// route to add. The Product opens on the Variant named by the SKU the code carries.
+/// route to add.
 ///
 /// It does own what the shopper is told when that does not happen, and the distinction it draws is
 /// between a scan that failed and a camera that cannot run. A code that opens nothing in Alfie is
@@ -24,7 +24,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private let deepLinkService: DeepLinkServiceProtocol
     private let analytics: AlfieAnalyticsTracker
     private let haptics: HapticsServiceProtocol
-    private let afterRecognitionFeedback: (@escaping () -> Void) -> Void
+    private let schedule: (TimeInterval, @escaping () -> Void) -> Void
     private let source: ScanEntryPoint
     private let openScannedLink: (URL) -> Void
     private let openAppSettings: () -> Void
@@ -38,6 +38,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private var isOnScreen = false
     private var isAppActive = true
     private var hasOpenedLink = false
+    private var isClosed = false
     private var isScanning = false
     /// Numbers the notices, so that the same words said twice are two notices rather than one. See
     /// ``ScannerNotice``.
@@ -53,6 +54,10 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     public var notice: ScannerNotice? { state.value?.notice }
     public var isRecognised: Bool { state.value?.isRecognised ?? false }
     @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = initialState
+    @Published public private(set) var isExplainingCameraAccess: Bool
+
+    static let recognitionFeedbackDuration: TimeInterval = 0.3
+    static let noticeDuration: TimeInterval = 4
 
     /// What the screen shows whenever a scan is starting: the guidance, and nothing said yet about
     /// a code. Named once, because a start after a failure has to arrive at exactly the state a
@@ -75,12 +80,13 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         self.deepLinkService = dependencies.deepLinkService
         self.analytics = dependencies.analytics
         self.haptics = dependencies.haptics
-        self.afterRecognitionFeedback = dependencies.afterRecognitionFeedback
+        self.schedule = dependencies.schedule
         self.log = dependencies.log
         self.source = source
         self.openScannedLink = openScannedLink
         self.openAppSettings = openAppSettings
         self.close = close
+        self.isExplainingCameraAccess = scanService.canAskForCameraAccess
         setupBindings()
     }
 
@@ -116,7 +122,17 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     }
 
     public func didTapClose() {
+        isClosed = true
         close()
+    }
+
+    public func didTapContinueToCamera() {
+        isExplainingCameraAccess = false
+    }
+
+    public func didDeclineCameraAccess() {
+        guard isExplainingCameraAccess else { return }
+        didTapClose()
     }
 
     public func didDismissNotice() {
@@ -149,11 +165,16 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private func show(notice message: String) {
         guard let model = state.value else { return }
         noticeCount += 1
-        state = .success(model.with(notice: .init(id: noticeCount, message: message)))
+        let id = noticeCount
+        state = .success(model.with(notice: .init(id: id, message: message)))
+        schedule(Self.noticeDuration) { [weak self] in
+            guard let self, notice?.id == id else { return }
+            didDismissNotice()
+        }
     }
 
     private func updateScanning() {
-        let shouldScan = isOnScreen && isAppActive && !hasOpenedLink
+        let shouldScan = isOnScreen && isAppActive && !hasOpenedLink && !isExplainingCameraAccess
         guard shouldScan != isScanning else { return }
         isScanning = shouldScan
 
@@ -252,10 +273,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             state = .success(model.recognised())
         }
         haptics.trigger(.notification(.success))
-        afterRecognitionFeedback { [weak self] in
-            guard let self else { return }
-            // Dismissed before the product opens, not left behind it: the deep-link path pushes onto
-            // a tab that the scanner is covering.
+        schedule(Self.recognitionFeedbackDuration) { [weak self] in
+            guard let self, !isClosed else { return }
             close()
             openScannedLink(url)
         }

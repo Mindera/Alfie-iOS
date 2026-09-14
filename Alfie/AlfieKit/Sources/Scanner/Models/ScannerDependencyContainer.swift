@@ -10,9 +10,7 @@ public final class ScannerDependencyContainer {
     let makeScanService: () -> CameraScanServiceProtocol
     let analytics: AlfieAnalyticsTracker
     let haptics: HapticsServiceProtocol
-    let isCameraAccessUndetermined: () -> Bool
-    /// Runs the hand-off once the recognised state has been on screen long enough to be seen.
-    let afterRecognitionFeedback: (@escaping () -> Void) -> Void
+    let schedule: (_ delay: TimeInterval, _ work: @escaping () -> Void) -> Void
     let log: Logger
 
     public init(
@@ -20,9 +18,8 @@ public final class ScannerDependencyContainer {
         makeScanService: @escaping () -> CameraScanServiceProtocol,
         analytics: AlfieAnalyticsTracker,
         haptics: HapticsServiceProtocol,
-        isCameraAccessUndetermined: @escaping () -> Bool,
-        afterRecognitionFeedback: @escaping (@escaping () -> Void) -> Void = {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: $0)
+        schedule: @escaping (_ delay: TimeInterval, _ work: @escaping () -> Void) -> Void = { delay, work in
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
         },
         log: Logger
     ) {
@@ -30,8 +27,7 @@ public final class ScannerDependencyContainer {
         self.makeScanService = makeScanService
         self.analytics = analytics
         self.haptics = haptics
-        self.isCameraAccessUndetermined = isCameraAccessUndetermined
-        self.afterRecognitionFeedback = afterRecognitionFeedback
+        self.schedule = schedule
         self.log = log
     }
 }

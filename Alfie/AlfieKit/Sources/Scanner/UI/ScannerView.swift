@@ -2,37 +2,69 @@ import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
+import Utils
 #if DEBUG
 import Mocks
 #endif
 
-/// The scanner screen: a header with the way back, the camera preview with a viewfinder, and the
-/// guidance that tells the shopper what to point it at.
+/// The scanner screen: the camera preview with a viewfinder, the guidance that tells the shopper
+/// what to point it at, and a way back.
 ///
-/// Presented as a full-screen overlay rather than pushed — it adds no navigation route, because a
-/// successful scan leaves through the deep-link path instead of a route of its own.
+/// Presented modally rather than pushed — it adds no navigation route, because a successful scan
+/// leaves through the deep-link path instead of a route of its own.
 ///
-/// Nothing here is ever blank. A code that is not ours puts a short-lived notice over a camera that
-/// keeps running, and a camera that cannot run at all is replaced by ``ScannerFailureView`` — the
-/// header and its way back survive both.
+/// Nothing here is ever blank. A code that is not ours puts a notice over a camera that keeps
+/// running, and a camera that cannot run at all is replaced by ``ScannerFailureView`` — the header
+/// and its way out survive both.
 public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @State private var introSize: CGSize = .zero
 
     public init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
+        Group {
+            if viewModel.isExplainingCameraAccess {
+                Color.clear
+            } else {
+                screen
+            }
+        }
+        .sheet(isPresented: isIntroPresented) {
+            ScannerIntroView(
+                onContinue: { viewModel.didTapContinueToCamera() },
+                onNotNow: { viewModel.didDeclineCameraAccess() }
+            )
+            .writingSize(to: $introSize)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .presentationDetents(introSize == .zero ? [.medium] : [.height(introSize.height)])
+        }
+    }
+
+    private var isIntroPresented: Binding<Bool> {
+        Binding(
+            get: { viewModel.isExplainingCameraAccess },
+            set: { isPresented in
+                guard !isPresented else { return }
+                viewModel.didDeclineCameraAccess()
+            }
+        )
+    }
+
+    private var screen: some View {
         VStack(spacing: 0) {
             header
                 .padding(.horizontal, theme.spacing.space200)
                 .padding(.vertical, theme.spacing.space150)
-                .background(chromeBackground.ignoresSafeArea(edges: .top))
+                .background(Theme.surfaceBackgroundInvertedPrimary.ignoresSafeArea(edges: .top))
 
             if let error = viewModel.state.failure {
                 ScannerFailureView(error: error, openSettings: { viewModel.didTapOpenSettings() })
                     .frame(maxHeight: .infinity)
+                    .background(Theme.surfaceBackgroundPrimary)
             } else {
                 camera
             }
@@ -56,12 +88,6 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         .onChange(of: viewModel.notice) { notice in
             guard let notice else { return }
             UIAccessibility.post(notification: .announcement, argument: notice.message)
-        }
-        .task(id: viewModel.notice?.id) {
-            guard viewModel.notice != nil else { return }
-            try? await Task.sleep(nanoseconds: Constants.noticeDuration)
-            guard !Task.isCancelled else { return }
-            viewModel.didDismissNotice()
         }
     }
 
@@ -103,8 +129,8 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// does not shift when the button's size changes with Dynamic Type.
     private var header: some View {
         ZStack {
-            Text.build(theme.font.body.medium(viewModel.title))
-                .foregroundStyle(chromeForeground)
+            Text.build(theme.font.heading.medium(viewModel.title))
+                .foregroundStyle(Theme.contentContentInvertedPrimary)
                 .accessibilityIdentifier(AccessibilityID.Scanner.title)
                 .accessibilityAddTraits(.isHeader)
 
@@ -117,9 +143,9 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         Button {
             viewModel.didTapClose()
         } label: {
-            ThemedIcon(.chevronLeft, size: .medium, tint: chromeForeground)
+            ThemedIcon(.chevronLeft, size: .medium, tint: Theme.contentContentInvertedPrimary)
         }
-        .accessibilityIdentifier(AccessibilityID.Scanner.close)
+        .accessibilityIdentifier(AccessibilityID.Scanner.back)
         .accessibilityLabel(Text(L10n.Accessibility.back))
     }
 
@@ -130,9 +156,8 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 lineWidth: Constants.viewfinderLineWidth
             )
             .frame(width: Constants.viewfinderSide, height: Constants.viewfinderSide)
-            .animation(.easeOut(duration: 0.15), value: viewModel.isRecognised)
+            .animation(.easeOut(duration: Constants.viewfinderAnimationDuration), value: viewModel.isRecognised)
             .accessibilityHidden(true)
-            .accessibilityIdentifier(AccessibilityID.Scanner.viewfinder)
     }
 
     /// Left as plain text in reading order: a shopper using VoiceOver cannot see what the camera is
@@ -153,28 +178,23 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 configuration: .init(
                     type: .error,
                     text: notice.message,
+                    showCloseButton: true,
                     icon: Icon.warning.image,
                     autoDismissTime: nil
-                )
+                ),
+                onCloseTap: { viewModel.didDismissNotice() }
             )
             .accessibilityIdentifier(AccessibilityID.Scanner.notice)
             .transition(.opacity)
         }
     }
 
-    private var chromeForeground: Color {
-        isShowingCamera ? Theme.contentContentInvertedPrimary : Theme.contentContentPrimary
-    }
-
-    private var chromeBackground: Color {
-        isShowingCamera ? Theme.surfaceBackgroundInvertedPrimary : Theme.surfaceBackgroundPrimary
-    }
 }
 
 private enum Constants {
     static let viewfinderSide: CGFloat = 250
     static let viewfinderLineWidth: CGFloat = 2
-    static let noticeDuration: UInt64 = 4_000_000_000
+    static let viewfinderAnimationDuration: TimeInterval = 0.15
 }
 
 #if DEBUG
@@ -188,6 +208,10 @@ private enum Constants {
             state: .success(.init(guidance: L10n.Scanner.Guidance.message, isRecognised: true))
         )
     )
+}
+
+#Preview("Camera access intro") {
+    ScannerView(viewModel: MockScannerViewModel(isExplainingCameraAccess: true))
 }
 
 #Preview("Unrecognised code") {

@@ -64,7 +64,6 @@ final class ScannerViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// The frame turns green the moment an Alfie code is recognised, before its page opens.
     func test_scannerView_recognised() {
         let viewModel = Self.makeViewModel(state: .success(.init(guidance: Self.guidance, isRecognised: true)))
         let sut = ScannerView(viewModel: viewModel)

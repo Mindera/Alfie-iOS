@@ -124,7 +124,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             makeScanService: { CameraScanService(log: log) },
             analytics: serviceProvider.analytics,
             haptics: serviceProvider.hapticsService,
-            isCameraAccessUndetermined: { CameraScanService.isCameraAccessUndetermined },
             log: log
         )
         let searchDependencyContainer = SearchDependencyContainer(

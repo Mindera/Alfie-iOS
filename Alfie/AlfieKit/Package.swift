@@ -397,8 +397,14 @@ let package = Package(
             dependencies: [
                 "CategorySelector",
                 "Mocks",
+                "MyAccount",
+                "ProductDetails",
                 "ProductListing",
+                "Scanner",
+                "Search",
                 "TestUtils",
+                "Web",
+                "Wishlist",
             ]
         ),
 

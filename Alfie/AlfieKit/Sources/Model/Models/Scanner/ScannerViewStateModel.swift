@@ -11,7 +11,6 @@ public struct ScannerViewStateModel: Equatable {
     /// What the last recognised code prompted, or `nil` when there is nothing to say. Shown without
     /// closing the camera: a notice is a correction, not a dead end.
     public let notice: ScannerNotice?
-    /// An Alfie code has been recognised and its page is about to open.
     public let isRecognised: Bool
 
     public init(guidance: String, notice: ScannerNotice? = nil, isRecognised: Bool = false) {

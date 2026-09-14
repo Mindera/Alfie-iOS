@@ -52,6 +52,7 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
     private let isDeviceSupported: @MainActor () -> Bool
     private let isScanningAvailable: @MainActor () -> Bool
     private let requestCameraAccess: @MainActor () async -> Bool
+    private let cameraAuthorizationStatus: @MainActor () -> AVAuthorizationStatus
 
     /// The two capability checks and the authorisation prompt are injected so that the order they
     /// run in — hardware first, prompt only if the hardware can use it — is a fact a test can
@@ -63,12 +64,16 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
         isScanningAvailable: @escaping @MainActor () -> Bool = { DataScannerViewController.isAvailable },
         requestCameraAccess: @escaping @MainActor () async -> Bool = {
             await AVCaptureDevice.requestAccess(for: .video)
+        },
+        cameraAuthorizationStatus: @escaping @MainActor () -> AVAuthorizationStatus = {
+            AVCaptureDevice.authorizationStatus(for: .video)
         }
     ) {
         self.log = log
         self.isDeviceSupported = isDeviceSupported
         self.isScanningAvailable = isScanningAvailable
         self.requestCameraAccess = requestCameraAccess
+        self.cameraAuthorizationStatus = cameraAuthorizationStatus
         super.init()
     }
 
@@ -83,11 +88,13 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
         Task { @MainActor in controller.stopScanning() }
     }
 
-    public static var isCameraAccessUndetermined: Bool {
-        AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined
-    }
-
     // MARK: - CameraScanServiceProtocol
+
+    public var canAskForCameraAccess: Bool {
+        MainActor.assumeIsolated {
+            isDeviceSupported() && cameraAuthorizationStatus() == .notDetermined
+        }
+    }
 
     public func makePreview() -> AnyView {
         MainActor.assumeIsolated {

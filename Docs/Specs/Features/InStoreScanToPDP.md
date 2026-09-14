@@ -57,20 +57,25 @@ AND scanning guidance is shown under the viewfinder
 ### Scenario 1a: Camera access has not been asked yet
 
 **GIVEN** iOS has not yet asked the shopper for camera access
+AND the device can scan
 **WHEN** the shopper taps the _Scan button_
-**THEN** an _explainer sheet_ ("Scan a tag") is shown over the presenting screen before any system prompt
+**THEN** a native _explainer sheet_ ("Scan a tag"), sized to its content, is shown over the presenting
+screen before any system prompt
 AND _Continue_ opens the _Scanner screen_, which triggers the system prompt
-AND _Not now_ closes the sheet without remembering the choice, so the next tap shows it again
+AND _Not now_, or swiping the sheet down, closes it without remembering the choice, so the next tap
+shows it again
 
 > Added from the Figma "Scan Barcode" user flow (node 3353:35620). Once iOS has asked, the sheet is
-> never shown again: a refusal is handled by Scenario 6.
+> never shown again: a refusal is handled by Scenario 6. A device that cannot scan skips it and goes
+> straight to Scenario 7 — asking for a camera it cannot use would contradict that scenario.
 
 ### Scenario 2: Shopper scans an Alfie code
 
 **GIVEN** the shopper is on the _Scanner screen_
 **WHEN** the camera recognises an Alfie code containing a valid Handle
-**THEN** a success haptic plays and the viewfinder turns green for a moment
-AND the _Scanner screen_ is dismissed
+**THEN** a success haptic plays and the viewfinder turns green for 0.3 seconds
+AND the _Scanner screen_ is dismissed, unless the shopper tapped _Back_ during those 0.3 seconds, in
+which case nothing opens
 AND the shopper is navigated to the _Product Details screen_ for that Handle
 AND the Variant named by the code's `sku` is selected, or the default Variant when there is no `sku`
 or it matches no Variant
@@ -88,8 +93,8 @@ AND an availability note states that stock shown is online stock
 **GIVEN** the shopper is on the _Scanner screen_
 **WHEN** the camera recognises an EAN-13 Barcode instead of an Alfie code
 **THEN** the scanner stays open
-AND the notice "We don't recognize this barcode." is shown and dismisses itself after about four
-seconds
+AND the notice "We don't recognize this barcode." is shown and dismisses itself after four seconds,
+or earlier from its close button
 AND the guidance naming the Alfie code stays on screen
 
 > Amended after the Figma flow review: the design's wording replaces the Barcode-specific message, and
@@ -218,8 +223,7 @@ openScannedLink: { deepLinkService.openUrls([$0]) }
 ```
 
 That construction lives in one place rather than in each tab's `FlowViewModel`: the decisions behind
-it — whether to show the explainer sheet first (`ScannerPresentation.needsIntro`), where a recognised
-link goes, that Settings is the one recovery a refused camera has, and that closing clears the tab's
+it — where a recognised link goes, that Settings is the one recovery a refused camera has, and that closing clears the tab's
 overlay — are the same wherever the Scan control appears. Only the
 last is supplied by the tab, because only the tab knows what it is covering.
 
@@ -229,6 +233,17 @@ last is supplied by the tab, because only the tab knows what it is covering.
 selects the Variant whose SKU matches. This means the scan reuses a
 navigation path that is already covered by tests, and it accepts the existing behaviour that all
 deep links land in the Shop tab.
+
+Whether to explain camera access first is the scanner's own state, not the tab's:
+`ScannerViewModel.isExplainingCameraAccess` starts from `CameraScanServiceProtocol.canAskForCameraAccess`
+(device supported and authorisation `.notDetermined`), and `ScannerView` presents the explainer as a
+`.sheet` with a content-height `presentationDetents` over a clear overlay. The tabs only ever present
+one `.scanner` overlay. The 0.3-second confirmation and the four-second notice are both timed through
+the container's injected `schedule`, so they are unit-tested without waiting.
+
+The `sku` is read in `TabRoute`, so it preselects a Variant for **every** product deep link, not only
+a scan — a shared `/product/<handle>?sku=<sku>` link lands on the same Variant. This is intended: the
+link format is the same one the Alfie code prints.
 
 ---
 
@@ -290,6 +305,7 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 | Camera recognises two codes at once | The Alfie code wins, then a Barcode, then anything else; scanner stops recognising once one opens. Amended by #139: a Swing tag prints the Barcode beside the Alfie code, so "first wins" would correct a shopper who scanned correctly. The scanner reads a frame at a time and ranks what it holds — see `ScannedCode.precedence` |
 | Shopper scans while offline | Product Details shows its existing no-connection error state |
 | Shopper scans the same code twice quickly | Second scan is ignored while navigation is in flight |
+| Shopper taps _Back_ while the viewfinder is green | The scanner closes and the Product does not open |
 | App is backgrounded mid-scan | Scanning stops and resumes when the screen reappears |
 
 ---
@@ -335,6 +351,11 @@ without a camera. Everything downstream of the payload is existing, already-test
 - [ ] An Alfie code payload results in the URL being passed to `DeepLinkService`
 - [ ] An EAN-13 payload produces the unrecognised notice and does not navigate
 - [ ] An Alfie code sets the recognised state and triggers a success haptic before navigating
+- [ ] Back during the confirmation opens nothing
+- [ ] A notice dismisses itself after four seconds; a repeated notice gets its own four seconds
+- [ ] The explainer shows only while the service can ask for camera access; Continue starts the
+  camera, Not now closes
+- [ ] `CameraScanService.canAskForCameraAccess` is false on an unsupported device (`CoreTests`)
 - [ ] `TabRoute` carries the `sku` into Product Details, and Product Details selects the matching
   Variant, falling back to the default
 - [ ] An unrecognised payload does not navigate
@@ -370,8 +391,9 @@ The developer will verify the camera path manually on device.
 
 - The _Scan button_ has the label "Scan a tag"
 - The Scanner screen announces its guidance text when presented
-- Notices are announced, not only shown — they dismiss themselves after about four seconds, so the
-  announcement is what a VoiceOver user relies on
+- Notices are announced, not only shown — they dismiss themselves after four seconds, so the
+  announcement is what a VoiceOver user relies on; the close button stays for anyone who wants it
+  gone sooner
 - All new controls carry `AccessibilityID` entries from the `AccessibilityIdentifiers` module
 
 ---
@@ -395,8 +417,7 @@ The developer will verify the camera path manually on device.
 
   Closing it would mean holding the Barcode notice behind a short grace period and cancelling it if
   an Alfie code joins. That is deliberately not done: it delays the honest Scenario 4 message, the
-  one case the ticket exists for, and puts a timer inside a ViewModel that is otherwise synchronous
-  and therefore deterministic under test. Revisit if the demo shows the flash actually reads badly.
+  one case the ticket exists for, and adds a cancellable timer to every Barcode read. Revisit if the demo shows the flash actually reads badly.
 - **A code arriving beside an already-answered Barcode gets no notice of its own.** The scanner
   answers one code per frame and suppresses a code it has already answered. When a Barcode is still
   in view and an unrecognised QR joins it, the Barcode wins on precedence and is then suppressed as
@@ -484,3 +505,4 @@ The developer will verify the camera path manually on device.
 | 2026-09-10 | #139: `ScannedCode` built with `precedence`; two-codes-at-once edge case amended; Barcode-notice snapshot added | Khoi Nguyen |
 | 2026-09-12 | Spec squared with the shipped code after review: Navigation block corrected to the `openScannedLink` seam, parser scope and the `TabRoute`/`IconLayout` additions recorded, per-frame notice limitation documented, status set to Implemented | Khoi Nguyen |
 | 2026-09-14 | Figma flow review (`/grill-with-docs`): explainer sheet (Scenario 1a), full-screen scanner with square viewfinder and success feedback, single self-dismissing notice in the design's wording, Variant preselection by SKU; manual entry and torch dropped | Khoi Nguyen |
+| 2026-09-14 | Review fixes: explainer is a native sheet owned by `ScannerViewModel` and skipped on unsupported devices; Back cancels the pending open; notice timer and close button in the ViewModel/view; header stays black in failure states; `sku` preselection documented as applying to all product links | Khoi Nguyen |

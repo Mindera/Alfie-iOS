@@ -23,6 +23,9 @@ public protocol CameraScanServiceProtocol: AnyObject {
     /// scanner that recognises nothing because it is pointed at a wall is not a failure.
     var failurePublisher: AnyPublisher<CameraScanFailure, Never> { get }
 
+    /// The device can scan and iOS has not yet asked for the camera.
+    var canAskForCameraAccess: Bool { get }
+
     /// The live preview to put on screen. Returned as a view rather than rendered by `ScannerView`
     /// directly, because only the service knows what it is previewing — a test double shows nothing.
     func makePreview() -> AnyView
