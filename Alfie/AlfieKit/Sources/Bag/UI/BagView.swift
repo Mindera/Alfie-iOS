@@ -16,11 +16,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
     var body: some View {
         content
-            .toolbarView(
-                isWishlistEnabled: viewModel.isWishlistEnabled,
-                openWishlistAction: viewModel.didTapWishlist,
-                myAccountAction: viewModel.didTapMyAccount
-            )
+            .toolbarView()
             .onAppear {
                 viewModel.viewDidAppear()
             }
