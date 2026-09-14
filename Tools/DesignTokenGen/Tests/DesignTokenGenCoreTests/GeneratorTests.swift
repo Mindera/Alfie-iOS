@@ -47,24 +47,24 @@ struct TokenLoaderTests {
         }
     }
 
-    @Test("theme is pinned to new-brand-theme, skipping the file-less selfridges mode (regression: dual-mode theme used to load every mode's file)")
+    @Test("theme is pinned to selfridges-theme, skipping the file-less new-brand-theme mode (regression: dual-mode theme used to load every mode's file)")
     func themeModeSelection() throws {
-        // The fixture's manifest lists a "selfridges" theme mode with no backing file. If theme
-        // ever stops being pinned, selectedFiles would include theme.selfridges.tokens.json and
+        // The fixture's manifest lists a "new-brand-theme" theme mode with no backing file. If theme
+        // ever stops being pinned, selectedFiles would include theme.new-brand-theme.tokens.json and
         // load() would throw fileNotFound.
         let files = try TokenLoader.selectedFiles(manifestURL: miniURL().appendingPathComponent("manifest.json"))
-        #expect(files.contains("theme.new-brand-theme.tokens.json"))
-        #expect(!files.contains("theme.selfridges.tokens.json"))
+        #expect(files.contains("theme.selfridges-theme.tokens.json"))
+        #expect(!files.contains("theme.new-brand-theme.tokens.json"))
         _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
     }
 
-    @Test("`.primitives` is pinned to alfie-theme, skipping the file-less new-theme mode")
+    @Test("`.primitives` is pinned to selfridges-theme, skipping the file-less new-theme mode")
     func primitivesModeSelection() throws {
-        // Upstream added a second "new-theme" primitives mode; the fixture mirrors it with no
-        // backing file. If .primitives ever stops being pinned, selectedFiles would include
+        // The fixture mirrors a second "new-theme" primitives mode with no backing file. If
+        // .primitives ever stops being pinned, selectedFiles would include
         // .primitives.new-theme.tokens.json and load() would throw fileNotFound.
         let files = try TokenLoader.selectedFiles(manifestURL: miniURL().appendingPathComponent("manifest.json"))
-        #expect(files.contains(".primitives.alfie-theme.tokens.json"))
+        #expect(files.contains(".primitives.selfridges-theme.tokens.json"))
         #expect(!files.contains(".primitives.new-theme.tokens.json"))
         _ = try TokenLoader.load(inputDirectory: miniURL())  // must still load cleanly
     }

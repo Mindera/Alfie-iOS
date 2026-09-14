@@ -50,8 +50,8 @@ picks the single mode iOS ships:
 |---|---|---|
 | `system` | `ios` | skip android/web |
 | `screen-size` | `small-(s)` | mobile uses Small at codegen |
-| `theme` | `new-brand-theme` | iOS ships the new brand palette; set back to `alfie-theme` for the original |
-| `.primitives` | `alfie-theme` | skip the `new-theme` brand |
+| `theme` | `selfridges-theme` | demo export ([token PR #7](https://github.com/Mindera/Alfie-Mobile-Design-Tokens/pull/7)) ships a single brand mode |
+| `.primitives` | `selfridges-theme` | same; the pin stays so a re-added brand mode can't load every file |
 
 An **unpinned** multi-mode collection fails generation with `unpinnedMultiModeCollection` rather than
 silently loading every mode's file. So when upstream adds a mode (as it did for `.primitives`), the
@@ -64,7 +64,7 @@ file, so deleting a pin breaks the suite (see `GeneratorTests.themeModeSelection
 
 The token export ships two allow-lists (`.cycle-allowlist.json`, `.broken-ref-allowlist.json`) for
 known export artefacts: **9 cycles** (7 font-family, plus `border-border-weight-{default,heavy}` in
-`sizing.alfie-theme.tokens.json`, where a sizing token aliases an identically-named primitive) and
+`sizing.selfridges-theme.tokens.json`, where a sizing token aliases an identically-named primitive) and
 **2 filtered font-weight primitives**. The generator honours them **exhaustively** — an unlisted
 cycle / missing ref fails generation, and a stale entry (scoped to the loaded iOS files) also fails
 — so the exceptions can't silently rot. Each allow-listed cycle prints a `⚠️ cycle on …` line on every

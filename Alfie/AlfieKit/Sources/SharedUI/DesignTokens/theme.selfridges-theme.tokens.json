@@ -37,7 +37,7 @@
   },
   "button-primary-background-primary-default": {
     "$type": "color",
-    "$value": "{colours-brand-new-brand-500}"
+    "$value": "{colours-brand-selfridges-500}"
   },
   "button-primary-background-primary-disabled": {
     "$type": "color",
@@ -45,7 +45,7 @@
   },
   "button-primary-content-primary-default": {
     "$type": "color",
-    "$value": "{colours-neutrals-800}"
+    "$value": "{colours-neutrals-700}"
   },
   "button-primary-content-primary-disabled": {
     "$type": "color",
@@ -53,7 +53,7 @@
   },
   "button-primary-stroke-primary-default": {
     "$type": "color",
-    "$value": "{colours-brand-new-brand-500}"
+    "$value": "{colours-brand-selfridges-500}"
   },
   "button-primary-stroke-primary-disabled": {
     "$type": "color",

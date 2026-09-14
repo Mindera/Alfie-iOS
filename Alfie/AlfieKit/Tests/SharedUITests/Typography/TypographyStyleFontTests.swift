@@ -78,8 +78,7 @@ final class TypographyStyleFontTests: XCTestCase {
         let style = Typography.Display.large
         XCTAssertEqual(style.fontFamily, Primitives.Typography.fontFamilyBrand)
         XCTAssertEqual(style.uiFont.pointSize, style.fontSize)
-        // The resolved family name should be the brand family, not the system font.
-        XCTAssertEqual(style.uiFont.familyName, Primitives.Typography.fontFamilyBrand)
+        XCTAssertEqual(style.uiFont.fontName, FontNames.libreBaskerville.rawValue)
     }
 
     func test_build_forwardsTokenLineHeightAndLetterSpacing() {
