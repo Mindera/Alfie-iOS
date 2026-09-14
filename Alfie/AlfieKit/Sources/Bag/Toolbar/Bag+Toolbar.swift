@@ -12,10 +12,10 @@ extension View {
                     EmptyView()
                 },
                 principalItems: {
-                    Text.build(theme.font.heading.xSmall(L10n.Bag.title))
-                        .foregroundStyle(Theme.contentContentPrimary)
-                        .accessibilityIdentifier(AccessibilityID.titleHeader)
-                        .accessibilityAddTraits(.isHeader)
+                    ThemedToolbarTitle(
+                        style: .text(L10n.Bag.title),
+                        accessibilityId: AccessibilityID.titleHeader
+                    )
                 },
                 trailingItems: {
                     EmptyView()
