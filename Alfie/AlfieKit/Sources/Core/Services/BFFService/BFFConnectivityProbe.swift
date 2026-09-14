@@ -38,7 +38,21 @@ public struct BFFConnectivityProbe {
                 log.error("BFF probe ⚠️ reached server but got HTTP \(status) in \(elapsed)ms")
             }
         } catch {
-            log.error("BFF probe ❌ cannot connect to \(url.absoluteString): \(error)")
+            log.error("BFF probe ❌ cannot connect to \(url.absoluteString) — \(Self.summary(of: error)) | \(error)")
         }
     }
+
+    private static func summary(of error: Error) -> String {
+        guard let urlError = error as? URLError else {
+            return "\(error)"
+        }
+
+        let underlying = urlError.userInfo[NSUnderlyingErrorKey] as? NSError
+        let path = (urlError.userInfo[pathKey] ?? underlying?.userInfo[pathKey]).map { "\($0)" }
+        return ["URLError \(urlError.code.rawValue)", path.map { "path: \($0)" }]
+            .compactMap { $0 }
+            .joined(separator: ", ")
+    }
+
+    private static let pathKey = "_NSURLErrorNWPathKey"
 }

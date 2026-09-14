@@ -45,6 +45,25 @@ final class BFFConnectivityProbeTests: XCTestCase {
         })
     }
 
+    func test_aBlockedNetworkPathIsLoggedWithTheSystemReason() async {
+        let underlying = NSError(
+            domain: kCFErrorDomainCFNetwork as String,
+            code: -1009,
+            userInfo: ["_NSURLErrorNWPathKey": "unsatisfied (Local network prohibited)"]
+        )
+        let sut = makeSut { _ in
+            throw URLError(.notConnectedToInternet, userInfo: [NSUnderlyingErrorKey: underlying])
+        }
+
+        await sut.run()
+
+        XCTAssertTrue(logs.contains {
+            $0.level == .error
+                && $0.message.contains("URLError -1009")
+                && $0.message.contains("path: unsatisfied (Local network prohibited)")
+        })
+    }
+
     // MARK: - Helpers
 
     private var logs: [(level: Log.Level, message: String)] = []
