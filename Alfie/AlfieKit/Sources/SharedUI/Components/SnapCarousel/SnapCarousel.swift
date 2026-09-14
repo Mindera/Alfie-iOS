@@ -87,14 +87,20 @@ public struct SnapCarousel<Content: View>: View {
                 }
             }
             .offset(x: xOffset(with: offsetAdjustmentWidth))
-            .highPriorityGesture(DragGesture()
+            // Simultaneous, so a vertical drag that starts on an item still scrolls the enclosing ScrollView.
+            .simultaneousGesture(DragGesture()
                 .updating($gestureOffset) { value, out, _ in
-                    out = value.translation.width
+                    out = isHorizontal(value.translation) ? value.translation.width : 0
                 }
-                .onChanged { _ in
+                .onChanged { value in
+                    guard isHorizontal(value.translation) else { return }
                     lockRealIndexAnimationTrigger = true
                 }
                 .onEnded { value in
+                    guard isHorizontal(value.translation) else {
+                        lockRealIndexAnimationTrigger = false
+                        return
+                    }
                     handleFinishedDragGesture(
                         with: value.translation.width,
                         and: value.velocity.width,
@@ -146,6 +152,10 @@ extension SnapCarousel {
             return initialOffset
         }
         return initialOffset + gestureOffset + -(CGFloat(offsetIndex) * offsetAdjustmentWidth)
+    }
+
+    private func isHorizontal(_ translation: CGSize) -> Bool {
+        abs(translation.width) > abs(translation.height)
     }
 
     private func scrollToPreviousView() {
@@ -211,6 +221,7 @@ extension SnapCarousel {
         let progress = -translationWidth / offsetAdjusmentWidth
         // There are two ways in which the user can swipe, either by putting enough velocity on the swipe, or by swipe enough distance
         guard abs(velocity) > minimumScrollVelocity || abs(translationWidth) > itemWidth / 2  else {
+            lockRealIndexAnimationTrigger = false
             return
         }
         if progress.rounded().sign == .plus {
