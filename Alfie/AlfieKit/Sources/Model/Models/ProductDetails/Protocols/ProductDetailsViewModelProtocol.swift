@@ -13,6 +13,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var isAddingToBag: Bool { get }
     /// The outcome of the last add-to-bag write; nil once its Snackbar has been dismissed.
     var addToBagFeedback: AddToBagFeedback? { get }
+    var isInWishlist: Bool { get }
     var canShowSizeSelector: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }

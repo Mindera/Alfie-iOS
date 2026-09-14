@@ -22,6 +22,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
+    @Published public private(set) var isInWishlist = false
     public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
         items: []
     )
@@ -147,6 +148,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
         Task {
             await loadProductIfNeeded()
+            await refreshWishlistState()
         }
         Task {
             await refreshWishlistContent()
@@ -278,9 +280,16 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public func didTapAddToWishlist() {
         guard let selectedProduct else { return }
+        let wasInWishlist = isInWishlist
         Task {
-            await dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            if wasInWishlist {
+                await dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
+            } else {
+                await dependencies.wishlistService.addProduct(selectedProduct)
+                dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            }
+            await refreshWishlistState()
         }
     }
 
@@ -351,6 +360,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @MainActor
     private func refreshWishlistContent() async {
         wishlistContent = await dependencies.wishlistService.getWishlistContent()
+    }
+
+    @MainActor
+    private func refreshWishlistState() async {
+        let wishlistedProductId = product?.id ?? productId
+        isInWishlist = await dependencies.wishlistService.getWishlistContent()
+            .contains { $0.product.id == wishlistedProductId }
     }
 
     @MainActor

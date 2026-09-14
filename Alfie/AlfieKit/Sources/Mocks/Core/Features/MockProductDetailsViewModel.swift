@@ -12,6 +12,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var isAddToBagEnabled: Bool = true
     public var isAddingToBag: Bool = false
     public var addToBagFeedback: AddToBagFeedback?
+    public var isInWishlist = false
     public var canShowSizeSelector: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []

@@ -20,7 +20,20 @@ final class ProductDetailsViewModelTests: XCTestCase {
         mockWebUrlProvider = MockWebUrlProvider()
         mockCartService = MockCartService()
         mockAnalytics = MockAnalyticsTracker()
-        mockDependencies = makeDependencies(wishlistService: MockWishlistService())
+        makeDependencies(wishlistService: MockWishlistService())
+    }
+
+    private func makeDependencies(wishlistService: WishlistServiceProtocol) {
+        mockDependencies = ProductDetailsDependencyContainer(
+            scheduler: .immediate,
+            productService: mockProductService,
+            webUrlProvider: mockWebUrlProvider,
+            cartService: mockCartService,
+            wishlistService: wishlistService,
+            configurationService: MockConfigurationService(),
+            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
+            log: Log.DummyLogger()
+        )
     }
 
     override func tearDownWithError() throws {
@@ -1490,7 +1503,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_did_tap_wishlist_on_related_product_in_wishlist_removes_it() {
         let related = Product.fixture(id: "related")
-        mockDependencies = makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
+        makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
         initViewModel()
         XCTAssertEmitsValue(from: sut.$wishlistContent, where: { !$0.isEmpty }, afterTrigger: { self.sut.viewDidAppear() })
 
@@ -1506,7 +1519,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_view_did_appear_marks_related_products_already_in_wishlist_as_favourite() {
         let related = Product.fixture(id: "related")
-        mockDependencies = makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
+        makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
         initViewModel()
 
         XCTAssertEmitsValue(from: sut.$wishlistContent, where: { !$0.isEmpty }, afterTrigger: { self.sut.viewDidAppear() })
@@ -1564,20 +1577,53 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertFalse(sut.shouldShowLoading(for: .availabilityNote))
     }
 
-    // MARK: - Helper methods
+    // MARK: - Wishlist
 
-    private func makeDependencies(wishlistService: MockWishlistService) -> ProductDetailsDependencyContainer {
-        ProductDetailsDependencyContainer(
-            scheduler: .immediate,
-            productService: mockProductService,
-            webUrlProvider: mockWebUrlProvider,
-            cartService: mockCartService,
-            wishlistService: wishlistService,
-            configurationService: MockConfigurationService(),
-            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
-            log: Log.DummyLogger()
-        )
+    func test_isInWishlist_isTrue_afterAppearing_forAProductAlreadyInTheWishlist() {
+        let product = Product.fixture(id: "p1")
+        makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: product)]))
+        mockProductService.onGetProductCalled = { _ in product }
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.viewDidAppear() })
     }
+
+    func test_isInWishlist_matchesTheLoadedProduct_forADeepLinkEnteredByHandle() {
+        let product = Product.fixture(id: "p1", slug: "nice-shirt")
+        makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: product)]))
+        mockProductService.onGetProductCalled = { _ in product }
+        initViewModel(configuration: .deepLink(handle: "nice-shirt"))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.viewDidAppear() })
+    }
+
+    func test_didTapAddToWishlist_addsTheProduct_andFlipsTheButtonOn() {
+        let product = Product.fixture(id: "p1")
+        let wishlistService = MockWishlistService()
+        makeDependencies(wishlistService: wishlistService)
+        mockProductService.onGetProductCalled = { _ in product }
+        initViewModel(configuration: .product(product))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.didTapAddToWishlist() })
+
+        XCTAssertEqual(mockAnalytics.trackedValues(of: .productID, for: .addToWishlist).count, 1)
+    }
+
+    func test_didTapAddToWishlist_removesAWishlistedProduct_andFlipsTheButtonOff() {
+        let product = Product.fixture(id: "p1")
+        let wishlistService = MockWishlistService(products: [SelectedProduct(product: product)])
+        makeDependencies(wishlistService: wishlistService)
+        mockProductService.onGetProductCalled = { _ in product }
+        initViewModel(configuration: .product(product))
+        XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: false, afterTrigger: { self.sut.didTapAddToWishlist() })
+
+        XCTAssertEqual(mockAnalytics.trackedValues(of: .productID, for: .removeFromWishlist), ["p1"])
+    }
+
+    // MARK: - Helper methods
 
     private func initViewModel(
         configuration: ProductDetailsConfiguration = .id(""),
