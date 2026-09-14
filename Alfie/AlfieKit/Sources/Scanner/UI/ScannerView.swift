@@ -6,15 +6,15 @@ import SwiftUI
 import Mocks
 #endif
 
-/// The scanner screen: a full-bleed camera preview, the guidance that tells the shopper what to
-/// point it at, and a way out.
+/// The scanner screen: a header with the way back, the camera preview with a viewfinder, and the
+/// guidance that tells the shopper what to point it at.
 ///
-/// Presented modally rather than pushed — it adds no navigation route, because a successful scan
-/// leaves through the deep-link path instead of a route of its own.
+/// Presented as a full-screen overlay rather than pushed — it adds no navigation route, because a
+/// successful scan leaves through the deep-link path instead of a route of its own.
 ///
-/// Nothing here is ever blank. A code that is not ours puts a notice over a camera that keeps
-/// running, and a camera that cannot run at all is replaced by ``ScannerFailureView`` — the header
-/// and its way out survive both, and invert with whatever ends up behind them.
+/// Nothing here is ever blank. A code that is not ours puts a short-lived notice over a camera that
+/// keeps running, and a camera that cannot run at all is replaced by ``ScannerFailureView`` — the
+/// header and its way back survive both.
 public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     @Environment(\.scenePhase) private var scenePhase
@@ -24,15 +24,18 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .top) {
+        VStack(spacing: 0) {
+            header
+                .padding(.horizontal, theme.spacing.space200)
+                .padding(.vertical, theme.spacing.space150)
+                .background(chromeBackground.ignoresSafeArea(edges: .top))
+
             if let error = viewModel.state.failure {
                 ScannerFailureView(error: error, openSettings: { viewModel.didTapOpenSettings() })
+                    .frame(maxHeight: .infinity)
             } else {
                 camera
             }
-
-            header
-                .padding(theme.spacing.space200)
         }
         .background(isShowingCamera ? Theme.surfaceBackgroundInvertedPrimary : Theme.surfaceBackgroundPrimary)
         .accessibilityIdentifier(AccessibilityID.Scanner.screen)
@@ -54,6 +57,12 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
             guard let notice else { return }
             UIAccessibility.post(notification: .announcement, argument: notice.message)
         }
+        .task(id: viewModel.notice?.id) {
+            guard viewModel.notice != nil else { return }
+            try? await Task.sleep(nanoseconds: Constants.noticeDuration)
+            guard !Task.isCancelled else { return }
+            viewModel.didDismissNotice()
+        }
     }
 
     private var isShowingCamera: Bool {
@@ -72,71 +81,58 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     }
 
     private var camera: some View {
-        ZStack(alignment: .top) {
+        ZStack {
             viewModel.preview
-                .ignoresSafeArea()
+                .ignoresSafeArea(edges: .bottom)
                 .accessibilityHidden(true)
 
-            messages
+            VStack(spacing: theme.spacing.space300) {
+                viewfinder
+                guidance
+            }
+            .padding(.horizontal, theme.spacing.space400)
+
+            notice
                 .frame(maxHeight: .infinity, alignment: .bottom)
-                .padding(.horizontal, theme.spacing.space400)
-                .padding(.bottom, theme.spacing.space600)
+                .padding(.horizontal, theme.spacing.space200)
+                .padding(.bottom, theme.spacing.space400)
         }
     }
 
-    /// The title is centred on the screen, not on the space left over by the close button, so it
+    /// The title is centred on the screen, not on the space left over by the back button, so it
     /// does not shift when the button's size changes with Dynamic Type.
     private var header: some View {
         ZStack {
-            Text.build(theme.font.heading.medium(viewModel.title))
+            Text.build(theme.font.body.medium(viewModel.title))
                 .foregroundStyle(chromeForeground)
                 .accessibilityIdentifier(AccessibilityID.Scanner.title)
                 .accessibilityAddTraits(.isHeader)
 
-            closeButton
+            backButton
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    private var closeButton: some View {
+    private var backButton: some View {
         Button {
             viewModel.didTapClose()
         } label: {
-            ThemedIcon(.close, size: .medium, tint: chromeForeground)
-                .padding(theme.spacing.space150)
-                .background(chromeBackground)
+            ThemedIcon(.chevronLeft, size: .medium, tint: chromeForeground)
         }
         .accessibilityIdentifier(AccessibilityID.Scanner.close)
-        .accessibilityLabel(Text(L10n.Accessibility.close))
+        .accessibilityLabel(Text(L10n.Accessibility.back))
     }
 
-    /// The guidance, and the notice about the last code when there is one. Both sit at the bottom
-    /// rather than one replacing the other: a shopper who has just scanned the wrong thing needs
-    /// telling *and* still needs to know what to point at.
-    @ViewBuilder private var messages: some View {
-        VStack(spacing: theme.spacing.space200) {
-            if let notice = viewModel.notice {
-                SnackbarView(
-                    configuration: .init(
-                        type: .error,
-                        text: notice.message,
-                        showCloseButton: true,
-                        icon: Icon.warning.image,
-                        autoDismissTime: nil,
-                        // Above the component's default of two, which cuts the Barcode notice at
-                        // "Scan the Alfie…" — losing the half that names the code to scan instead,
-                        // which is the only reason the notice exists. A notice here is the screen's
-                        // whole answer to a failed scan, not a toast over content it must not
-                        // cover, so it is given the room to finish its sentence.
-                        lineLimit: Constants.noticeLineLimit
-                    ),
-                    onCloseTap: { viewModel.didDismissNotice() }
-                )
-                .accessibilityIdentifier(AccessibilityID.Scanner.notice)
-            }
-
-            guidance
-        }
+    private var viewfinder: some View {
+        RoundedRectangle(cornerRadius: Sizing.radiusSoft)
+            .stroke(
+                viewModel.isRecognised ? Theme.contentContentPositive : Theme.borderSoft,
+                lineWidth: Constants.viewfinderLineWidth
+            )
+            .frame(width: Constants.viewfinderSide, height: Constants.viewfinderSide)
+            .animation(.easeOut(duration: 0.15), value: viewModel.isRecognised)
+            .accessibilityHidden(true)
+            .accessibilityIdentifier(AccessibilityID.Scanner.viewfinder)
     }
 
     /// Left as plain text in reading order: a shopper using VoiceOver cannot see what the camera is
@@ -144,43 +140,54 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     /// rather than hidden behind the preview.
     @ViewBuilder private var guidance: some View {
         if let guidance = viewModel.guidance {
-            Text.build(theme.font.body.medium(guidance))
+            Text.build(theme.font.body.small(guidance))
                 .foregroundStyle(Theme.contentContentInvertedPrimary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, theme.spacing.space300)
-                .padding(.vertical, theme.spacing.space200)
-                .background(
-                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                        .fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity))
-                )
                 .accessibilityIdentifier(AccessibilityID.Scanner.guidance)
         }
     }
 
-    /// The chrome sits over a live camera in the ordinary case and over a plain background in the
-    /// failure cases, so it inverts with what is behind it.
+    @ViewBuilder private var notice: some View {
+        if let notice = viewModel.notice {
+            SnackbarView(
+                configuration: .init(
+                    type: .error,
+                    text: notice.message,
+                    icon: Icon.warning.image,
+                    autoDismissTime: nil
+                )
+            )
+            .accessibilityIdentifier(AccessibilityID.Scanner.notice)
+            .transition(.opacity)
+        }
+    }
+
     private var chromeForeground: Color {
         isShowingCamera ? Theme.contentContentInvertedPrimary : Theme.contentContentPrimary
     }
 
-    @ViewBuilder private var chromeBackground: some View {
-        if isShowingCamera {
-            Circle().fill(Theme.surfaceBackgroundInvertedPrimary.opacity(Constants.chromeOpacity))
-        }
+    private var chromeBackground: Color {
+        isShowingCamera ? Theme.surfaceBackgroundInvertedPrimary : Theme.surfaceBackgroundPrimary
     }
 }
 
 private enum Constants {
-    /// The chrome sits over a live preview, so it is legible without hiding what the camera sees.
-    static let chromeOpacity: Double = 0.6
-    /// Enough for the longest notice — the Barcode one needs three lines at the default text size —
-    /// with one spare for larger type.
-    static let noticeLineLimit = 4
+    static let viewfinderSide: CGFloat = 250
+    static let viewfinderLineWidth: CGFloat = 2
+    static let noticeDuration: UInt64 = 4_000_000_000
 }
 
 #if DEBUG
 #Preview("Scanning") {
     ScannerView(viewModel: MockScannerViewModel())
+}
+
+#Preview("Recognised") {
+    ScannerView(
+        viewModel: MockScannerViewModel(
+            state: .success(.init(guidance: L10n.Scanner.Guidance.message, isRecognised: true))
+        )
+    )
 }
 
 #Preview("Unrecognised code") {
@@ -190,19 +197,6 @@ private enum Constants {
                 .init(
                     guidance: L10n.Scanner.Guidance.message,
                     notice: .init(id: 1, message: L10n.Scanner.Unrecognised.message)
-                )
-            )
-        )
-    )
-}
-
-#Preview("Manufacturer barcode") {
-    ScannerView(
-        viewModel: MockScannerViewModel(
-            state: .success(
-                .init(
-                    guidance: L10n.Scanner.Guidance.message,
-                    notice: .init(id: 1, message: L10n.Scanner.BarcodeDetected.message)
                 )
             )
         )

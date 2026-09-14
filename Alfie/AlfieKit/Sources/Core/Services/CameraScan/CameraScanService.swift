@@ -83,6 +83,10 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
         Task { @MainActor in controller.stopScanning() }
     }
 
+    public static var isCameraAccessUndetermined: Bool {
+        AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined
+    }
+
     // MARK: - CameraScanServiceProtocol
 
     public func makePreview() -> AnyView {

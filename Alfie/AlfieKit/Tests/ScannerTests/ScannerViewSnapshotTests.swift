@@ -10,7 +10,7 @@ import XCTest
 /// The scanner's chrome, over a stand-in for the camera feed.
 ///
 /// The preview comes from the scan service, so `MockCameraScanService` renders a blank one and the
-/// snapshot covers what this screen actually owns: the title, the close button and the guidance,
+/// snapshot covers what this screen actually owns: the header, the viewfinder and the guidance,
 /// laid out over the preview rather than beside it. The failure cases cover the opposite — the
 /// chrome over a plain background, where there is no camera to invert against.
 final class ScannerViewSnapshotTests: XCTestCase {
@@ -47,7 +47,7 @@ final class ScannerViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// The notice sits above the guidance rather than replacing it: what went wrong and what to do
+    /// The notice sits below the guidance rather than replacing it: what went wrong and what to do
     /// next are both on screen, over a camera that never stopped.
     func test_scannerView_withNotice() {
         let viewModel = Self.makeViewModel(
@@ -64,19 +64,17 @@ final class ScannerViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// The longest thing the scanner says, and the one most likely to be read in a hurry over a live
-    /// camera: it names what was scanned *and* what to scan instead, so it wraps where the shorter
-    /// notice does not.
-    func test_scannerView_withBarcodeNotice() {
-        let viewModel = Self.makeViewModel(
-            state: .success(
-                .init(
-                    guidance: Self.guidance,
-                    notice: .init(id: 1, message: L10n.Scanner.BarcodeDetected.message)
-                )
-            )
-        )
+    /// The frame turns green the moment an Alfie code is recognised, before its page opens.
+    func test_scannerView_recognised() {
+        let viewModel = Self.makeViewModel(state: .success(.init(guidance: Self.guidance, isRecognised: true)))
         let sut = ScannerView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_scannerIntroView() {
+        let sut = ScannerIntroView(onContinue: {}, onNotNow: {})
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)

@@ -29,10 +29,9 @@ final class DeepLinkRoutingTests: XCTestCase {
         XCTAssertEqual(TabRoute(deepLinkType: .account), .home(.myAccount(.myAccount)))
     }
 
-    /// The reason this PR exists: the whole Handle has to survive the trip to the Product Details
-    /// page, separators included. `route` and `query` are carried by the link but not by the route —
-    /// the page resolves the product from the Handle alone.
-    func test_productDetailLinkCarriesTheWholeHandleToProductDetails() {
+    /// The whole Handle has to survive the trip to the Product Details page, separators included,
+    /// and so does the SKU that picks the Variant the shopper arrives on.
+    func test_productDetailLinkCarriesTheWholeHandleAndSkuToProductDetails() {
         let deepLink = DeepLink.LinkType.productDetail(
             handle: "women/dresses/red-midi-dress",
             route: "885035",
@@ -41,7 +40,16 @@ final class DeepLinkRoutingTests: XCTestCase {
 
         XCTAssertEqual(
             TabRoute(deepLinkType: deepLink),
-            .shop(.productDetails(.productDetails(.deepLink(handle: "women/dresses/red-midi-dress"))))
+            .shop(.productDetails(.productDetails(.deepLink(handle: "women/dresses/red-midi-dress", sku: "12345"))))
+        )
+    }
+
+    func test_productDetailLinkWithoutSkuOpensOnTheDefaultVariant() {
+        let deepLink = DeepLink.LinkType.productDetail(handle: "red-midi-dress", route: nil, query: nil)
+
+        XCTAssertEqual(
+            TabRoute(deepLinkType: deepLink),
+            .shop(.productDetails(.productDetails(.deepLink(handle: "red-midi-dress"))))
         )
     }
 

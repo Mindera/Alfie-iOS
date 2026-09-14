@@ -474,10 +474,6 @@ public enum L10n {
   public enum Scanner {
     /// Scan
     public static let title = L10n.tr("L10n", "scanner.title")
-    public enum BarcodeDetected {
-      /// That's the product barcode. Scan the Alfie code on the tag instead.
-      public static let message = L10n.tr("L10n", "scanner.barcode_detected.message")
-    }
     public enum Error {
       public enum Generic {
         /// Something went wrong.
@@ -500,8 +496,18 @@ public enum L10n {
       /// Point the camera at the Alfie code on the tag
       public static let message = L10n.tr("L10n", "scanner.guidance.message")
     }
+    public enum Intro {
+      /// Continue
+      public static let `continue` = L10n.tr("L10n", "scanner.intro.continue")
+      /// Allow camera access to scan the Alfie code on a tag and go straight to the product.
+      public static let message = L10n.tr("L10n", "scanner.intro.message")
+      /// Not now
+      public static let notNow = L10n.tr("L10n", "scanner.intro.not_now")
+      /// Scan a tag
+      public static let title = L10n.tr("L10n", "scanner.intro.title")
+    }
     public enum Unrecognised {
-      /// That code doesn't open anything in Alfie.
+      /// We don't recognize this barcode.
       public static let message = L10n.tr("L10n", "scanner.unrecognised.message")
     }
   }
@@ -837,13 +843,16 @@ public extension L10n {
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
       case scannerTitle = "scanner.title"
-      case scannerBarcodeDetectedMessage = "scanner.barcode_detected.message"
       case scannerErrorGenericMessage = "scanner.error.generic.message"
       case scannerErrorPermissionDeniedAction = "scanner.error.permission_denied.action"
       case scannerErrorPermissionDeniedMessage = "scanner.error.permission_denied.message"
       case scannerErrorPermissionDeniedTitle = "scanner.error.permission_denied.title"
       case scannerErrorUnsupportedMessage = "scanner.error.unsupported.message"
       case scannerGuidanceMessage = "scanner.guidance.message"
+      case scannerIntroContinue = "scanner.intro.continue"
+      case scannerIntroMessage = "scanner.intro.message"
+      case scannerIntroNotNow = "scanner.intro.not_now"
+      case scannerIntroTitle = "scanner.intro.title"
       case scannerUnrecognisedMessage = "scanner.unrecognised.message"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"

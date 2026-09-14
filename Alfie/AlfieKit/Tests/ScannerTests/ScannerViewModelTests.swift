@@ -20,6 +20,8 @@ final class ScannerViewModelTests: XCTestCase {
     private var closeCount: Int!
     private var openSettingsCount: Int!
     private var mockAnalytics: MockAnalyticsTracker!
+    private var mockHaptics: MockHapticsService!
+    private var triggeredHaptics: [HapticType]!
     private var sut: ScannerViewModel!
 
     /// The format the generator prints — see `Tools/AlfieCodeGen` and ADR-0001.
@@ -37,6 +39,9 @@ final class ScannerViewModelTests: XCTestCase {
         closeCount = 0
         openSettingsCount = 0
         mockAnalytics = MockAnalyticsTracker()
+        triggeredHaptics = []
+        mockHaptics = MockHapticsService()
+        mockHaptics.onTriggerCalled = { [weak self] in self?.triggeredHaptics.append($0) }
         scanService = MockCameraScanService()
 
         let handler = MockDeepLinkHandler()
@@ -48,12 +53,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         let scanService = try XCTUnwrap(scanService)
         sut = ScannerViewModel(
-            dependencies: .init(
-                deepLinkService: deepLinkService,
-                makeScanService: { scanService },
-                analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
-                log: MockLogger()
-            ),
+            dependencies: makeDependencies(scanService: scanService),
             source: .searchBar,
             // The flow's closures, standing in for HomeFlowViewModel: the first hands the scanned
             // link to the real deep-link service, so these tests still assert on the link the app
@@ -66,6 +66,8 @@ final class ScannerViewModelTests: XCTestCase {
 
     override func tearDownWithError() throws {
         sut = nil
+        mockHaptics = nil
+        triggeredHaptics = nil
         deepLinkService = nil
         scanService = nil
         handledDeepLinks = nil
@@ -97,12 +99,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         let scanService = MockCameraScanService()
         let sut = ScannerViewModel(
-            dependencies: .init(
-                deepLinkService: deepLinkService,
-                makeScanService: { scanService },
-                analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
-                log: MockLogger()
-            ),
+            dependencies: makeDependencies(scanService: scanService),
             source: .searchBar,
             openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
             openAppSettings: { },
@@ -115,6 +112,46 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(eventsInOrder, ["close", "open"])
     }
 
+    /// The shopper is shown that the code worked — a success haptic and the frame turning green —
+    /// before the scanner gives way to the product.
+    func test_anAlfieCodeIsConfirmedBeforeItsProductOpens() throws {
+        var handOff: (() -> Void)?
+        let scanService = MockCameraScanService()
+        let sut = ScannerViewModel(
+            dependencies: makeDependencies(scanService: scanService, afterRecognitionFeedback: { handOff = $0 }),
+            source: .searchBar,
+            openScannedLink: { [weak self] url in self?.deepLinkService.openUrls([url]) },
+            openAppSettings: { },
+            close: { [weak self] in self?.closeCount += 1 }
+        )
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertEqual(sut.state.value?.isRecognised, true)
+        XCTAssertFalse(scanService.isScanning)
+        XCTAssertEqual(closeCount, 0)
+        XCTAssertTrue(handledDeepLinks.isEmpty)
+        guard case .notification(.success) = try XCTUnwrap(triggeredHaptics.first) else {
+            return XCTFail("Expected a success haptic, got \(triggeredHaptics ?? [])")
+        }
+
+        try XCTUnwrap(handOff)()
+
+        XCTAssertEqual(closeCount, 1)
+        XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
+    }
+
+    func test_aCodeThatIsNotAnAlfieCodeIsNotConfirmed() {
+        sut.viewDidAppear()
+
+        scanService.recognise(Self.barcode)
+        scanService.recognise("https://example.com/not-an-alfie-code")
+
+        XCTAssertEqual(sut.state.value?.isRecognised, false)
+        XCTAssertTrue(triggeredHaptics.isEmpty)
+    }
+
     /// The Handle is a route path on BigCommerce, so it routinely carries separators. All of it has
     /// to reach the Product Details page.
     func test_aMultiSegmentHandleReachesTheProductIntact() throws {
@@ -125,15 +162,9 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(try handledHandle(), "mens/jeans/slim-indigo")
     }
 
-    /// The printed code carries a SKU so that reprinting is not needed when Variant preselection
-    /// lands. Until then it must neither be honoured nor get in the way.
-    ///
-    /// What this test can show is the first half: the SKU survives the scanner and reaches the deep
-    /// link intact, rather than being stripped or making the code unrecognisable. The Product then
-    /// opening on its *default* Variant is not this module's doing — the SKU is discarded downstream
-    /// in `TabRoute`'s `case .productDetail(let handle, _, _)`, which is pre-existing routing already
-    /// covered by `DeepLinkRoutingTests`. Naming that half here would claim an assertion this test
-    /// does not make.
+    /// The SKU has to survive the scanner intact for the Product to open on the scanned Variant.
+    /// Preselecting it is `TabRoute` and the Product Details page's doing, covered by
+    /// `DeepLinkRoutingTests` and `ProductDetailsViewModelTests`.
     func test_aSkuInTheCodeIsCarriedIntoTheDeepLink() throws {
         sut.viewDidAppear()
 
@@ -278,14 +309,14 @@ final class ScannerViewModelTests: XCTestCase {
     // MARK: - Scanning the manufacturer's Barcode
 
     /// The Barcode is the obvious thing to point a camera at, and in a demo somebody will. Alfie
-    /// cannot resolve one — ADR-0001 — so the only useful thing recognising it buys is being able to
-    /// name the code that does work.
-    func test_aBarcodeSaysWhichCodeToScanInstead() {
+    /// cannot resolve one — ADR-0001 — so it gets the same notice as any other code, and the
+    /// guidance left on screen names the code that does work.
+    func test_aBarcodeIsNotRecognised() {
         sut.viewDidAppear()
 
         scanService.recognise(Self.barcode)
 
-        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.BarcodeDetected.message)
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.Unrecognised.message)
     }
 
     /// Recognition exists to produce a message and nothing else: there is no catalogue lookup by
@@ -372,7 +403,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         scanService.recognise("0012345678905")
 
-        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.BarcodeDetected.message)
+        XCTAssertEqual(sut.state.value?.notice?.message, L10n.Scanner.Unrecognised.message)
     }
 
     // MARK: - When recognition runs
@@ -633,6 +664,21 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    private func makeDependencies(
+        scanService: MockCameraScanService,
+        afterRecognitionFeedback: @escaping (@escaping () -> Void) -> Void = { $0() }
+    ) -> ScannerDependencyContainer {
+        .init(
+            deepLinkService: deepLinkService,
+            makeScanService: { scanService },
+            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
+            haptics: mockHaptics,
+            isCameraAccessUndetermined: { false },
+            afterRecognitionFeedback: afterRecognitionFeedback,
+            log: MockLogger()
+        )
+    }
 
     /// The `reason` carried by each `scan_failed` event, in order.
     private var reportedScanFailures: [String] {

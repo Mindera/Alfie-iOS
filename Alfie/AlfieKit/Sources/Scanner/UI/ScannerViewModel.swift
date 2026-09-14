@@ -11,8 +11,7 @@ import SwiftUI
 /// a recognised code is handed back to the flow, which passes it to the deep-link path the app
 /// already uses for a tapped link, and that path decides where it lands. ADR-0001 is what makes
 /// this possible: it puts the Handle inside the code, so there is nothing to look up and no new
-/// route to add. The Product opens on its default Variant — the SKU the code carries is parsed and
-/// ignored until Variant preselection is implemented.
+/// route to add. The Product opens on the Variant named by the SKU the code carries.
 ///
 /// It does own what the shopper is told when that does not happen, and the distinction it draws is
 /// between a scan that failed and a camera that cannot run. A code that opens nothing in Alfie is
@@ -24,6 +23,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private let scanService: CameraScanServiceProtocol
     private let deepLinkService: DeepLinkServiceProtocol
     private let analytics: AlfieAnalyticsTracker
+    private let haptics: HapticsServiceProtocol
+    private let afterRecognitionFeedback: (@escaping () -> Void) -> Void
     private let source: ScanEntryPoint
     private let openScannedLink: (URL) -> Void
     private let openAppSettings: () -> Void
@@ -50,6 +51,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     public var preview: AnyView { scanService.makePreview() }
     public var guidance: String? { state.value?.guidance }
     public var notice: ScannerNotice? { state.value?.notice }
+    public var isRecognised: Bool { state.value?.isRecognised ?? false }
     @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = initialState
 
     /// What the screen shows whenever a scan is starting: the guidance, and nothing said yet about
@@ -72,6 +74,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         self.scanService = dependencies.makeScanService()
         self.deepLinkService = dependencies.deepLinkService
         self.analytics = dependencies.analytics
+        self.haptics = dependencies.haptics
+        self.afterRecognitionFeedback = dependencies.afterRecognitionFeedback
         self.log = dependencies.log
         self.source = source
         self.openScannedLink = openScannedLink
@@ -191,7 +195,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             guard !hasAnswered(value, whenHolding: previouslyHeld, nowHolding: nowHeld) else { return }
             log.debug("Scanned the manufacturer's Barcode, which Alfie cannot resolve: \(value)")
             analytics.trackScanFailed(reason: .barcode)
-            show(notice: L10n.Scanner.BarcodeDetected.message)
+            show(notice: L10n.Scanner.Unrecognised.message)
 
         case .unrecognised(let payload):
             guard !hasAnswered(payload, whenHolding: previouslyHeld, nowHolding: nowHeld) else { return }
@@ -244,10 +248,17 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         hasOpenedLink = true
         trackSucceeded(for: url)
         updateScanning()
-        // Dismissed before the product opens, not left behind it: the deep-link path pushes onto a
-        // tab that the scanner is covering.
-        close()
-        openScannedLink(url)
+        if let model = state.value {
+            state = .success(model.recognised())
+        }
+        haptics.trigger(.notification(.success))
+        afterRecognitionFeedback { [weak self] in
+            guard let self else { return }
+            // Dismissed before the product opens, not left behind it: the deep-link path pushes onto
+            // a tab that the scanner is covering.
+            close()
+            openScannedLink(url)
+        }
     }
 
     /// `scan_succeeded` reports the Handle the code named, so it is raised for the one link type that
@@ -258,12 +269,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         guard case .productDetail(let handle, _, let query) = deepLinkService.deepLinkType(url) else {
             return
         }
-        analytics.trackScanSucceeded(handle: handle, hasSku: query?[Constants.skuQueryItem] != nil)
-    }
-
-    private enum Constants {
-        /// The query item `AlfieCode` writes into the printed link. See `Tools/AlfieCodeGen`.
-        static let skuQueryItem = "sku"
+        analytics.trackScanSucceeded(handle: handle, hasSku: query?[DeepLink.skuQueryItem] != nil)
     }
 
     /// Whether a scanned link reaches somewhere in the app.

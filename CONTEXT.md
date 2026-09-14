@@ -39,4 +39,5 @@ _Avoid_: EAN, UPC, GTIN (use these only when the specific symbology matters)
 A QR code Alfie generates and prints, encoding a link to a Product and the Variant it is attached
 to. Distinct from a Barcode: it is ours, it is not digits-only, and it needs no catalogue lookup to
 interpret.
-_Avoid_: QR, product code, scan code
+_Avoid_: QR, product code, scan code, barcode (designs say "Scan Barcode" for the feature; the
+thing scanned is still an Alfie code)

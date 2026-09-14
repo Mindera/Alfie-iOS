@@ -1283,17 +1283,6 @@
         }
       }
     },
-    "scanner.barcode_detected.message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "That's the product barcode. Scan the Alfie code on the tag instead."
-          }
-        }
-      }
-    },
     "scanner.error.generic.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1360,6 +1349,50 @@
         }
       }
     },
+    "scanner.intro.continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "scanner.intro.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow camera access to scan the Alfie code on a tag and go straight to the product."
+          }
+        }
+      }
+    },
+    "scanner.intro.not_now" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        }
+      }
+    },
+    "scanner.intro.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan a tag"
+          }
+        }
+      }
+    },
     "scanner.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1377,7 +1410,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "That code doesn't open anything in Alfie."
+            "value" : "We don't recognize this barcode."
           }
         }
       }

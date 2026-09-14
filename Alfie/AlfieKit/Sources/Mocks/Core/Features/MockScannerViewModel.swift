@@ -13,6 +13,7 @@ public class MockScannerViewModel: ScannerViewModelProtocol {
     public var preview: AnyView
     public var guidance: String? { state.value?.guidance }
     public var notice: ScannerNotice? { state.value?.notice }
+    public var isRecognised: Bool { state.value?.isRecognised ?? false }
 
     public init(
         title: String = "Scan",

@@ -415,6 +415,32 @@ final class ProductDetailsViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: .default)
     }
 
+    func test_deep_link_entry_with_sku_preselects_the_matching_variant() {
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", colour: .fixture(id: "1"), stock: 1)
+        let scannedVariant = Product.Variant.fixture(id: "v2", sku: "SKU-2", colour: .fixture(id: "2"), stock: 1)
+        mockProductService.onGetProductCalled = { _ in
+            .fixture(defaultVariant: defaultVariant, variants: [defaultVariant, scannedVariant])
+        }
+
+        initViewModel(configuration: .deepLink(handle: "nice-shirt", sku: "SKU-2"))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productReference, "SKU-2")
+        XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
+    }
+
+    func test_deep_link_entry_with_unknown_sku_falls_back_to_the_default_variant() {
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", stock: 1)
+        mockProductService.onGetProductCalled = { _ in
+            .fixture(defaultVariant: defaultVariant, variants: [defaultVariant])
+        }
+
+        initViewModel(configuration: .deepLink(handle: "nice-shirt", sku: "NOT-IN-CATALOGUE"))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productReference, "SKU-1")
+    }
+
     func test_product_is_not_fetched_when_view_appears_if_already_fetched() {
         let productId = "1"
         initViewModel(configuration: .id(productId))

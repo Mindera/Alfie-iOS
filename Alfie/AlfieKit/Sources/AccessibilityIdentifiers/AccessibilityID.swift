@@ -61,6 +61,10 @@ public enum AccessibilityID {
         public static let notice = "scanner.notice.label"
         public static let failure = "scanner.failure.view"
         public static let openSettings = "scanner.openSettings.button"
+        public static let viewfinder = "scanner.viewfinder.view"
+        public static let intro = "scanner.intro.view"
+        public static let introContinue = "scanner.intro.continue.button"
+        public static let introNotNow = "scanner.intro.notNow.button"
     }
 
     // MARK: - Splash

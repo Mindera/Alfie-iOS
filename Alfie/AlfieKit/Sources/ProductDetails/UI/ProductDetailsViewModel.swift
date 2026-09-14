@@ -33,6 +33,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
     private let productHandle: String
     private let initialSelectedProduct: SelectedProduct?
+    private let requestedSku: String?
 
     private var product: Product? {
         guard case .success(let model) = state else {
@@ -104,18 +105,21 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.productId = productId
             self.productHandle = productId
             self.initialSelectedProduct = nil
+            self.requestedSku = nil
             self.baseProduct = nil
 
-        case .deepLink(let handle):
+        case .deepLink(let handle, let sku):
             self.productId = handle
             self.productHandle = handle
             self.initialSelectedProduct = nil
+            self.requestedSku = sku
             self.baseProduct = nil
 
         case .product(let product):
             self.productId = product.id
             self.productHandle = product.slug
             self.initialSelectedProduct = nil
+            self.requestedSku = nil
             self.baseProduct = product
 
             buildColorAndSizingSelectionConfigurations(
@@ -127,6 +131,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.productId = selectedProduct.product.id
             self.productHandle = selectedProduct.product.slug
             self.initialSelectedProduct = selectedProduct
+            self.requestedSku = selectedProduct.selectedVariant.sku
             baseProduct = selectedProduct.product
 
             buildColorAndSizingSelectionConfigurations(
@@ -373,13 +378,14 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
     /// snapshot (e.g. out-of-date stock), so map the selection onto the freshly fetched product by
-    /// `sku` — keeping the user's choice while reflecting current stock/price. Fall back to the
-    /// product's default variant when there is no persisted selection or no match.
+    /// `sku` — keeping the user's choice while reflecting current stock/price. A deep link's `sku`
+    /// (a scanned Alfie code) is mapped the same way. Fall back to the product's default variant when
+    /// there is no requested SKU or no match.
     private func resolvedSelectedVariant(for product: Product) -> Product.Variant {
-        guard let persistedSku = initialSelectedProduct?.selectedVariant.sku else {
+        guard let requestedSku else {
             return product.defaultVariant
         }
-        return product.variants.first { $0.sku == persistedSku } ?? product.defaultVariant
+        return product.variants.first { $0.sku == requestedSku } ?? product.defaultVariant
     }
 
     private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {

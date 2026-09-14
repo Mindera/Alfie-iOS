@@ -152,7 +152,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
                     switch productDetailsRoute {
                     case .productDetails(let configuration):
                         switch configuration {
-                        case .id(let configurationProductID), .deepLink(let configurationProductID):
+                        case .id(let configurationProductID), .deepLink(let configurationProductID, _):
                             productID = configurationProductID
                             product = nil
 

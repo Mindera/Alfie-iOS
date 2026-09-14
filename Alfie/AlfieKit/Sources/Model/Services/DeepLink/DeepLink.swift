@@ -3,6 +3,8 @@ import Foundation
 // MARK: - DeepLink
 
 public struct DeepLink {
+    public static let skuQueryItem = "sku"
+
     public enum LinkType: Equatable {
         case unknown
         case webView(url: URL)
