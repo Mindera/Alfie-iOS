@@ -1,7 +1,8 @@
 # Testing
 
-This standard covers the `AlfieKit` unit and integration tests. `AlfieUITests` (XCUITest, run from its
-own scheme) and `Tools/DesignTokenGen` (Swift Testing, its own package) keep their own conventions.
+This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`. `AlfieUITests`
+(XCUITest, run from its own scheme) and `Tools/DesignTokenGen` (Swift Testing, its own package) sit in
+neither plan and keep their own conventions.
 
 ## Rules
 
@@ -98,7 +99,7 @@ rule above in new code rather than copying them.
 
 ### Framework
 
-`XCTest` is the house framework; every `AlfieKit` test is written against it. Swift Testing
+`XCTest` is the house framework; every test in either plan is written against it. Swift Testing
 (`@Test` / `#expect`) is **not** adopted there, and introducing it is a funded migration rather than a
 per-PR choice. Three things block it:
 
@@ -132,7 +133,8 @@ Treat them as correct, in review and when writing.
 ## Test Structure
 
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
-  (`ls Alfie/AlfieKit/Tests/` for the current set). `BFFIntegrationTests` is the odd one out:
+  (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
+  `BFFIntegrationTests` is the odd one out:
   it runs against a real local BFF, not mocks, and only when `verify.sh` runs without
   `--skip-integration`.
 
