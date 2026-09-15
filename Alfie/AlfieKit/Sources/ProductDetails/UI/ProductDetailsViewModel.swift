@@ -19,7 +19,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         ProductDetailsViewStateModel, ProductDetailsViewErrorType
     > = .loading
     @Published public private(set) var relatedProductsState: ViewState<[Product], Error> = .loading
-    @Published public private(set) var wishlistContent: [SelectedProduct] = []
+    @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
     public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
@@ -136,7 +136,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public func viewDidAppear() {
-        loadRelatedProductsIfNeeded()
+        Task {
+            await loadRelatedProductsIfNeeded()
+        }
         Task {
             await loadProductIfNeeded()
         }
@@ -292,48 +294,44 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.contains { $0.product.id == product.id }
+        wishlistContent.containsProduct(product)
     }
 
     public func didTapWishlist(for product: Product, isFavorite: Bool) {
         Task { @MainActor in
-            if isFavorite {
-                await dependencies.wishlistService.removeProduct(withId: product.id)
-                dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
-            } else {
-                await dependencies.wishlistService.addProduct(SelectedProduct(product: product))
-                dependencies.analytics.trackAddToWishlist(productID: product.id)
-            }
-            wishlistContent = await dependencies.wishlistService.getWishlistContent()
+            wishlistContent = await dependencies.wishlistService.toggleProduct(
+                product,
+                isFavorite: isFavorite,
+                analytics: dependencies.analytics
+            )
         }
     }
 
     // MARK: - Private
 
-    private func loadRelatedProductsIfNeeded() {
+    @MainActor
+    private func loadRelatedProductsIfNeeded() async {
         guard !hasRequestedRelatedProducts else {
             return
         }
         hasRequestedRelatedProducts = true
 
-        Task { @MainActor in
-            do {
-                let products = try await dependencies.productService.relatedProducts(
-                    handle: productHandle,
-                    limit: Constants.relatedProductsRequestLimit
-                )
-                relatedProductsState = .success(
-                    Array(
-                        products
-                            .filter { $0.slug != productHandle && $0.id != productId }
-                            .prefix(Constants.relatedProductsMaxCount)
-                    )
-                )
-            } catch {
-                dependencies.log.error("Error fetching related products for \(productHandle): \(error)")
-                relatedProductsState = .error(error)
-            }
+        do {
+            let products = try await dependencies.productService.relatedProducts(
+                handle: productHandle,
+                limit: Constants.relatedProductsRequestLimit
+            )
+            relatedProductsState = .success(
+                Array(products.filter { !isCurrentProduct($0) }.prefix(Constants.relatedProductsMaxCount))
+            )
+        } catch {
+            dependencies.log.error("Error fetching related products for \(productHandle): \(error)")
+            relatedProductsState = .error(error)
         }
+    }
+
+    private func isCurrentProduct(_ candidate: Product) -> Bool {
+        candidate.slug == productHandle || candidate.id == productId
     }
 
     @MainActor
@@ -541,5 +539,6 @@ private extension String {
 
 private enum Constants {
     static let relatedProductsMaxCount = 6
-    static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
+    static let currentProductSlot = 1
+    static let relatedProductsRequestLimit = relatedProductsMaxCount + currentProductSlot
 }

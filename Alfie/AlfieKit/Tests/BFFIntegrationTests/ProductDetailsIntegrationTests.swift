@@ -70,7 +70,7 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
             return
         }
 
-        throw XCTSkip("No seeded product in '\(IntegrationSeed.collectionHandle)' has related products")
+        XCTFail("No seeded product in '\(IntegrationSeed.collectionHandle)' returned related products")
     }
 
     // MARK: - Helpers

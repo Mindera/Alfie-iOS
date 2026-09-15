@@ -72,7 +72,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public var onShouldShowSectionCalled: ((ProductDetailsSection) -> Bool)?
     public func shouldShow(section: ProductDetailsSection) -> Bool {
-        onShouldShowSectionCalled?(section) ?? (section != .relatedProducts)
+        onShouldShowSectionCalled?(section) ?? true
     }
 
     public var onDidTapAddToBagCalled: (() -> Void)?

@@ -193,9 +193,7 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
             dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.searchFlowViewModel.pop() },
             openWebfeatureAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.webFeature($0))) },
-            openProductAction: { [weak self] in
-                self?.searchFlowViewModel.navigate(.searchIntent(.productDetails(productID: $0.id, product: $0)))
-            }
+            openProductAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.productDetails($0))) }
         )
     }
 

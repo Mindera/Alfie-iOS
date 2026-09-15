@@ -504,23 +504,26 @@ extension ProductDetailsView {
 
     @ViewBuilder private var relatedProducts: some View {
         if viewModel.shouldShow(section: .relatedProducts) {
-            let isLoading = viewModel.shouldShowLoading(for: .relatedProducts)
-            let products = isLoading ? Product.relatedProductsSkeleton : (viewModel.relatedProductsState.value ?? [])
-
             VStack(alignment: .leading, spacing: theme.spacing.space100) {
                 Text.build(theme.font.body.mediumBold(L10n.Pdp.RelatedProducts.title))
                     .foregroundStyle(Theme.contentContentPrimary)
                     .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsTitleLabel)
 
                 LazyVGrid(columns: relatedProductsColumns, alignment: .leading, spacing: theme.spacing.space200) {
-                    ForEach(products) { product in
-                        relatedProductCard(product, isLoading: isLoading)
+                    if viewModel.shouldShowLoading(for: .relatedProducts) {
+                        ForEach(Product.skeletons(count: Constants.relatedProductsSkeletonCount)) { product in
+                            relatedProductCard(product, isLoading: true)
+                        }
+                    } else {
+                        ForEach(viewModel.relatedProductsState.value ?? []) { product in
+                            relatedProductCard(product, isLoading: false)
+                                .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductButton(id: product.id))
+                        }
                     }
                 }
             }
             .padding(.top, theme.spacing.space200)
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProducts)
         }
     }
 
@@ -549,7 +552,6 @@ extension ProductDetailsView {
             viewModel.didSelectRelatedProduct(product)
         }
         .allowsHitTesting(!isLoading)
-        .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductCard(id: product.id))
     }
 
     @ViewBuilder private var descriptionSection: some View {
@@ -707,32 +709,6 @@ private enum Constants {
     static let errorViewIconSize: CGFloat = 210
     static let relatedProductsColumns = 2
     static let relatedProductsSkeletonCount = 6
-}
-
-private extension Product {
-    static let relatedProductsSkeleton: [Product] = (0..<Constants.relatedProductsSkeletonCount).map { index in
-        let amount = Money(currencyCode: "", amount: 0, amountFormatted: "£000.00")
-        return Product(
-            id: "related-products-skeleton-\(index)",
-            styleNumber: "",
-            name: "",
-            brand: Brand(name: "", slug: ""),
-            shortDescription: "",
-            slug: "",
-            priceRange: nil,
-            attributes: nil,
-            defaultVariant: Variant(
-                sku: "",
-                size: nil,
-                colour: nil,
-                attributes: nil,
-                stock: 0,
-                price: Price(amount: amount, was: nil)
-            ),
-            variants: [],
-            colours: nil
-        )
-    }
 }
 
 #if DEBUG

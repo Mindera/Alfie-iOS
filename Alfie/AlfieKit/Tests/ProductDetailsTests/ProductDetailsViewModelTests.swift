@@ -1375,35 +1375,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     func test_relatedProducts_areNotRefetched_whenViewReappears_afterSuccess() {
-        initViewModel()
-        mockProductService.onGetProductCalled = { _ in .fixture() }
-        mockProductService.onRelatedProductsCalled = { _, _ in [.fixture(slug: "other")] }
-        appearAndWaitForBothRequests()
-
-        let noCall = expectation(description: "No related products call")
-        noCall.isInverted = true
-        mockProductService.onRelatedProductsCalled = { _, _ in
-            noCall.fulfill()
-            return []
-        }
-        sut.viewDidAppear()
-        wait(for: [noCall], timeout: .inverted)
+        assertRelatedProductsAreNotRefetchedOnReappear(firstResponse: { _, _ in [.fixture(slug: "other")] })
     }
 
     func test_relatedProducts_areNotRefetched_whenViewReappears_afterFailure() {
-        initViewModel()
-        mockProductService.onGetProductCalled = { _ in .fixture() }
-        mockProductService.onRelatedProductsCalled = { _, _ in throw BFFRequestError(type: .generic) }
-        appearAndWaitForBothRequests()
-
-        let noCall = expectation(description: "No related products call")
-        noCall.isInverted = true
-        mockProductService.onRelatedProductsCalled = { _, _ in
-            noCall.fulfill()
-            return []
-        }
-        sut.viewDidAppear()
-        wait(for: [noCall], timeout: .inverted)
+        assertRelatedProductsAreNotRefetchedOnReappear(firstResponse: { _, _ in throw BFFRequestError(type: .generic) })
     }
 
     func test_reappearing_afterProductFailure_refetchesOnlyTheProduct() {
@@ -1480,30 +1456,22 @@ final class ProductDetailsViewModelTests: XCTestCase {
             afterTrigger: { self.sut.viewDidAppear() }
         )
     }
-}
 
-private final class PendingResult<Value>: @unchecked Sendable {
-    private let lock = NSLock()
-    private var continuation: CheckedContinuation<Value, Error>?
-    private var result: Value?
+    private func assertRelatedProductsAreNotRefetchedOnReappear(
+        firstResponse: @escaping (String, Int) async throws -> [Product]
+    ) {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in .fixture() }
+        mockProductService.onRelatedProductsCalled = firstResponse
+        appearAndWaitForBothRequests()
 
-    func value() async throws -> Value {
-        try await withCheckedThrowingContinuation { continuation in
-            lock.lock()
-            defer { lock.unlock() }
-            if let result {
-                continuation.resume(returning: result)
-            } else {
-                self.continuation = continuation
-            }
+        let noCall = expectation(description: "No related products call")
+        noCall.isInverted = true
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            noCall.fulfill()
+            return []
         }
-    }
-
-    func resume(with value: Value) {
-        lock.lock()
-        defer { lock.unlock() }
-        result = value
-        continuation?.resume(returning: value)
-        continuation = nil
+        sut.viewDidAppear()
+        wait(for: [noCall], timeout: .inverted)
     }
 }
