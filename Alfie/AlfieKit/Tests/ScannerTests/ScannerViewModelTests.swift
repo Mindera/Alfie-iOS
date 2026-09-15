@@ -259,6 +259,17 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(try handledHandle(), "slim-indigo-jean")
     }
 
+    func test_recognisingAnAlfieCodeClearsAnEarlierNotice() {
+        sut.viewDidAppear()
+        scanService.recognise("https://example.com/not-an-alfie-code")
+        XCTAssertNotNil(sut.state.value?.notice)
+
+        scanService.recognise(Self.alfieCode)
+
+        XCTAssertNil(sut.state.value?.notice)
+        XCTAssertEqual(sut.state.value?.isRecognised, true)
+    }
+
     /// An Alfie code carries an Alfie link, and the flow's deep-link path decides where it lands.
     /// Judging the code on "is it a Product?" would tell a shopper holding a real Alfie code that it
     /// is not from Alfie — false, and it would strand a link the app can open perfectly well.

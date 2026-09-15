@@ -442,6 +442,19 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
     }
 
+    func test_selected_product_entry_keeps_the_saved_non_default_variant_after_refetch() {
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", colour: .fixture(id: "1"), stock: 1)
+        let savedVariant = Product.Variant.fixture(id: "v2", sku: "SKU-2", colour: .fixture(id: "2"), stock: 1)
+        let product = Product.fixture(defaultVariant: defaultVariant, variants: [defaultVariant, savedVariant])
+        mockProductService.onGetProductCalled = { _ in product }
+
+        initViewModel(configuration: .selectedProduct(SelectedProduct(product: product, selectedVariant: savedVariant)))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.value?.selectedVariant.sku, "SKU-2")
+        XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
+    }
+
     func test_deep_link_entry_with_unknown_sku_falls_back_to_the_default_variant() {
         let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", stock: 1)
         mockProductService.onGetProductCalled = { _ in

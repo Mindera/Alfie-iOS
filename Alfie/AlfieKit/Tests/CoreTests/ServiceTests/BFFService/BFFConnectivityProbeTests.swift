@@ -35,6 +35,17 @@ final class BFFConnectivityProbeTests: XCTestCase {
         XCTAssertTrue(logs.contains { $0.level == .error && $0.message.contains("HTTP 404") })
     }
 
+    func test_aNonHTTPResponseIsLoggedAsAnError() async {
+        let sut = makeSut { _ in
+            (Data(), URLResponse(url: self.baseUrl, mimeType: nil, expectedContentLength: 0, textEncodingName: nil))
+        }
+
+        await sut.run()
+
+        XCTAssertTrue(logs.contains { $0.level == .error && $0.message.contains("HTTP -1") })
+        XCTAssertFalse(logs.contains { $0.message.contains("connected") })
+    }
+
     func test_aTransportFailureIsLoggedWithItsCause() async {
         let sut = makeSut { _ in throw URLError(.notConnectedToInternet) }
 
