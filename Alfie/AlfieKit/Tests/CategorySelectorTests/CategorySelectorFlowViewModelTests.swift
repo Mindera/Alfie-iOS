@@ -34,20 +34,21 @@ final class CategorySelectorFlowViewModelTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_theTabHasNoOverlayUntilSomethingAsksForOne() {
+    func test_overlay_before_any_presentation_is_nil() {
         XCTAssertEqual(overlayViews.count, 1)
         XCTAssertNil(overlayViews.last ?? nil)
     }
 
-    func test_presentingTheScannerCoversTheTab() {
+    func test_present_scanner_with_no_overlay_emits_an_overlay() {
         sut.presentScanner()
 
         XCTAssertEqual(overlayViews.count, 2)
         XCTAssertNotNil(overlayViews.last ?? nil)
     }
 
-    func test_presentingTheScannerReplacesSearch() {
+    func test_present_scanner_while_search_is_presented_replaces_the_overlay() {
         sut.presentSearch()
+
         sut.presentScanner()
 
         XCTAssertEqual(overlayViews.count, 3)
@@ -85,7 +86,7 @@ final class CategorySelectorFlowViewModelTests: XCTestCase {
             ),
             productListingDependencyContainer: ProductListingDependencyContainer(
                 productListingService: MockProductListingService(),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: MockProductListingStyleProvider(),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService,

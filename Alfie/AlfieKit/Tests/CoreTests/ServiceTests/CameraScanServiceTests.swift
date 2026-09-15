@@ -2,6 +2,7 @@ import AVFoundation
 import Combine
 import Mocks
 import Model
+import TestUtils
 import XCTest
 @testable import Core
 
@@ -23,25 +24,30 @@ final class CameraScanServiceTests: XCTestCase {
         subscriptions = []
     }
 
+    override func tearDownWithError() throws {
+        subscriptions = []
+        failures = []
+        accessRequestCount = 0
+        try super.tearDownWithError()
+    }
+
     /// Asking for a camera we have no use for is a prompt the shopper has to answer for nothing, and
     /// a permission they have then granted to an app that still cannot scan.
     @MainActor
-    func test_aDeviceThatCannotScanIsNeverAskedForTheCamera() async {
+    func test_start_on_unsupported_device_reports_unsupported_without_asking_for_camera() {
         let sut = makeSut(isDeviceSupported: false, isAccessGranted: true)
 
-        sut.startScanning()
-        await settle(until: { self.failures.count == 1 })
+        XCTAssertEmitsValue(from: sut.failurePublisher, afterTrigger: sut.startScanning)
 
         XCTAssertEqual(accessRequestCount, 0)
         XCTAssertEqual(failures, [.deviceNotSupported])
     }
 
     @MainActor
-    func test_aRefusedCameraIsReportedAsRefused() async {
+    func test_start_with_camera_refused_reports_permission_denied() {
         let sut = makeSut(isDeviceSupported: true, isAccessGranted: false)
 
-        sut.startScanning()
-        await settle(until: { self.failures.count == 1 })
+        XCTAssertEmitsValue(from: sut.failurePublisher, afterTrigger: sut.startScanning)
 
         XCTAssertEqual(accessRequestCount, 1)
         XCTAssertEqual(failures, [.permissionDenied])
@@ -50,13 +56,11 @@ final class CameraScanServiceTests: XCTestCase {
     /// A refusal leaves nothing scanning and nobody having asked it to stop, so the next appearance
     /// has to reach the camera again — the shopper may have granted access in Settings meanwhile.
     @MainActor
-    func test_aRefusedCameraIsAskedAgainOnTheNextStart() async {
+    func test_start_after_refusal_asks_for_camera_again() {
         let sut = makeSut(isDeviceSupported: true, isAccessGranted: false)
+        XCTAssertEmitsValue(from: sut.failurePublisher, afterTrigger: sut.startScanning)
 
-        sut.startScanning()
-        await settle(until: { self.failures.count == 1 })
-        sut.startScanning()
-        await settle(until: { self.failures.count == 2 })
+        XCTAssertEmitsValue(from: sut.failurePublisher, afterTrigger: sut.startScanning)
 
         XCTAssertEqual(accessRequestCount, 2)
         XCTAssertEqual(failures, [.permissionDenied, .permissionDenied])
@@ -65,16 +69,25 @@ final class CameraScanServiceTests: XCTestCase {
     /// Stopping before the prompt is answered abandons that start request: the screen has gone, so
     /// nothing should be reported about a camera nobody is looking at any more.
     @MainActor
-    func test_aStartAbandonedBeforeTheAnswerReportsNothing() async {
-        let sut = makeSut(isDeviceSupported: true, isAccessGranted: false)
-
+    func test_stop_before_prompt_is_answered_reports_nothing() async {
+        let prompt = CameraAccessPrompt()
+        let promptRaised = expectation(description: "camera access prompt raised")
+        let promptAnswered = expectation(description: "camera access prompt answered")
+        let sut = makeSut(isDeviceSupported: true) {
+            let isGranted = await prompt.ask(raised: promptRaised)
+            promptAnswered.fulfill()
+            return isGranted
+        }
         sut.startScanning()
-        sut.stopScanning()
-        // Waits for the prompt to have been answered, which is the point at which an abandoned start
-        // would report if it were going to. Waiting for a failure instead would mean waiting for
-        // something that must never arrive, which can only ever be a timeout.
-        await settle(until: { self.accessRequestCount == 1 })
+        await fulfillment(of: [promptRaised], timeout: .default)
 
+        sut.stopScanning()
+
+        await prompt.answer(isGranted: false)
+        // The service resumes from the prompt in the same main-actor job that fulfils this, so an
+        // abandoned start that were going to report would already have done so.
+        await fulfillment(of: [promptAnswered], timeout: .default)
+        XCTAssertEqual(accessRequestCount, 1)
         XCTAssertTrue(failures.isEmpty)
     }
 
@@ -83,11 +96,10 @@ final class CameraScanServiceTests: XCTestCase {
     /// itself will not run. Left unstubbed this is unreachable — the real check is false on every
     /// simulator, so it would mask the two cases above rather than be tested by them.
     @MainActor
-    func test_aScannerThatWillNotRunIsReportedAsUnavailable() async {
+    func test_start_with_scanner_unavailable_reports_unavailable() {
         let sut = makeSut(isDeviceSupported: true, isAccessGranted: true, isScanningAvailable: false)
 
-        sut.startScanning()
-        await settle(until: { self.failures.count == 1 })
+        XCTAssertEmitsValue(from: sut.failurePublisher, afterTrigger: sut.startScanning)
 
         XCTAssertEqual(accessRequestCount, 1)
         XCTAssertEqual(failures, [.unavailable])
@@ -96,17 +108,29 @@ final class CameraScanServiceTests: XCTestCase {
     // MARK: - Camera access explainer
 
     @MainActor
-    func test_cameraAccessCanBeAskedForOnlyBeforeIOSHasAsked() {
-        XCTAssertTrue(makeSut(isDeviceSupported: true, isAccessGranted: false, status: .notDetermined).canAskForCameraAccess)
-        XCTAssertFalse(makeSut(isDeviceSupported: true, isAccessGranted: false, status: .denied).canAskForCameraAccess)
-        XCTAssertFalse(makeSut(isDeviceSupported: true, isAccessGranted: true, status: .authorized).canAskForCameraAccess)
+    func test_can_ask_for_camera_access_only_before_ios_has_asked() {
+        let cases: [(status: AVAuthorizationStatus, isAccessGranted: Bool, expected: Bool)] = [
+            (.notDetermined, false, true),
+            (.denied, false, false),
+            (.authorized, true, false),
+        ]
+
+        for (status, isAccessGranted, expected) in cases {
+            let sut = makeSut(isDeviceSupported: true, isAccessGranted: isAccessGranted, status: status)
+
+            let canAsk = sut.canAskForCameraAccess
+
+            XCTAssertEqual(canAsk, expected, "Unexpected answer for authorisation status \(status.rawValue)")
+        }
     }
 
     @MainActor
-    func test_aDeviceThatCannotScanIsNeverOfferedCameraAccess() {
+    func test_can_ask_for_camera_access_on_unsupported_device_is_false() {
         let sut = makeSut(isDeviceSupported: false, isAccessGranted: false, status: .notDetermined)
 
-        XCTAssertFalse(sut.canAskForCameraAccess)
+        let canAsk = sut.canAskForCameraAccess
+
+        XCTAssertFalse(canAsk)
     }
 
     // MARK: - Helpers
@@ -118,6 +142,21 @@ final class CameraScanServiceTests: XCTestCase {
         isScanningAvailable: Bool = true,
         status: AVAuthorizationStatus = .notDetermined
     ) -> CameraScanService {
+        makeSut(
+            isDeviceSupported: isDeviceSupported,
+            isScanningAvailable: isScanningAvailable,
+            status: status,
+            requestCameraAccess: { isAccessGranted }
+        )
+    }
+
+    @MainActor
+    private func makeSut(
+        isDeviceSupported: Bool,
+        isScanningAvailable: Bool = true,
+        status: AVAuthorizationStatus = .notDetermined,
+        requestCameraAccess: @escaping @MainActor () async -> Bool
+    ) -> CameraScanService {
         let sut = CameraScanService(
             log: MockLogger(),
             isDeviceSupported: { isDeviceSupported },
@@ -126,7 +165,7 @@ final class CameraScanServiceTests: XCTestCase {
             isScanningAvailable: { isScanningAvailable },
             requestCameraAccess: { [weak self] in
                 self?.accessRequestCount += 1
-                return isAccessGranted
+                return await requestCameraAccess()
             },
             cameraAuthorizationStatus: { status }
         )
@@ -135,20 +174,20 @@ final class CameraScanServiceTests: XCTestCase {
             .store(in: &subscriptions)
         return sut
     }
+}
 
-    /// Lets the service's authorisation `Task` reach the outcome the caller is waiting for.
-    ///
-    /// Keyed on that outcome rather than on a count of hops: how many awaits the implementation
-    /// happens to contain is not something a test should have to know, and a fixed count stops being
-    /// enough the moment one is added — silently, as a pass. It yields rather than sleeping, so the
-    /// deadline is a backstop against a hang, not a delay any passing run waits out.
-    private func settle(until isSatisfied: () -> Bool, timeout: TimeInterval = 1) async {
-        let deadline = Date().addingTimeInterval(timeout)
-        while !isSatisfied(), Date() < deadline {
-            await Task.yield()
-        }
-        // One more hop, so that a continuation released by the last one has run before the
-        // assertions read what it did.
-        await Task.yield()
+/// Holds the system camera prompt open until the test answers it, so a stop can land while the
+/// shopper is still looking at the alert.
+private actor CameraAccessPrompt {
+    private var continuation: CheckedContinuation<Bool, Never>?
+
+    func ask(raised: XCTestExpectation) async -> Bool {
+        raised.fulfill()
+        return await withCheckedContinuation { continuation = $0 }
+    }
+
+    func answer(isGranted: Bool) {
+        continuation?.resume(returning: isGranted)
+        continuation = nil
     }
 }

@@ -1544,13 +1544,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     /// The note qualifies what the selectors' availability means, so it must not appear before there
     /// is any availability on screen — while loading, the swatches are shimmer placeholders.
-    func test_availabilityNote_isHidden_whileTheProductIsLoading() {
+    func test_should_show_availability_note_while_loading_is_false() {
         initViewModel()
 
         XCTAssertFalse(sut.shouldShow(section: .availabilityNote))
     }
 
-    func test_availabilityNote_isShown_onceTheProductHasLoaded() {
+    func test_should_show_availability_note_once_loaded_is_true() {
         initViewModel()
 
         mockProductService.onGetProductCalled = { _ in
@@ -1563,7 +1563,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     /// An error state draws no selectors, so there is nothing for the note to qualify.
-    func test_availabilityNote_isHidden_whenTheProductFailedToLoad() {
+    func test_should_show_availability_note_after_load_failure_is_false() {
         initViewModel()
 
         mockProductService.onGetProductCalled = { _ in
@@ -1576,11 +1576,14 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     /// Static copy: it is either on screen or absent, and never shimmers in as placeholder content.
-    func test_availabilityNote_neverShimmers() {
+    func test_should_show_loading_for_availability_note_while_loading_is_false() {
         initViewModel()
 
         XCTAssertFalse(sut.shouldShowLoading(for: .availabilityNote))
+    }
 
+    func test_should_show_loading_for_availability_note_once_loaded_is_false() {
+        initViewModel()
         mockProductService.onGetProductCalled = { _ in
             .fixture()
         }
@@ -1592,7 +1595,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     // MARK: - Wishlist
 
-    func test_isInWishlist_isTrue_afterAppearing_forAProductAlreadyInTheWishlist() {
+    func test_view_did_appear_for_product_already_in_wishlist_sets_is_in_wishlist() {
         let product = Product.fixture(id: "p1")
         makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: product)]))
         mockProductService.onGetProductCalled = { _ in product }
@@ -1601,7 +1604,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.viewDidAppear() })
     }
 
-    func test_isInWishlist_matchesTheLoadedProduct_forADeepLinkEnteredByHandle() {
+    func test_view_did_appear_for_deep_link_handle_of_wishlisted_product_sets_is_in_wishlist() {
         let product = Product.fixture(id: "p1", slug: "nice-shirt")
         makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: product)]))
         mockProductService.onGetProductCalled = { _ in product }
@@ -1610,26 +1613,25 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.viewDidAppear() })
     }
 
-    func test_didTapAddToWishlist_addsTheProduct_andFlipsTheButtonOn() {
-        let product = Product.fixture(id: "p1")
-        let wishlistService = MockWishlistService()
-        makeDependencies(wishlistService: wishlistService)
+    func test_did_tap_add_to_wishlist_for_unwishlisted_product_adds_it_and_sets_is_in_wishlist() {
+        let variant = Product.Variant.fixture(sku: "SKU-1")
+        let product = Product.fixture(id: "p1", defaultVariant: variant, variants: [variant])
+        makeDependencies(wishlistService: MockWishlistService())
         mockProductService.onGetProductCalled = { _ in product }
         initViewModel(configuration: .product(product))
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.didTapAddToWishlist() })
 
-        XCTAssertEqual(mockAnalytics.trackedValues(of: .productID, for: .addToWishlist).count, 1)
+        XCTAssertEqual(mockAnalytics.trackedValues(of: .productID, for: .addToWishlist), ["p1-SKU-1"])
     }
 
-    func test_didTapAddToWishlist_removesAWishlistedProduct_andFlipsTheButtonOff() {
+    func test_did_tap_add_to_wishlist_for_wishlisted_product_removes_it_and_clears_is_in_wishlist() {
         let product = Product.fixture(id: "p1")
-        let wishlistService = MockWishlistService(products: [SelectedProduct(product: product)])
-        makeDependencies(wishlistService: wishlistService)
+        makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: product)]))
         mockProductService.onGetProductCalled = { _ in product }
         initViewModel(configuration: .product(product))
-        XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: true, afterTrigger: { self.sut.viewDidAppear() })
+        XCTAssertEmitsValue(from: sut.$isInWishlist, where: { $0 }, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEmitsValueEqualTo(from: sut.$isInWishlist, expectedValue: false, afterTrigger: { self.sut.didTapAddToWishlist() })
 

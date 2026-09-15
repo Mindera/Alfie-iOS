@@ -29,19 +29,21 @@ final class ScannerViewSnapshotTests: XCTestCase {
         MockScannerViewModel(title: L10n.Scanner.title, state: state)
     }
 
-    func test_scannerView() {
+    func test_scanner_view_scanning() {
         let sut = ScannerView(viewModel: Self.makeViewModel(state: .success(.init(guidance: Self.guidance))))
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
     /// Guidance long enough to wrap: the panel grows with the text rather than clipping it.
-    func test_scannerView_withLongGuidance() {
+    func test_scanner_view_with_long_guidance() {
         let viewModel = Self.makeViewModel(
             state: .success(.init(guidance: String(repeating: "\(Self.guidance). ", count: 3)))
         )
         let sut = ScannerView(viewModel: viewModel)
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
@@ -49,7 +51,7 @@ final class ScannerViewSnapshotTests: XCTestCase {
 
     /// The notice sits below the guidance rather than replacing it: what went wrong and what to do
     /// next are both on screen, over a camera that never stopped.
-    func test_scannerView_withNotice() {
+    func test_scanner_view_with_notice() {
         let viewModel = Self.makeViewModel(
             state: .success(
                 .init(
@@ -59,35 +61,40 @@ final class ScannerViewSnapshotTests: XCTestCase {
             )
         )
         let sut = ScannerView(viewModel: viewModel)
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_scannerView_recognised() {
+    func test_scanner_view_recognised() {
         let viewModel = Self.makeViewModel(state: .success(.init(guidance: Self.guidance, isRecognised: true)))
         let sut = ScannerView(viewModel: viewModel)
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_scannerIntroView() {
+    func test_scanner_intro_view() {
         let sut = ScannerIntroView(onContinue: {}, onNotNow: {})
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_scannerView_withPermissionDenied() {
+    func test_scanner_view_with_permission_denied() {
         let sut = ScannerView(viewModel: Self.makeViewModel(state: .error(.cameraPermissionDenied)))
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_scannerView_withDeviceNotSupported() {
+    func test_scanner_view_with_device_not_supported() {
         let sut = ScannerView(viewModel: Self.makeViewModel(state: .error(.deviceNotSupported)))
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
@@ -95,8 +102,9 @@ final class ScannerViewSnapshotTests: XCTestCase {
 
     /// The camera exists and is permitted, but would not start. It has no headline and no way out,
     /// so it renders a shorter panel than the other two — which is exactly what a reference is for.
-    func test_scannerView_withGenericFailure() {
+    func test_scanner_view_with_generic_failure() {
         let sut = ScannerView(viewModel: Self.makeViewModel(state: .error(.generic)))
+
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)

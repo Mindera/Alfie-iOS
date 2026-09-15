@@ -32,6 +32,7 @@ final class HomeViewModelTests: XCTestCase {
     override func tearDown() {
         sut = nil
         mockSessionService = nil
+        showScannerCalled = false
         super.tearDown()
     }
 
@@ -57,7 +58,7 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertTrue(showSearchCalled)
     }
 
-    func test_DidTapScan_ShowsTheScanner() {
+    func test_did_tap_scan_shows_the_scanner_not_search() {
         sut.didTapScan()
 
         XCTAssertTrue(showScannerCalled)

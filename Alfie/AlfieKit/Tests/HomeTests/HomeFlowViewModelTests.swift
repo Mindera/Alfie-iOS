@@ -43,18 +43,18 @@ final class HomeFlowViewModelTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_theTabHasNoOverlayUntilSomethingAsksForOne() {
+    func test_overlay_before_any_presentation_is_nil() {
         XCTAssertEqual(overlayViews.count, 1)
         XCTAssertNil(overlayViews.last ?? nil)
     }
 
-    func test_tappingScanPresentsTheScanner() {
+    func test_did_tap_scan_on_home_presents_an_overlay() {
         sut.makeHomeViewModel().didTapScan()
 
         XCTAssertNotNil(overlayViews.last ?? nil)
     }
 
-    func test_tappingSearchPresentsAnOverlayToo() {
+    func test_did_tap_search_on_home_presents_an_overlay() {
         sut.makeHomeViewModel().didTapSearch()
 
         XCTAssertNotNil(overlayViews.last ?? nil)
@@ -62,10 +62,10 @@ final class HomeFlowViewModelTests: XCTestCase {
 
     /// Presenting one overlay and then the other replaces it rather than stacking: `overlay` holds a
     /// single value, so the scanner cannot open behind the search screen.
-    func test_askingForASecondOverlayReplacesTheFirst() {
+    func test_did_tap_scan_while_search_is_presented_replaces_the_overlay() {
         let homeViewModel = sut.makeHomeViewModel()
-
         homeViewModel.didTapSearch()
+
         homeViewModel.didTapScan()
 
         XCTAssertNotNil(overlayViews.last ?? nil)
@@ -79,7 +79,7 @@ final class HomeFlowViewModelTests: XCTestCase {
     /// the tab's overlay — the same single value the scanner uses. This is the one line of this
     /// builder the scanner work changed, and nothing reached it before: the builder is handed to
     /// `SearchFlowViewModel` inside a closure that no unit test drives.
-    func test_aListingOpenedFromSearchCanOpenSearchAgain() {
+    func test_did_tap_search_on_a_listing_opened_from_search_presents_an_overlay() {
         let listing = sut.makeProductListingViewModelForSearch(searchTerm: "jeans", category: nil)
 
         listing.didTapSearch()
@@ -105,7 +105,7 @@ final class HomeFlowViewModelTests: XCTestCase {
             ),
             productListingDependencyContainer: ProductListingDependencyContainer(
                 productListingService: MockProductListingService(),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: serviceProvider.userDefaults),
+                plpStyleListProvider: MockProductListingStyleProvider(),
                 wishlistService: serviceProvider.wishlistService,
                 analytics: serviceProvider.analytics,
                 configurationService: serviceProvider.configurationService,

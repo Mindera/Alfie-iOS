@@ -78,7 +78,7 @@ final class TypographyStyleFontTests: XCTestCase {
         let style = Typography.Display.large
         XCTAssertEqual(style.fontFamily, Primitives.Typography.fontFamilyBrand)
         XCTAssertEqual(style.uiFont.pointSize, style.fontSize)
-        XCTAssertEqual(style.uiFont.fontName, FontNames.libreBaskerville.rawValue)
+        XCTAssertEqual(style.uiFont.fontName, "LibreBaskerville-Regular")
     }
 
     func test_build_forwardsTokenLineHeightAndLetterSpacing() {

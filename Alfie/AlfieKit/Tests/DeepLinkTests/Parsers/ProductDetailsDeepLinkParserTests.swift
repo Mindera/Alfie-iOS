@@ -3,6 +3,8 @@ import XCTest
 @testable import DeepLink
 
 final class ProductDetailsDeepLinkParserTests: XCTestCase {
+    private typealias ParseCase = (link: String, handle: String, route: String?, query: [String: String]?)
+
     private var sut: ProductDetailsDeepLinkParser!
     private var linkConfig: LinkConfiguration!
 
@@ -39,7 +41,7 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
 
         try assertNoParse(testLinks)
     }
-    
+
     func test_does_not_parse_links_with_invalid_path() throws {
         let testLinks = [
             "\(Self.httpUrl)/products",
@@ -56,98 +58,128 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
     // MARK: - Product Links
 
     func test_parses_product_links_with_numeric_handle_as_pdp() throws {
-        let testLinks = [
-            "\(Self.httpUrl)/product/26146503",
-            "\(Self.httpUrl)/product/24449925?something=test",
-            "\(Self.httpUrl)/product/25562382?#ins_sr=eyJwcm9kdWN0SWQiOiIyNTU2MjM4MiJ9",
+        let cases: [ParseCase] = [
+            ("\(Self.httpUrl)/product/26146503", "26146503", nil, nil),
+            ("\(Self.httpUrl)/product/24449925?something=test", "24449925", nil, ["something": "test"]),
+            ("\(Self.httpUrl)/product/25562382?#ins_sr=eyJwcm9kdWN0SWQiOiIyNTU2MjM4MiJ9", "25562382", nil, [:]),
         ]
-        try assertParse(testLinks[0], handle: "26146503", route: nil)
-        try assertParse(testLinks[1], handle: "24449925", route: nil)
-        try assertParse(testLinks[2], handle: "25562382", route: nil)
+
+        try assertParse(cases)
     }
 
     func test_ignores_casing_when_parsing_product_links() throws {
-        let testLinks = [
-            "\(Self.httpUrl)/product/26146503",
-            "\(Self.httpUrl)/PRODUCT/24449925",
-            "\(Self.httpUrl)/pRoDuCt/25562382",
+        let cases: [ParseCase] = [
+            ("\(Self.httpUrl)/product/26146503", "26146503", nil, nil),
+            ("\(Self.httpUrl)/PRODUCT/24449925", "24449925", nil, nil),
+            ("\(Self.httpUrl)/pRoDuCt/25562382", "25562382", nil, nil),
         ]
-        try assertParse(testLinks[0], handle: "26146503", route: nil)
-        try assertParse(testLinks[1], handle: "24449925", route: nil)
-        try assertParse(testLinks[2], handle: "25562382", route: nil)
+
+        try assertParse(cases)
     }
 
     func test_parses_product_links_with_numeric_handle_and_route_as_pdp() throws {
-        let testLinks = [
-            "\(Self.httpUrl)/product/26146503?nav=885035",
-            "\(Self.httpUrl)/product/24449925?something=test&nav=885035",
-            "\(Self.httpUrl)/product/25562382?nav=927986#ins_sr=eyJwcm9kdWN0SWQiOiIyNTU2MjM4MiJ9",
+        let cases: [ParseCase] = [
+            ("\(Self.httpUrl)/product/26146503?nav=885035", "26146503", "885035", ["nav": "885035"]),
+            (
+                "\(Self.httpUrl)/product/24449925?something=test&nav=885035",
+                "24449925",
+                "885035",
+                ["something": "test", "nav": "885035"]
+            ),
+            (
+                "\(Self.httpUrl)/product/25562382?nav=927986#ins_sr=eyJwcm9kdWN0SWQiOiIyNTU2MjM4MiJ9",
+                "25562382",
+                "927986",
+                ["nav": "927986"]
+            ),
         ]
-        try assertParse(testLinks[0], handle: "26146503", route: "885035")
-        try assertParse(testLinks[1], handle: "24449925", route: "885035")
-        try assertParse(testLinks[2], handle: "25562382", route: "927986")
+
+        try assertParse(cases)
     }
 
     func test_parses_product_links_with_handle_and_route_as_pdp() throws {
-        let testLinks = [
-            "\(Self.httpUrl)/product/polo-ralph-lauren-ao-short-sleeve-t-shirt-26146503?nav=885035",
-            "\(Self.httpUrl)/product/lanc%C3%B4me-absolue-the-serum-30ml-24449925?nav=927986",
-            "\(Self.httpUrl)/product/lanc%C3%B4me-advanced-g%C3%A9nifique-youth-activating-concentrate-serum-115ml-22859726?nav=927986",
-            "\(Self.httpUrl)/product/bally-bomber%7Cblouson-25642827?nav=881496",
+        let cases: [ParseCase] = [
+            (
+                "\(Self.httpUrl)/product/polo-ralph-lauren-ao-short-sleeve-t-shirt-26146503?nav=885035",
+                "polo-ralph-lauren-ao-short-sleeve-t-shirt-26146503",
+                "885035",
+                ["nav": "885035"]
+            ),
+            (
+                "\(Self.httpUrl)/product/lanc%C3%B4me-absolue-the-serum-30ml-24449925?nav=927986",
+                "lanc%C3%B4me-absolue-the-serum-30ml-24449925",
+                "927986",
+                ["nav": "927986"]
+            ),
+            (
+                "\(Self.httpUrl)/product/lanc%C3%B4me-advanced-g%C3%A9nifique-youth-activating-concentrate-serum-115ml-22859726?nav=927986",
+                "lanc%C3%B4me-advanced-g%C3%A9nifique-youth-activating-concentrate-serum-115ml-22859726",
+                "927986",
+                ["nav": "927986"]
+            ),
+            (
+                "\(Self.httpUrl)/product/bally-bomber%7Cblouson-25642827?nav=881496",
+                "bally-bomber%7Cblouson-25642827",
+                "881496",
+                ["nav": "881496"]
+            ),
         ]
 
-        try assertParse(testLinks[0],
-                        handle: "polo-ralph-lauren-ao-short-sleeve-t-shirt-26146503",
-                        route: "885035")
-        try assertParse(testLinks[1],
-                        handle: "lanc%C3%B4me-absolue-the-serum-30ml-24449925",
-                        route: "927986")
-        try assertParse(testLinks[2],
-                        handle: "lanc%C3%B4me-advanced-g%C3%A9nifique-youth-activating-concentrate-serum-115ml-22859726",
-                        route: "927986")
-        try assertParse(testLinks[3],
-                        handle: "bally-bomber%7Cblouson-25642827",
-                        route: "881496")
+        try assertParse(cases)
     }
 
     func test_parses_bare_handle_links_as_pdp() throws {
         // Real Handles are bare, with no trailing numeric id: the whole path after the `/product/`
         // prefix is the Handle, used as-is.
-        try assertParse("\(Self.httpUrl)/product/t-shirt",
-                        handle: "t-shirt",
-                        route: nil)
-        try assertParse("\(Self.httpUrl)/product/la-mer-creme-de-la-mer-moisturizing-cream",
-                        handle: "la-mer-creme-de-la-mer-moisturizing-cream",
-                        route: nil)
-        try assertParse("\(Self.httpUrl)/product/polo-short-product-id-12345",
-                        handle: "polo-short-product-id-12345",
-                        route: nil)
+        let cases: [ParseCase] = [
+            ("\(Self.httpUrl)/product/t-shirt", "t-shirt", nil, nil),
+            (
+                "\(Self.httpUrl)/product/la-mer-creme-de-la-mer-moisturizing-cream",
+                "la-mer-creme-de-la-mer-moisturizing-cream",
+                nil,
+                nil
+            ),
+            ("\(Self.httpUrl)/product/polo-short-product-id-12345", "polo-short-product-id-12345", nil, nil),
+        ]
+
+        try assertParse(cases)
     }
 
     func test_parses_product_links_with_multi_segment_handle_as_pdp() throws {
         // A Handle is platform-shaped: on BigCommerce it is a site route path and routinely contains
         // slashes, so everything after the `/product/` prefix is the Handle.
-        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress",
-                        handle: "women/dresses/red-midi-dress",
-                        route: nil)
-        try assertParse("\(Self.httpUrl)/product/t-shirt/reviews",
-                        handle: "t-shirt/reviews",
-                        route: nil)
-        try assertParse("\(Self.httpUrl)/PRODUCT/women/dresses/red-midi-dress",
-                        handle: "women/dresses/red-midi-dress",
-                        route: nil)
+        let cases: [ParseCase] = [
+            ("\(Self.httpUrl)/product/women/dresses/red-midi-dress", "women/dresses/red-midi-dress", nil, nil),
+            ("\(Self.httpUrl)/product/t-shirt/reviews", "t-shirt/reviews", nil, nil),
+            ("\(Self.httpUrl)/PRODUCT/women/dresses/red-midi-dress", "women/dresses/red-midi-dress", nil, nil),
+        ]
+
+        try assertParse(cases)
     }
 
     func test_parses_multi_segment_handle_with_route_and_unknown_query_parameters() throws {
-        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress?nav=885035",
-                        handle: "women/dresses/red-midi-dress",
-                        route: "885035")
-        try assertParse("\(Self.httpUrl)/product/beauty/lanc%C3%B4me-absolue-the-serum-30ml?unknown=1&nav=927986",
-                        handle: "beauty/lanc%C3%B4me-absolue-the-serum-30ml",
-                        route: "927986")
-        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress?unknown=1",
-                        handle: "women/dresses/red-midi-dress",
-                        route: nil)
+        let cases: [ParseCase] = [
+            (
+                "\(Self.httpUrl)/product/women/dresses/red-midi-dress?nav=885035",
+                "women/dresses/red-midi-dress",
+                "885035",
+                ["nav": "885035"]
+            ),
+            (
+                "\(Self.httpUrl)/product/beauty/lanc%C3%B4me-absolue-the-serum-30ml?unknown=1&nav=927986",
+                "beauty/lanc%C3%B4me-absolue-the-serum-30ml",
+                "927986",
+                ["unknown": "1", "nav": "927986"]
+            ),
+            (
+                "\(Self.httpUrl)/product/women/dresses/red-midi-dress?unknown=1",
+                "women/dresses/red-midi-dress",
+                nil,
+                ["unknown": "1"]
+            ),
+        ]
+
+        try assertParse(cases)
     }
 
     func test_preserves_an_unknown_sku_query_parameter_when_parsing() throws {
@@ -166,34 +198,37 @@ final class ProductDetailsDeepLinkParserTests: XCTestCase {
     }
 
     func test_ignores_trailing_slash_when_parsing_handles() throws {
-        try assertParse("\(Self.httpUrl)/product/t-shirt/",
-                        handle: "t-shirt",
-                        route: nil)
-        try assertParse("\(Self.httpUrl)/product/women/dresses/red-midi-dress/?nav=885035",
-                        handle: "women/dresses/red-midi-dress",
-                        route: "885035")
-        // However many separators trail the Handle.
-        try assertParse("\(Self.httpUrl)/product/t-shirt///",
-                        handle: "t-shirt",
-                        route: nil)
+        let cases: [ParseCase] = [
+            ("\(Self.httpUrl)/product/t-shirt/", "t-shirt", nil, nil),
+            (
+                "\(Self.httpUrl)/product/women/dresses/red-midi-dress/?nav=885035",
+                "women/dresses/red-midi-dress",
+                "885035",
+                ["nav": "885035"]
+            ),
+            // However many separators trail the Handle.
+            ("\(Self.httpUrl)/product/t-shirt///", "t-shirt", nil, nil),
+        ]
+
+        try assertParse(cases)
     }
 
     // MARK: - Helpers
 
-    private func assertParse(_ link: String,
-                             handle expectedHandle: String,
-                             route expectedRoute: String?) throws {
-        let testUrl = try XCTUnwrap(URL(string: link))
-        let queryParameters = testUrl.queryParameters
-        let result = sut.parseUrl(testUrl)
-        guard case .productDetail(let handle, let route, let query) = result?.type else {
-            XCTFail()
-            return
-        }
+    private func assertParse(_ cases: [ParseCase], file: StaticString = #filePath, line: UInt = #line) throws {
+        for testCase in cases {
+            let testUrl = try XCTUnwrap(URL(string: testCase.link), file: file, line: line)
 
-        XCTAssertEqual(handle, expectedHandle)
-        XCTAssertEqual(route, expectedRoute)
-        XCTAssertEqual(query, queryParameters)
+            let result = sut.parseUrl(testUrl)
+
+            guard case .productDetail(let handle, let route, let query) = result?.type else {
+                XCTFail("Expected \(testCase.link) to parse as a product detail link", file: file, line: line)
+                continue
+            }
+            XCTAssertEqual(handle, testCase.handle, "handle for \(testCase.link)", file: file, line: line)
+            XCTAssertEqual(route, testCase.route, "route for \(testCase.link)", file: file, line: line)
+            XCTAssertEqual(query, testCase.query, "query for \(testCase.link)", file: file, line: line)
+        }
     }
 
     private func assertNoParse(_ links: [String]) throws {
