@@ -60,6 +60,7 @@ public struct SearchBarEntryButton: View {
                 iconLayout: iconLayout
             )
             .allowsHitTesting(false)
+            .contentShape(Rectangle())
             .accessibilityHidden(true)
         }
         .buttonStyle(.plain)
