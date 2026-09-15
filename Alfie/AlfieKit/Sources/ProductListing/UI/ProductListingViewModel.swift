@@ -2,7 +2,6 @@ import Combine
 import Core
 import Foundation
 import Model
-import SharedUI
 import SwiftUI
 
 // MARK: - ProductListingViewModel
@@ -90,7 +89,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.mode = mode
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
-        state = .loadingFirstPage(.init(title: "", products: Product.skeletons(count: skeletonItemsSize)))
+        state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
         wishlistContent = []
         self.navigate = navigate
         self.showSearch = showSearch
@@ -125,7 +124,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.containsProduct(product)
+        wishlistContent.contains { $0.product.id == product.id }
     }
 
     public func didTapSearch() {
@@ -134,11 +133,14 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {
         Task { @MainActor in
-            wishlistContent = await dependencies.wishlistService.toggleProduct(
-                product,
-                isFavorite: isFavorite,
-                analytics: dependencies.analytics
-            )
+            if !isFavorite {
+                await dependencies.wishlistService.addProduct(SelectedProduct(product: product))
+                dependencies.analytics.trackAddToWishlist(productID: product.id)
+            } else {
+                await dependencies.wishlistService.removeProduct(withId: product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+            }
+            wishlistContent = await dependencies.wishlistService.getWishlistContent()
         }
     }
 
@@ -339,5 +341,39 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
                 filters: filters
             )
         }
+    }
+}
+
+// MARK: - Skeleton
+
+extension Collection where Element == Product {
+    // swiftlint:disable:next strict_fileprivate
+    fileprivate static func skeleton(itemsSize: Int) -> [Element] {
+        Array(repeating: (), count: itemsSize).map { Element.empty }
+    }
+}
+
+extension Product {
+    // swiftlint:disable:next strict_fileprivate
+    fileprivate static var empty: Product {
+        let variant = Product.Variant(
+            sku: "",
+            size: nil,
+            colour: nil,
+            attributes: nil,
+            stock: 0,
+            price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
+        )
+        return Product(
+            id: UUID().uuidString,
+            styleNumber: "",
+            name: "",
+            brand: Brand(id: "", name: "", slug: ""),
+            shortDescription: "",
+            slug: "",
+            defaultVariant: variant,
+            variants: [variant],
+            colours: nil
+        )
     }
 }

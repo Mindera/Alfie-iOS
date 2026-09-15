@@ -1378,6 +1378,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
         assertRelatedProductsAreNotRefetchedOnReappear(firstResponse: { _, _ in [.fixture(slug: "other")] })
     }
 
+    func test_relatedProducts_areNotRefetched_whenViewReappears_afterEmptyResult() {
+        assertRelatedProductsAreNotRefetchedOnReappear(firstResponse: { _, _ in [] })
+    }
+
     func test_relatedProducts_areNotRefetched_whenViewReappears_afterFailure() {
         assertRelatedProductsAreNotRefetchedOnReappear(firstResponse: { _, _ in throw BFFRequestError(type: .generic) })
     }
@@ -1473,5 +1477,31 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
         sut.viewDidAppear()
         wait(for: [noCall], timeout: .inverted)
+    }
+}
+
+private final class PendingResult<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<Value, Error>?
+    private var result: Value?
+
+    func value() async throws -> Value {
+        try await withCheckedThrowingContinuation { continuation in
+            lock.lock()
+            defer { lock.unlock() }
+            if let result {
+                continuation.resume(returning: result)
+            } else {
+                self.continuation = continuation
+            }
+        }
+    }
+
+    func resume(with value: Value) {
+        lock.lock()
+        defer { lock.unlock() }
+        result = value
+        continuation?.resume(returning: value)
+        continuation = nil
     }
 }

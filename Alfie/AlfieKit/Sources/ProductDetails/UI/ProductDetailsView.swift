@@ -512,7 +512,7 @@ extension ProductDetailsView {
 
                 LazyVGrid(columns: relatedProductsColumns, alignment: .leading, spacing: theme.spacing.space200) {
                     if viewModel.shouldShowLoading(for: .relatedProducts) {
-                        ForEach(Product.skeletons(count: Constants.relatedProductsSkeletonCount)) { product in
+                        ForEach(Product.relatedProductSkeletons) { product in
                             relatedProductCard(product, isLoading: true)
                         }
                     } else {
@@ -709,6 +709,34 @@ private enum Constants {
     static let errorViewIconSize: CGFloat = 210
     static let relatedProductsColumns = 2
     static let relatedProductsSkeletonCount = 6
+}
+
+private extension Product {
+    static var relatedProductSkeletons: [Product] {
+        (0..<Constants.relatedProductsSkeletonCount).map { skeleton(id: "related-skeleton-\($0)") }
+    }
+
+    static func skeleton(id: String) -> Product {
+        let variant = Product.Variant(
+            sku: "",
+            size: nil,
+            colour: nil,
+            attributes: nil,
+            stock: 0,
+            price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
+        )
+        return Product(
+            id: id,
+            styleNumber: "",
+            name: "",
+            brand: Brand(id: "", name: "", slug: ""),
+            shortDescription: "",
+            slug: "",
+            defaultVariant: variant,
+            variants: [variant],
+            colours: nil
+        )
+    }
 }
 
 #if DEBUG

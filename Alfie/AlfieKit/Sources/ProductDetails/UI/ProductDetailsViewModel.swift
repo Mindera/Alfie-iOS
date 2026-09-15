@@ -294,16 +294,19 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public func isFavoriteState(for product: Product) -> Bool {
-        wishlistContent.containsProduct(product)
+        wishlistContent.contains { $0.product.id == product.id }
     }
 
     public func didTapWishlist(for product: Product, isFavorite: Bool) {
         Task { @MainActor in
-            wishlistContent = await dependencies.wishlistService.toggleProduct(
-                product,
-                isFavorite: isFavorite,
-                analytics: dependencies.analytics
-            )
+            if isFavorite {
+                await dependencies.wishlistService.removeProduct(withId: product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+            } else {
+                await dependencies.wishlistService.addProduct(SelectedProduct(product: product))
+                dependencies.analytics.trackAddToWishlist(productID: product.id)
+            }
+            wishlistContent = await dependencies.wishlistService.getWishlistContent()
         }
     }
 
