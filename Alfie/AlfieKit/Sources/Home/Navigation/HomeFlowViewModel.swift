@@ -173,44 +173,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
-            navigate: { [weak self] route in
-                switch route {
-                case .productDetails(let productDetailsRoute):
-                    let productID: String
-                    let product: Product?
-
-                    switch productDetailsRoute {
-                    case .productDetails(let configuration):
-                        switch configuration {
-                        case .id(let configurationProductID), .deepLink(let configurationProductID, _):
-                            productID = configurationProductID
-                            product = nil
-
-                        case .product(let configurationProduct):
-                            productID = configurationProduct.id
-                            product = configurationProduct
-
-                        case .selectedProduct(let selectedProduct):
-                            productID = selectedProduct.product.id
-                            product = selectedProduct.product
-                        }
-
-                        self?.searchFlowViewModel.navigate(
-                            .searchIntent(.productDetails(productID: productID, product: product))
-                        )
-
-                    case .webFeature(let feature):
-                        self?.searchFlowViewModel.navigate(.searchIntent(.webFeature(feature)))
-                    }
-
-                case .productListing(let configuration):
-                    self?.searchFlowViewModel.navigate(
-                        .searchIntent(
-                            .productListing(searchTerm: configuration.searchText, category: configuration.category)
-                        )
-                    )
-                }
-            },
+            navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },
             showSearch: { [weak self] in self?.overlay = .search }
         )
     }
