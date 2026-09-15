@@ -1,5 +1,8 @@
 # Testing
 
+This standard covers the `AlfieKit` unit and integration tests. `AlfieUITests` (XCUITest, run from its
+own scheme) and `Tools/DesignTokenGen` (Swift Testing, its own package) keep their own conventions.
+
 ## Rules
 
 Every rule here binds both writing a test and reviewing one. A review is not done until each has been
@@ -22,16 +25,17 @@ checked against the diff.
   and nil every stored `var` in `tearDownWithError()`. Each test passes alone and in any order. An
   immutable `let` collaborator needs no teardown — XCTest builds a fresh test instance per test.
 - Reach every collaborator through a **seam**, never a singleton or a type the SUT constructs itself.
-  In a feature or ViewModel test that seam is the feature's `DependencyContainer`, built from the
-  `Mock<Service>` types — construct the container rather than bypassing it. A `Core` service test has
+  In a feature ViewModel test that seam is the feature's `DependencyContainer`, built from the
+  `Mock<Service>` types — construct the container rather than bypassing it. An `AppFeature` ViewModel
+  wires the app graph, so its seam is a `MockServiceProvider`. A `Core` service test has
   no container: inject the protocol collaborators straight into the initialiser, as
   `ProductListingServiceTests` does.
 - Stub a mock by assigning its `on<Method>Called` closure, and **spy** by capturing the arguments
   inside that same closure (navigation into a `capturedRoutes` array).
-- Leave an unset mock closure throwing — `guard let x = try onFooCalled?(…) else { throw … }`. A silent
-  success lets a test assert an empty result while the mock was never configured at all. The exception
-  is an operation whose empty answer is a real answer: `categoryPriceRange` returns `nil` and
-  `getHeaderNav` returns `[]` when unset, because absence there is a legitimate outcome.
+- Leave the unset closure of a value-returning mock throwing — `guard let x = try onFooCalled?(…) else
+  { throw … }`. A silent success lets a test assert an empty result while the mock was never configured
+  at all. Return the empty value only where empty is itself a real answer, such as `categoryPriceRange`
+  giving `nil`: a category with no price range is legitimate.
 - Build domain values with `.fixture(...)`, naming only the field the test is about.
 - Assert `ViewState` / `PaginatedViewState` transitions with the `XCTAssertEmitsValue*` helpers and
   the named timeout constants in `TestUtils`.
@@ -67,7 +71,7 @@ checked against the diff.
 | Set an `accuracy:` looser than the maths needs, or widen one so a failing test goes quiet | Use the tightest value that passes, and name the constant when it budgets something physical. A loose tolerance **blocks the review** — see §Tolerances |
 | Loosen snapshot `precision` to absorb a diff | Re-record the reference (`Docs/SnapshotTesting.md`) |
 | Assert screen *content* through a snapshot | Snapshot the layout; unit-test the content |
-| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan` (18 of them); `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone |
+| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan`; `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone |
 
 ### Tolerances
 
@@ -94,9 +98,9 @@ rule above in new code rather than copying them.
 
 ### Framework
 
-`XCTest` is the house framework; every test in the repo is written against it. Swift Testing
-(`@Test` / `#expect`) is **not** adopted, and introducing it is a funded migration rather than a
-per-PR choice. Four things block it:
+`XCTest` is the house framework; every `AlfieKit` test is written against it. Swift Testing
+(`@Test` / `#expect`) is **not** adopted there, and introducing it is a funded migration rather than a
+per-PR choice. Three things block it:
 
 1. The assertion helpers — `XCTAssertEmitsValue*` (140 call sites) and `trackForMemoryLeak` — are
    `XCTestCase` extensions, so a `@Test` function cannot reach them. Porting
@@ -104,9 +108,7 @@ per-PR choice. Four things block it:
    The rest of `TestUtils` extends `TimeInterval`, `View` and `Snapshotting`, and carries over as is.
 2. `XCTAssertEqual(_:_:accuracy:)` has no Swift Testing equivalent, and the carousel-geometry and
    typography tests depend on it throughout.
-3. `Package.swift` declares `swift-tools-version: 5.9`. Whether SwiftPM enables Swift Testing below
-   6.0 is unresolved — settle that before proposing adoption.
-4. The package builds in Swift 5 language mode with no strict-concurrency opt-in. Swift Testing runs
+3. The package builds in Swift 5 language mode with no strict-concurrency opt-in. Swift Testing runs
    tests on arbitrary tasks, so the data-race warnings would all land at once.
 
 UI and performance tests stay on XCTest whatever happens: Apple does not support `XCUIApplication`
@@ -121,7 +123,7 @@ Treat them as correct, in review and when writing.
 |---|---|
 | Feature and service mocks are hand-written, never generated | They double as `#Preview` fixtures, so they live in a production target. A generator would add a third codegen step and make them un-hand-tunable, losing the throwing unset closure. Spying inside the closure already gives call counts. |
 | Table-driven `for` loops over cases | XCTest has no parameterized tests; the loop is the workaround. |
-| `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. One test in the suite uses `XCTAssertThrowsError`; the typed form is the house idiom. |
+| `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. The typed form is the house idiom. |
 | No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the acceptance criterion (`(AC 5)`, `(Q36)`). |
 | No CI test retries | Retries suit unreliable external services; CI runs the unit plan only, so a flake there is a real bug. |
 | Test code is held to this document, not to SwiftLint | `Alfie/.swiftlint.yml` excludes `AlfieKit/Tests` and `AlfieKit/Sources/Mocks`, so no lint runs on either. Review test code against the rules above — naming, seams, the state matrix — and leave formatting alone. Lifting the exclusion is a repo-wide call, not a per-PR one. |
@@ -140,8 +142,8 @@ Under `Alfie/AlfieKit/Sources/Mocks/`: `Core/Features/` for mock ViewModels, `Co
 mock services, `Fixtures/` for the `.fixture(...)` builders. BFF mocks are Apollo-generated under
 `Sources/BFFGraph/Mocks/` — regenerate them rather than editing.
 
-`Mocks` is a production `.target`, not a test target: `AppFeature` and `DebugMenu` depend on it for
-`#Preview`s, so anything added there ships in the app binary.
+`Mocks` is a production `.target`, not a test target: `SharedUI` depends on it for `#Preview`s, which
+puts it in nearly every module, so anything added there ships in the app binary.
 
 ## Snapshot Testing
 
