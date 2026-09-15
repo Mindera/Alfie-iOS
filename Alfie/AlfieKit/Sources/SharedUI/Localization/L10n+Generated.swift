@@ -256,6 +256,10 @@ public enum L10n {
         return L10n.tr("L10n", "pdp.product_reference.value", String(describing: p1))
       }
     }
+    public enum RelatedProducts {
+      /// You might also like
+      public static let title = L10n.tr("L10n", "pdp.related_products.title")
+    }
     public enum SearchColors {
       /// Search Colours
       public static let placeholder = L10n.tr("L10n", "pdp.search_colors.placeholder")
@@ -744,6 +748,7 @@ public extension L10n {
       case pdpGalleryAccessibilityLabel = "pdp.gallery.accessibility_label"
       case pdpGalleryAccessibilityValue = "pdp.gallery.accessibility_value"
       case pdpProductReferenceValue = "pdp.product_reference.value"
+      case pdpRelatedProductsTitle = "pdp.related_products.title"
       case pdpSearchColorsPlaceholder = "pdp.search_colors.placeholder"
       case pdpShareProductFromSubject = "pdp.share_product.from.subject"
       case pdpSizeGuideLink = "pdp.size_guide.link"

@@ -40,6 +40,39 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         }
     }
 
+    // MARK: - Related products
+
+    func test_relatedProducts_handleWithoutRecommendations_returnsEmpty() async throws {
+        let products = try await sut.relatedProducts(handle: IntegrationSeed.handleWithoutRelatedProducts, limit: 7)
+
+        XCTAssertTrue(products.isEmpty)
+    }
+
+    func test_relatedProducts_seededHandle_returnsListItems() async throws {
+        let listing = try await sut.productList(
+            collectionHandle: IntegrationSeed.collectionHandle,
+            after: nil,
+            limit: 5,
+            sort: nil,
+            filters: nil
+        )
+
+        for candidate in listing.products {
+            let products = try await sut.relatedProducts(handle: candidate.slug, limit: 7)
+            guard !products.isEmpty else { continue }
+
+            XCTAssertLessThanOrEqual(products.count, 7)
+            for product in products {
+                XCTAssertFalse(product.id.isEmpty)
+                XCTAssertFalse(product.name.isEmpty)
+                XCTAssertFalse(product.slug.isEmpty)
+            }
+            return
+        }
+
+        throw XCTSkip("No seeded product in '\(IntegrationSeed.collectionHandle)' has related products")
+    }
+
     // MARK: - Helpers
 
     /// Fetches the first available product's slug, skipping the test when the seed BFF has no products.

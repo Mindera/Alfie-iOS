@@ -9,4 +9,5 @@ public enum ProductDetailsSection {
     case productDescription
     case addToBag
     case addToWishlist
+    case relatedProducts
 }

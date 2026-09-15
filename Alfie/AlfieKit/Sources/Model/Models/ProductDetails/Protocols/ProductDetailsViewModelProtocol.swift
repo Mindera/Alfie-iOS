@@ -27,6 +27,9 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var selectedColourName: String? { get }
     /// Selected variant's SKU, rendered as the product reference.
     var productReference: String? { get }
+    /// Fetched alongside the product, at most 6, never containing the current product.
+    var relatedProductsState: ViewState<[Product], Error> { get }
+    var isWishlistEnabled: Bool { get }
 
     func viewDidAppear()
     func shouldShow(section: ProductDetailsSection) -> Bool
@@ -38,4 +41,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func didTapBackButton()
     func openWebFeature(_ feature: WebFeature)
     func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
+    func didSelectRelatedProduct(_ product: Product)
+    func isFavoriteState(for product: Product) -> Bool
+    func didTapWishlist(for product: Product, isFavorite: Bool)
 }

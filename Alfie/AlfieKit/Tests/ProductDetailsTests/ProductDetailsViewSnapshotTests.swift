@@ -129,7 +129,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.productDescription = ""
-        viewModel.onShouldShowSectionCalled = { $0 != .productDescription }
+        viewModel.onShouldShowSectionCalled = { $0 != .productDescription && $0 != .relatedProducts }
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
@@ -178,6 +178,55 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    func test_productDetailsView_withSixRelatedProducts() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.onShouldShowSectionCalled = { _ in true }
+        viewModel.relatedProductsState = .success(relatedProducts(count: 6))
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(height: Constants.relatedProductsSnapshotHeight),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// An odd count leaves the last grid slot empty rather than stretching the card.
+    func test_productDetailsView_withThreeRelatedProducts() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.onShouldShowSectionCalled = { _ in true }
+        viewModel.relatedProductsState = .success(relatedProducts(count: 3))
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(height: Constants.relatedProductsSnapshotHeight),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_productDetailsView_relatedProductsLoading() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.onShouldShowSectionCalled = { _ in true }
+        viewModel.onShouldShowLoadingForSectionCalled = { $0 == .relatedProducts }
+        viewModel.relatedProductsState = .loading
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(height: Constants.relatedProductsSnapshotHeight),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// No media, so each card renders its solid image placeholder with no network race.
+    private func relatedProducts(count: Int) -> [Product] {
+        (1...count).map { index in
+            .fixture(
+                id: "related-\(index)",
+                name: "Related product \(index)",
+                brand: .fixture(name: "Brand \(index)"),
+                slug: "related-\(index)",
+                defaultVariant: .fixture(sku: "sku-\(index)", price: .fixture()),
+                variants: []
+            )
+        }
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)
@@ -186,4 +235,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        as: .defaultImage(),
                        record: isRecording)
     }
+}
+
+private enum Constants {
+    static let relatedProductsSnapshotHeight: CGFloat = 2400
 }

@@ -1,0 +1,8 @@
+query RelatedProductsQuery(
+    $handle: String!,
+    $limit: Int!
+) {
+    relatedProducts(handle: $handle, limit: $limit) {
+        ...ProductListItemFragment
+    }
+}

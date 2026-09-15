@@ -15,6 +15,7 @@ class Query: MockObject {
     @Field<Menu>("menu") public var menu
     @Field<OmniProduct>("productDetails") public var productDetails
     @Field<ProductListResponse>("productList") public var productList
+    @Field<[OmniProduct]>("relatedProducts") public var relatedProducts
     @Field<ProductListResponse>("searchProducts") public var searchProducts
   }
 }
@@ -26,6 +27,7 @@ extension Mock where O == Query {
     menu: Mock<Menu>? = nil,
     productDetails: Mock<OmniProduct>? = nil,
     productList: Mock<ProductListResponse>? = nil,
+    relatedProducts: [Mock<OmniProduct>]? = nil,
     searchProducts: Mock<ProductListResponse>? = nil
   ) {
     self.init()
@@ -34,6 +36,7 @@ extension Mock where O == Query {
     _setEntity(menu, for: \.menu)
     _setEntity(productDetails, for: \.productDetails)
     _setEntity(productList, for: \.productList)
+    _setList(relatedProducts, for: \.relatedProducts)
     _setEntity(searchProducts, for: \.searchProducts)
   }
 }

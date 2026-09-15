@@ -69,4 +69,14 @@ public final class ProductService: ProductServiceProtocol {
             throw BFFRequestError(type: .product(.generic))
         }
     }
+
+    public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {
+        do {
+            return try await bffClient.relatedProducts(handle: handle, limit: limit)
+        } catch let error as CancellationError {
+            throw error
+        } catch {
+            throw BFFRequestError(type: .product(.generic))
+        }
+    }
 }

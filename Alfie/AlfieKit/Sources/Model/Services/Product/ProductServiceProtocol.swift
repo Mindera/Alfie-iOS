@@ -12,4 +12,5 @@ public protocol ProductServiceProtocol {
     /// Whole-collection price bounds, independent of any active filter. `nil` when the BFF has
     /// no range for the collection.
     func categoryPriceRange(collectionHandle: String) async throws -> PriceRange?
+    func relatedProducts(handle: String, limit: Int) async throws -> [Product]
 }

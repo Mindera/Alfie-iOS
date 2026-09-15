@@ -267,6 +267,8 @@ extension ProductDetailsView {
                 .padding(.vertical, theme.spacing.space200)
 
             complementaryInfo
+
+            relatedProducts
         }
     }
 
@@ -500,6 +502,57 @@ extension ProductDetailsView {
         }
     }
 
+    /// Figma "Recommendations": 24 below the accordions (8 stack spacing + 16), 8 from heading to grid.
+    @ViewBuilder private var relatedProducts: some View {
+        if viewModel.shouldShow(section: .relatedProducts) {
+            let isLoading = viewModel.shouldShowLoading(for: .relatedProducts)
+            let products = isLoading ? Product.relatedProductsSkeleton : (viewModel.relatedProductsState.value ?? [])
+
+            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+                Text.build(theme.font.body.mediumBold(L10n.Pdp.RelatedProducts.title))
+                    .foregroundStyle(Theme.contentContentPrimary)
+                    .accessibilityAddTraits(.isHeader)
+
+                LazyVGrid(columns: relatedProductsColumns, alignment: .leading, spacing: theme.spacing.space200) {
+                    ForEach(products) { product in
+                        relatedProductCard(product, isLoading: isLoading)
+                    }
+                }
+            }
+            .padding(.top, theme.spacing.space200)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProducts)
+        }
+    }
+
+    private var relatedProductsColumns: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+            count: Constants.relatedProductsColumns
+        )
+    }
+
+    private func relatedProductCard(_ product: Product, isLoading: Bool) -> some View {
+        VerticalProductCard(
+            viewModel: .init(
+                configuration: .init(size: .medium, hideAction: !viewModel.isWishlistEnabled),
+                product: product
+            ),
+            onUserAction: { _, type in
+                guard case .wishlist(let isFavorite) = type else { return }
+                viewModel.didTapWishlist(for: product, isFavorite: isFavorite)
+            },
+            isSkeleton: .constant(isLoading),
+            isFavorite: viewModel.isFavoriteState(for: product)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.didSelectRelatedProduct(product)
+        }
+        .allowsHitTesting(!isLoading)
+        .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductCard(id: product.id))
+    }
+
     @ViewBuilder private var descriptionSection: some View {
         let showDescription = viewModel.shouldShow(section: .productDescription)
         // Gated apart from the description: the colour and reference are what a shopper quotes to
@@ -653,6 +706,34 @@ private enum Constants {
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210
+    static let relatedProductsColumns = 2
+    static let relatedProductsSkeletonCount = 6
+}
+
+private extension Product {
+    static let relatedProductsSkeleton: [Product] = (0..<Constants.relatedProductsSkeletonCount).map { index in
+        let amount = Money(currencyCode: "", amount: 0, amountFormatted: "£000.00")
+        return Product(
+            id: "related-products-skeleton-\(index)",
+            styleNumber: "",
+            name: "",
+            brand: Brand(name: "", slug: ""),
+            shortDescription: "",
+            slug: "",
+            priceRange: nil,
+            attributes: nil,
+            defaultVariant: Variant(
+                sku: "",
+                size: nil,
+                colour: nil,
+                attributes: nil,
+                stock: 0,
+                price: Price(amount: amount, was: nil)
+            ),
+            variants: [],
+            colours: nil
+        )
+    }
 }
 
 #if DEBUG

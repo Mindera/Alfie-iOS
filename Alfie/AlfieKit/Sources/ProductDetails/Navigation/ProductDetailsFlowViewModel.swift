@@ -23,7 +23,8 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
             configuration: configuration,
             dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
-            openWebfeatureAction: { [weak self] in self?.navigate(.webFeature($0)) }
+            openWebfeatureAction: { [weak self] in self?.navigate(.webFeature($0)) },
+            openProductAction: { [weak self] in self?.navigate(.productDetails(.product($0))) }
         )
     }
 
@@ -34,7 +35,8 @@ public final class ProductDetailsFlowViewModel: ObservableObject, FlowViewModelP
             configuration: configuration,
             dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
-            openWebfeatureAction: { [weak self] in self?.navigate(.webFeature($0)) }
+            openWebfeatureAction: { [weak self] in self?.navigate(.webFeature($0)) },
+            openProductAction: { [weak self] in self?.navigate(.productDetails(.product($0))) }
         )
     }
 

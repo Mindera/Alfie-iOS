@@ -740,6 +740,17 @@
         }
       }
     },
+    "pdp.related_products.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You might also like"
+          }
+        }
+      }
+    },
     "pdp.search_colors.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -35,7 +35,8 @@ public final class WishlistFlowViewModel: WishlistFlowViewModelProtocol {
             configuration: configuration,
             dependencies: dependencies.productDetailsDependencyContainer,
             goBackAction: { [weak self] in self?.pop() },
-            openWebfeatureAction: { [weak self] in self?.navigate(.productDetails(.webFeature($0))) }
+            openWebfeatureAction: { [weak self] in self?.navigate(.productDetails(.webFeature($0))) },
+            openProductAction: { [weak self] in self?.navigate(.productDetails(.productDetails(.product($0)))) }
         )
     }
 
