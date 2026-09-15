@@ -20,16 +20,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         mockWebUrlProvider = MockWebUrlProvider()
         mockCartService = MockCartService()
         mockAnalytics = MockAnalyticsTracker()
-        mockDependencies = ProductDetailsDependencyContainer(
-            scheduler: .immediate,
-            productService: mockProductService,
-            webUrlProvider: mockWebUrlProvider,
-            cartService: mockCartService,
-            wishlistService: MockWishlistService(),
-            configurationService: MockConfigurationService(),
-            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
-            log: Log.DummyLogger()
-        )
+        mockDependencies = makeDependencies(wishlistService: MockWishlistService())
     }
 
     override func tearDownWithError() throws {
@@ -1315,6 +1306,26 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.relatedProductsState.value?.map(\.id), (1...maxCount).map { "\($0)" })
     }
 
+    func test_relatedProducts_excludeCurrentProduct_whenOnlyItsIdMatches() {
+        initViewModel(configuration: .product(.fixture(id: "current", slug: "current-slug")))
+        mockProductService.onGetProductCalled = { _ in .fixture(id: "current", slug: "current-slug") }
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            [.fixture(id: "current", slug: "other-slug"), .fixture(id: "1", slug: "slug-1")]
+        }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertEqual(sut.relatedProductsState.value?.map(\.id), ["1"])
+    }
+
+    func test_relatedProductsSection_doesNotShowSkeleton_whileProductIsLoading() {
+        initViewModel()
+
+        XCTAssertTrue(sut.state.isLoading)
+        XCTAssertTrue(sut.relatedProductsState.isLoading)
+        XCTAssertFalse(sut.shouldShowLoading(for: .relatedProducts))
+    }
+
     func test_relatedProductsSection_isShown_whenProductAndRelatedProductsLoaded() {
         initViewModel()
         mockProductService.onGetProductCalled = { _ in .fixture() }
@@ -1438,7 +1449,34 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(mockAnalytics.trackedActions, [.addToWishlist, .removeFromWishlist])
     }
 
+    func test_relatedProductFavoriteState_reflectsExistingWishlist_whenViewAppears() {
+        let related = Product.fixture(id: "related")
+        mockDependencies = makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
+        initViewModel()
+        XCTAssertFalse(sut.isFavoriteState(for: related))
+
+        XCTAssertEmitsValue(
+            from: sut.$wishlistContent,
+            where: { !$0.isEmpty },
+            afterTrigger: { self.sut.viewDidAppear() }
+        )
+        XCTAssertTrue(sut.isFavoriteState(for: related))
+    }
+
     // MARK: - Helper methods
+
+    private func makeDependencies(wishlistService: MockWishlistService) -> ProductDetailsDependencyContainer {
+        ProductDetailsDependencyContainer(
+            scheduler: .immediate,
+            productService: mockProductService,
+            webUrlProvider: mockWebUrlProvider,
+            cartService: mockCartService,
+            wishlistService: wishlistService,
+            configurationService: MockConfigurationService(),
+            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
+            log: Log.DummyLogger()
+        )
+    }
 
     private func initViewModel(
         configuration: ProductDetailsConfiguration = .id(""),
