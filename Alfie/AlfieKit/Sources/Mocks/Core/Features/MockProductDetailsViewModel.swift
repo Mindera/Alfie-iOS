@@ -24,7 +24,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var priceType: PriceType? = nil
     public var selectedColourName: String?
     public var productReference: String?
-    public var relatedProductsState: ViewState<[Product], Error> = .loading
+    public var relatedProductsState: ViewState<[Product], ProductDetailsViewErrorType> = .loading
     public var isWishlistEnabled = true
 
     public init(state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading,

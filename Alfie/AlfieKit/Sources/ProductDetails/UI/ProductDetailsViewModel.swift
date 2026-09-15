@@ -18,7 +18,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published public private(set) var state: ViewState<
         ProductDetailsViewStateModel, ProductDetailsViewErrorType
     > = .loading
-    @Published public private(set) var relatedProductsState: ViewState<[Product], Error> = .loading
+    @Published public private(set) var relatedProductsState: ViewState<[Product], ProductDetailsViewErrorType> = .loading
     @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
@@ -322,14 +322,14 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         do {
             let products = try await dependencies.productService.relatedProducts(
                 handle: productHandle,
-                limit: Constants.relatedProductsRequestLimit
+                limit: Self.relatedProductsRequestLimit
             )
             relatedProductsState = .success(
-                Array(products.filter { !isCurrentProduct($0) }.prefix(Constants.relatedProductsMaxCount))
+                Array(products.filter { !isCurrentProduct($0) }.prefix(Self.relatedProductsMaxCount))
             )
         } catch {
             dependencies.log.error("Error fetching related products for \(productHandle): \(error)")
-            relatedProductsState = .error(error)
+            relatedProductsState = .error(.from(error: error))
         }
     }
 
@@ -540,8 +540,7 @@ private extension String {
     var nilWhenEmpty: String? { isEmpty ? nil : self }
 }
 
-private enum Constants {
+extension ProductDetailsViewModel {
     static let relatedProductsMaxCount = 6
-    static let currentProductSlot = 1
-    static let relatedProductsRequestLimit = relatedProductsMaxCount + currentProductSlot
+    static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }

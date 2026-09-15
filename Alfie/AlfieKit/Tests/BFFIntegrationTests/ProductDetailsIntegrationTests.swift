@@ -43,7 +43,10 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
     // MARK: - Related products
 
     func test_relatedProducts_handleWithoutRecommendations_returnsEmpty() async throws {
-        let products = try await sut.relatedProducts(handle: IntegrationSeed.handleWithoutRelatedProducts, limit: 7)
+        let products = try await sut.relatedProducts(
+            handle: IntegrationSeed.handleWithoutRelatedProducts,
+            limit: Constants.relatedProductsLimit
+        )
 
         XCTAssertTrue(products.isEmpty)
     }
@@ -58,10 +61,10 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         )
 
         for candidate in listing.products {
-            let products = try await sut.relatedProducts(handle: candidate.slug, limit: 7)
+            let products = try await sut.relatedProducts(handle: candidate.slug, limit: Constants.relatedProductsLimit)
             guard !products.isEmpty else { continue }
 
-            XCTAssertLessThanOrEqual(products.count, 7)
+            XCTAssertLessThanOrEqual(products.count, Constants.relatedProductsLimit)
             for product in products {
                 XCTAssertFalse(product.id.isEmpty)
                 XCTAssertFalse(product.name.isEmpty)
@@ -87,4 +90,8 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         try XCTSkipUnless(!listing.products.isEmpty, "Seed BFF returned no products to fetch details for")
         return try XCTUnwrap(listing.products.first).slug
     }
+}
+
+private enum Constants {
+    static let relatedProductsLimit = 3
 }

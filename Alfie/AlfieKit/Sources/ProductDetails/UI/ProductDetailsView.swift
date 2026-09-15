@@ -512,13 +512,13 @@ extension ProductDetailsView {
 
                 LazyVGrid(columns: relatedProductsColumns, alignment: .leading, spacing: theme.spacing.space200) {
                     if viewModel.shouldShowLoading(for: .relatedProducts) {
-                        ForEach(Product.relatedProductSkeletons) { product in
-                            relatedProductCard(product, isLoading: true)
+                        ForEach(Product.skeletons(count: Constants.relatedProductsSkeletonCount)) { product in
+                            relatedProductCard(product, isSkeleton: true)
                         }
                     } else {
                         ForEach(viewModel.relatedProductsState.value ?? []) { product in
-                            relatedProductCard(product, isLoading: false)
-                                .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductButton(id: product.id))
+                            relatedProductCard(product, isSkeleton: false)
+                                .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductCard(id: product.id))
                         }
                     }
                 }
@@ -534,7 +534,7 @@ extension ProductDetailsView {
         )
     }
 
-    private func relatedProductCard(_ product: Product, isLoading: Bool) -> some View {
+    private func relatedProductCard(_ product: Product, isSkeleton: Bool) -> some View {
         VerticalProductCard(
             viewModel: .init(
                 configuration: .init(size: .medium, hideAction: !viewModel.isWishlistEnabled),
@@ -544,14 +544,15 @@ extension ProductDetailsView {
                 guard case .wishlist(let isFavorite) = type else { return }
                 viewModel.didTapWishlist(for: product, isFavorite: isFavorite)
             },
-            isSkeleton: .constant(isLoading),
-            isFavorite: viewModel.isFavoriteState(for: product)
+            isSkeleton: .constant(isSkeleton),
+            isFavorite: viewModel.isFavoriteState(for: product),
+            actionAccessibilityIdentifier: AccessibilityID.ProductDetails.relatedProductWishlistButton(id: product.id)
         )
         .contentShape(Rectangle())
         .onTapGesture {
             viewModel.didSelectRelatedProduct(product)
         }
-        .allowsHitTesting(!isLoading)
+        .allowsHitTesting(!isSkeleton)
     }
 
     @ViewBuilder private var descriptionSection: some View {
@@ -709,34 +710,6 @@ private enum Constants {
     static let errorViewIconSize: CGFloat = 210
     static let relatedProductsColumns = 2
     static let relatedProductsSkeletonCount = 6
-}
-
-private extension Product {
-    static var relatedProductSkeletons: [Product] {
-        (0..<Constants.relatedProductsSkeletonCount).map { skeleton(id: "related-skeleton-\($0)") }
-    }
-
-    static func skeleton(id: String) -> Product {
-        let variant = Product.Variant(
-            sku: "",
-            size: nil,
-            colour: nil,
-            attributes: nil,
-            stock: 0,
-            price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
-        )
-        return Product(
-            id: id,
-            styleNumber: "",
-            name: "",
-            brand: Brand(id: "", name: "", slug: ""),
-            shortDescription: "",
-            slug: "",
-            defaultVariant: variant,
-            variants: [variant],
-            colours: nil
-        )
-    }
 }
 
 #if DEBUG

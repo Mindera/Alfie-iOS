@@ -193,7 +193,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     }
 
     private func assertRelatedProductsSnapshot(
-        state: ViewState<[Product], Error>,
+        state: ViewState<[Product], ProductDetailsViewErrorType>,
         testName: String = #function
     ) {
         let viewModel = makeViewModel()

@@ -89,7 +89,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.mode = mode
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
-        state = .loadingFirstPage(.init(title: "", products: .skeleton(itemsSize: skeletonItemsSize)))
+        state = .loadingFirstPage(.init(title: "", products: Product.skeletons(count: skeletonItemsSize)))
         wishlistContent = []
         self.navigate = navigate
         self.showSearch = showSearch
@@ -341,39 +341,5 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
                 filters: filters
             )
         }
-    }
-}
-
-// MARK: - Skeleton
-
-extension Collection where Element == Product {
-    // swiftlint:disable:next strict_fileprivate
-    fileprivate static func skeleton(itemsSize: Int) -> [Element] {
-        Array(repeating: (), count: itemsSize).map { Element.empty }
-    }
-}
-
-extension Product {
-    // swiftlint:disable:next strict_fileprivate
-    fileprivate static var empty: Product {
-        let variant = Product.Variant(
-            sku: "",
-            size: nil,
-            colour: nil,
-            attributes: nil,
-            stock: 0,
-            price: .init(amount: .init(currencyCode: "AUD", amount: 0, amountFormatted: "$000,00"), was: nil)
-        )
-        return Product(
-            id: UUID().uuidString,
-            styleNumber: "",
-            name: "",
-            brand: Brand(id: "", name: "", slug: ""),
-            shortDescription: "",
-            slug: "",
-            defaultVariant: variant,
-            variants: [variant],
-            colours: nil
-        )
     }
 }

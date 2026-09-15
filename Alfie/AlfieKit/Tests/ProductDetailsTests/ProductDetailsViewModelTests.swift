@@ -1272,14 +1272,14 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     // MARK: - Related products
 
-    func test_relatedProducts_areRequested_withProductHandleAndLimitSeven_whenViewAppears() {
+    func test_relatedProducts_areRequested_withProductHandleAndOneSlotForCurrentProduct_whenViewAppears() {
         initViewModel(configuration: .product(.fixture(slug: "nice-shirt")))
         mockProductService.onGetProductCalled = { _ in .fixture() }
 
         let expectation = expectation(description: "Wait for related products call")
         mockProductService.onRelatedProductsCalled = { handle, limit in
             XCTAssertEqual(handle, "nice-shirt")
-            XCTAssertEqual(limit, 7)
+            XCTAssertEqual(limit, ProductDetailsViewModel.relatedProductsMaxCount + 1)
             expectation.fulfill()
             return []
         }
@@ -1302,17 +1302,17 @@ final class ProductDetailsViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: .default)
     }
 
-    func test_relatedProducts_excludeCurrentProduct_andAreTrimmedToSix() {
+    func test_relatedProducts_excludeCurrentProduct_andAreTrimmedToMaxCount() {
+        let maxCount = ProductDetailsViewModel.relatedProductsMaxCount
         initViewModel(configuration: .product(.fixture(id: "current", slug: "current-slug")))
         mockProductService.onGetProductCalled = { _ in .fixture(id: "current", slug: "current-slug") }
-        let related = (1...3).map { Product.fixture(id: "\($0)", slug: "slug-\($0)") }
-            + [.fixture(id: "current", slug: "current-slug")]
-            + (4...7).map { Product.fixture(id: "\($0)", slug: "slug-\($0)") }
+        let related = [Product.fixture(id: "current", slug: "current-slug")]
+            + (1...maxCount + 1).map { Product.fixture(id: "\($0)", slug: "slug-\($0)") }
         mockProductService.onRelatedProductsCalled = { _, _ in related }
 
         appearAndWaitForBothRequests()
 
-        XCTAssertEqual(sut.relatedProductsState.value?.map(\.id), ["1", "2", "3", "4", "5", "6"])
+        XCTAssertEqual(sut.relatedProductsState.value?.map(\.id), (1...maxCount).map { "\($0)" })
     }
 
     func test_relatedProductsSection_isShown_whenProductAndRelatedProductsLoaded() {
