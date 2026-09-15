@@ -299,8 +299,10 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         Task { @MainActor in
             if isFavorite {
                 await dependencies.wishlistService.removeProduct(withId: product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
             } else {
                 await dependencies.wishlistService.addProduct(SelectedProduct(product: product))
+                dependencies.analytics.trackAddToWishlist(productID: product.id)
             }
             wishlistContent = await dependencies.wishlistService.getWishlistContent()
         }
@@ -538,7 +540,6 @@ private extension String {
 }
 
 private enum Constants {
-    /// One over the grid size, so dropping the current product can still leave a full grid.
-    static let relatedProductsRequestLimit = 7
     static let relatedProductsMaxCount = 6
+    static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }

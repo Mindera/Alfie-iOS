@@ -502,7 +502,6 @@ extension ProductDetailsView {
         }
     }
 
-    /// Figma "Recommendations": 24 below the accordions (8 stack spacing + 16), 8 from heading to grid.
     @ViewBuilder private var relatedProducts: some View {
         if viewModel.shouldShow(section: .relatedProducts) {
             let isLoading = viewModel.shouldShowLoading(for: .relatedProducts)

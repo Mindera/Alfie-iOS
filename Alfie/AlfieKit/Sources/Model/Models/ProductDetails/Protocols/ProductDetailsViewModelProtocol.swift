@@ -27,7 +27,6 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var selectedColourName: String? { get }
     /// Selected variant's SKU, rendered as the product reference.
     var productReference: String? { get }
-    /// Fetched alongside the product, at most 6, never containing the current product.
     var relatedProductsState: ViewState<[Product], Error> { get }
     var isWishlistEnabled: Bool { get }
 

@@ -1455,6 +1455,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
             afterTrigger: { self.sut.didTapWishlist(for: related, isFavorite: true) }
         )
         XCTAssertFalse(sut.isFavoriteState(for: related))
+        XCTAssertEqual(mockAnalytics.trackedActions, [.addToWishlist, .removeFromWishlist])
     }
 
     // MARK: - Helper methods

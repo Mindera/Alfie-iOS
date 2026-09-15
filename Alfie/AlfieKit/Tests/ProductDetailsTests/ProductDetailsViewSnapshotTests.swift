@@ -189,7 +189,6 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// An odd count leaves the last grid slot empty rather than stretching the card.
     func test_productDetailsView_withThreeRelatedProducts() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
@@ -213,7 +212,6 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// No media, so each card renders its solid image placeholder with no network race.
     private func relatedProducts(count: Int) -> [Product] {
         (1...count).map { index in
             .fixture(
