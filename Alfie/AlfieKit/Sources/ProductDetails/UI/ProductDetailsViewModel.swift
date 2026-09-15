@@ -85,6 +85,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var selectedColourName: String? { selectedVariant?.colour?.name.nilWhenEmpty }
     public var productReference: String? { selectedVariant?.sku.nilWhenEmpty }
     public var isWishlistEnabled: Bool { dependencies.configurationService.isFeatureEnabled(.wishlist) }
+    public var relatedProducts: [Product] { relatedProductsState.value ?? [] }
 
     public init(
         configuration: ProductDetailsConfiguration,
@@ -541,6 +542,6 @@ private extension String {
 }
 
 extension ProductDetailsViewModel {
-    static let relatedProductsMaxCount = 6
-    static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
+    private static let relatedProductsMaxCount = 6
+    private static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }

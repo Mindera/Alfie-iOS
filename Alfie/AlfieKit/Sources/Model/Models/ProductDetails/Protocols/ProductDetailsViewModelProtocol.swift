@@ -28,6 +28,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     /// Selected variant's SKU, rendered as the product reference.
     var productReference: String? { get }
     var relatedProductsState: ViewState<[Product], ProductDetailsViewErrorType> { get }
+    var relatedProducts: [Product] { get }
     var isWishlistEnabled: Bool { get }
 
     func viewDidAppear()

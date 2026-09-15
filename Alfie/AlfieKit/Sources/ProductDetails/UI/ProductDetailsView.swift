@@ -516,14 +516,16 @@ extension ProductDetailsView {
                             relatedProductCard(product, isSkeleton: true)
                         }
                     } else {
-                        ForEach(viewModel.relatedProductsState.value ?? []) { product in
+                        ForEach(viewModel.relatedProducts) { product in
                             relatedProductCard(product, isSkeleton: false)
                                 .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductCard(id: product.id))
                         }
                     }
                 }
             }
-            .padding(.top, theme.spacing.space200)
+            .padding(.top, viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsSection)
         }
     }
 

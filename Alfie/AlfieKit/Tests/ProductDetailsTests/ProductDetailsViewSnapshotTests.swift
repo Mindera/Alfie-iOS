@@ -180,15 +180,15 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    func test_productDetailsView_withSixRelatedProducts() {
+    func test_product_details_view_with_six_related_products() {
         assertRelatedProductsSnapshot(state: .success(relatedProducts(count: 6)))
     }
 
-    func test_productDetailsView_withThreeRelatedProducts() {
+    func test_product_details_view_with_three_related_products() {
         assertRelatedProductsSnapshot(state: .success(relatedProducts(count: 3)))
     }
 
-    func test_productDetailsView_relatedProductsLoading() {
+    func test_product_details_view_while_related_products_load_shows_skeleton() {
         assertRelatedProductsSnapshot(state: .loading)
     }
 
@@ -209,16 +209,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     }
 
     private func relatedProducts(count: Int) -> [Product] {
-        (1...count).map { index in
-            .fixture(
-                id: "related-\(index)",
-                name: "Related product \(index)",
-                brand: .fixture(name: "Brand \(index)"),
-                slug: "related-\(index)",
-                defaultVariant: .fixture(sku: "sku-\(index)", price: .fixture()),
-                variants: []
-            )
-        }
+        (1...count).map { .fixture(id: "related-\($0)") }
     }
 
     func test_productDetailsView_errorState() {

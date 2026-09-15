@@ -86,6 +86,7 @@ public enum AccessibilityID {
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
+        public static let relatedProductsSection = "productDetails.relatedProducts.section"
         public static let relatedProductsTitleLabel = "productDetails.relatedProducts.title.label"
         public static func relatedProductCard(id: String) -> String { "productDetails.relatedProducts.\(id).card" }
         public static func relatedProductWishlistButton(id: String) -> String {

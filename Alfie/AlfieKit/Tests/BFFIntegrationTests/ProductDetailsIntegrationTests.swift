@@ -42,7 +42,7 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
 
     // MARK: - Related products
 
-    func test_relatedProducts_handleWithoutRecommendations_returnsEmpty() async throws {
+    func test_related_products_for_handle_without_recommendations_are_empty() async throws {
         let products = try await sut.relatedProducts(
             handle: IntegrationSeed.handleWithoutRelatedProducts,
             limit: Constants.relatedProductsLimit
@@ -51,32 +51,35 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         XCTAssertTrue(products.isEmpty)
     }
 
-    func test_relatedProducts_seededHandle_returnsListItems() async throws {
-        let listing = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
-            after: nil,
-            limit: 5,
-            sort: nil,
-            filters: nil
-        )
+    func test_related_products_for_seeded_handle_are_complete_list_items_within_limit() async throws {
+        let related = try await firstNonEmptyRelatedProducts()
 
-        for candidate in listing.products {
-            let products = try await sut.relatedProducts(handle: candidate.slug, limit: Constants.relatedProductsLimit)
-            guard !products.isEmpty else { continue }
+        let products = try XCTUnwrap(related, "No seeded product in '\(IntegrationSeed.collectionHandle)' returned related products")
 
-            XCTAssertLessThanOrEqual(products.count, Constants.relatedProductsLimit)
-            for product in products {
-                XCTAssertFalse(product.id.isEmpty)
-                XCTAssertFalse(product.name.isEmpty)
-                XCTAssertFalse(product.slug.isEmpty)
-            }
-            return
-        }
-
-        XCTFail("No seeded product in '\(IntegrationSeed.collectionHandle)' returned related products")
+        XCTAssertLessThanOrEqual(products.count, Constants.relatedProductsLimit)
+        XCTAssertFalse(products.contains { $0.id.isEmpty })
+        XCTAssertFalse(products.contains { $0.name.isEmpty })
+        XCTAssertFalse(products.contains { $0.slug.isEmpty })
     }
 
     // MARK: - Helpers
+
+    private func firstNonEmptyRelatedProducts() async throws -> [Product]? {
+        let listing = try await sut.productList(
+            collectionHandle: IntegrationSeed.collectionHandle,
+            after: nil,
+            limit: Constants.relatedProductsCandidateCount,
+            sort: nil,
+            filters: nil
+        )
+        for candidate in listing.products {
+            let products = try await sut.relatedProducts(handle: candidate.slug, limit: Constants.relatedProductsLimit)
+            if !products.isEmpty {
+                return products
+            }
+        }
+        return nil
+    }
 
     /// Fetches the first available product's slug, skipping the test when the seed BFF has no products.
     private func firstProductSlug() async throws -> String {
@@ -94,4 +97,5 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
 
 private enum Constants {
     static let relatedProductsLimit = 3
+    static let relatedProductsCandidateCount = 5
 }

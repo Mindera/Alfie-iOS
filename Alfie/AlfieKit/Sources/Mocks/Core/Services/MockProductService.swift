@@ -33,6 +33,9 @@ public final class MockProductService: ProductServiceProtocol {
 
     public var onRelatedProductsCalled: ((String, Int) async throws -> [Product])?
     public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {
-        try await onRelatedProductsCalled?(handle, limit) ?? []
+        guard let products = try await onRelatedProductsCalled?(handle, limit) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return products
     }
 }
