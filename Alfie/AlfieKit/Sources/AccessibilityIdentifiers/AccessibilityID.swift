@@ -13,6 +13,18 @@ public enum AccessibilityID {
         public static let item = "brands.item.button"
     }
 
+    // MARK: - Quantity stepper
+
+    /// The shared `− n +` control. Fixed identifiers, not a per-instance function, because no
+    /// screen shows two of them today — the PDP is the only consumer. A screen that steps more than
+    /// one line at once (the bag, when it gains a stepper) needs id-derived variants instead.
+    public enum QuantityStepper {
+        public static let control = "quantityStepper.control"
+        public static let value = "quantityStepper.value.label"
+        public static let decreaseButton = "quantityStepper.decrease.button"
+        public static let increaseButton = "quantityStepper.increase.button"
+    }
+
     // MARK: - Bag
 
     public enum Bag {

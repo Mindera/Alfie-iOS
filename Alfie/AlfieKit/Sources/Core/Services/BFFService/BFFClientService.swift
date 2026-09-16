@@ -262,6 +262,29 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func updateCart(cartId: String, lines: [CartLineUpdate]) async throws -> Cart {
+        log.info("updateCart → cartId=\(cartId) lines=\(lines.count)")
+
+        do {
+            let cart = try await executeMutation(
+                BFFGraphAPI.UpdateCartMutation(
+                    input: BFFGraphAPI.UpdateCartInput(
+                        cartId: cartId,
+                        lines: lines.map(BFFGraphAPI.UpdateCartLineInput.init(domain:))
+                    )
+                ),
+                mapError: { $0.mappingCartNotFound() }
+            ).updateCart.fragments.cartFragment.convertToCart()
+
+            log.info("updateCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "updateCart")
+            return cart
+        } catch {
+            log.error("updateCart failed: \(error)")
+            throw error
+        }
+    }
+
     public func getCart(cartId: String) async throws -> Cart {
         log.info("getCart → cartId=\(cartId)")
 

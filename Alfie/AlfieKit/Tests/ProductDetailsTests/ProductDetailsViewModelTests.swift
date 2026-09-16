@@ -1240,6 +1240,196 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     /// A single-size, in-stock product whose variant carries a server id — the shape for which
     /// add-to-bag is enabled on entry, with no swatch tapping needed first.
+    // MARK: - Bag quantity
+
+    func test_bagQuantity_isZero_whenTheCartDoesNotHoldTheSelectedVariant() {
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "some-other-variant")]))
+
+        XCTAssertEqual(sut.bagQuantity, 0)
+    }
+
+    func test_bagQuantity_followsTheCartLineForTheSelectedVariant() {
+        initViewModel(configuration: .product(addableProduct()))
+
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 3)]))
+
+        XCTAssertEqual(sut.bagQuantity, 3)
+    }
+
+    func test_bagQuantity_isZero_whenTheCartIsEmptied() {
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 3)]))
+
+        mockCartService.send(cart: nil)
+
+        XCTAssertEqual(sut.bagQuantity, 0)
+    }
+
+    func test_didTapIncreaseBagQuantity_writesOneMoreThanTheCartHolds() {
+        var written: (String, Int)?
+        mockCartService.onSetQuantityCalled = { lineId, quantity in
+            written = (lineId, quantity)
+            return .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: quantity)])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 2)]))
+
+        sut.didTapIncreaseBagQuantity()
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+
+        XCTAssertEqual(written?.0, "line-1")
+        XCTAssertEqual(written?.1, 3)
+    }
+
+    func test_didTapIncreaseBagQuantity_atTheServerMaximum_isNoOp() {
+        // The bound is the server's, so the shopper meets a greyed-out control rather than a
+        // BAD_REQUEST carrying the platform's raw wording.
+        var setQuantityCallCount = 0
+        mockCartService.onSetQuantityCalled = { _, _ in
+            setQuantityCallCount += 1
+            return .fixture()
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(
+            cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: sut.maxBagQuantity)])
+        )
+
+        sut.didTapIncreaseBagQuantity()
+
+        XCTAssertEqual(setQuantityCallCount, 0)
+    }
+
+    func test_didTapDecreaseBagQuantity_writesOneFewer() {
+        var written: Int?
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            written = quantity
+            return .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: quantity)])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 3)]))
+
+        sut.didTapDecreaseBagQuantity()
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+
+        XCTAssertEqual(written, 2)
+    }
+
+    func test_didTapDecreaseBagQuantity_atOne_writesZeroSoTheLineIsDropped() {
+        // Zero is what puts the Add to Bag CTA back, and `CartService` turns it into a removal.
+        var written: Int?
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            written = quantity
+            return .fixture(lines: [])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 1)]))
+
+        sut.didTapDecreaseBagQuantity()
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+
+        XCTAssertEqual(written, 0)
+        XCTAssertEqual(sut.bagQuantity, 0)
+    }
+
+    func test_didTapDecreaseBagQuantity_withNothingInTheBag_isNoOp() {
+        var setQuantityCallCount = 0
+        mockCartService.onSetQuantityCalled = { _, _ in
+            setQuantityCallCount += 1
+            return .fixture()
+        }
+        initViewModel(configuration: .product(addableProduct()))
+
+        sut.didTapDecreaseBagQuantity()
+
+        XCTAssertEqual(setQuantityCallCount, 0)
+    }
+
+    func test_didTapIncreaseBagQuantity_twiceInARow_producesOneRequest() {
+        // Pessimistic, like the add: the second tap would otherwise build its request from a
+        // quantity the server has already moved past.
+        var setQuantityCallCount = 0
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            setQuantityCallCount += 1
+            return .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: quantity)])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 1)]))
+
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+
+        XCTAssertEqual(setQuantityCallCount, 1)
+    }
+
+    func test_didTapIncreaseBagQuantity_isInFlightForTheDurationOfTheWrite() {
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: quantity)])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 1)]))
+
+        sut.didTapIncreaseBagQuantity()
+
+        XCTAssertTrue(sut.isUpdatingBagQuantity)
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+    }
+
+    func test_didTapIncreaseBagQuantity_thatSucceeds_tracksAnAddToBag() {
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: quantity)])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 1)]))
+
+        sut.didTapIncreaseBagQuantity()
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+
+        XCTAssertEqual(mockAnalytics.trackedActions, [.addToBag])
+    }
+
+    func test_didTapDecreaseBagQuantity_thatSucceeds_tracksARemoveFromBag() {
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: quantity)])
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 2)]))
+
+        sut.didTapDecreaseBagQuantity()
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+
+        XCTAssertEqual(mockAnalytics.trackedActions, [.removeFromBag])
+    }
+
+    func test_quantityChange_thatFails_saysSoInQuantityWording_notAddToBagWording() {
+        // `.failure` reads "Couldn't add to bag", which describes an action the shopper did not
+        // take — the item was already in the bag before they touched the stepper.
+        mockCartService.onSetQuantityCalled = { _, _ in throw BFFRequestError(type: .generic) }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 2)]))
+
+        XCTAssertEmitsValue(
+            from: sut.$addToBagFeedback.compactMap { $0 },
+            afterTrigger: { self.sut.didTapIncreaseBagQuantity() }
+        )
+
+        XCTAssertEqual(sut.addToBagFeedback, .quantityUpdateFailure)
+    }
+
+    func test_quantityChange_thatFails_tracksNothing() {
+        mockCartService.onSetQuantityCalled = { _, _ in throw BFFRequestError(type: .generic) }
+        initViewModel(configuration: .product(addableProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-1", quantity: 2)]))
+
+        XCTAssertEmitsValue(
+            from: sut.$addToBagFeedback.compactMap { $0 },
+            afterTrigger: { self.sut.didTapIncreaseBagQuantity() }
+        )
+
+        XCTAssertTrue(mockAnalytics.trackedActions.isEmpty)
+    }
+
     private func addableProduct() -> Product {
         let variant = Product.Variant.fixture(
             id: "variant-1",

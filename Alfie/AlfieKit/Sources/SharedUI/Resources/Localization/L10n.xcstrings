@@ -1249,6 +1249,61 @@
         }
       }
     },
+    "product.quantity.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantity: %d in bag"
+          }
+        }
+      }
+    },
+    "product.quantity.error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't update quantity"
+          }
+        }
+      }
+    },
+    "product.quantity.decrease.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrease quantity"
+          }
+        }
+      }
+    },
+    "product.quantity.increase.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Increase quantity"
+          }
+        }
+      }
+    },
+    "product.quantity.remove.accessibility_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from bag"
+          }
+        }
+      }
+    },
     "product.size.out_of_stock.accessibility_value" : {
       "comment" : "VoiceOver value for a crossed-out size swatch. Says \"online\" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.",
       "extractionState" : "manual",

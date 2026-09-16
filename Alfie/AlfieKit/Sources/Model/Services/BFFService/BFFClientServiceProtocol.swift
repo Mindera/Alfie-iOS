@@ -23,5 +23,7 @@ public protocol BFFClientServiceProtocol {
     func createCart(lines: [CartLineInput]) async throws -> Cart
     func addToCart(cartId: String, lines: [CartLineInput]) async throws -> Cart
     func removeFromCart(cartId: String, lineId: String) async throws -> Cart
+    /// Sets the quantity of every line given. `lines` is the cart's whole array, not a delta.
+    func updateCart(cartId: String, lines: [CartLineUpdate]) async throws -> Cart
     func getCart(cartId: String) async throws -> Cart
 }

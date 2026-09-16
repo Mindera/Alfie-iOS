@@ -77,6 +77,14 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return cart
     }
 
+    public var onUpdateCartCalled: ((String, [CartLineUpdate]) async throws -> Cart)?
+    public func updateCart(cartId: String, lines: [CartLineUpdate]) async throws -> Cart {
+        guard let cart = try await onUpdateCartCalled?(cartId, lines) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return cart
+    }
+
     /// `async` like the two cart mutations above, so a test can hold a read open and start a write
     /// against it. A synchronous closure still converts, so plain stubs are unaffected.
     public var onGetCartCalled: ((String) async throws -> Cart)?

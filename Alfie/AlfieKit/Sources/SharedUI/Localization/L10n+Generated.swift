@@ -458,6 +458,28 @@ public enum L10n {
         public static let cta = L10n.tr("L10n", "product.out_of_stock.button.cta")
       }
     }
+    public enum Quantity {
+      /// Quantity: %d in bag
+      public static func accessibilityLabel(_ p1: Int) -> String {
+        return L10n.tr("L10n", "product.quantity.accessibility_label", p1)
+      }
+      public enum Decrease {
+        /// Decrease quantity
+        public static let accessibilityLabel = L10n.tr("L10n", "product.quantity.decrease.accessibility_label")
+      }
+      public enum Error {
+        /// Couldn't update quantity
+        public static let message = L10n.tr("L10n", "product.quantity.error.message")
+      }
+      public enum Increase {
+        /// Increase quantity
+        public static let accessibilityLabel = L10n.tr("L10n", "product.quantity.increase.accessibility_label")
+      }
+      public enum Remove {
+        /// Remove from bag
+        public static let accessibilityLabel = L10n.tr("L10n", "product.quantity.remove.accessibility_label")
+      }
+    }
     public enum Size {
       /// Size: %@
       public static func selected(_ p1: Any) -> String {
@@ -839,6 +861,11 @@ public extension L10n {
       case productColorTitle = "product.color.title"
       case productOneSizeTitle = "product.one_size.title"
       case productOutOfStockButtonCta = "product.out_of_stock.button.cta"
+      case productQuantityAccessibilityLabel = "product.quantity.accessibility_label"
+      case productQuantityDecreaseAccessibilityLabel = "product.quantity.decrease.accessibility_label"
+      case productQuantityErrorMessage = "product.quantity.error.message"
+      case productQuantityIncreaseAccessibilityLabel = "product.quantity.increase.accessibility_label"
+      case productQuantityRemoveAccessibilityLabel = "product.quantity.remove.accessibility_label"
       case productSizeSelected = "product.size.selected"
       case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"

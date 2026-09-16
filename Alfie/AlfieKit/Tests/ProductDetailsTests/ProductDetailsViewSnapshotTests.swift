@@ -219,6 +219,42 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         (1...count).map { .fixture(id: "related-\($0)") }
     }
 
+    /// The CTA once the bag already holds the variant: the stepper stands in its place, at the same
+    /// height and squared corners, so the row below it does not shift when the swap happens.
+    func test_productDetailsView_withItemInBag() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.bagQuantity = 2
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// At the server's per-line ceiling the increase is greyed and the decrease is not — the one
+    /// state where the stepper's two halves differ.
+    func test_productDetailsView_atMaximumBagQuantity() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.bagQuantity = viewModel.maxBagQuantity
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    /// A quantity change in flight: both halves greyed, so a second tap has no affordance behind it.
+    func test_productDetailsView_whileChangingBagQuantity() {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.bagQuantity = 2
+        viewModel.isUpdatingBagQuantity = true
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)

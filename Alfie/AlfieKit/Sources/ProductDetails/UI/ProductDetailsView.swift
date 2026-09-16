@@ -596,32 +596,61 @@ extension ProductDetailsView {
         }
     }
 
+    /// Once the bag holds the variant on screen, the CTA has nothing left to say — tapping it again
+    /// would add a second line rather than a second item. The stepper takes its place so the
+    /// shopper adjusts the count they already have, and gives the slot back when that count reaches
+    /// zero.
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
-            VStack(spacing: theme.spacing.space0) {
-                let addToBagText = L10n.Product.AddToBag.Button.cta
-                let outOfStockText = L10n.Product.OutOfStock.Button.cta
-
-                ThemedButton(
-                    text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
-                    isDisabled: .init(
-                        // Disabled for the duration of the write, not merely showing a spinner:
-                        // `ThemedButton` stays hit-testable while loading, and a tappable spinner
-                        // reads to VoiceOver as an ordinary button.
-                        get: { !viewModel.isAddToBagEnabled || viewModel.isAddingToBag },
-                        set: { _ in }
+            if viewModel.bagQuantity > 0 {
+                QuantityStepper(
+                    quantity: viewModel.bagQuantity,
+                    // Zero, not one: the last decrement removes the line rather than being refused.
+                    bounds: 0...viewModel.maxBagQuantity,
+                    isDisabled: viewModel.isUpdatingBagQuantity,
+                    cornerRadius: Constants.ctaCornerRadius,
+                    accessibilityLabels: .init(
+                        value: L10n.Product.Quantity.accessibilityLabel(viewModel.bagQuantity),
+                        // At one, decreasing empties the line — so it is a removal, and says so.
+                        decrease: viewModel.bagQuantity == 1
+                            ? L10n.Product.Quantity.Remove.accessibilityLabel
+                            : L10n.Product.Quantity.Decrease.accessibilityLabel,
+                        increase: L10n.Product.Quantity.Increase.accessibilityLabel
                     ),
-                    isLoading: .init(
-                        get: { viewModel.isAddingToBag },
-                        set: { _ in }
-                    ),
-                    isFullWidth: true,
-                    cornerRadius: Constants.ctaCornerRadius
-                ) {
-                    viewModel.didTapAddToBag()
-                }
-                .accessibilityIdentifier(AccessibilityID.ProductDetails.addToBagButton)
+                    onDecrease: { viewModel.didTapDecreaseBagQuantity() },
+                    onIncrease: { viewModel.didTapIncreaseBagQuantity() }
+                )
+                .frame(maxWidth: .infinity)
+            } else {
+                addToBagButton
             }
+        }
+    }
+
+    @ViewBuilder private var addToBagButton: some View {
+        VStack(spacing: theme.spacing.space0) {
+            let addToBagText = L10n.Product.AddToBag.Button.cta
+            let outOfStockText = L10n.Product.OutOfStock.Button.cta
+
+            ThemedButton(
+                text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
+                isDisabled: .init(
+                    // Disabled for the duration of the write, not merely showing a spinner:
+                    // `ThemedButton` stays hit-testable while loading, and a tappable spinner
+                    // reads to VoiceOver as an ordinary button.
+                    get: { !viewModel.isAddToBagEnabled || viewModel.isAddingToBag },
+                    set: { _ in }
+                ),
+                isLoading: .init(
+                    get: { viewModel.isAddingToBag },
+                    set: { _ in }
+                ),
+                isFullWidth: true,
+                cornerRadius: Constants.ctaCornerRadius
+            ) {
+                viewModel.didTapAddToBag()
+            }
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.addToBagButton)
         }
     }
 
@@ -775,7 +804,9 @@ private extension AddToBagFeedback {
     var snackbarType: SnackbarViewConfiguration.SnackbarViewType {
         switch self {
         case .success: .success
-        case .failure: .error
+        case .failure,
+             .quantityUpdateFailure: // swiftlint:disable:this indentation_width
+            .error
         }
     }
 
@@ -783,13 +814,16 @@ private extension AddToBagFeedback {
         switch self {
         case .success: L10n.Product.AddToBag.Success.message
         case .failure: L10n.Product.AddToBag.Error.message
+        case .quantityUpdateFailure: L10n.Product.Quantity.Error.message
         }
     }
 
     var snackbarIcon: Image {
         switch self {
         case .success: Icon.checkmark.image
-        case .failure: Icon.warning.image
+        case .failure,
+             .quantityUpdateFailure: // swiftlint:disable:this indentation_width
+            Icon.warning.image
         }
     }
 }
