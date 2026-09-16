@@ -13,12 +13,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var isAddingToBag: Bool { get }
     /// The outcome of the last bag write; nil once its Snackbar has been dismissed.
     var addToBagFeedback: AddToBagFeedback? { get }
-    /// How many of the selected variant the bag already holds. Zero until it is added, which is
-    /// what puts the Add to Bag CTA on screen in place of the quantity stepper.
     var bagQuantity: Int { get }
-    /// The most this line may be raised to. A server bound, not a stock figure.
     var maxBagQuantity: Int { get }
-    /// True while a quantity change is in flight, so the stepper can refuse a second one.
     var isUpdatingBagQuantity: Bool { get }
     var isInWishlist: Bool { get }
     var canShowSizeSelector: Bool { get }
@@ -45,7 +41,6 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
     func didTapAddToBag()
     func didTapIncreaseBagQuantity()
-    /// Decreasing the last one removes the line, putting the Add to Bag CTA back.
     func didTapDecreaseBagQuantity()
     func didDismissAddToBagFeedback()
     func didTapAddToWishlist()

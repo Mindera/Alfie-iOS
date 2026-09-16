@@ -22,12 +22,7 @@ public protocol CartServiceProtocol {
     /// Drops a line from the cart, taking the cart the server returns in its place.
     func remove(lineId: String) async throws
 
-    /// Sets one line's quantity, leaving every other line as it is. A quantity of zero drops the
-    /// line, so callers do not need a separate path for the last decrement.
-    ///
-    /// Throws when there is no cart to change, or when the held cart does not carry `lineId`: the
-    /// request is assembled from the lines we hold, so a line we do not know about cannot be
-    /// changed without rewriting the ones we do.
+    /// Zero removes the line.
     func setQuantity(lineId: String, to quantity: Int) async throws
 
     /// Discards the stored cart id and the held cart, so a shared device does not hand the next

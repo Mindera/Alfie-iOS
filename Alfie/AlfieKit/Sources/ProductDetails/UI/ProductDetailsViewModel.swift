@@ -23,8 +23,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
     @Published public private(set) var isUpdatingBagQuantity = false
-    /// The cart as the service last published it. Held rather than read on demand so the stepper
-    /// follows a change made anywhere else — the bag screen, or another PDP for the same variant.
     @Published private var cart: Cart?
     private var cartSubscription: AnyCancellable?
     @Published public private(set) var isInWishlist = false
@@ -283,9 +281,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
     }
 
-    /// The cart line holding the variant on screen, matched on `variantId` rather than product:
-    /// a shopper who added the black one and switched to the blue is looking at a variant the bag
-    /// does not hold, and must be offered Add to Bag rather than the black one's quantity.
     private var bagLine: CartLine? {
         guard
             let variantId = selectedVariant?.id,
@@ -302,7 +297,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public var maxBagQuantity: Int {
-        Constants.maxLineQuantity
+        min(selectedVariant?.stock ?? 0, Constants.maxLineQuantity)
     }
 
     public func didTapIncreaseBagQuantity() {
@@ -314,15 +309,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public func didTapDecreaseBagQuantity() {
         guard bagQuantity > 0 else { return }
 
-        // Zero is a removal; `CartService` routes it to `removeFromCart` rather than a zero-quantity
-        // update, and the stepper gives way to the Add to Bag CTA once the line is gone.
         setBagQuantity(to: bagQuantity - 1)
     }
 
-    /// Pessimistic, like `didTapAddToBag()`: the number on screen is the one the server last
-    /// confirmed, never one guessed ahead of it. `isUpdatingBagQuantity` flips before the Task
-    /// starts, so a second tap mid-write is rejected here rather than becoming a request built from
-    /// a quantity the server has already moved past.
     private func setBagQuantity(to quantity: Int) {
         guard !isUpdatingBagQuantity, !isAddingToBag, let line = bagLine, let selectedProduct else { return }
 
@@ -333,8 +322,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             defer { isUpdatingBagQuantity = false }
             do {
                 try await dependencies.cartService.setQuantity(lineId: line.id, to: quantity)
-                // Only once the cart holds the new quantity, matching `didTapAddToBag()`. The
-                // composite id is that method's analytics shape, kept so one screen reports one id.
                 if isIncrease {
                     dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
                 } else {
@@ -649,8 +636,5 @@ extension ProductDetailsViewModel {
 }
 
 private enum Constants {
-    /// The server's per-line ceiling (`Docs/Specs/Features/Cart.md`), not a stock figure — neither
-    /// platform checks availability here. Enforced in the app so the shopper is stopped by a
-    /// greyed-out control rather than by a `BAD_REQUEST` carrying the platform's raw wording.
     static let maxLineQuantity = 100
 }

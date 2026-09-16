@@ -49,8 +49,6 @@ public final class MockCartService: CartServiceProtocol {
         cartSubject.send(try await onSetQuantityCalled(lineId, quantity))
     }
 
-    /// Lets a test stand the mock up holding a cart, which is what a screen reading
-    /// `cartPublisher` needs before it has called anything.
     public func send(cart: Cart?) {
         cartSubject.send(cart)
     }

@@ -102,33 +102,30 @@ public actor CartService: CartServiceProtocol {
         try await serialised { try await self.changeQuantity(ofLine: lineId, to: quantity) }
     }
 
-    /// Queued like every other write, and for a reason the others do not have: the request carries
-    /// the cart's whole `lines` array, assembled from the cart we hold. An update that overtook an
-    /// add would send an array missing the line that add had just created, and the server reads a
-    /// missing line as one to drop — so the shopper's new item disappears.
     private func changeQuantity(ofLine lineId: String, to quantity: Int) async throws {
-        // Zero is a removal, not a quantity. `updateCart` at zero is left to each platform to
-        // interpret, while `removeFromCart` means the same thing on both.
-        guard quantity > 0 else {
-            try await dropLine(id: lineId)
-            return
-        }
-
-        // Throws rather than returning quietly, for the reason `dropLine(id:)` does: a silent
-        // success republishes an unchanged cart for a change the server was never asked to make.
-        guard let cartId = storedCartId, let heldCart = cartSubject.value,
-              heldCart.lines.contains(where: { $0.id == lineId }) else {
+        guard let heldCart = cartSubject.value, heldCart.lines.contains(where: { $0.id == lineId }) else {
             throw BFFRequestError(type: .generic)
         }
 
-        let lines = heldCart.lines.map { $0.update(quantity: $0.id == lineId ? quantity : $0.quantity) }
-        let cart: Cart
         do {
-            cart = try await bffClient.updateCart(cartId: cartId, lines: lines)
+            if quantity > 0 {
+                try await replaceQuantity(ofLine: lineId, to: quantity, in: heldCart)
+            } else {
+                try await dropLine(id: lineId)
+            }
         } catch {
             try? await read()
             throw error
         }
+    }
+
+    private func replaceQuantity(ofLine lineId: String, to quantity: Int, in heldCart: Cart) async throws {
+        guard let cartId = storedCartId else {
+            throw BFFRequestError(type: .generic)
+        }
+
+        let lines = heldCart.lines.map { $0.asUpdate(quantity: $0.id == lineId ? quantity : $0.quantity) }
+        let cart = try await bffClient.updateCart(cartId: cartId, lines: lines)
         userDefaults.set(cart.id, for: storageKey)
         cartSubject.send(cart)
     }

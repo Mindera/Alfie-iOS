@@ -596,22 +596,16 @@ extension ProductDetailsView {
         }
     }
 
-    /// Once the bag holds the variant on screen, the CTA has nothing left to say — tapping it again
-    /// would add a second line rather than a second item. The stepper takes its place so the
-    /// shopper adjusts the count they already have, and gives the slot back when that count reaches
-    /// zero.
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
             if viewModel.bagQuantity > 0 {
                 QuantityStepper(
                     quantity: viewModel.bagQuantity,
-                    // Zero, not one: the last decrement removes the line rather than being refused.
                     bounds: 0...viewModel.maxBagQuantity,
                     isDisabled: viewModel.isUpdatingBagQuantity,
                     cornerRadius: Constants.ctaCornerRadius,
                     accessibilityLabels: .init(
                         value: L10n.Product.Quantity.accessibilityLabel(viewModel.bagQuantity),
-                        // At one, decreasing empties the line — so it is a removal, and says so.
                         decrease: viewModel.bagQuantity == 1
                             ? L10n.Product.Quantity.Remove.accessibilityLabel
                             : L10n.Product.Quantity.Decrease.accessibilityLabel,

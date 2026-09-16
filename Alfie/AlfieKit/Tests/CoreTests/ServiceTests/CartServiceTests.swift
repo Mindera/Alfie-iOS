@@ -501,9 +501,7 @@ final class CartServiceTests: XCTestCase {
 
     // MARK: - Quantity
 
-    func test_setQuantity_sendsEveryLineInTheCart_notOnlyTheChangedOne() async throws {
-        // `updateCart` replaces the cart's lines with the array it is given, so a call carrying only
-        // the changed line is a request to drop every other one.
+    func test_set_quantity_sends_every_line_in_the_cart_not_only_the_changed_one() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         var sentLines: [CartLineUpdate] = []
         client.onUpdateCartCalled = { _, lines in
@@ -517,9 +515,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sentLines.map(\.quantity), [2, 3], "The untouched line keeps the quantity it had")
     }
 
-    func test_setQuantity_carriesBothProductIdsOnEveryLine() async throws {
-        // BigCommerce rejects an update line without them; Shopify ignores them. Sending both is
-        // the only shape that works on either platform.
+    func test_set_quantity_carries_both_product_ids_on_every_line() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         var sentLines: [CartLineUpdate] = []
         client.onUpdateCartCalled = { _, lines in
@@ -533,9 +529,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sentLines.map(\.variantId), ["v1", "v2"])
     }
 
-    func test_setQuantity_toZero_removesTheLineRatherThanSendingAZeroQuantity() async throws {
-        // A line at zero is a line the shopper no longer wants. Routing it through `removeFromCart`
-        // keeps one meaning of "gone" rather than leaving an empty line the platforms disagree about.
+    func test_set_quantity_to_zero_removes_the_line_rather_than_sending_a_zero_quantity() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         var updateCallCount = 0
         var removedLineId: String?
@@ -554,7 +548,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(updateCallCount, 0)
     }
 
-    func test_setQuantity_replacesTheHeldCartWholesaleWithTheReturnedOne() async throws {
+    func test_set_quantity_replaces_the_held_cart_with_the_returned_one() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         client.onUpdateCartCalled = { _, _ in
             .fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 2)])
@@ -565,9 +559,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.lines.map(\.quantity), [2])
     }
 
-    func test_setQuantity_persistsTheCartIdItReturns_evenWhenItDiffers() async throws {
-        // Same reason as an append: a stored id that disagrees with the cart we hold is the next
-        // operation aimed at the wrong one.
+    func test_set_quantity_persists_the_returned_cart_id_even_when_it_differs() async throws {
         let (sut, client, userDefaults) = try await makeSUTHoldingTwoLines()
         client.onUpdateCartCalled = { _, _ in .fixture(id: "cart-2") }
         var persisted: [String: String] = [:]
@@ -578,7 +570,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(persisted[Self.storageKey], "cart-2")
     }
 
-    func test_setQuantity_withNoStoredCartId_throwsRatherThanReportingAChangeThatNeverHappened() async {
+    func test_set_quantity_with_no_stored_cart_id_throws_rather_than_reporting_a_change_that_never_happened() async {
         let (sut, client, _) = makeSUT()
         var askedTheServer = false
         client.onUpdateCartCalled = { _, _ in
@@ -597,10 +589,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertNil(sut.cart)
     }
 
-    func test_setQuantity_forALineTheHeldCartDoesNotCarry_throwsRatherThanRewritingTheRest() async throws {
-        // The lines array is built from the held cart. With the target absent the request would
-        // still be well-formed — and would quietly rewrite every other line for a change the
-        // shopper never asked for.
+    func test_set_quantity_for_a_line_the_held_cart_does_not_carry_throws_rather_than_rewriting_the_rest() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         var askedTheServer = false
         client.onUpdateCartCalled = { _, _ in
@@ -618,7 +607,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertFalse(askedTheServer)
     }
 
-    func test_setQuantity_thatFails_propagatesAndPublishesTheCartTheServerNowHolds() async throws {
+    func test_set_quantity_that_fails_propagates_and_publishes_the_cart_the_server_now_holds() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         client.onUpdateCartCalled = { _, _ in throw BFFRequestError(type: .generic) }
         client.onGetCartCalled = { _ in
@@ -635,7 +624,7 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.lines.map(\.quantity), [2, 3])
     }
 
-    func test_setQuantity_thatFails_stillPropagatesTheUpdateError_whenTheRefetchAlsoFails() async throws {
+    func test_set_quantity_that_fails_propagates_the_update_error_when_the_refetch_also_fails() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         client.onUpdateCartCalled = { _, _ in throw BFFRequestError(type: .generic) }
         client.onGetCartCalled = { _ in throw BFFRequestError(type: .noInternet) }
@@ -650,10 +639,22 @@ final class CartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.lines.map(\.quantity), [1, 3])
     }
 
-    func test_setQuantity_whileAnAddIsInFlight_buildsItsLinesFromTheCartThatAddReturns() async throws {
-        // The whole reason this is queued: the lines array is built from the held cart, so an
-        // update that overtakes an add sends an array missing the line the add just created — and
-        // the server reads that as a request to drop it.
+    func test_set_quantity_to_zero_that_fails_propagates_and_publishes_the_cart_the_server_now_holds() async throws {
+        let (sut, client, _) = try await makeSUTHoldingTwoLines()
+        client.onRemoveFromCartCalled = { _, _ in throw BFFRequestError(type: .generic) }
+        client.onGetCartCalled = { _ in .fixture(id: "cart-1", lines: [.fixture(id: "line-2", quantity: 3)]) }
+
+        do {
+            try await sut.setQuantity(lineId: "line-1", to: 0)
+            XCTFail("A failed removal must propagate")
+        } catch {
+            XCTAssertEqual((error as? BFFRequestError)?.type, .generic)
+        }
+
+        XCTAssertEqual(sut.cart?.lines.map(\.id), ["line-2"])
+    }
+
+    func test_set_quantity_while_an_add_is_in_flight_builds_its_lines_from_the_cart_that_add_returns() async throws {
         let (sut, client, _) = makeSUT(storedCartId: "cart-1")
         client.onGetCartCalled = { _ in .fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 1)]) }
         try await sut.fetch()
@@ -682,7 +683,6 @@ final class CartServiceTests: XCTestCase {
 
     // MARK: - Helpers
 
-    /// A SUT holding a two-line cart, which is what a quantity change reads to build its request.
     private func makeSUTHoldingTwoLines() async throws -> (CartService, MockBFFClientService, MockUserDefaults) {
         let (sut, client, userDefaults) = makeSUT(storedCartId: "cart-1")
         client.onGetCartCalled = { _ in
