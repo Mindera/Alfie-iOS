@@ -17,13 +17,29 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchBackground" translatesAutoresizingMaskIntoConstraints="NO" id="Bgd-Im-Vw1">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Scr-Im-Vw2">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.3" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="AbB-FK-wl1">
                                 <rect key="frame" x="116.5" y="413" width="160" height="26"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" name="LaunchScreenBackground"/>
                         <constraints>
+                            <constraint firstItem="Bgd-Im-Vw1" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="bgd-top-cst"/>
+                            <constraint firstItem="Bgd-Im-Vw1" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="bgd-lead-cst"/>
+                            <constraint firstItem="Bgd-Im-Vw1" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="bgd-trail-cst"/>
+                            <constraint firstItem="Bgd-Im-Vw1" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="bgd-bot-cst"/>
+                            <constraint firstItem="Scr-Im-Vw2" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="scr-top-cst"/>
+                            <constraint firstItem="Scr-Im-Vw2" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="scr-lead-cst"/>
+                            <constraint firstItem="Scr-Im-Vw2" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="scr-trail-cst"/>
+                            <constraint firstItem="Scr-Im-Vw2" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="scr-bot-cst"/>
                             <constraint firstItem="AbB-FK-wl1" firstAttribute="centerX" secondItem="Bcu-3y-fUS" secondAttribute="centerX" id="Ddd-Fi-LLt"/>
                             <constraint firstItem="AbB-FK-wl1" firstAttribute="centerY" secondItem="Bcu-3y-fUS" secondAttribute="centerY" id="jgb-UZ-g4g"/>
                         </constraints>
@@ -35,6 +51,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="LaunchBackground" width="375" height="812"/>
         <image name="LaunchLogo" width="160" height="26"/>
         <namedColor name="LaunchScreenBackground">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
