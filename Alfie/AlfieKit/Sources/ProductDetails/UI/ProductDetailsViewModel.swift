@@ -24,7 +24,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
     @Published public private(set) var isUpdatingBagQuantity = false
     @Published private var cart: Cart?
+    @Published private var pendingBagQuantity: PendingBagQuantity?
     private var cartSubscription: AnyCancellable?
+    private var bagQuantityTapCount = 0
     @Published public private(set) var isInWishlist = false
     public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
         items: []
@@ -148,8 +150,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             .receive(on: dependencies.scheduler)
             .sink { [weak self] cart in
                 self?.cart = cart
-            }
-    }
+            }    }
 
     public func viewDidAppear() {
         Task {
@@ -293,7 +294,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public var bagQuantity: Int {
-        bagLine?.quantity ?? 0
+        guard let bagLine else { return 0 }
+
+        if let pendingBagQuantity, pendingBagQuantity.lineId == bagLine.id {
+            return pendingBagQuantity.quantity
+        }
+        return bagLine.quantity
     }
 
     public var maxBagQuantity: Int {
@@ -303,32 +309,63 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public func didTapIncreaseBagQuantity() {
         guard bagQuantity < maxBagQuantity else { return }
 
-        setBagQuantity(to: bagQuantity + 1)
+        stepBagQuantity(to: bagQuantity + 1)
     }
 
     public func didTapDecreaseBagQuantity() {
         guard bagQuantity > 0 else { return }
 
-        setBagQuantity(to: bagQuantity - 1)
+        stepBagQuantity(to: bagQuantity - 1)
     }
 
-    private func setBagQuantity(to quantity: Int) {
-        guard !isUpdatingBagQuantity, !isAddingToBag, let line = bagLine, let selectedProduct else { return }
+    private func stepBagQuantity(to quantity: Int) {
+        guard !isUpdatingBagQuantity, !isAddingToBag, let line = bagLine else { return }
 
-        let isIncrease = quantity > line.quantity
+        pendingBagQuantity = .init(lineId: line.id, quantity: quantity)
+        bagQuantityTapCount += 1
+        guard quantity > 0 else {
+            commitPendingBagQuantity()
+            return
+        }
+
+        let tap = bagQuantityTapCount
+        let scheduler = dependencies.scheduler
+        scheduler.schedule(after: scheduler.now.advanced(by: Constants.bagQuantityDebounce)) { [weak self] in
+            guard let self, tap == bagQuantityTapCount else { return }
+            commitPendingBagQuantity()
+        }
+    }
+
+    private func commitPendingBagQuantity() {
+        guard
+            !isUpdatingBagQuantity,
+            let pending = pendingBagQuantity,
+            let line = cart?.lines.first(where: { $0.id == pending.lineId }),
+            pending.quantity != line.quantity,
+            let selectedProduct
+        else {
+            pendingBagQuantity = nil
+            return
+        }
+
+        let isIncrease = pending.quantity > line.quantity
         addToBagFeedback = nil
         isUpdatingBagQuantity = true
         Task { @MainActor in
-            defer { isUpdatingBagQuantity = false }
+            defer {
+                cart = dependencies.cartService.cart
+                pendingBagQuantity = nil
+                isUpdatingBagQuantity = false
+            }
             do {
-                try await dependencies.cartService.setQuantity(lineId: line.id, to: quantity)
+                try await dependencies.cartService.setQuantity(lineId: line.id, to: pending.quantity)
                 if isIncrease {
                     dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
                 } else {
                     dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.id)
                 }
             } catch {
-                dependencies.log.error("Error setting line \(line.id) to quantity \(quantity): \(error)")
+                dependencies.log.error("Error setting line \(line.id) to quantity \(pending.quantity): \(error)")
                 addToBagFeedback = .quantityUpdateFailure
             }
         }
@@ -635,6 +672,12 @@ extension ProductDetailsViewModel {
     private static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }
 
+private struct PendingBagQuantity: Equatable {
+    let lineId: String
+    let quantity: Int
+}
+
 private enum Constants {
     static let maxLineQuantity = 100
+    static let bagQuantityDebounce: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(500)
 }

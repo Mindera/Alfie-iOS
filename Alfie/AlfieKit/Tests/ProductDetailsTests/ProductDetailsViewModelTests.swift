@@ -1,4 +1,5 @@
 import AlicerceLogging
+import CombineSchedulers
 import Mocks
 import Model
 import SharedUI
@@ -23,9 +24,12 @@ final class ProductDetailsViewModelTests: XCTestCase {
         makeDependencies(wishlistService: MockWishlistService())
     }
 
-    private func makeDependencies(wishlistService: WishlistServiceProtocol) {
+    private func makeDependencies(
+        wishlistService: WishlistServiceProtocol,
+        scheduler: AnySchedulerOf<DispatchQueue> = .immediate
+    ) {
         mockDependencies = ProductDetailsDependencyContainer(
-            scheduler: .immediate,
+            scheduler: scheduler,
             productService: mockProductService,
             webUrlProvider: mockWebUrlProvider,
             cartService: mockCartService,
@@ -1443,6 +1447,142 @@ final class ProductDetailsViewModelTests: XCTestCase {
         )
 
         XCTAssertTrue(mockAnalytics.trackedActions.isEmpty)
+    }
+
+    // MARK: - Bag quantity debounce
+
+    func test_did_tap_increase_bag_quantity_shows_the_new_quantity_before_the_write_is_sent() {
+        let scheduler = DispatchQueue.test
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return self.cartHolding(quantity: quantity)
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+
+        sut.didTapIncreaseBagQuantity()
+
+        XCTAssertEqual(sut.bagQuantity, 2)
+        XCTAssertEqual(writtenQuantities, [])
+    }
+
+    func test_bag_quantity_taps_within_the_debounce_window_send_one_write_with_the_final_quantity() {
+        let scheduler = DispatchQueue.test
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return self.cartHolding(quantity: quantity)
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+        XCTAssertEqual(writtenQuantities, [4])
+        XCTAssertEqual(sut.bagQuantity, 4)
+    }
+
+    func test_bag_quantity_write_is_not_sent_before_the_debounce_interval_elapses() {
+        let scheduler = DispatchQueue.test
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return self.cartHolding(quantity: quantity)
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+        sut.didTapIncreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(499))
+
+        XCTAssertEqual(writtenQuantities, [])
+        XCTAssertFalse(sut.isUpdatingBagQuantity)
+    }
+
+    func test_did_tap_decrease_bag_quantity_to_zero_sends_the_removal_without_waiting() {
+        let scheduler = DispatchQueue.test
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return .fixture(lines: [])
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+
+        sut.didTapDecreaseBagQuantity()
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+        XCTAssertEqual(writtenQuantities, [0])
+    }
+
+    func test_bag_quantity_burst_that_fails_falls_back_to_the_quantity_the_cart_holds() {
+        let scheduler = DispatchQueue.test
+        mockCartService.onSetQuantityCalled = { _, _ in throw BFFRequestError(type: .generic) }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$addToBagFeedback, expectedValue: .quantityUpdateFailure)
+        XCTAssertEqual(sut.bagQuantity, 1)
+    }
+
+    func test_bag_quantity_burst_tracks_one_add_to_bag() {
+        let scheduler = DispatchQueue.test
+        mockCartService.onSetQuantityCalled = { _, quantity in self.cartHolding(quantity: quantity) }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+        XCTAssertEqual(mockAnalytics.trackedActions, [.addToBag])
+    }
+
+    func test_bag_quantity_burst_back_to_the_starting_quantity_sends_no_write() {
+        let scheduler = DispatchQueue.test
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return self.cartHolding(quantity: quantity)
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 2)
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapDecreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertEqual(writtenQuantities, [])
+        XCTAssertFalse(sut.isUpdatingBagQuantity)
+        XCTAssertTrue(mockAnalytics.trackedActions.isEmpty)
+    }
+
+    func test_did_tap_increase_bag_quantity_stops_at_stock_counting_taps_not_yet_sent() {
+        let scheduler = DispatchQueue.test
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return self.cartHolding(quantity: quantity)
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 4)
+        sut.didTapIncreaseBagQuantity()
+        sut.didTapIncreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+        XCTAssertEqual(writtenQuantities, [5])
+    }
+
+    private func initDebouncedViewModel(scheduler: TestSchedulerOf<DispatchQueue>, bagQuantity: Int) {
+        makeDependencies(wishlistService: MockWishlistService(), scheduler: scheduler.eraseToAnyScheduler())
+        initViewModel(configuration: .product(addableProduct()))
+        holdInBag(quantity: bagQuantity)
+        scheduler.advance()
     }
 
     private func holdInBag(variantId: String = "variant-1", quantity: Int) {
