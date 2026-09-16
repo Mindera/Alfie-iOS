@@ -9,8 +9,9 @@ struct HomeHeroBannerView: View {
         static let scrimEndLocation: CGFloat = 0.52
         static let activeDotSize = CGSize(width: 12, height: 6)
         static let inactiveDotDiameter: CGFloat = 6
-        static let inactiveDotOpacity: CGFloat = 0.4
     }
+
+    @Environment(\.theme) private var theme
 
     private let banner: HomeHeroBanner
     private let pageCount: Int
@@ -75,11 +76,11 @@ struct HomeHeroBannerView: View {
     private func pageDot(isSelected: Bool) -> some View {
         if isSelected {
             Capsule()
-                .fill(Theme.contentContentInvertedPrimary)
+                .fill(theme.color.brandSelfridges500)
                 .frame(width: Constants.activeDotSize.width, height: Constants.activeDotSize.height)
         } else {
             Circle()
-                .fill(Theme.contentContentInvertedPrimary.opacity(Constants.inactiveDotOpacity))
+                .fill(theme.color.neutrals300)
                 .frame(width: Constants.inactiveDotDiameter, height: Constants.inactiveDotDiameter)
         }
     }
