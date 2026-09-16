@@ -28,7 +28,7 @@ extension TypographyStyle {
     /// Resolves a generated `TypographyStyle` token to a concrete `UIFont`.
     /// - "SF Pro" (`fontFamilyPrimaryIos`) resolves to the dynamic system font — there is no
     ///   "SF Pro" named font to load via `UIFont(name:)`, so `systemFont(ofSize:weight:)` is used.
-    /// - `fontFamilyBrand` resolves to the bundled Libre Baskerville face (stand-in for the unbundled Avalon).
+    /// - `fontFamilyBrand` resolves to the bundled Avalon face.
     /// - Any other family falls back to the system font (safe, never crashes).
     public var uiFont: UIFont {
         switch fontFamily {
@@ -37,7 +37,7 @@ extension TypographyStyle {
         case Primitives.Typography.fontFamilyBrand:
             // If the bundled brand face isn't registered, fall back to the system font at the
             // token's size/weight rather than `UIFont()` (which loses both).
-            return UIFont(name: FontNames.libreBaskerville.rawValue, size: fontSize)
+            return UIFont(name: FontNames.avalon.rawValue, size: fontSize)
                 ?? .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
         default:
             return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
