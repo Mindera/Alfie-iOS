@@ -1,4 +1,4 @@
-# Feature: Product Details — Information Rows from BFF Metafields (iOS port of ALFMOB-519)
+# Feature: Product Details — Information Rows from BFF Metafields (ALFMOB-535)
 
 **Status**: Draft
 **Created**: 2026-09-16
@@ -19,7 +19,7 @@ description, because the BFF had no field to carry it.
 [AF-107](https://mindera.atlassian.net/browse/AF-107) closed that gap: `productDetails` now accepts
 `productMetafields` identifiers and returns the matching values in `extensions`. The web storefront
 consumed this in [ALFMOB-519](https://mindera.atlassian.net/browse/ALFMOB-519). This spec brings the
-same content to iOS.
+same content to iOS, tracked in [ALFMOB-535](https://mindera.atlassian.net/browse/ALFMOB-535).
 
 Two things make the iOS build deliberately different from web's, and both are decisions, not oversights:
 
