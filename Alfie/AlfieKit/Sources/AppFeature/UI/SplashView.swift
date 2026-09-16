@@ -2,12 +2,12 @@ import AccessibilityIdentifiers
 import SharedUI
 import SwiftUI
 
-/// App startup splash: the MINDERA/ALFIE wordmark above the loading spinner.
+/// App startup splash: the SELFRIDGES&Co wordmark above the loading spinner.
 struct SplashView: View {
     @Environment(\.theme) private var theme
 
     var body: some View {
-        Image(ThemedImage.splashLogo.literalName, bundle: ThemedImage.splashLogo.bundle)
+        Image(ThemedImage.brandWordmark.literalName, bundle: ThemedImage.brandWordmark.bundle)
             // Spinner hangs below the wordmark without affecting its centring (aligns with launch screen).
             .overlay(alignment: .bottom) {
                 LoadingSpinner()
