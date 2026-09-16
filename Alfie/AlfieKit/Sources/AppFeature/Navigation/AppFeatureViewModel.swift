@@ -2,6 +2,7 @@ import AlicerceLogging
 import Bag
 import CategorySelector
 import Combine
+import CombineSchedulers
 import Core
 import Foundation
 import Home
@@ -47,7 +48,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
     public init(
         serviceProvider: ServiceProviderProtocol,
         log: Logger,
-        startupCompletionDelay: CGFloat = 2
+        startupCompletionDelay: CGFloat = 2,
+        scheduler: AnySchedulerOf<DispatchQueue> = .main
     ) {
         self.configurationService = serviceProvider.configurationService
 
@@ -183,7 +185,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             categorySelectorFlowViewModel: categorySelectorFlowViewModel,
             homeFlowViewModel: homeFlowViewModel,
             wishlistFlowViewModel: wishlistFlowViewModel,
-            myAccountFlowViewModel: myAccountFlowViewModel
+            myAccountFlowViewModel: myAccountFlowViewModel,
+            scheduler: scheduler
         )
 
         self.appUpdateInfoConfiguration = serviceProvider.configurationService.forceAppUpdateInfo
