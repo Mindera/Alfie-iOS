@@ -1266,6 +1266,32 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.bagQuantity, 0)
     }
 
+    func test_bagQuantity_isZero_untilASizeIsPicked_whenTheProductOffersASizeChoice() {
+        initViewModel(configuration: .product(twoSizeProduct()))
+
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-s", quantity: 2)]))
+
+        XCTAssertEqual(sut.bagQuantity, 0)
+    }
+
+    func test_bagQuantity_followsTheCartLine_onceTheSizeInTheBagIsPicked() {
+        initViewModel(configuration: .product(twoSizeProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-s", quantity: 2)]))
+
+        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first { $0.id == "s" }
+
+        XCTAssertEqual(sut.bagQuantity, 2)
+    }
+
+    func test_didTapDecreaseBagQuantity_beforeASizeIsPicked_isNoOp() {
+        initViewModel(configuration: .product(twoSizeProduct()))
+        mockCartService.send(cart: .fixture(lines: [.fixture(id: "line-1", variantId: "variant-s", quantity: 2)]))
+
+        sut.didTapDecreaseBagQuantity()
+
+        XCTAssertFalse(sut.isUpdatingBagQuantity)
+    }
+
     func test_didTapIncreaseBagQuantity_writesOneMoreThanTheCartHolds() {
         var written: (String, Int)?
         mockCartService.onSetQuantityCalled = { lineId, quantity in
@@ -1438,6 +1464,13 @@ final class ProductDetailsViewModelTests: XCTestCase {
             stock: 5
         )
         return Product.fixture(id: "product-1", defaultVariant: variant, variants: [variant])
+    }
+
+    private func twoSizeProduct() -> Product {
+        let colour = Product.Colour.fixture(id: "1", name: "Color 1")
+        let small = Product.Variant.fixture(id: "variant-s", size: .fixture(id: "s", value: "S"), colour: colour, stock: 5)
+        let medium = Product.Variant.fixture(id: "variant-m", size: .fixture(id: "m", value: "M"), colour: colour, stock: 5)
+        return Product.fixture(id: "product-1", defaultVariant: small, variants: [small, medium])
     }
 
     // MARK: - Share

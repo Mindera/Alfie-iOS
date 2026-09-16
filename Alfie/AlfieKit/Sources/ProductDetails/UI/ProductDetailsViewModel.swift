@@ -287,7 +287,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     /// a shopper who added the black one and switched to the blue is looking at a variant the bag
     /// does not hold, and must be offered Add to Bag rather than the black one's quantity.
     private var bagLine: CartLine? {
-        guard let variantId = selectedVariant?.id else { return nil }
+        guard
+            let variantId = selectedVariant?.id,
+            !canShowSizeSelector || sizingSelectionConfiguration.selectedItem != nil
+        else {
+            return nil
+        }
 
         return cart?.lines.first { $0.variantId == variantId }
     }

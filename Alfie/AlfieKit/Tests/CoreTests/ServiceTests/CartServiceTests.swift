@@ -618,15 +618,33 @@ final class CartServiceTests: XCTestCase {
         XCTAssertFalse(askedTheServer)
     }
 
-    func test_setQuantity_thatFails_propagatesAndLeavesTheHeldCartUntouched() async throws {
+    func test_setQuantity_thatFails_propagatesAndPublishesTheCartTheServerNowHolds() async throws {
         let (sut, client, _) = try await makeSUTHoldingTwoLines()
         client.onUpdateCartCalled = { _, _ in throw BFFRequestError(type: .generic) }
+        client.onGetCartCalled = { _ in
+            .fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 2), .fixture(id: "line-2", quantity: 3)])
+        }
 
         do {
             try await sut.setQuantity(lineId: "line-1", to: 2)
             XCTFail("A failed quantity change must propagate")
         } catch {
-            // Expected.
+            XCTAssertEqual((error as? BFFRequestError)?.type, .generic)
+        }
+
+        XCTAssertEqual(sut.cart?.lines.map(\.quantity), [2, 3])
+    }
+
+    func test_setQuantity_thatFails_stillPropagatesTheUpdateError_whenTheRefetchAlsoFails() async throws {
+        let (sut, client, _) = try await makeSUTHoldingTwoLines()
+        client.onUpdateCartCalled = { _, _ in throw BFFRequestError(type: .generic) }
+        client.onGetCartCalled = { _ in throw BFFRequestError(type: .noInternet) }
+
+        do {
+            try await sut.setQuantity(lineId: "line-1", to: 2)
+            XCTFail("A failed quantity change must propagate")
+        } catch {
+            XCTAssertEqual((error as? BFFRequestError)?.type, .generic)
         }
 
         XCTAssertEqual(sut.cart?.lines.map(\.quantity), [1, 3])

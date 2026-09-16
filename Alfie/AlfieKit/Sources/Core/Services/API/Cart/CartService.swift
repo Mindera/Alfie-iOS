@@ -122,7 +122,13 @@ public actor CartService: CartServiceProtocol {
         }
 
         let lines = heldCart.lines.map { $0.update(quantity: $0.id == lineId ? quantity : $0.quantity) }
-        let cart = try await bffClient.updateCart(cartId: cartId, lines: lines)
+        let cart: Cart
+        do {
+            cart = try await bffClient.updateCart(cartId: cartId, lines: lines)
+        } catch {
+            try? await read()
+            throw error
+        }
         userDefaults.set(cart.id, for: storageKey)
         cartSubject.send(cart)
     }
