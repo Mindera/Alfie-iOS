@@ -20,44 +20,64 @@ import XCTest
 final class HomeFlowViewModelTests: XCTestCase {
     private var serviceProvider: MockServiceProvider!
     private var sut: HomeFlowViewModel!
-    private var overlayViews: [AnyView?]!
+    private var overlays: [TabOverlay?]!
     private var subscriptions: Set<AnyCancellable>!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
 
         serviceProvider = MockServiceProvider()
-        overlayViews = []
+        overlays = []
         subscriptions = []
         sut = HomeFlowViewModel(dependencies: Self.makeDependencies(serviceProvider: serviceProvider))
-        sut.overlayViewPublisher
-            .sink { [weak self] in self?.overlayViews.append($0) }
+        sut.overlayPublisher
+            .sink { [weak self] in self?.overlays.append($0) }
             .store(in: &subscriptions)
     }
 
     override func tearDownWithError() throws {
         subscriptions = nil
-        overlayViews = nil
+        overlays = nil
         sut = nil
         serviceProvider = nil
         try super.tearDownWithError()
     }
 
     func test_overlay_before_any_presentation_is_nil() {
-        XCTAssertEqual(overlayViews.count, 1)
-        XCTAssertNil(overlayViews.last ?? nil)
+        XCTAssertEqual(overlays.count, 1)
+        XCTAssertNil(overlays.last ?? nil)
     }
 
     func test_did_tap_scan_on_home_presents_an_overlay() {
         sut.makeHomeViewModel().didTapScan()
 
-        XCTAssertNotNil(overlayViews.last ?? nil)
+        XCTAssertNotNil(overlays.last ?? nil)
     }
 
     func test_did_tap_search_on_home_presents_an_overlay() {
         sut.makeHomeViewModel().didTapSearch()
 
-        XCTAssertNotNil(overlayViews.last ?? nil)
+        XCTAssertNotNil(overlays.last ?? nil)
+    }
+
+    func test_did_tap_search_on_home_keeps_the_tab_bar() {
+        sut.makeHomeViewModel().didTapSearch()
+
+        XCTAssertEqual(overlays.last??.hidesTabBar, false)
+    }
+
+    func test_did_tap_scan_on_home_hides_the_tab_bar() {
+        sut.makeHomeViewModel().didTapScan()
+
+        XCTAssertEqual(overlays.last??.hidesTabBar, true)
+    }
+
+    func test_dismiss_overlay_while_search_is_presented_clears_the_overlay() {
+        sut.makeHomeViewModel().didTapSearch()
+
+        sut.dismissOverlay()
+
+        XCTAssertNil(overlays.last ?? nil)
     }
 
     /// Presenting one overlay and then the other replaces it rather than stacking: `overlay` holds a
@@ -68,9 +88,9 @@ final class HomeFlowViewModelTests: XCTestCase {
 
         homeViewModel.didTapScan()
 
-        XCTAssertNotNil(overlayViews.last ?? nil)
+        XCTAssertNotNil(overlays.last ?? nil)
         // One emission for the initial nil, then one per presentation — never two live at once.
-        XCTAssertEqual(overlayViews.count, 3)
+        XCTAssertEqual(overlays.count, 3)
     }
 
     // MARK: - Search results
@@ -84,7 +104,7 @@ final class HomeFlowViewModelTests: XCTestCase {
 
         listing.didTapSearch()
 
-        XCTAssertNotNil(overlayViews.last ?? nil)
+        XCTAssertNotNil(overlays.last ?? nil)
     }
 
     // MARK: - Helpers

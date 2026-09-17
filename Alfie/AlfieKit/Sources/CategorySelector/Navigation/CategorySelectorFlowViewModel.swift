@@ -15,15 +15,15 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     @Published public var path = NavigationPath()
     private let dependencies: CategorySelectorFlowDependencyContainer
     /// Which screen, if any, is covering the tab. One value rather than a flag per screen, so a
-    /// second overlay cannot open behind the first and so `overlayView` has a single writer.
+    /// second overlay cannot open behind the first and so `tabOverlay` has a single writer.
     private enum Overlay {
         case search
         case scanner
     }
 
     @Published private var overlay: Overlay?
-    @Published private var overlayView: AnyView?
-    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
+    @Published private var tabOverlay: TabOverlay?
+    public var overlayPublisher: AnyPublisher<TabOverlay?, Never> { $tabOverlay.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
@@ -48,16 +48,26 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
 
                 switch overlay {
                 case .search:
-                    overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
+                    tabOverlay = TabOverlay(
+                        view: AnyView(SearchFlowView(viewModel: searchFlowViewModel)),
+                        hidesTabBar: false
+                    )
 
                 case .scanner:
-                    overlayView = AnyView(ScannerView(viewModel: makeScannerViewModel()))
+                    tabOverlay = TabOverlay(
+                        view: AnyView(ScannerView(viewModel: makeScannerViewModel())),
+                        hidesTabBar: true
+                    )
 
                 case nil:
-                    overlayView = nil
+                    tabOverlay = nil
                 }
             }
             .store(in: &subscriptions)
+    }
+
+    public func dismissOverlay() {
+        overlay = nil
     }
 
     /// Closing clears the overlay as well as dismissing the screen, so the flow does not go on

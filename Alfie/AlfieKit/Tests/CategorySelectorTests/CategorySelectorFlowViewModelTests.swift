@@ -14,36 +14,36 @@ import XCTest
 
 final class CategorySelectorFlowViewModelTests: XCTestCase {
     private var sut: CategorySelectorFlowViewModel!
-    private var overlayViews: [AnyView?]!
+    private var overlays: [TabOverlay?]!
     private var subscriptions: Set<AnyCancellable>!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        overlayViews = []
+        overlays = []
         subscriptions = []
         sut = CategorySelectorFlowViewModel(dependencies: Self.makeDependencies(serviceProvider: MockServiceProvider()))
-        sut.overlayViewPublisher
-            .sink { [weak self] in self?.overlayViews.append($0) }
+        sut.overlayPublisher
+            .sink { [weak self] in self?.overlays.append($0) }
             .store(in: &subscriptions)
     }
 
     override func tearDownWithError() throws {
         subscriptions = nil
-        overlayViews = nil
+        overlays = nil
         sut = nil
         try super.tearDownWithError()
     }
 
     func test_overlay_before_any_presentation_is_nil() {
-        XCTAssertEqual(overlayViews.count, 1)
-        XCTAssertNil(overlayViews.last ?? nil)
+        XCTAssertEqual(overlays.count, 1)
+        XCTAssertNil(overlays.last ?? nil)
     }
 
     func test_present_scanner_with_no_overlay_emits_an_overlay() {
         sut.presentScanner()
 
-        XCTAssertEqual(overlayViews.count, 2)
-        XCTAssertNotNil(overlayViews.last ?? nil)
+        XCTAssertEqual(overlays.count, 2)
+        XCTAssertNotNil(overlays.last ?? nil)
     }
 
     func test_present_scanner_while_search_is_presented_replaces_the_overlay() {
@@ -51,8 +51,28 @@ final class CategorySelectorFlowViewModelTests: XCTestCase {
 
         sut.presentScanner()
 
-        XCTAssertEqual(overlayViews.count, 3)
-        XCTAssertNotNil(overlayViews.last ?? nil)
+        XCTAssertEqual(overlays.count, 3)
+        XCTAssertNotNil(overlays.last ?? nil)
+    }
+
+    func test_present_search_keeps_the_tab_bar() {
+        sut.presentSearch()
+
+        XCTAssertEqual(overlays.last??.hidesTabBar, false)
+    }
+
+    func test_present_scanner_hides_the_tab_bar() {
+        sut.presentScanner()
+
+        XCTAssertEqual(overlays.last??.hidesTabBar, true)
+    }
+
+    func test_dismiss_overlay_while_search_is_presented_clears_the_overlay() {
+        sut.presentSearch()
+
+        sut.dismissOverlay()
+
+        XCTAssertNil(overlays.last ?? nil)
     }
 
     // MARK: - Helpers
