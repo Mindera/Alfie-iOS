@@ -343,7 +343,7 @@ After this slice ships, the screen will **not** match the Figma frame. Four thin
 
 | Deferred | Blocked by |
 |---|---|
-| "You might also like" recommendations grid — roughly the bottom third of the design | Related products are exposed as IDs only, so resolving them needs a second fetch; the "Best Seller" badge has no identified data source |
+| ~~"You might also like" recommendations grid~~ — delivered in ALFMOB-534 | Unblocked by AF-108 (`relatedProducts` query returning full products). Still deferred: the "Best Seller" badge, which has no identified data source |
 | Rich in-panel accordion content — twelve category-specific variants with imagery | Needs a metafield namespace and key contract from backend |
 | Notify-me — makes the out-of-stock bell functional | No service exists |
 | Size guide — makes the link functional | No content and no destination exist |

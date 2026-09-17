@@ -20,16 +20,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         mockWebUrlProvider = MockWebUrlProvider()
         mockCartService = MockCartService()
         mockAnalytics = MockAnalyticsTracker()
-        mockDependencies = ProductDetailsDependencyContainer(
-            scheduler: .immediate,
-            productService: mockProductService,
-            webUrlProvider: mockWebUrlProvider,
-            cartService: mockCartService,
-            wishlistService: MockWishlistService(),
-            configurationService: MockConfigurationService(),
-            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
-            log: Log.DummyLogger()
-        )
+        mockDependencies = makeDependencies(wishlistService: MockWishlistService())
     }
 
     override func tearDownWithError() throws {
@@ -1134,7 +1125,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
             configuration: .product(addableProduct()),
             dependencies: mockDependencies,
             goBackAction: { didGoBack = true },
-            openWebfeatureAction: { _ in }
+            openWebfeatureAction: { _ in },
+            openProductAction: { _ in }
         )
 
         XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
@@ -1269,14 +1261,303 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertFalse(swatchesSearchResult.map(\.name).contains(expectedNonMatchedColors.map(\.name)))
     }
 
+
+    // MARK: - Related products
+
+    func test_view_did_appear_requests_related_products_for_product_handle_with_one_extra_slot() {
+        initViewModel(configuration: .product(.fixture(slug: "nice-shirt")))
+        mockProductService.onGetProductCalled = { _ in .fixture() }
+        var capturedRequests: [(handle: String, limit: Int)] = []
+        let requested = expectation(description: "Related products are requested")
+        mockProductService.onRelatedProductsCalled = { handle, limit in
+            capturedRequests.append((handle, limit))
+            requested.fulfill()
+            return []
+        }
+
+        sut.viewDidAppear()
+        wait(for: [requested], timeout: .default)
+
+        XCTAssertEqual(capturedRequests.map { $0.handle }, ["nice-shirt"])
+        XCTAssertEqual(capturedRequests.map { $0.limit }, [7])
+    }
+
+    func test_view_did_appear_requests_related_products_when_product_fetch_fails() {
+        initViewModel(configuration: .deepLink(handle: "nice-shirt"))
+        mockProductService.onGetProductCalled = { _ in throw BFFRequestError(type: .generic) }
+        let requested = expectation(description: "Related products are requested")
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            requested.fulfill()
+            return []
+        }
+
+        sut.viewDidAppear()
+
+        wait(for: [requested], timeout: .default)
+    }
+
+    func test_related_products_exclude_current_product_and_keep_the_first_six() {
+        initViewModel(configuration: .product(.fixture(id: "current", slug: "current-slug")))
+        mockProductService.onGetProductCalled = { _ in .fixture(id: "current", slug: "current-slug") }
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            [.fixture(id: "current", slug: "current-slug")] + (1...7).map { .fixture(id: "\($0)", slug: "slug-\($0)") }
+        }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertEqual(sut.relatedProducts.map(\.id), ["1", "2", "3", "4", "5", "6"])
+    }
+
+    func test_related_products_exclude_current_product_when_only_its_id_matches() {
+        initViewModel(configuration: .product(.fixture(id: "current", slug: "current-slug")))
+        mockProductService.onGetProductCalled = { _ in .fixture(id: "current", slug: "current-slug") }
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            [.fixture(id: "current", slug: "other-slug"), .fixture(id: "1", slug: "slug-1")]
+        }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertEqual(sut.relatedProducts.map(\.id), ["1"])
+    }
+
+    func test_related_products_skeleton_is_hidden_while_product_is_loading() {
+        initViewModel()
+
+        let showsSkeleton = sut.shouldShowLoading(for: .relatedProducts)
+
+        XCTAssertTrue(sut.state.isLoading)
+        XCTAssertTrue(sut.relatedProductsState.isLoading)
+        XCTAssertFalse(showsSkeleton)
+    }
+
+    func test_related_products_section_is_shown_without_skeleton_when_product_and_related_products_loaded() {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in .fixture() }
+        mockProductService.onRelatedProductsCalled = { _, _ in [.fixture(slug: "other")] }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertTrue(sut.shouldShow(section: .relatedProducts))
+        XCTAssertFalse(sut.shouldShowLoading(for: .relatedProducts))
+    }
+
+    func test_related_products_skeleton_is_shown_when_product_loads_before_related_products() async {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in .fixture() }
+        let gate = RelatedProductsGate()
+        let relatedRequested = expectation(description: "Related products are requested")
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            await gate.hold(signal: relatedRequested)
+            return []
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+        await fulfillment(of: [relatedRequested], timeout: .default)
+
+        XCTAssertTrue(sut.relatedProductsState.isLoading)
+        XCTAssertTrue(sut.shouldShow(section: .relatedProducts))
+        XCTAssertTrue(sut.shouldShowLoading(for: .relatedProducts))
+        await gate.open()
+    }
+
+    func test_related_products_section_is_hidden_when_product_fails_even_if_related_products_loaded() {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in throw BFFRequestError(type: .generic) }
+        mockProductService.onRelatedProductsCalled = { _, _ in [.fixture(slug: "other")] }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertTrue(sut.relatedProductsState.isSuccess)
+        XCTAssertFalse(sut.shouldShow(section: .relatedProducts))
+        XCTAssertFalse(sut.shouldShowLoading(for: .relatedProducts))
+    }
+
+    func test_related_products_section_is_hidden_when_related_products_are_empty() {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in .fixture() }
+        mockProductService.onRelatedProductsCalled = { _, _ in [] }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertFalse(sut.shouldShow(section: .relatedProducts))
+    }
+
+    func test_related_products_section_is_hidden_when_related_products_fail() {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in .fixture() }
+        mockProductService.onRelatedProductsCalled = { _, _ in throw BFFRequestError(type: .generic) }
+
+        appearAndWaitForBothRequests()
+
+        XCTAssertTrue(sut.relatedProductsState.didFail)
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertFalse(sut.shouldShow(section: .relatedProducts))
+    }
+
+    func test_view_reappearing_after_related_products_success_does_not_refetch_them() {
+        arrangeAppearedScreen(relatedProductsResponse: { _, _ in [.fixture(slug: "other")] })
+        let relatedRefetch = expectRelatedProductsNotRequested()
+
+        sut.viewDidAppear()
+
+        wait(for: [relatedRefetch], timeout: .inverted)
+    }
+
+    func test_view_reappearing_after_empty_related_products_does_not_refetch_them() {
+        arrangeAppearedScreen(relatedProductsResponse: { _, _ in [] })
+        let relatedRefetch = expectRelatedProductsNotRequested()
+
+        sut.viewDidAppear()
+
+        wait(for: [relatedRefetch], timeout: .inverted)
+    }
+
+    func test_view_reappearing_after_related_products_failure_does_not_refetch_them() {
+        arrangeAppearedScreen(relatedProductsResponse: { _, _ in throw BFFRequestError(type: .generic) })
+        let relatedRefetch = expectRelatedProductsNotRequested()
+
+        sut.viewDidAppear()
+
+        wait(for: [relatedRefetch], timeout: .inverted)
+    }
+
+    func test_view_reappearing_after_product_failure_refetches_only_the_product() {
+        arrangeAppearedScreen(
+            productResponse: { _ in throw BFFRequestError(type: .generic) },
+            relatedProductsResponse: { _, _ in [.fixture(slug: "other")] }
+        )
+        let productRefetch = expectation(description: "Product is refetched")
+        mockProductService.onGetProductCalled = { _ in
+            productRefetch.fulfill()
+            return .fixture()
+        }
+        let relatedRefetch = expectRelatedProductsNotRequested()
+
+        sut.viewDidAppear()
+
+        wait(for: [productRefetch], timeout: .default)
+        wait(for: [relatedRefetch], timeout: .inverted)
+    }
+
+    func test_did_select_related_product_opens_that_product() {
+        var openedProducts: [Product] = []
+        initViewModel(openProductAction: { openedProducts.append($0) })
+
+        sut.didSelectRelatedProduct(.fixture(id: "related"))
+
+        XCTAssertEqual(openedProducts.map(\.id), ["related"])
+    }
+
+    func test_did_tap_wishlist_on_related_product_not_in_wishlist_adds_it() {
+        initViewModel()
+        let related = Product.fixture(id: "related")
+
+        XCTAssertEmitsValue(
+            from: sut.$wishlistContent,
+            where: { $0.map(\.product.id) == ["related"] },
+            afterTrigger: { self.sut.didTapWishlist(for: related, isFavorite: false) }
+        )
+
+        XCTAssertTrue(sut.isFavoriteState(for: related))
+        XCTAssertEqual(mockAnalytics.trackedActions, [.addToWishlist])
+    }
+
+    func test_did_tap_wishlist_on_related_product_in_wishlist_removes_it() {
+        let related = Product.fixture(id: "related")
+        mockDependencies = makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
+        initViewModel()
+        XCTAssertEmitsValue(from: sut.$wishlistContent, where: { !$0.isEmpty }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$wishlistContent.dropFirst(),
+            where: { $0.isEmpty },
+            afterTrigger: { self.sut.didTapWishlist(for: related, isFavorite: true) }
+        )
+
+        XCTAssertFalse(sut.isFavoriteState(for: related))
+        XCTAssertEqual(mockAnalytics.trackedActions, [.removeFromWishlist])
+    }
+
+    func test_view_did_appear_marks_related_products_already_in_wishlist_as_favourite() {
+        let related = Product.fixture(id: "related")
+        mockDependencies = makeDependencies(wishlistService: MockWishlistService(products: [SelectedProduct(product: related)]))
+        initViewModel()
+
+        XCTAssertEmitsValue(from: sut.$wishlistContent, where: { !$0.isEmpty }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertTrue(sut.isFavoriteState(for: related))
+    }
+
     // MARK: - Helper methods
 
-    private func initViewModel(configuration: ProductDetailsConfiguration = .id("")) {
+    private func makeDependencies(wishlistService: MockWishlistService) -> ProductDetailsDependencyContainer {
+        ProductDetailsDependencyContainer(
+            scheduler: .immediate,
+            productService: mockProductService,
+            webUrlProvider: mockWebUrlProvider,
+            cartService: mockCartService,
+            wishlistService: wishlistService,
+            configurationService: MockConfigurationService(),
+            analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
+            log: Log.DummyLogger()
+        )
+    }
+
+    private func initViewModel(
+        configuration: ProductDetailsConfiguration = .id(""),
+        openProductAction: @escaping (Product) -> Void = { _ in }
+    ) {
         sut = .init(
             configuration: configuration,
             dependencies: mockDependencies,
             goBackAction: {},
-            openWebfeatureAction: { _ in }
+            openWebfeatureAction: { _ in },
+            openProductAction: openProductAction
         )
+    }
+
+    private func appearAndWaitForBothRequests() {
+        XCTAssertEmitsValue(
+            from: sut.$state.combineLatest(sut.$relatedProductsState),
+            where: { !$0.isLoading && !$1.isLoading },
+            afterTrigger: { self.sut.viewDidAppear() }
+        )
+    }
+
+    private func arrangeAppearedScreen(
+        productResponse: @escaping (String) throws -> Product = { _ in .fixture() },
+        relatedProductsResponse: @escaping (String, Int) async throws -> [Product]
+    ) {
+        initViewModel()
+        mockProductService.onGetProductCalled = productResponse
+        mockProductService.onRelatedProductsCalled = relatedProductsResponse
+        appearAndWaitForBothRequests()
+    }
+
+    private func expectRelatedProductsNotRequested() -> XCTestExpectation {
+        let relatedRequested = expectation(description: "Related products are not requested")
+        relatedRequested.isInverted = true
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            relatedRequested.fulfill()
+            return []
+        }
+        return relatedRequested
+    }
+}
+
+private actor RelatedProductsGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var opened = false
+
+    func hold(signal: XCTestExpectation) async {
+        signal.fulfill()
+        guard !opened else { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func open() {
+        opened = true
+        continuation?.resume()
+        continuation = nil
     }
 }

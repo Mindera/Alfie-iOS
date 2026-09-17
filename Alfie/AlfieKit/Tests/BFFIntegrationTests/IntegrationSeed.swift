@@ -8,4 +8,5 @@ enum IntegrationSeed {
     static let collectionHandle = "women"
     static let searchTerm = "shirt"
     static let sortLowToHigh = "LOW_TO_HIGH"
+    static let handleWithoutRelatedProducts = "t-shirt"
 }

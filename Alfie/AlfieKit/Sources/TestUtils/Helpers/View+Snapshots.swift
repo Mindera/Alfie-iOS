@@ -14,6 +14,10 @@ extension View {
         embededInContainer(size: fullHeightSnapshotSize)
     }
 
+    public func embededInContainer(height: CGFloat) -> UIView {
+        embededInContainer(size: .init(width: fullHeightSnapshotSize.width, height: height))
+    }
+
     // Scale is pinned via the snapshot strategy's traits (displayScale 3 in `defaultImage`), so the
     // container no longer mutates the process-global UIScreen.main.
     private func embededInContainer(size: CGSize) -> UIView {

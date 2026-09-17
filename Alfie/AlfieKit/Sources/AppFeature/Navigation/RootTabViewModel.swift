@@ -1,6 +1,7 @@
 import Bag
 import CategorySelector
 import Combine
+import CombineSchedulers
 import Foundation
 import Home
 import Model
@@ -21,6 +22,7 @@ WishlistFlowVM.Route == WishlistRoute {
     public let tabs: [Model.Tab]
     @Published public var selectedTab: Model.Tab
     private let serviceProvider: ServiceProviderProtocol
+    private let scheduler: AnySchedulerOf<DispatchQueue>
 
     public let bagFlowViewModel: BagFlowVM
     public let categorySelectorFlowViewModel: CategorySelectorVM
@@ -41,7 +43,8 @@ WishlistFlowVM.Route == WishlistRoute {
         categorySelectorFlowViewModel: CategorySelectorVM,
         homeFlowViewModel: HomeFlowVM,
         wishlistFlowViewModel: WishlistFlowVM,
-        myAccountFlowViewModel: MyAccountFlowViewModel
+        myAccountFlowViewModel: MyAccountFlowViewModel,
+        scheduler: AnySchedulerOf<DispatchQueue> = .main
     ) {
         guard tabs.contains(initialTab) else {
             fatalError("Initial tab \(initialTab) does not exist in the list of tabs \(tabs)")
@@ -50,6 +53,7 @@ WishlistFlowVM.Route == WishlistRoute {
         self.tabs = tabs
         self.selectedTab = initialTab
         self.serviceProvider = serviceProvider
+        self.scheduler = scheduler
         self.bagFlowViewModel = bagFlowViewModel
         self.categorySelectorFlowViewModel = categorySelectorFlowViewModel
         self.homeFlowViewModel = homeFlowViewModel
@@ -120,7 +124,7 @@ WishlistFlowVM.Route == WishlistRoute {
         // the hop to main.
         serviceProvider.cartService.cartPublisher
             .map { BagBadge.value(for: $0) }
-            .receive(on: DispatchQueue.main)
+            .receive(on: scheduler)
             .assignWeakly(to: \.bagBadgeValue, on: self)
             .store(in: &subscriptions)
 

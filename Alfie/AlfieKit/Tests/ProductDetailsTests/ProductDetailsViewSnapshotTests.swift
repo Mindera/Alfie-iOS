@@ -10,7 +10,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     private let isRecording = false
 
     private func makeViewModel() -> MockProductDetailsViewModel {
-        .init(
+        let viewModel = MockProductDetailsViewModel(
             state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
             productId: "0273393",
             productTitle: "Tommy Hilfiger",
@@ -35,6 +35,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
             ),
             complementaryInfoToShow: [.delivery, .paymentOptions, .returns]
         )
+        viewModel.onShouldShowSectionCalled = { $0 != .relatedProducts }
+        return viewModel
     }
 
     func test_productDetailsView_defaultState() {
@@ -129,7 +131,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.productDescription = ""
-        viewModel.onShouldShowSectionCalled = { $0 != .productDescription }
+        viewModel.onShouldShowSectionCalled = { $0 != .productDescription && $0 != .relatedProducts }
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
@@ -178,6 +180,38 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    func test_product_details_view_with_six_related_products() {
+        assertRelatedProductsSnapshot(state: .success(relatedProducts(count: 6)))
+    }
+
+    func test_product_details_view_with_three_related_products() {
+        assertRelatedProductsSnapshot(state: .success(relatedProducts(count: 3)))
+    }
+
+    func test_product_details_view_while_related_products_load_shows_skeleton() {
+        assertRelatedProductsSnapshot(state: .loading)
+    }
+
+    private func assertRelatedProductsSnapshot(
+        state: ViewState<[Product], ProductDetailsViewErrorType>,
+        testName: String = #function
+    ) {
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.onShouldShowSectionCalled = { _ in true }
+        viewModel.onShouldShowLoadingForSectionCalled = { $0 == .relatedProducts && state.isLoading }
+        viewModel.relatedProductsState = state
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInContainer(height: Constants.relatedProductsSnapshotHeight),
+                       as: .defaultImage(),
+                       record: isRecording,
+                       testName: testName)
+    }
+
+    private func relatedProducts(count: Int) -> [Product] {
+        (1...count).map { .fixture(id: "related-\($0)") }
+    }
+
     func test_productDetailsView_errorState() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)
@@ -186,4 +220,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        as: .defaultImage(),
                        record: isRecording)
     }
+}
+
+private enum Constants {
+    static let relatedProductsSnapshotHeight: CGFloat = 2400
 }

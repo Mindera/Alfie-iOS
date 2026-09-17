@@ -29,7 +29,7 @@ struct MultilineShimmerEffectModifier: ViewModifier {
         animateOnStateTransition: Bool = true
     ) {
         self._isLoading = isLoading
-        self.shouldShowShimmer = isLoading.wrappedValue
+        self._shouldShowShimmer = State(initialValue: isLoading.wrappedValue)
         self.cornerRadius = cornerRadius
         self.blurRadius = blurRadius
         self.lighterShimmerColor = customLighterShimmerColor ?? Primitives.Colours.neutrals200

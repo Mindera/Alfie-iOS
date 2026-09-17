@@ -24,6 +24,9 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var priceType: PriceType? = nil
     public var selectedColourName: String?
     public var productReference: String?
+    public var relatedProductsState: ViewState<[Product], ProductDetailsViewErrorType> = .loading
+    public var relatedProducts: [Product] { relatedProductsState.value ?? [] }
+    public var isWishlistEnabled = true
 
     public init(state: ViewState<ProductDetailsViewStateModel, ProductDetailsViewErrorType> = .loading,
                 productId: String = "",
@@ -101,5 +104,20 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?
     public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
         onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
+    }
+
+    public var onDidSelectRelatedProductCalled: ((Product) -> Void)?
+    public func didSelectRelatedProduct(_ product: Product) {
+        onDidSelectRelatedProductCalled?(product)
+    }
+
+    public var onIsFavoriteStateCalled: ((Product) -> Bool)?
+    public func isFavoriteState(for product: Product) -> Bool {
+        onIsFavoriteStateCalled?(product) ?? false
+    }
+
+    public var onDidTapWishlistCalled: ((Product, Bool) -> Void)?
+    public func didTapWishlist(for product: Product, isFavorite: Bool) {
+        onDidTapWishlistCalled?(product, isFavorite)
     }
 }

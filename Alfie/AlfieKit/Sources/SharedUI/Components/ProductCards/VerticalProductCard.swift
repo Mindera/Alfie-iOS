@@ -15,17 +15,20 @@ public struct VerticalProductCard: View {
     private let viewModel: VerticalProductCardViewModel
     private let onUserAction: ProductUserActionHandler
     private let isFavorite: Bool
+    private let actionAccessibilityIdentifier: String?
     @Binding public private(set) var isSkeleton: Bool
 
     public init(
         viewModel: VerticalProductCardViewModel,
         onUserAction: @escaping ProductUserActionHandler,
         isSkeleton: Binding<Bool> = .constant(false),
-        isFavorite: Bool = false
+        isFavorite: Bool = false,
+        actionAccessibilityIdentifier: String? = nil
     ) {
         self.viewModel = viewModel
         self.onUserAction = onUserAction
         self.isFavorite = isFavorite
+        self.actionAccessibilityIdentifier = actionAccessibilityIdentifier
         self._isSkeleton = isSkeleton
     }
 
@@ -182,7 +185,7 @@ public struct VerticalProductCard: View {
                     .foregroundStyle(Primitives.Colours.neutrals900, Primitives.Colours.neutrals0)
             })
             .padding([.top, .trailing], topTrailingEdgePadding)
-            .accessibilityIdentifier(actionViewAccessibilityIdentifier)
+            .accessibilityIdentifier(actionAccessibilityIdentifier ?? actionViewAccessibilityIdentifier)
             .accessibilityLabel(Text(actionAccessibilityLabel))
         }
     }

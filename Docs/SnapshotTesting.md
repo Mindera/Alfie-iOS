@@ -15,6 +15,7 @@ They live **in the AlfieKit module test targets** (not the `AlfieTests` app targ
 |---|---|
 | `View.embededInContainer()` | Wraps a view in a 393×852 `UIView` |
 | `View.embededInFullHeightContainer()` | Same at 393×1500, for long screens |
+| `View.embededInContainer(height:)` | Same width at a custom height, for screens longer than 1500 |
 | `Snapshotting.defaultImage(precision:perceptualPrecision:)` | Image strategy, defaults `1.0` / `0.95`, SRGB, `displayScale` 3 |
 
 `defaultImage` pins `displayScale` to 3 via the strategy's traits, so rendering is @3x regardless of the host
@@ -87,7 +88,7 @@ of the build.
 | `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
 | `CustomTabBarViewSnapshotTests` | `AppFeatureTests` | Bag tab badge: absent, single digit, summed multi-line, overflow |
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
-| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error |
+| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error, related products (6, 3, skeleton) |
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, both error states |
 | `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one, unpriced totals |
 

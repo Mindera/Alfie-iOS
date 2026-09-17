@@ -37,6 +37,14 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         try onCategoryPriceRangeCalled?(collectionHandle)
     }
 
+    public var onRelatedProductsCalled: ((String, Int) async throws -> [Product])?
+    public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {
+        guard let products = try await onRelatedProductsCalled?(handle, limit) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return products
+    }
+
     public var onGetWebViewConfigCalled: (() throws -> WebViewConfiguration)?
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         guard let config = try onGetWebViewConfigCalled?() else {

@@ -267,6 +267,8 @@ extension ProductDetailsView {
                 .padding(.vertical, theme.spacing.space200)
 
             complementaryInfo
+
+            relatedProducts
         }
     }
 
@@ -500,6 +502,61 @@ extension ProductDetailsView {
         }
     }
 
+    @ViewBuilder private var relatedProducts: some View {
+        if viewModel.shouldShow(section: .relatedProducts) {
+            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+                Text.build(theme.font.body.mediumBold(L10n.Pdp.RelatedProducts.title))
+                    .foregroundStyle(Theme.contentContentPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsTitleLabel)
+
+                LazyVGrid(columns: relatedProductsColumns, alignment: .leading, spacing: theme.spacing.space200) {
+                    if viewModel.shouldShowLoading(for: .relatedProducts) {
+                        ForEach(Product.skeletons(count: Constants.relatedProductsSkeletonCount)) { product in
+                            relatedProductCard(product, isSkeleton: true)
+                        }
+                    } else {
+                        ForEach(viewModel.relatedProducts) { product in
+                            relatedProductCard(product, isSkeleton: false)
+                                .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductCard(id: product.id))
+                        }
+                    }
+                }
+            }
+            .padding(.top, viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsSection)
+        }
+    }
+
+    private var relatedProductsColumns: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+            count: Constants.relatedProductsColumns
+        )
+    }
+
+    private func relatedProductCard(_ product: Product, isSkeleton: Bool) -> some View {
+        VerticalProductCard(
+            viewModel: .init(
+                configuration: .init(size: .medium, hideAction: !viewModel.isWishlistEnabled),
+                product: product
+            ),
+            onUserAction: { _, type in
+                guard case .wishlist(let isFavorite) = type else { return }
+                viewModel.didTapWishlist(for: product, isFavorite: isFavorite)
+            },
+            isSkeleton: .constant(isSkeleton),
+            isFavorite: viewModel.isFavoriteState(for: product),
+            actionAccessibilityIdentifier: AccessibilityID.ProductDetails.relatedProductWishlistButton(id: product.id)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.didSelectRelatedProduct(product)
+        }
+        .allowsHitTesting(!isSkeleton)
+    }
+
     @ViewBuilder private var descriptionSection: some View {
         let showDescription = viewModel.shouldShow(section: .productDescription)
         // Gated apart from the description: the colour and reference are what a shopper quotes to
@@ -653,6 +710,8 @@ private enum Constants {
     static let chevronSize: CGFloat = 16
     static let complementaryInfoCellMinHeight: CGFloat = 72
     static let errorViewIconSize: CGFloat = 210
+    static let relatedProductsColumns = 2
+    static let relatedProductsSkeletonCount = 6
 }
 
 #if DEBUG

@@ -176,6 +176,23 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {
+        log.info("relatedProducts → handle=\(handle) limit=\(limit)")
+
+        do {
+            let products = try await executeFetch(
+                BFFGraphAPI.RelatedProductsQuery(handle: handle, limit: limit)
+            ).relatedProducts
+
+            log.info("relatedProducts ← products=\(products.count)")
+
+            return products.map { $0.fragments.productListItemFragment.convertToProduct() }
+        } catch {
+            log.error("relatedProducts failed: \(error)")
+            throw error
+        }
+    }
+
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         let url = baseUrl.appending(path: BFFEndpoint.webviewConfig.rawValue)
         do {

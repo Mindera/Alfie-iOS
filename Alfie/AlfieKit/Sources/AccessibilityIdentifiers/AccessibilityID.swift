@@ -86,6 +86,12 @@ public enum AccessibilityID {
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
+        public static let relatedProductsSection = "productDetails.relatedProducts.section"
+        public static let relatedProductsTitleLabel = "productDetails.relatedProducts.title.label"
+        public static func relatedProductCard(id: String) -> String { "productDetails.relatedProducts.\(id).card" }
+        public static func relatedProductWishlistButton(id: String) -> String {
+            "productDetails.relatedProducts.\(id).wishlist.button"
+        }
         /// The toolbar's share item. The string is the private constant this moved out of
         /// `ToolbarItemProvider`, kept rather than churned — it predates the dotted convention its
         /// siblings follow, and nothing matched it before #129 added the matcher below. Lives

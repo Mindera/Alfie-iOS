@@ -120,6 +120,7 @@ let package = Package(
                 "SharedUI",
                 "Utils",
                 "Wishlist",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
@@ -346,6 +347,7 @@ let package = Package(
                 "AppFeature",
                 "Mocks",
                 "TestUtils",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 

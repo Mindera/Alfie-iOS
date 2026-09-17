@@ -12,10 +12,14 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private var sizingSelectionSubscription: AnyCancellable?
     private let goBackAction: () -> Void
     private let openWebfeatureAction: (WebFeature) -> Void
+    private let openProductAction: (Product) -> Void
+    private var hasRequestedRelatedProducts = false
 
     @Published public private(set) var state: ViewState<
         ProductDetailsViewStateModel, ProductDetailsViewErrorType
     > = .loading
+    @Published public private(set) var relatedProductsState: ViewState<[Product], ProductDetailsViewErrorType> = .loading
+    @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
     public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
@@ -80,16 +84,20 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     // Empty collapses to nil so the metadata line omits the part rather than rendering a blank.
     public var selectedColourName: String? { selectedVariant?.colour?.name.nilWhenEmpty }
     public var productReference: String? { selectedVariant?.sku.nilWhenEmpty }
+    public var isWishlistEnabled: Bool { dependencies.configurationService.isFeatureEnabled(.wishlist) }
+    public var relatedProducts: [Product] { relatedProductsState.value ?? [] }
 
     public init(
         configuration: ProductDetailsConfiguration,
         dependencies: ProductDetailsDependencyContainer,
         goBackAction: @escaping () -> Void,
-        openWebfeatureAction: @escaping (WebFeature) -> Void
+        openWebfeatureAction: @escaping (WebFeature) -> Void,
+        openProductAction: @escaping (Product) -> Void
     ) {
         self.dependencies = dependencies
         self.goBackAction = goBackAction
         self.openWebfeatureAction = openWebfeatureAction
+        self.openProductAction = openProductAction
 
         switch configuration {
         case .id(let productId):
@@ -130,7 +138,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public func viewDidAppear() {
         Task {
+            await loadRelatedProductsIfNeeded()
+        }
+        Task {
             await loadProductIfNeeded()
+        }
+        Task {
+            await refreshWishlistContent()
         }
     }
 
@@ -147,6 +161,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
              .addToBag, // swiftlint:disable:this indentation_width
              .addToWishlist:
             return false
+        case .relatedProducts:
+            return state.isSuccess && relatedProductsState.isLoading
         }
     }
 
@@ -166,7 +182,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         case .addToBag:
             return state.isSuccess
         case .addToWishlist:
-            return state.isSuccess && dependencies.configurationService.isFeatureEnabled(.wishlist)
+            return state.isSuccess && isWishlistEnabled
+        case .relatedProducts:
+            return state.isSuccess && (relatedProductsState.isLoading || relatedProductsState.value?.isEmpty == false)
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -272,7 +290,58 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
     }
 
+    public func didSelectRelatedProduct(_ product: Product) {
+        openProductAction(product)
+    }
+
+    public func isFavoriteState(for product: Product) -> Bool {
+        wishlistContent.contains { $0.product.id == product.id }
+    }
+
+    public func didTapWishlist(for product: Product, isFavorite: Bool) {
+        Task { @MainActor in
+            if isFavorite {
+                await dependencies.wishlistService.removeProduct(withId: product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: product.id)
+            } else {
+                await dependencies.wishlistService.addProduct(SelectedProduct(product: product))
+                dependencies.analytics.trackAddToWishlist(productID: product.id)
+            }
+            wishlistContent = await dependencies.wishlistService.getWishlistContent()
+        }
+    }
+
     // MARK: - Private
+
+    @MainActor
+    private func loadRelatedProductsIfNeeded() async {
+        guard !hasRequestedRelatedProducts else {
+            return
+        }
+        hasRequestedRelatedProducts = true
+
+        do {
+            let products = try await dependencies.productService.relatedProducts(
+                handle: productHandle,
+                limit: Self.relatedProductsRequestLimit
+            )
+            relatedProductsState = .success(
+                Array(products.filter { !isCurrentProduct($0) }.prefix(Self.relatedProductsMaxCount))
+            )
+        } catch {
+            dependencies.log.error("Error fetching related products for \(productHandle): \(error)")
+            relatedProductsState = .error(.from(error: error))
+        }
+    }
+
+    private func isCurrentProduct(_ candidate: Product) -> Bool {
+        candidate.slug == productHandle || candidate.id == productId
+    }
+
+    @MainActor
+    private func refreshWishlistContent() async {
+        wishlistContent = await dependencies.wishlistService.getWishlistContent()
+    }
 
     @MainActor
     private func loadProductIfNeeded() async {
@@ -470,4 +539,9 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
 private extension String {
     var nilWhenEmpty: String? { isEmpty ? nil : self }
+}
+
+extension ProductDetailsViewModel {
+    private static let relatedProductsMaxCount = 6
+    private static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }

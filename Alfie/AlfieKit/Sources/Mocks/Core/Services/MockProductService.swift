@@ -30,4 +30,12 @@ public final class MockProductService: ProductServiceProtocol {
     public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
         try onCategoryPriceRangeCalled?(collectionHandle)
     }
+
+    public var onRelatedProductsCalled: ((String, Int) async throws -> [Product])?
+    public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {
+        guard let products = try await onRelatedProductsCalled?(handle, limit) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return products
+    }
 }
