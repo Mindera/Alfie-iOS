@@ -9,9 +9,8 @@ import SwiftUI
 ///
 /// The scanner deliberately owns no navigation of its own. An Alfie code carries an Alfie link, so
 /// a recognised code is handed back to the flow, which passes it to the deep-link path the app
-/// already uses for a tapped link, and that path decides where it lands. ADR-0001 puts the Handle
-/// inside an Alfie code, so there is nothing to look up. A Barcode is looked up through the catalogue
-/// first, and the Product it names leaves through the same path (ADR-0002).
+/// already uses for a tapped link, and that path decides where it lands. A Barcode is looked up
+/// first, then leaves through the same path (ADR-0002).
 ///
 /// It does own what the shopper is told when that does not happen, and the distinction it draws is
 /// between a scan that failed and a camera that cannot run. A code that opens nothing in Alfie is
@@ -49,6 +48,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private var lastHeldPayloads: Set<String> = []
     private var subscriptions = Set<AnyCancellable>()
     private var lookupTask: Task<Void, Never>?
+    private var payloadsHeldDuringLookup: [ScannedPayload] = []
 
     public var title: String { L10n.Scanner.title }
     public var preview: AnyView { scanService.makePreview() }
@@ -204,9 +204,13 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     /// Acts on one code per frame, and on the one the shopper meant. A Swing tag prints the Barcode
     /// beside the Alfie code, so both are routinely read at once; ``ScannedCode/precedence`` is what
-    /// settles which is answered. Nothing is acted on while a Barcode is being looked up.
+    /// settles which is answered.
     private func didRecognise(payloads: [ScannedPayload]) {
-        guard !hasOpenedLink, lookupTask == nil else { return }
+        guard !hasOpenedLink else { return }
+        guard lookupTask == nil else {
+            payloadsHeldDuringLookup = payloads
+            return
+        }
 
         let previouslyHeld = lastHeldPayloads
         let nowHeld = Set(payloads.map(\.value))
@@ -265,6 +269,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     }
 
     private func lookUp(barcode: String) {
+        payloadsHeldDuringLookup = []
         if let model = state.value {
             state = .success(model.with(isLookingUp: true))
         }
@@ -285,27 +290,42 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
         switch result {
         case .success(let match?):
-            guard let url = productLink(for: match) else {
-                show(notice: L10n.Scanner.LookupFailed.message)
-                return
+            if let url = productLink(for: match) {
+                open(url)
+            } else {
+                failLookUp(of: barcode, notice: L10n.Scanner.LookupFailed.message)
             }
-            open(url)
 
         case .success(nil):
-            log.debug("No Product carries the scanned Barcode: \(barcode)")
-            analytics.trackScanFailed(reason: .barcode)
-            show(notice: L10n.Scanner.NotFound.message)
+            failLookUp(of: barcode, notice: L10n.Scanner.NotFound.message)
 
         case .failure(let error):
             log.error("Looking up the scanned Barcode failed: \(error)")
-            analytics.trackScanFailed(reason: .barcode)
-            show(notice: L10n.Scanner.LookupFailed.message)
+            failLookUp(of: barcode, notice: L10n.Scanner.LookupFailed.message)
         }
     }
 
+    private func failLookUp(of barcode: String, notice: String) {
+        let heldPayloads = payloadsHeldDuringLookup
+        payloadsHeldDuringLookup = []
+        if case .alfieCode(let url) = heldPayloads.map(classify(payload:)).codeToActOn {
+            lastHeldPayloads = Set(heldPayloads.map(\.value))
+            open(url)
+            return
+        }
+        log.debug("Barcode lookup found no Product: \(barcode)")
+        analytics.trackScanFailed(reason: .barcode)
+        show(notice: notice)
+    }
+
     private func cancelLookup() {
-        lookupTask?.cancel()
-        lookupTask = nil
+        guard let lookupTask else { return }
+        lookupTask.cancel()
+        self.lookupTask = nil
+        payloadsHeldDuringLookup = []
+        if let model = state.value {
+            state = .success(model.with(isLookingUp: false))
+        }
     }
 
     private func productLink(for match: BarcodeMatch) -> URL? {

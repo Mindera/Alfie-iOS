@@ -16,6 +16,7 @@ final class ScannerViewModelTests: XCTestCase {
     private var deepLinkService: MockDeepLinkService!
     private var productService: MockProductService!
     private var lookedUpBarcodes: [String]!
+    private var lookupGate: LookupGate!
     private var linkTypes: [URL: DeepLink.LinkType]!
     private var openedLinks: [URL]!
     private var closeCount: Int!
@@ -61,6 +62,7 @@ final class ScannerViewModelTests: XCTestCase {
             url(Self.barcodeVariantLink): .productDetail(handle: "8", route: nil, query: ["variantId": "22"]),
         ]
         lookedUpBarcodes = []
+        lookupGate = LookupGate()
         productService = MockProductService()
         productService.onProductByBarcodeCalled = { [weak self] in
             self?.lookedUpBarcodes?.append($0)
@@ -79,6 +81,8 @@ final class ScannerViewModelTests: XCTestCase {
         deepLinkService = nil
         productService = nil
         lookedUpBarcodes = nil
+        Task { [lookupGate] in await lookupGate?.open() }
+        lookupGate = nil
         linkTypes = nil
         scanService = nil
         openedLinks = nil
@@ -427,11 +431,7 @@ final class ScannerViewModelTests: XCTestCase {
     // MARK: - Scanning the manufacturer's Barcode
 
     func test_scanning_barcode_looks_it_up_while_camera_keeps_running() {
-        productService.onProductByBarcodeCalled = { [weak self] in
-            self?.lookedUpBarcodes?.append($0)
-            try await Task.sleep(nanoseconds: 60_000_000_000)
-            return nil
-        }
+        holdLookups()
         sut.viewDidAppear()
 
         let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scanService.recognise(Self.barcode) })
@@ -493,46 +493,78 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(lookedUpBarcodes, ["5901234123457", "5901234123457"])
     }
 
-    func test_scanning_codes_while_looking_up_ignores_them() {
+    func test_scanning_barcode_while_looking_up_does_not_look_it_up() {
         let started = expectation(description: "lookup started")
-        productService.onProductByBarcodeCalled = { [weak self] in
-            self?.lookedUpBarcodes?.append($0)
-            started.fulfill()
-            try await Task.sleep(nanoseconds: 60_000_000_000)
-            return nil
-        }
+        holdLookups(started: started)
         sut.viewDidAppear()
         scanService.recognise(Self.barcode)
-        wait(for: [started], timeout: 1)
+        wait(for: [started], timeout: .default)
 
         scanService.recognise(Self.otherBarcode)
-        scanService.recognise(Self.alfieCode)
-        finishRecognitionFeedback()
 
         XCTAssertEqual(lookedUpBarcodes, ["5901234123457"])
-        XCTAssertTrue(openedLinks.isEmpty)
-        XCTAssertEqual(sut.state.value?.isLookingUp, true)
+    }
+
+    func test_scanning_alfie_code_while_looking_up_does_not_open_it() {
+        let started = expectation(description: "lookup started")
+        holdLookups(started: started)
+        sut.viewDidAppear()
+        scanService.recognise(Self.barcode)
+        wait(for: [started], timeout: .default)
+
+        scanService.recognise([Self.barcode, Self.alfieCode])
+
+        XCTAssertFalse(sut.isRecognised)
+        XCTAssertTrue(sut.isLookingUp)
+    }
+
+    func test_alfie_code_held_when_lookup_finds_nothing_opens_it_without_failure() throws {
+        let started = expectation(description: "lookup started")
+        holdLookups(started: started)
+        sut.viewDidAppear()
+        scanService.recognise(Self.barcode)
+        wait(for: [started], timeout: .default)
+        scanService.recognise([Self.barcode, Self.alfieCode])
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value?.isRecognised == true },
+            afterTrigger: { self.releaseLookups() }
+        )
+        finishRecognitionFeedback()
+
+        XCTAssertEqual(openedLinks, [try url(Self.alfieCode)])
+        XCTAssertTrue(reportedScanFailures.isEmpty)
     }
 
     func test_closing_while_looking_up_cancels_lookup() {
+        let started = expectation(description: "lookup started")
         let cancelled = expectation(description: "lookup cancelled")
-        productService.onProductByBarcodeCalled = { _ in
-            do {
-                try await Task.sleep(nanoseconds: 60_000_000_000)
-            } catch {
-                cancelled.fulfill()
-                throw error
-            }
-            return BarcodeMatch(productId: "8", variantId: "22")
-        }
+        holdLookups(started: started, cancelled: cancelled, answer: BarcodeMatch(productId: "8", variantId: "22"))
         sut.viewDidAppear()
-        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scanService.recognise(Self.barcode) })
+        scanService.recognise(Self.barcode)
+        wait(for: [started], timeout: .default)
 
         sut.didTapClose()
 
-        wait(for: [cancelled], timeout: 1)
+        wait(for: [cancelled], timeout: .default)
         XCTAssertTrue(openedLinks.isEmpty)
         XCTAssertEqual(closeCount, 1)
+    }
+
+    func test_backgrounding_while_looking_up_cancels_lookup_and_clears_loader() {
+        let started = expectation(description: "lookup started")
+        let cancelled = expectation(description: "lookup cancelled")
+        holdLookups(started: started, cancelled: cancelled, answer: BarcodeMatch(productId: "8", variantId: "22"))
+        sut.viewDidAppear()
+        scanService.recognise(Self.barcode)
+        wait(for: [started], timeout: .default)
+
+        sut.didChangeScenePhase(isActive: false)
+
+        wait(for: [cancelled], timeout: .default)
+        XCTAssertFalse(sut.isLookingUp)
+        XCTAssertTrue(openedLinks.isEmpty)
     }
 
     func test_scanning_barcode_in_same_frame_as_alfie_code_does_not_look_it_up() {
@@ -915,6 +947,28 @@ final class ScannerViewModelTests: XCTestCase {
         try XCTUnwrap(URL(string: string))
     }
 
+    private func holdLookups(
+        started: XCTestExpectation? = nil,
+        cancelled: XCTestExpectation? = nil,
+        answer: BarcodeMatch? = nil
+    ) {
+        let gate = lookupGate!
+        productService.onProductByBarcodeCalled = { [weak self] barcode in
+            self?.lookedUpBarcodes?.append(barcode)
+            started?.fulfill()
+            await withTaskCancellationHandler {
+                await gate.wait()
+            } onCancel: {
+                cancelled?.fulfill()
+            }
+            return answer
+        }
+    }
+
+    private func releaseLookups() {
+        Task { [lookupGate] in await lookupGate?.open() }
+    }
+
     private func url(_ payload: ScannedPayload) throws -> URL {
         try url(payload.value)
     }
@@ -983,5 +1037,21 @@ private final class TestScheduler {
             item.work()
         }
         now = target
+    }
+}
+
+private actor LookupGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var isOpen = false
+
+    func wait() async {
+        guard !isOpen else { return }
+        await withCheckedContinuation { continuation = $0 }
+    }
+
+    func open() {
+        isOpen = true
+        continuation?.resume()
+        continuation = nil
     }
 }

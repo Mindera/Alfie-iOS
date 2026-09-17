@@ -136,6 +136,8 @@ AND the camera keeps running, and scanning the same Barcode again looks it up ag
 **GIVEN** a Barcode lookup is in flight
 **WHEN** the camera recognises any code, an Alfie code included
 **THEN** it is ignored
+AND if the lookup then finds nothing or fails while an Alfie code is held, that Alfie code opens
+instead of the notice
 
 ### Scenario 4f: Shopper closes the scanner during a lookup
 
@@ -500,8 +502,8 @@ The developer will verify the camera path manually on device.
   a 1D Barcode locks on faster than a QR, and in the moment when it is the only thing tracked there
   is nothing to tell the scanner an Alfie code is a frame away: the Barcode lookup starts, and the
   Alfie code joining the frame is ignored because every code is ignored during a lookup. On a match
-  the same Product opens anyway, only a lookup later. On not found or failure the shopper sees the
-  notice and one `scan_failed reason=barcode`, and re-presents the tag.
+  the same Product opens anyway, only a lookup later. On not found or failure, an Alfie code the
+  camera held during the lookup opens then, with no notice and no `scan_failed`.
 
   Closing it would mean letting an Alfie code cancel an in-flight lookup. That is deliberately not
   done: ignoring codes while looking up is what keeps one tag from producing two navigations, and

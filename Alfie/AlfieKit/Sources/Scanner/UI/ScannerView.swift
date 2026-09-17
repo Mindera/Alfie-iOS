@@ -85,13 +85,13 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         // Keyed on the whole notice rather than its words: a second bad code in a row says the same
         // thing, and it is exactly then that the shopper most needs telling. ``ScannerNotice``
         // carries an identity so that repeat still reads as a change.
-        .onChange(of: viewModel.isLookingUp) { isLookingUp in
-            guard isLookingUp else { return }
-            UIAccessibility.post(notification: .announcement, argument: L10n.Scanner.Lookup.message)
-        }
         .onChange(of: viewModel.notice) { notice in
             guard let notice else { return }
             UIAccessibility.post(notification: .announcement, argument: notice.message)
+        }
+        .onChange(of: viewModel.isLookingUp) { isLookingUp in
+            guard isLookingUp else { return }
+            UIAccessibility.post(notification: .announcement, argument: L10n.Scanner.Lookup.message)
         }
     }
 

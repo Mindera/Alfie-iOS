@@ -510,8 +510,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
     /// snapshot (e.g. out-of-date stock), so map the selection onto the freshly fetched product by
     /// `sku` — keeping the user's choice while reflecting current stock/price. A deep link's `sku`
-    /// (a scanned Alfie code) is mapped the same way, and a scanned Barcode's `variantId` after it. Fall
-    /// back to the product's default variant when neither is requested or neither matches.
+    /// (a scanned Alfie code) is mapped the same way, then a scanned Barcode's `variantId`, then the
+    /// default variant.
     private func resolvedSelectedVariant(for product: Product) -> Product.Variant {
         if let requestedSku, let variant = product.variants.first(where: { $0.sku == requestedSku }) {
             return variant

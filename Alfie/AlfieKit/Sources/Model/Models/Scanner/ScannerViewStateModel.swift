@@ -12,7 +12,6 @@ public struct ScannerViewStateModel: Equatable {
     /// closing the camera: a notice is a correction, not a dead end.
     public let notice: ScannerNotice?
     public let isRecognised: Bool
-    /// A Barcode is being resolved; the camera keeps running but no code is acted on.
     public let isLookingUp: Bool
 
     public init(guidance: String, notice: ScannerNotice? = nil, isRecognised: Bool = false, isLookingUp: Bool = false) {
