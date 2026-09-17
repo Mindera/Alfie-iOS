@@ -20,7 +20,7 @@ public extension SearchIntent {
 private extension ProductDetailsConfiguration {
     var productID: String {
         switch self {
-        case .id(let id), .deepLink(let id, _):
+        case .id(let id), .deepLink(let id, _, _):
             id
         case .product(let product):
             product.id

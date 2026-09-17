@@ -14,6 +14,8 @@ import XCTest
 final class ScannerViewModelTests: XCTestCase {
     private var scanService: MockCameraScanService!
     private var deepLinkService: MockDeepLinkService!
+    private var productService: MockProductService!
+    private var lookedUpBarcodes: [String]!
     private var linkTypes: [URL: DeepLink.LinkType]!
     private var openedLinks: [URL]!
     private var closeCount: Int!
@@ -25,15 +27,18 @@ final class ScannerViewModelTests: XCTestCase {
     private var sut: ScannerViewModel!
 
     /// The format the generator prints — see `Tools/AlfieCodeGen` and ADR-0001.
-    private static let alfieCode = "https://localhost:4000/product/slim-indigo-jean"
-    private static let alfieCodeWithSku = "https://localhost:4000/product/slim-indigo-jean?sku=SKU-42"
-    private static let multiSegmentAlfieCode = "https://localhost:4000/product/mens/jeans/slim-indigo"
-    private static let wishlistAlfieCode = "https://localhost:4000/wishlist"
-    private static let foreignLink = "https://example.com/not-an-alfie-code"
-    /// A real EAN-13, check digit and all — the kind already printed on the Swing tag beside the
-    /// Alfie code.
-    private static let barcode = "5901234123457"
+    private static let alfieCode = ScannedPayload.qr("https://localhost:4000/product/slim-indigo-jean")
+    private static let alfieCodeWithSku = ScannedPayload.qr("https://localhost:4000/product/slim-indigo-jean?sku=SKU-42")
+    private static let multiSegmentAlfieCode = ScannedPayload.qr("https://localhost:4000/product/mens/jeans/slim-indigo")
+    private static let wishlistAlfieCode = ScannedPayload.qr("https://localhost:4000/wishlist")
+    private static let foreignLink = ScannedPayload.qr("https://example.com/not-an-alfie-code")
+    private static let barcode = ScannedPayload.ean13("5901234123457")
+    private static let otherBarcode = ScannedPayload.ean13("4006381333931")
+    private static let barcodeProductLink = "alfie://alfie.target/product/8"
+    private static let barcodeVariantLink = "alfie://alfie.target/product/8?variantId=22"
     private static let unrecognisedMessage = "We don't recognize this barcode."
+    private static let notFoundMessage = "We couldn't find this product."
+    private static let lookupFailedMessage = "Something went wrong. Try scanning again."
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -52,7 +57,15 @@ final class ScannerViewModelTests: XCTestCase {
             url(Self.alfieCodeWithSku): .productDetail(handle: "slim-indigo-jean", route: nil, query: ["sku": "SKU-42"]),
             url(Self.multiSegmentAlfieCode): .productDetail(handle: "mens/jeans/slim-indigo", route: nil, query: nil),
             url(Self.wishlistAlfieCode): .wishlist,
+            url(Self.barcodeProductLink): .productDetail(handle: "8", route: nil, query: nil),
+            url(Self.barcodeVariantLink): .productDetail(handle: "8", route: nil, query: ["variantId": "22"]),
         ]
+        lookedUpBarcodes = []
+        productService = MockProductService()
+        productService.onProductByBarcodeCalled = { [weak self] in
+            self?.lookedUpBarcodes?.append($0)
+            return nil
+        }
         deepLinkService = MockDeepLinkService()
         deepLinkService.onDeepLinkTypeCalled = { [weak self] in self?.linkTypes[$0] }
         sut = makeSUT()
@@ -64,6 +77,8 @@ final class ScannerViewModelTests: XCTestCase {
         triggeredHaptics = nil
         scheduler = nil
         deepLinkService = nil
+        productService = nil
+        lookedUpBarcodes = nil
         linkTypes = nil
         scanService = nil
         openedLinks = nil
@@ -202,19 +217,19 @@ final class ScannerViewModelTests: XCTestCase {
     func test_scanning_code_that_reaches_nothing_opens_nothing_and_keeps_scanning() {
         let payloads = [
             Self.foreignLink,
-            // Thirteen digits, but the check digit does not hold: digits alone are not a Barcode.
-            "5901234123456",
-            "",
+            ScannedPayload.qr("5901234123457"),
+            ScannedPayload.qr(""),
         ]
         sut.viewDidAppear()
 
         for payload in payloads {
             scanService.recognise(payload)
 
-            XCTAssertTrue(openedLinks.isEmpty, "payload: \"\(payload)\"")
-            XCTAssertEqual(closeCount, 0, "payload: \"\(payload)\"")
-            XCTAssertTrue(scanService.isScanning, "payload: \"\(payload)\"")
+            XCTAssertTrue(openedLinks.isEmpty, "payload: \"\(payload.value)\"")
+            XCTAssertEqual(closeCount, 0, "payload: \"\(payload.value)\"")
+            XCTAssertTrue(scanService.isScanning, "payload: \"\(payload.value)\"")
         }
+        XCTAssertTrue(lookedUpBarcodes.isEmpty)
     }
 
     /// Silence would read as a broken scanner: the shopper is holding the camera over something and
@@ -279,7 +294,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: {
-            self.scanService.recognise("https://localhost:4000/help/returns")
+            self.scanService.recognise(.qr("https://localhost:4000/help/returns"))
         })
 
         XCTAssertTrue(openedLinks.isEmpty)
@@ -411,40 +426,130 @@ final class ScannerViewModelTests: XCTestCase {
 
     // MARK: - Scanning the manufacturer's Barcode
 
-    /// The Barcode is the obvious thing to point a camera at, and in a demo somebody will. Alfie
-    /// cannot resolve one — ADR-0001 — so it gets the same notice as any other code, and the
-    /// guidance left on screen names the code that does work.
-    func test_scanning_barcode_shows_unrecognised_notice() {
+    func test_scanning_barcode_looks_it_up_while_camera_keeps_running() {
+        productService.onProductByBarcodeCalled = { [weak self] in
+            self?.lookedUpBarcodes?.append($0)
+            try await Task.sleep(nanoseconds: 60_000_000_000)
+            return nil
+        }
         sut.viewDidAppear()
 
         let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scanService.recognise(Self.barcode) })
 
-        XCTAssertEqual(state?.value?.notice?.message, Self.unrecognisedMessage)
+        XCTAssertEqual(state?.value?.isLookingUp, true)
+        XCTAssertEqual(state?.value?.isRecognised, false)
+        XCTAssertTrue(scanService.isScanning)
     }
 
-    /// Recognition exists to produce a message and nothing else: there is no catalogue lookup by
-    /// Barcode to attempt, so none is attempted. The flow's open closure records everything the
-    /// scanner asked to open, and it stays empty.
-    func test_scanning_barcode_opens_nothing() {
+    func test_scanning_barcode_matching_variant_opens_product_with_variant_id() throws {
+        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: "22") }
         sut.viewDidAppear()
 
-        scanService.recognise(Self.barcode)
+        recogniseAndAwaitRecognition(Self.barcode)
+        finishRecognitionFeedback()
 
+        XCTAssertEqual(openedLinks, [try url(Self.barcodeVariantLink)])
+        XCTAssertEqual(closeCount, 1)
+    }
+
+    func test_scanning_barcode_matching_product_only_opens_product_without_variant_id() throws {
+        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: nil) }
+        sut.viewDidAppear()
+
+        recogniseAndAwaitRecognition(Self.barcode)
+        finishRecognitionFeedback()
+
+        XCTAssertEqual(openedLinks, [try url(Self.barcodeProductLink)])
+    }
+
+    func test_scanning_barcode_matching_nothing_shows_not_found_notice_and_keeps_scanning() {
+        sut.viewDidAppear()
+
+        let state = recogniseAndAwaitLookup([Self.barcode])
+
+        XCTAssertEqual(state?.value?.notice, ScannerNotice(id: 1, message: Self.notFoundMessage))
+        XCTAssertEqual(state?.value?.isLookingUp, false)
         XCTAssertTrue(openedLinks.isEmpty)
-        XCTAssertEqual(closeCount, 0)
+        XCTAssertTrue(scanService.isScanning)
     }
 
-    /// The camera never stops, so the tag the shopper is already holding is the next thing it reads
-    /// — which is the whole point of saying "scan the Alfie code instead".
-    func test_scanning_alfie_code_after_barcode_opens_it_from_the_same_session() throws {
+    func test_scanning_barcode_when_lookup_fails_shows_lookup_failed_notice() {
+        productService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .product(.generic)) }
+        sut.viewDidAppear()
+
+        let state = recogniseAndAwaitLookup([Self.barcode])
+
+        XCTAssertEqual(state?.value?.notice?.message, Self.lookupFailedMessage)
+        XCTAssertEqual(state?.value?.isLookingUp, false)
+        XCTAssertTrue(openedLinks.isEmpty)
+    }
+
+    func test_scanning_barcode_again_after_not_found_looks_it_up_again() {
+        sut.viewDidAppear()
+        recogniseAndAwaitLookup([Self.barcode])
+
+        recogniseAndAwaitLookup([Self.barcode])
+
+        XCTAssertEqual(lookedUpBarcodes, ["5901234123457", "5901234123457"])
+    }
+
+    func test_scanning_codes_while_looking_up_ignores_them() {
+        let started = expectation(description: "lookup started")
+        productService.onProductByBarcodeCalled = { [weak self] in
+            self?.lookedUpBarcodes?.append($0)
+            started.fulfill()
+            try await Task.sleep(nanoseconds: 60_000_000_000)
+            return nil
+        }
         sut.viewDidAppear()
         scanService.recognise(Self.barcode)
+        wait(for: [started], timeout: 1)
 
+        scanService.recognise(Self.otherBarcode)
         scanService.recognise(Self.alfieCode)
         finishRecognitionFeedback()
 
-        XCTAssertEqual(openedLinks, [try url(Self.alfieCode)])
-        XCTAssertEqual(scanService.startCount, 1)
+        XCTAssertEqual(lookedUpBarcodes, ["5901234123457"])
+        XCTAssertTrue(openedLinks.isEmpty)
+        XCTAssertEqual(sut.state.value?.isLookingUp, true)
+    }
+
+    func test_closing_while_looking_up_cancels_lookup() {
+        let cancelled = expectation(description: "lookup cancelled")
+        productService.onProductByBarcodeCalled = { _ in
+            do {
+                try await Task.sleep(nanoseconds: 60_000_000_000)
+            } catch {
+                cancelled.fulfill()
+                throw error
+            }
+            return BarcodeMatch(productId: "8", variantId: "22")
+        }
+        sut.viewDidAppear()
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scanService.recognise(Self.barcode) })
+
+        sut.didTapClose()
+
+        wait(for: [cancelled], timeout: 1)
+        XCTAssertTrue(openedLinks.isEmpty)
+        XCTAssertEqual(closeCount, 1)
+    }
+
+    func test_scanning_barcode_in_same_frame_as_alfie_code_does_not_look_it_up() {
+        sut.viewDidAppear()
+
+        scanService.recognise([Self.barcode, Self.alfieCode])
+
+        XCTAssertTrue(lookedUpBarcodes.isEmpty)
+    }
+
+    func test_scanning_qr_code_holding_barcode_digits_does_not_look_it_up() {
+        sut.viewDidAppear()
+
+        let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scanService.recognise(.qr("5901234123457")) })
+
+        XCTAssertEqual(state?.value?.notice?.message, Self.unrecognisedMessage)
+        XCTAssertTrue(lookedUpBarcodes.isEmpty)
     }
 
     /// Both codes are printed on the same Swing tag, so a camera held over one sees both. Correcting
@@ -462,16 +567,9 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertNil(state?.value?.notice)
     }
 
-    /// The order the camera really acquires a tag in: the 1D Barcode locks on first, and the Alfie
-    /// code joins it a moment later. The scanner is told everything being held, not just what has
-    /// arrived, so the second reading ranks both and opens the Product.
-    ///
-    /// Handing both over in one call — as
-    /// `test_scanning_alfie_code_in_same_frame_as_barcode_opens_it_without_notice` does — would
-    /// assume away exactly the sequence that makes this hard.
-    func test_alfie_code_joining_tracked_barcode_opens_it() throws {
+    func test_alfie_code_joining_barcode_after_its_lookup_opens_it() throws {
         sut.viewDidAppear()
-        scanService.recognise([Self.barcode])
+        recogniseAndAwaitLookup([Self.barcode])
 
         scanService.recognise([Self.barcode, Self.alfieCode])
         finishRecognitionFeedback()
@@ -483,35 +581,13 @@ final class ScannerViewModelTests: XCTestCase {
     /// The camera republishes everything it holds each time that set grows, so a Barcode still in
     /// view as another code joins it arrives twice. It is one physical code and gets one answer —
     /// otherwise the `scan_failed` breakdown this feature added counts a single mistake twice.
-    func test_barcode_still_in_view_as_another_code_joins_is_reported_once() {
+    func test_barcode_still_in_view_as_another_code_joins_is_looked_up_once() {
         sut.viewDidAppear()
-        scanService.recognise([Self.barcode])
+        recogniseAndAwaitLookup([Self.barcode])
 
         scanService.recognise([Self.barcode, Self.foreignLink])
 
-        XCTAssertEqual(reportedScanFailures, ["barcode"])
-    }
-
-    /// The suppression above must not swallow a genuine second look. The camera only reports the
-    /// same set twice once the code has left tracking and returned — the shopper presenting it
-    /// again — and being told again is exactly the point.
-    func test_barcode_presented_again_is_reported_again() {
-        sut.viewDidAppear()
-        scanService.recognise([Self.barcode])
-
-        scanService.recognise([Self.barcode])
-
-        XCTAssertEqual(reportedScanFailures, ["barcode", "barcode"])
-    }
-
-    /// A UPC-A reaches the app as an EAN-13 with a leading zero, which is the only form the scanner
-    /// ever reports. It is the same mistake and gets the same answer.
-    func test_scanning_upc_a_barcode_shows_unrecognised_notice() {
-        sut.viewDidAppear()
-
-        let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scanService.recognise("0012345678905") })
-
-        XCTAssertEqual(state?.value?.notice?.message, Self.unrecognisedMessage)
+        XCTAssertEqual(lookedUpBarcodes, ["5901234123457"])
     }
 
     // MARK: - When recognition runs
@@ -656,16 +732,6 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(reportedScanFailures, ["unrecognised"])
     }
 
-    /// Under its own name, not under `unrecognised`: a run of these says the printed Alfie codes are
-    /// being missed on tags that carry them, which is a demo to fix rather than a catalogue gap.
-    func test_scanning_barcode_reports_barcode_failure() {
-        sut.viewDidAppear()
-
-        scanService.recognise(Self.barcode)
-
-        XCTAssertEqual(reportedScanFailures, ["barcode"])
-    }
-
     /// An Alfie code that won the frame is not also a Barcode failure. Reporting the loser would
     /// count a scan that worked as one that did not.
     func test_scanning_barcode_in_same_frame_as_alfie_code_reports_no_failure() {
@@ -674,6 +740,23 @@ final class ScannerViewModelTests: XCTestCase {
         scanService.recognise([Self.barcode, Self.alfieCode])
 
         XCTAssertTrue(reportedScanFailures.isEmpty)
+    }
+
+    func test_scanning_barcode_matching_nothing_reports_barcode_failure() {
+        sut.viewDidAppear()
+
+        recogniseAndAwaitLookup([Self.barcode])
+
+        XCTAssertEqual(reportedScanFailures, ["barcode"])
+    }
+
+    func test_scanning_barcode_when_lookup_fails_reports_barcode_failure() {
+        productService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .product(.generic)) }
+        sut.viewDidAppear()
+
+        recogniseAndAwaitLookup([Self.barcode])
+
+        XCTAssertEqual(reportedScanFailures, ["barcode"])
     }
 
     func test_camera_failing_with_permission_denied_reports_permission_denied_failure() {
@@ -761,12 +844,32 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(reportedScanSuccessSkuFlags, [true])
     }
 
-    /// A code that opens nothing is a failure, and must not also appear as a success — the two are
-    /// read as a pair.
-    func test_scanning_barcode_reports_no_success() {
+    func test_scanning_barcode_matching_variant_reports_success_with_sku_flag() {
+        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: "22") }
         sut.viewDidAppear()
 
-        scanService.recognise(Self.barcode)
+        recogniseAndAwaitRecognition(Self.barcode)
+
+        XCTAssertEqual(reportedScanSuccessHandles, ["8"])
+        XCTAssertEqual(reportedScanSuccessSkuFlags, [true])
+    }
+
+    func test_scanning_barcode_matching_product_only_reports_success_without_sku_flag() {
+        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: nil) }
+        sut.viewDidAppear()
+
+        recogniseAndAwaitRecognition(Self.barcode)
+
+        XCTAssertEqual(reportedScanSuccessHandles, ["8"])
+        XCTAssertEqual(reportedScanSuccessSkuFlags, [false])
+    }
+
+    /// A code that opens nothing is a failure, and must not also appear as a success — the two are
+    /// read as a pair.
+    func test_scanning_barcode_matching_nothing_reports_no_success() {
+        sut.viewDidAppear()
+
+        recogniseAndAwaitLookup([Self.barcode])
 
         XCTAssertTrue(reportedScanSuccessHandles.isEmpty)
     }
@@ -794,6 +897,7 @@ final class ScannerViewModelTests: XCTestCase {
         return ScannerViewModel(
             dependencies: .init(
                 deepLinkService: deepLinkService,
+                productService: productService,
                 makeScanService: { scanService },
                 analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
                 haptics: mockHaptics,
@@ -809,6 +913,29 @@ final class ScannerViewModelTests: XCTestCase {
 
     private func url(_ string: String) throws -> URL {
         try XCTUnwrap(URL(string: string))
+    }
+
+    private func url(_ payload: ScannedPayload) throws -> URL {
+        try url(payload.value)
+    }
+
+    @discardableResult
+    private func recogniseAndAwaitLookup(
+        _ payloads: [ScannedPayload]
+    ) -> ViewState<ScannerViewStateModel, ScannerViewErrorType>? {
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value?.isLookingUp == false },
+            afterTrigger: { self.scanService.recognise(payloads) }
+        )
+    }
+
+    private func recogniseAndAwaitRecognition(_ payload: ScannedPayload) {
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value?.isRecognised == true },
+            afterTrigger: { self.scanService.recognise(payload) }
+        )
     }
 
     private func finishRecognitionFeedback() {

@@ -85,6 +85,10 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         // Keyed on the whole notice rather than its words: a second bad code in a row says the same
         // thing, and it is exactly then that the shopper most needs telling. ``ScannerNotice``
         // carries an identity so that repeat still reads as a change.
+        .onChange(of: viewModel.isLookingUp) { isLookingUp in
+            guard isLookingUp else { return }
+            UIAccessibility.post(notification: .announcement, argument: L10n.Scanner.Lookup.message)
+        }
         .onChange(of: viewModel.notice) { notice in
             guard let notice else { return }
             UIAccessibility.post(notification: .announcement, argument: notice.message)
@@ -114,7 +118,11 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
 
             VStack(spacing: theme.spacing.space300) {
                 viewfinder
-                guidance
+                if viewModel.isLookingUp {
+                    lookup
+                } else {
+                    guidance
+                }
             }
             .padding(.horizontal, theme.spacing.space400)
 
@@ -172,6 +180,17 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         }
     }
 
+    private var lookup: some View {
+        VStack(spacing: theme.spacing.space150) {
+            LoaderView(circleDiameter: .defaultSmall, style: .light)
+            Text.build(theme.font.body.small(L10n.Scanner.Lookup.message))
+                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .multilineTextAlignment(.center)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.Scanner.lookup)
+    }
+
     @ViewBuilder private var notice: some View {
         if let notice = viewModel.notice {
             SnackbarView(
@@ -206,6 +225,14 @@ private enum Constants {
     ScannerView(
         viewModel: MockScannerViewModel(
             state: .success(.init(guidance: L10n.Scanner.Guidance.message, isRecognised: true))
+        )
+    )
+}
+
+#Preview("Looking up Barcode") {
+    ScannerView(
+        viewModel: MockScannerViewModel(
+            state: .success(.init(guidance: L10n.Scanner.Guidance.message, isLookingUp: true))
         )
     )
 }

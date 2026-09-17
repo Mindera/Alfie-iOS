@@ -8,9 +8,8 @@ import VisionKit
 /// The real camera, via VisionKit's `DataScannerViewController`.
 ///
 /// Two symbologies are recognised: QR, which is what an Alfie code is, and EAN-13, which is what
-/// the manufacturer prints beside it. The Barcode is read only so that the shopper can be told it
-/// is the wrong code — nothing is ever looked up by one. Everything the scanner sees is published
-/// verbatim — deciding what a payload means belongs to `ScannerViewModel`.
+/// the manufacturer prints beside it. Everything the scanner sees is published with the symbology
+/// it was read as — deciding what a payload means belongs to `ScannerViewModel`.
 ///
 /// A device that cannot scan, and a shopper who has refused the camera, are both reported through
 /// ``failurePublisher`` rather than left at a preview that never recognises anything — and the
@@ -23,8 +22,8 @@ import VisionKit
 /// every call arrives from the ViewModel, which SwiftUI drives from `body`, `onAppear` and
 /// `onChange` — all on the main thread — so the assumption is one the caller already guarantees.
 public final class CameraScanService: NSObject, CameraScanServiceProtocol {
-    private let payloadsSubject = PassthroughSubject<[String], Never>()
-    public var recognisedPayloadsPublisher: AnyPublisher<[String], Never> {
+    private let payloadsSubject = PassthroughSubject<[ScannedPayload], Never>()
+    public var recognisedPayloadsPublisher: AnyPublisher<[ScannedPayload], Never> {
         payloadsSubject.eraseToAnyPublisher()
     }
 
@@ -206,9 +205,16 @@ extension CameraScanService: DataScannerViewControllerDelegate {
         // usually acquired before the QR beside it, so ranking the additions alone would answer the
         // tag with "that's the product barcode" on the strength of the half of it that arrived
         // first — then open the Product a moment later anyway.
-        let payloads = allItems.compactMap { item -> String? in
-            guard case .barcode(let barcode) = item else { return nil }
-            return barcode.payloadStringValue
+        let payloads = allItems.compactMap { item -> ScannedPayload? in
+            guard case .barcode(let barcode) = item, let value = barcode.payloadStringValue else { return nil }
+            switch barcode.observation.symbology {
+            case .qr:
+                return .qr(value)
+            case .ean13:
+                return .ean13(value)
+            default:
+                return nil
+            }
         }
         guard !payloads.isEmpty else { return }
         payloadsSubject.send(payloads)

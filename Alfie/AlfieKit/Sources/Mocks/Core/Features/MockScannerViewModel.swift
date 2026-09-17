@@ -14,6 +14,7 @@ public class MockScannerViewModel: ScannerViewModelProtocol {
     public var guidance: String? { state.value?.guidance }
     public var notice: ScannerNotice? { state.value?.notice }
     public var isRecognised: Bool { state.value?.isRecognised ?? false }
+    public var isLookingUp: Bool { state.value?.isLookingUp ?? false }
     @Published public var isExplainingCameraAccess: Bool
 
     public init(

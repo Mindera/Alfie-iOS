@@ -76,6 +76,15 @@ final class ScannerViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    func test_scanner_view_looking_up() {
+        let viewModel = Self.makeViewModel(state: .success(.init(guidance: Self.guidance, isLookingUp: true)))
+        let sut = ScannerView(viewModel: viewModel)
+
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_scanner_intro_view() {
         let sut = ScannerIntroView(onContinue: {}, onNotNow: {})
 

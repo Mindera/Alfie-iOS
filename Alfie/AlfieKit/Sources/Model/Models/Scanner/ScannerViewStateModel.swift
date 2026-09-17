@@ -12,15 +12,22 @@ public struct ScannerViewStateModel: Equatable {
     /// closing the camera: a notice is a correction, not a dead end.
     public let notice: ScannerNotice?
     public let isRecognised: Bool
+    /// A Barcode is being resolved; the camera keeps running but no code is acted on.
+    public let isLookingUp: Bool
 
-    public init(guidance: String, notice: ScannerNotice? = nil, isRecognised: Bool = false) {
+    public init(guidance: String, notice: ScannerNotice? = nil, isRecognised: Bool = false, isLookingUp: Bool = false) {
         self.guidance = guidance
         self.notice = notice
         self.isRecognised = isRecognised
+        self.isLookingUp = isLookingUp
     }
 
     public func with(notice: ScannerNotice?) -> Self {
-        .init(guidance: guidance, notice: notice, isRecognised: isRecognised)
+        .init(guidance: guidance, notice: notice, isRecognised: isRecognised, isLookingUp: isLookingUp)
+    }
+
+    public func with(isLookingUp: Bool) -> Self {
+        .init(guidance: guidance, notice: isLookingUp ? nil : notice, isRecognised: isRecognised, isLookingUp: isLookingUp)
     }
 
     public func recognised() -> Self {

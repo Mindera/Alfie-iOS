@@ -67,6 +67,7 @@ public enum AccessibilityID {
         public static let guidance = "scanner.guidance.label"
         public static let back = "scanner.back.button"
         public static let notice = "scanner.notice.label"
+        public static let lookup = "scanner.lookup.view"
         public static let failure = "scanner.failure.view"
         public static let openSettings = "scanner.openSettings.button"
         public static let intro = "scanner.intro.view"

@@ -16,6 +16,11 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return product
     }
 
+    public var onProductByBarcodeCalled: ((String) async throws -> BarcodeMatch?)?
+    public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
+        try await onProductByBarcodeCalled?(barcode)
+    }
+
     public var onProductListCalled: ((String, String?, Int, String?, ProductFilterInput?) throws -> ProductListing)?
     public func productList(collectionHandle: String, after: String?, limit: Int, sort: String?, filters: ProductFilterInput?) async throws -> ProductListing {
         guard let productListing = try onProductListCalled?(collectionHandle, after, limit, sort, filters) else {

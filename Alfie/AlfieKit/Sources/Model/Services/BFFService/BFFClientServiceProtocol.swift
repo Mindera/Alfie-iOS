@@ -3,6 +3,7 @@ import Foundation
 public protocol BFFClientServiceProtocol {
     func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem]
     func getProduct(handle: String) async throws -> Product
+    func productByBarcode(_ barcode: String) async throws -> BarcodeMatch?
     func productList(
         collectionHandle: String,
         after: String?,

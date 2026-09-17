@@ -97,6 +97,23 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
+        log.info("productByBarcode → barcode=\(barcode)")
+
+        do {
+            let match = try await executeFetch(
+                BFFGraphAPI.ProductByBarcodeQuery(barcode: barcode)
+            ).productByBarcode
+
+            log.info("productByBarcode ← productId=\(match?.id ?? "nil") variantId=\(match?.variantId ?? "nil")")
+
+            return match.map { BarcodeMatch(productId: $0.id, variantId: $0.variantId) }
+        } catch {
+            log.error("productByBarcode failed: \(error)")
+            throw error
+        }
+    }
+
     public func productList(
         collectionHandle: String,
         after: String?,

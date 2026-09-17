@@ -4,6 +4,7 @@ import Model
 
 public final class ScannerDependencyContainer {
     let deepLinkService: DeepLinkServiceProtocol
+    let productService: ProductServiceProtocol
     /// A factory rather than an instance: each presentation of the scanner gets its own camera
     /// session, and the previous one is released with the screen that owned it. Supplied by the app
     /// graph, which is the only layer that knows the real implementation.
@@ -15,6 +16,7 @@ public final class ScannerDependencyContainer {
 
     public init(
         deepLinkService: DeepLinkServiceProtocol,
+        productService: ProductServiceProtocol,
         makeScanService: @escaping () -> CameraScanServiceProtocol,
         analytics: AlfieAnalyticsTracker,
         haptics: HapticsServiceProtocol,
@@ -24,6 +26,7 @@ public final class ScannerDependencyContainer {
         log: Logger
     ) {
         self.deepLinkService = deepLinkService
+        self.productService = productService
         self.makeScanService = makeScanService
         self.analytics = analytics
         self.haptics = haptics

@@ -459,6 +459,46 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
     }
 
+    func test_deep_link_entry_with_variant_id_preselects_that_variant() {
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", colour: .fixture(id: "1"), stock: 1)
+        let scannedVariant = Product.Variant.fixture(id: "v2", sku: "SKU-2", colour: .fixture(id: "2"), stock: 1)
+        mockProductService.onGetProductCalled = { _ in
+            .fixture(defaultVariant: defaultVariant, variants: [defaultVariant, scannedVariant])
+        }
+
+        initViewModel(configuration: .deepLink(handle: "8", variantId: "v2"))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productReference, "SKU-2")
+        XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
+    }
+
+    func test_deep_link_entry_with_sku_and_variant_id_prefers_the_sku() {
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", stock: 1)
+        let skuVariant = Product.Variant.fixture(id: "v2", sku: "SKU-2", stock: 1)
+        let idVariant = Product.Variant.fixture(id: "v3", sku: "SKU-3", stock: 1)
+        mockProductService.onGetProductCalled = { _ in
+            .fixture(defaultVariant: defaultVariant, variants: [defaultVariant, skuVariant, idVariant])
+        }
+
+        initViewModel(configuration: .deepLink(handle: "8", sku: "SKU-2", variantId: "v3"))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productReference, "SKU-2")
+    }
+
+    func test_deep_link_entry_with_unknown_variant_id_falls_back_to_the_default_variant() {
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", stock: 1)
+        mockProductService.onGetProductCalled = { _ in
+            .fixture(defaultVariant: defaultVariant, variants: [defaultVariant])
+        }
+
+        initViewModel(configuration: .deepLink(handle: "8", variantId: "NOT-IN-CATALOGUE"))
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productReference, "SKU-1")
+    }
+
     func test_deep_link_entry_with_unknown_sku_falls_back_to_the_default_variant() {
         let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", stock: 1)
         mockProductService.onGetProductCalled = { _ in

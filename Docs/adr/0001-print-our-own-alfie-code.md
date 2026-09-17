@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: accepted, partly superseded by ADR-0002
 ---
 
 # Print our own Alfie code instead of reading the manufacturer's Barcode

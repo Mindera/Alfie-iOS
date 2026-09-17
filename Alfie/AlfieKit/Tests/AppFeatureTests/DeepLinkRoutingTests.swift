@@ -52,6 +52,15 @@ final class DeepLinkRoutingTests: XCTestCase {
         )
     }
 
+    func test_tab_route_for_product_detail_link_carries_the_variant_id() {
+        let deepLink = DeepLink.LinkType.productDetail(handle: "8", route: nil, query: ["variantId": "22"])
+
+        XCTAssertEqual(
+            TabRoute(deepLinkType: deepLink),
+            .shop(.productDetails(.productDetails(.deepLink(handle: "8", variantId: "22"))))
+        )
+    }
+
     func test_tab_route_for_product_detail_link_without_sku_opens_the_default_variant() {
         let deepLink = DeepLink.LinkType.productDetail(handle: "red-midi-dress", route: nil, query: nil)
 

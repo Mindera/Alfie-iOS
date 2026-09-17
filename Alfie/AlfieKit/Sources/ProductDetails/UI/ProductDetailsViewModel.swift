@@ -40,6 +40,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let productHandle: String
     private let initialSelectedProduct: SelectedProduct?
     private let requestedSku: String?
+    private let requestedVariantId: String?
 
     private var product: Product? {
         guard case .success(let model) = state else {
@@ -112,13 +113,15 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.productHandle = productId
             self.initialSelectedProduct = nil
             self.requestedSku = nil
+            self.requestedVariantId = nil
             self.baseProduct = nil
 
-        case .deepLink(let handle, let sku):
+        case .deepLink(let handle, let sku, let variantId):
             self.productId = handle
             self.productHandle = handle
             self.initialSelectedProduct = nil
             self.requestedSku = sku
+            self.requestedVariantId = variantId
             self.baseProduct = nil
 
         case .product(let product):
@@ -126,6 +129,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.productHandle = product.slug
             self.initialSelectedProduct = nil
             self.requestedSku = nil
+            self.requestedVariantId = nil
             self.baseProduct = product
 
             buildColorAndSizingSelectionConfigurations(
@@ -138,6 +142,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.productHandle = selectedProduct.product.slug
             self.initialSelectedProduct = selectedProduct
             self.requestedSku = selectedProduct.selectedVariant.sku
+            self.requestedVariantId = nil
             baseProduct = selectedProduct.product
 
             buildColorAndSizingSelectionConfigurations(
@@ -505,13 +510,16 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
     /// snapshot (e.g. out-of-date stock), so map the selection onto the freshly fetched product by
     /// `sku` — keeping the user's choice while reflecting current stock/price. A deep link's `sku`
-    /// (a scanned Alfie code) is mapped the same way. Fall back to the product's default variant when
-    /// there is no requested SKU or no match.
+    /// (a scanned Alfie code) is mapped the same way, and a scanned Barcode's `variantId` after it. Fall
+    /// back to the product's default variant when neither is requested or neither matches.
     private func resolvedSelectedVariant(for product: Product) -> Product.Variant {
-        guard let requestedSku else {
-            return product.defaultVariant
+        if let requestedSku, let variant = product.variants.first(where: { $0.sku == requestedSku }) {
+            return variant
         }
-        return product.variants.first { $0.sku == requestedSku } ?? product.defaultVariant
+        if let requestedVariantId, let variant = product.variants.first(where: { $0.id == requestedVariantId }) {
+            return variant
+        }
+        return product.defaultVariant
     }
 
     private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {

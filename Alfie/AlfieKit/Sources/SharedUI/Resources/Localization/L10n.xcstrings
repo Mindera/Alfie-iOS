@@ -1448,6 +1448,39 @@
         }
       }
     },
+    "scanner.lookup.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finding product…"
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Try scanning again."
+          }
+        }
+      }
+    },
+    "scanner.not_found.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We couldn't find this product."
+          }
+        }
+      }
+    },
     "scanner.title" : {
       "extractionState" : "manual",
       "localizations" : {

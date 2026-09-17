@@ -55,7 +55,11 @@ extension TabRoute {
         case .productDetail(let handle, _, let query):
             // The BFF resolves a product by its Handle, which is the whole path after the `/product/` prefix.
             self = .shop(
-                .productDetails(.productDetails(.deepLink(handle: handle, sku: query?[DeepLink.skuQueryItem])))
+                .productDetails(.productDetails(.deepLink(
+                    handle: handle,
+                    sku: query?[DeepLink.skuQueryItem],
+                    variantId: query?[DeepLink.variantIdQueryItem]
+                )))
             )
 
         case .webView(let url):

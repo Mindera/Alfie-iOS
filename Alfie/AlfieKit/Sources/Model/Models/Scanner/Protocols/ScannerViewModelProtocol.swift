@@ -16,6 +16,7 @@ public protocol ScannerViewModelProtocol: ObservableObject {
     /// What the shopper was last told about a code, if anything.
     var notice: ScannerNotice? { get }
     var isRecognised: Bool { get }
+    var isLookingUp: Bool { get }
     var isExplainingCameraAccess: Bool { get }
 
     func viewDidAppear()

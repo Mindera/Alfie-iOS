@@ -1,7 +1,7 @@
 # Alfie
 
 A native iOS storefront for a fashion retailer, backed by a GraphQL BFF that fronts a commerce
-platform (Shopify or BigCommerce). This glossary fixes the vocabulary for the catalogue and for the
+platform (SCAYLE, Shopify or BigCommerce). This glossary fixes the vocabulary for the catalogue and for the
 physical-retail features that reach into it.
 
 ## Language
@@ -14,7 +14,8 @@ _Avoid_: item, article, SKU
 
 **Handle**:
 The identifier that addresses a Product in the BFF and in a link. On Shopify it is the platform's
-native product handle; on BigCommerce it is a site route path, so it may contain `/`.
+native product handle; on BigCommerce it is a site route path, so it may contain `/`; on SCAYLE it
+is the Product's name followed by its numeric id.
 _Avoid_: slug, product ID
 
 **Variant**:
@@ -31,8 +32,10 @@ colour and size a shopper arrives on.
 The card attached to a garment in store, carrying its printed identifiers.
 
 **Barcode**:
-The machine-readable number already printed on a Swing tag (EAN-13 or UPC-A). It identifies a
-Variant, is issued by the manufacturer, and holds only digits — it cannot carry a Handle.
+The machine-readable number already printed on a Swing tag (EAN-13 or UPC-A). Issued by the
+manufacturer, it holds only digits and cannot carry a Handle, so it is resolved through the
+catalogue (SCAYLE only). It usually identifies one Variant; when several Variants share it, it
+resolves to the Product alone and no colour or size is preselected.
 _Avoid_: EAN, UPC, GTIN (use these only when the specific symbology matters)
 
 **Alfie code**:

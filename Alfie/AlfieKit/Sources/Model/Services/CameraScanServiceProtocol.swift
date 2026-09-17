@@ -8,15 +8,15 @@ import SwiftUI
 /// recognition may run — is exercised in a unit test on a simulator that has no camera. The real
 /// implementation is `CameraScanService`; tests substitute `MockCameraScanService`.
 public protocol CameraScanServiceProtocol: AnyObject {
-    /// Every code the camera recognises, as the raw string it carries. A QR code emits its contents;
-    /// interpreting them is the ViewModel's job, not the camera's.
+    /// Every code the camera recognises, as the symbology it was read as and the raw string it
+    /// carries. Interpreting them is the ViewModel's job, not the camera's.
     ///
     /// Each emission is everything the camera is holding at that moment, not the one code that has
     /// just arrived, and it is republished whenever that set grows. A Swing tag prints the Barcode
     /// and the Alfie code side by side, so which of the two the scanner acts on is a choice that
     /// needs both in hand; published one at a time, the Alfie code would win or lose by whichever
     /// the camera happened to acquire first — and it acquires the Barcode first.
-    var recognisedPayloadsPublisher: AnyPublisher<[String], Never> { get }
+    var recognisedPayloadsPublisher: AnyPublisher<[ScannedPayload], Never> { get }
 
     /// Emitted in place of the recognitions a ``startScanning()`` was expected to produce, when
     /// there turns out to be no camera to produce them. Silence means the camera is running: a

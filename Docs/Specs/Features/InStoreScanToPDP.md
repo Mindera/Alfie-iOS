@@ -2,7 +2,7 @@
 
 **Status**: Implemented
 **Created**: 2026-09-09
-**Last Updated**: 2026-09-14
+**Last Updated**: 2026-09-17
 **Implementation PR**: #146 (`feature/gh-133-in-store-scan-to-pdp` → `main`)
 
 ---
@@ -14,14 +14,16 @@ with the Alfie app, and arrives on that Product's details page — where the exi
 swatches already show what is and is not available.
 
 This is a **feature demo for one client**, not a production rollout. It is deliberately scoped so
-that nothing outside the iOS app has to change: no BFF work, no new commerce-platform credentials,
-no hosted domain.
+that no new commerce-platform credentials and no hosted domain are needed; the only BFF change is
+one read-only query.
 
-The central design decision is that Alfie **does not read the manufacturer's Barcode**. Neither
-commerce platform can resolve a Barcode with the credentials the BFF holds — the Shopify Storefront
-API has no `barcode:` filter, and reaching Shopify's Admin API would mean provisioning an
-Admin-scoped token for a customer-facing service. Instead we print our own **Alfie code**, a QR code
-that already contains the Handle. See `Docs/adr/0001-print-our-own-alfie-code.md`.
+The central design decision is that Alfie **prints its own Alfie code**, a QR code that already
+contains the Handle, and prefers it over anything else on the tag. See
+`Docs/adr/0001-print-our-own-alfie-code.md`. The manufacturer's EAN-13 **Barcode** is also resolved,
+through the BFF's `productByBarcode` query (Alfie-BFF PR #46), but only on SCAYLE: the Shopify
+Storefront API has no `barcode:` filter, and reaching Shopify's Admin API would mean provisioning an
+Admin-scoped token for a customer-facing service. See `Docs/adr/0002-resolve-barcodes-through-the-bff-on-scayle.md`,
+which partly supersedes ADR-0001.
 
 ---
 
@@ -88,24 +90,64 @@ or it matches no Variant
 AND a colour with no available Variant is dimmed in the _Colour selector_
 AND an availability note states that stock shown is online stock
 
-### Scenario 4: Shopper scans the manufacturer's Barcode by mistake
+### Scenario 4: Shopper scans the manufacturer's Barcode
 
 **GIVEN** the shopper is on the _Scanner screen_
-**WHEN** the camera recognises an EAN-13 Barcode instead of an Alfie code
-**THEN** the scanner stays open
-AND the notice "We don't recognize this barcode." is shown and dismisses itself after four seconds,
-or earlier from its close button
-AND the guidance naming the Alfie code stays on screen
+**WHEN** the camera recognises an EAN-13 Barcode and no Alfie code
+**THEN** the camera preview stays live
+AND the guidance is replaced by a small loader and "Finding product…", announced to VoiceOver
+AND the Barcode is looked up through `productByBarcode`
 
-> Amended after the Figma flow review: the design's wording replaces the Barcode-specific message, and
-> the guidance under the viewfinder carries the hint to scan the Alfie code instead. `scan_failed`
-> still reports `barcode` and `unrecognised` separately.
+> Amended by ADR-0002 (2026-09-17). This scenario first answered a Barcode with the unrecognised
+> notice. Classification is by the symbology VisionKit reports, not the payload's shape: a QR code
+> holding thirteen digits is unrecognised (Scenario 5) and is never looked up.
+
+### Scenario 4a: Barcode matches a Variant
+
+**GIVEN** a Barcode lookup is in flight
+**WHEN** the BFF returns a match with a `variantId`
+**THEN** the success haptic and green viewfinder of Scenario 2 follow
+AND the Product opens through the deep-link path as `alfie://alfie.target/product/<productId>?variantId=<variantId>`
+AND that Variant is selected on arrival
+
+### Scenario 4b: Barcode matches a Product only
+
+**GIVEN** a Barcode lookup is in flight
+**WHEN** the BFF returns a match without a `variantId` — the code is on several Variants, or none
+**THEN** the Product opens as `alfie://alfie.target/product/<productId>` with its default Variant
+
+### Scenario 4c: Barcode not found
+
+**GIVEN** a Barcode lookup is in flight
+**WHEN** the BFF returns no match, including an ambiguous one
+**THEN** the notice "We couldn't find this product." is shown and dismisses itself after four seconds,
+or earlier from its close button
+AND the camera keeps running, and scanning the same Barcode again looks it up again
+
+### Scenario 4d: Barcode lookup fails
+
+**GIVEN** a Barcode lookup is in flight
+**WHEN** the request fails — including on a non-SCAYLE platform, where the query errors
+**THEN** the notice "Something went wrong. Try scanning again." is shown, dismissing as in 4c
+AND the camera keeps running, and scanning the same Barcode again looks it up again
+
+### Scenario 4e: Codes recognised during a lookup
+
+**GIVEN** a Barcode lookup is in flight
+**WHEN** the camera recognises any code, an Alfie code included
+**THEN** it is ignored
+
+### Scenario 4f: Shopper closes the scanner during a lookup
+
+**GIVEN** a Barcode lookup is in flight
+**WHEN** the shopper taps _Back_, or the camera stops
+**THEN** the lookup is cancelled and nothing opens
 
 ### Scenario 5: Shopper scans an unrelated code
 
 **GIVEN** the shopper is on the _Scanner screen_
 **WHEN** the camera recognises a QR code that opens nothing in Alfie
-**THEN** the scanner stays open and the same self-dismissing notice as Scenario 4 is shown
+**THEN** the scanner stays open and the self-dismissing notice "We don't recognize this barcode." is shown
 AND a Product Details screen is not opened
 
 > Amended by #138. This scenario originally handed the URL to the existing deep-link fallback, which
@@ -136,22 +178,25 @@ AND no camera permission is requested
 ## Data Models
 
 ```swift
-// What the scanner recognised
+// What the camera read, as VisionKit reported it. CameraScanService publishes [ScannedPayload].
+public struct ScannedPayload: Equatable {
+    public enum Symbology: Equatable { case qr, ean13 }
+    public let symbology: Symbology
+    public let value: String
+}
+
+// What the scanner recognised — classified by symbology, never by payload shape (ADR-0002)
 public enum ScannedCode: Equatable {
-    /// A code carrying an Alfie link, e.g. https://localhost:4000/product/<handle>?sku=<sku>
+    /// A QR code carrying an Alfie link, e.g. https://localhost:4000/product/<handle>?sku=<sku>
     case alfieCode(URL)
-    /// A manufacturer Barcode, which Alfie cannot resolve
+    /// An EAN-13 manufacturer Barcode, resolved through productByBarcode
     case barcode(value: String)
-    /// Anything else the camera recognised
+    /// Anything else the camera recognised, including a QR code holding thirteen digits
     case unrecognised(payload: String)
 
     /// Which of several codes read in one frame is acted on — lower first. A Swing tag prints both
     /// codes side by side, so both are routinely read at once and the Alfie code has to win.
     public var precedence: Int { ... }
-
-    /// Thirteen digits with a valid EAN-13 check digit. The check digit is tested and not merely the
-    /// shape, so a QR code holding thirteen digits is not answered with "that's the product barcode".
-    public static func isBarcode(_ payload: String) -> Bool { ... }
 }
 
 public extension Collection where Element == ScannedCode {
@@ -162,10 +207,19 @@ public extension Collection where Element == ScannedCode {
 // Built by #139. #138 needed only Alfie-code-or-not, which one `guard` expressed; the manufacturer
 // Barcode is what made the third case real.
 
+// What productByBarcode resolved. variantId is nil unless exactly one Variant carries the code.
+public struct BarcodeMatch: Equatable {
+    public let productId: String
+    public let variantId: String?
+}
+
 // ViewModel State Model
 public struct ScannerViewStateModel: Equatable {
     let guidance: String
     let notice: ScannerNotice?
+    let isRecognised: Bool
+    /// A Barcode is being resolved; the camera keeps running but no code is acted on
+    let isLookingUp: Bool
 }
 
 // A notice carries an identity as well as its words, because it is an event rather than a state:
@@ -189,9 +243,19 @@ State is held as `ViewState<ScannerViewStateModel, ScannerViewErrorType>`.
 
 ## API Contracts
 
-**None.** This feature adds no GraphQL query, mutation or fragment, and requires no BFF change. The
-Handle travels inside the Alfie code, and the Product is then fetched by the existing
-`ProductDetailsQuery(handle:)` through the existing deep-link path.
+For an Alfie code, none: the Handle travels inside the code, and the Product is fetched by the
+existing `ProductDetailsQuery(handle:)` through the existing deep-link path.
+
+For a Barcode, one query added by Alfie-BFF PR #46 (`ProductByBarcodeQuery.graphql`), reached through
+`ProductServiceProtocol.productByBarcode(_:) -> BarcodeMatch?`:
+
+```graphql
+productByBarcode(barcode: String!): BarcodeMatch   # { id, name, slug, variantId }
+```
+
+SCAYLE only. `null` when no Product carries the code or more than one does; `variantId` is `null`
+unless exactly one Variant carries it. Other platforms fail the query. The returned `id` is a bare
+SCAYLE id, which `productDetails(handle:)` accepts.
 
 ---
 
@@ -202,6 +266,7 @@ Handle travels inside the Alfie code, and the Product is then fetched by the exi
 - Any screen with the _Search bar_ → tap _Scan button_ → Scanner screen, or the explainer sheet first
   while camera access has not been asked
 - Scanner screen → recognises an Alfie code → Product Details screen
+- Scanner screen → Barcode lookup matches → Product Details screen
 
 ### Exit Points
 
@@ -245,6 +310,12 @@ The `sku` is read in `TabRoute`, so it preselects a Variant for **every** produc
 a scan — a shared `/product/<handle>?sku=<sku>` link lands on the same Variant. This is intended: the
 link format is the same one the Alfie code prints.
 
+A Barcode match takes the same path: the ViewModel builds `alfie://alfie.target/product/<productId>`,
+adding `?variantId=<id>` (`DeepLink.variantIdQueryItem`) when the match names one, and hands it to
+`openScannedLink`. `TabRoute` carries it into `ProductDetailsConfiguration.deepLink(handle:sku:variantId:)`,
+and Product Details preselects by `sku`, then `variantId`, then the default Variant. Like `sku`,
+`variantId` applies to every product deep link.
+
 ---
 
 ## Localization
@@ -253,7 +324,10 @@ link format is the same one the Alfie code prints.
 |-----|---------|-------|
 | `scanner.title` | "Scan" | Screen title |
 | `scanner.guidance.message` | "Point the camera at the Alfie code on the tag" | Shown under the preview |
-| `scanner.unrecognised.message` | "We don't recognize this barcode." | Scenarios 4 and 5 — the design's wording; replaces `scanner.barcode_detected.message` |
+| `scanner.unrecognised.message` | "We don't recognize this barcode." | Scenario 5 — the design's wording; replaces `scanner.barcode_detected.message` |
+| `scanner.lookup.message` | "Finding product…" | Scenario 4 — replaces the guidance during a lookup |
+| `scanner.not_found.message` | "We couldn't find this product." | Scenario 4c |
+| `scanner.lookup_failed.message` | "Something went wrong. Try scanning again." | Scenario 4d |
 | `scanner.intro.title` | "Scan a tag" | Scenario 1a |
 | `scanner.intro.message` | "Allow camera access to scan the Alfie code on a tag and go straight to the product." | Scenario 1a |
 | `scanner.intro.continue` | "Continue" | Scenario 1a |
@@ -278,10 +352,10 @@ link format is the same one the Alfie code prints.
 
 ### Event: `scan_succeeded`
 
-**When**: An Alfie code is recognised and navigation begins
+**When**: An Alfie code is recognised, or a Barcode lookup matches, and navigation begins
 **Parameters**:
-- `handle`: String - The Product Handle from the code
-- `has_sku`: Bool - Whether the code carried a SKU
+- `handle`: String - The Product Handle from the code; for a Barcode, the matched `productId`
+- `has_sku`: Bool - Whether the code carried a SKU; for a Barcode, whether the match carried a `variantId`
 
 ### Event: `scan_failed`
 
@@ -289,8 +363,8 @@ link format is the same one the Alfie code prints.
 **Parameters**:
 - `reason`: String - "barcode" | "unrecognised" | "permission_denied" | "unsupported" | "generic"
 
-`generic` covers a camera that exists and is permitted but will not start; `barcode` arrives with the
-manufacturer-Barcode ticket. See `ScanFailureReason`.
+`generic` covers a camera that exists and is permitted but will not start; `barcode` is a Barcode
+lookup that found nothing or failed (Scenarios 4c, 4d). The lookup adds no events. See `ScanFailureReason`.
 
 ---
 
@@ -305,6 +379,13 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 | Camera recognises two codes at once | The Alfie code wins, then a Barcode, then anything else; scanner stops recognising once one opens. Amended by #139: a Swing tag prints the Barcode beside the Alfie code, so "first wins" would correct a shopper who scanned correctly. The scanner reads a frame at a time and ranks what it holds — see `ScannedCode.precedence` |
 | Shopper scans while offline | Product Details shows its existing no-connection error state |
 | Shopper scans the same code twice quickly | Second scan is ignored while navigation is in flight |
+| Barcode is on several Products | BFF returns `null`; treated as not found (Scenario 4c) |
+| Barcode is on several Variants of one Product | Product opens on its default Variant (Scenario 4b) |
+| Any code arrives during a Barcode lookup | Ignored, Alfie codes included (Scenario 4e) |
+| Same Barcode rescanned after a notice | Looked up again |
+| Barcode scanned on a non-SCAYLE BFF | Query fails; lookup-failed notice (Scenario 4d) |
+| QR code holding thirteen digits | Unrecognised notice; not looked up |
+| Shopper taps _Back_ during a lookup | Lookup cancelled; nothing opens |
 | Shopper taps _Back_ while the viewfinder is green | The scanner closes and the Product does not open |
 | App is backgrounded mid-scan | Scanning stops and resumes when the screen reappears |
 
@@ -317,6 +398,7 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 - `DeepLinkServiceProtocol` (Core/Services) - Parse the scanned URL and route to Product Details
 - `AlfieAnalyticsTracker` (Core/Services) - Track scan events
 - `HapticsServiceProtocol` (Core/Services) - Success haptic on recognition
+- `ProductServiceProtocol` (Core/Services) - Resolve a Barcode through `productByBarcode`
 
 ### External Dependencies
 
@@ -343,13 +425,19 @@ manufacturer-Barcode ticket. See `ScanFailureReason`.
 
 ## Testing Strategy
 
-The seam is `CameraScanServiceProtocol`: the ViewModel receives recognised payload strings and is tested
-without a camera. Everything downstream of the payload is existing, already-tested code.
+The seams are `CameraScanServiceProtocol`, which hands the ViewModel `[ScannedPayload]`, and
+`ProductServiceProtocol` for the Barcode lookup, so the ViewModel is tested without a camera or BFF. Everything downstream of the payload is existing, already-tested code.
 
 ### Unit Tests (`ScannerTests`)
 
 - [ ] An Alfie code payload results in the URL being passed to `DeepLinkService`
-- [ ] An EAN-13 payload produces the unrecognised notice and does not navigate
+- [ ] An EAN-13 payload starts a lookup and shows the loader; a match opens the Product with and
+  without `variantId`; not found and failure show their notices; codes during a lookup are ignored;
+  closing cancels it; a QR holding digits is not looked up (`ScannerViewModelTests`)
+- [ ] Product Details preselects by `variantId` (`ProductDetailsViewModelTests`); `TabRoute` carries
+  `variantId` (`DeepLinkRoutingTests`)
+- [ ] `ProductService.productByBarcode` maps the BFF match (`ProductServiceTests`); an unknown code
+  returns `nil` against a real BFF (`BarcodeIntegrationTests`)
 - [ ] An Alfie code sets the recognised state and triggers a success haptic before navigating
 - [ ] Back during the confirmation opens nothing
 - [ ] A notice dismisses itself after four seconds; a repeated notice gets its own four seconds
@@ -381,6 +469,7 @@ Prior art: `Alfie/AlfieKit/Tests/DeepLinkTests/Parsers/ProductDetailsDeepLinkPar
 - [ ] Unrecognised notice
 - [ ] Recognised (green viewfinder)
 - [ ] Explainer sheet
+- [ ] Looking up a Barcode (`test_scanner_view_looking_up`)
 
 The camera preview itself is not tested — it is a system component, and the simulator has no camera.
 The developer will verify the camera path manually on device.
@@ -404,26 +493,25 @@ The developer will verify the camera path manually on device.
   with no location dimension, and neither adapter queries location-scoped inventory. The app cannot
   tell a shopper whether a size is in the store they are standing in. Scenario 3 states this
   explicitly on screen so nobody in the demo infers a capability that does not exist.
-- **Manufacturer Barcodes are not resolvable.** Only Alfie codes work.
-- **A Barcode acquired alone can flash its notice before the Alfie code is picked up.** The scanner
-  ranks everything the camera is *holding* (`allItems`), so once both codes on a tag are tracked the
-  Alfie code wins, and a code already answered is not answered twice as the set grows around it. But
+- **Manufacturer Barcodes resolve on SCAYLE only.** Other platforms fail the query and the shopper
+  sees the lookup-failed notice (ADR-0002). A Barcode on several Products is not resolvable at all.
+- **A Barcode acquired first wins over the Alfie code beside it.** The scanner ranks everything the
+  camera is *holding* (`allItems`), so once both codes on a tag are tracked the Alfie code wins. But
   a 1D Barcode locks on faster than a QR, and in the moment when it is the only thing tracked there
-  is nothing to tell the scanner an Alfie code is a frame away: the notice shows and one
-  `scan_failed reason=barcode` is recorded, then the Product opens.
+  is nothing to tell the scanner an Alfie code is a frame away: the Barcode lookup starts, and the
+  Alfie code joining the frame is ignored because every code is ignored during a lookup. On a match
+  the same Product opens anyway, only a lookup later. On not found or failure the shopper sees the
+  notice and one `scan_failed reason=barcode`, and re-presents the tag.
 
-  Note this sits outside Scenario 4, which is conditioned on recognising a Barcode *instead of* an
-  Alfie code — here the shopper scanned correctly and is briefly told they did not.
-
-  Closing it would mean holding the Barcode notice behind a short grace period and cancelling it if
-  an Alfie code joins. That is deliberately not done: it delays the honest Scenario 4 message, the
-  one case the ticket exists for, and adds a cancellable timer to every Barcode read. Revisit if the demo shows the flash actually reads badly.
+  Closing it would mean letting an Alfie code cancel an in-flight lookup. That is deliberately not
+  done: ignoring codes while looking up is what keeps one tag from producing two navigations, and
+  the common outcome — a match — lands on the right Product regardless.
 - **A code arriving beside an already-answered Barcode gets no notice of its own.** The scanner
   answers one code per frame and suppresses a code it has already answered. When a Barcode is still
   in view and an unrecognised QR joins it, the Barcode wins on precedence and is then suppressed as
-  a repeat, so the frame is answered with silence: the shopper sees the earlier Barcode notice,
-  which may still be on screen, but nothing is said about the new code. Covered by
-  `test_aBarcodeStillInViewAsAnotherCodeJoinsIsAnsweredOnce`.
+  a repeat, so the frame is answered with silence and no second lookup runs: the shopper sees the
+  earlier not-found or lookup-failed notice, which may still be on screen, but nothing is said about
+  the new code. Covered by `test_barcode_still_in_view_as_another_code_joins_is_looked_up_once`.
 
   This is the cost of the rule that stops one physical code producing two notices and two
   `scan_failed` events, and it is paid in the case that matters least — the shopper is holding a
@@ -440,8 +528,8 @@ The developer will verify the camera path manually on device.
 
 - Alfie code payload format: `https://localhost:4000/product/<handle>?sku=<sku>`. The `sku`
   selects the Variant the shopper arrives on.
-- Configure the scanner for QR **and** EAN-13. EAN-13 is recognised only in order to answer it with the
-  unrecognised notice; it is never resolved.
+- Configure the scanner for QR **and** EAN-13. Each payload keeps the symbology VisionKit reported, and
+  only an EAN-13 read is looked up.
 - Gate the scanner on both `DataScannerViewController.isSupported` and `.isAvailable`.
 - `ProductDetailsDeepLinkParser` currently captures a single path segment, so a Handle containing
   `/` fails to parse and falls through to the web view. This is a pre-existing defect that affects
@@ -469,7 +557,14 @@ The developer will verify the camera path manually on device.
 
 - [x] Resolve the manufacturer's Barcode, or print our own code?
   - **Decision**: Print our own Alfie code. Barcode lookup is not possible with the BFF's
-    credentials. See ADR-0001.
+    credentials. See ADR-0001. _Partly superseded 2026-09-17 below: Alfie codes are still printed
+    and preferred, but Barcodes now resolve on SCAYLE._
+- [x] Resolve the manufacturer's Barcode after all? (2026-09-17)
+  - **Decision**: Yes, on SCAYLE, through the BFF's `productByBarcode` (Alfie-BFF PR #46). See
+    ADR-0002. Classify by reported symbology rather than the check-digit heuristic; show a loader
+    and ignore all codes while looking up; open a match through the existing deep-link path with an
+    optional `variantId`; answer not-found and failure with self-dismissing notices. No new analytics
+    events.
 - [x] What does the Alfie code contain?
   - **Decision**: An `https` URL. It is parsed in-app, so no associated-domains entitlement is
     needed, and the format survives into a later phase that adds a real host.
@@ -489,7 +584,8 @@ The developer will verify the camera path manually on device.
     slips (garbled scanner guidance, "Scan Barcode"/"Scan barcode", "Shippings", mixed £/$) go back
     to the designer.
 - [x] Recognise EAN-13?
-  - **Decision**: Yes, to show a helpful message. It is the most likely demo mishap.
+  - **Decision**: Yes, to show a helpful message. It is the most likely demo mishap. _Since
+    2026-09-17 it is looked up instead (ADR-0002)._
 
 ### Open Questions
 
@@ -506,3 +602,4 @@ The developer will verify the camera path manually on device.
 | 2026-09-12 | Spec squared with the shipped code after review: Navigation block corrected to the `openScannedLink` seam, parser scope and the `TabRoute`/`IconLayout` additions recorded, per-frame notice limitation documented, status set to Implemented | Khoi Nguyen |
 | 2026-09-14 | Figma flow review (`/grill-with-docs`): explainer sheet (Scenario 1a), full-screen scanner with square viewfinder and success feedback, single self-dismissing notice in the design's wording, Variant preselection by SKU; manual entry and torch dropped | Khoi Nguyen |
 | 2026-09-14 | Review fixes: explainer is a native sheet owned by `ScannerViewModel` and skipped on unsupported devices; Back cancels the pending open; notice timer and close button in the ViewModel/view; header stays black in failure states; `sku` preselection documented as applying to all product links | Khoi Nguyen |
+| 2026-09-17 | ADR-0002: Barcodes resolved through the BFF's `productByBarcode` on SCAYLE (Alfie-BFF PR #46); symbology-based classification; Scenario 4 replaced by lookup scenarios 4–4f; `variantId` deep-link preselection; lookup keys, edge cases, limitation and tests updated | Khoi Nguyen |

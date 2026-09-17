@@ -528,6 +528,18 @@ public enum L10n {
       /// Scan a tag
       public static let title = L10n.tr("L10n", "scanner.intro.title")
     }
+    public enum Lookup {
+      /// Finding product…
+      public static let message = L10n.tr("L10n", "scanner.lookup.message")
+    }
+    public enum LookupFailed {
+      /// Something went wrong. Try scanning again.
+      public static let message = L10n.tr("L10n", "scanner.lookup_failed.message")
+    }
+    public enum NotFound {
+      /// We couldn't find this product.
+      public static let message = L10n.tr("L10n", "scanner.not_found.message")
+    }
     public enum Unrecognised {
       /// We don't recognize this barcode.
       public static let message = L10n.tr("L10n", "scanner.unrecognised.message")
@@ -880,6 +892,9 @@ public extension L10n {
       case scannerIntroMessage = "scanner.intro.message"
       case scannerIntroNotNow = "scanner.intro.not_now"
       case scannerIntroTitle = "scanner.intro.title"
+      case scannerLookupMessage = "scanner.lookup.message"
+      case scannerLookupFailedMessage = "scanner.lookup_failed.message"
+      case scannerNotFoundMessage = "scanner.not_found.message"
       case scannerUnrecognisedMessage = "scanner.unrecognised.message"
       case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
       case searchScreenEmptyViewTitle = "search.screen.empty_view.title"

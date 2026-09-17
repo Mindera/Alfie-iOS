@@ -4,6 +4,7 @@ import Foundation
 
 public struct DeepLink {
     public static let skuQueryItem = "sku"
+    public static let variantIdQueryItem = "variantId"
 
     public enum LinkType: Equatable {
         case unknown

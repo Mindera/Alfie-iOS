@@ -9,9 +9,9 @@ import SwiftUI
 ///
 /// The scanner deliberately owns no navigation of its own. An Alfie code carries an Alfie link, so
 /// a recognised code is handed back to the flow, which passes it to the deep-link path the app
-/// already uses for a tapped link, and that path decides where it lands. ADR-0001 is what makes
-/// this possible: it puts the Handle inside the code, so there is nothing to look up and no new
-/// route to add.
+/// already uses for a tapped link, and that path decides where it lands. ADR-0001 puts the Handle
+/// inside an Alfie code, so there is nothing to look up. A Barcode is looked up through the catalogue
+/// first, and the Product it names leaves through the same path (ADR-0002).
 ///
 /// It does own what the shopper is told when that does not happen, and the distinction it draws is
 /// between a scan that failed and a camera that cannot run. A code that opens nothing in Alfie is
@@ -22,6 +22,7 @@ import SwiftUI
 public final class ScannerViewModel: ScannerViewModelProtocol {
     private let scanService: CameraScanServiceProtocol
     private let deepLinkService: DeepLinkServiceProtocol
+    private let productService: ProductServiceProtocol
     private let analytics: AlfieAnalyticsTracker
     private let haptics: HapticsServiceProtocol
     private let schedule: (TimeInterval, @escaping () -> Void) -> Void
@@ -47,12 +48,14 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     /// again as the set grows around it. See ``hasAnswered(_:whenHolding:nowHolding:)``.
     private var lastHeldPayloads: Set<String> = []
     private var subscriptions = Set<AnyCancellable>()
+    private var lookupTask: Task<Void, Never>?
 
     public var title: String { L10n.Scanner.title }
     public var preview: AnyView { scanService.makePreview() }
     public var guidance: String? { state.value?.guidance }
     public var notice: ScannerNotice? { state.value?.notice }
     public var isRecognised: Bool { state.value?.isRecognised ?? false }
+    public var isLookingUp: Bool { state.value?.isLookingUp ?? false }
     @Published public private(set) var state: ViewState<ScannerViewStateModel, ScannerViewErrorType> = initialState
     @Published public private(set) var isExplainingCameraAccess: Bool
 
@@ -78,6 +81,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     ) {
         self.scanService = dependencies.makeScanService()
         self.deepLinkService = dependencies.deepLinkService
+        self.productService = dependencies.productService
         self.analytics = dependencies.analytics
         self.haptics = dependencies.haptics
         self.schedule = dependencies.schedule
@@ -88,6 +92,10 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         self.close = close
         self.isExplainingCameraAccess = scanService.canAskForCameraAccess
         setupBindings()
+    }
+
+    deinit {
+        lookupTask?.cancel()
     }
 
     private func setupBindings() {
@@ -123,6 +131,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
     public func didTapClose() {
         isClosed = true
+        cancelLookup()
         close()
     }
 
@@ -166,7 +175,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         guard let model = state.value else { return }
         noticeCount += 1
         let id = noticeCount
-        state = .success(model.with(notice: .init(id: id, message: message)))
+        state = .success(model.with(isLookingUp: false).with(notice: .init(id: id, message: message)))
         schedule(Self.noticeDuration) { [weak self] in
             guard let self, notice?.id == id else { return }
             didDismissNotice()
@@ -188,24 +197,19 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             lastHeldPayloads = []
             scanService.startScanning()
         } else {
+            cancelLookup()
             scanService.stopScanning()
         }
     }
 
     /// Acts on one code per frame, and on the one the shopper meant. A Swing tag prints the Barcode
     /// beside the Alfie code, so both are routinely read at once; ``ScannedCode/precedence`` is what
-    /// settles which is answered.
-    ///
-    /// Neither thing said here goes near the network. A code that is not ours is not looked up
-    /// because nothing in Alfie answers to it, and a Barcode is not looked up because nothing *can*
-    /// — the credentials to resolve one do not exist, which is the reason Alfie prints its own code
-    /// (ADR-0001). Both are said over a camera that keeps running: the shopper is standing at the
-    /// rail, and the fix is the next code along.
-    private func didRecognise(payloads: [String]) {
-        guard !hasOpenedLink else { return }
+    /// settles which is answered. Nothing is acted on while a Barcode is being looked up.
+    private func didRecognise(payloads: [ScannedPayload]) {
+        guard !hasOpenedLink, lookupTask == nil else { return }
 
         let previouslyHeld = lastHeldPayloads
-        let nowHeld = Set(payloads)
+        let nowHeld = Set(payloads.map(\.value))
         lastHeldPayloads = nowHeld
 
         switch payloads.map(classify(payload:)).codeToActOn {
@@ -214,9 +218,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
         case .barcode(let value):
             guard !hasAnswered(value, whenHolding: previouslyHeld, nowHolding: nowHeld) else { return }
-            log.debug("Scanned the manufacturer's Barcode, which Alfie cannot resolve: \(value)")
-            analytics.trackScanFailed(reason: .barcode)
-            show(notice: L10n.Scanner.Unrecognised.message)
+            lookUp(barcode: value)
 
         case .unrecognised(let payload):
             guard !hasAnswered(payload, whenHolding: previouslyHeld, nowHolding: nowHeld) else { return }
@@ -247,22 +249,74 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         nowHeld != previouslyHeld && previouslyHeld.contains(payload)
     }
 
-    /// The deep-link service is asked what the code is, not asked to open it: classifying the
+    /// The deep-link service is asked what a QR code is, not asked to open it: classifying the
     /// payload is the scanner's job — a code that opens nothing must leave the camera running —
     /// while opening the page belongs to the flow.
-    ///
-    /// Tried as an Alfie link first, so the one code that is worth resolving is never mistaken for
-    /// one of the two that are not.
-    private func classify(payload: String) -> ScannedCode {
-        if let url = URL(string: payload), opensInApp(deepLinkService.deepLinkType(url)) {
-            return .alfieCode(url)
+    private func classify(payload: ScannedPayload) -> ScannedCode {
+        switch payload.symbology {
+        case .ean13:
+            return .barcode(value: payload.value)
+        case .qr:
+            if let url = URL(string: payload.value), opensInApp(deepLinkService.deepLinkType(url)) {
+                return .alfieCode(url)
+            }
+            return .unrecognised(payload: payload.value)
         }
+    }
 
-        if ScannedCode.isBarcode(payload) {
-            return .barcode(value: payload)
+    private func lookUp(barcode: String) {
+        if let model = state.value {
+            state = .success(model.with(isLookingUp: true))
         }
+        lookupTask = Task { @MainActor [weak self, productService] in
+            let result: Result<BarcodeMatch?, Error>
+            do {
+                result = .success(try await productService.productByBarcode(barcode))
+            } catch {
+                result = .failure(error)
+            }
+            guard let self, !Task.isCancelled else { return }
+            finishLookUp(of: barcode, with: result)
+        }
+    }
 
-        return .unrecognised(payload: payload)
+    private func finishLookUp(of barcode: String, with result: Result<BarcodeMatch?, Error>) {
+        lookupTask = nil
+
+        switch result {
+        case .success(let match?):
+            guard let url = productLink(for: match) else {
+                show(notice: L10n.Scanner.LookupFailed.message)
+                return
+            }
+            open(url)
+
+        case .success(nil):
+            log.debug("No Product carries the scanned Barcode: \(barcode)")
+            analytics.trackScanFailed(reason: .barcode)
+            show(notice: L10n.Scanner.NotFound.message)
+
+        case .failure(let error):
+            log.error("Looking up the scanned Barcode failed: \(error)")
+            analytics.trackScanFailed(reason: .barcode)
+            show(notice: L10n.Scanner.LookupFailed.message)
+        }
+    }
+
+    private func cancelLookup() {
+        lookupTask?.cancel()
+        lookupTask = nil
+    }
+
+    private func productLink(for match: BarcodeMatch) -> URL? {
+        var components = URLComponents()
+        components.scheme = ThemedURL.internalScheme
+        components.host = ThemedURL.internalHost
+        components.path = "/product/\(match.productId)"
+        if let variantId = match.variantId {
+            components.queryItems = [URLQueryItem(name: DeepLink.variantIdQueryItem, value: variantId)]
+        }
+        return components.url
     }
 
     private func open(_ url: URL) {
@@ -288,7 +342,8 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         guard case .productDetail(let handle, _, let query) = deepLinkService.deepLinkType(url) else {
             return
         }
-        analytics.trackScanSucceeded(handle: handle, hasSku: query?[DeepLink.skuQueryItem] != nil)
+        let hasVariant = query?[DeepLink.skuQueryItem] != nil || query?[DeepLink.variantIdQueryItem] != nil
+        analytics.trackScanSucceeded(handle: handle, hasSku: hasVariant)
     }
 
     /// Whether a scanned link reaches somewhere in the app.
