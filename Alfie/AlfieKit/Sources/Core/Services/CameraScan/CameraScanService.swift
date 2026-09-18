@@ -3,6 +3,7 @@ import AVFoundation
 import Combine
 import Model
 import SwiftUI
+import Vision
 import VisionKit
 
 /// The real camera, via VisionKit's `DataScannerViewController`.
@@ -206,18 +207,31 @@ extension CameraScanService: DataScannerViewControllerDelegate {
         // tag with "that's the product barcode" on the strength of the half of it that arrived
         // first — then open the Product a moment later anyway.
         let payloads = allItems.compactMap { item -> ScannedPayload? in
-            guard case .barcode(let barcode) = item, let value = barcode.payloadStringValue else { return nil }
-            switch barcode.observation.symbology {
-            case .qr:
-                return .qr(value)
-            case .ean13:
-                return .ean13(value)
-            default:
-                return nil
-            }
+            guard case .barcode(let barcode) = item else { return nil }
+            return Self.payload(for: barcode.observation.symbology, value: barcode.payloadStringValue)
         }
         guard !payloads.isEmpty else { return }
         payloadsSubject.send(payloads)
+    }
+}
+
+// MARK: - Payload mapping
+
+extension CameraScanService {
+    /// Which symbologies become a payload, kept out of the delegate callback so it can be asserted:
+    /// `RecognizedItem` has no public initialiser, so nothing reaching VisionKit's own types is
+    /// reachable from a test.
+    static func payload(for symbology: VNBarcodeSymbology, value: String?) -> ScannedPayload? {
+        guard let value else { return nil }
+
+        switch symbology {
+        case .qr:
+            return .qr(value)
+        case .ean13:
+            return .ean13(value)
+        default:
+            return nil
+        }
     }
 }
 
