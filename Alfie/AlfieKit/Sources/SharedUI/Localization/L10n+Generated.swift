@@ -44,10 +44,28 @@ public enum L10n {
     public static let wishlist = L10n.tr("L10n", "accessibility.wishlist")
   }
   public enum Account {
+    /// My Address Book
+    public static let addressBook = L10n.tr("L10n", "account.address_book")
+    /// Hi, Alfie
+    public static let greeting = L10n.tr("L10n", "account.greeting")
+    /// Member since 2024
+    public static let memberSince = L10n.tr("L10n", "account.member_since")
+    /// Orders
+    public static let orders = L10n.tr("L10n", "account.orders")
+    /// Personal Information
+    public static let personalInformation = L10n.tr("L10n", "account.personal_information")
     /// Settings
     public static let settings = L10n.tr("L10n", "account.settings")
+    /// Sign In
+    public static let signIn = L10n.tr("L10n", "account.sign_in")
+    /// Sign Out
+    public static let signOut = L10n.tr("L10n", "account.sign_out")
     /// Account
     public static let title = L10n.tr("L10n", "account.title")
+    /// Wallet
+    public static let wallet = L10n.tr("L10n", "account.wallet")
+    /// Wishlist
+    public static let wishlist = L10n.tr("L10n", "account.wishlist")
   }
   public enum Bag {
     /// Bag
@@ -780,8 +798,17 @@ public extension L10n {
       case accessibilitySettings = "accessibility.settings"
       case accessibilityShare = "accessibility.share"
       case accessibilityWishlist = "accessibility.wishlist"
+      case accountAddressBook = "account.address_book"
+      case accountGreeting = "account.greeting"
+      case accountMemberSince = "account.member_since"
+      case accountOrders = "account.orders"
+      case accountPersonalInformation = "account.personal_information"
       case accountSettings = "account.settings"
+      case accountSignIn = "account.sign_in"
+      case accountSignOut = "account.sign_out"
       case accountTitle = "account.title"
+      case accountWallet = "account.wallet"
+      case accountWishlist = "account.wishlist"
       case bagTitle = "bag.title"
       case bagAmountUnavailable = "bag.amount.unavailable"
       case bagEmptyMessage = "bag.empty.message"

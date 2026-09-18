@@ -200,6 +200,61 @@
         }
       }
     },
+    "account.address_book" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My Address Book"
+          }
+        }
+      }
+    },
+    "account.greeting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi, Alfie"
+          }
+        }
+      }
+    },
+    "account.member_since" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Member since 2024"
+          }
+        }
+      }
+    },
+    "account.orders" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orders"
+          }
+        }
+      }
+    },
+    "account.personal_information" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal Information"
+          }
+        }
+      }
+    },
     "account.settings" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -211,6 +266,28 @@
         }
       }
     },
+    "account.sign_in" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In"
+          }
+        }
+      }
+    },
+    "account.sign_out" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        }
+      }
+    },
     "account.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -218,6 +295,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Account"
+          }
+        }
+      }
+    },
+    "account.wallet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wallet"
+          }
+        }
+      }
+    },
+    "account.wishlist" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wishlist"
           }
         }
       }

@@ -2,56 +2,39 @@ import SharedUI
 import SwiftUI
 
 struct AccountSectionView: View {
-    private var section: AccountSection
-    private var hiddenDividerTop: Bool
-    private var hiddenDividerBottom: Bool
+    private let section: AccountSection
 
-    init(for section: AccountSection, hiddenDividerTop: Bool = false, hiddenDividerBottom: Bool = false) {
+    init(for section: AccountSection) {
         self.section = section
-        self.hiddenDividerTop = hiddenDividerTop
-        self.hiddenDividerBottom = hiddenDividerBottom
     }
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
-            if !hiddenDividerTop {
-                ThemedDivider.horizontalThin
-            }
-            HStack(alignment: .center) {
-                iconForImage(section.icon.image)
-                Text.build(theme.font.body.medium(section.title))
-                Spacer()
-                Icon.chevronRight.image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: AccountConstants.iconSize, height: AccountConstants.iconSize)
-                    .accessibilityIdentifier(AccessibilityId.actionIcon)
-            }
-            .frame(minHeight: AccountConstants.sectionHeight)
-            if !hiddenDividerBottom {
-                ThemedDivider.horizontalThin
-            }
-        }
-    }
+        HStack(spacing: Primitives.Spacing.spacing8) {
+            section.icon.image
+                .resizable()
+                .scaledToFit()
+                .frame(width: AccountConstants.iconSize, height: AccountConstants.iconSize)
+                .accessibilityIdentifier(AccessibilityId.sectionIcon)
 
-    private func iconForImage(_ image: Image) -> some View {
-        image.resizable()
-            .scaledToFit()
-            .frame(width: AccountConstants.iconSize, height: AccountConstants.iconSize)
-            .accessibilityIdentifier(AccessibilityId.sectionIcon)
+            Text.build(theme.font.body.medium(section.title))
+                .foregroundStyle(Theme.contentContentPrimary)
+
+            Spacer()
+        }
+        .padding(.vertical, Primitives.Spacing.spacing12)
+        .frame(minHeight: AccountConstants.sectionHeight)
     }
 
     private enum AccountConstants {
-        static let iconSize: CGFloat = Sizing.iconsIconSmall
-        static let sectionHeight: CGFloat = 60
+        static let iconSize: CGFloat = Sizing.iconsIconMedium
+        static let sectionHeight: CGFloat = 48
     }
 }
 
 private enum AccessibilityId {
-    static let actionIcon = "action-icon"
     static let sectionIcon = "section-icon"
 }
 
 #Preview {
-    AccountSectionView(for: .myDetails)
+    AccountSectionView(for: .personalInformation)
 }
