@@ -98,6 +98,38 @@ public actor CartService: CartServiceProtocol {
         cartSubject.send(cart)
     }
 
+    public func setQuantity(lineId: String, to quantity: Int) async throws {
+        try await serialised { try await self.changeQuantity(ofLine: lineId, to: quantity) }
+    }
+
+    private func changeQuantity(ofLine lineId: String, to quantity: Int) async throws {
+        guard let heldCart = cartSubject.value, heldCart.lines.contains(where: { $0.id == lineId }) else {
+            throw BFFRequestError(type: .generic)
+        }
+
+        do {
+            if quantity > 0 {
+                try await replaceQuantity(ofLine: lineId, to: quantity, in: heldCart)
+            } else {
+                try await dropLine(id: lineId)
+            }
+        } catch {
+            try? await read()
+            throw error
+        }
+    }
+
+    private func replaceQuantity(ofLine lineId: String, to quantity: Int, in heldCart: Cart) async throws {
+        guard let cartId = storedCartId else {
+            throw BFFRequestError(type: .generic)
+        }
+
+        let lines = heldCart.lines.map { $0.asUpdate(quantity: $0.id == lineId ? quantity : $0.quantity) }
+        let cart = try await bffClient.updateCart(cartId: cartId, lines: lines)
+        userDefaults.set(cart.id, for: storageKey)
+        cartSubject.send(cart)
+    }
+
     private func write(line: CartLineInput) async throws {
         // The first add creates the cart carrying the line, so create-and-add costs one round trip
         // rather than two.

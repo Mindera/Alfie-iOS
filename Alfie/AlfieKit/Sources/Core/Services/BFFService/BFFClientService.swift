@@ -40,6 +40,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             client: client,
             store: store,
             reachabilityService: dependencies.reachabilityService,
+            apiKeyService: dependencies.apiKeyService,
             logRequests: logRequests,
             log: log
         )
@@ -93,6 +94,23 @@ public final class BFFClientService: BFFClientServiceProtocol {
             return product.fragments.productDetailsFragment.convertToProduct()
         } catch {
             log.error("productDetails failed: \(error)")
+            throw error
+        }
+    }
+
+    public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
+        log.info("productByBarcode → barcode=\(barcode)")
+
+        do {
+            let match = try await executeFetch(
+                BFFGraphAPI.ProductByBarcodeQuery(barcode: barcode)
+            ).productByBarcode
+
+            log.info("productByBarcode ← productId=\(match?.id ?? "nil") variantId=\(match?.variantId ?? "nil")")
+
+            return match.map { BarcodeMatch(productId: $0.id, variantId: $0.variantId) }
+        } catch {
+            log.error("productByBarcode failed: \(error)")
             throw error
         }
     }
@@ -196,7 +214,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         let url = baseUrl.appending(path: BFFEndpoint.webviewConfig.rawValue)
         do {
-            return try await dependencies.restNetworkClient.getData(from: url, authenticationToken: nil)
+            return try await dependencies.restNetworkClient.getData(
+                from: url,
+                authenticationToken: dependencies.apiKeyService.currentApiKey
+            )
         } catch {
             throw BFFRequestError(type: .generic)
         }
@@ -258,6 +279,29 @@ public final class BFFClientService: BFFClientServiceProtocol {
             return cart
         } catch {
             log.error("removeFromCart failed: \(error)")
+            throw error
+        }
+    }
+
+    public func updateCart(cartId: String, lines: [CartLineUpdate]) async throws -> Cart {
+        log.info("updateCart → cartId=\(cartId) lines=\(lines.count)")
+
+        do {
+            let cart = try await executeMutation(
+                BFFGraphAPI.UpdateCartMutation(
+                    input: BFFGraphAPI.UpdateCartInput(
+                        cartId: cartId,
+                        lines: lines.map(BFFGraphAPI.UpdateCartLineInput.init(domain:))
+                    )
+                ),
+                mapError: { $0.mappingCartNotFound() }
+            ).updateCart.fragments.cartFragment.convertToCart()
+
+            log.info("updateCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
+            logUnrepresentableAmounts(in: cart, operation: "updateCart")
+            return cart
+        } catch {
+            log.error("updateCart failed: \(error)")
             throw error
         }
     }

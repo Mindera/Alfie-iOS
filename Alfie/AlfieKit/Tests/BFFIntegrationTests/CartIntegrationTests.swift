@@ -46,6 +46,49 @@ final class CartIntegrationTests: IntegrationTestCase {
         try assertTotalsAreConsistent(readBack)
     }
 
+    func test_updateCart_sets_one_lines_quantity_and_leaves_the_other_untouched() async throws {
+        let (first, second) = try await twoAddableVariants()
+        let cart = try await sut.createCart(lines: [first])
+        let twoLines = try await sut.addToCart(cartId: cart.id, lines: [second])
+        let firstLine = try XCTUnwrap(twoLines.lines.first { $0.variantId == first.variantId })
+        let secondLine = try XCTUnwrap(twoLines.lines.first { $0.variantId == second.variantId })
+
+        let updated = try await sut.updateCart(
+            cartId: cart.id,
+            lines: [firstLine.asUpdate(quantity: 4), secondLine.asUpdate(quantity: secondLine.quantity)]
+        )
+
+        XCTAssertEqual(updated.lines.count, 2, "Neither line may be dropped by a quantity change")
+        XCTAssertEqual(updated.lines.first { $0.variantId == first.variantId }?.quantity, 4)
+        XCTAssertEqual(updated.lines.first { $0.variantId == second.variantId }?.quantity, secondLine.quantity)
+        try assertTotalsAreConsistent(updated)
+    }
+
+    func test_updateCart_quantity_survives_a_fresh_read() async throws {
+        let (first, _) = try await twoAddableVariants()
+        let cart = try await sut.createCart(lines: [first])
+        let line = try XCTUnwrap(cart.lines.first)
+
+        _ = try await sut.updateCart(cartId: cart.id, lines: [line.asUpdate(quantity: 3)])
+
+        let readBack = try await sut.getCart(cartId: cart.id)
+        XCTAssertEqual(readBack.lines.first?.quantity, 3, "The server must have kept the new quantity")
+        XCTAssertEqual(readBack.totalQuantity, 3)
+    }
+
+    func test_updateCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        let (first, _) = try await twoAddableVariants()
+        let cart = try await sut.createCart(lines: [first])
+        let line = try XCTUnwrap(cart.lines.first)
+
+        do {
+            _ = try await sut.updateCart(cartId: "does-not-exist", lines: [line.asUpdate(quantity: 2)])
+            XCTFail("An update against an unknown cart must throw")
+        } catch let error as BFFRequestError {
+            XCTAssertEqual(error.type, .cart(.cartNotFound))
+        }
+    }
+
     func test_every_line_carries_both_a_product_id_and_a_variant_id() async throws {
         // BigCommerce throws BadRequestException on a line without `productId`; Shopify ignores it.
         // Sending both is the only input shape that works on either platform.

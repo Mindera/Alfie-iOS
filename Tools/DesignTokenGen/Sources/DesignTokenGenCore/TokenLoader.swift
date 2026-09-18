@@ -17,10 +17,9 @@ public enum TokenLoader {
     static let modeForCollection: [String: String] = [
         "system": "ios",
         "screen-size": "small-(s)",
-        "theme": "alfie-theme",
-        // Upstream added a second `new-theme` mode; iOS still ships the Alfie brand, and
-        // pull-design-tokens.sh only copies the alfie-theme file.
-        ".primitives": "alfie-theme",
+        // The Selfridges demo export replaces every brand mode with a single `selfridges-theme`.
+        "theme": "selfridges-theme",
+        ".primitives": "selfridges-theme",
     ]
     static let documentationPrefix = "~~doc-"
 

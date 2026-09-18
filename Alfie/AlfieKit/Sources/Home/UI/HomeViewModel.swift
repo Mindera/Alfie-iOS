@@ -8,8 +8,10 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     private let sessionService: SessionServiceProtocol
     private let configurationService: ConfigurationServiceProtocol
     private let apiEndpointService: ApiEndpointServiceProtocol
+    private let bffApiKeyService: BFFApiKeyServiceProtocol
     private let navigate: (HomeRoute) -> Void
     private let showSearch: () -> Void
+    private let showScanner: () -> Void
     @Published private var isUserSignedIn = false
     private var subscriptions: Set<AnyCancellable> = []
 
@@ -29,13 +31,16 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     init(
         dependencies: HomeDependencyContainer,
         navigate: @escaping (HomeRoute) -> Void,
-        showSearch: @escaping () -> Void
+        showSearch: @escaping () -> Void,
+        showScanner: @escaping () -> Void
     ) {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
         self.apiEndpointService = dependencies.apiEndpointService
+        self.bffApiKeyService = dependencies.bffApiKeyService
         self.navigate = navigate
         self.showSearch = showSearch
+        self.showScanner = showScanner
 
         setupBindings()
     }
@@ -60,6 +65,7 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
                 viewModel: DebugMenuViewModel(
                     configurationService: configurationService,
                     apiEndpointService: apiEndpointService,
+                    bffApiKeyService: bffApiKeyService,
                     closeMenuAction: { [weak self] in self?.fullScreenCover = nil
                     },
                     openForceAppUpdate: { [weak self] in
@@ -79,5 +85,9 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
 
     public func didTapSearch() {
         showSearch()
+    }
+
+    public func didTapScan() {
+        showScanner()
     }
 }

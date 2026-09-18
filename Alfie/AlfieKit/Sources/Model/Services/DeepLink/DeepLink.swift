@@ -3,6 +3,9 @@ import Foundation
 // MARK: - DeepLink
 
 public struct DeepLink {
+    public static let skuQueryItem = "sku"
+    public static let variantIdQueryItem = "variantId"
+
     public enum LinkType: Equatable {
         case unknown
         case webView(url: URL)
@@ -16,7 +19,7 @@ public struct DeepLink {
 
         // Screens
         case productList(category: String, query: String?, urlParameters: [String: String]?)
-        case productDetail(slug: String, route: String?, query: [String: String]?)
+        case productDetail(handle: String, route: String?, query: [String: String]?)
 
         public func configurationKey() -> ConfigurationKey? {
             // In case a link type depends on a specific feature toggle to be enabled, return the key here

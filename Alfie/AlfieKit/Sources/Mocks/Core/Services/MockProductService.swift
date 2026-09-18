@@ -12,6 +12,11 @@ public final class MockProductService: ProductServiceProtocol {
         return product
     }
 
+    public var onProductByBarcodeCalled: ((String) async throws -> BarcodeMatch?)?
+    public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
+        try await onProductByBarcodeCalled?(barcode)
+    }
+
     public var onProductListCalled: ((String, String?, Int, String?, ProductFilterInput?) throws -> ProductListing)?
     public func productList(
         collectionHandle: String,

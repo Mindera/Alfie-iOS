@@ -4,6 +4,7 @@ import Model
 import MyAccount
 import ProductDetails
 import ProductListing
+import Scanner
 import Search
 import SwiftUI
 import Web
@@ -13,9 +14,16 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public typealias Route = HomeRoute
     @Published public var path = NavigationPath()
     private let dependencies: HomeFlowDependencyContainer
-    @Published private var isSearchPresented = false
-    @Published private var overlayView: AnyView?
-    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
+    /// Which screen, if any, is covering the tab. One value rather than a flag per screen, so a
+    /// second overlay cannot open behind the first and so `tabOverlay` has a single writer.
+    private enum Overlay {
+        case search
+        case scanner
+    }
+
+    @Published private var overlay: Overlay?
+    @Published private var tabOverlay: TabOverlay?
+    public var overlayPublisher: AnyPublisher<TabOverlay?, Never> { $tabOverlay.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
@@ -24,7 +32,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             intentViewBuilder: { [weak self] in
                 self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
             },
-            closeSearchAction: { [weak self] in self?.isSearchPresented = false }
+            closeSearchAction: { [weak self] in self?.overlay = nil }
         )
     }()
 
@@ -34,17 +42,43 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     }
 
     private func setupBindings() {
-        $isSearchPresented
-            .sink { [weak self] isSearchPresented in
+        $overlay
+            .sink { [weak self] overlay in
                 guard let self else { return }
 
-                if isSearchPresented {
-                    overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
-                } else {
-                    overlayView = nil
+                switch overlay {
+                case .search:
+                    tabOverlay = TabOverlay(
+                        view: AnyView(SearchFlowView(viewModel: searchFlowViewModel)),
+                        hidesTabBar: false
+                    )
+
+                case .scanner:
+                    tabOverlay = TabOverlay(
+                        view: AnyView(ScannerView(viewModel: makeScannerViewModel())),
+                        hidesTabBar: true
+                    )
+
+                case nil:
+                    tabOverlay = nil
                 }
             }
             .store(in: &subscriptions)
+    }
+
+    public func dismissOverlay() {
+        overlay = nil
+    }
+
+    /// Closing clears the overlay as well as dismissing the screen, so the flow does not go on
+    /// believing the scanner is up and refuse to present it a second time. The rest of the wiring is
+    /// the same on every tab — see ``ScannerPresentation``.
+    private func makeScannerViewModel() -> ScannerViewModel {
+        ScannerPresentation.makeViewModel(
+            dependencies: dependencies.scannerDependencyContainer,
+            source: .searchBar,
+            close: { [weak self] in self?.overlay = nil }
+        )
     }
 
     // MARK: - View Models for HomeRoute
@@ -53,7 +87,8 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         HomeViewModel(
             dependencies: dependencies.homeDependencyContainer,
             navigate: { [weak self] route in self?.navigate(route) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.overlay = .search },
+            showScanner: { [weak self] in self?.overlay = .scanner }
         )
     }
 
@@ -73,7 +108,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.overlay = .search }
         )
     }
 
@@ -129,7 +164,9 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         }
     }
 
-    private func makeProductListingViewModelForSearch(
+    /// Internal rather than private so a test can reach it: it is otherwise only called from inside
+    /// a closure handed to `SearchFlowViewModel`, which no unit test drives.
+    func makeProductListingViewModelForSearch(
         searchTerm: String?,
         category: String?
     ) -> some ProductListingViewModelProtocol {
@@ -146,45 +183,8 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             searchText: configuration.searchText,
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
-            navigate: { [weak self] route in
-                switch route {
-                case .productDetails(let productDetailsRoute):
-                    let productID: String
-                    let product: Product?
-
-                    switch productDetailsRoute {
-                    case .productDetails(let configuration):
-                        switch configuration {
-                        case .id(let configurationProductID), .deepLink(let configurationProductID):
-                            productID = configurationProductID
-                            product = nil
-
-                        case .product(let configurationProduct):
-                            productID = configurationProduct.id
-                            product = configurationProduct
-
-                        case .selectedProduct(let selectedProduct):
-                            productID = selectedProduct.product.id
-                            product = selectedProduct.product
-                        }
-
-                        self?.searchFlowViewModel.navigate(
-                            .searchIntent(.productDetails(productID: productID, product: product))
-                        )
-
-                    case .webFeature(let feature):
-                        self?.searchFlowViewModel.navigate(.searchIntent(.webFeature(feature)))
-                    }
-
-                case .productListing(let configuration):
-                    self?.searchFlowViewModel.navigate(
-                        .searchIntent(
-                            .productListing(searchTerm: configuration.searchText, category: configuration.category)
-                        )
-                    )
-                }
-            },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },
+            showSearch: { [weak self] in self?.overlay = .search }
         )
     }
 

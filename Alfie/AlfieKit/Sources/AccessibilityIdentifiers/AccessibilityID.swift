@@ -13,6 +13,14 @@ public enum AccessibilityID {
         public static let item = "brands.item.button"
     }
 
+    // MARK: - Quantity stepper
+
+    public enum QuantityStepper {
+        public static let value = "quantityStepper.value.label"
+        public static let decreaseButton = "quantityStepper.decrease.button"
+        public static let increaseButton = "quantityStepper.increase.button"
+    }
+
     // MARK: - Bag
 
     public enum Bag {
@@ -48,6 +56,23 @@ public enum AccessibilityID {
 
     public enum Shop {
         public static let searchInput = "shop.search.input"
+        public static let scanButton = "shop.scan.button"
+    }
+
+    // MARK: - Scanner
+
+    public enum Scanner {
+        public static let screen = "scanner.screen"
+        public static let title = "scanner.title.label"
+        public static let guidance = "scanner.guidance.label"
+        public static let back = "scanner.back.button"
+        public static let notice = "scanner.notice.label"
+        public static let lookup = "scanner.lookup.view"
+        public static let failure = "scanner.failure.view"
+        public static let openSettings = "scanner.openSettings.button"
+        public static let intro = "scanner.intro.view"
+        public static let introContinue = "scanner.intro.continue.button"
+        public static let introNotNow = "scanner.intro.notNow.button"
     }
 
     // MARK: - Splash
@@ -84,6 +109,8 @@ public enum AccessibilityID {
         public static let sizeSelector = "productDetails.size.selector"
         /// Drawn by the design with no destination behind it — rendered, but not interactive.
         public static let sizeGuideLink = "productDetails.sizeGuide.link"
+        /// The line below the selectors stating that the availability they show is online stock.
+        public static let availabilityNote = "productDetails.availability.label"
         public static let addToBagButton = "productDetails.addToBag.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
         public static let relatedProductsSection = "productDetails.relatedProducts.section"
@@ -151,11 +178,22 @@ public enum AccessibilityID {
     public enum Home {
         public static let titleHeader = "home.title.header"
         public static let searchInput = "home.search.input"
+        public static let scanButton = "home.scan.button"
     }
 
     // MARK: - Account
 
     public enum Account {
+        public static let greetingLabel = "account.greeting.label"
+        public static let memberSinceLabel = "account.memberSince.label"
+
+        public static let addressBookSection = "account.addressBook.section"
+        public static let ordersSection = "account.orders.section"
+        public static let personalInformationSection = "account.personalInformation.section"
         public static let settingsSection = "account.settings.section"
+        public static let signInSection = "account.signIn.section"
+        public static let signOutSection = "account.signOut.section"
+        public static let walletSection = "account.wallet.section"
+        public static let wishlistSection = "account.wishlist.section"
     }
 }

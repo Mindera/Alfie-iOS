@@ -2,6 +2,8 @@ import Foundation
 
 public protocol ProductServiceProtocol {
     func getProduct(handle: String) async throws -> Product
+    /// `nil` when no Product carries the Barcode.
+    func productByBarcode(_ barcode: String) async throws -> BarcodeMatch?
     func productList(
         collectionHandle: String,
         after: String?,

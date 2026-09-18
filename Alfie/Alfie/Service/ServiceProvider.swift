@@ -12,6 +12,7 @@ import Utils
 final class ServiceProvider: ServiceProviderProtocol {
     let analytics: AlfieAnalyticsTracker
     let apiEndpointService: ApiEndpointServiceProtocol
+    let bffApiKeyService: BFFApiKeyServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let deepLinkService: DeepLinkServiceProtocol
     let hapticsService: HapticsServiceProtocol
@@ -34,6 +35,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     init() {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
+        self.bffApiKeyService = BFFApiKeyService(userDefaults: userDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 
         // Assuming Australia for now, to be revised later
@@ -76,6 +78,7 @@ final class ServiceProvider: ServiceProviderProtocol {
         let bffDependencies = BFFClientDependencyContainer(
             reachabilityService: reachabilityService,
             restNetworkClient: restClient,
+            apiKeyService: bffApiKeyService,
             errorReporter: bffErrorReporter
         )
         let apiUrl = apiEndpointService.apiEndpoint(for: apiEndpointService.currentApiEndpoint)
@@ -86,6 +89,9 @@ final class ServiceProvider: ServiceProviderProtocol {
             dependencies: bffDependencies,
             log: log
         )
+        #if DEBUG
+        Task { await BFFConnectivityProbe(baseUrl: apiUrl, log: log).run() }
+        #endif
         notificationsService = NotificationsService()
 
         // API Services
@@ -93,10 +99,9 @@ final class ServiceProvider: ServiceProviderProtocol {
         productService = ProductService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
-        cartService = CartService(
-            bffClient: bffClient,
+        cartService = LocalCartService(
             userDefaults: userDefaults,
-            storageKey: StorageKey.cartId.rawValue
+            storageKey: StorageKey.localCartLines.rawValue
         )
         wishlistService = WishlistService(
             store: UserDefaultsStore(

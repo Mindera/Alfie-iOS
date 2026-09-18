@@ -29,9 +29,9 @@ WishlistFlowVM.Route == WishlistRoute {
     public let homeFlowViewModel: HomeFlowVM
     public let wishlistFlowViewModel: WishlistFlowVM
     public let myAccountFlowViewModel: MyAccountFlowViewModel
-    @Published public private(set) var overlayView: AnyView?
+    @Published public private(set) var overlay: TabOverlay?
     @Published public private(set) var bagBadgeValue: Int?
-    @Published public var isOverlayVisible = false
+    @Published public private(set) var isTabBarHidden = false
     @Published public var isReadyForNavigation = false
     private var subscriptions = Set<AnyCancellable>()
 
@@ -64,6 +64,8 @@ WishlistFlowVM.Route == WishlistRoute {
     }
 
     public func popToRoot(in tab: Model.Tab) {
+        dismissOverlays()
+
         switch tab {
         case .bag:
             bagFlowViewModel.popToRoot()
@@ -85,7 +87,7 @@ WishlistFlowVM.Route == WishlistRoute {
     public func navigate(_ route: TabRoute) {
         guard tabs.contains(route.tab) else { return }
         selectedTab = route.tab
-        overlayView = nil
+        dismissOverlays()
 
         switch route {
         case .bag(let bagRoute):
@@ -105,18 +107,26 @@ WishlistFlowVM.Route == WishlistRoute {
         }
     }
 
+    private func dismissOverlays() {
+        homeFlowViewModel.dismissOverlay()
+        categorySelectorFlowViewModel.dismissOverlay()
+    }
+
     private func setupBindings() {
-        homeFlowViewModel.overlayViewPublisher
-            .assignWeakly(to: \.overlayView, on: self)
+        homeFlowViewModel.overlayPublisher
+            .merge(with: categorySelectorFlowViewModel.overlayPublisher)
+            .assignWeakly(to: \.overlay, on: self)
             .store(in: &subscriptions)
 
-        categorySelectorFlowViewModel.overlayViewPublisher
-            .assignWeakly(to: \.overlayView, on: self)
+        $overlay
+            .map { $0?.hidesTabBar ?? false }
+            .assignWeakly(to: \.isTabBarHidden, on: self)
             .store(in: &subscriptions)
 
-        $overlayView
-            .map { $0 != nil }
-            .assignWeakly(to: \.isOverlayVisible, on: self)
+        $selectedTab
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] _ in self?.dismissOverlays() }
             .store(in: &subscriptions)
 
         // The cart service is the cart's single owner, so the badge follows every add, remove and

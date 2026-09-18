@@ -16,11 +16,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
     var body: some View {
         content
-            .toolbarView(
-                isWishlistEnabled: viewModel.isWishlistEnabled,
-                openWishlistAction: viewModel.didTapWishlist,
-                myAccountAction: viewModel.didTapMyAccount
-            )
+            .toolbarView()
             .onAppear {
                 viewModel.viewDidAppear()
             }
@@ -85,10 +81,11 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
                 .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.bottom, Primitives.Spacing.spacing16)
         }
         .listStyle(.plain)
         .listRowSpacing(Primitives.Spacing.spacing16)
-        .padding(.vertical, Primitives.Spacing.spacing16)
+        .padding(.top, Primitives.Spacing.spacing16)
         .accessibilityIdentifier(AccessibilityID.Bag.bagView)
     }
 

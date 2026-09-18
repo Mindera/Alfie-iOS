@@ -13,6 +13,7 @@ class Mutation: MockObject {
     @Field<Cart>("addToCart") public var addToCart
     @Field<Cart>("createCart") public var createCart
     @Field<Cart>("removeFromCart") public var removeFromCart
+    @Field<Cart>("updateCart") public var updateCart
   }
 }
 
@@ -20,11 +21,13 @@ extension Mock where O == Mutation {
   convenience init(
     addToCart: Mock<Cart>? = nil,
     createCart: Mock<Cart>? = nil,
-    removeFromCart: Mock<Cart>? = nil
+    removeFromCart: Mock<Cart>? = nil,
+    updateCart: Mock<Cart>? = nil
   ) {
     self.init()
     _setEntity(addToCart, for: \.addToCart)
     _setEntity(createCart, for: \.createCart)
     _setEntity(removeFromCart, for: \.removeFromCart)
+    _setEntity(updateCart, for: \.updateCart)
   }
 }

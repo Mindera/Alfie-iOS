@@ -28,5 +28,10 @@ public class MockHomeViewModel: HomeViewModelProtocol {
         onDidTapSearchCalled?()
     }
 
+    public var onDidTapScanCalled: (() -> Void)?
+    public func didTapScan() {
+        onDidTapScanCalled?()
+    }
+
     public init() { }
 }

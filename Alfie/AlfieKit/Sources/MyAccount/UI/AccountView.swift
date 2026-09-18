@@ -14,24 +14,21 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: Primitives.Spacing.spacing0) {
-                ForEach(viewModel.sectionList, id: \.self) { section in
-                    AccountSectionView(
-                        for: section,
-                        hiddenDividerTop: section == viewModel.sectionList.first,
-                        hiddenDividerBottom: section != viewModel.sectionList.last
-                    )
-                    .modifier(
-                        TapHighlightableModifier(
-                            action: { navigateToSection(section) },
-                            accessibilityId: section.accessibilityId
-                        )
-                    )
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing24) {
+                welcome
+
+                VStack(spacing: Primitives.Spacing.spacing0) {
+                    ForEach(viewModel.sectionList, id: \.self) { section in
+                        row(for: section)
+                    }
                 }
+
+                row(for: viewModel.sessionSection)
             }
+            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.vertical, Primitives.Spacing.spacing8)
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
-        .toolbarView()
+        .toolbar(.hidden, for: .navigationBar)
         .fullScreenCover(
             isPresented: Binding(
                 get: { viewModel.fullScreenCover != nil },
@@ -40,6 +37,29 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         ) {
             viewModel.fullScreenCover
         }
+    }
+
+    private var welcome: some View {
+        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
+            Text.build(theme.font.display.small(L10n.Account.greeting))
+                .foregroundStyle(Theme.contentContentPrimary)
+                .accessibilityIdentifier(AccessibilityID.Account.greetingLabel)
+
+            Text.build(theme.font.label.small(L10n.Account.memberSince))
+                .foregroundStyle(Theme.contentContentTerciary)
+                .accessibilityIdentifier(AccessibilityID.Account.memberSinceLabel)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func row(for section: AccountSection) -> some View {
+        AccountSectionView(for: section)
+            .modifier(
+                TapHighlightableModifier(
+                    action: { navigateToSection(section) },
+                    accessibilityId: section.accessibilityId
+                )
+            )
     }
 
     private func navigateToSection(_ section: AccountSection) {
@@ -57,8 +77,8 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
             viewModel.didTapSettings()
 
         case .myAddressBook,
-             .myDetails, // swiftlint:disable:this indentation_width
-             .myOrders,
+             .orders, // swiftlint:disable:this indentation_width
+             .personalInformation,
              .wallet:
             // TODO: Implement in a future ticket
             break
@@ -66,36 +86,26 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
     }
 }
 
-private enum AccessibilityId { // TODO: Move to a seperate model and see where we have more AccessibilityID's
-    static let addressBookSection = "address-book-section"
-    static let myDetailsSection = "my-details-section"
-    static let myOrdersSection = "my-orders-section"
-    static let signInSection = "sign-in-section"
-    static let signOutSection = "sign-out-section"
-    static let walletSection = "wallet-section"
-    static let wishlistSection = "wishlist-section"
-}
-
 private extension AccountSection {
     var accessibilityId: String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
+        case .personalInformation:
+            AccessibilityID.Account.personalInformationSection
+        case .orders:
+            AccessibilityID.Account.ordersSection
+        case .wishlist:
+            AccessibilityID.Account.wishlistSection
+        case .wallet:
+            AccessibilityID.Account.walletSection
         case .myAddressBook:
-            AccessibilityId.addressBookSection
-        case .myDetails:
-            AccessibilityId.myDetailsSection
-        case .myOrders:
-            AccessibilityId.myOrdersSection
+            AccessibilityID.Account.addressBookSection
         case .settings:
             AccessibilityID.Account.settingsSection
         case .signIn:
-            AccessibilityId.signInSection
+            AccessibilityID.Account.signInSection
         case .signOut:
-            AccessibilityId.signOutSection
-        case .wallet:
-            AccessibilityId.walletSection
-        case .wishlist:
-            AccessibilityId.wishlistSection
+            AccessibilityID.Account.signOutSection
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
