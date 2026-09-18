@@ -6,7 +6,7 @@ public protocol ServiceProviderProtocol: AnyObject {
     var configurationService: ConfigurationServiceProtocol { get }
     var deepLinkService: DeepLinkServiceProtocol { get }
     var apiEndpointService: ApiEndpointServiceProtocol { get }
-    var bffApiKeyService: BffApiKeyServiceProtocol { get }
+    var bffApiKeyService: BFFApiKeyServiceProtocol { get }
     var hapticsService: HapticsServiceProtocol { get }
     var recentsService: RecentsServiceProtocol? { get }
     var reachabilityService: ReachabilityServiceProtocol { get }

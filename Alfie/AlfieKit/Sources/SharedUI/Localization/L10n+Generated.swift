@@ -60,8 +60,6 @@ public enum L10n {
     public static let signIn = L10n.tr("L10n", "account.sign_in")
     /// Sign Out
     public static let signOut = L10n.tr("L10n", "account.sign_out")
-    /// Account
-    public static let title = L10n.tr("L10n", "account.title")
     /// Wallet
     public static let wallet = L10n.tr("L10n", "account.wallet")
     /// Wishlist
@@ -806,7 +804,6 @@ public extension L10n {
       case accountSettings = "account.settings"
       case accountSignIn = "account.sign_in"
       case accountSignOut = "account.sign_out"
-      case accountTitle = "account.title"
       case accountWallet = "account.wallet"
       case accountWishlist = "account.wishlist"
       case bagTitle = "bag.title"

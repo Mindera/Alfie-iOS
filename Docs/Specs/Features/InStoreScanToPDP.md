@@ -2,7 +2,7 @@
 
 **Status**: Implemented
 **Created**: 2026-09-09
-**Last Updated**: 2026-09-17
+**Last Updated**: 2026-09-18
 **Implementation PR**: #146 (`feature/gh-133-in-store-scan-to-pdp` → `main`)
 
 ---
@@ -19,7 +19,7 @@ one read-only query.
 
 The central design decision is that Alfie **prints its own Alfie code**, a QR code that already
 contains the Handle, and prefers it over anything else on the tag. See
-`Docs/adr/0001-print-our-own-alfie-code.md`. The manufacturer's EAN-13 **Barcode** is also resolved,
+`Docs/adr/0001-print-our-own-alfie-code.md`. The **Barcode** a Swing tag prints is also resolved,
 through the BFF's `productByBarcode` query (Alfie-BFF PR #46), but only on SCAYLE: the Shopify
 Storefront API has no `barcode:` filter, and reaching Shopify's Admin API would mean provisioning an
 Admin-scoped token for a customer-facing service. See `Docs/adr/0002-resolve-barcodes-through-the-bff-on-scayle.md`,
@@ -93,7 +93,7 @@ AND an availability note states that stock shown is online stock
 ### Scenario 4: Shopper scans the manufacturer's Barcode
 
 **GIVEN** the shopper is on the _Scanner screen_
-**WHEN** the camera recognises an EAN-13 Barcode and no Alfie code
+**WHEN** the camera recognises a Barcode — EAN-13 or Code 128 — and no Alfie code
 **THEN** the camera preview stays live
 AND the guidance is replaced by a small loader and "Finding product…", announced to VoiceOver
 AND the Barcode is looked up through `productByBarcode`
@@ -101,6 +101,11 @@ AND the Barcode is looked up through `productByBarcode`
 > Amended by ADR-0002 (2026-09-17). This scenario first answered a Barcode with the unrecognised
 > notice. Classification is by the symbology VisionKit reports, not the payload's shape: a QR code
 > holding thirteen digits is unrecognised (Scenario 5) and is never looked up.
+>
+> Amended again (2026-09-18). Code 128 was added alongside EAN-13. A real Selfridges tag prints its
+> GTIN-13 inside a Code 128 symbol, so an EAN-13-only scanner never fired on one. Both symbologies
+> take the same path from here — the symbology decides only that this is a Barcode, never what the
+> payload means.
 
 ### Scenario 4a: Barcode matches a Variant
 
@@ -433,7 +438,7 @@ The seams are `CameraScanServiceProtocol`, which hands the ViewModel `[ScannedPa
 ### Unit Tests (`ScannerTests`)
 
 - [ ] An Alfie code payload results in the URL being passed to `DeepLinkService`
-- [ ] An EAN-13 payload starts a lookup and shows the loader; a match opens the Product with and
+- [ ] A Barcode payload — EAN-13 or Code 128 — starts a lookup and shows the loader; a match opens the Product with and
   without `variantId`; not found and failure show their notices; codes during a lookup are ignored;
   closing cancels it; a QR holding digits is not looked up (`ScannerViewModelTests`)
 - [ ] Product Details preselects by `variantId` (`ProductDetailsViewModelTests`); `TabRoute` carries
@@ -520,6 +525,19 @@ The developer will verify the camera path manually on device.
   Swing tag whose Barcode has already been answered, and the guidance on screen ("Point the camera at
   the Alfie code on the tag") is the advice the new code would also have earned. Answering per code rather
   than per frame would fix it and reopen the double-notice it was written to close.
+- **A real Selfridges tag scans but does not resolve on staging.** The tag photographed in store
+  carries two different numbers: its bars encode `2600030000445`, a valid EAN-13 whose `260` prefix
+  is GS1 restricted circulation (a retailer's own in-store range), while the text printed beneath
+  them reads `96848723`, which fails the EAN-8 check digit and is not a GTIN at all. Staging's
+  fixture keys Variant 1836 on the printed text, so the scanner reads the tag correctly and the
+  lookup then returns nothing. The app is not at fault and no app change fixes it — the `ean`
+  attribute on the SCAYLE Variant has to carry the value the bars encode. Scanning that tag today
+  shows the not-found notice of Scenario 4c.
+- **Production tags may key on the reference key, not the `ean`.** SCAYLE's Omnichannel guidance
+  tells retailers to encode a Variant's **reference key** in in-store barcodes, and `productByBarcode`
+  filters on the `ean` attribute only. A production scan could therefore miss for a reason that
+  looks identical to absent data. `/v2/search/resolve` matches either and is reachable on the token
+  the BFF already holds; see `Docs/Research/scayle-barcode-handling.md`.
 - **The printed URL does not resolve in a browser.** It points at `localhost:4000`, which is the
   configured host. Scanning an Alfie code with the iOS Camera app will not open Alfie.
 - **The shopper must already have Alfie installed.** No App Clip, no universal links.
@@ -530,7 +548,8 @@ The developer will verify the camera path manually on device.
 
 - Alfie code payload format: `https://localhost:4000/product/<handle>?sku=<sku>`. The `sku`
   selects the Variant the shopper arrives on.
-- Configure the scanner for QR, EAN-13 **and** Code 128. Each payload keeps the symbology VisionKit
+- Configure the scanner for QR, EAN-13 **and** Code 128 — three symbologies, matching
+  `CameraScanService`'s `recognizedDataTypes`. Each payload keeps the symbology VisionKit
   reported, and every Barcode read is looked up. Selfridges price tags print their GTIN-13 in a Code
   128 symbol rather than an EAN-13 one, so EAN-13 alone never sees a real swing tag.
 - Gate the scanner on both `DataScannerViewController.isSupported` and `.isAvailable`.
@@ -586,9 +605,10 @@ The developer will verify the camera path manually on device.
     typed Barcode up against), the torch button, the sheets' "Remove All" link. The design's copy
     slips (garbled scanner guidance, "Scan Barcode"/"Scan barcode", "Shippings", mixed £/$) go back
     to the designer.
-- [x] Recognise EAN-13?
-  - **Decision**: Yes, to show a helpful message. It is the most likely demo mishap. _Since
-    2026-09-17 it is looked up instead (ADR-0002)._
+- [x] Which Barcode symbologies?
+  - **Decision**: EAN-13 at first, to show a helpful message — the most likely demo mishap. _Since
+    2026-09-17 it is looked up instead (ADR-0002). Since 2026-09-18 Code 128 is read too, because
+    that is what a real Selfridges tag prints; EAN-13 alone never fired in store._
 
 ### Open Questions
 
@@ -606,3 +626,4 @@ The developer will verify the camera path manually on device.
 | 2026-09-14 | Figma flow review (`/grill-with-docs`): explainer sheet (Scenario 1a), full-screen scanner with square viewfinder and success feedback, single self-dismissing notice in the design's wording, Variant preselection by SKU; manual entry and torch dropped | Khoi Nguyen |
 | 2026-09-14 | Review fixes: explainer is a native sheet owned by `ScannerViewModel` and skipped on unsupported devices; Back cancels the pending open; notice timer and close button in the ViewModel/view; header stays black in failure states; `sku` preselection documented as applying to all product links | Khoi Nguyen |
 | 2026-09-17 | ADR-0002: Barcodes resolved through the BFF's `productByBarcode` on SCAYLE (Alfie-BFF PR #46); symbology-based classification; Scenario 4 replaced by lookup scenarios 4–4f; `variantId` deep-link preselection; lookup keys, edge cases, limitation and tests updated | Khoi Nguyen |
+| 2026-09-18 | Code 128 added beside EAN-13, because Selfridges tags print their GTIN-13 in a Code 128 symbol; Scenario 4, Q2 and the test checklist widened from EAN-13 to "a Barcode"; the real-tag and reference-key limitations recorded | Khoi Nguyen |

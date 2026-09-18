@@ -62,17 +62,19 @@ private func makeNavigationItem(
     )
 }
 
-// Routes that are never a PLP, so their handle must not be guessed at.
-private let nonListingRoutePrefixes: Set<String> = ["pages", "blogs", "products"]
+// Segments that mark a route as never a PLP, so its handle must not be guessed at. They are matched
+// anywhere in the path, not just at the front: SCAYLE nests categories, so `/shop/products/x` is as
+// much a product route as `/products/x`.
+private let nonListingRouteSegments: Set<String> = ["pages", "blogs", "products"]
 
 // Maps a menu url to a domain destination. Shopify nests the handle under `collections`, while
 // SCAYLE serves a category path whose last segment is the handle:
 //   /collections/<handle>[/<tag>]  → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
 //   women/women-108                → `.listing`, url `/women-108`
 //   /<handle> (bare)               → `.listing`, url `/<handle>`
-// Page, blog and product routes are not listings, and an absolute link outside `collections` points
-// at off-app content, so both are dropped rather than guessed. Root `/` and path-less absolute urls
-// (`https://host`) have no segments and are dropped too.
+// Page, blog and product routes are not listings at any depth, and an absolute link outside
+// `collections` points at off-app content, so both are dropped rather than guessed. Root `/` and
+// path-less absolute urls (`https://host`) have no segments and are dropped too.
 private func menuDestination(from url: String?) -> (type: NavigationItemType, url: String)? {
     guard
         let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty,
@@ -91,7 +93,7 @@ private func menuDestination(from url: String?) -> (type: NavigationItemType, ur
     }
 
     guard
-        !nonListingRoutePrefixes.contains(first),
+        !segments.contains(where: nonListingRouteSegments.contains),
         components.host == nil,
         let handle = segments.last
     else {

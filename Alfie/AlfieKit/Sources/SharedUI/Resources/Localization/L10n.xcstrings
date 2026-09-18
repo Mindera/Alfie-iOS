@@ -288,17 +288,6 @@
         }
       }
     },
-    "account.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Account"
-          }
-        }
-      }
-    },
     "account.wallet" : {
       "extractionState" : "manual",
       "localizations" : {

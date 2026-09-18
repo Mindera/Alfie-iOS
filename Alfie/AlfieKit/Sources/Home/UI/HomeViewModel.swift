@@ -8,7 +8,7 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     private let sessionService: SessionServiceProtocol
     private let configurationService: ConfigurationServiceProtocol
     private let apiEndpointService: ApiEndpointServiceProtocol
-    private let bffApiKeyService: BffApiKeyServiceProtocol
+    private let bffApiKeyService: BFFApiKeyServiceProtocol
     private let navigate: (HomeRoute) -> Void
     private let showSearch: () -> Void
     private let showScanner: () -> Void

@@ -113,7 +113,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         viewModel: .init(
             configurationService: MockConfigurationService(),
             apiEndpointService: MockApiEndpointService(),
-            bffApiKeyService: MockBffApiKeyService(),
+            bffApiKeyService: MockBFFApiKeyService(),
             closeMenuAction: {},
             openForceAppUpdate: {},
             closeEndpointSelection: {}

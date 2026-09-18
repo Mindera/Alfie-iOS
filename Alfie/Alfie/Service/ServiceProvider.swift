@@ -12,7 +12,7 @@ import Utils
 final class ServiceProvider: ServiceProviderProtocol {
     let analytics: AlfieAnalyticsTracker
     let apiEndpointService: ApiEndpointServiceProtocol
-    let bffApiKeyService: BffApiKeyServiceProtocol
+    let bffApiKeyService: BFFApiKeyServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let deepLinkService: DeepLinkServiceProtocol
     let hapticsService: HapticsServiceProtocol
@@ -35,7 +35,7 @@ final class ServiceProvider: ServiceProviderProtocol {
     init() {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
-        self.bffApiKeyService = BffApiKeyService(userDefaults: userDefaults)
+        self.bffApiKeyService = BFFApiKeyService(userDefaults: userDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 
         // Assuming Australia for now, to be revised later

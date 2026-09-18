@@ -8,9 +8,10 @@ import VisionKit
 
 /// The real camera, via VisionKit's `DataScannerViewController`.
 ///
-/// Two symbologies are recognised: QR, which is what an Alfie code is, and EAN-13, which is what
-/// the manufacturer prints beside it. Everything the scanner sees is published with the symbology
-/// it was read as — deciding what a payload means belongs to `ScannerViewModel`.
+/// Three symbologies are recognised: QR, which is what an Alfie code is, and EAN-13 and Code 128,
+/// which are what a Swing tag prints beside it — Selfridges tags carry a Code 128, so EAN-13 alone
+/// read nothing in store. Everything the scanner sees is published with the symbology it was read
+/// as — deciding what a payload means belongs to `ScannerViewModel`.
 ///
 /// A device that cannot scan, and a shopper who has refused the camera, are both reported through
 /// ``failurePublisher`` rather than left at a preview that never recognises anything — and the

@@ -1,7 +1,7 @@
 import Foundation
 import Model
 
-public class MockBffApiKeyService: BffApiKeyServiceProtocol {
+public class MockBFFApiKeyService: BFFApiKeyServiceProtocol {
     public var currentApiKey: String?
 
     public var onUpdateApiKeyCalled: ((String?) -> Void)?

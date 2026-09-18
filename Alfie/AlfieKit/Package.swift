@@ -193,6 +193,7 @@ let package = Package(
                 "Mocks",
                 "Model",
                 "SharedUI",
+                "Utils",
             ]
         ),
 

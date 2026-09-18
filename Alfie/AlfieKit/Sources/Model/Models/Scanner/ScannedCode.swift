@@ -5,7 +5,7 @@ import Foundation
 public enum ScannedCode: Equatable {
     /// A QR code carrying a link the app can open, e.g. `https://localhost:4000/product/<handle>`.
     case alfieCode(URL)
-    /// The manufacturer's EAN-13 Barcode, resolved through the catalogue.
+    /// The Barcode a Swing tag prints, read as EAN-13 or Code 128, resolved through the catalogue.
     case barcode(value: String)
     /// Anything else the camera recognised: a poster, a colleague's Wi-Fi code, a link that is not
     /// ours.

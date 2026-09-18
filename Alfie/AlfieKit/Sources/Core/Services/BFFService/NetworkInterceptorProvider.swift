@@ -7,7 +7,7 @@ final class NetworkInterceptorProvider: InterceptorProvider {
     private let store: ApolloStore
     private let client: URLSessionClient
     private let reachabilityService: ReachabilityServiceProtocol
-    private let apiKeyService: BffApiKeyServiceProtocol
+    private let apiKeyService: BFFApiKeyServiceProtocol
     private let logRequests: Bool
     private let log: Logger
 
@@ -15,7 +15,7 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         client: URLSessionClient,
         store: ApolloStore,
         reachabilityService: ReachabilityServiceProtocol,
-        apiKeyService: BffApiKeyServiceProtocol,
+        apiKeyService: BFFApiKeyServiceProtocol,
         logRequests: Bool,
         log: Logger
     ) {

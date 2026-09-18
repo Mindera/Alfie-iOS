@@ -43,11 +43,11 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
             Text.build(theme.font.display.small(L10n.Account.greeting))
                 .foregroundStyle(Theme.contentContentPrimary)
-                .accessibilityIdentifier(AccessibilityId.greeting)
+                .accessibilityIdentifier(AccessibilityID.Account.greetingLabel)
 
             Text.build(theme.font.label.small(L10n.Account.memberSince))
                 .foregroundStyle(Theme.contentContentTerciary)
-                .accessibilityIdentifier(AccessibilityId.memberSince)
+                .accessibilityIdentifier(AccessibilityID.Account.memberSinceLabel)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -86,38 +86,26 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
     }
 }
 
-private enum AccessibilityId { // TODO: Move to a seperate model and see where we have more AccessibilityID's
-    static let addressBookSection = "address-book-section"
-    static let greeting = "greeting"
-    static let memberSince = "member-since"
-    static let ordersSection = "orders-section"
-    static let personalInformationSection = "personal-information-section"
-    static let signInSection = "sign-in-section"
-    static let signOutSection = "sign-out-section"
-    static let walletSection = "wallet-section"
-    static let wishlistSection = "wishlist-section"
-}
-
 private extension AccountSection {
     var accessibilityId: String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .personalInformation:
-            AccessibilityId.personalInformationSection
+            AccessibilityID.Account.personalInformationSection
         case .orders:
-            AccessibilityId.ordersSection
+            AccessibilityID.Account.ordersSection
         case .wishlist:
-            AccessibilityId.wishlistSection
+            AccessibilityID.Account.wishlistSection
         case .wallet:
-            AccessibilityId.walletSection
+            AccessibilityID.Account.walletSection
         case .myAddressBook:
-            AccessibilityId.addressBookSection
+            AccessibilityID.Account.addressBookSection
         case .settings:
             AccessibilityID.Account.settingsSection
         case .signIn:
-            AccessibilityId.signInSection
+            AccessibilityID.Account.signInSection
         case .signOut:
-            AccessibilityId.signOutSection
+            AccessibilityID.Account.signOutSection
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

@@ -7,12 +7,12 @@ import XCTest
 final class EndpointSelectionViewModelTests: XCTestCase {
     private var sut: DebugMenu.EndpointSelectionViewModel!
     private var mockEndpointService: MockApiEndpointService!
-    private var mockApiKeyService: MockBffApiKeyService!
+    private var mockApiKeyService: MockBFFApiKeyService!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockEndpointService = MockApiEndpointService()
-        mockApiKeyService = MockBffApiKeyService()
+        mockApiKeyService = MockBFFApiKeyService()
         // Init the sut in every test individually
     }
 
@@ -217,7 +217,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
         sut.didTapSave()
 
-        wait(for: [reboot], timeout: 0.5)
+        wait(for: [reboot], timeout: .inverted)
         XCTAssertTrue(sut.shouldShowSuccess)
         XCTAssertFalse(sut.willReboot)
     }

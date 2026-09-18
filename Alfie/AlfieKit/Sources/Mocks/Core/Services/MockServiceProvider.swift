@@ -10,7 +10,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
     public var deepLinkService: DeepLinkServiceProtocol
     public var hapticsService: HapticsServiceProtocol
     public var apiEndpointService: ApiEndpointServiceProtocol
-    public var bffApiKeyService: BffApiKeyServiceProtocol
+    public var bffApiKeyService: BFFApiKeyServiceProtocol
     public var reachabilityService: ReachabilityServiceProtocol
     public var navigationService: NavigationServiceProtocol
     public var recentsService: RecentsServiceProtocol?
@@ -31,7 +31,7 @@ public final class MockServiceProvider: ServiceProviderProtocol {
         configurationService: ConfigurationServiceProtocol = MockConfigurationService(),
         deepLinkService: DeepLinkServiceProtocol = MockDeepLinkService(),
         apiEndpointService: ApiEndpointServiceProtocol = MockApiEndpointService(),
-        bffApiKeyService: BffApiKeyServiceProtocol = MockBffApiKeyService(),
+        bffApiKeyService: BFFApiKeyServiceProtocol = MockBFFApiKeyService(),
         hapticsService: HapticsServiceProtocol = MockHapticsService(),
         reachabilityService: ReachabilityServiceProtocol = MockReachabilityService(),
         navigationService: NavigationServiceProtocol = MockNavigationService(),

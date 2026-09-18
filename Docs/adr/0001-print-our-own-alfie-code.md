@@ -27,8 +27,11 @@ holds. Encoding the Handle directly removes the lookup entirely.
 
 ## Consequences
 
-- Only garments we have tagged with an Alfie code are scannable. A shopper scanning an ordinary
-  swing tag Barcode gets an explanatory message, not a Product.
+- ~~Only garments we have tagged with an Alfie code are scannable. A shopper scanning an ordinary
+  swing tag Barcode gets an explanatory message, not a Product.~~ **Superseded by ADR-0002:** on
+  SCAYLE the BFF resolves a Barcode through `productByBarcode`, so an untagged swing tag opens the
+  Product it names. The rest of this decision stands — Alfie codes are still printed, and still win
+  when both are in frame.
 - Printing is now a dependency of the feature: adding Products to a demo means regenerating and
   reprinting codes.
 - The app needs no new BFF query, no new credential, and no associated-domains entitlement, because

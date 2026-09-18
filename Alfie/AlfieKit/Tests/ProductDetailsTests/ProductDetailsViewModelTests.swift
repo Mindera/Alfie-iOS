@@ -1430,7 +1430,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         sut.didTapDecreaseBagQuantity()
 
-        wait(for: [write], timeout: 0.5)
+        wait(for: [write], timeout: .inverted)
         XCTAssertEqual(writtenQuantities, [])
     }
 
@@ -1465,7 +1465,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         sut.didTapIncreaseBagQuantity()
         scheduler.advance(by: .milliseconds(300))
 
-        wait(for: [supersededWrite], timeout: 0.5)
+        wait(for: [supersededWrite], timeout: .inverted)
         XCTAssertEqual(writtenQuantities, [])
 
         mockCartService.onSetQuantityCalled = { _, quantity in

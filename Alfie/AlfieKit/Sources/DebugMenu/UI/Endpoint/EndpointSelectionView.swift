@@ -83,7 +83,7 @@ struct EndpointSelectionView: View {
     EndpointSelectionView(
         viewModel: EndpointSelectionViewModel(
             apiEndpointService: MockApiEndpointService(),
-            apiKeyService: MockBffApiKeyService()
+            apiKeyService: MockBFFApiKeyService()
         ) { }
     )
 }

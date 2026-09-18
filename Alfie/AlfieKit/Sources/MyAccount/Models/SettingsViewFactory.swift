@@ -11,7 +11,7 @@ public enum SettingsViewFactory {
     public static func make(
         configurationService: ConfigurationServiceProtocol,
         apiEndpointService: ApiEndpointServiceProtocol,
-        bffApiKeyService: BffApiKeyServiceProtocol,
+        bffApiKeyService: BFFApiKeyServiceProtocol,
         present: @escaping PresentCover
     ) -> AnyView {
         AnyView(

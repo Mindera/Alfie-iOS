@@ -184,6 +184,16 @@ public enum AccessibilityID {
     // MARK: - Account
 
     public enum Account {
+        public static let greetingLabel = "account.greeting.label"
+        public static let memberSinceLabel = "account.memberSince.label"
+
+        public static let addressBookSection = "account.addressBook.section"
+        public static let ordersSection = "account.orders.section"
+        public static let personalInformationSection = "account.personalInformation.section"
         public static let settingsSection = "account.settings.section"
+        public static let signInSection = "account.signIn.section"
+        public static let signOutSection = "account.signOut.section"
+        public static let walletSection = "account.wallet.section"
+        public static let wishlistSection = "account.wishlist.section"
     }
 }

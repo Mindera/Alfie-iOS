@@ -6,9 +6,9 @@ import Model
 final class AuthorizationInterceptor: ApolloInterceptor {
     var id: String = UUID().uuidString
 
-    private let apiKeyService: BffApiKeyServiceProtocol
+    private let apiKeyService: BFFApiKeyServiceProtocol
 
-    init(apiKeyService: BffApiKeyServiceProtocol) {
+    init(apiKeyService: BFFApiKeyServiceProtocol) {
         self.apiKeyService = apiKeyService
     }
 

@@ -3,13 +3,13 @@ import Model
 public final class HomeDependencyContainer {
     let configurationService: ConfigurationServiceProtocol
     let apiEndpointService: ApiEndpointServiceProtocol
-    let bffApiKeyService: BffApiKeyServiceProtocol
+    let bffApiKeyService: BFFApiKeyServiceProtocol
     let sessionService: SessionServiceProtocol
 
     public init(
         configurationService: ConfigurationServiceProtocol,
         apiEndpointService: ApiEndpointServiceProtocol,
-        bffApiKeyService: BffApiKeyServiceProtocol,
+        bffApiKeyService: BFFApiKeyServiceProtocol,
         sessionService: SessionServiceProtocol
     ) {
         self.configurationService = configurationService

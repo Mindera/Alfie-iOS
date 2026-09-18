@@ -4,7 +4,7 @@ import Model
 public class DebugMenuViewModel: ObservableObject {
     let configurationService: ConfigurationServiceProtocol
     let apiEndpointService: ApiEndpointServiceProtocol
-    let bffApiKeyService: BffApiKeyServiceProtocol
+    let bffApiKeyService: BFFApiKeyServiceProtocol
     let closeMenuAction: () -> Void
     let openForceAppUpdate: () -> Void
     let closeEndpointSelection: () -> Void
@@ -12,7 +12,7 @@ public class DebugMenuViewModel: ObservableObject {
     public init(
         configurationService: ConfigurationServiceProtocol,
         apiEndpointService: ApiEndpointServiceProtocol,
-        bffApiKeyService: BffApiKeyServiceProtocol,
+        bffApiKeyService: BFFApiKeyServiceProtocol,
         closeMenuAction: @escaping () -> Void,
         openForceAppUpdate: @escaping () -> Void,
         closeEndpointSelection: @escaping () -> Void

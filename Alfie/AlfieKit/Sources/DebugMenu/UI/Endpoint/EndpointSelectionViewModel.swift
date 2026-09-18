@@ -1,9 +1,10 @@
 import Foundation
 import Model
+import Utils
 
 public final class EndpointSelectionViewModel: ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol
-    private let apiKeyService: BffApiKeyServiceProtocol
+    private let apiKeyService: BFFApiKeyServiceProtocol
     @Published public var selectedEndpointOption: ApiEndpointOption?
     @Published public var customEndpointUrl: String
     @Published public var bffApiKey: String
@@ -45,7 +46,7 @@ public final class EndpointSelectionViewModel: ObservableObject {
 
     public init(
         apiEndpointService: ApiEndpointServiceProtocol,
-        apiKeyService: BffApiKeyServiceProtocol,
+        apiKeyService: BFFApiKeyServiceProtocol,
         closeEndpointSelection: @escaping () -> Void
     ) {
         self.apiEndpointService = apiEndpointService
@@ -95,7 +96,7 @@ public final class EndpointSelectionViewModel: ObservableObject {
     }
 
     private var hasApiKeyChange: Bool {
-        bffApiKey.trimmingCharacters(in: .whitespacesAndNewlines) != (apiKeyService.currentApiKey ?? "")
+        bffApiKey.trim() != (apiKeyService.currentApiKey ?? "")
     }
 
     private var hasEndpointChange: Bool {

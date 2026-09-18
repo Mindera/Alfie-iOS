@@ -3,16 +3,16 @@ import Mocks
 import Model
 import XCTest
 
-final class BffApiKeyServiceTests: XCTestCase {
+final class BFFApiKeyServiceTests: XCTestCase {
     private var userDefaults: MockUserDefaults!
-    private var sut: BffApiKeyService!
+    private var sut: BFFApiKeyService!
 
     override func setUp() {
         super.setUp()
         userDefaults = MockUserDefaults()
         userDefaults.onSetCalled = { [unowned self] value, key in userDefaults.forcedValueForKey[key] = value }
         userDefaults.onRemoveCalled = { [unowned self] key in userDefaults.forcedValueForKey[key] = nil }
-        sut = BffApiKeyService(userDefaults: userDefaults, storageKey: "key")
+        sut = BFFApiKeyService(userDefaults: userDefaults, storageKey: "key")
     }
 
     override func tearDown() {

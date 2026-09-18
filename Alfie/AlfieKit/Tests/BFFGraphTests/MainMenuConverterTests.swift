@@ -66,6 +66,18 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertTrue(items.isEmpty)
     }
 
+    /// The guard used to test only the first segment, so a nested product route reached the PLP as
+    /// if its last segment were a category handle.
+    func test_nested_page_blog_product_links_are_dropped() {
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Contact", url: "/shop/pages/x"),
+            Mock<MenuItem>(id: "2", title: "News", url: "/shop/blogs/y"),
+            Mock<MenuItem>(id: "3", title: "Shirt", url: "/shop/products/z")
+        ]).convertToNavigationItems()
+
+        XCTAssertTrue(items.isEmpty)
+    }
+
     /// SCAYLE nests a category under its parent, and the handle the PLP wants is the last segment:
     /// `women/women-108` lists 217 products on staging, where the first segment `women` is a
     /// different, smaller category. Dropping these is what hid Women, New In and Jewellery from the
