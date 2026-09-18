@@ -62,13 +62,17 @@ private func makeNavigationItem(
     )
 }
 
-// Maps a Shopify menu url to a domain destination based on its route prefix. The static store menu
-// is collections-only, so only these links are actionable — everything else is dropped:
-//   /collections/<handle>  → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
-//   /<handle> (bare)        → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
-// Anything else — page/blog/product links, path-less absolute urls (`https://host`), root `/`, or
-// unrecognized multi-segment paths — is dropped rather than guessed. Collections resolve to just the
-// handle (host irrelevant to the PLP flow).
+// Routes that are never a PLP, so their handle must not be guessed at.
+private let nonListingRoutePrefixes: Set<String> = ["pages", "blogs", "products"]
+
+// Maps a menu url to a domain destination. Shopify nests the handle under `collections`, while
+// SCAYLE serves a category path whose last segment is the handle:
+//   /collections/<handle>[/<tag>]  → `.listing`, url `/<handle>`   (PLP; only the handle is needed)
+//   women/women-108                → `.listing`, url `/women-108`
+//   /<handle> (bare)               → `.listing`, url `/<handle>`
+// Page, blog and product routes are not listings, and an absolute link outside `collections` points
+// at off-app content, so both are dropped rather than guessed. Root `/` and path-less absolute urls
+// (`https://host`) have no segments and are dropped too.
 private func menuDestination(from url: String?) -> (type: NavigationItemType, url: String)? {
     guard
         let trimmed = url?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty,
@@ -79,15 +83,20 @@ private func menuDestination(from url: String?) -> (type: NavigationItemType, ur
     let segments = components.path.split(separator: "/").map { $0.lowercased() }
     guard let first = segments.first else { return nil }
 
-    switch first {
-    case "collections":
+    if first == "collections" {
         // Handle is the segment *after* "collections" — a tag-filtered link like
         // `/collections/all/sale` keeps the tag last — and a bare `/collections` has no handle.
         guard segments.count >= 2 else { return nil }
         return (.listing, "/\(segments[1])")
-    default:
-        // A bare single segment is a collection handle (or a SpecialCategory, matched upstream).
-        guard segments.count == 1 else { return nil }
-        return (.listing, "/\(first)")
     }
+
+    guard
+        !nonListingRoutePrefixes.contains(first),
+        components.host == nil,
+        let handle = segments.last
+    else {
+        return nil
+    }
+
+    return (.listing, "/\(handle)")
 }
