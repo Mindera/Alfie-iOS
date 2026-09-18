@@ -7,8 +7,11 @@ status: accepted
 ADR-0001 printed an **Alfie code** because the BFF could not resolve a **Barcode**. On SCAYLE it now
 can: `productByBarcode(barcode:)` (Alfie-BFF PR #46) filters the catalogue by the `ean` attribute and
 returns the Product's id, plus the Variant's id when exactly one Variant carries the code. The
-scanner therefore resolves an EAN-13 Barcode through the BFF and opens the Product it names. Alfie
+scanner therefore resolves a Barcode through the BFF and opens the Product it names. Alfie
 codes are still printed and still win when both are in frame, because they need no lookup.
+
+A Barcode here is the value, not the symbology: Selfridges price tags carry a GTIN-13 inside a **Code
+128** symbol rather than an EAN-13 one, so the scanner recognises both and looks up either unchanged.
 
 ## Considered options
 

@@ -441,6 +441,24 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertTrue(scanService.isScanning)
     }
 
+    /// A Selfridges price tag carries its GTIN-13 in a Code 128 symbol. It is a product barcode like
+    /// any other, so it reaches `productByBarcode` as-is — the symbology it was read as is not part
+    /// of the code.
+    func test_scanning_code128_looks_up_its_value_as_a_barcode() throws {
+        var lookedUp: [String] = []
+        productService.onProductByBarcodeCalled = { barcode in
+            lookedUp.append(barcode)
+            return BarcodeMatch(productId: "8", variantId: "22")
+        }
+        sut.viewDidAppear()
+
+        recogniseAndAwaitRecognition(.code128("2600030000445"))
+        finishRecognitionFeedback()
+
+        XCTAssertEqual(lookedUp, ["2600030000445"])
+        XCTAssertEqual(openedLinks, [try url(Self.barcodeVariantLink)])
+    }
+
     func test_scanning_barcode_matching_variant_opens_product_with_variant_id() throws {
         productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: "22") }
         sut.viewDidAppear()

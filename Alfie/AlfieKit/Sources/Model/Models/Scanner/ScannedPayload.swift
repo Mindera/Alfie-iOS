@@ -4,6 +4,9 @@ public struct ScannedPayload: Equatable {
     public enum Symbology: Equatable {
         case qr
         case ean13
+        /// Selfridges tags carry their GTIN-13 in a Code 128 symbol rather than an EAN-13 one, so
+        /// this is a product barcode too — the symbology differs, the value it carries does not.
+        case code128
     }
 
     public let symbology: Symbology
@@ -20,5 +23,9 @@ public struct ScannedPayload: Equatable {
 
     public static func ean13(_ value: String) -> Self {
         .init(symbology: .ean13, value: value)
+    }
+
+    public static func code128(_ value: String) -> Self {
+        .init(symbology: .code128, value: value)
     }
 }

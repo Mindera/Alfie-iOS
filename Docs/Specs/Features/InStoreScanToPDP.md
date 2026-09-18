@@ -182,7 +182,7 @@ AND no camera permission is requested
 ```swift
 // What the camera read, as VisionKit reported it. CameraScanService publishes [ScannedPayload].
 public struct ScannedPayload: Equatable {
-    public enum Symbology: Equatable { case qr, ean13 }
+    public enum Symbology: Equatable { case qr, ean13, code128 }
     public let symbology: Symbology
     public let value: String
 }
@@ -191,7 +191,7 @@ public struct ScannedPayload: Equatable {
 public enum ScannedCode: Equatable {
     /// A QR code carrying an Alfie link, e.g. https://localhost:4000/product/<handle>?sku=<sku>
     case alfieCode(URL)
-    /// An EAN-13 manufacturer Barcode, resolved through productByBarcode
+    /// A product Barcode (EAN-13, or a GTIN-13 in a Code 128 symbol), resolved through productByBarcode
     case barcode(value: String)
     /// Anything else the camera recognised, including a QR code holding thirteen digits
     case unrecognised(payload: String)
@@ -530,8 +530,9 @@ The developer will verify the camera path manually on device.
 
 - Alfie code payload format: `https://localhost:4000/product/<handle>?sku=<sku>`. The `sku`
   selects the Variant the shopper arrives on.
-- Configure the scanner for QR **and** EAN-13. Each payload keeps the symbology VisionKit reported, and
-  only an EAN-13 read is looked up.
+- Configure the scanner for QR, EAN-13 **and** Code 128. Each payload keeps the symbology VisionKit
+  reported, and every Barcode read is looked up. Selfridges price tags print their GTIN-13 in a Code
+  128 symbol rather than an EAN-13 one, so EAN-13 alone never sees a real swing tag.
 - Gate the scanner on both `DataScannerViewController.isSupported` and `.isAvailable`.
 - `ProductDetailsDeepLinkParser` currently captures a single path segment, so a Handle containing
   `/` fails to parse and falls through to the web view. This is a pre-existing defect that affects

@@ -258,7 +258,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     /// while opening the page belongs to the flow.
     private func classify(payload: ScannedPayload) -> ScannedCode {
         switch payload.symbology {
-        case .ean13:
+        case .ean13, .code128:
             return .barcode(value: payload.value)
         case .qr:
             if let url = URL(string: payload.value), opensInApp(deepLinkService.deepLinkType(url)) {

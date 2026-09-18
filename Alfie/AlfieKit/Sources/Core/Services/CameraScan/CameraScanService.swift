@@ -174,7 +174,7 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
         }
 
         let controller = DataScannerViewController(
-            recognizedDataTypes: [.barcode(symbologies: [.qr, .ean13])],
+            recognizedDataTypes: [.barcode(symbologies: [.qr, .ean13, .code128])],
             qualityLevel: .balanced,
             // On, so that a tag showing both its codes at once is reported as both. Tracking a
             // single item would hand over whichever the scanner happened to pick, and the choice
@@ -229,6 +229,8 @@ extension CameraScanService {
             return .qr(value)
         case .ean13:
             return .ean13(value)
+        case .code128:
+            return .code128(value)
         default:
             return nil
         }
