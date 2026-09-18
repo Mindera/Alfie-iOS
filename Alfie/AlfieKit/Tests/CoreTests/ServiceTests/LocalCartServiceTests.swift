@@ -89,8 +89,27 @@ final class LocalCartServiceTests: XCTestCase {
         XCTAssertNil(sut.cart)
     }
 
+    /// Without a refetch: `discardCart` publishes the cleared cart itself, rather than leaving the
+    /// old one in place until something else happens to reload.
+    func test_discardCart_publishes_nil_without_a_refetch() async throws {
+        try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
+
+        await sut.discardCart()
+
+        XCTAssertNil(sut.cart)
+    }
+
     func test_total_with_unknown_price_is_nil() {
         let total = LocalCartService.total(of: [Money(currencyCode: "GBP", amount: 100, amountFormatted: "£1.00"), nil])
+
+        XCTAssertNil(total)
+    }
+
+    func test_total_with_mixed_currencies_is_nil() {
+        let total = LocalCartService.total(of: [
+            Money(currencyCode: "GBP", amount: 100, amountFormatted: "£1.00"),
+            Money(currencyCode: "USD", amount: 100, amountFormatted: "$1.00"),
+        ])
 
         XCTAssertNil(total)
     }

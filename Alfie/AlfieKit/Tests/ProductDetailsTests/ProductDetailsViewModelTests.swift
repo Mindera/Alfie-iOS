@@ -1414,6 +1414,70 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(setQuantityCallCount, 0)
     }
 
+    /// Pins the `> 0` guard on decrease rather than leaving it to `bagLine`: a line the cart reports
+    /// as zero still has a `bagLine`, so nothing else stops a write of -1.
+    func test_did_tap_decrease_bag_quantity_on_a_line_the_cart_reports_as_zero_writes_nothing() {
+        let write = expectation(description: "No quantity is written")
+        write.isInverted = true
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            write.fulfill()
+            return self.cartHolding(quantity: quantity)
+        }
+        initViewModel(configuration: .product(addableProduct()))
+        holdInBag(quantity: 0)
+
+        sut.didTapDecreaseBagQuantity()
+
+        wait(for: [write], timeout: 0.5)
+        XCTAssertEqual(writtenQuantities, [])
+    }
+
+    /// The write count alone cannot tell the in-flight guard in `stepBagQuantity` from the one in
+    /// `commitPendingBagQuantity`; the quantity on screen can.
+    func test_did_tap_increase_bag_quantity_while_a_change_is_in_flight_does_not_advance_the_shown_quantity() {
+        mockCartService.onSetQuantityCalled = { _, quantity in self.cartHolding(quantity: quantity) }
+        initViewModel(configuration: .product(addableProduct()))
+        holdInBag(quantity: 1)
+        sut.didTapIncreaseBagQuantity()
+
+        sut.didTapIncreaseBagQuantity()
+
+        XCTAssertEqual(sut.bagQuantity, 2)
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+    }
+
+    func test_did_tap_increase_bag_quantity_re_arms_the_debounce_window_so_the_earlier_tap_sends_nothing() {
+        let scheduler = DispatchQueue.test
+        let supersededWrite = expectation(description: "The superseded tap does not write when its own window elapses")
+        supersededWrite.isInverted = true
+        var writtenQuantities: [Int] = []
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            supersededWrite.fulfill()
+            return self.cartHolding(quantity: quantity)
+        }
+        initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
+        sut.didTapIncreaseBagQuantity()
+
+        scheduler.advance(by: .milliseconds(200))
+        sut.didTapIncreaseBagQuantity()
+        scheduler.advance(by: .milliseconds(300))
+
+        wait(for: [supersededWrite], timeout: 0.5)
+        XCTAssertEqual(writtenQuantities, [])
+
+        mockCartService.onSetQuantityCalled = { _, quantity in
+            writtenQuantities.append(quantity)
+            return self.cartHolding(quantity: quantity)
+        }
+        scheduler.advance(by: .milliseconds(200))
+
+        XCTAssertEmitsValueEqualTo(from: sut.$isUpdatingBagQuantity, expectedValue: false)
+        XCTAssertEqual(writtenQuantities, [3])
+    }
+
     func test_did_tap_increase_bag_quantity_while_a_change_is_in_flight_sends_no_second_request() {
         var setQuantityCallCount = 0
         mockCartService.onSetQuantityCalled = { _, quantity in
