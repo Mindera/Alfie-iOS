@@ -4,7 +4,7 @@ import Utils
 
 public final class NetworkClient: NetworkClientProtocol {
     private enum Headers: String {
-        case authorization = "Autorization"
+        case authorization = "Authorization"
     }
 
     private let logRequests: Bool

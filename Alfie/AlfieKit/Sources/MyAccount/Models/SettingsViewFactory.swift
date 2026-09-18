@@ -11,6 +11,7 @@ public enum SettingsViewFactory {
     public static func make(
         configurationService: ConfigurationServiceProtocol,
         apiEndpointService: ApiEndpointServiceProtocol,
+        bffApiKeyService: BffApiKeyServiceProtocol,
         present: @escaping PresentCover
     ) -> AnyView {
         AnyView(
@@ -18,6 +19,7 @@ public enum SettingsViewFactory {
                 viewModel: DebugMenuViewModel(
                     configurationService: configurationService,
                     apiEndpointService: apiEndpointService,
+                    bffApiKeyService: bffApiKeyService,
                     closeMenuAction: { present(nil) },
                     openForceAppUpdate: {
                         if let configuration = configurationService.forceAppUpdateInfo {

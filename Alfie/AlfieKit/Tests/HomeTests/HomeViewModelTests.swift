@@ -21,6 +21,7 @@ final class HomeViewModelTests: XCTestCase {
             dependencies: HomeDependencyContainer(
                 configurationService: MockConfigurationService(),
                 apiEndpointService: MockApiEndpointService(),
+                bffApiKeyService: MockBffApiKeyService(),
                 sessionService: mockSessionService
             ),
             navigate: { [weak self] route in self?.capturedRoute = route },

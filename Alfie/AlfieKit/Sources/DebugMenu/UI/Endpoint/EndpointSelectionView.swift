@@ -25,6 +25,12 @@ struct EndpointSelectionView: View {
 
             ThemedInput($viewModel.customEndpointUrl, isDisabled: .constant(viewModel.isInputDisabled))
 
+            DemoHelper.demoSectionHeader(title: "BFF API Key")
+
+            ThemedInput($viewModel.bffApiKey, isDisabled: .constant(viewModel.isApiKeyInputDisabled))
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+
             HStack {
                 Spacer()
                 ThemedButton(
@@ -57,7 +63,9 @@ struct EndpointSelectionView: View {
                 // swiftlint:disable:next trailing_closure
                 snackbarConfig = .init(
                     type: .success,
-                    text: "Done. The app will now restart automatically.",
+                    text: viewModel.willReboot
+                        ? "Done. The app will now restart automatically."
+                        : "Saved. The API key applies to the next request.",
                     showCloseButton: false,
                     showFromTop: true,
                     autoDismissTime: 4,
@@ -74,7 +82,8 @@ struct EndpointSelectionView: View {
 #Preview {
     EndpointSelectionView(
         viewModel: EndpointSelectionViewModel(
-            apiEndpointService: MockApiEndpointService()
+            apiEndpointService: MockApiEndpointService(),
+            apiKeyService: MockBffApiKeyService()
         ) { }
     )
 }

@@ -40,6 +40,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             client: client,
             store: store,
             reachabilityService: dependencies.reachabilityService,
+            apiKeyService: dependencies.apiKeyService,
             logRequests: logRequests,
             log: log
         )
@@ -213,7 +214,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
     public func getWebViewConfig() async throws -> WebViewConfiguration {
         let url = baseUrl.appending(path: BFFEndpoint.webviewConfig.rawValue)
         do {
-            return try await dependencies.restNetworkClient.getData(from: url, authenticationToken: nil)
+            return try await dependencies.restNetworkClient.getData(
+                from: url,
+                authenticationToken: dependencies.apiKeyService.currentApiKey
+            )
         } catch {
             throw BFFRequestError(type: .generic)
         }

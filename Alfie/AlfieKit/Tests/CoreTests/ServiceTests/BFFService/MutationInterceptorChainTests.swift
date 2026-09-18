@@ -82,6 +82,7 @@ final class MutationInterceptorChainTests: XCTestCase {
             client: URLSessionClient(),
             store: ApolloStore(cache: InMemoryNormalizedCache()),
             reachabilityService: MockReachabilityService(),
+            apiKeyService: MockBffApiKeyService(),
             logRequests: false,
             log: Log.DummyLogger()
         )
