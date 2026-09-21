@@ -46,7 +46,7 @@ public enum L10n {
   public enum Account {
     /// My Address Book
     public static let addressBook = L10n.tr("L10n", "account.address_book")
-    /// Hi, Alfie
+    /// Hi, Camilla
     public static let greeting = L10n.tr("L10n", "account.greeting")
     /// Member since 2024
     public static let memberSince = L10n.tr("L10n", "account.member_since")
