@@ -19,6 +19,7 @@
 - Route all navigation through `FlowViewModel` closures passed into the `ViewModel`
 - Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier (see `Docs/Accessibility.md`)
 - Reach for existing `SharedUI` components before writing a new view
+- Invoke `/swiftui-specialist` when writing or reviewing SwiftUI; where Apple's guidance assumes iOS 17+ (`@Observable`, `@Entry`), the iOS 16 + MVVM rules here win
 - Run `./Alfie/scripts/verify.sh` after every code change, and finish on a pass
 
 ### ❌ NEVER
