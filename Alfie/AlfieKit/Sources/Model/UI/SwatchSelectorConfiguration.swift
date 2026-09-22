@@ -1,5 +1,3 @@
-import Model
-
 /// Input to a swatch selector: what to draw, what is highlighted, and what to call on a tap.
 ///
 /// Immutable on purpose. The selection lives with whoever derives it, so a view cannot write a

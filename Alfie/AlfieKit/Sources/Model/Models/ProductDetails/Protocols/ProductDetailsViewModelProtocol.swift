@@ -6,7 +6,6 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productId: String { get }
     var productTitle: String { get }
     var productName: String { get }
-    var productHasStock: Bool { get }
     var productHasAnyStock: Bool { get }
     var isAddToBagEnabled: Bool { get }
     /// True while an add-to-bag write is in flight, so the CTA can show its loading state.

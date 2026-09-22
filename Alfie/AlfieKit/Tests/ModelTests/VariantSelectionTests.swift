@@ -1,6 +1,6 @@
 import Mocks
+import Model
 import XCTest
-@testable import Model
 
 /// The colour × size matrix. Every case here crosses both axes: a one-axis fixture passes while the
 /// colour scoping is missing, which is how the defect this type exists to remove survived four

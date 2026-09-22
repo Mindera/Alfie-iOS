@@ -70,12 +70,8 @@ public struct VariantSelection: Equatable {
 
     public var sizes: [SizeOption] {
         let scoped = variantsForSelectedColour
-        var seen = Set<String>()
-        return scoped.compactMap { variant in
-            guard let size = variant.size, seen.insert(size.id).inserted else {
-                return nil
-            }
-            return SizeOption(
+        return Self.distinct(scoped.map(\.size), by: \.id).map { size in
+            SizeOption(
                 size: size,
                 isInStock: scoped.contains { $0.size?.id == size.id && $0.stock > 0 }
             )
@@ -148,12 +144,20 @@ public struct VariantSelection: Equatable {
     /// Distinct colours in the order the BFF returned the variants, which is the merchandising
     /// order and not necessarily ascending by id.
     private static func distinctColours(in variants: [Product.Variant]) -> [Product.Colour] {
+        distinct(variants.map(\.colour), by: \.id)
+    }
+
+    /// First occurrence wins, so the incoming order survives.
+    private static func distinct<Element>(
+        _ elements: [Element?],
+        by id: (Element) -> String
+    ) -> [Element] {
         var seen = Set<String>()
-        return variants.compactMap { variant in
-            guard let colour = variant.colour, seen.insert(colour.id).inserted else {
+        return elements.compactMap { element in
+            guard let element, seen.insert(id(element)).inserted else {
                 return nil
             }
-            return colour
+            return element
         }
     }
 }

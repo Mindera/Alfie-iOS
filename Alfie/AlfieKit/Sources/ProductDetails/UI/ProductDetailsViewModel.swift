@@ -193,10 +193,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         // swiftlint:enable vertical_whitespace_between_cases
     }
 
-    public var productHasStock: Bool {
-        (selectedVariant?.stock ?? 0) > 0
-    }
-
     /// True when at least one variant of the product has stock.
     /// Use this for the CTA label (avoid showing "Out of Stock" while the product is still buyable in another size).
     public var productHasAnyStock: Bool {
@@ -371,7 +367,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         guard selection != self.selection else { return }
 
         self.selection = selection
-        let colours = selection.colours.map(colorSwatch(for:))
+        let colours = selection.colours.map(colourSwatch(for:))
         let sizes = selection.sizes.map(sizingSwatch(for:))
         variantSelection = VariantSelectionState(
             colours: colours,
@@ -381,7 +377,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         )
     }
 
-    private func colorSwatch(for option: VariantSelection.ColourOption) -> ColorSwatch {
+    private func colourSwatch(for option: VariantSelection.ColourOption) -> ColorSwatch {
         let type: SwatchType = if let url = option.colour.swatch?.url {
             .url(url)
         } else {

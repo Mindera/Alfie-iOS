@@ -86,8 +86,9 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertNotNil(sut.variantSelection.selectedColour)
     }
 
-    /// A lone size is implicit, so it is chosen rather than left for the shopper to tap. This is
-    /// what removes the `canShowSizeSelector` special case from the add-to-bag gate.
+    /// A lone size is implicit, so it is chosen rather than left for the shopper to tap. That is
+    /// what lets the add-to-bag gate ask one question rather than special-casing single-size
+    /// products.
     func test_sole_size_is_pre_selected_on_init_with_product() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
@@ -814,28 +815,25 @@ final class ProductDetailsViewModelTests: XCTestCase {
         })
     }
 
-    /// Entering by `.product` seeds the grid from a stale snapshot, so the refetch behind it has to
-    /// reach the swatches — otherwise a colour that sold out while the shopper was away stays drawn
-    /// as available.
-    func test_a_refetch_that_only_changes_stock_still_reaches_the_swatches() {
-        let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
-        let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
-        let stale = Product.fixture(
-            defaultVariant: .fixture(colour: color1, stock: 1),
-            variants: [.fixture(colour: color1, stock: 1), .fixture(colour: color2, stock: 5)]
-        )
-        let fresh = Product.fixture(
-            defaultVariant: .fixture(colour: color1, stock: 1),
-            variants: [.fixture(colour: color1, stock: 1), .fixture(colour: color2, stock: 0)]
-        )
+    /// Entering by `.product` draws the grid from the snapshot the caller carried in, before any
+    /// fetch has happened. The refetch test below is only meaningful if this starts out enabled.
+    func test_entering_with_a_product_seeds_the_swatches_from_its_snapshot() {
+        let stale = productWhoseSecondColourHasStock(5)
 
         initViewModel(configuration: .product(stale))
-        XCTAssertEqual(sut.variantSelection.colours.first { $0.id == color2.id }?.isDisabled, false)
 
-        mockProductService.onGetProductCalled = { _ in fresh }
+        XCTAssertEqual(isSecondColourDisabled, false)
+    }
+
+    /// The snapshot can be stale, so the refetch behind it has to reach the swatches — otherwise a
+    /// colour that sold out while the shopper was away stays drawn as available.
+    func test_a_refetch_that_only_changes_stock_still_reaches_the_swatches() {
+        initViewModel(configuration: .product(productWhoseSecondColourHasStock(5)))
+        mockProductService.onGetProductCalled = { _ in self.productWhoseSecondColourHasStock(0) }
+
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(sut.variantSelection.colours.first { $0.id == color2.id }?.isDisabled, true)
+        XCTAssertEqual(isSecondColourDisabled, true)
     }
 
     func test_selection_is_unchanged_if_an_unknown_colour_is_tapped() {
@@ -1473,6 +1471,21 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     // MARK: - Helper methods
+
+    /// Two colours, the first always stocked, the second carrying whatever stock the case needs —
+    /// so a refetch can change availability without changing anything else about the product.
+    private func productWhoseSecondColourHasStock(_ stock: Int) -> Product {
+        let colour1 = Product.Colour.fixture(id: "1", name: "Color 1")
+        let colour2 = Product.Colour.fixture(id: "2", name: "Color 2")
+        return .fixture(
+            defaultVariant: .fixture(colour: colour1, stock: 1),
+            variants: [.fixture(colour: colour1, stock: 1), .fixture(colour: colour2, stock: stock)]
+        )
+    }
+
+    private var isSecondColourDisabled: Bool? {
+        sut.variantSelection.colours.first { $0.id == "2" }?.isDisabled
+    }
 
     /// Two sizes in one colour: the shape where a size choice is genuinely open, so "no size is
     /// pre-selected" means something. A single size is auto-selected by design.
