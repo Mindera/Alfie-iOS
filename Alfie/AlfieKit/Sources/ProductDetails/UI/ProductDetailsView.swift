@@ -21,17 +21,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.variantSelection.colours.count)
     }
 
-    private var isOneSize: Bool {
-        viewModel.variantSelection.sizes.count == 1
-    }
-
-    private var canShowSize: Bool {
-        let sizes = viewModel.variantSelection.sizes
-        guard !sizes.isEmpty else { return true }
-
-        return sizes.contains { $0.state != .outOfStock }
-    }
-
     // showFailureState is driven by the view model; the flag lets the error-state snapshot render it.
     public init(viewModel: ViewModel, showFailureState: Bool = false) {
         _showFailureState = State(initialValue: showFailureState)
@@ -256,9 +245,7 @@ extension ProductDetailsView {
 
             colorSelector
 
-            if canShowSize {
-                sizeSelector
-            }
+            sizeSelector
 
             descriptionSection
                 .padding(.vertical, theme.spacing.space200)
@@ -451,7 +438,8 @@ extension ProductDetailsView {
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: theme.spacing.space150) {
-                if viewModel.variantSelection.canShowSizeSelector {
+                switch viewModel.variantSelection.sizeDisplay {
+                case .selector:
                     sizeSelectorHeader
 
                     SizingSelectorComponentView(
@@ -462,8 +450,12 @@ extension ProductDetailsView {
                         ),
                         layoutConfiguration: .init(arrangement: .grid(columns: Constants.sizeGridColumns))
                     )
-                } else {
-                    singleSizeView
+
+                case .single(let name):
+                    selectedSizeLabel(name)
+
+                case .oneSize:
+                    selectedSizeLabel(L10n.Product.OneSize.title)
                 }
             }
             .shimmering(while: shimmeringBinding(for: .sizeSelector), animateOnStateTransition: false)
@@ -487,11 +479,8 @@ extension ProductDetailsView {
         }
     }
 
-    private var singleSizeView: some View {
-        let sizeText: String = isOneSize
-            ? (viewModel.variantSelection.sizes.first?.name ?? "")
-            : L10n.Product.OneSize.title
-        return Text.build(theme.font.body.medium(L10n.Product.Size.selected(sizeText)))
+    private func selectedSizeLabel(_ size: String) -> some View {
+        Text.build(theme.font.body.medium(L10n.Product.Size.selected(size)))
             .foregroundStyle(Theme.contentContentPrimary)
     }
 
