@@ -815,8 +815,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     /// Entering by `.product` seeds the grid from a stale snapshot, so the refetch behind it has to
-    /// reach the swatches. `ColorSwatch` compares by id, so guarding on the drawn state would
-    /// swallow a colour that sold out while the shopper was away.
+    /// reach the swatches — otherwise a colour that sold out while the shopper was away stays drawn
+    /// as available.
     func test_a_refetch_that_only_changes_stock_still_reaches_the_swatches() {
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
         let color2 = Product.Colour.fixture(id: "2", name: "Color 2")

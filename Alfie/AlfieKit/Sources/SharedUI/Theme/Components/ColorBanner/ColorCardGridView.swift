@@ -17,7 +17,7 @@ public struct ColorCardGridView: View {
             spacing: theme.spacing.space100
         ) {
             ForEach(configuration.items) { item in
-                ColorCardView(item: item, isSelected: configuration.selectedItem == item) {
+                ColorCardView(item: item, isSelected: configuration.selectedItem?.id == item.id) {
                     configuration.onSelect(item)
                 }
             }

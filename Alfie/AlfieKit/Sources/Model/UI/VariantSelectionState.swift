@@ -4,7 +4,7 @@ import Foundation
 ///
 /// The swatches and the highlight are produced together from one derivation, so the screen cannot
 /// show a colour as selected that the chosen variant does not have.
-public struct VariantSelectionState: Equatable {
+public struct VariantSelectionState {
     public let colours: [ColorSwatch]
     public let selectedColour: ColorSwatch?
     public let sizes: [SizingSwatch]
