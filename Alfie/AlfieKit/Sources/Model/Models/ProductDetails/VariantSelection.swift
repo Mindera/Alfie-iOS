@@ -11,8 +11,10 @@ import Foundation
 public struct VariantSelection: Equatable {
     public struct ColourOption: Equatable {
         public let colour: Product.Colour
-        /// False only when no variant of this colour has any stock. Never disables the swatch —
-        /// colour is the axis shoppers browse.
+        /// False only when no variant of this colour has any stock in any size, which is the one
+        /// case the grid disables. A colour missing the *selected* size stays available and
+        /// tappable — colour is the axis shoppers browse, so it is never gated on an incidental
+        /// size.
         public let isAvailable: Bool
     }
 

@@ -788,6 +788,32 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.productReference, variant2.sku)
     }
 
+    func test_reselecting_the_current_colour_does_not_republish_the_selection() throws {
+        initViewModel()
+
+        let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
+        let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
+        let variant1 = Product.Variant.fixture(colour: color1, stock: 1)
+        let variant2 = Product.Variant.fixture(colour: color2, stock: 2)
+        let product = Product.fixture(name: "Product Name",
+                                      brand: .fixture(name: "Product Brand"),
+                                      defaultVariant: variant1,
+                                      variants: [variant1, variant2])
+        mockProductService.onGetProductCalled = { _ in
+            product
+        }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        let selected = try XCTUnwrap(sut.variantSelection.selectedColour)
+
+        // `@Published` publishes on every set, so without the equality guard this redraws the whole
+        // page for a tap that changed nothing.
+        XCTAssertNoEmit(from: sut.$variantSelection, afterTrigger: {
+            self.sut.didSelectColour(selected)
+        })
+    }
+
     func test_selection_is_unchanged_if_an_unknown_colour_is_tapped() {
         initViewModel()
 
