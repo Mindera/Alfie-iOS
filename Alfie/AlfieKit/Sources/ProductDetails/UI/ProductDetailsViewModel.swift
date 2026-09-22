@@ -368,12 +368,16 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.selection = selection
         let colours = selection.colours.map(colorSwatch(for:))
         let sizes = selection.sizes.map(sizingSwatch(for:))
-        variantSelection = VariantSelectionState(
+        let state = VariantSelectionState(
             colours: colours,
             selectedColour: colours.first { $0.id == selection.selectedColour?.id },
             sizes: sizes,
             selectedSize: sizes.first { $0.id == selection.selectedSize?.id }
         )
+        // `@Published` publishes on every set, equal or not, and re-picking the current swatch
+        // derives an identical state.
+        guard state != variantSelection else { return }
+        variantSelection = state
     }
 
     private func colorSwatch(for option: VariantSelection.ColourOption) -> ColorSwatch {
