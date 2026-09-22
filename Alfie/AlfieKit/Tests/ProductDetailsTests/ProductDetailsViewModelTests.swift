@@ -814,6 +814,30 @@ final class ProductDetailsViewModelTests: XCTestCase {
         })
     }
 
+    /// Entering by `.product` seeds the grid from a stale snapshot, so the refetch behind it has to
+    /// reach the swatches. `ColorSwatch` compares by id, so guarding on the drawn state would
+    /// swallow a colour that sold out while the shopper was away.
+    func test_a_refetch_that_only_changes_stock_still_reaches_the_swatches() {
+        let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
+        let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
+        let stale = Product.fixture(
+            defaultVariant: .fixture(colour: color1, stock: 1),
+            variants: [.fixture(colour: color1, stock: 1), .fixture(colour: color2, stock: 5)]
+        )
+        let fresh = Product.fixture(
+            defaultVariant: .fixture(colour: color1, stock: 1),
+            variants: [.fixture(colour: color1, stock: 1), .fixture(colour: color2, stock: 0)]
+        )
+
+        initViewModel(configuration: .product(stale))
+        XCTAssertEqual(sut.variantSelection.colours.first { $0.id == color2.id }?.isDisabled, false)
+
+        mockProductService.onGetProductCalled = { _ in fresh }
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.variantSelection.colours.first { $0.id == color2.id }?.isDisabled, true)
+    }
+
     func test_selection_is_unchanged_if_an_unknown_colour_is_tapped() {
         initViewModel()
 

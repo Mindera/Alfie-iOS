@@ -365,19 +365,21 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     /// The one way to move the selection, so the drawn state can never lag behind it.
     private func updateSelection(_ selection: VariantSelection) {
+        // `@Published` publishes on every set, equal or not, and re-picking the current swatch
+        // lands an identical selection. Guarding on the source rather than the derived state is
+        // deliberate: `ColorSwatch` compares by id alone, so two equal `VariantSelectionState`s
+        // can still draw different stock and swatch images after a refetch.
+        guard selection != self.selection else { return }
+
         self.selection = selection
         let colours = selection.colours.map(colorSwatch(for:))
         let sizes = selection.sizes.map(sizingSwatch(for:))
-        let state = VariantSelectionState(
+        variantSelection = VariantSelectionState(
             colours: colours,
             selectedColour: colours.first { $0.id == selection.selectedColour?.id },
             sizes: sizes,
             selectedSize: sizes.first { $0.id == selection.selectedSize?.id }
         )
-        // `@Published` publishes on every set, equal or not, and re-picking the current swatch
-        // derives an identical state.
-        guard state != variantSelection else { return }
-        variantSelection = state
     }
 
     private func colorSwatch(for option: VariantSelection.ColourOption) -> ColorSwatch {
