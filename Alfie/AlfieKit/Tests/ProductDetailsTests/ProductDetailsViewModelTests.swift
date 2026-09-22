@@ -235,8 +235,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     func test_isAddToBagEnabled_isTrueOnInit_forSingleSizeProduct_withStock() {
         // Product has sizes, but only one size variant exists (e.g. only available in M).
-        // The View renders a non-interactive singleSizeView, so the user can't tap a swatch —
-        // treat the size as implicitly selected.
+        // `sizeDisplay` is `.single`, so the View names the size rather than offering a grid and
+        // the user can't tap a swatch — treat the size as implicitly selected.
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "m", value: "M")
         let variant = Product.Variant.fixture(id: "v1", size: size, colour: color, stock: 5)
