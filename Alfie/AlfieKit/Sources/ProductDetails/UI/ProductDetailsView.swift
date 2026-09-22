@@ -18,21 +18,18 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @State private var addToBagSnackbarConfig: SnackbarViewConfiguration?
 
     private var colourLayout: ProductDetailsLayoutRules.ColourLayout {
-        ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.colorSelectionConfiguration.items.count)
+        ProductDetailsLayoutRules.colourLayout(forColourCount: viewModel.variantSelection.colours.count)
     }
 
     private var isOneSize: Bool {
-        viewModel.sizingSelectionConfiguration.items.count == 1
+        viewModel.variantSelection.sizes.count == 1
     }
 
     private var canShowSize: Bool {
-        guard !viewModel.sizingSelectionConfiguration.items.isEmpty else { return true }
+        let sizes = viewModel.variantSelection.sizes
+        guard !sizes.isEmpty else { return true }
 
-        let productStockCount = viewModel.sizingSelectionConfiguration.items.reduce(into: 0) {
-            $0 += ($1.state != .outOfStock ? 1 : 0)
-        }
-
-        return productStockCount != 0
+        return sizes.contains { $0.state != .outOfStock }
     }
 
     // showFailureState is driven by the view model; the flag lets the error-state snapshot render it.
@@ -389,19 +386,17 @@ extension ProductDetailsView {
     }
 
     @ViewBuilder private var colorSummary: some View {
-        let configuration = viewModel.colorSelectionConfiguration
+        let selection = viewModel.variantSelection
         let remainingCount = ProductDetailsLayoutRules.colourSummaryRemainingCount(
-            forColourCount: configuration.items.count,
-            hasSelection: configuration.selectedItem != nil
+            forColourCount: selection.colours.count,
+            hasSelection: selection.selectedColour != nil
         )
         if viewModel.shouldShow(section: .colorSelector),
-           let selectedItem = configuration.selectedItem,
+           let selectedColour = selection.selectedColour,
            let remainingCount {
-            // Informational: with the grid always inline there is nowhere left for a tap to go.
-            ColorSummaryView(selectedItem: selectedItem, remainingCount: remainingCount) {}
-                .allowsHitTesting(false)
-            .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
-            .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
+            ColorSummaryView(selectedItem: selectedColour, remainingCount: remainingCount)
+                .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
         }
     }
 
@@ -431,7 +426,11 @@ extension ProductDetailsView {
                         colourSelectorTitle
 
                         ColorCardGridView(
-                            configuration: viewModel.colorSelectionConfiguration,
+                            configuration: .init(
+                                items: viewModel.variantSelection.colours,
+                                selectedItem: viewModel.variantSelection.selectedColour,
+                                onSelect: viewModel.didSelectColour
+                            ),
                             columns: Constants.colourGridColumns
                         )
                     }
@@ -452,11 +451,15 @@ extension ProductDetailsView {
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
             VStack(alignment: .leading, spacing: theme.spacing.space150) {
-                if viewModel.canShowSizeSelector {
+                if viewModel.variantSelection.canShowSizeSelector {
                     sizeSelectorHeader
 
                     SizingSelectorComponentView(
-                        configuration: viewModel.sizingSelectionConfiguration,
+                        configuration: .init(
+                            items: viewModel.variantSelection.sizes,
+                            selectedItem: viewModel.variantSelection.selectedSize,
+                            onSelect: viewModel.didSelectSize
+                        ),
                         layoutConfiguration: .init(arrangement: .grid(columns: Constants.sizeGridColumns))
                     )
                 } else {
@@ -486,7 +489,7 @@ extension ProductDetailsView {
 
     private var singleSizeView: some View {
         let sizeText: String = isOneSize
-            ? (viewModel.sizingSelectionConfiguration.items.first?.name ?? "")
+            ? (viewModel.variantSelection.sizes.first?.name ?? "")
             : L10n.Product.OneSize.title
         return Text.build(theme.font.body.medium(L10n.Product.Size.selected(sizeText)))
             .foregroundStyle(Theme.contentContentPrimary)
@@ -718,15 +721,15 @@ private enum Constants {
 #Preview("Loaded") {
     ProductDetailsView(
         viewModel: MockProductDetailsViewModel(
-            state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
+            state: .success(.init(product: .fixture())),
             productName: "Nolita SW Signature Loafer",
             productImageUrls: [
                 URL.fromString("https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
                 URL.fromString("https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
             ],
             productDescription: "A short-sleeved dress in a slim fit by BOSS Womenswear. Featuring a wrap-over bodice and a tiered skirt, this V-neck dress is crafted in metallic fabric with lining underneath.", // swiftlint:disable:this line_length
-            colorSelectionConfiguration: .init(
-                items: [
+            variantSelection: .init(
+                colours: [
                     .init(id: "1", name: "", type: .url(URL.fromString("URL.fromString(https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"))),
                     .init(id: "2", name: "", type: .url(URL.fromString("URL.fromString(https://images.pexels.com/photos/9077817/pexels-photo-9077817.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"))),
                     .init(id: "3", name: "", type: .color(.green), isDisabled: true),
@@ -755,7 +758,7 @@ private enum Constants {
 #Preview("Error - Generic") {
     ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
 }
-#endif // swiftlint:disable:this file_length
+#endif
 
 private extension AddToBagFeedback {
     var snackbarType: SnackbarViewConfiguration.SnackbarViewType {

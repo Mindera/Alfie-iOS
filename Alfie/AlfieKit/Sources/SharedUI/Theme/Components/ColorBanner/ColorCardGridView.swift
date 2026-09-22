@@ -2,12 +2,11 @@ import Model
 import SwiftUI
 
 /// The design's inline colour picker: one card per colour, swatch above name, laid out in a grid.
-/// `ColorSelectorComponentView` renders swatches alone, with no room for the name the card carries.
 public struct ColorCardGridView: View {
-    @ObservedObject private var configuration: ColorAndSizingSelectorConfiguration<ColorSwatch>
+    private let configuration: SwatchSelectorConfiguration<ColorSwatch>
     private let columns: Int
 
-    public init(configuration: ColorAndSizingSelectorConfiguration<ColorSwatch>, columns: Int) {
+    public init(configuration: SwatchSelectorConfiguration<ColorSwatch>, columns: Int) {
         self.configuration = configuration
         self.columns = columns
     }
@@ -19,7 +18,7 @@ public struct ColorCardGridView: View {
         ) {
             ForEach(configuration.items) { item in
                 ColorCardView(item: item, isSelected: configuration.selectedItem == item) {
-                    configuration.selectedItem = item
+                    configuration.onSelect(item)
                 }
             }
         }
@@ -96,7 +95,8 @@ private enum Constants {
                 .init(id: "4", name: "Midnight Navy", type: .color(.blue)),
                 .init(id: "5", name: "Sand", type: .color(.brown), isDisabled: true),
             ],
-            selectedItem: .init(id: "2", name: "Black", type: .color(.black))
+            selectedItem: .init(id: "2", name: "Black", type: .color(.black)),
+            onSelect: { _ in }
         ),
         columns: 3
     )

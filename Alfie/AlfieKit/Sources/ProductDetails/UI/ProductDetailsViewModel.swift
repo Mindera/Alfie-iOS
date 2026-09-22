@@ -8,8 +8,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let dependencies: ProductDetailsDependencyContainer
     // In case we already have a full or partial product to show while fetching
     private let baseProduct: Product?
-    private var colorSelectionSubscription: AnyCancellable?
-    private var sizingSelectionSubscription: AnyCancellable?
     private let goBackAction: () -> Void
     private let openWebfeatureAction: (WebFeature) -> Void
     private let openProductAction: (Product) -> Void
@@ -22,12 +20,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
-    public private(set) var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(
-        items: []
-    )
-    public private(set) var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(
-        items: []
-    )
+    /// The only selection state on the PDP. Everything the shopper sees about colour, size, the
+    /// chosen variant and whether the product can be bought is derived from it.
+    private var selection = VariantSelection(variants: [])
+    /// Rebuilt when `selection` changes, not on every read: the view touches this several times per
+    /// body pass and each rebuild rescans every variant.
+    @Published public private(set) var variantSelection = VariantSelectionState()
     public let productId: String
     /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
     /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
@@ -43,11 +41,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     private var selectedVariant: Product.Variant? {
-        guard case .success(let model) = state else {
-            return initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariant
-        }
-
-        return model.selectedVariant
+        selection.displayVariant ?? initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariant
     }
 
     public var productTitle: String { product?.brand.name ?? "" }
@@ -118,10 +112,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.initialSelectedProduct = nil
             self.baseProduct = product
 
-            buildColorAndSizingSelectionConfigurations(
-                product: product,
-                selectedVariant: product.defaultVariant
-            )
+            updateSelection(VariantSelection(variants: product.variants, preferredVariant: product.defaultVariant))
 
         case .selectedProduct(let selectedProduct):
             self.productId = selectedProduct.product.id
@@ -129,10 +120,10 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.initialSelectedProduct = selectedProduct
             baseProduct = selectedProduct.product
 
-            buildColorAndSizingSelectionConfigurations(
-                product: selectedProduct.product,
-                selectedVariant: selectedProduct.selectedVariant
-            )
+            updateSelection(VariantSelection(
+                variants: selectedProduct.product.variants,
+                preferredVariant: selectedProduct.selectedVariant
+            ))
         }
     }
 
@@ -212,30 +203,23 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         product?.variants.contains { $0.stock > 0 } ?? false
     }
 
-    /// True when the user is offered an interactive size choice (more than one size swatch).
-    /// When false, the size is implicit (sizeless product or a single available size).
-    public var canShowSizeSelector: Bool {
-        sizingSelectionConfiguration.items.count > 1
-    }
-
     public var isAddToBagEnabled: Bool {
-        productHasStock
-            && selectedVariant?.id != nil
-            && colorSelectionConfiguration.selectedItem != nil
-            && (!canShowSizeSelector || sizingSelectionConfiguration.selectedItem != nil)
+        selection.purchaseState.readyVariant != nil
     }
 
     public func didTapAddToBag() {
         // `isAddingToBag` flips before the Task is started, so a second tap while the first write
         // is still in flight is rejected here rather than becoming a second request.
         guard
-            isAddToBagEnabled,
             !isAddingToBag,
-            let selectedProduct,
-            let variantId = selectedVariant?.id
+            let variant = selection.purchaseState.readyVariant,
+            let variantId = variant.id,
+            let product
         else {
             return
         }
+
+        let selectedProduct = SelectedProduct(product: product, selectedVariant: variant)
 
         // Cleared up front so a second write with the same outcome is still a change the View
         // observes, rather than being swallowed as an unchanged value.
@@ -247,7 +231,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 // `product.id`, not `selectedProduct.id`: the latter is the composite
                 // "<productId>-<sku>" used for local identity, which no platform would resolve.
                 try await dependencies.cartService.add(
-                    line: .init(productId: selectedProduct.product.id, variantId: variantId)
+                    line: .init(productId: product.id, variantId: variantId)
                 )
                 // Only once the cart holds the line — firing on the tap would count adds that failed.
                 // The composite id here is the pre-existing analytics shape, left alone per Q29.
@@ -282,12 +266,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         openWebfeatureAction(feature)
     }
 
-    public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
-        if searchTerm.isEmpty {
-            colorSelectionConfiguration.items
-        } else {
-            colorSelectionConfiguration.items.filter { $0.name.localizedCaseInsensitiveContains(searchTerm) }
-        }
+    public func didSelectColour(_ swatch: ColorSwatch) {
+        updateSelection(selection.selecting(colourID: swatch.id))
+    }
+
+    public func didSelectSize(_ swatch: SizingSwatch) {
+        updateSelection(selection.selecting(sizeID: swatch.id))
     }
 
     public func didSelectRelatedProduct(_ product: Product) {
@@ -361,9 +345,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        let selectedVariant = resolvedSelectedVariant(for: product)
-        buildColorAndSizingSelectionConfigurations(product: product, selectedVariant: selectedVariant)
-        state = .success(.init(product: product, selectedVariant: selectedVariant))
+        updateSelection(VariantSelection(
+            variants: product.variants,
+            preferredVariant: resolvedSelectedVariant(for: product)
+        ))
+        state = .success(.init(product: product))
     }
 
     /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
@@ -377,152 +363,42 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return product.variants.first { $0.sku == persistedSku } ?? product.defaultVariant
     }
 
-    private func buildColorAndSizingSelectionConfigurations(product: Product, selectedVariant: Product.Variant) {
-        buildColorSelectionConfiguration(product: product, selectedVariant: selectedVariant)
-        buildSizingSelectionConfiguration(product: product, selectedVariant: selectedVariant)
-    }
-
-    private func buildColorSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
-        colorSelectionSubscription?.cancel()
-
-        let colorSwatches = buildColorSwatches(product: product)
-
-        var selectedSwatch: ColorSwatch?
-        if let selectedVariant {
-            selectedSwatch = colorSwatches.first { $0.id == selectedVariant.colour?.id }
-        }
-
-        colorSelectionConfiguration = .init(items: colorSwatches, selectedItem: selectedSwatch)
-        colorSelectionSubscription = colorSelectionConfiguration.$selectedItem
-            .receive(on: dependencies.scheduler)
-            .dropFirst()
-            .sink { [weak self] colorSwatch in
-                guard let self, let colorSwatch else {
-                    return
-                }
-                self.didSelect(colorSwatch: colorSwatch)
-            }
-    }
-
-    private func buildColorSwatches(product: Product) -> [ColorSwatch] {
-        let colors = buildVariantColors(product: product)
-        return colors.map { color in
-            var type: SwatchType
-            if let url = color.swatch?.url {
-                type = .url(url)
-            } else {
-                // A filled stand-in for a missing swatch image, so it reads as a surface token.
-                type = .color(Theme.surfaceBackgroundInvertedPrimary)
-            }
-
-            let isAvailable = product.variants.contains { $0.colour?.id == color.id && $0.stock > 0 }
-
-            return ColorSwatch(id: color.id, name: color.name, type: type, isDisabled: !isAvailable)
-        }
-    }
-
-    private func buildVariantColors(product: Product) -> [Product.Colour] {
-        // We could have used a Set<Product.Colour> or an OrderedSet and map the variants to it,
-        // but we need to preserve the order returned by the API and it may not be the color ID ascending
-        // so we map it manually
-        var productColors = [Product.Colour]()
-        product.variants.forEach { variant in
-            guard let color = variant.colour, !productColors.contains(where: { $0.id == color.id }) else {
-                return
-            }
-            productColors
-                .append(Product.Colour(id: color.id, swatch: color.swatch, name: color.name, media: color.media))
-        }
-        return productColors
-    }
-
-    private func buildSizingSelectionConfiguration(product: Product, selectedVariant: Product.Variant?) {
-        sizingSelectionSubscription?.cancel()
-
-        let sizingSwatches = buildSizingSwatches(product: product, selectedVariant: selectedVariant)
-
-        // Size is never auto-selected on PDP entry — the user must tap a swatch.
-        sizingSelectionConfiguration = .init(
-            selectedTitle: L10n.Product.Size.title + ":",
-            items: sizingSwatches,
-            selectedItem: nil
+    /// The one way to move the selection, so the drawn state can never lag behind it.
+    private func updateSelection(_ selection: VariantSelection) {
+        self.selection = selection
+        let colours = selection.colours.map(colorSwatch(for:))
+        let sizes = selection.sizes.map(sizingSwatch(for:))
+        variantSelection = VariantSelectionState(
+            colours: colours,
+            selectedColour: colours.first { $0.id == selection.selectedColour?.id },
+            sizes: sizes,
+            selectedSize: sizes.first { $0.id == selection.selectedSize?.id }
         )
-        sizingSelectionSubscription = sizingSelectionConfiguration.$selectedItem
-            .receive(on: dependencies.scheduler)
-            .dropFirst()
-            .sink { [weak self] sizingSwatch in
-                guard let self, let sizingSwatch else {
-                    return
-                }
-                self.didSelect(sizingSwatch: sizingSwatch)
-            }
     }
 
-    private func buildSizingSwatches(product: Product, selectedVariant: Product.Variant?) -> [SizingSwatch] {
-        let sizes = buildVariantSizes(product: product, selectedVariant: selectedVariant)
-        return sizes.map { size in
-            let isAvailable = product.variants.contains { $0.size?.id == size.id && $0.stock > 0 }
-            var sizeName = size.value
-            if let scale = size.scale {
-                sizeName += " \(scale)"
-            }
-            // TODO: Handle unavailable state if needed
-            return SizingSwatch(id: size.id, name: sizeName, state: isAvailable ? .available : .outOfStock)
-        }
-    }
-
-    private func buildVariantSizes(product: Product, selectedVariant: Product.Variant?) -> [Product.ProductSize] {
-        let variantsForSelectedColor = product.variants.filter { $0.colour?.id == selectedVariant?.colour?.id }
-        var productSizes = [Product.ProductSize]()
-        variantsForSelectedColor.forEach { variant in
-            guard let size = variant.size, !productSizes.contains(where: { $0.id == size.id }) else {
-                return
-            }
-            productSizes.append(
-                Product.ProductSize(
-                    id: size.id,
-                    value: size.value,
-                    scale: size.scale,
-                    description: size.description,
-                    sizeGuide: size.sizeGuide
-                )
-            )
-        }
-        return productSizes
-    }
-
-    private func didSelect(colorSwatch: ColorSwatch) {
-        guard let product else {
-            dependencies.log.error("Tried to select color on inexistent product")
-            return
+    private func colorSwatch(for option: VariantSelection.ColourOption) -> ColorSwatch {
+        let type: SwatchType = if let url = option.colour.swatch?.url {
+            .url(url)
+        } else {
+            // A filled stand-in for a missing swatch image, so it reads as a surface token.
+            .color(Theme.surfaceBackgroundInvertedPrimary)
         }
 
-        guard let variant = product.variants.first(
-            where: { $0.colour?.id == colorSwatch.id && $0.size?.id == selectedVariant?.size?.id }
+        return ColorSwatch(
+            id: option.colour.id,
+            name: option.colour.name,
+            type: type,
+            isDisabled: !option.isAvailable
         )
-        else {
-            dependencies.log.debug("Unexpected data inconsistency: tried to select color \(colorSwatch.id) on product \(productId) but no variant exists with that color, ignoring selection")
-            return
-        }
-
-        state = .success(.init(product: product, selectedVariant: variant))
     }
 
-    private func didSelect(sizingSwatch: SizingSwatch) {
-        guard let product else {
-            dependencies.log.error("Tried to select size on inexistent product")
-            return
+    private func sizingSwatch(for option: VariantSelection.SizeOption) -> SizingSwatch {
+        var name = option.size.value
+        if let scale = option.size.scale {
+            name += " \(scale)"
         }
 
-        guard let variant = product.variants.first(
-            where: { $0.size?.id == sizingSwatch.id && $0.colour?.id == selectedVariant?.colour?.id }
-        )
-        else {
-            dependencies.log.debug("Unexpected data inconsistency: tried to select size \(sizingSwatch.id) on product \(productId) but no variant exists with that size, ignoring selection")
-            return
-        }
-
-        state = .success(.init(product: product, selectedVariant: variant))
+        return SizingSwatch(id: option.size.id, name: name, state: option.isInStock ? .available : .outOfStock)
     }
 
     private var selectedProduct: SelectedProduct? {

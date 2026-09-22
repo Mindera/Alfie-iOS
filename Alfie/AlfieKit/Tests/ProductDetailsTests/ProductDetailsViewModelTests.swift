@@ -39,10 +39,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
         XCTAssertTrue(sut.productName.isEmpty)
         XCTAssertTrue(sut.productTitle.isEmpty)
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        let sizingSelectionConfiguration = sut.sizingSelectionConfiguration
-        XCTAssertTrue(colorSelectionConfiguration.items.isEmpty)
-        XCTAssertTrue(sizingSelectionConfiguration.items.isEmpty)
+        XCTAssertTrue(sut.variantSelection.colours.isEmpty)
+        XCTAssertTrue(sut.variantSelection.sizes.isEmpty)
     }
 
     func test_placeholder_information_is_available_when_a_base_product_is_passed_on_init() {
@@ -56,50 +54,66 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel(configuration: .product(product))
         XCTAssertEqual(sut.productName, product.name)
         XCTAssertEqual(sut.productTitle, product.brand.name)
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.id, color.id)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.name, color.name)
-        let sizingSelectionConfiguration = sut.sizingSelectionConfiguration
-        XCTAssertEqual(sizingSelectionConfiguration.items.count, 1)
-        XCTAssertEqual(sizingSelectionConfiguration.items.first?.id, size.id)
-        XCTAssertEqual(sizingSelectionConfiguration.items.first?.name, size.value)
+        let selection = sut.variantSelection
+        XCTAssertEqual(selection.colours.count, 1)
+        XCTAssertEqual(selection.colours.first?.id, color.id)
+        XCTAssertEqual(selection.colours.first?.name, color.name)
+        XCTAssertEqual(selection.sizes.count, 1)
+        XCTAssertEqual(selection.sizes.first?.id, size.id)
+        XCTAssertEqual(selection.sizes.first?.name, size.value)
     }
     
     func test_size_swatch_is_not_pre_selected_on_init_with_product() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
-        let variant = Product.Variant.fixture(size: size, colour: color)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        let product = Product.fixture(defaultVariant: twoSizeVariants(colour: color)[0],
+                                      variants: twoSizeVariants(colour: color))
         initViewModel(configuration: .product(product))
 
-        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
-        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+        XCTAssertNil(sut.variantSelection.selectedSize)
+        XCTAssertNotNil(sut.variantSelection.selectedColour)
     }
 
     func test_size_swatch_is_not_pre_selected_after_product_fetch() {
         initViewModel()
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
-        let variant = Product.Variant.fixture(size: size, colour: color)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        let product = Product.fixture(defaultVariant: twoSizeVariants(colour: color)[0],
+                                      variants: twoSizeVariants(colour: color))
         mockProductService.onGetProductCalled = { _ in product }
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
-        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+        XCTAssertNil(sut.variantSelection.selectedSize)
+        XCTAssertNotNil(sut.variantSelection.selectedColour)
     }
 
-    func test_sizing_selection_configuration_is_unavailable_when_there_is_no_selected_variant_on_init() {
+    /// A lone size is implicit, so it is chosen rather than left for the shopper to tap. This is
+    /// what removes the `canShowSizeSelector` special case from the add-to-bag gate.
+    func test_sole_size_is_pre_selected_on_init_with_product() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.selectedSize?.id, size.id)
+    }
+
+    /// The seeding defect: the product's default variant carries no colour, so matching it against
+    /// the built swatches used to leave the selection nil and the size grid empty. Colour is now
+    /// seeded to the first colour whatever the default variant says.
+    func test_sizes_are_offered_when_the_default_variant_matches_no_built_colour() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
         let variant = Product.Variant.fixture(size: size, colour: color)
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
                                       variants: [variant])
+
         initViewModel(configuration: .product(product))
-        XCTAssertEqual(sut.sizingSelectionConfiguration.items.count, 0)
+
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, color.id)
+        XCTAssertEqual(sut.variantSelection.sizes.map(\.id), [size.id])
     }
 
     // MARK: - Properties
@@ -183,7 +197,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
         initViewModel(configuration: .product(product))
 
-        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first
+        sut.didSelectSize(sut.variantSelection.sizes[0])
 
         XCTAssertTrue(sut.isAddToBagEnabled)
     }
@@ -195,7 +209,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
         initViewModel(configuration: .product(product))
 
-        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first
+        sut.didSelectSize(sut.variantSelection.sizes[0])
 
         XCTAssertFalse(sut.isAddToBagEnabled)
     }
@@ -506,13 +520,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let selectedVariant = sut.state.value?.selectedVariant
-        XCTAssertNotNil(selectedVariant)
-        XCTAssertEqual(selectedVariant?.colour?.id, variant1.colour?.id)
-        XCTAssertEqual(selectedVariant?.colour?.name, variant1.colour?.name)
-        XCTAssertEqual(selectedVariant?.size?.id, variant1.size?.id)
-        XCTAssertEqual(selectedVariant?.size?.value, variant1.size?.value)
-        XCTAssertEqual(selectedVariant?.stock, variant1.stock)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant1.colour?.id)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.name, variant1.colour?.name)
+        XCTAssertEqual(sut.variantSelection.selectedSize?.id, variant1.size?.id)
+        XCTAssertEqual(sut.selectedColourName, variant1.colour?.name)
+        XCTAssertEqual(sut.productReference, variant1.sku)
     }
 
     // MARK: - Loading state
@@ -674,11 +686,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.id, color.id)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.name, color.name)
-        switch colorSelectionConfiguration.items.first?.type {
+        let colours = sut.variantSelection.colours
+        XCTAssertEqual(colours.count, 1)
+        XCTAssertEqual(colours.first?.id, color.id)
+        XCTAssertEqual(colours.first?.name, color.name)
+        switch colours.first?.type {
             case .url(let url):
                 XCTAssertEqual(url.absoluteString, stringUrl)
             default:
@@ -699,8 +711,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
+        XCTAssertEqual(sut.variantSelection.colours.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
     }
 
     /// `isDisabled` is the flag both colour surfaces key off — the card grid and the sheet row each
@@ -725,7 +736,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let items = sut.colorSelectionConfiguration.items
+        let items = sut.variantSelection.colours
         XCTAssertEqual(items.first { $0.id == inStock.id }?.isDisabled, false)
         XCTAssertEqual(items.first { $0.id == soldOut.id }?.isDisabled, true)
     }
@@ -750,35 +761,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(sut.colorSelectionConfiguration.items.first?.isDisabled, false)
+        XCTAssertEqual(sut.variantSelection.colours.first?.isDisabled, false)
     }
 
-    /// The sheet's list source: an empty term shows everything, otherwise it matches by name,
-    /// ignoring case.
-    func test_color_swatches_filter_by_name_ignoring_case() {
-        initViewModel()
-
-        let navy = Product.Colour.fixture(id: "1", name: "Midnight Navy")
-        let sand = Product.Colour.fixture(id: "2", name: "Sand")
-        let product = Product.fixture(
-            name: "Product Name",
-            brand: .fixture(name: "Product Brand"),
-            defaultVariant: .fixture(colour: navy, stock: 1),
-            variants: [.fixture(colour: navy, stock: 1), .fixture(colour: sand, stock: 1)]
-        )
-        mockProductService.onGetProductCalled = { _ in
-            product
-        }
-
-        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
-
-        XCTAssertEqual(sut.colorSwatches(filteredBy: "").count, 2)
-        XCTAssertEqual(sut.colorSwatches(filteredBy: "navy").map(\.id), [navy.id])
-        XCTAssertEqual(sut.colorSwatches(filteredBy: "SAND").map(\.id), [sand.id])
-        XCTAssertTrue(sut.colorSwatches(filteredBy: "teal").isEmpty)
-    }
-
-    func test_state_has_selected_variant_when_color_is_selected() {
+    func test_selection_follows_the_tapped_colour() {
         initViewModel()
 
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -795,20 +781,14 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: \.isLoading),
-            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
-        )
+        sut.didSelectColour(sut.variantSelection.colours[1])
 
-        let selectedVariant = sut.state.value?.selectedVariant
-        XCTAssertNotNil(selectedVariant)
-        XCTAssertEqual(selectedVariant?.colour?.id, variant2.colour?.id)
-        XCTAssertEqual(selectedVariant?.colour?.name, variant2.colour?.name)
-        XCTAssertEqual(selectedVariant?.stock, variant2.stock)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant2.colour?.id)
+        XCTAssertEqual(sut.selectedColourName, variant2.colour?.name)
+        XCTAssertEqual(sut.productReference, variant2.sku)
     }
 
-    func test_state_is_not_updated_if_nil_color_is_selected() {
+    func test_selection_is_unchanged_if_an_unknown_colour_is_tapped() {
         initViewModel()
 
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -825,32 +805,9 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertNoEmit(from: sut.$state, afterTrigger: { colorSelectionConfiguration.selectedItem = nil })
-    }
+        sut.didSelectColour(ColorSwatch(id: "3", name: "Color 3", type: .color(.black)))
 
-    func test_state_is_not_updated_if_unknown_color_is_selected() {
-        initViewModel()
-
-        let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
-        let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
-        let variant1 = Product.Variant.fixture(colour: color1, stock: 1)
-        let variant2 = Product.Variant.fixture(colour: color2, stock: 2)
-        let product = Product.fixture(name: "Product Name",
-                                      brand: .fixture(name: "Product Brand"),
-                                      defaultVariant: variant1,
-                                      variants: [variant1, variant2])
-        mockProductService.onGetProductCalled = { _ in
-            product
-        }
-
-        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
-
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertNoEmit(
-            from: sut.$state,
-            afterTrigger: { colorSelectionConfiguration.selectedItem = ColorSwatch(id: "3", name: "Color 3", type: .color(.black)) }
-        )
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, color1.id)
     }
 
     func test_product_images_are_updated_when_color_is_selected() {
@@ -875,11 +832,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: \.isLoading),
-            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
-        )
+        sut.didSelectColour(sut.variantSelection.colours[1])
 
         XCTAssertEqual(sut.productImageUrls.count, variant2.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant2.media[0].asImage?.url.absoluteString)
@@ -901,11 +854,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.selectedColourName, "Color 1")
         XCTAssertEqual(sut.productReference, "SKU-1")
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: \.isLoading),
-            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
-        )
+        sut.didSelectColour(sut.variantSelection.colours[1])
 
         XCTAssertEqual(sut.selectedColourName, "Color 2")
         XCTAssertEqual(sut.productReference, "SKU-2")
@@ -1247,21 +1196,6 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(shareConfiguration?.subject, "Product Name from Alfie")
     }
 
-    func test_search_returns_correct_swatches() {
-        let expectedMatchedColors = [Product.Colour.fixture(name: "color 1"), Product.Colour.fixture(name: "COLOR 2")]
-        let expectedNonMatchedColors = [Product.Colour.fixture(name: "Clor"), Product.Colour.fixture(name: "Coror")]
-
-        let product = Product.fixture(name: "Product Name",
-                                      brand: .fixture(name: "Product Brand"),
-                                      variants: (expectedMatchedColors + expectedNonMatchedColors).map { Product.Variant.fixture(colour: $0) })
-
-        initViewModel(configuration: .product(product))
-        let swatchesSearchResult = sut.colorSwatches(filteredBy: "Col")
-        XCTAssertTrue(swatchesSearchResult.map(\.name).contains(expectedMatchedColors.map(\.name)))
-        XCTAssertFalse(swatchesSearchResult.map(\.name).contains(expectedNonMatchedColors.map(\.name)))
-    }
-
-
     // MARK: - Related products
 
     func test_view_did_appear_requests_related_products_for_product_handle_with_one_extra_slot() {
@@ -1490,9 +1424,17 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     // MARK: - Helper methods
 
+    /// Two sizes in one colour: the shape where a size choice is genuinely open, so "no size is
+    /// pre-selected" means something. A single size is auto-selected by design.
+    private func twoSizeVariants(colour: Product.Colour, stock: Int = 5) -> [Product.Variant] {
+        [
+            .fixture(id: "v-s", sku: "v-s", size: .fixture(id: "s", value: "S"), colour: colour, stock: stock),
+            .fixture(id: "v-m", sku: "v-m", size: .fixture(id: "m", value: "M"), colour: colour, stock: stock),
+        ]
+    }
+
     private func makeDependencies(wishlistService: MockWishlistService) -> ProductDetailsDependencyContainer {
         ProductDetailsDependencyContainer(
-            scheduler: .immediate,
             productService: mockProductService,
             webUrlProvider: mockWebUrlProvider,
             cartService: mockCartService,

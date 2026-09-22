@@ -8,9 +8,6 @@ public struct SizingSwatchAppearance: Equatable {
     public let borderWidth: CGFloat
     public let textColor: Color
     public let backgroundColor: Color
-    /// Drives both out-of-stock marks the design draws: the diagonal line across the chip and the
-    /// bell in its corner.
-    public let isCrossedOut: Bool
 
     /// Selection is a heavier *border* — never a fill, which is what the pre-redesign chip did.
     public static func resolve(for state: SizingSwatch.ItemState, isSelected: Bool) -> Self {
@@ -19,8 +16,7 @@ public struct SizingSwatchAppearance: Equatable {
                 borderColor: Theme.borderSoft,
                 borderWidth: Constants.borderWidthDefault,
                 textColor: Theme.contentContentTerciary,
-                backgroundColor: .clear,
-                isCrossedOut: state == .outOfStock
+                backgroundColor: .clear
             )
         }
 
@@ -28,8 +24,7 @@ public struct SizingSwatchAppearance: Equatable {
             borderColor: isSelected ? Theme.contentContentPrimary : Theme.borderSoft,
             borderWidth: isSelected ? Constants.borderWidthSelected : Constants.borderWidthDefault,
             textColor: Theme.contentContentPrimary,
-            backgroundColor: .clear,
-            isCrossedOut: false
+            backgroundColor: .clear
         )
     }
 }
