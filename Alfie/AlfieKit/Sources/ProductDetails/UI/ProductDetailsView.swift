@@ -770,4 +770,4 @@ private extension AddToBagFeedback {
         case .failure: Icon.warning.image
         }
     }
-}
+} // swiftlint:disable:this file_length
