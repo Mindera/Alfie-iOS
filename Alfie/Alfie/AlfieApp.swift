@@ -43,7 +43,7 @@ struct AlfieApp: App {
                     }
                     .id(appState.sessionID) // So that the view can be recreated / rebooted
             } else {
-                Primitives.Colours.transparentTransparent
+                SplashView()
                     .onAppear {
                         // Lazy initialize once appDelegate is ready
                         appFeatureViewModel = AppFeatureViewModel(

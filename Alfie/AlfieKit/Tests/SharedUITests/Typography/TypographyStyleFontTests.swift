@@ -68,8 +68,8 @@ final class TypographyStyleFontTests: XCTestCase {
 
     func test_brandFont_registers_andResolves() throws {
         try FontManager.registerAll()
-        let brand = UIFont(name: FontNames.libreBaskerville.rawValue, size: 24)
-        XCTAssertNotNil(brand, "Libre Baskerville must resolve after FontManager.registerAll()")
+        let brand = UIFont(name: FontNames.avalon.rawValue, size: 24)
+        XCTAssertNotNil(brand, "Avalon must resolve after FontManager.registerAll()")
         XCTAssertEqual(brand?.pointSize, 24)
     }
 
@@ -78,8 +78,7 @@ final class TypographyStyleFontTests: XCTestCase {
         let style = Typography.Display.large
         XCTAssertEqual(style.fontFamily, Primitives.Typography.fontFamilyBrand)
         XCTAssertEqual(style.uiFont.pointSize, style.fontSize)
-        // The resolved family name should be the brand family, not the system font.
-        XCTAssertEqual(style.uiFont.familyName, Primitives.Typography.fontFamilyBrand)
+        XCTAssertEqual(style.uiFont.fontName, "AvalonPlain")
     }
 
     func test_build_forwardsTokenLineHeightAndLetterSpacing() {
