@@ -7,32 +7,10 @@ public struct CartLineInput: Hashable {
     public let productId: String
     public let variantId: String
     public let quantity: Int
-    public let sku: String?
-    public let slug: String?
-    public let name: String?
-    public let imageURL: URL?
-    public let imageAltText: String?
-    public let unitPrice: Money?
 
-    public init(
-        productId: String,
-        variantId: String,
-        quantity: Int = 1,
-        sku: String? = nil,
-        slug: String? = nil,
-        name: String? = nil,
-        imageURL: URL? = nil,
-        imageAltText: String? = nil,
-        unitPrice: Money? = nil
-    ) {
+    public init(productId: String, variantId: String, quantity: Int = 1) {
         self.productId = productId
         self.variantId = variantId
         self.quantity = quantity
-        self.sku = sku
-        self.slug = slug
-        self.name = name
-        self.imageURL = imageURL
-        self.imageAltText = imageAltText
-        self.unitPrice = unitPrice
     }
 }

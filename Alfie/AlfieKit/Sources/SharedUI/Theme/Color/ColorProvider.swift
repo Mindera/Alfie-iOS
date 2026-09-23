@@ -4,7 +4,6 @@ import SwiftUI
 public struct ColorProvider {
     public init() {}
 
-    public var brandSelfridges500: Color { Primitives.Colours.brandSelfridges500 }
     public var neutrals0: Color { Primitives.Colours.neutrals0 }
     public var neutrals100: Color { Primitives.Colours.neutrals100 }
     public var neutrals200: Color { Primitives.Colours.neutrals200 }

@@ -127,7 +127,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-0": {
+  "colours-brand-new-brand-0": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -138,7 +138,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-100": {
+  "colours-brand-new-brand-100": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -149,7 +149,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-200": {
+  "colours-brand-new-brand-200": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -160,7 +160,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-300": {
+  "colours-brand-new-brand-300": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -171,7 +171,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-400": {
+  "colours-brand-new-brand-400": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -182,7 +182,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-500": {
+  "colours-brand-new-brand-500": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -193,7 +193,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-600": {
+  "colours-brand-new-brand-600": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -204,7 +204,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-700": {
+  "colours-brand-new-brand-700": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -215,7 +215,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-800": {
+  "colours-brand-new-brand-800": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -226,7 +226,7 @@
       ]
     }
   },
-  "colours-brand-selfridges-900": {
+  "colours-brand-new-brand-900": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
@@ -684,7 +684,7 @@
   },
   "typography-font-family-brand": {
     "$type": "fontFamily",
-    "$value": "Avalon"
+    "$value": "Libre Baskerville"
   },
   "typography-font-family-primary-android": {
     "$type": "fontFamily",

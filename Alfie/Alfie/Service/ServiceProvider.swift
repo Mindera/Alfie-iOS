@@ -99,9 +99,10 @@ final class ServiceProvider: ServiceProviderProtocol {
         productService = ProductService(bffClient: bffClient)
         searchService = SearchService(bffClient: bffClient)
         webViewConfigurationService = WebViewConfigurationService(bffClient: bffClient, log: log)
-        cartService = LocalCartService(
+        cartService = CartService(
+            bffClient: bffClient,
             userDefaults: userDefaults,
-            storageKey: StorageKey.localCartLines.rawValue
+            storageKey: StorageKey.cartId.rawValue
         )
         wishlistService = WishlistService(
             store: UserDefaultsStore(
