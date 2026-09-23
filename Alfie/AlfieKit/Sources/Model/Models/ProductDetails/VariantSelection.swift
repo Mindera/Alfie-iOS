@@ -49,8 +49,11 @@ public struct VariantSelection: Equatable {
         let colours = Self.distinctColours(in: variants)
         let colour = colours.first { $0.id == preferredVariant?.colour?.id } ?? colours.first
 
-        self.init(variants: variants, selectedColour: colour, selectedSize: nil)
-        selectedSize = soleSize
+        self.init(
+            variants: variants,
+            selectedColour: colour,
+            selectedSize: Self.soleSize(in: Self.sizeOptions(in: variants, colour: colour))
+        )
     }
 
     private init(variants: [Product.Variant], selectedColour: Product.Colour?, selectedSize: Product.ProductSize?) {
@@ -69,13 +72,7 @@ public struct VariantSelection: Equatable {
     }
 
     public var sizes: [SizeOption] {
-        let scoped = variantsForSelectedColour
-        return Self.distinct(scoped.map(\.size), by: \.id).map { size in
-            SizeOption(
-                size: size,
-                isInStock: scoped.contains { $0.size?.id == size.id && $0.stock > 0 }
-            )
-        }
+        Self.sizeOptions(in: variants, colour: selectedColour)
     }
 
     /// What the gallery, share sheet and description metadata read. Follows the colour on its own,
@@ -114,11 +111,14 @@ public struct VariantSelection: Equatable {
             return self
         }
 
-        var next = Self(variants: variants, selectedColour: colour, selectedSize: nil)
         // Keep the size only where the new colour stocks it; never snap to a nearest size.
-        let kept = next.sizes.first { $0.size.id == selectedSize?.id && $0.isInStock }?.size
-        next.selectedSize = kept ?? next.soleSize
-        return next
+        let options = Self.sizeOptions(in: variants, colour: colour)
+        let kept = options.first { $0.size.id == selectedSize?.id && $0.isInStock }?.size
+        return Self(
+            variants: variants,
+            selectedColour: colour,
+            selectedSize: kept ?? Self.soleSize(in: options)
+        )
     }
 
     public func selecting(sizeID: String) -> Self {
@@ -134,11 +134,20 @@ public struct VariantSelection: Equatable {
         variants.filter { $0.colour?.id == selectedColour?.id }
     }
 
+    private static func sizeOptions(in variants: [Product.Variant], colour: Product.Colour?) -> [SizeOption] {
+        let scoped = variants.filter { $0.colour?.id == colour?.id }
+        return distinct(scoped.map(\.size), by: \.id).map { size in
+            SizeOption(
+                size: size,
+                isInStock: scoped.contains { $0.size?.id == size.id && $0.stock > 0 }
+            )
+        }
+    }
+
     /// A lone size is implicit, so it is chosen for the shopper — out of stock included, so the CTA
     /// can say "out of stock" rather than asking for a size there is no choice about.
-    private var soleSize: Product.ProductSize? {
-        let options = sizes
-        return options.count == 1 ? options.first?.size : nil
+    private static func soleSize(in options: [SizeOption]) -> Product.ProductSize? {
+        options.count == 1 ? options.first?.size : nil
     }
 
     /// Distinct colours in the order the BFF returned the variants, which is the merchandising
