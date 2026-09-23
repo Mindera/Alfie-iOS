@@ -513,7 +513,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let variant2 = Product.Variant.fixture(size: size2, colour: color2, stock: 2)
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
-                                      defaultVariant: variant1,
+                                      defaultVariant: variant2,
                                       variants: [variant1, variant2])
         mockProductService.onGetProductCalled = { _ in
             product
@@ -521,11 +521,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant1.colour?.id)
-        XCTAssertEqual(sut.variantSelection.selectedColour?.name, variant1.colour?.name)
-        XCTAssertEqual(sut.variantSelection.selectedSize?.id, variant1.size?.id)
-        XCTAssertEqual(sut.selectedColourName, variant1.colour?.name)
-        XCTAssertEqual(sut.productReference, variant1.sku)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant2.colour?.id)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.name, variant2.colour?.name)
+        XCTAssertEqual(sut.variantSelection.selectedSize?.id, variant2.size?.id)
+        XCTAssertEqual(sut.selectedColourName, variant2.colour?.name)
+        XCTAssertEqual(sut.productReference, variant2.sku)
     }
 
     // MARK: - Loading state
@@ -787,6 +787,41 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant2.colour?.id)
         XCTAssertEqual(sut.selectedColourName, variant2.colour?.name)
         XCTAssertEqual(sut.productReference, variant2.sku)
+    }
+
+    func test_entering_with_a_product_seeds_the_selection_from_its_default_variant() {
+        let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
+        let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
+        let variant1 = Product.Variant.fixture(colour: color1, stock: 1)
+        let variant2 = Product.Variant.fixture(colour: color2, stock: 2)
+        // The default is deliberately not the head of the list: seeding from the default and
+        // seeding from the first variant are otherwise indistinguishable.
+        let product = Product.fixture(defaultVariant: variant2, variants: [variant1, variant2])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, color2.id)
+    }
+
+    func test_size_swatch_name_carries_the_scale_when_the_size_has_one() {
+        let size = Product.ProductSize.fixture(id: "s", value: "6", scale: "UK")
+        let variant = Product.Variant.fixture(size: size, colour: .fixture(id: "1"), stock: 1)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.sizes.first?.name, "6 UK")
+    }
+
+    func test_size_swatches_carry_the_stock_state_of_each_size() {
+        let colour = Product.Colour.fixture(id: "1", name: "Color 1")
+        let stocked = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: colour, stock: 3)
+        let soldOut = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: colour, stock: 0)
+        let product = Product.fixture(defaultVariant: stocked, variants: [stocked, soldOut])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.sizes.map(\.state), [.available, .outOfStock])
     }
 
     func test_reselecting_the_current_colour_does_not_republish_the_selection() throws {
@@ -1102,6 +1137,29 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEqual(sut.addToBagFeedback, .success)
         XCTAssertEqual(mockAnalytics.trackedActions, [.addToBag])
+    }
+
+    func test_didTapAddToBag_tracksTheVariantTheShopperChose_notTheProductDefault() {
+        let fallback = Product.Variant.fixture(
+            id: "variant-fallback",
+            sku: "sku-fallback",
+            colour: .fixture(id: "1", name: "Color 1"),
+            stock: 5
+        )
+        let chosen = Product.Variant.fixture(
+            id: "variant-chosen",
+            sku: "sku-chosen",
+            colour: .fixture(id: "2", name: "Color 2"),
+            stock: 5
+        )
+        let product = Product.fixture(id: "product-1", defaultVariant: fallback, variants: [fallback, chosen])
+        mockCartService.onAddCalled = { _ in .fixture() }
+        initViewModel(configuration: .product(product))
+
+        sut.didSelectColour(sut.variantSelection.colours[1])
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        XCTAssertEqual(mockAnalytics.trackedProductIDs(for: .addToBag), ["product-1-sku-chosen"])
     }
 
     func test_didTapAddToBag_thatFails_reportsFailureAndTracksNothing() {
