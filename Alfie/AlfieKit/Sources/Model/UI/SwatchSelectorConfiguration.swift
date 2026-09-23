@@ -12,4 +12,9 @@ public struct SwatchSelectorConfiguration<Swatch: ColorAndSizingSwatchProtocol> 
         self.selectedItem = selectedItem
         self.onSelect = onSelect
     }
+
+    /// Identity, not equality: a swatch carrying fresh stock is still the selected one.
+    public func isSelected(_ item: Swatch) -> Bool {
+        selectedItem?.id == item.id
+    }
 }

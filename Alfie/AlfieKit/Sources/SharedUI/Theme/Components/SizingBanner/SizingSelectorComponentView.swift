@@ -57,7 +57,7 @@ public struct SizingSelectorComponentView: View {
             Button {
                 configuration.onSelect(item)
             } label: {
-                SizingSwatchView(item: item, isSelected: configuration.selectedItem == item)
+                SizingSwatchView(item: item, isSelected: configuration.isSelected(item))
                     // The design draws a 40pt chip, 4pt under the minimum target. Outset the hit
                     // region rather than the frame, so the drawn box and the row gaps stay put.
                     .contentShape(Rectangle().inset(by: -theme.spacing.space025))

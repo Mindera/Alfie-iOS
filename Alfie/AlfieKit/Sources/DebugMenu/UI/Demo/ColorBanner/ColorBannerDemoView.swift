@@ -22,6 +22,10 @@ struct ColorBannerDemoView: View {
         .init(id: "4", name: "Pattern 4", type: .image(Image("pattern4", bundle: .module))),
     ]
 
+    private var configuration: SwatchSelectorConfiguration<ColorSwatch> {
+        .init(items: Self.items, selectedItem: selectedItem, onSelect: { selectedItem = $0 })
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: Primitives.Spacing.spacing20) {
@@ -29,11 +33,7 @@ struct ColorBannerDemoView: View {
 
                 section(title: "Colour Cards - 3 columns") {
                     ColorCardGridView(
-                        configuration: .init(
-                            items: Self.items,
-                            selectedItem: selectedItem,
-                            onSelect: { selectedItem = $0 }
-                        ),
+                        configuration: configuration,
                         columns: 3
                     )
                 }
@@ -42,11 +42,7 @@ struct ColorBannerDemoView: View {
 
                 section(title: "Colour Cards - 2 columns") {
                     ColorCardGridView(
-                        configuration: .init(
-                            items: Self.items,
-                            selectedItem: selectedItem,
-                            onSelect: { selectedItem = $0 }
-                        ),
+                        configuration: configuration,
                         columns: 2
                     )
                 }

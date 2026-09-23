@@ -1139,7 +1139,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(mockAnalytics.trackedActions, [.addToBag])
     }
 
-    func test_didTapAddToBag_tracksTheVariantTheShopperChose_notTheProductDefault() {
+    func test_add_to_bag_tracks_the_chosen_variant_rather_than_the_product_default() {
         let fallback = Product.Variant.fixture(
             id: "variant-fallback",
             sku: "sku-fallback",
@@ -1155,8 +1155,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let product = Product.fixture(id: "product-1", defaultVariant: fallback, variants: [fallback, chosen])
         mockCartService.onAddCalled = { _ in .fixture() }
         initViewModel(configuration: .product(product))
-
         sut.didSelectColour(sut.variantSelection.colours[1])
+
         XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
 
         XCTAssertEqual(mockAnalytics.trackedProductIDs(for: .addToBag), ["product-1-sku-chosen"])

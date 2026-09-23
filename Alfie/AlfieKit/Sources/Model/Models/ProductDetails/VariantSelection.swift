@@ -131,11 +131,15 @@ public struct VariantSelection: Equatable {
     // MARK: - Private
 
     private var variantsForSelectedColour: [Product.Variant] {
-        variants.filter { $0.colour?.id == selectedColour?.id }
+        Self.variants(in: variants, colour: selectedColour)
+    }
+
+    private static func variants(in variants: [Product.Variant], colour: Product.Colour?) -> [Product.Variant] {
+        variants.filter { $0.colour?.id == colour?.id }
     }
 
     private static func sizeOptions(in variants: [Product.Variant], colour: Product.Colour?) -> [SizeOption] {
-        let scoped = variants.filter { $0.colour?.id == colour?.id }
+        let scoped = Self.variants(in: variants, colour: colour)
         return distinct(scoped.map(\.size), by: \.id).map { size in
             SizeOption(
                 size: size,
