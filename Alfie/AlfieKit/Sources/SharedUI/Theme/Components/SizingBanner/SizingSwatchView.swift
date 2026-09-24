@@ -41,7 +41,7 @@ public struct SizingSwatchView: View {
                 }
             )
             .overlay(alignment: .topTrailing) {
-                outOfStockBellView(appearance)
+                outOfStockBellView()
             }
             .accessibilityElement(children: .combine)
             // Selection is drawn as a border, which assistive technology cannot see. The button
@@ -62,7 +62,7 @@ public struct SizingSwatchView: View {
     /// Decoration only: notify-me has no service behind it yet, so the bell carries no tap target
     /// and no accessibility label. The design insets it from the corner rather than centring it.
     @ViewBuilder
-    private func outOfStockBellView(_ appearance: SizingSwatchAppearance) -> some View {
+    private func outOfStockBellView() -> some View {
         if isOutOfStock {
             ThemedIcon(.bell, tint: Theme.contentContentTerciary)
                 .padding(.top, theme.spacing.space050)
