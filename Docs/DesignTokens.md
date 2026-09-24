@@ -50,7 +50,7 @@ picks the single mode iOS ships:
 |---|---|---|
 | `system` | `ios` | skip android/web |
 | `screen-size` | `small-(s)` | mobile uses Small at codegen |
-| `theme` | `new-brand-theme` | iOS ships the new brand palette; set back to `alfie-theme` for the original |
+| `theme` | `alfie-theme` | skip the `new-theme` brand |
 | `.primitives` | `alfie-theme` | skip the `new-theme` brand |
 
 An **unpinned** multi-mode collection fails generation with `unpinnedMultiModeCollection` rather than

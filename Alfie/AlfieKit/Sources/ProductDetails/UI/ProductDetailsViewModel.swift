@@ -155,7 +155,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             .receive(on: dependencies.scheduler)
             .sink { [weak self] cart in
                 self?.cart = cart
-            }    }
+            }
+    }
 
     public func viewDidAppear() {
         Task {

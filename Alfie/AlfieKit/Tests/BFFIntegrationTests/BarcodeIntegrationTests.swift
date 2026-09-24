@@ -7,7 +7,12 @@ final class BarcodeIntegrationTests: IntegrationTestCase {
         do {
             match = try await sut.productByBarcode("0000000000000")
         } catch is BFFRequestError {
-            throw XCTSkip("productByBarcode is SCAYLE only; the local BFF runs another platform")
+            // Catching every BFFRequestError also swallows a genuine SCAYLE regression; gating on the
+            // platform up front needs a signal the suite does not have yet. See issue #156.
+            throw XCTSkip(
+                "productByBarcode is SCAYLE only; the local BFF runs another platform. "
+                    + "https://github.com/Mindera/Alfie-iOS/issues/156"
+            )
         }
 
         XCTAssertNil(match)

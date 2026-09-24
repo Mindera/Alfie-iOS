@@ -186,6 +186,7 @@ public enum AccessibilityID {
     public enum Account {
         public static let greetingLabel = "account.greeting.label"
         public static let memberSinceLabel = "account.memberSince.label"
+        public static let sectionIcon = "account.section.image"
 
         public static let addressBookSection = "account.addressBook.section"
         public static let ordersSection = "account.orders.section"

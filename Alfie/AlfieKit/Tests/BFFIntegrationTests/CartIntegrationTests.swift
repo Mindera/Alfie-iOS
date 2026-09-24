@@ -8,6 +8,10 @@ import XCTest
 /// documented platform behaviour that no BFF test covers, and the app's entire quantity story rests
 /// on it — if it were false, quantity would have to be tracked client-side.
 final class CartIntegrationTests: IntegrationTestCase {
+    /// Shopify reports an unknown cart in `userErrors`, which the BFF maps to 400, so the 404 that
+    /// `mappingCartNotFound()` keys on never reaches the add and update paths. Flip once #155 lands.
+    private let addAndUpdateReportAnUnknownCartAs404 = false
+
     func test_cart_round_trip_creates_merges_adds_removes_and_reads_back() async throws {
         let (first, second) = try await twoAddableVariants()
 
@@ -76,6 +80,24 @@ final class CartIntegrationTests: IntegrationTestCase {
         XCTAssertEqual(readBack.totalQuantity, 3)
     }
 
+    func test_updateCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        try XCTSkipUnless(
+            addAndUpdateReportAnUnknownCartAs404,
+            "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"
+        )
+
+        let (first, _) = try await twoAddableVariants()
+        let cart = try await sut.createCart(lines: [first])
+        let line = try XCTUnwrap(cart.lines.first)
+
+        do {
+            _ = try await sut.updateCart(cartId: "does-not-exist", lines: [line.asUpdate(quantity: 2)])
+            XCTFail("An update against an unknown cart must throw")
+        } catch let error as BFFRequestError {
+            XCTAssertEqual(error.type, .cart(.cartNotFound))
+        }
+    }
+
     func test_every_line_carries_both_a_product_id_and_a_variant_id() async throws {
         // BigCommerce throws BadRequestException on a line without `productId`; Shopify ignores it.
         // Sending both is the only input shape that works on either platform.
@@ -138,6 +160,28 @@ final class CartIntegrationTests: IntegrationTestCase {
             XCTAssertEqual(
                 (error as? BFFRequestError)?.type, .cart(.cartNotFound),
                 "The bag renders empty off this exact type; got \(error)"
+            )
+        }
+    }
+
+    /// The same for the add path, which recovers differently: it starts a fresh cart carrying the
+    /// line rather than emptying the bag, so it needs the same type to arrive.
+    func test_addToCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        try XCTSkipUnless(
+            addAndUpdateReportAnUnknownCartAs404,
+            "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"
+        )
+
+        let (first, _) = try await twoAddableVariants()
+        let unknownId = try await unknownButWellFormedCartId()
+
+        do {
+            _ = try await sut.addToCart(cartId: unknownId, lines: [first])
+            XCTFail("Expected a cart-not-found for an unknown cart id")
+        } catch {
+            XCTAssertEqual(
+                (error as? BFFRequestError)?.type, .cart(.cartNotFound),
+                "The add-time recovery turns on this exact type; got \(error)"
             )
         }
     }

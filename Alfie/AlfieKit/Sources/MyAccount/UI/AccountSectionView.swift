@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import SharedUI
 import SwiftUI
 
@@ -14,7 +15,7 @@ struct AccountSectionView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: AccountConstants.iconSize, height: AccountConstants.iconSize)
-                .accessibilityIdentifier(AccessibilityId.sectionIcon)
+                .accessibilityIdentifier(AccessibilityID.Account.sectionIcon)
 
             Text.build(theme.font.body.medium(section.title))
                 .foregroundStyle(Theme.contentContentPrimary)
@@ -29,10 +30,6 @@ struct AccountSectionView: View {
         static let iconSize: CGFloat = Sizing.iconsIconMedium
         static let sectionHeight: CGFloat = 48
     }
-}
-
-private enum AccessibilityId {
-    static let sectionIcon = "section-icon"
 }
 
 #Preview {
