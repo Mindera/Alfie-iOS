@@ -8,14 +8,14 @@ import class UIKit.UIFont
 public enum FontNames: String, CaseIterable {
     case sfProMedium = "SF Pro Display Medium"
     // rawValue is the PostScript name (resolved via UIFont(name:)); fileName is the .dataset name.
-    case avalon = "AvalonPlain"
+    case libreBaskerville = "LibreBaskerville-Regular"
 
     public var fileName: String {
         switch self {
         case .sfProMedium:
             return "SF-Pro-Display-Medium"
-        case .avalon:
-            return "Avalon-Regular"
+        case .libreBaskerville:
+            return "LibreBaskerville-Regular"
         }
     }
 

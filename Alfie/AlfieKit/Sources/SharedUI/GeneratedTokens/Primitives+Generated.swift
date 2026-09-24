@@ -20,16 +20,16 @@ public enum Primitives {
         public static let brand700 = Color(.sRGB, red: 0.168627, green: 0.168627, blue: 0.168627, opacity: 1.0)
         public static let brand800 = Color(.sRGB, red: 0.066667, green: 0.066667, blue: 0.066667, opacity: 1.0)
         public static let brand900 = Color(.sRGB, red: 0.023529, green: 0.031373, blue: 0.039216, opacity: 1.0)
-        public static let brandSelfridges0 = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)
-        public static let brandSelfridges100 = Color(.sRGB, red: 1.0, green: 0.984314, blue: 0.898039, opacity: 1.0)
-        public static let brandSelfridges200 = Color(.sRGB, red: 1.0, green: 0.960784, blue: 0.721569, opacity: 1.0)
-        public static let brandSelfridges300 = Color(.sRGB, red: 1.0, green: 0.909804, blue: 0.541176, opacity: 1.0)
-        public static let brandSelfridges400 = Color(.sRGB, red: 1.0, green: 0.870588, blue: 0.360784, opacity: 1.0)
-        public static let brandSelfridges500 = Color(.sRGB, red: 1.0, green: 0.819608, blue: 0.0, opacity: 1.0)
-        public static let brandSelfridges600 = Color(.sRGB, red: 0.858824, green: 0.690196, blue: 0.0, opacity: 1.0)
-        public static let brandSelfridges700 = Color(.sRGB, red: 0.721569, green: 0.564706, blue: 0.0, opacity: 1.0)
-        public static let brandSelfridges800 = Color(.sRGB, red: 0.580392, green: 0.443137, blue: 0.0, opacity: 1.0)
-        public static let brandSelfridges900 = Color(.sRGB, red: 0.478431, green: 0.356863, blue: 0.0, opacity: 1.0)
+        public static let brandNewBrand0 = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)
+        public static let brandNewBrand100 = Color(.sRGB, red: 1.0, green: 0.984314, blue: 0.898039, opacity: 1.0)
+        public static let brandNewBrand200 = Color(.sRGB, red: 1.0, green: 0.960784, blue: 0.721569, opacity: 1.0)
+        public static let brandNewBrand300 = Color(.sRGB, red: 1.0, green: 0.909804, blue: 0.541176, opacity: 1.0)
+        public static let brandNewBrand400 = Color(.sRGB, red: 1.0, green: 0.870588, blue: 0.360784, opacity: 1.0)
+        public static let brandNewBrand500 = Color(.sRGB, red: 1.0, green: 0.819608, blue: 0.0, opacity: 1.0)
+        public static let brandNewBrand600 = Color(.sRGB, red: 0.858824, green: 0.690196, blue: 0.0, opacity: 1.0)
+        public static let brandNewBrand700 = Color(.sRGB, red: 0.721569, green: 0.564706, blue: 0.0, opacity: 1.0)
+        public static let brandNewBrand800 = Color(.sRGB, red: 0.580392, green: 0.443137, blue: 0.0, opacity: 1.0)
+        public static let brandNewBrand900 = Color(.sRGB, red: 0.478431, green: 0.356863, blue: 0.0, opacity: 1.0)
         public static let neutrals0 = Color(.sRGB, red: 1.0, green: 1.0, blue: 1.0, opacity: 1.0)
         public static let neutrals100 = Color(.sRGB, red: 0.97, green: 0.97, blue: 0.97, opacity: 1.0)
         public static let neutrals200 = Color(.sRGB, red: 0.913725, green: 0.913725, blue: 0.913725, opacity: 1.0)
@@ -82,7 +82,7 @@ public enum Primitives {
         public static let spacing96: CGFloat = CGFloat(96.0)
     }
     public enum Typography {
-        public static let fontFamilyBrand: String = "Avalon"
+        public static let fontFamilyBrand: String = "Libre Baskerville"
         public static let fontFamilyPrimaryAndroid: String = "Roboto"
         public static let fontFamilyPrimaryIos: String = "SF Pro"
         public static let fontFamilyPrimaryWeb: String = "Inter"

@@ -21,14 +21,14 @@ DEST="$REPO_ROOT/Alfie/AlfieKit/Sources/SharedUI/DesignTokens"
 TOKENS_REMOTE="${DESIGN_TOKENS_REMOTE:-git@github.com:Mindera/Alfie-Mobile-Design-Tokens.git}"
 
 # iOS subset (mode-selected per the contract): System=ios, Screen Size=small; skip android/web,
-# medium/large/wide, and the .documentation collection. typography.selfridges-theme is kept because
-# the composite styles reference its sub-tokens.
+# medium/large/wide, and the .documentation collection. typography.alfie-theme is kept because the
+# composite styles reference its sub-tokens.
 TOKEN_FILES=(
   "manifest.json"
-  ".primitives.selfridges-theme.tokens.json"
-  "theme.selfridges-theme.tokens.json"
-  "sizing.selfridges-theme.tokens.json"
-  "typography.selfridges-theme.tokens.json"
+  ".primitives.alfie-theme.tokens.json"
+  "theme.alfie-theme.tokens.json"
+  "sizing.alfie-theme.tokens.json"
+  "typography.alfie-theme.tokens.json"
   "typography.styles.tokens.json"
   "system.ios.tokens.json"
   "screen-size.small-(s).tokens.json"

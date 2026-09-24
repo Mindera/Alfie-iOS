@@ -37,8 +37,8 @@
     },
     ".primitives": {
       "modes": {
-        "selfridges-theme": [
-          ".primitives.selfridges-theme.tokens.json"
+        "alfie-theme": [
+          ".primitives.alfie-theme.tokens.json"
         ],
         "new-theme": [
           ".primitives.new-theme.tokens.json"
@@ -47,11 +47,11 @@
     },
     "theme": {
       "modes": {
-        "selfridges-theme": [
-          "theme.selfridges-theme.tokens.json"
+        "alfie-theme": [
+          "theme.alfie-theme.tokens.json"
         ],
-        "new-brand-theme": [
-          "theme.new-brand-theme.tokens.json"
+        "selfridges": [
+          "theme.selfridges.tokens.json"
         ]
       }
     },
