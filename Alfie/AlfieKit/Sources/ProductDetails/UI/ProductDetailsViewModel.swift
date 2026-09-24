@@ -24,8 +24,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     /// chosen variant and whether the product can be bought is derived from it.
     private var selection = VariantSelection(variants: [])
     /// Rebuilt when `selection` changes, not on every read: the view touches this several times per
-    /// body pass and each rebuild rescans every variant.
+    /// body pass and each rebuild rescans every variant. `displayVariant` and `addToBagState` are
+    /// cached alongside it for the same reason.
     @Published public private(set) var variantSelection = VariantSelectionState()
+    @Published public private(set) var addToBagState: AddToBagState = .outOfStock
+    private var displayVariant: Product.Variant?
     public let productId: String
     /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
     /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
@@ -41,7 +44,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     private var selectedVariant: Product.Variant? {
-        selection.displayVariant ?? initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariant
+        displayVariant ?? initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariant
     }
 
     public var productTitle: String { product?.brand.name ?? "" }
@@ -122,7 +125,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
             updateSelection(VariantSelection(
                 variants: selectedProduct.product.variants,
-                preferredVariant: selectedProduct.selectedVariant
+                restoring: selectedProduct.selectedVariant
             ))
         }
     }
@@ -191,16 +194,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return .returnOptions
         }
         // swiftlint:enable vertical_whitespace_between_cases
-    }
-
-    /// True when at least one variant of the product has stock.
-    /// Use this for the CTA label (avoid showing "Out of Stock" while the product is still buyable in another size).
-    public var productHasAnyStock: Bool {
-        product?.variants.contains { $0.stock > 0 } ?? false
-    }
-
-    public var isAddToBagEnabled: Bool {
-        selection.purchaseState.readyVariant != nil
     }
 
     public func didTapAddToBag() {
@@ -341,22 +334,26 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        updateSelection(VariantSelection(
-            variants: product.variants,
-            preferredVariant: resolvedSelectedVariant(for: product)
-        ))
+        updateSelection(selection(for: product))
         state = .success(.init(product: product))
     }
 
-    /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
-    /// snapshot (e.g. out-of-date stock), so map the selection onto the freshly fetched product by
-    /// `sku` — keeping the user's choice while reflecting current stock/price. Fall back to the
-    /// product's default variant when there is no persisted selection or no match.
-    private func resolvedSelectedVariant(for product: Product) -> Product.Variant {
-        guard let persistedSku = initialSelectedProduct?.selectedVariant.sku else {
-            return product.defaultVariant
+    private func selection(for product: Product) -> VariantSelection {
+        guard let restored = restoredVariant(in: product) else {
+            return VariantSelection(variants: product.variants, preferredVariant: product.defaultVariant)
         }
-        return product.variants.first { $0.sku == persistedSku } ?? product.defaultVariant
+        return VariantSelection(variants: product.variants, restoring: restored)
+    }
+
+    /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
+    /// snapshot (e.g. out-of-date stock), so map the shopper's choice onto the freshly fetched
+    /// product by `sku` — keeping what they chose while reflecting current stock and price. Nil when
+    /// there is no persisted selection, or the product no longer offers it.
+    private func restoredVariant(in product: Product) -> Product.Variant? {
+        guard let persistedSku = initialSelectedProduct?.selectedVariant.sku else {
+            return nil
+        }
+        return product.variants.first { $0.sku == persistedSku }
     }
 
     /// The one way to move the selection, so the drawn state can never lag behind it.
@@ -375,6 +372,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             sizes: sizes,
             selectedSize: sizes.first { $0.id == selection.selectedSize?.id }
         )
+        displayVariant = selection.displayVariant
+        addToBagState = switch selection.purchaseState {
+        case .ready: .ready
+        case .needsSize: .needsSize
+        case .outOfStock: .outOfStock
+        }
     }
 
     private func colourSwatch(for option: VariantSelection.ColourOption) -> ColorSwatch {
@@ -394,10 +397,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     private func sizingSwatch(for option: VariantSelection.SizeOption) -> SizingSwatch {
-        var name = option.size.value
-        if let scale = option.size.scale {
-            name += " \(scale)"
-        }
+        let name = option.size.displayName
 
         return SizingSwatch(id: option.size.id, name: name, state: option.isInStock ? .available : .outOfStock)
     }

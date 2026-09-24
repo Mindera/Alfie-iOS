@@ -43,17 +43,34 @@ public struct VariantSelection: Equatable {
     public private(set) var selectedColour: Product.Colour?
     public private(set) var selectedSize: Product.ProductSize?
 
-    /// Colour is always seeded — to `preferredVariant`'s colour where the product offers it, to the
-    /// first colour otherwise. A single size is seeded too, so "is a size selected?" has one answer.
+    /// Opening the PDP fresh. `preferredVariant` is the product's default, which is merchandising
+    /// rather than anything the shopper picked — so it seeds the colour but never the size, and a
+    /// default that cannot be bought gives way to a colour that can, instead of opening on a grid
+    /// where every chip is disabled. A lone size is still seeded, so "is a size selected?" has one
+    /// answer.
     public init(variants: [Product.Variant], preferredVariant: Product.Variant? = nil) {
-        let colours = Self.distinctColours(in: variants)
-        let colour = colours.first { $0.id == preferredVariant?.colour?.id } ?? colours.first
+        let preferred = Self.colour(preferredVariant?.colour?.id, in: variants)
+        let buyable = preferred.flatMap { Self.hasStock($0, in: variants) ? $0 : nil }
 
-        self.init(
-            variants: variants,
-            selectedColour: colour,
-            selectedSize: Self.soleSize(in: Self.sizeOptions(in: variants, colour: colour))
-        )
+        self.init(variants: variants, colour: buyable ?? Self.firstBuyableColour(in: variants), size: nil)
+    }
+
+    /// Re-entering from Bag or Wishlist. `saved` is the shopper's own choice, so both of its axes
+    /// come back: the PDP lands on the variant that was saved rather than on whichever size happens
+    /// to come first in that colour.
+    public init(variants: [Product.Variant], restoring saved: Product.Variant) {
+        // The saved colour stands even where it sold out. Moving the shopper off what they chose
+        // hides that it sold out; keeping it lets the CTA say so.
+        let colour = Self.colour(saved.colour?.id, in: variants) ?? Self.firstBuyableColour(in: variants)
+
+        self.init(variants: variants, colour: colour, size: saved.size)
+    }
+
+    private init(variants: [Product.Variant], colour: Product.Colour?, size: Product.ProductSize?) {
+        let options = Self.sizeOptions(in: variants, colour: colour)
+        let restored = options.first { $0.size.id == size?.id }?.size
+
+        self.init(variants: variants, selectedColour: colour, selectedSize: restored ?? Self.soleSize(in: options))
     }
 
     private init(variants: [Product.Variant], selectedColour: Product.Colour?, selectedSize: Product.ProductSize?) {
@@ -64,10 +81,7 @@ public struct VariantSelection: Equatable {
 
     public var colours: [ColourOption] {
         Self.distinctColours(in: variants).map { colour in
-            ColourOption(
-                colour: colour,
-                isAvailable: variants.contains { $0.colour?.id == colour.id && $0.stock > 0 }
-            )
+            ColourOption(colour: colour, isAvailable: Self.hasStock(colour, in: variants))
         }
     }
 
@@ -87,7 +101,15 @@ public struct VariantSelection: Equatable {
     }
 
     public var purchaseState: PurchaseState {
-        guard selectedSize != nil || sizes.isEmpty else {
+        let options = sizes
+
+        // Stock is asked before size, so a colour with nothing left reads as out of stock rather
+        // than asking for a size among chips that are all disabled.
+        guard options.contains(where: \.isInStock) || options.isEmpty else {
+            return .outOfStock
+        }
+
+        guard selectedSize != nil || options.isEmpty else {
             return .needsSize
         }
 
@@ -146,6 +168,20 @@ public struct VariantSelection: Equatable {
                 isInStock: scoped.contains { $0.size?.id == size.id && $0.stock > 0 }
             )
         }
+    }
+
+    private static func colour(_ id: String?, in variants: [Product.Variant]) -> Product.Colour? {
+        Self.distinctColours(in: variants).first { $0.id == id }
+    }
+
+    private static func hasStock(_ colour: Product.Colour, in variants: [Product.Variant]) -> Bool {
+        variants.contains { $0.colour?.id == colour.id && $0.stock > 0 }
+    }
+
+    /// The first colour that can actually be bought, falling back to the first colour when none can.
+    private static func firstBuyableColour(in variants: [Product.Variant]) -> Product.Colour? {
+        let colours = Self.distinctColours(in: variants)
+        return colours.first { Self.hasStock($0, in: variants) } ?? colours.first
     }
 
     /// A lone size is implicit, so it is chosen for the shopper — out of stock included, so the CTA

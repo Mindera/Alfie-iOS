@@ -37,6 +37,62 @@ final class VariantSelectionTests: XCTestCase {
         XCTAssertNil(selection.selectedSize)
     }
 
+    func test_a_restored_variant_brings_back_its_size_not_the_first_in_its_colour() {
+        // Re-entry from Bag/Wishlist: the saved Navy/M must come back as Navy/M, not as Navy/S.
+        let selection = VariantSelection(variants: matrix(), restoring: variant(navy, medium))
+
+        XCTAssertEqual(selection.selectedSize?.id, medium.id)
+        XCTAssertEqual(selection.displayVariant?.sku, "navy-m")
+    }
+
+    func test_a_product_default_seeds_the_colour_but_never_the_size() {
+        // The default is merchandising, not a choice — pre-selecting its size would put a size in
+        // the shopper's basket that they never picked.
+        let selection = VariantSelection(variants: matrix(), preferredVariant: variant(navy, medium))
+
+        XCTAssertEqual(selection.selectedColour?.id, navy.id)
+        XCTAssertNil(selection.selectedSize)
+    }
+
+    func test_a_restored_size_that_sold_out_is_still_seeded() {
+        // Keeping the shopper's saved size lets the CTA say it sold out, rather than silently
+        // moving them onto a size they never chose.
+        let variants = [variant(navy, small), variant(navy, medium, stock: 0)]
+
+        let selection = VariantSelection(variants: variants, restoring: variant(navy, medium, stock: 0))
+
+        XCTAssertEqual(selection.selectedSize?.id, medium.id)
+        XCTAssertEqual(selection.purchaseState, .outOfStock)
+    }
+
+    func test_a_restored_colour_that_sold_out_is_kept_rather_than_swapped() {
+        // Opening on a different colour than the one they saved hides that it sold out.
+        let variants = [variant(sand, medium), variant(navy, medium, stock: 0)]
+
+        let selection = VariantSelection(variants: variants, restoring: variant(navy, medium, stock: 0))
+
+        XCTAssertEqual(selection.selectedColour?.id, navy.id)
+        XCTAssertEqual(selection.purchaseState, .outOfStock)
+    }
+
+    func test_a_sold_out_preferred_colour_gives_way_to_one_that_can_be_bought() {
+        // Opening on a sold-out colour leaves every size chip disabled and the CTA dead, with
+        // nothing saying another colour is buyable.
+        let variants = [variant(sand, small, stock: 0), variant(sand, medium, stock: 0), variant(navy, medium)]
+
+        let selection = VariantSelection(variants: variants, preferredVariant: variant(sand, small, stock: 0))
+
+        XCTAssertEqual(selection.selectedColour?.id, navy.id)
+    }
+
+    func test_the_first_colour_is_seeded_when_no_colour_has_stock() {
+        let variants = [variant(sand, medium, stock: 0), variant(navy, medium, stock: 0)]
+
+        let selection = VariantSelection(variants: variants, preferredVariant: nil)
+
+        XCTAssertEqual(selection.selectedColour?.id, sand.id)
+    }
+
     func test_sole_size_is_auto_selected() {
         let variants = [variant(sand, medium)]
 
@@ -203,6 +259,15 @@ final class VariantSelectionTests: XCTestCase {
         let selection = VariantSelection(variants: matrix(), preferredVariant: nil)
 
         XCTAssertEqual(selection.purchaseState, .needsSize)
+    }
+
+    func test_purchase_state_is_out_of_stock_rather_than_needs_size_when_every_size_is_sold_out() {
+        // Asking for a size among chips that are all disabled tells the shopper nothing.
+        let variants = [variant(sand, small, stock: 0), variant(sand, medium, stock: 0)]
+
+        let selection = VariantSelection(variants: variants, preferredVariant: nil)
+
+        XCTAssertEqual(selection.purchaseState, .outOfStock)
     }
 
     func test_purchase_state_is_ready_when_the_selection_resolves_to_one_variant_in_stock() {

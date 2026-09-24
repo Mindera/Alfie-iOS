@@ -583,12 +583,12 @@ extension ProductDetailsView {
                 let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
                 ThemedButton(
-                    text: viewModel.productHasAnyStock ? addToBagText : outOfStockText,
+                    text: viewModel.addToBagState == .outOfStock ? outOfStockText : addToBagText,
                     isDisabled: .init(
                         // Disabled for the duration of the write, not merely showing a spinner:
                         // `ThemedButton` stays hit-testable while loading, and a tappable spinner
                         // reads to VoiceOver as an ordinary button.
-                        get: { !viewModel.isAddToBagEnabled || viewModel.isAddingToBag },
+                        get: { viewModel.addToBagState != .ready || viewModel.isAddingToBag },
                         set: { _ in }
                     ),
                     isLoading: .init(

@@ -7,8 +7,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public var productId: String = ""
     public var productTitle: String = ""
-    public var productHasAnyStock: Bool = true
-    public var isAddToBagEnabled: Bool = true
+    public var addToBagState: AddToBagState = .ready
     public var isAddingToBag: Bool = false
     public var addToBagFeedback: AddToBagFeedback?
     public var productName: String = ""
