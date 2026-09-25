@@ -20,6 +20,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published private(set) var wishlistContent: [SelectedProduct] = []
     @Published public private(set) var isAddingToBag = false
     @Published public private(set) var addToBagFeedback: AddToBagFeedback?
+    @Published public private(set) var isUpdatingBagQuantity = false
+    @Published private var cart: Cart?
+    @Published private var pendingBagQuantity: PendingBagQuantity?
+    private var cartSubscription: AnyCancellable?
+    private let bagQuantityDebounce: Debounce
+    @Published public private(set) var isInWishlist = false
     /// The only selection state on the PDP. Everything the shopper sees about colour, size, the
     /// chosen variant and whether the product can be bought is derived from it.
     private var selection = VariantSelection(variants: [])
@@ -31,9 +37,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private var displayVariant: Product.Variant?
     public let productId: String
     /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
-    /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
+    /// product; for `.id` entry we only have the numeric id, which the BFF resolves for Shopify.
     private let productHandle: String
     private let initialSelectedProduct: SelectedProduct?
+    private let requestedSku: String?
+    private let requestedVariantId: String?
 
     private var product: Product? {
         guard case .success(let model) = state else {
@@ -95,24 +103,34 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.goBackAction = goBackAction
         self.openWebfeatureAction = openWebfeatureAction
         self.openProductAction = openProductAction
+        self.bagQuantityDebounce = Debounce(
+            scheduler: dependencies.scheduler,
+            delay: Constants.bagQuantityDebounce
+        )
 
         switch configuration {
         case .id(let productId):
             self.productId = productId
             self.productHandle = productId
             self.initialSelectedProduct = nil
+            self.requestedSku = nil
+            self.requestedVariantId = nil
             self.baseProduct = nil
 
-        case .deepLink(let handle):
+        case .deepLink(let handle, let sku, let variantId):
             self.productId = handle
             self.productHandle = handle
             self.initialSelectedProduct = nil
+            self.requestedSku = sku
+            self.requestedVariantId = variantId
             self.baseProduct = nil
 
         case .product(let product):
             self.productId = product.id
             self.productHandle = product.slug
             self.initialSelectedProduct = nil
+            self.requestedSku = nil
+            self.requestedVariantId = nil
             self.baseProduct = product
 
             updateSelection(VariantSelection(variants: product.variants, preferredVariant: product.defaultVariant))
@@ -121,6 +139,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             self.productId = selectedProduct.product.id
             self.productHandle = selectedProduct.product.slug
             self.initialSelectedProduct = selectedProduct
+            self.requestedSku = selectedProduct.selectedVariant.sku
+            self.requestedVariantId = nil
             baseProduct = selectedProduct.product
 
             updateSelection(VariantSelection(
@@ -128,6 +148,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 restoring: selectedProduct.selectedVariant
             ))
         }
+
+        cartSubscription = dependencies.cartService.cartPublisher
+            .receive(on: dependencies.scheduler)
+            .sink { [weak self] cart in
+                self?.cart = cart
+            }
     }
 
     public func viewDidAppear() {
@@ -136,6 +162,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
         Task {
             await loadProductIfNeeded()
+            await refreshWishlistState()
         }
         Task {
             await refreshWishlistContent()
@@ -153,7 +180,8 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading
         case .productDescription,
              .addToBag, // swiftlint:disable:this indentation_width
-             .addToWishlist:
+             .addToWishlist,
+             .availabilityNote:
             return false
         case .relatedProducts:
             return state.isSuccess && relatedProductsState.isLoading
@@ -173,7 +201,11 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return state.isLoading || !productImageUrls.isEmpty
         case .productDescription:
             return !productDescription.isEmpty
-        case .addToBag:
+        // The note qualifies what the selectors' availability means, so it only belongs on screen
+        // once there is real availability to qualify: while loading the swatches are shimmer
+        // placeholders, and a failure draws no selectors at all. Same gate as the CTA.
+        case .addToBag,
+             .availabilityNote: // swiftlint:disable:this indentation_width
             return state.isSuccess
         case .addToWishlist:
             return state.isSuccess && isWishlistEnabled
@@ -207,6 +239,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         else {
             return
         }
+        let image = variant.media.lazy.compactMap(\.asImage).first
 
         let selectedProduct = SelectedProduct(product: product, selectedVariant: variant)
 
@@ -220,7 +253,16 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 // `product.id`, not `selectedProduct.id`: the latter is the composite
                 // "<productId>-<sku>" used for local identity, which no platform would resolve.
                 try await dependencies.cartService.add(
-                    line: .init(productId: product.id, variantId: variantId)
+                    line: .init(
+                        productId: product.id,
+                        variantId: variantId,
+                        sku: variant.sku,
+                        slug: product.slug,
+                        name: selectedProduct.name,
+                        imageURL: image?.url,
+                        imageAltText: image?.alt,
+                        unitPrice: variant.price.amount
+                    )
                 )
                 // Only once the cart holds the line — firing on the tap would count adds that failed.
                 // The composite id here is the pre-existing analytics shape, left alone per Q29.
@@ -233,6 +275,92 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
     }
 
+    private var bagLine: CartLine? {
+        guard
+            let variantId = selectedVariant?.id,
+            variantSelection.sizeDisplay != .selector || variantSelection.selectedSize != nil
+        else {
+            return nil
+        }
+
+        return cart?.lines.first { $0.variantId == variantId }
+    }
+
+    public var bagQuantity: Int {
+        guard let bagLine else { return 0 }
+
+        if let pendingBagQuantity, pendingBagQuantity.lineId == bagLine.id {
+            return pendingBagQuantity.quantity
+        }
+        return bagLine.quantity
+    }
+
+    public var maxBagQuantity: Int {
+        min(selectedVariant?.stock ?? 0, Constants.maxLineQuantity)
+    }
+
+    public func didTapIncreaseBagQuantity() {
+        guard bagQuantity < maxBagQuantity else { return }
+
+        stepBagQuantity(to: bagQuantity + 1)
+    }
+
+    public func didTapDecreaseBagQuantity() {
+        guard bagQuantity > 0 else { return }
+
+        stepBagQuantity(to: bagQuantity - 1)
+    }
+
+    private func stepBagQuantity(to quantity: Int) {
+        guard !isUpdatingBagQuantity, !isAddingToBag, let line = bagLine else { return }
+
+        pendingBagQuantity = .init(lineId: line.id, quantity: quantity)
+        // Zero removes the line and takes Add to bag's place, so it writes at once: a removal left
+        // pending behind a visible Add to bag would race a fresh add.
+        guard quantity > 0 else {
+            bagQuantityDebounce.cancel()
+            commitPendingBagQuantity()
+            return
+        }
+
+        bagQuantityDebounce.schedule { [weak self] in self?.commitPendingBagQuantity() }
+    }
+
+    private func commitPendingBagQuantity() {
+        guard
+            !isUpdatingBagQuantity,
+            let pending = pendingBagQuantity,
+            let line = cart?.lines.first(where: { $0.id == pending.lineId }),
+            pending.quantity != line.quantity,
+            let selectedProduct
+        else {
+            pendingBagQuantity = nil
+            return
+        }
+
+        let isIncrease = pending.quantity > line.quantity
+        addToBagFeedback = nil
+        isUpdatingBagQuantity = true
+        Task { @MainActor in
+            defer {
+                cart = dependencies.cartService.cart
+                pendingBagQuantity = nil
+                isUpdatingBagQuantity = false
+            }
+            do {
+                try await dependencies.cartService.setQuantity(lineId: line.id, to: pending.quantity)
+                if isIncrease {
+                    dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
+                } else {
+                    dependencies.analytics.trackRemoveFromBag(productID: selectedProduct.id)
+                }
+            } catch {
+                dependencies.log.error("Error setting line \(line.id) to quantity \(pending.quantity): \(error)")
+                addToBagFeedback = .quantityUpdateFailure
+            }
+        }
+    }
+
     public func didDismissAddToBagFeedback() {
         // Cleared on dismissal so an identical later outcome re-presents rather than being
         // swallowed as an unchanged value.
@@ -241,9 +369,16 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public func didTapAddToWishlist() {
         guard let selectedProduct else { return }
+        let wasInWishlist = isInWishlist
         Task {
-            await dependencies.wishlistService.addProduct(selectedProduct)
-            dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            if wasInWishlist {
+                await dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
+                dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
+            } else {
+                await dependencies.wishlistService.addProduct(selectedProduct)
+                dependencies.analytics.trackAddToWishlist(productID: selectedProduct.id)
+            }
+            await refreshWishlistState()
         }
     }
 
@@ -317,6 +452,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     @MainActor
+    private func refreshWishlistState() async {
+        let wishlistedProductId = product?.id ?? productId
+        isInWishlist = await dependencies.wishlistService.getWishlistContent()
+            .contains { $0.product.id == wishlistedProductId }
+    }
+
+    @MainActor
     private func loadProductIfNeeded() async {
         guard !state.isSuccess else {
             return
@@ -347,13 +489,18 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     /// When re-entering from Bag/Wishlist (`.selectedProduct`) the persisted variant carries a stale
     /// snapshot (e.g. out-of-date stock), so map the shopper's choice onto the freshly fetched
-    /// product by `sku` — keeping what they chose while reflecting current stock and price. Nil when
-    /// there is no persisted selection, or the product no longer offers it.
+    /// product by `sku` — keeping what they chose while reflecting current stock and price. A deep
+    /// link's `sku` (a scanned Alfie code) is mapped the same way, then a scanned Barcode's
+    /// `variantId`. Nil when nothing was requested, or the product no longer offers it, which leaves
+    /// the fresh-open path to seed the colour from merchandising.
     private func restoredVariant(in product: Product) -> Product.Variant? {
-        guard let persistedSku = initialSelectedProduct?.selectedVariant.sku else {
-            return nil
+        if let requestedSku, let variant = product.variants.first(where: { $0.sku == requestedSku }) {
+            return variant
         }
-        return product.variants.first { $0.sku == persistedSku }
+        if let requestedVariantId, let variant = product.variants.first(where: { $0.id == requestedVariantId }) {
+            return variant
+        }
+        return nil
     }
 
     /// The one way to move the selection, so the drawn state can never lag behind it.
@@ -421,4 +568,14 @@ private extension String {
 extension ProductDetailsViewModel {
     private static let relatedProductsMaxCount = 6
     private static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
+}
+
+private struct PendingBagQuantity: Equatable {
+    let lineId: String
+    let quantity: Int
+}
+
+private enum Constants {
+    static let maxLineQuantity = 100
+    static let bagQuantityDebounce: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(500)
 }

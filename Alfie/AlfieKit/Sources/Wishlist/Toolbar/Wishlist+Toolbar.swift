@@ -12,24 +12,13 @@ extension View {
             DefaultToolbarModifier(
                 hasDivider: hasDivider,
                 leadingItems: {
-                    if hasDivider {
-                        EmptyView()
-                    } else {
-                        ThemedToolbarTitle(
-                            style: .leftText(L10n.Wishlist.title),
-                            accessibilityId: AccessibilityID.titleHeader
-                        )
-                    }
+                    EmptyView()
                 },
                 principalItems: {
-                    if hasDivider {
-                        ThemedToolbarTitle(
-                            style: .text(L10n.Wishlist.title),
-                            accessibilityId: AccessibilityID.titleHeader
-                        )
-                    } else {
-                        Spacer()
-                    }
+                    ThemedToolbarTitle(
+                        style: .text(L10n.Wishlist.title),
+                        accessibilityId: AccessibilityID.titleHeader
+                    )
                 },
                 trailingItems: {
                     if hasDivider {

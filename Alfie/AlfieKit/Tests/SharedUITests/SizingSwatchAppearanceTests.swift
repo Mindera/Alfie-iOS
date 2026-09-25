@@ -48,10 +48,6 @@ final class SizingSwatchAppearanceTests: XCTestCase {
         let sut = SizingSwatchAppearance.resolve(for: .outOfStock, isSelected: true)
 
         XCTAssertEqual(sut.backgroundColor, .clear)
-        XCTAssertEqual(
-            sut.borderWidth,
-            SizingSwatchAppearance.resolve(for: .available, isSelected: false).borderWidth,
-            "out of stock took the selected border weight"
-        )
+        XCTAssertEqual(sut.borderWidth, 1, "out of stock took the selected border weight")
     }
 }

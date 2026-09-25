@@ -6,15 +6,16 @@ public protocol FlowViewModelProtocol: ObservableObject {
     associatedtype Route: Hashable
 
     var path: NavigationPath { get set }
-    var overlayViewPublisher: AnyPublisher<AnyView?, Never> { get }
+    var overlayPublisher: AnyPublisher<TabOverlay?, Never> { get }
 
     func navigate(_ route: Route)
     func popToRoot()
     func pop()
+    func dismissOverlay()
 }
 
 public extension FlowViewModelProtocol where Self: ObservableObject {
-    var overlayViewPublisher: AnyPublisher<AnyView?, Never> { Empty<AnyView?, Never>().eraseToAnyPublisher() }
+    var overlayPublisher: AnyPublisher<TabOverlay?, Never> { Empty<TabOverlay?, Never>().eraseToAnyPublisher() }
 
     func navigate(_ route: Route) {
         path.append(route)
@@ -27,4 +28,6 @@ public extension FlowViewModelProtocol where Self: ObservableObject {
     func pop() {
         path.removeLast()
     }
+
+    func dismissOverlay() {}
 }

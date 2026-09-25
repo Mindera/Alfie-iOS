@@ -24,6 +24,26 @@ public extension AlfieAnalyticsTracker {
         track(.action(.search, [.searchTerm: term]))
     }
 
+    /// A scanner was opened. The denominator the other two scan events are read against: started
+    /// against succeeded is the completion rate, started against failed is the failure rate.
+    func trackScanStarted(source: ScanEntryPoint) {
+        track(.action(.scanStarted, [.source: source.rawValue]))
+    }
+
+    /// An Alfie code resolved to a Product and navigation began. `hasVariant` records whether the
+    /// code named a Variant as well, by SKU or by variant id — the codes are printed both ways, and
+    /// only a code that names one lands the shopper on a preselected size.
+    func trackScanSucceeded(handle: String, hasVariant: Bool) {
+        track(.action(.scanSucceeded, [.handle: handle, .hasVariant: hasVariant]))
+    }
+
+    /// Every way a scan ends without a Product, under one event: the reasons are read against each
+    /// other — a store whose shoppers mostly meet a refused camera needs a different fix from one
+    /// whose shoppers mostly scan the wrong codes.
+    func trackScanFailed(reason: ScanFailureReason) {
+        track(.action(.scanFailed, [.reason: reason.rawValue]))
+    }
+
     // MARK: - State Events
 
     func trackUser(isSignedIn: Bool) {

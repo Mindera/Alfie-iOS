@@ -10,6 +10,10 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var addToBagState: AddToBagState = .ready
     public var isAddingToBag: Bool = false
     public var addToBagFeedback: AddToBagFeedback?
+    public var bagQuantity: Int = 0
+    public var maxBagQuantity: Int = 100
+    public var isUpdatingBagQuantity: Bool = false
+    public var isInWishlist = false
     public var productName: String = ""
     public var productImageUrls: [URL] = []
     public var variantSelection: VariantSelectionState
@@ -73,6 +77,16 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
     public var onDidTapAddToBagCalled: (() -> Void)?
     public func didTapAddToBag() {
         onDidTapAddToBagCalled?()
+    }
+
+    public var onDidTapIncreaseBagQuantityCalled: (() -> Void)?
+    public func didTapIncreaseBagQuantity() {
+        onDidTapIncreaseBagQuantityCalled?()
+    }
+
+    public var onDidTapDecreaseBagQuantityCalled: (() -> Void)?
+    public func didTapDecreaseBagQuantity() {
+        onDidTapDecreaseBagQuantityCalled?()
     }
 
     public var onDidDismissAddToBagFeedbackCalled: (() -> Void)?

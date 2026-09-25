@@ -1,8 +1,8 @@
 # Testing
 
 This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`. `AlfieUITests`
-(XCUITest, run from its own scheme) and `Tools/DesignTokenGen` (Swift Testing, its own package) sit in
-neither plan and keep their own conventions.
+(XCUITest, run from its own scheme) and the standalone packages under `Tools/` — `DesignTokenGen` and
+`AlfieCodeGen`, both Swift Testing — sit in neither plan and keep their own conventions.
 
 ## Rules
 
@@ -89,13 +89,10 @@ review** — treat it as a defect in the diff, not a style preference. Two shape
 
 Read any bare literal above `0.001` as unexamined until someone shows the maths behind it.
 
-**Unswept, and not precedent.** `SnapCarouselHeightTests` is the known case: nine layout assertions
-at `accuracy: 1`, roughly 6× wider than the grid requires and enough to hide a real regression, plus
-five colour-channel assertions at `accuracy: 0.1` against a 0–1 channel. Tightening the layout nine
-to `0.001` was measured: eight still pass, and the ninth exposes a 0.056pt gap that `1` was absorbing
-— the grid rounding above. The colour budget needs measuring rather than guessing, since pixel
-sampling carries real noise. All fourteen are debt pending a suite-wide tolerance review; match the
-rule above in new code rather than copying them.
+**Not precedent.** `SnapCarouselHeightTests` used to be the known offender here — nine layout
+assertions at `accuracy: 1` and five colour-channel assertions at `accuracy: 0.1`. It went with the
+`SnapCarousel` when the PDP gallery moved to a native `TabView`, so the debt is gone rather than
+swept. Should a loose budget turn up elsewhere, treat it the same way: measure it, don't copy it.
 
 ### Framework
 

@@ -11,4 +11,5 @@ public protocol HomeViewModelProtocol: ObservableObject {
     func didTapDebugMenu()
     func didTapMyAccount()
     func didTapSearch()
+    func didTapScan()
 }

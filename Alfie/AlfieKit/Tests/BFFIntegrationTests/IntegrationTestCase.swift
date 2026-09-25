@@ -49,7 +49,8 @@ class IntegrationTestCase: XCTestCase {
             logRequests: false,
             dependencies: BFFClientDependencyContainer(
                 reachabilityService: MockReachabilityService(),
-                restNetworkClient: NetworkClient(logRequests: false, logResponses: false, log: Log.DummyLogger())
+                restNetworkClient: NetworkClient(logRequests: false, logResponses: false, log: Log.DummyLogger()),
+                apiKeyService: MockBFFApiKeyService()
             ),
             log: Log.DummyLogger()
         )

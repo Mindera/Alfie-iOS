@@ -81,6 +81,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
             EndpointSelectionView(
                 viewModel: EndpointSelectionViewModel(
                     apiEndpointService: viewModel.apiEndpointService,
+                    apiKeyService: viewModel.bffApiKeyService,
                     closeEndpointSelection: viewModel.closeEndpointSelection
                 )
             )
@@ -112,6 +113,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         viewModel: .init(
             configurationService: MockConfigurationService(),
             apiEndpointService: MockApiEndpointService(),
+            bffApiKeyService: MockBFFApiKeyService(),
             closeMenuAction: {},
             openForceAppUpdate: {},
             closeEndpointSelection: {}

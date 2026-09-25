@@ -13,7 +13,6 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @StateObject private var viewModel: ViewModel
     @State private var currentMediaIndex = 0
     @State private var isMediaFullScreen = false
-    @State private var shouldAnimateCurrentMediaIndex = true
     @State private var showFailureState: Bool
     @State private var addToBagSnackbarConfig: SnackbarViewConfiguration?
 
@@ -47,11 +46,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
             viewModel.viewDidAppear()
         }
         .onChange(of: viewModel.productImageUrls) { _ in
-            shouldAnimateCurrentMediaIndex = false
             currentMediaIndex = 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                shouldAnimateCurrentMediaIndex = true
-            }
         }
         .onChange(of: viewModel.state.didFail) { newValue in
             showFailureState = newValue
@@ -64,11 +59,12 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 addToBagSnackbarConfig = nil
                 return
             }
+            let snackbar = feedback.snackbar
             addToBagSnackbarConfig = .init(
-                type: feedback.snackbarType,
-                text: feedback.snackbarText,
+                type: snackbar.type,
+                text: snackbar.text,
                 showCloseButton: true,
-                icon: feedback.snackbarIcon,
+                icon: snackbar.icon,
                 // From the top: the PDP pins the add-to-bag CTA to the bottom, and the default
                 // bottom placement lands the Snackbar squarely on top of it — covering both the
                 // button and the price. `ProductListingView` can use the default; it has no
@@ -147,20 +143,21 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         isIpad ? theme.spacing.space500 : theme.spacing.space200
     }
 
-    /// The gallery when there is imagery, otherwise one empty slot while the product loads: the
-    /// carousel hugs its content, so with nothing to measure it would collapse and then shove the
-    /// information block down the moment the images arrive.
-    /// The gallery takes its height from its content, so with no images it would collapse to nothing
-    /// and then shove the whole information block down once they arrive. An empty set reserves a
-    /// square instead. It cannot reserve with a url-less `RemoteImage`: that resolves to the failure
-    /// branch, which paints the inverted surface — a black block, not a neutral placeholder.
-    private var galleryItems: [AnyView] {
+    /// The gallery when there is imagery, otherwise one empty slot while the product loads. An empty
+    /// set reserves a square rather than showing nothing, so the information block does not jump the
+    /// moment the images arrive. It cannot reserve with a url-less `RemoteImage`: that resolves to
+    /// the failure branch, which paints the inverted surface — a black block, not a neutral
+    /// placeholder.
+    @ViewBuilder private var galleryPages: some View {
         let urls = viewModel.productImageUrls
-        guard !urls.isEmpty else {
-            return [AnyView(Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit))]
-        }
-        return urls.map { url in
-            AnyView(
+        if urls.isEmpty {
+            Theme.surfaceForegroundPrimary
+                .aspectRatio(1, contentMode: .fit)
+                .tag(0)
+        } else {
+            // Keyed by index, not url: the index is also the `.tag` the `TabView` selects by, and a
+            // variant may list the same image twice — which as an identity would be a duplicate.
+            ForEach(Array(urls.enumerated()), id: \.offset) { index, url in
                 RemoteImage(
                     url: url,
                     success: { image in
@@ -180,7 +177,8 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                         Theme.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
                     }
                 )
-            )
+                .tag(index)
+            }
         }
     }
 
@@ -247,6 +245,8 @@ extension ProductDetailsView {
 
             sizeSelector
 
+            availabilityNote
+
             descriptionSection
                 .padding(.vertical, theme.spacing.space200)
 
@@ -256,27 +256,23 @@ extension ProductDetailsView {
         }
     }
 
-    /// Full-bleed: the images fill the screen width, so there is no item spacing, no slice of the
-    /// neighbouring image, and no corner radius. The gutter belongs to the content below.
+    /// Full-bleed: the images fill the screen width, so there is no item spacing and no corner
+    /// radius. The gutter belongs to the content below.
     ///
     /// The height is the design's 3:4 gallery ratio (Figma: the Image component's default variant),
-    /// not the imagery's. Hugging the content was tried and shipped, but in the app the carousel
-    /// settled on the reserved placeholder's square and a taller photo drew past the frame, over the
-    /// product info beneath it. The measurement is not obviously at fault — `SnapCarouselHeightTests`
-    /// pins the hug path growing correctly for a declared ratio, a resizable image, an item-set swap
-    /// and an item that grows in place — so the cause is unresolved and a fixed ratio is the
-    /// deterministic choice rather than the diagnosed one. Images keep `.fit` inside the box, so
-    /// nothing is cropped; anything other than 3:4 letterboxes.
+    /// not the imagery's. Images keep `.fit` inside the box, so nothing is cropped; anything other
+    /// than 3:4 letterboxes. A paged `TabView` does not take its height from its pages, so the ratio
+    /// is imposed here and the pager fills what it is given.
     var mediaCarousel: some View {
-        SnapCarousel(
-            areItemsLoading: shimmeringBinding(for: .mediaCarousel),
-            itemAspectRatio: Constants.galleryAspectRatio,
-            itemIndex: $currentMediaIndex,
-            shouldAnimateRealIndexUpdate: $shouldAnimateCurrentMediaIndex,
-            showsAdjacentItemPeek: false
-        ) {
-            galleryItems
+        GeometryReader { proxy in
+            TabView(selection: $currentMediaIndex) {
+                galleryPages
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(width: proxy.size.width, height: proxy.size.height)
         }
+        .aspectRatio(Constants.galleryAspectRatio, contentMode: .fit)
+        .shimmering(while: shimmeringBinding(for: .mediaCarousel))
         .frame(maxWidth: Constants.maxContentWidth)
         .frame(maxWidth: .infinity)
         .disabled(isMediaFullScreen)
@@ -448,7 +444,7 @@ extension ProductDetailsView {
                             selectedItem: viewModel.variantSelection.selectedSize,
                             onSelect: viewModel.didSelectSize
                         ),
-                        layoutConfiguration: .init(arrangement: .grid(columns: Constants.sizeGridColumns))
+                        arrangement: .grid(columns: Constants.sizeGridColumns)
                     )
 
                 case .single(let name):
@@ -476,6 +472,25 @@ extension ProductDetailsView {
                 .foregroundStyle(Theme.linkLinkPrimaryDefault)
                 .allowsHitTesting(false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeGuideLink)
+        }
+    }
+
+    /// The availability the colour and size selectors show is an **online** aggregate: the BFF exposes
+    /// `Inventory { available: Int }` with no location dimension, and neither commerce adapter queries
+    /// location-scoped inventory. Without this line a shopper standing in a store reads a crossed-out
+    /// size chip as "not in this shop" — which is not what it means, and not something the stack can say.
+    /// See `Docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
+    ///
+    /// This is the visible half. The spoken half rides on the swatches' own out-of-stock
+    /// `accessibilityValue` — "Out of stock online" — rather than an `accessibilityHint` here: Speak
+    /// Hints is user-toggleable, and Braille and Switch Control never surface hints at all, so a hint
+    /// is the first thing dropped. A value is always announced, and it lands on the one element whose
+    /// availability actually needs qualifying.
+    @ViewBuilder private var availabilityNote: some View {
+        if viewModel.shouldShow(section: .availabilityNote) {
+            Text.build(theme.font.label.small(L10n.Pdp.Availability.onlineNote))
+                .foregroundStyle(Theme.contentContentTerciary)
+                .accessibilityIdentifier(AccessibilityID.ProductDetails.availabilityNote)
         }
     }
 
@@ -578,30 +593,62 @@ extension ProductDetailsView {
 
     @ViewBuilder private var addToBag: some View {
         if viewModel.shouldShow(section: .addToBag) {
-            VStack(spacing: theme.spacing.space0) {
-                let addToBagText = L10n.Product.AddToBag.Button.cta
-                let outOfStockText = L10n.Product.OutOfStock.Button.cta
-
-                ThemedButton(
-                    text: viewModel.addToBagState == .outOfStock ? outOfStockText : addToBagText,
-                    isDisabled: .init(
-                        // Disabled for the duration of the write, not merely showing a spinner:
-                        // `ThemedButton` stays hit-testable while loading, and a tappable spinner
-                        // reads to VoiceOver as an ordinary button.
-                        get: { viewModel.addToBagState != .ready || viewModel.isAddingToBag },
-                        set: { _ in }
+            if viewModel.bagQuantity > 0 {
+                QuantityStepper(
+                    quantity: viewModel.bagQuantity,
+                    bounds: 0...viewModel.maxBagQuantity,
+                    isDisabled: viewModel.isUpdatingBagQuantity,
+                    cornerRadius: Constants.ctaCornerRadius,
+                    accessibility: .init(
+                        value: .init(
+                            label: L10n.Product.Quantity.accessibilityLabel(viewModel.bagQuantity),
+                            identifier: AccessibilityID.ProductDetails.bagQuantityValue
+                        ),
+                        decrease: .init(
+                            label: viewModel.bagQuantity == 1
+                                ? L10n.Product.Quantity.Remove.accessibilityLabel
+                                : L10n.Product.Quantity.Decrease.accessibilityLabel,
+                            identifier: AccessibilityID.ProductDetails.bagQuantityDecreaseButton
+                        ),
+                        increase: .init(
+                            label: L10n.Product.Quantity.Increase.accessibilityLabel,
+                            identifier: AccessibilityID.ProductDetails.bagQuantityIncreaseButton
+                        )
                     ),
-                    isLoading: .init(
-                        get: { viewModel.isAddingToBag },
-                        set: { _ in }
-                    ),
-                    isFullWidth: true,
-                    cornerRadius: Constants.ctaCornerRadius
-                ) {
-                    viewModel.didTapAddToBag()
-                }
-                .accessibilityIdentifier(AccessibilityID.ProductDetails.addToBagButton)
+                    onDecrease: { viewModel.didTapDecreaseBagQuantity() },
+                    onIncrease: { viewModel.didTapIncreaseBagQuantity() }
+                )
+                .frame(maxWidth: .infinity)
+            } else {
+                addToBagButton
             }
+        }
+    }
+
+    @ViewBuilder private var addToBagButton: some View {
+        VStack(spacing: theme.spacing.space0) {
+            let addToBagText = L10n.Product.AddToBag.Button.cta
+            let outOfStockText = L10n.Product.OutOfStock.Button.cta
+
+            ThemedButton(
+                text: viewModel.addToBagState == .outOfStock ? outOfStockText : addToBagText,
+                isDisabled: .init(
+                    // Disabled for the duration of the write, not merely showing a spinner:
+                    // `ThemedButton` stays hit-testable while loading, and a tappable spinner
+                    // reads to VoiceOver as an ordinary button.
+                    get: { viewModel.addToBagState != .ready || viewModel.isAddingToBag },
+                    set: { _ in }
+                ),
+                isLoading: .init(
+                    get: { viewModel.isAddingToBag },
+                    set: { _ in }
+                ),
+                isFullWidth: true,
+                cornerRadius: Constants.ctaCornerRadius
+            ) {
+                viewModel.didTapAddToBag()
+            }
+            .accessibilityIdentifier(AccessibilityID.ProductDetails.addToBagButton)
         }
     }
 
@@ -612,7 +659,7 @@ extension ProductDetailsView {
             ThemedButton(
                 text: "",
                 style: .secondary,
-                leadingAsset: .heart,
+                leadingAsset: viewModel.isInWishlist ? .heartFill : .heart,
                 cornerRadius: Constants.ctaCornerRadius,
                 // Figma: a 24pt glyph in the 40pt square, not the 16pt a label-with-icon uses.
                 iconSize: Sizing.iconsIconMedium
@@ -620,7 +667,9 @@ extension ProductDetailsView {
                 viewModel.didTapAddToWishlist()
             }
             .frame(width: Sizing.iconsIconXlarge, height: Sizing.iconsIconXlarge)
-            .accessibilityLabel(L10n.Product.AddToWishlist.Button.cta)
+            .accessibilityLabel(
+                viewModel.isInWishlist ? L10n.Accessibility.removeFromWishlist : L10n.Product.AddToWishlist.Button.cta
+            )
             .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
         }
     }
@@ -750,24 +799,22 @@ private enum Constants {
 #endif
 
 private extension AddToBagFeedback {
-    var snackbarType: SnackbarViewConfiguration.SnackbarViewType {
-        switch self {
-        case .success: .success
-        case .failure: .error
-        }
+    struct Snackbar {
+        let type: SnackbarViewConfiguration.SnackbarViewType
+        let text: String
+        let icon: Image
     }
 
-    var snackbarText: String {
+    var snackbar: Snackbar {
         switch self {
-        case .success: L10n.Product.AddToBag.Success.message
-        case .failure: L10n.Product.AddToBag.Error.message
-        }
-    }
+        case .success:
+            .init(type: .success, text: L10n.Product.AddToBag.Success.message, icon: Icon.checkmark.image)
 
-    var snackbarIcon: Image {
-        switch self {
-        case .success: Icon.checkmark.image
-        case .failure: Icon.warning.image
+        case .failure:
+            .init(type: .error, text: L10n.Product.AddToBag.Error.message, icon: Icon.warning.image)
+
+        case .quantityUpdateFailure:
+            .init(type: .error, text: L10n.Product.Quantity.Error.message, icon: Icon.warning.image)
         }
     }
 } // swiftlint:disable:this file_length

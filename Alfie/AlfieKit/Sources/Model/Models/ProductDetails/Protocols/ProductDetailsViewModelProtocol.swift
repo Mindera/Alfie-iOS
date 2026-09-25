@@ -10,8 +10,12 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var addToBagState: AddToBagState { get }
     /// True while an add-to-bag write is in flight, so the CTA can show its loading state.
     var isAddingToBag: Bool { get }
-    /// The outcome of the last add-to-bag write; nil once its Snackbar has been dismissed.
+    /// The outcome of the last bag write; nil once its Snackbar has been dismissed.
     var addToBagFeedback: AddToBagFeedback? { get }
+    var bagQuantity: Int { get }
+    var maxBagQuantity: Int { get }
+    var isUpdatingBagQuantity: Bool { get }
+    var isInWishlist: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
     /// Both selection axes and their highlights, derived together so they cannot disagree.
@@ -34,6 +38,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func shouldShowLoading(for section: ProductDetailsSection) -> Bool
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?
     func didTapAddToBag()
+    func didTapIncreaseBagQuantity()
+    func didTapDecreaseBagQuantity()
     func didDismissAddToBagFeedback()
     func didTapAddToWishlist()
     func didTapBackButton()

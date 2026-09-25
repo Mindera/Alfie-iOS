@@ -19,6 +19,53 @@ final class ProductServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
+    // MARK: - Product by Barcode
+
+    func test_product_by_barcode_returns_the_bff_match() async throws {
+        var capturedBarcode: String?
+        mockClientService.onProductByBarcodeCalled = { barcode in
+            capturedBarcode = barcode
+            return BarcodeMatch(productId: "8", variantId: "22")
+        }
+
+        let match = try await sut.productByBarcode("5901234123457")
+
+        XCTAssertEqual(capturedBarcode, "5901234123457")
+        XCTAssertEqual(match, BarcodeMatch(productId: "8", variantId: "22"))
+    }
+
+    func test_product_by_barcode_with_no_match_returns_nil() async throws {
+        mockClientService.onProductByBarcodeCalled = { _ in nil }
+
+        let match = try await sut.productByBarcode("5901234123457")
+
+        XCTAssertNil(match)
+    }
+
+    func test_product_by_barcode_throws_generic_error_when_bff_service_fails() async {
+        mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .generic) }
+
+        do {
+            _ = try await sut.productByBarcode("5901234123457")
+            XCTFail("Expected productByBarcode to throw")
+        } catch let error as BFFRequestError {
+            XCTAssertEqual(error.type, .product(.generic))
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func test_product_by_barcode_rethrows_cancellation_unmapped() async {
+        mockClientService.onProductByBarcodeCalled = { _ in throw CancellationError() }
+
+        do {
+            _ = try await sut.productByBarcode("5901234123457")
+            XCTFail("Expected productByBarcode to throw")
+        } catch {
+            XCTAssertTrue(error is CancellationError)
+        }
+    }
+
     // MARK: - Get Product
 
     func test_get_product_calls_bff_service() async throws {

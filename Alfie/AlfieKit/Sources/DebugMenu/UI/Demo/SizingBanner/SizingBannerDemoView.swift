@@ -26,7 +26,7 @@ struct SizingBannerDemoView: View {
                 section(title: "Sizing Swatches - Scrollable") {
                     SizingSelectorComponentView(
                         configuration: configuration,
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8))
+                        arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8)
                     )
                 }
 
@@ -35,11 +35,9 @@ struct SizingBannerDemoView: View {
                 section(title: "Sizing Swatches - Chips") {
                     SizingSelectorComponentView(
                         configuration: configuration,
-                        layoutConfiguration: .init(
-                            arrangement: .chips(
-                                itemHorizontalSpacing: Primitives.Spacing.spacing8,
-                                itemVerticalSpacing: Primitives.Spacing.spacing8
-                            )
+                        arrangement: .chips(
+                            itemHorizontalSpacing: Primitives.Spacing.spacing8,
+                            itemVerticalSpacing: Primitives.Spacing.spacing8
                         )
                     )
                 }
@@ -49,7 +47,7 @@ struct SizingBannerDemoView: View {
                 section(title: "Sizing Swatches - Grid") {
                     SizingSelectorComponentView(
                         configuration: configuration,
-                        layoutConfiguration: .init(arrangement: .grid(columns: 4))
+                        arrangement: .grid(columns: 4)
                     )
                 }
 

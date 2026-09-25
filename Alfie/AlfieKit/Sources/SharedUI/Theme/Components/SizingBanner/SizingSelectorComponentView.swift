@@ -3,16 +3,16 @@ import SwiftUI
 
 public struct SizingSelectorComponentView: View {
     private let configuration: SwatchSelectorConfiguration<SizingSwatch>
-    private let layoutConfiguration: SwatchLayoutConfiguration
+    private let arrangement: SwatchArrangement
 
-    public init(configuration: SwatchSelectorConfiguration<SizingSwatch>, layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: SwatchSelectorConfiguration<SizingSwatch>, arrangement: SwatchArrangement) {
         self.configuration = configuration
-        self.layoutConfiguration = layoutConfiguration
+        self.arrangement = arrangement
     }
 
     public var body: some View {
         // swiftlint:disable vertical_whitespace_between_cases
-        switch layoutConfiguration.arrangement {
+        switch arrangement {
         case .horizontal(let itemSpacing, let scrollable):
             horizontalSwatches(itemSpacing: itemSpacing, scrollable: scrollable)
         case .chips(let horizontalSpacing, let verticalSpacing):
@@ -89,7 +89,7 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
             ],
             onSelect: { _ in }
         ),
-        layoutConfiguration: .init(arrangement: .grid(columns: 4))
+        arrangement: .grid(columns: 4)
     )
 }
 
@@ -106,8 +106,9 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
             ],
             onSelect: { _ in }
         ),
-        layoutConfiguration: .init(
-            arrangement: .chips(itemHorizontalSpacing: Primitives.Spacing.spacing16, itemVerticalSpacing: Primitives.Spacing.spacing16)
+        arrangement: .chips(
+            itemHorizontalSpacing: Primitives.Spacing.spacing16,
+            itemVerticalSpacing: Primitives.Spacing.spacing16
         )
     )
 }
@@ -125,6 +126,6 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
             ],
             onSelect: { _ in }
         ),
-        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16))
+        arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16)
     )
 }

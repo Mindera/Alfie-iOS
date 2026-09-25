@@ -2,7 +2,7 @@
 
 **Status**: Ready for implementation
 **Created**: 2026-08-26
-**Last Updated**: 2026-08-26
+**Last Updated**: 2026-09-16
 **Jira**: ALFMOB-491 (epic) · ALFMOB-498 (this spec)
 **Implementation PRs**: #121 (Story 1 — headless cart round-trip) · #122 (add to bag from the PDP) · #124 (the bag screen renders and empties the cart)
 
@@ -301,6 +301,11 @@ them. The empty state has no call to action (Q34), so no cross-tab navigation is
 | `bag.error_view.retry.cta` | "Try again" | Error retry action |
 | `product.add_to_bag.success.message` | "Added to bag" | Success snackbar |
 | `product.add_to_bag.error.message` | "Couldn't add to bag" | Error snackbar |
+| `product.quantity.error.message` | "Couldn't update quantity" | PDP stepper error snackbar (Q37) |
+| `product.quantity.accessibility_label` | "Quantity: %d in bag" | PDP stepper value |
+| `product.quantity.decrease.accessibility_label` | "Decrease quantity" | PDP stepper `−` above one |
+| `product.quantity.remove.accessibility_label` | "Remove from bag" | PDP stepper `−` at one |
+| `product.quantity.increase.accessibility_label` | "Increase quantity" | PDP stepper `+` |
 
 Existing and unchanged: `bag.title`, `tab.bag.title`, `product.add_to_bag.button.cta`,
 `product.color.title`, `product.size.title`, `product.one_size.title`.
@@ -309,16 +314,20 @@ Existing and unchanged: `bag.title`, `tab.bag.title`, `product.add_to_bag.button
 
 ## Analytics
 
-Both existing events keep their current signature. The only change is **when** they fire.
+Both existing events keep their current signature. The only change is **when** they fire — and,
+since Q37, that the PDP stepper fires one per committed quantity change.
 
 ### Event: `add_to_bag`
 
-**When**: after the cart mutation **succeeds** — not on tap.
+**When**: after the cart mutation **succeeds** — not on tap. Includes each successful PDP stepper write
+that raised the quantity — once per debounced burst, not per tap (Q37).
 **Parameters**: `product_id: String`
 
 ### Event: `remove_from_bag`
 
-**When**: after `removeFromCart` **succeeds**.
+**When**: after `removeFromCart` **succeeds**, and after each successful PDP stepper write that
+lowered the quantity — including one that leaves the line in place (e.g. 3 → 2); once per debounced
+burst, not per tap (Q37).
 **Parameters**: `product_id: String`
 
 A `quantity` dimension, a separate `variant_id` parameter, and normalising the existing
@@ -463,8 +472,14 @@ and a loading announcement for the cart fetch.
     tapped. There is no fetch-by-id path in the product service to fall back on.
 - **The bag row shows no brand, colour, size or was-price.** `CartItem` carries none of them and no
   enrichment is asked for.
-- **Quantity is display-only.** There is no stepper, so reducing a quantity means removing the line
-  and re-adding. Deferred to ALFMOB-443 (Q27).
+- **Quantity is editable on the PDP only.** The PDP swaps Add to bag for a `− n +` stepper once the
+  selected variant is in the bag (Q37). The bag row is still display-only, so reducing a quantity
+  from the bag means removing the line; its stepper stays with ALFMOB-443.
+- **The stepper's ceiling is online stock, capped at 100.** Stock is the PDP's last-fetched figure,
+  so a stock drop since then surfaces as the quantity error snackbar rather than a greyed `+`.
+- **A cold open can briefly offer Add to bag for a variant already in the bag.** The cart is fetched
+  at launch without being awaited; tapping it merges server-side (Scenario 3), and the stepper takes
+  over once the cart arrives.
 - **No clear-all action.** The BFF exposes no `clearCart`; emptying means removing lines one by one.
 - **No offline support.** Reads error, writes are blocked (Q25).
 - **Guest carts only.** BFF identity is guest-only; `customerAccessToken` is unused and a
@@ -527,7 +542,7 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q17 | **`CartLine.id` is the server line id** (`CartItem.id`) — use what the BFF gives us. | It is what `removeFromCart(cartId:lineId:)` takes, and the only id guaranteed unique per line. A product+variant composite breaks when the same variant appears twice and yields an id we cannot remove with. |
 | Q18 | **Trust the nested `Money.currencyCode`; `CartTotals.currency` is not modelled in the domain.** | Domain `Money` already carries `currencyCode` and `toDomainMoney()` already reads it. Consuming the outer field would mean a second code path and a disagreement nobody wants to reconcile. |
 | Q19 | **Bag read state is `ViewState<Cart, BFFRequestError>`.** An empty bag is `.success(cart)` with `lines.isEmpty` — the view renders the empty state. | Totals are cart-level and must move with the lines atomically; a `[CartLine]` state leaves totals in a second `@Published` that can lag. `ViewState` has no `.empty` case (`ViewState.swift:3`), so emptiness is a view concern. `.loading` reuses the existing shimmer, `.error` an `ErrorView` with retry (`ProductListingView` is the precedent). |
-| Q20 | ~~Debounce each stepper, disable controls in flight, re-fetch on failure.~~ **Superseded by Q27** — with no stepper there is no `updateCart`, no debounce and no concurrent-update race in this epic. Reinstate if the stepper lands with ALFMOB-443. | `updateCart` takes the full `lines` array, so two in-flight updates clobber each other. Pessimistic writes (Q8) supply the disable; the debounce stops a tap burst becoming three round-trips. The re-fetch is required because BigCommerce's `updateCart` loops line-by-line and can fail mid-loop with earlier lines committed. |
+| Q20 | ~~Debounce each stepper, disable controls in flight, re-fetch on failure.~~ **Superseded by Q27**, then **reinstated in full by Q37** for the PDP stepper: taps debounce for 500 ms, controls disable while the write is in flight, and the cart is re-read on failure. | `updateCart` takes the full `lines` array, so two in-flight updates clobber each other. Pessimistic writes (Q8) supply the disable; the debounce stops a tap burst becoming three round-trips. The re-fetch is required because BigCommerce's `updateCart` loops line-by-line and can fail mid-loop with earlier lines committed. |
 | Q22 | **Add `.cart(BFFCartRequestErrorType)` to `BFFRequestErrorType`, mirroring `.product`, and carry `extensions.status` alongside the existing `graphqlErrorCode`.** | The status field is where the 404-vs-500 discrimination lives. T7 closed as "keep 404", so this is the permanent mechanism, not an interim one — see Q12. |
 | Q15 | **`Product.Variant.id` is `String?`**, populated by `ProductDetails+Converter`; `syntheticDefaultVariant()` gets `nil`. | The BFF always sends an id for real variants (`ProductDetailsFragment.graphql:22` already selects it), but `syntheticDefaultVariant()` (`ProductDetails+Converter.swift:71`) fabricates a variant when the BFF returns none. A fake id would turn "not addable" into a server round-trip that fails; `nil` makes it a local `guard let`, unit-testable and free. |
 | Q16 | **Withdrawn — `PersistedProductDTO` gains no `variantId`, and needs no change at all.** | Once Q4 retires `BagService`, the DTO is wishlist-only: it has one production consumer (`UserDefaultsStore`), instantiated twice (`ServiceProvider.swift:97,103`). The wishlist's add-to-bag navigates to the PDP (`WishlistViewModel.swift:45`), which re-fetches variants with live ids — so a persisted id buys nothing. Consequence: no `keyNotFound` silent-wipe risk, no stored-data migration, and `PersistedProductDTOTests` is untouched. |
@@ -538,8 +553,8 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q26 | **PDP add-to-bag shows an in-flight indicator, then a snackbar.** `ThemedButton(isLoading:)` on the CTA (`ProductDetailsView.swift:523`), `.success` "Added to bag" / `.error` on failure. **No auto-navigation to the bag on success.** | Today it is fire-and-forget with no feedback at all (`ProductDetailsViewModel.swift:207`); pessimistic writes (Q8) give it an in-flight state and a failure case. Pieces already exist — `ThemedButton.swift:25`, `SnackbarView.swift:7`, with `ProductListingView` as the wiring precedent. Auto-navigation is a product decision outside this epic. |
 | Q28 | **Empty bag reuses `ErrorView`** with bag copy. ~~…and a "Start shopping" CTA switching to the Shop tab.~~ **The CTA half is superseded by Q34** — title and message only. | Per Q19 an empty bag is `.success(cart)` with `lines.isEmpty`. `SharedUI` has no `EmptyState` component, and `ErrorView` already renders title + message (`ErrorView.swift:42`). `CLAUDE.md` requires reaching for existing `SharedUI` components before writing a new view. The component choice stands; only the CTA was dropped. |
 | Q29 | **Analytics fire on success only.** The schema changes (a `quantity` dimension, a separate `variantId` parameter, normalising `productID`) are **deferred** — not done in this epic. | Writes can now fail, so firing on intent would inflate add-to-bag against real cart contents. The schema changes are deferred because they alter an existing event stream whose downstream owner has not been identified; the pre-existing `productID` inconsistency (`ProductDetailsViewModel.swift:211` sends a composite, `BagViewModel.swift:38` sends a bare id) is recorded under Verified Facts and left in place. |
-| Q27 | **Quantity is display-only this epic.** The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. The stepper is deferred to ALFMOB-443 **with a design request raised**. | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
-| Q30 | **Author exactly four operations** — `CreateCart`, `AddToCart`, `RemoveFromCart`, `Cart` — with a minimal fragment: `id`, `lineItems`, `totals { subtotal, grandTotal }`. Every line input sends both `productId` and `variantId`. | Q27 removes `updateCart`; checkout removes `cartCheckoutUrl`. `status` is a hardcoded `"active"`, `platformId` is transitional, `externalReferences` is platform plumbing, `checkoutUrl` is unwired. Authoring `updateCart` "for later" would freeze a schema shape before ALFMOB-443 needs it. |
+| Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. The stepper is deferred to ALFMOB-443 **with a design request raised**. | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
+| Q30 | ~~**Author exactly four operations**~~ **Amended by Q37**, which adds `UpdateCart` on the same fragment. — `CreateCart`, `AddToCart`, `RemoveFromCart`, `Cart` — with a minimal fragment: `id`, `lineItems`, `totals { subtotal, grandTotal }`. Every line input sends both `productId` and `variantId`. | Q27 removes `updateCart`; checkout removes `cartCheckoutUrl`. `status` is a hardcoded `"active"`, `platformId` is transitional, `externalReferences` is platform plumbing, `checkoutUrl` is unwired. Authoring `updateCart` "for later" would freeze a schema shape before ALFMOB-443 needs it. |
 | Q31 | **Write snapshot tests for all four bag states**, accepting that ALFMOB-443 will regenerate the baselines. | Regenerating a baseline is one command, and 443 regenerating them deliberately is what baselines are for. The alternative is implementing the cart with no visual regression net during the epic that replaces the bag's entire data source. |
 | Q32 | **The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope, so the bag is a dead end by design. |
 | Q33 | **Twelve new L10n keys and a new `AccessibilityID.Bag` enum**, following the existing `plp.error_view.*` pattern. The private local `AccessibilityID` enums in `Bag+Toolbar.swift` and `HorizontalProductCard.swift` are **left alone**. | Those private enums contradict the `CLAUDE.md` rule, but they predate this feature and are unrelated to it — folding a cleanup in would break the surgical-changes rule. Noted, not fixed. |
@@ -550,6 +565,7 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q5 | **One observable cart.** `CartService` holds a single published `Cart?`; the bag screen and the tab badge both read from it, and every mutation replaces it wholesale. No caller fetches its own. | Closed by T4. The badge value is `cart.lines.reduce(0) { $0 + $1.quantity }` — computed on the client, since `Cart` has no `totalQuantity` field (`cart.model.ts:135`) and needs none: every operation, query and mutation alike, returns the complete `Cart` with `lineItems { quantity }`. A server field would not have addressed the actual failure, which is two client-side copies of the cart drifting apart. |
 | Q12 | **A cart-not-found is `extensions.status == 404`**, mapped to `.cart(.cartNotFound)`; anything else is a server error and the stored id is kept. | Closed by T7: the team keeps 404 rather than adding a distinguishable error code. One cost accepted with it — a *malformed* cart id surfaces as a 500 and so never self-heals. Unreachable in practice, because the only ids we store are ones the server issued. |
 | Q36 | **A non-finite line total renders `—`.** The zero fallback in `toDomainMoney()` stays for listings; the bag suppresses the row total instead of printing it. | Closed by T5. Two halves, both small: there is no cross-platform major→minor rule to agree because iOS does no money arithmetic in the cart — the BFF returns `lineTotal` and both totals pre-computed, so the client only formats, and `CurrencyFormatter.minorUnits` (`CurrencyFormatter.swift:40`) already handles per-currency digits. What was left was the render: `toDomainMoney()` collapses NaN/±inf to zero (`ProductListing+Converter.swift:89`), which prints **£0.00** — cosmetic on a listing, but on a bag row it reads as "this item is free". |
+| Q37 | **The PDP gets a quantity stepper.** Once the selected variant is in the bag (and, where the product offers a size choice, a size is picked), Add to bag becomes `− n +`. `+` is capped at `min(stock, 100)`. Taps show their quantity at once and are debounced: 500 ms after the last one, a single `updateCart` sends the final quantity with the whole `lines` array, queued behind every other cart operation; a burst that ends where it started sends nothing. `−` to zero skips the debounce and removes the line through `removeFromCart`, putting Add to bag back. Controls disable while the write is in flight. A failed write re-reads the cart, the stepper falls back to the server's quantity, and "Couldn't update quantity" shows. Each successful write fires one `add_to_bag` / `remove_from_bag` by direction. | Queuing stops an update overtaking an add and dropping its line. The re-read covers BigCommerce applying `updateCart` line-by-line and a timeout after the server committed. The debounce turns a tap burst into one round-trip. Zero skips it because the stepper disappears at zero, and a pending removal behind a visible Add to bag would race a fresh add. One event per write, since a `quantity` dimension is still deferred (Q29). |
 
 ### Answered by the team
 
@@ -674,3 +690,4 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 |------|--------|--------|
 | 2026-08-26 | Decision log and verified facts opened during the design session | khoi.nguyen |
 | 2026-08-26 | Full spec written; 30 decisions closed, 7 questions deferred to the team | khoi.nguyen |
+| 2026-09-16 | PDP quantity stepper (Q37); Q20, Q27, Q30, analytics, L10n and Known Limitations updated | khoi.nguyen |

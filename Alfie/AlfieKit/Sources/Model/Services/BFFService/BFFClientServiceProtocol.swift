@@ -3,6 +3,7 @@ import Foundation
 public protocol BFFClientServiceProtocol {
     func getHeaderNav(handle: NavigationHandle) async throws -> [NavigationItem]
     func getProduct(handle: String) async throws -> Product
+    func productByBarcode(_ barcode: String) async throws -> BarcodeMatch?
     func productList(
         collectionHandle: String,
         after: String?,
@@ -23,5 +24,6 @@ public protocol BFFClientServiceProtocol {
     func createCart(lines: [CartLineInput]) async throws -> Cart
     func addToCart(cartId: String, lines: [CartLineInput]) async throws -> Cart
     func removeFromCart(cartId: String, lineId: String) async throws -> Cart
+    func updateCart(cartId: String, lines: [CartLineUpdate]) async throws -> Cart
     func getCart(cartId: String) async throws -> Cart
 }

@@ -11,6 +11,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
     private let navigate: (MyAccountRoute) -> Void
     private var subscriptions: Set<AnyCancellable> = []
     @Published public private(set) var sectionList: [AccountSection] = []
+    @Published public private(set) var sessionSection: AccountSection = .signIn
     @Published public var fullScreenCover: AnyView?
 
     public init(
@@ -33,15 +34,15 @@ public final class AccountViewModel: AccountViewModelProtocol {
         .sink { [weak self] featureAvailability, isUserSignedIn in
             guard let self else { return }
             sectionList = [
-                .myDetails,
-                .myOrders,
+                .personalInformation,
+                .orders,
+                featureAvailability[.wishlist] != nil ? .wishlist : nil,
                 .wallet,
                 .myAddressBook,
-                featureAvailability[.wishlist] != nil ? .wishlist : nil,
                 .settings,
-                isUserSignedIn ? .signOut : .signIn,
             ]
             .compactMap { $0 }
+            sessionSection = isUserSignedIn ? .signOut : .signIn
         }
         .store(in: &subscriptions)
     }

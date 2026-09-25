@@ -4,8 +4,8 @@ import Model
 import MyAccount
 import ProductDetails
 import ProductListing
-import Search
 import SwiftUI
+import TabFlow
 import Web
 import Wishlist
 
@@ -13,38 +13,24 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     public typealias Route = CategorySelectorRoute
     @Published public var path = NavigationPath()
     private let dependencies: CategorySelectorFlowDependencyContainer
-    @Published private var isSearchPresented = false
-    @Published private var overlayView: AnyView?
-    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
-    private var subscriptions = Set<AnyCancellable>()
-
-    private lazy var searchFlowViewModel: SearchFlowViewModel = {
-        SearchFlowViewModel(
-            dependencies: dependencies.searchDependencyContainer,
-            intentViewBuilder: { [weak self] in
-                self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
-            },
-            closeSearchAction: { [weak self] in self?.isSearchPresented = false }
-        )
-    }()
+    private let overlays: TabOverlayCoordinator
+    public var overlayPublisher: AnyPublisher<TabOverlay?, Never> { overlays.overlayPublisher }
 
     public init(dependencies: CategorySelectorFlowDependencyContainer) {
         self.dependencies = dependencies
-        setupBindings()
+        overlays = TabOverlayCoordinator(
+            dependencies: .init(
+                search: dependencies.searchDependencyContainer,
+                scanner: dependencies.scannerDependencyContainer,
+                productListing: dependencies.productListingDependencyContainer,
+                productDetails: dependencies.productDetailsDependencyContainer,
+                web: dependencies.webDependencyContainer
+            )
+        )
     }
 
-    private func setupBindings() {
-        $isSearchPresented
-            .sink { [weak self] isSearchPresented in
-                guard let self else { return }
-
-                if isSearchPresented {
-                    overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
-                } else {
-                    overlayView = nil
-                }
-            }
-            .store(in: &subscriptions)
+    public func dismissOverlay() {
+        overlays.dismiss()
     }
 
     // MARK: - View Models for CategorySelectorRoute
@@ -99,7 +85,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: overlays.showSearch
         )
     }
 
@@ -120,114 +106,6 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
         }
     }
 
-    // MARK: - View Models for SearchIntent
-
-    private func searchIntentViewBuilder(for intent: SearchIntent) -> AnyView {
-        switch intent {
-        case .productListing(let searchTerm, let category):
-            return AnyView(
-                ProductListingView(
-                    viewModel: makeProductListingViewModelForSearch(searchTerm: searchTerm, category: category)
-                )
-            )
-
-        case .productDetails(let productID, let product):
-            let configuration: ProductDetailsConfiguration
-            if let product {
-                configuration = .product(product)
-            } else {
-                configuration = .id(productID)
-            }
-
-            return AnyView(
-                ProductDetailsView(
-                    viewModel: makeProductDetailsViewModelForSearch(configuration: configuration)
-                )
-            )
-
-        case .webFeature(let feature):
-            return AnyView(
-                WebView(viewModel: makeWebViewModelForSearch(feature: feature))
-                    .toolbarView(title: feature.title)
-            )
-        }
-    }
-
-    private func makeProductListingViewModelForSearch(
-        searchTerm: String?,
-        category: String?
-    ) -> some ProductListingViewModelProtocol {
-        let configuration = ProductListingScreenConfiguration(
-            category: category,
-            searchText: searchTerm,
-            urlQueryParameters: nil,
-            mode: .searchResults
-        )
-
-        return ProductListingViewModel(
-            dependencies: dependencies.productListingDependencyContainer,
-            category: configuration.category,
-            searchText: configuration.searchText,
-            urlQueryParameters: configuration.urlQueryParameters,
-            mode: configuration.mode,
-            navigate: { [weak self] route in
-                switch route {
-                case .productDetails(let productDetailsRoute):
-                    let productID: String
-                    let product: Product?
-
-                    switch productDetailsRoute {
-                    case .productDetails(let configuration):
-                        switch configuration {
-                        case .id(let configurationProductID), .deepLink(let configurationProductID):
-                            productID = configurationProductID
-                            product = nil
-
-                        case .product(let configurationProduct):
-                            productID = configurationProduct.id
-                            product = configurationProduct
-
-                        case .selectedProduct(let selectedProduct):
-                            productID = selectedProduct.product.id
-                            product = selectedProduct.product
-                        }
-
-                        self?.searchFlowViewModel.navigate(
-                            .searchIntent(.productDetails(productID: productID, product: product))
-                        )
-
-                    case .webFeature(let feature):
-                        self?.searchFlowViewModel.navigate(.searchIntent(.webFeature(feature)))
-                    }
-
-                case .productListing(let configuration):
-                    self?.searchFlowViewModel.navigate(
-                        .searchIntent(
-                            .productListing(searchTerm: configuration.searchText, category: configuration.category)
-                        )
-                    )
-                }
-            },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
-        )
-    }
-
-    private func makeProductDetailsViewModelForSearch(
-        configuration: ProductDetailsConfiguration
-    ) -> some ProductDetailsViewModelProtocol {
-        ProductDetailsViewModel(
-            configuration: configuration,
-            dependencies: dependencies.productDetailsDependencyContainer,
-            goBackAction: { [weak self] in self?.searchFlowViewModel.pop() },
-            openWebfeatureAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.webFeature($0))) },
-            openProductAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.productDetails($0))) }
-        )
-    }
-
-    private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol {
-        WebViewModel(webFeature: feature, dependencies: dependencies.webDependencyContainer)
-    }
-
     // MARK: - View Models for MyAccountIntent
 
     public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
@@ -239,10 +117,14 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
         }
     }
 
-    // MARK: - Search
+    // MARK: - Search and Scan
 
     public func presentSearch() {
-        isSearchPresented = true
+        overlays.presentSearch()
+    }
+
+    public func presentScanner() {
+        overlays.presentScanner()
     }
 
     // MARK: - FlowViewModelProtocol
