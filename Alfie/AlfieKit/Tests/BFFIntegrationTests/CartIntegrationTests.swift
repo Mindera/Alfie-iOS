@@ -50,7 +50,7 @@ final class CartIntegrationTests: IntegrationTestCase {
         try assertTotalsAreConsistent(readBack)
     }
 
-    func test_updateCart_sets_one_lines_quantity_and_leaves_the_other_untouched() async throws {
+    func test_update_cart_sets_one_lines_quantity_and_leaves_the_other_untouched() async throws {
         let (first, second) = try await twoAddableVariants()
         let cart = try await sut.createCart(lines: [first])
         let twoLines = try await sut.addToCart(cartId: cart.id, lines: [second])
@@ -68,7 +68,7 @@ final class CartIntegrationTests: IntegrationTestCase {
         try assertTotalsAreConsistent(updated)
     }
 
-    func test_updateCart_quantity_survives_a_fresh_read() async throws {
+    func test_update_cart_quantity_survives_a_fresh_read() async throws {
         let (first, _) = try await twoAddableVariants()
         let cart = try await sut.createCart(lines: [first])
         let line = try XCTUnwrap(cart.lines.first)
@@ -80,7 +80,7 @@ final class CartIntegrationTests: IntegrationTestCase {
         XCTAssertEqual(readBack.totalQuantity, 3)
     }
 
-    func test_updateCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+    func test_update_cart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
         try XCTSkipUnless(
             addAndUpdateReportAnUnknownCartAs404,
             "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"

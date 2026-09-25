@@ -30,11 +30,11 @@ public extension AlfieAnalyticsTracker {
         track(.action(.scanStarted, [.source: source.rawValue]))
     }
 
-    /// An Alfie code resolved to a Product and navigation began. `hasSku` records whether the code
-    /// named a Variant as well — the codes are printed both ways, and the SKU is parsed but not yet
-    /// acted on, so this is how we see how much would change once it is.
-    func trackScanSucceeded(handle: String, hasSku: Bool) {
-        track(.action(.scanSucceeded, [.handle: handle, .hasSku: hasSku]))
+    /// An Alfie code resolved to a Product and navigation began. `hasVariant` records whether the
+    /// code named a Variant as well, by SKU or by variant id — the codes are printed both ways, and
+    /// only a code that names one lands the shopper on a preselected size.
+    func trackScanSucceeded(handle: String, hasVariant: Bool) {
+        track(.action(.scanSucceeded, [.handle: handle, .hasVariant: hasVariant]))
     }
 
     /// Every way a scan ends without a Product, under one event: the reasons are read against each

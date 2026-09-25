@@ -27,14 +27,14 @@ final class ScannerViewStateModelTests: XCTestCase {
     func test_with_looking_up_true_clears_notice() {
         let state = ScannerViewStateModel(guidance: "Point at a tag", notice: notice)
 
-        let sut = state.with(isLookingUp: true)
+        let sut = state.lookingUp()
 
         XCTAssertTrue(sut.isLookingUp)
         XCTAssertNil(sut.notice)
     }
 
     func test_with_notice_when_looking_up_keeps_looking_up_flag() {
-        let state = ScannerViewStateModel(guidance: "Point at a tag").with(isLookingUp: true)
+        let state = ScannerViewStateModel(guidance: "Point at a tag").lookingUp()
 
         let sut = state.with(notice: notice)
 

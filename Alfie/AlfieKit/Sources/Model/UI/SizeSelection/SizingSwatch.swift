@@ -17,16 +17,8 @@ public struct SizingSwatch: ColorAndSizingSwatchProtocol {
     }
 }
 
-public struct SwatchLayoutConfiguration {
-    public let arrangement: Arrangement
-
-    public enum Arrangement {
-        case horizontal(itemSpacing: CGFloat, scrollable: Bool = true)
-        case chips(itemHorizontalSpacing: CGFloat, itemVerticalSpacing: CGFloat)
-        case grid(columns: Int, columnWidth: CGFloat = .zero)
-    }
-
-    public init(arrangement: Arrangement) {
-        self.arrangement = arrangement
-    }
+public enum SwatchArrangement {
+    case horizontal(itemSpacing: CGFloat, scrollable: Bool = true)
+    case chips(itemHorizontalSpacing: CGFloat, itemVerticalSpacing: CGFloat)
+    case grid(columns: Int, columnWidth: CGFloat = .zero)
 }

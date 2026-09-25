@@ -77,6 +77,10 @@ let package = Package(
             targets: ["SharedUI"]
         ),
         .library(
+            name: "TabFlow",
+            targets: ["TabFlow"]
+        ),
+        .library(
             name: "TestUtils",
             targets: ["TestUtils"]
         ),
@@ -162,6 +166,7 @@ let package = Package(
                 "Scanner",
                 "Search",
                 "SharedUI",
+                "TabFlow",
                 "Utils",
                 "Web",
                 "Wishlist",
@@ -221,6 +226,7 @@ let package = Package(
                 "Scanner",
                 "Search",
                 "SharedUI",
+                "TabFlow",
                 "Utils",
                 "Web",
                 "Wishlist",
@@ -330,6 +336,18 @@ let package = Package(
             ]
         ),
         
+        .target(
+            name: "TabFlow",
+            dependencies: [
+                "Model",
+                "ProductDetails",
+                "ProductListing",
+                "Scanner",
+                "Search",
+                "Web",
+            ]
+        ),
+
         .target(
             name: "TestUtils",
             dependencies: [

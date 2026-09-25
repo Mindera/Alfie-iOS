@@ -59,11 +59,12 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 addToBagSnackbarConfig = nil
                 return
             }
+            let snackbar = feedback.snackbar
             addToBagSnackbarConfig = .init(
-                type: feedback.snackbarType,
-                text: feedback.snackbarText,
+                type: snackbar.type,
+                text: snackbar.text,
                 showCloseButton: true,
-                icon: feedback.snackbarIcon,
+                icon: snackbar.icon,
                 // From the top: the PDP pins the add-to-bag CTA to the bottom, and the default
                 // bottom placement lands the Snackbar squarely on top of it — covering both the
                 // button and the price. `ProductListingView` can use the default; it has no
@@ -154,6 +155,8 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 .aspectRatio(1, contentMode: .fit)
                 .tag(0)
         } else {
+            // Keyed by index, not url: the index is also the `.tag` the `TabView` selects by, and a
+            // variant may list the same image twice — which as an identity would be a duplicate.
             ForEach(Array(urls.enumerated()), id: \.offset) { index, url in
                 RemoteImage(
                     url: url,
@@ -441,7 +444,7 @@ extension ProductDetailsView {
                             selectedItem: viewModel.variantSelection.selectedSize,
                             onSelect: viewModel.didSelectSize
                         ),
-                        layoutConfiguration: .init(arrangement: .grid(columns: Constants.sizeGridColumns))
+                        arrangement: .grid(columns: Constants.sizeGridColumns)
                     )
 
                 case .single(let name):
@@ -596,17 +599,21 @@ extension ProductDetailsView {
                     bounds: 0...viewModel.maxBagQuantity,
                     isDisabled: viewModel.isUpdatingBagQuantity,
                     cornerRadius: Constants.ctaCornerRadius,
-                    accessibilityLabels: .init(
-                        value: L10n.Product.Quantity.accessibilityLabel(viewModel.bagQuantity),
-                        decrease: viewModel.bagQuantity == 1
-                            ? L10n.Product.Quantity.Remove.accessibilityLabel
-                            : L10n.Product.Quantity.Decrease.accessibilityLabel,
-                        increase: L10n.Product.Quantity.Increase.accessibilityLabel
-                    ),
-                    accessibilityIdentifiers: .init(
-                        value: AccessibilityID.ProductDetails.bagQuantityValue,
-                        decrease: AccessibilityID.ProductDetails.bagQuantityDecreaseButton,
-                        increase: AccessibilityID.ProductDetails.bagQuantityIncreaseButton
+                    accessibility: .init(
+                        value: .init(
+                            label: L10n.Product.Quantity.accessibilityLabel(viewModel.bagQuantity),
+                            identifier: AccessibilityID.ProductDetails.bagQuantityValue
+                        ),
+                        decrease: .init(
+                            label: viewModel.bagQuantity == 1
+                                ? L10n.Product.Quantity.Remove.accessibilityLabel
+                                : L10n.Product.Quantity.Decrease.accessibilityLabel,
+                            identifier: AccessibilityID.ProductDetails.bagQuantityDecreaseButton
+                        ),
+                        increase: .init(
+                            label: L10n.Product.Quantity.Increase.accessibilityLabel,
+                            identifier: AccessibilityID.ProductDetails.bagQuantityIncreaseButton
+                        )
                     ),
                     onDecrease: { viewModel.didTapDecreaseBagQuantity() },
                     onIncrease: { viewModel.didTapIncreaseBagQuantity() }
@@ -792,29 +799,22 @@ private enum Constants {
 #endif
 
 private extension AddToBagFeedback {
-    var snackbarType: SnackbarViewConfiguration.SnackbarViewType {
-        switch self {
-        case .success: .success
-        case .failure,
-             .quantityUpdateFailure: // swiftlint:disable:this indentation_width
-            .error
-        }
+    struct Snackbar {
+        let type: SnackbarViewConfiguration.SnackbarViewType
+        let text: String
+        let icon: Image
     }
 
-    var snackbarText: String {
+    var snackbar: Snackbar {
         switch self {
-        case .success: L10n.Product.AddToBag.Success.message
-        case .failure: L10n.Product.AddToBag.Error.message
-        case .quantityUpdateFailure: L10n.Product.Quantity.Error.message
-        }
-    }
+        case .success:
+            .init(type: .success, text: L10n.Product.AddToBag.Success.message, icon: Icon.checkmark.image)
 
-    var snackbarIcon: Image {
-        switch self {
-        case .success: Icon.checkmark.image
-        case .failure,
-             .quantityUpdateFailure: // swiftlint:disable:this indentation_width
-            Icon.warning.image
+        case .failure:
+            .init(type: .error, text: L10n.Product.AddToBag.Error.message, icon: Icon.warning.image)
+
+        case .quantityUpdateFailure:
+            .init(type: .error, text: L10n.Product.Quantity.Error.message, icon: Icon.warning.image)
         }
     }
 } // swiftlint:disable:this file_length

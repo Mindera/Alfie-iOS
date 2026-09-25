@@ -12,6 +12,7 @@ public class MockScannerViewModel: ScannerViewModelProtocol {
     /// solid rather than over nothing.
     public var preview: AnyView
     public var guidance: String? { state.value?.guidance }
+    public var failure: ScannerViewErrorType? { state.failure }
     public var notice: ScannerNotice? { state.value?.notice }
     public var isRecognised: Bool { state.value?.isRecognised ?? false }
     public var isLookingUp: Bool { state.value?.isLookingUp ?? false }

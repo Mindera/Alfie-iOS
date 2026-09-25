@@ -25,10 +25,17 @@ public struct ScannerViewStateModel: Equatable {
         .init(guidance: guidance, notice: notice, isRecognised: isRecognised, isLookingUp: isLookingUp)
     }
 
-    public func with(isLookingUp: Bool) -> Self {
-        .init(guidance: guidance, notice: isLookingUp ? nil : notice, isRecognised: isRecognised, isLookingUp: isLookingUp)
+    /// A lookup is in flight, and supersedes whatever the last scan had to say — so the notice goes.
+    public func lookingUp() -> Self {
+        .init(guidance: guidance, notice: nil, isRecognised: isRecognised, isLookingUp: true)
     }
 
+    /// The lookup is over. Any notice stays: a lookup that found nothing ends by saying so.
+    public func lookupFinished() -> Self {
+        .init(guidance: guidance, notice: notice, isRecognised: isRecognised, isLookingUp: false)
+    }
+
+    /// A code the app can act on. Nothing is left to correct and no lookup is outstanding.
     public func recognised() -> Self {
         .init(guidance: guidance, notice: nil, isRecognised: true)
     }

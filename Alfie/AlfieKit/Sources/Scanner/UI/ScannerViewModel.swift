@@ -53,6 +53,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     public var title: String { L10n.Scanner.title }
     public var preview: AnyView { scanService.makePreview() }
     public var guidance: String? { state.value?.guidance }
+    public var failure: ScannerViewErrorType? { state.failure }
     public var notice: ScannerNotice? { state.value?.notice }
     public var isRecognised: Bool { state.value?.isRecognised ?? false }
     public var isLookingUp: Bool { state.value?.isLookingUp ?? false }
@@ -175,7 +176,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         guard let model = state.value else { return }
         noticeCount += 1
         let id = noticeCount
-        state = .success(model.with(isLookingUp: false).with(notice: .init(id: id, message: message)))
+        state = .success(model.lookupFinished().with(notice: .init(id: id, message: message)))
         schedule(Self.noticeDuration) { [weak self] in
             guard let self, notice?.id == id else { return }
             didDismissNotice()
@@ -271,7 +272,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
     private func lookUp(barcode: String) {
         payloadsHeldDuringLookup = []
         if let model = state.value {
-            state = .success(model.with(isLookingUp: true))
+            state = .success(model.lookingUp())
         }
         lookupTask = Task { @MainActor [weak self, productService] in
             let result: Result<BarcodeMatch?, Error>
@@ -324,7 +325,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         self.lookupTask = nil
         payloadsHeldDuringLookup = []
         if let model = state.value {
-            state = .success(model.with(isLookingUp: false))
+            state = .success(model.lookupFinished())
         }
     }
 
@@ -363,7 +364,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
             return
         }
         let hasVariant = query?[DeepLink.skuQueryItem] != nil || query?[DeepLink.variantIdQueryItem] != nil
-        analytics.trackScanSucceeded(handle: handle, hasSku: hasVariant)
+        analytics.trackScanSucceeded(handle: handle, hasVariant: hasVariant)
     }
 
     /// Whether a scanned link reaches somewhere in the app.

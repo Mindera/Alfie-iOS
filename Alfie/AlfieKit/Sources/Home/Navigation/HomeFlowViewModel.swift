@@ -4,9 +4,8 @@ import Model
 import MyAccount
 import ProductDetails
 import ProductListing
-import Scanner
-import Search
 import SwiftUI
+import TabFlow
 import Web
 import Wishlist
 
@@ -14,77 +13,24 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public typealias Route = HomeRoute
     @Published public var path = NavigationPath()
     private let dependencies: HomeFlowDependencyContainer
-    /// Which screen, if any, is covering the tab. One value rather than a flag per screen, so a
-    /// second overlay cannot open behind the first and so `tabOverlay` has a single writer.
-    private enum Overlay {
-        case search
-        case scanner
-    }
-
-    @Published private var overlay: Overlay?
-    @Published private var tabOverlay: TabOverlay?
-    public var overlayPublisher: AnyPublisher<TabOverlay?, Never> { $tabOverlay.eraseToAnyPublisher() }
-    private var subscriptions = Set<AnyCancellable>()
-
-    /// The one way back to search, shared by every screen that offers it — so a test driving any of
-    /// them covers the wiring for all, including the builders reached only through `SearchFlowViewModel`.
-    private var showSearchOverlay: () -> Void {
-        { [weak self] in self?.overlay = .search }
-    }
-
-    private lazy var searchFlowViewModel: SearchFlowViewModel = {
-        SearchFlowViewModel(
-            dependencies: dependencies.searchDependencyContainer,
-            intentViewBuilder: { [weak self] in
-                self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
-            },
-            closeSearchAction: { [weak self] in self?.overlay = nil }
-        )
-    }()
+    private let overlays: TabOverlayCoordinator
+    public var overlayPublisher: AnyPublisher<TabOverlay?, Never> { overlays.overlayPublisher }
 
     public init(dependencies: HomeFlowDependencyContainer) {
         self.dependencies = dependencies
-        setupBindings()
-    }
-
-    private func setupBindings() {
-        $overlay
-            .sink { [weak self] overlay in
-                guard let self else { return }
-
-                switch overlay {
-                case .search:
-                    tabOverlay = TabOverlay(
-                        view: AnyView(SearchFlowView(viewModel: searchFlowViewModel)),
-                        hidesTabBar: false
-                    )
-
-                case .scanner:
-                    tabOverlay = TabOverlay(
-                        view: AnyView(ScannerView(viewModel: makeScannerViewModel())),
-                        hidesTabBar: true
-                    )
-
-                case nil:
-                    tabOverlay = nil
-                }
-            }
-            .store(in: &subscriptions)
+        overlays = TabOverlayCoordinator(
+            dependencies: .init(
+                search: dependencies.searchDependencyContainer,
+                scanner: dependencies.scannerDependencyContainer,
+                productListing: dependencies.productListingDependencyContainer,
+                productDetails: dependencies.productDetailsDependencyContainer,
+                web: dependencies.webDependencyContainer
+            )
+        )
     }
 
     public func dismissOverlay() {
-        overlay = nil
-    }
-
-    /// Closing clears the overlay as well as dismissing the screen, so the flow does not go on
-    /// believing the scanner is up and refuse to present it a second time. The rest of the wiring is
-    /// the same on every tab — see ``ScannerPresentation``.
-    private func makeScannerViewModel() -> ScannerViewModel {
-        ScannerPresentation.makeViewModel(
-            dependencies: dependencies.scannerDependencyContainer,
-            source: .searchBar,
-            close: { [weak self] in self?.overlay = nil }
-        )
+        overlays.dismiss()
     }
 
     // MARK: - View Models for HomeRoute
@@ -93,8 +39,8 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         HomeViewModel(
             dependencies: dependencies.homeDependencyContainer,
             navigate: { [weak self] route in self?.navigate(route) },
-            showSearch: showSearchOverlay,
-            showScanner: { [weak self] in self?.overlay = .scanner }
+            showSearch: overlays.showSearch,
+            showScanner: overlays.showScanner
         )
     }
 
@@ -114,7 +60,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: showSearchOverlay
+            showSearch: overlays.showSearch
         )
     }
 
@@ -135,77 +81,6 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             webFeature: feature,
             dependencies: dependencies.webDependencyContainer
         )
-    }
-
-    // MARK: - View Models for SearchIntent
-
-    private func searchIntentViewBuilder(for intent: SearchIntent) -> AnyView {
-        switch intent {
-        case .productListing(let searchTerm, let category):
-            return AnyView(
-                ProductListingView(
-                    viewModel: makeProductListingViewModelForSearch(searchTerm: searchTerm, category: category)
-                )
-            )
-
-        case .productDetails(let productID, let product):
-            let configuration: ProductDetailsConfiguration
-            if let product {
-                configuration = .product(product)
-            } else {
-                configuration = .id(productID)
-            }
-
-            return AnyView(
-                ProductDetailsView(
-                    viewModel: makeProductDetailsViewModelForSearch(configuration: configuration)
-                )
-            )
-
-        case .webFeature(let feature):
-            return AnyView(
-                WebView(viewModel: makeWebViewModelForSearch(feature: feature))
-                    .toolbarView(title: feature.title)
-            )
-        }
-    }
-
-    private func makeProductListingViewModelForSearch(
-        searchTerm: String?,
-        category: String?
-    ) -> some ProductListingViewModelProtocol {
-        let configuration = ProductListingScreenConfiguration(
-            category: category,
-            searchText: searchTerm,
-            urlQueryParameters: nil,
-            mode: .searchResults
-        )
-
-        return ProductListingViewModel(
-            dependencies: dependencies.productListingDependencyContainer,
-            category: configuration.category,
-            searchText: configuration.searchText,
-            urlQueryParameters: configuration.urlQueryParameters,
-            mode: configuration.mode,
-            navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },
-            showSearch: showSearchOverlay
-        )
-    }
-
-    private func makeProductDetailsViewModelForSearch(
-        configuration: ProductDetailsConfiguration
-    ) -> some ProductDetailsViewModelProtocol {
-        ProductDetailsViewModel(
-            configuration: configuration,
-            dependencies: dependencies.productDetailsDependencyContainer,
-            goBackAction: { [weak self] in self?.searchFlowViewModel.pop() },
-            openWebfeatureAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.webFeature($0))) },
-            openProductAction: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(.productDetails($0))) }
-        )
-    }
-
-    private func makeWebViewModelForSearch(feature: WebFeature) -> some WebViewModelProtocol {
-        WebViewModel(webFeature: feature, dependencies: dependencies.webDependencyContainer)
     }
 
     // MARK: - View Models for MyAccountIntent

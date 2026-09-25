@@ -1,29 +1,24 @@
 import SwiftUI
 
-// MARK: - QuantityStepper
-
 public struct QuantityStepper: View {
-    public struct AccessibilityLabels {
-        let value: String
-        let decrease: String
-        let increase: String
+    /// Both come from the caller because both are screen-scoped: the component cannot know which
+    /// screen it is on, and two steppers sharing one identifier are indistinguishable to a UI test.
+    public struct Accessibility {
+        public struct Control {
+            let label: String
+            let identifier: String
 
-        public init(value: String, decrease: String, increase: String) {
-            self.value = value
-            self.decrease = decrease
-            self.increase = increase
+            public init(label: String, identifier: String) {
+                self.label = label
+                self.identifier = identifier
+            }
         }
-    }
 
-    /// Identifiers come from the caller because they are screen-scoped: the component cannot know
-    /// which screen it is on, and two steppers sharing one identifier are indistinguishable to a
-    /// UI test.
-    public struct AccessibilityIdentifiers {
-        let value: String
-        let decrease: String
-        let increase: String
+        let value: Control
+        let decrease: Control
+        let increase: Control
 
-        public init(value: String, decrease: String, increase: String) {
+        public init(value: Control, decrease: Control, increase: Control) {
             self.value = value
             self.decrease = decrease
             self.increase = increase
@@ -40,8 +35,7 @@ public struct QuantityStepper: View {
     private let isDisabled: Bool
     private let height: CGFloat
     private let cornerRadius: CGFloat
-    private let accessibilityLabels: AccessibilityLabels
-    private let accessibilityIdentifiers: AccessibilityIdentifiers
+    private let accessibility: Accessibility
     private let onDecrease: () -> Void
     private let onIncrease: () -> Void
 
@@ -51,8 +45,7 @@ public struct QuantityStepper: View {
         isDisabled: Bool = false,
         height: CGFloat = Primitives.Spacing.spacing40,
         cornerRadius: CGFloat = Sizing.radiusSoft,
-        accessibilityLabels: AccessibilityLabels,
-        accessibilityIdentifiers: AccessibilityIdentifiers,
+        accessibility: Accessibility,
         onDecrease: @escaping () -> Void,
         onIncrease: @escaping () -> Void
     ) {
@@ -61,8 +54,7 @@ public struct QuantityStepper: View {
         self.isDisabled = isDisabled
         self.height = height
         self.cornerRadius = cornerRadius
-        self.accessibilityLabels = accessibilityLabels
-        self.accessibilityIdentifiers = accessibilityIdentifiers
+        self.accessibility = accessibility
         self.onDecrease = onDecrease
         self.onIncrease = onIncrease
     }
@@ -71,8 +63,7 @@ public struct QuantityStepper: View {
         HStack(spacing: Primitives.Spacing.spacing0) {
             stepButton(
                 icon: .minus,
-                label: accessibilityLabels.decrease,
-                identifier: accessibilityIdentifiers.decrease,
+                control: accessibility.decrease,
                 isEnabled: quantity > bounds.lowerBound,
                 action: onDecrease
             )
@@ -81,13 +72,12 @@ public struct QuantityStepper: View {
                 .foregroundStyle(contentColor(isEnabled: true))
                 .monospacedDigit()
                 .frame(maxWidth: .infinity)
-                .accessibilityLabel(accessibilityLabels.value)
-                .accessibilityIdentifier(accessibilityIdentifiers.value)
+                .accessibilityLabel(accessibility.value.label)
+                .accessibilityIdentifier(accessibility.value.identifier)
 
             stepButton(
                 icon: .plus,
-                label: accessibilityLabels.increase,
-                identifier: accessibilityIdentifiers.increase,
+                control: accessibility.increase,
                 isEnabled: quantity < bounds.upperBound,
                 action: onIncrease
             )
@@ -100,8 +90,7 @@ public struct QuantityStepper: View {
 
     private func stepButton(
         icon: Icon,
-        label: String,
-        identifier: String,
+        control: Accessibility.Control,
         isEnabled: Bool,
         action: @escaping () -> Void
     ) -> some View {
@@ -116,8 +105,8 @@ public struct QuantityStepper: View {
                 .contentShape(Rectangle())
         }
         .disabled(isDisabled || !isEnabled)
-        .accessibilityLabel(label)
-        .accessibilityIdentifier(identifier)
+        .accessibilityLabel(control.label)
+        .accessibilityIdentifier(control.identifier)
     }
 
     private func contentColor(isEnabled: Bool) -> Color {
@@ -130,12 +119,14 @@ public struct QuantityStepper: View {
 // MARK: - Previews
 
 #if DEBUG
-private extension QuantityStepper.AccessibilityIdentifiers {
-    static let preview = Self(
-        value: "preview.quantity.value.label",
-        decrease: "preview.quantity.decrease.button",
-        increase: "preview.quantity.increase.button"
-    )
+private extension QuantityStepper.Accessibility {
+    static func preview(quantity: Int, decrease: String) -> Self {
+        Self(
+            value: .init(label: "Quantity: \(quantity)", identifier: "preview.quantity.value.label"),
+            decrease: .init(label: decrease, identifier: "preview.quantity.decrease.button"),
+            increase: .init(label: "Increase", identifier: "preview.quantity.increase.button")
+        )
+    }
 }
 
 #Preview("Quantity stepper") {
@@ -143,23 +134,20 @@ private extension QuantityStepper.AccessibilityIdentifiers {
         QuantityStepper(
             quantity: 1,
             bounds: 0...100,
-            accessibilityLabels: .init(value: "Quantity: 1", decrease: "Remove", increase: "Increase"),
-            accessibilityIdentifiers: .preview
+            accessibility: .preview(quantity: 1, decrease: "Remove")
         ) {} onIncrease: {}
 
         QuantityStepper(
             quantity: 100,
             bounds: 0...100,
-            accessibilityLabels: .init(value: "Quantity: 100", decrease: "Decrease", increase: "Increase"),
-            accessibilityIdentifiers: .preview
+            accessibility: .preview(quantity: 100, decrease: "Decrease")
         ) {} onIncrease: {}
 
         QuantityStepper(
             quantity: 3,
             bounds: 0...100,
             isDisabled: true,
-            accessibilityLabels: .init(value: "Quantity: 3", decrease: "Decrease", increase: "Increase"),
-            accessibilityIdentifiers: .preview
+            accessibility: .preview(quantity: 3, decrease: "Decrease")
         ) {} onIncrease: {}
     }
     .padding()

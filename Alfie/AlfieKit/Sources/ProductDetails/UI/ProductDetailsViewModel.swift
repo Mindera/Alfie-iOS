@@ -24,7 +24,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     @Published private var cart: Cart?
     @Published private var pendingBagQuantity: PendingBagQuantity?
     private var cartSubscription: AnyCancellable?
-    private var bagQuantityTapCount = 0
+    private let bagQuantityDebounce: Debounce
     @Published public private(set) var isInWishlist = false
     /// The only selection state on the PDP. Everything the shopper sees about colour, size, the
     /// chosen variant and whether the product can be bought is derived from it.
@@ -37,7 +37,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private var displayVariant: Product.Variant?
     public let productId: String
     /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
-    /// product; for `.id` entry (deep link) we only have the numeric id today — see TODO in `init`.
+    /// product; for `.id` entry we only have the numeric id, which the BFF resolves for Shopify.
     private let productHandle: String
     private let initialSelectedProduct: SelectedProduct?
     private let requestedSku: String?
@@ -103,6 +103,10 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.goBackAction = goBackAction
         self.openWebfeatureAction = openWebfeatureAction
         self.openProductAction = openProductAction
+        self.bagQuantityDebounce = Debounce(
+            scheduler: dependencies.scheduler,
+            delay: Constants.bagQuantityDebounce
+        )
 
         switch configuration {
         case .id(let productId):
@@ -311,18 +315,15 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         guard !isUpdatingBagQuantity, !isAddingToBag, let line = bagLine else { return }
 
         pendingBagQuantity = .init(lineId: line.id, quantity: quantity)
-        bagQuantityTapCount += 1
+        // Zero removes the line and takes Add to bag's place, so it writes at once: a removal left
+        // pending behind a visible Add to bag would race a fresh add.
         guard quantity > 0 else {
+            bagQuantityDebounce.cancel()
             commitPendingBagQuantity()
             return
         }
 
-        let tap = bagQuantityTapCount
-        let scheduler = dependencies.scheduler
-        scheduler.schedule(after: scheduler.now.advanced(by: Constants.bagQuantityDebounce)) { [weak self] in
-            guard let self, tap == bagQuantityTapCount else { return }
-            commitPendingBagQuantity()
-        }
+        bagQuantityDebounce.schedule { [weak self] in self?.commitPendingBagQuantity() }
     }
 
     private func commitPendingBagQuantity() {

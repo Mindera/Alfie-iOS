@@ -362,7 +362,7 @@ and Product Details preselects by `sku`, then `variantId`, then the default Vari
 **When**: An Alfie code is recognised, or a Barcode lookup matches, and navigation begins
 **Parameters**:
 - `handle`: String - The Product Handle from the code; for a Barcode, the matched `productId`
-- `has_sku`: Bool - Whether the code carried a SKU; for a Barcode, whether the match carried a `variantId`
+- `has_variant`: Bool - Whether the scan named a specific Variant: a SKU on the code, or a `variantId` on a Barcode match
 
 ### Event: `scan_failed`
 

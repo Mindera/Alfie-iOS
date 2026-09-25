@@ -61,7 +61,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 .padding(.vertical, theme.spacing.space150)
                 .background(Theme.surfaceBackgroundInvertedPrimary.ignoresSafeArea(edges: .top))
 
-            if let error = viewModel.state.failure {
+            if let error = viewModel.failure {
                 ScannerFailureView(error: error, openSettings: { viewModel.didTapOpenSettings() })
                     .frame(maxHeight: .infinity)
                     .background(Theme.surfaceBackgroundPrimary)
@@ -96,7 +96,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     }
 
     private var isShowingCamera: Bool {
-        viewModel.state.failure == nil
+        viewModel.failure == nil
     }
 
     /// The screen opens straight onto a live camera, so a shopper using VoiceOver has nothing to read

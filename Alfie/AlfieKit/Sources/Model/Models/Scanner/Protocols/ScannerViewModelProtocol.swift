@@ -13,6 +13,9 @@ public protocol ScannerViewModelProtocol: ObservableObject {
     /// Read off ``state`` here rather than in the View: the walk into the state model belongs on
     /// this side of the seam, as it does for every other screen.
     var guidance: String? { get }
+    /// Why there is no camera to look through, or `nil` while there is one. Read off ``state`` for
+    /// the same reason as ``guidance``.
+    var failure: ScannerViewErrorType? { get }
     /// What the shopper was last told about a code, if anything.
     var notice: ScannerNotice? { get }
     var isRecognised: Bool { get }

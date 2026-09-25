@@ -10,11 +10,9 @@ public final class MockCameraScanService: CameraScanServiceProtocol {
     public var failurePublisher: AnyPublisher<CameraScanFailure, Never> { failureSubject.eraseToAnyPublisher() }
 
     public var canAskForCameraAccess = false
-    public private(set) var startCount = 0
-    public private(set) var stopCount = 0
-    /// What the camera would be doing, inferred from the calls made rather than tracked separately,
-    /// so a test cannot assert a state the service was never actually put into.
-    public var isScanning: Bool { startCount > stopCount }
+
+    public var onStartScanningCalled: (() -> Void)?
+    public var onStopScanningCalled: (() -> Void)?
 
     public init() { }
 
@@ -23,11 +21,11 @@ public final class MockCameraScanService: CameraScanServiceProtocol {
     }
 
     public func startScanning() {
-        startCount += 1
+        onStartScanningCalled?()
     }
 
     public func stopScanning() {
-        stopCount += 1
+        onStopScanningCalled?()
     }
 
     /// Drives the seam: stands in for the camera seeing a code.

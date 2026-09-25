@@ -11,5 +11,5 @@ public enum AnalyticsParameter: String, AnalyticsParameterKey {
     case reason = "reason"
     case source = "source"
     case handle = "handle"
-    case hasSku = "has_sku"
+    case hasVariant = "has_variant"
 }

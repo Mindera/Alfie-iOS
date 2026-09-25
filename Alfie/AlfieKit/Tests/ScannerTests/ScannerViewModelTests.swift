@@ -21,6 +21,8 @@ final class ScannerViewModelTests: XCTestCase {
     private var openedLinks: [URL]!
     private var closeCount: Int!
     private var openSettingsCount: Int!
+    private var startScanCount: Int!
+    private var stopScanCount: Int!
     private var mockAnalytics: MockAnalyticsTracker!
     private var mockHaptics: MockHapticsService!
     private var triggeredHaptics: [HapticType]!
@@ -52,7 +54,11 @@ final class ScannerViewModelTests: XCTestCase {
         scheduler = TestScheduler()
         mockHaptics = MockHapticsService()
         mockHaptics.onTriggerCalled = { [weak self] in self?.triggeredHaptics.append($0) }
+        startScanCount = 0
+        stopScanCount = 0
         scanService = MockCameraScanService()
+        scanService.onStartScanningCalled = { [weak self] in self?.startScanCount += 1 }
+        scanService.onStopScanningCalled = { [weak self] in self?.stopScanCount += 1 }
         linkTypes = try [
             url(Self.alfieCode): .productDetail(handle: "slim-indigo-jean", route: nil, query: nil),
             url(Self.alfieCodeWithSku): .productDetail(handle: "slim-indigo-jean", route: nil, query: ["sku": "SKU-42"]),
@@ -85,6 +91,8 @@ final class ScannerViewModelTests: XCTestCase {
         lookupGate = nil
         linkTypes = nil
         scanService = nil
+        startScanCount = nil
+        stopScanCount = nil
         openedLinks = nil
         closeCount = nil
         openSettingsCount = nil
@@ -201,7 +209,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         scanService.recognise(Self.alfieCode)
 
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     /// A scan that has already navigated must not be undone by the screen going away and coming
@@ -213,7 +221,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.viewDidAppear()
 
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     // MARK: - Codes that are not Alfie codes
@@ -231,7 +239,7 @@ final class ScannerViewModelTests: XCTestCase {
 
             XCTAssertTrue(openedLinks.isEmpty, "payload: \"\(payload.value)\"")
             XCTAssertEqual(closeCount, 0, "payload: \"\(payload.value)\"")
-            XCTAssertTrue(scanService.isScanning, "payload: \"\(payload.value)\"")
+            XCTAssertTrue(isScanning, "payload: \"\(payload.value)\"")
         }
         XCTAssertTrue(lookedUpBarcodes.isEmpty)
     }
@@ -258,7 +266,7 @@ final class ScannerViewModelTests: XCTestCase {
         finishRecognitionFeedback()
 
         XCTAssertEqual(openedLinks, [try url(Self.alfieCode)])
-        XCTAssertEqual(scanService.startCount, 1)
+        XCTAssertEqual(startScanCount, 1)
         XCTAssertEqual(closeCount, 1)
     }
 
@@ -344,7 +352,7 @@ final class ScannerViewModelTests: XCTestCase {
         let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.scheduler.advance(by: 4) })
 
         XCTAssertNil(state?.value?.notice)
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
     }
 
     func test_repeated_notice_outlives_the_first_notice_duration() {
@@ -383,7 +391,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut = makeSUT(canAskForCameraAccess: false)
 
         XCTAssertFalse(sut.isExplainingCameraAccess)
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     func test_appearing_while_explaining_camera_access_does_not_start_camera() {
@@ -393,7 +401,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         XCTAssertTrue(sut.isExplainingCameraAccess)
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     func test_appearing_after_continuing_from_explanation_starts_camera() {
@@ -404,7 +412,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.viewDidAppear()
 
         XCTAssertFalse(sut.isExplainingCameraAccess)
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
         XCTAssertEqual(closeCount, 0)
     }
 
@@ -415,7 +423,7 @@ final class ScannerViewModelTests: XCTestCase {
         sut.didDeclineCameraAccess()
 
         XCTAssertEqual(closeCount, 1)
-        XCTAssertEqual(scanService.startCount, 0)
+        XCTAssertEqual(startScanCount, 0)
     }
 
     func test_explanation_going_away_after_continuing_does_not_close() {
@@ -438,7 +446,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         XCTAssertEqual(state?.value?.isLookingUp, true)
         XCTAssertEqual(state?.value?.isRecognised, false)
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
     }
 
     /// A Selfridges price tag carries its GTIN-13 in a Code 128 symbol. It is a product barcode like
@@ -488,7 +496,7 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(state?.value?.notice, ScannerNotice(id: 1, message: Self.notFoundMessage))
         XCTAssertEqual(state?.value?.isLookingUp, false)
         XCTAssertTrue(openedLinks.isEmpty)
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
     }
 
     func test_scanning_barcode_when_lookup_fails_shows_lookup_failed_notice() {
@@ -645,7 +653,7 @@ final class ScannerViewModelTests: XCTestCase {
     func test_appearing_starts_scanning() {
         sut.viewDidAppear()
 
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
     }
 
     func test_disappearing_stops_scanning() {
@@ -653,7 +661,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.viewDidDisappear()
 
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     func test_backgrounding_stops_scanning() {
@@ -661,7 +669,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.didChangeScenePhase(isActive: false)
 
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     func test_returning_to_foreground_resumes_scanning() {
@@ -670,7 +678,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.didChangeScenePhase(isActive: true)
 
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
     }
 
     /// Coming back to the foreground while the scanner is *not* the visible screen must not switch
@@ -681,7 +689,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.didChangeScenePhase(isActive: true)
 
-        XCTAssertFalse(scanService.isScanning)
+        XCTAssertFalse(isScanning)
     }
 
     /// Repeated appearances do not stack camera sessions.
@@ -691,7 +699,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         sut.didChangeScenePhase(isActive: true)
 
-        XCTAssertEqual(scanService.startCount, 1)
+        XCTAssertEqual(startScanCount, 1)
     }
 
     // MARK: - When there is no camera to look through
@@ -751,7 +759,7 @@ final class ScannerViewModelTests: XCTestCase {
         let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.didChangeScenePhase(isActive: true) })
 
         XCTAssertNil(state?.failure)
-        XCTAssertTrue(scanService.isScanning)
+        XCTAssertTrue(isScanning)
     }
 
     /// A failure leaves nothing running, and the service says so by clearing its own start request.
@@ -766,7 +774,7 @@ final class ScannerViewModelTests: XCTestCase {
 
         let state = XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(scanService.startCount, 2)
+        XCTAssertEqual(startScanCount, 2)
         XCTAssertNil(state?.failure)
     }
 
@@ -961,6 +969,8 @@ final class ScannerViewModelTests: XCTestCase {
         )
     }
 
+    private var isScanning: Bool { startScanCount > stopScanCount }
+
     private func url(_ string: String) throws -> URL {
         try XCTUnwrap(URL(string: string))
     }
@@ -1029,12 +1039,12 @@ final class ScannerViewModelTests: XCTestCase {
         mockAnalytics.trackedValues(of: .handle, for: .scanSucceeded)
     }
 
-    /// The `has_sku` flag carried by each `scan_succeeded` event, in order. Read off the events
+    /// The `has_variant` flag carried by each `scan_succeeded` event, in order. Read off the events
     /// directly rather than through `trackedValues(of:for:)`, which only reads String parameters.
     private var reportedScanSuccessSkuFlags: [Bool] {
         mockAnalytics.trackedEvents.compactMap { event in
             guard case .action(.scanSucceeded, let parameters) = event else { return nil }
-            return parameters?[.hasSku] as? Bool
+            return parameters?[.hasVariant] as? Bool
         }
     }
 }
