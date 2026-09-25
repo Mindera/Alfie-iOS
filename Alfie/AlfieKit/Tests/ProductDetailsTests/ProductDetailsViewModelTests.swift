@@ -56,10 +56,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel()
         XCTAssertTrue(sut.productName.isEmpty)
         XCTAssertTrue(sut.productTitle.isEmpty)
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        let sizingSelectionConfiguration = sut.sizingSelectionConfiguration
-        XCTAssertTrue(colorSelectionConfiguration.items.isEmpty)
-        XCTAssertTrue(sizingSelectionConfiguration.items.isEmpty)
+        XCTAssertTrue(sut.variantSelection.colours.isEmpty)
+        XCTAssertTrue(sut.variantSelection.sizes.isEmpty)
     }
 
     func test_placeholder_information_is_available_when_a_base_product_is_passed_on_init() {
@@ -73,50 +71,67 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel(configuration: .product(product))
         XCTAssertEqual(sut.productName, product.name)
         XCTAssertEqual(sut.productTitle, product.brand.name)
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.id, color.id)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.name, color.name)
-        let sizingSelectionConfiguration = sut.sizingSelectionConfiguration
-        XCTAssertEqual(sizingSelectionConfiguration.items.count, 1)
-        XCTAssertEqual(sizingSelectionConfiguration.items.first?.id, size.id)
-        XCTAssertEqual(sizingSelectionConfiguration.items.first?.name, size.value)
+        let selection = sut.variantSelection
+        XCTAssertEqual(selection.colours.count, 1)
+        XCTAssertEqual(selection.colours.first?.id, color.id)
+        XCTAssertEqual(selection.colours.first?.name, color.name)
+        XCTAssertEqual(selection.sizes.count, 1)
+        XCTAssertEqual(selection.sizes.first?.id, size.id)
+        XCTAssertEqual(selection.sizes.first?.name, size.value)
     }
     
     func test_size_swatch_is_not_pre_selected_on_init_with_product() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
-        let variant = Product.Variant.fixture(size: size, colour: color)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        let product = Product.fixture(defaultVariant: twoSizeVariants(colour: color)[0],
+                                      variants: twoSizeVariants(colour: color))
         initViewModel(configuration: .product(product))
 
-        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
-        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+        XCTAssertNil(sut.variantSelection.selectedSize)
+        XCTAssertNotNil(sut.variantSelection.selectedColour)
     }
 
     func test_size_swatch_is_not_pre_selected_after_product_fetch() {
         initViewModel()
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
-        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
-        let variant = Product.Variant.fixture(size: size, colour: color)
-        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+        let product = Product.fixture(defaultVariant: twoSizeVariants(colour: color)[0],
+                                      variants: twoSizeVariants(colour: color))
         mockProductService.onGetProductCalled = { _ in product }
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertNil(sut.sizingSelectionConfiguration.selectedItem)
-        XCTAssertNotNil(sut.colorSelectionConfiguration.selectedItem)
+        XCTAssertNil(sut.variantSelection.selectedSize)
+        XCTAssertNotNil(sut.variantSelection.selectedColour)
     }
 
-    func test_sizing_selection_configuration_is_unavailable_when_there_is_no_selected_variant_on_init() {
+    /// A lone size is implicit, so it is chosen rather than left for the shopper to tap. That is
+    /// what lets the add-to-bag gate ask one question rather than special-casing single-size
+    /// products.
+    func test_sole_size_is_pre_selected_on_init_with_product() {
+        let color = Product.Colour.fixture(id: "1", name: "Color 1")
+        let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
+        let variant = Product.Variant.fixture(size: size, colour: color)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.selectedSize?.id, size.id)
+    }
+
+    /// The seeding defect: the product's default variant carries no colour, so matching it against
+    /// the built swatches used to leave the selection nil and the size grid empty. Colour is now
+    /// seeded to the first colour whatever the default variant says.
+    func test_sizes_are_offered_when_the_default_variant_matches_no_built_colour() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
         let variant = Product.Variant.fixture(size: size, colour: color)
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
                                       variants: [variant])
+
         initViewModel(configuration: .product(product))
-        XCTAssertEqual(sut.sizingSelectionConfiguration.items.count, 0)
+
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, color.id)
+        XCTAssertEqual(sut.variantSelection.sizes.map(\.id), [size.id])
     }
 
     // MARK: - Properties
@@ -183,41 +198,42 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
     // MARK: - Add to Bag gating
 
-    func test_isAddToBagEnabled_isFalseOnInit_forMultiSizeProduct_evenWithStock() {
+    func test_add_to_bag_needs_a_size_on_init_for_a_multi_size_product_even_with_stock() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
         let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+
         initViewModel(configuration: .product(product))
 
-        XCTAssertFalse(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .needsSize)
     }
 
-    func test_isAddToBagEnabled_becomesTrue_afterSizeIsSelected_onMultiSizeProduct() {
+    func test_add_to_bag_becomes_ready_after_a_size_is_selected_on_a_multi_size_product() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let small = Product.Variant.fixture(id: "v1", size: .fixture(id: "s", value: "S"), colour: color, stock: 5)
         let medium = Product.Variant.fixture(id: "v2", size: .fixture(id: "m", value: "M"), colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
         initViewModel(configuration: .product(product))
 
-        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first
+        sut.didSelectSize(sut.variantSelection.sizes[0])
 
-        XCTAssertTrue(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .ready)
     }
 
-    func test_isAddToBagEnabled_isFalse_whenSelectedVariantIsOutOfStock() {
+    func test_add_to_bag_is_out_of_stock_when_the_selected_variant_is_out_of_stock() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "12", value: "UK 6")
         let variant = Product.Variant.fixture(size: size, colour: color, stock: 0)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
         initViewModel(configuration: .product(product))
 
-        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first
+        sut.didSelectSize(sut.variantSelection.sizes[0])
 
-        XCTAssertFalse(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .outOfStock)
     }
 
-    func test_isAddToBagEnabled_usesFreshStock_whenEnteringFromBagWithStaleVariant() {
+    func test_add_to_bag_uses_fresh_stock_when_entering_from_the_bag_with_a_stale_variant() {
         // Re-entering from Bag/Wishlist carries a persisted (stale) variant that was out of stock when
         // saved; after the re-fetch the gating must reflect the fresh product's stock, not the snapshot.
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -226,62 +242,97 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let freshVariant = Product.Variant.fixture(id: "v1", sku: "v1", colour: color, stock: 5)
         let freshProduct = Product.fixture(defaultVariant: freshVariant, variants: [freshVariant])
         mockProductService.onGetProductCalled = { _ in freshProduct }
-
         initViewModel(
             configuration: .selectedProduct(SelectedProduct(product: staleProduct, selectedVariant: staleVariant))
         )
+
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertTrue(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .ready)
     }
 
-    func test_isAddToBagEnabled_isTrueOnInit_forSingleSizeProduct_withStock() {
+    func test_re_entry_restores_the_saved_size_rather_than_the_first_one_in_the_colour() {
+        // A saved Navy/L used to come back as the first Navy variant, so the reference, the share
+        // price and the wishlist heart all named a size the shopper never chose.
+        let navy = Product.Colour.fixture(id: "navy", name: "Navy")
+        let small = Product.Variant.fixture(id: "v1", sku: "navy-s", size: .fixture(id: "s", value: "S"), colour: navy)
+        let large = Product.Variant.fixture(id: "v2", sku: "navy-l", size: .fixture(id: "l", value: "L"), colour: navy)
+        let product = Product.fixture(defaultVariant: small, variants: [small, large])
+        mockProductService.onGetProductCalled = { _ in product }
+        initViewModel(configuration: .selectedProduct(SelectedProduct(product: product, selectedVariant: large)))
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productReference, "navy-l")
+        XCTAssertEqual(sut.variantSelection.selectedSize?.id, "l")
+    }
+
+    func test_add_to_bag_is_ready_on_init_for_a_single_size_product_with_stock() {
         // Product has sizes, but only one size variant exists (e.g. only available in M).
-        // The View renders a non-interactive singleSizeView, so the user can't tap a swatch —
-        // treat the size as implicitly selected.
+        // `sizeDisplay` is `.single`, so the View names the size rather than offering a grid and
+        // the user can't tap a swatch — treat the size as implicitly selected.
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let size = Product.ProductSize.fixture(id: "m", value: "M")
         let variant = Product.Variant.fixture(id: "v1", size: size, colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
         initViewModel(configuration: .product(product))
 
-        XCTAssertTrue(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .ready)
     }
 
-    func test_isAddToBagEnabled_isTrueOnInit_forSizelessProduct_withStock() {
+    func test_add_to_bag_is_ready_on_init_for_a_sizeless_product_with_stock() {
         // Product has no size dimension at all (e.g. a necklace).
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let variant = Product.Variant.fixture(id: "v1", size: nil, colour: color, stock: 5)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
         initViewModel(configuration: .product(product))
 
-        XCTAssertTrue(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .ready)
     }
 
-    func test_productHasAnyStock_isTrue_whenAtLeastOneVariantHasStock() {
+    func test_add_to_bag_asks_for_a_size_while_the_colour_still_stocks_one() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 0)
         let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 3)
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+
         initViewModel(configuration: .product(product))
 
-        XCTAssertTrue(sut.productHasAnyStock)
+        XCTAssertEqual(sut.addToBagState, .needsSize)
     }
 
-    func test_productHasAnyStock_isFalse_whenEveryVariantIsOutOfStock() {
+    func test_add_to_bag_is_out_of_stock_rather_than_needs_size_when_every_size_is_sold_out() {
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
         let small = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: color, stock: 0)
         let medium = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: color, stock: 0)
         let product = Product.fixture(defaultVariant: small, variants: [small, medium])
+
         initViewModel(configuration: .product(product))
 
-        XCTAssertFalse(sut.productHasAnyStock)
+        XCTAssertEqual(sut.addToBagState, .outOfStock)
     }
 
-    func test_productHasAnyStock_isFalse_whenProductIsNotLoaded() {
+    func test_add_to_bag_is_out_of_stock_when_no_product_is_loaded() {
         initViewModel()
 
-        XCTAssertFalse(sut.productHasAnyStock)
+        XCTAssertEqual(sut.addToBagState, .outOfStock)
+    }
+
+    func test_add_to_bag_reports_the_chosen_colour_not_the_product_when_another_colour_has_stock() {
+        // The CTA used to read the product-wide stock, so picking a sold-out colour left it saying
+        // "Add to bag" while refusing the tap.
+        let navy = Product.Colour.fixture(id: "navy", name: "Navy")
+        let sand = Product.Colour.fixture(id: "sand", name: "Sand")
+        let soldOut = Product.Variant.fixture(id: "v1", size: .fixture(id: "m", value: "M"), colour: navy, stock: 0)
+        let inStock = Product.Variant.fixture(id: "v2", size: .fixture(id: "m", value: "M"), colour: sand, stock: 4)
+        let product = Product.fixture(defaultVariant: inStock, variants: [soldOut, inStock])
+        initViewModel(configuration: .product(product))
+
+        sut.didSelectColour(sut.variantSelection.colours[0])
+
+        XCTAssertEqual(sut.addToBagState, .outOfStock)
     }
 
     func test_didTapAddToBag_isNoOp_whenSizeIsNotSelected_onMultiSizeProduct() {
@@ -443,7 +494,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.productReference, "SKU-2")
-        XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, "2")
     }
 
     func test_selected_product_entry_keeps_the_saved_non_default_variant_after_refetch() {
@@ -455,8 +506,8 @@ final class ProductDetailsViewModelTests: XCTestCase {
         initViewModel(configuration: .selectedProduct(SelectedProduct(product: product, selectedVariant: savedVariant)))
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(sut.state.value?.selectedVariant.sku, "SKU-2")
-        XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
+        XCTAssertEqual(sut.productReference, "SKU-2")
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, "2")
     }
 
     func test_deep_link_entry_with_variant_id_preselects_that_variant() {
@@ -470,13 +521,15 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.productReference, "SKU-2")
-        XCTAssertEqual(sut.colorSelectionConfiguration.selectedItem?.id, "2")
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, "2")
     }
 
     func test_deep_link_entry_with_sku_and_variant_id_prefers_the_sku() {
-        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", stock: 1)
-        let skuVariant = Product.Variant.fixture(id: "v2", sku: "SKU-2", stock: 1)
-        let idVariant = Product.Variant.fixture(id: "v3", sku: "SKU-3", stock: 1)
+        // A colour each: the selection addresses a variant by colour and size, so variants alike on
+        // both axes are not a choice the PDP can express — nor one a shopper could make.
+        let defaultVariant = Product.Variant.fixture(id: "v1", sku: "SKU-1", colour: .fixture(id: "1"), stock: 1)
+        let skuVariant = Product.Variant.fixture(id: "v2", sku: "SKU-2", colour: .fixture(id: "2"), stock: 1)
+        let idVariant = Product.Variant.fixture(id: "v3", sku: "SKU-3", colour: .fixture(id: "3"), stock: 1)
         mockProductService.onGetProductCalled = { _ in
             .fixture(defaultVariant: defaultVariant, variants: [defaultVariant, skuVariant, idVariant])
         }
@@ -594,7 +647,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         let variant2 = Product.Variant.fixture(size: size2, colour: color2, stock: 2)
         let product = Product.fixture(name: "Product Name",
                                       brand: .fixture(name: "Product Brand"),
-                                      defaultVariant: variant1,
+                                      defaultVariant: variant2,
                                       variants: [variant1, variant2])
         mockProductService.onGetProductCalled = { _ in
             product
@@ -602,13 +655,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let selectedVariant = sut.state.value?.selectedVariant
-        XCTAssertNotNil(selectedVariant)
-        XCTAssertEqual(selectedVariant?.colour?.id, variant1.colour?.id)
-        XCTAssertEqual(selectedVariant?.colour?.name, variant1.colour?.name)
-        XCTAssertEqual(selectedVariant?.size?.id, variant1.size?.id)
-        XCTAssertEqual(selectedVariant?.size?.value, variant1.size?.value)
-        XCTAssertEqual(selectedVariant?.stock, variant1.stock)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant2.colour?.id)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.name, variant2.colour?.name)
+        XCTAssertEqual(sut.variantSelection.selectedSize?.id, variant2.size?.id)
+        XCTAssertEqual(sut.selectedColourName, variant2.colour?.name)
+        XCTAssertEqual(sut.productReference, variant2.sku)
     }
 
     // MARK: - Loading state
@@ -770,11 +821,11 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.count, 1)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.id, color.id)
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.name, color.name)
-        switch colorSelectionConfiguration.items.first?.type {
+        let colours = sut.variantSelection.colours
+        XCTAssertEqual(colours.count, 1)
+        XCTAssertEqual(colours.first?.id, color.id)
+        XCTAssertEqual(colours.first?.name, color.name)
+        switch colours.first?.type {
             case .url(let url):
                 XCTAssertEqual(url.absoluteString, stringUrl)
             default:
@@ -795,8 +846,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEqual(colorSelectionConfiguration.items.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
+        XCTAssertEqual(sut.variantSelection.colours.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
     }
 
     /// `isDisabled` is the flag both colour surfaces key off — the card grid and the sheet row each
@@ -821,7 +871,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let items = sut.colorSelectionConfiguration.items
+        let items = sut.variantSelection.colours
         XCTAssertEqual(items.first { $0.id == inStock.id }?.isDisabled, false)
         XCTAssertEqual(items.first { $0.id == soldOut.id }?.isDisabled, true)
     }
@@ -846,35 +896,10 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(sut.colorSelectionConfiguration.items.first?.isDisabled, false)
+        XCTAssertEqual(sut.variantSelection.colours.first?.isDisabled, false)
     }
 
-    /// The sheet's list source: an empty term shows everything, otherwise it matches by name,
-    /// ignoring case.
-    func test_color_swatches_filter_by_name_ignoring_case() {
-        initViewModel()
-
-        let navy = Product.Colour.fixture(id: "1", name: "Midnight Navy")
-        let sand = Product.Colour.fixture(id: "2", name: "Sand")
-        let product = Product.fixture(
-            name: "Product Name",
-            brand: .fixture(name: "Product Brand"),
-            defaultVariant: .fixture(colour: navy, stock: 1),
-            variants: [.fixture(colour: navy, stock: 1), .fixture(colour: sand, stock: 1)]
-        )
-        mockProductService.onGetProductCalled = { _ in
-            product
-        }
-
-        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
-
-        XCTAssertEqual(sut.colorSwatches(filteredBy: "").count, 2)
-        XCTAssertEqual(sut.colorSwatches(filteredBy: "navy").map(\.id), [navy.id])
-        XCTAssertEqual(sut.colorSwatches(filteredBy: "SAND").map(\.id), [sand.id])
-        XCTAssertTrue(sut.colorSwatches(filteredBy: "teal").isEmpty)
-    }
-
-    func test_state_has_selected_variant_when_color_is_selected() {
+    func test_selection_follows_the_tapped_colour() {
         initViewModel()
 
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -891,20 +916,49 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: \.isLoading),
-            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
-        )
+        sut.didSelectColour(sut.variantSelection.colours[1])
 
-        let selectedVariant = sut.state.value?.selectedVariant
-        XCTAssertNotNil(selectedVariant)
-        XCTAssertEqual(selectedVariant?.colour?.id, variant2.colour?.id)
-        XCTAssertEqual(selectedVariant?.colour?.name, variant2.colour?.name)
-        XCTAssertEqual(selectedVariant?.stock, variant2.stock)
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, variant2.colour?.id)
+        XCTAssertEqual(sut.selectedColourName, variant2.colour?.name)
+        XCTAssertEqual(sut.productReference, variant2.sku)
     }
 
-    func test_state_is_not_updated_if_nil_color_is_selected() {
+    func test_entering_with_a_product_seeds_the_selection_from_its_default_variant() {
+        let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
+        let color2 = Product.Colour.fixture(id: "2", name: "Color 2")
+        let variant1 = Product.Variant.fixture(colour: color1, stock: 1)
+        let variant2 = Product.Variant.fixture(colour: color2, stock: 2)
+        // The default is deliberately not the head of the list: seeding from the default and
+        // seeding from the first variant are otherwise indistinguishable.
+        let product = Product.fixture(defaultVariant: variant2, variants: [variant1, variant2])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, color2.id)
+    }
+
+    func test_size_swatch_name_carries_the_scale_when_the_size_has_one() {
+        let size = Product.ProductSize.fixture(id: "s", value: "6", scale: "UK")
+        let variant = Product.Variant.fixture(size: size, colour: .fixture(id: "1"), stock: 1)
+        let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.sizes.first?.name, "6 UK")
+    }
+
+    func test_size_swatches_carry_the_stock_state_of_each_size() {
+        let colour = Product.Colour.fixture(id: "1", name: "Color 1")
+        let stocked = Product.Variant.fixture(size: .fixture(id: "s", value: "S"), colour: colour, stock: 3)
+        let soldOut = Product.Variant.fixture(size: .fixture(id: "m", value: "M"), colour: colour, stock: 0)
+        let product = Product.fixture(defaultVariant: stocked, variants: [stocked, soldOut])
+
+        initViewModel(configuration: .product(product))
+
+        XCTAssertEqual(sut.variantSelection.sizes.map(\.state), [.available, .outOfStock])
+    }
+
+    func test_reselecting_the_current_colour_does_not_republish_the_selection() throws {
         initViewModel()
 
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -921,11 +975,37 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertNoEmit(from: sut.$state, afterTrigger: { colorSelectionConfiguration.selectedItem = nil })
+        let selected = try XCTUnwrap(sut.variantSelection.selectedColour)
+
+        // `@Published` publishes on every set, so without the equality guard this redraws the whole
+        // page for a tap that changed nothing.
+        XCTAssertNoEmit(from: sut.$variantSelection, afterTrigger: {
+            self.sut.didSelectColour(selected)
+        })
     }
 
-    func test_state_is_not_updated_if_unknown_color_is_selected() {
+    /// Entering by `.product` draws the grid from the snapshot the caller carried in, before any
+    /// fetch has happened. The refetch test below is only meaningful if this starts out enabled.
+    func test_entering_with_a_product_seeds_the_swatches_from_its_snapshot() {
+        let stale = productWhoseSecondColourHasStock(5)
+
+        initViewModel(configuration: .product(stale))
+
+        XCTAssertEqual(isSecondColourDisabled, false)
+    }
+
+    /// The snapshot can be stale, so the refetch behind it has to reach the swatches — otherwise a
+    /// colour that sold out while the shopper was away stays drawn as available.
+    func test_a_refetch_that_only_changes_stock_still_reaches_the_swatches() {
+        initViewModel(configuration: .product(productWhoseSecondColourHasStock(5)))
+        mockProductService.onGetProductCalled = { _ in self.productWhoseSecondColourHasStock(0) }
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(isSecondColourDisabled, true)
+    }
+
+    func test_selection_is_unchanged_if_an_unknown_colour_is_tapped() {
         initViewModel()
 
         let color1 = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -942,11 +1022,9 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertNoEmit(
-            from: sut.$state,
-            afterTrigger: { colorSelectionConfiguration.selectedItem = ColorSwatch(id: "3", name: "Color 3", type: .color(.black)) }
-        )
+        sut.didSelectColour(ColorSwatch(id: "3", name: "Color 3", type: .color(.black)))
+
+        XCTAssertEqual(sut.variantSelection.selectedColour?.id, color1.id)
     }
 
     func test_product_images_are_updated_when_color_is_selected() {
@@ -971,11 +1049,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: \.isLoading),
-            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
-        )
+        sut.didSelectColour(sut.variantSelection.colours[1])
 
         XCTAssertEqual(sut.productImageUrls.count, variant2.media.count)
         XCTAssertEqual(sut.productImageUrls[0].absoluteString, variant2.media[0].asImage?.url.absoluteString)
@@ -997,11 +1071,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.selectedColourName, "Color 1")
         XCTAssertEqual(sut.productReference, "SKU-1")
 
-        let colorSelectionConfiguration = sut.colorSelectionConfiguration
-        XCTAssertEmitsValue(
-            from: sut.$state.drop(while: \.isLoading),
-            afterTrigger: { colorSelectionConfiguration.selectedItem = colorSelectionConfiguration.items[1] }
-        )
+        sut.didSelectColour(sut.variantSelection.colours[1])
 
         XCTAssertEqual(sut.selectedColourName, "Color 2")
         XCTAssertEqual(sut.productReference, "SKU-2")
@@ -1203,6 +1273,29 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(mockAnalytics.trackedActions, [.addToBag])
     }
 
+    func test_add_to_bag_tracks_the_chosen_variant_rather_than_the_product_default() {
+        let fallback = Product.Variant.fixture(
+            id: "variant-fallback",
+            sku: "sku-fallback",
+            colour: .fixture(id: "1", name: "Color 1"),
+            stock: 5
+        )
+        let chosen = Product.Variant.fixture(
+            id: "variant-chosen",
+            sku: "sku-chosen",
+            colour: .fixture(id: "2", name: "Color 2"),
+            stock: 5
+        )
+        let product = Product.fixture(id: "product-1", defaultVariant: fallback, variants: [fallback, chosen])
+        mockCartService.onAddCalled = { _ in .fixture() }
+        initViewModel(configuration: .product(product))
+        sut.didSelectColour(sut.variantSelection.colours[1])
+
+        XCTAssertEmitsValue(from: sut.$addToBagFeedback.compactMap { $0 }, afterTrigger: { self.sut.didTapAddToBag() })
+
+        XCTAssertEqual(mockAnalytics.trackedProductIDs(for: .addToBag), ["product-1-sku-chosen"])
+    }
+
     func test_didTapAddToBag_thatFails_reportsFailureAndTracksNothing() {
         // Writes can fail now, so firing on intent would inflate add-to-bag against real carts.
         mockCartService.onAddCalled = { _ in throw BFFRequestError(type: .generic) }
@@ -1257,13 +1350,14 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(emitted, [.success, nil, .success])
     }
 
-    func test_isAddToBagEnabled_isFalse_whenTheVariantHasNoServerId() {
+    func test_add_to_bag_is_not_ready_when_the_variant_has_no_server_id() {
         // A variant synthesised locally has no server counterpart, so there is nothing to add.
         let variant = Product.Variant.fixture(id: nil, colour: .fixture(id: "1"), stock: 5)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
+
         initViewModel(configuration: .product(product))
 
-        XCTAssertFalse(sut.isAddToBagEnabled)
+        XCTAssertEqual(sut.addToBagState, .outOfStock)
     }
 
     func test_didTapAddToBag_makesNoRequest_whenTheVariantHasNoServerId() {
@@ -1316,11 +1410,12 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.bagQuantity, 0)
     }
 
-    func test_bag_quantity_follows_the_cart_line_once_the_size_in_the_bag_is_picked() {
+    func test_bag_quantity_follows_the_cart_line_once_the_size_in_the_bag_is_picked() throws {
         initViewModel(configuration: .product(twoSizeProduct()))
         holdInBag(variantId: "variant-s", quantity: 2)
+        let size = try XCTUnwrap(sut.variantSelection.sizes.first { $0.id == "s" })
 
-        sut.sizingSelectionConfiguration.selectedItem = sut.sizingSelectionConfiguration.items.first { $0.id == "s" }
+        sut.didSelectSize(size)
 
         XCTAssertEqual(sut.bagQuantity, 2)
     }
@@ -1765,21 +1860,6 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(shareConfiguration?.subject, "Product Name from Alfie")
     }
 
-    func test_search_returns_correct_swatches() {
-        let expectedMatchedColors = [Product.Colour.fixture(name: "color 1"), Product.Colour.fixture(name: "COLOR 2")]
-        let expectedNonMatchedColors = [Product.Colour.fixture(name: "Clor"), Product.Colour.fixture(name: "Coror")]
-
-        let product = Product.fixture(name: "Product Name",
-                                      brand: .fixture(name: "Product Brand"),
-                                      variants: (expectedMatchedColors + expectedNonMatchedColors).map { Product.Variant.fixture(colour: $0) })
-
-        initViewModel(configuration: .product(product))
-        let swatchesSearchResult = sut.colorSwatches(filteredBy: "Col")
-        XCTAssertTrue(swatchesSearchResult.map(\.name).contains(expectedMatchedColors.map(\.name)))
-        XCTAssertFalse(swatchesSearchResult.map(\.name).contains(expectedNonMatchedColors.map(\.name)))
-    }
-
-
     // MARK: - Related products
 
     func test_view_did_appear_requests_related_products_for_product_handle_with_one_extra_slot() {
@@ -2105,6 +2185,30 @@ final class ProductDetailsViewModelTests: XCTestCase {
     }
 
     // MARK: - Helper methods
+
+    /// Two colours, the first always stocked, the second carrying whatever stock the case needs —
+    /// so a refetch can change availability without changing anything else about the product.
+    private func productWhoseSecondColourHasStock(_ stock: Int) -> Product {
+        let colour1 = Product.Colour.fixture(id: "1", name: "Color 1")
+        let colour2 = Product.Colour.fixture(id: "2", name: "Color 2")
+        return .fixture(
+            defaultVariant: .fixture(colour: colour1, stock: 1),
+            variants: [.fixture(colour: colour1, stock: 1), .fixture(colour: colour2, stock: stock)]
+        )
+    }
+
+    private var isSecondColourDisabled: Bool? {
+        sut.variantSelection.colours.first { $0.id == "2" }?.isDisabled
+    }
+
+    /// Two sizes in one colour: the shape where a size choice is genuinely open, so "no size is
+    /// pre-selected" means something. A single size is auto-selected by design.
+    private func twoSizeVariants(colour: Product.Colour, stock: Int = 5) -> [Product.Variant] {
+        [
+            .fixture(id: "v-s", sku: "v-s", size: .fixture(id: "s", value: "S"), colour: colour, stock: stock),
+            .fixture(id: "v-m", sku: "v-m", size: .fixture(id: "m", value: "M"), colour: colour, stock: stock),
+        ]
+    }
 
     private func initViewModel(
         configuration: ProductDetailsConfiguration = .id(""),

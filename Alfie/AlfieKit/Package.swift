@@ -449,6 +449,7 @@ let package = Package(
             name: "ModelTests",
             dependencies: [
                 "Model",
+                "Mocks",
             ]
         ),
 

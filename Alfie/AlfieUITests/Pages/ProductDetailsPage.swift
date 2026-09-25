@@ -31,8 +31,10 @@ final class ProductDetailsPage {
         app.staticTexts[AccessibilityID.ProductDetails.productName]
     }
 
+    /// Informational, not a control: the grid is always inline, so there is nowhere for a tap to
+    /// go. `accessibilityElement(children: .ignore)` merges it into one element.
     var colourSummary: XCUIElement {
-        app.buttons[AccessibilityID.ProductDetails.colourSummary]
+        app.otherElements[AccessibilityID.ProductDetails.colourSummary]
     }
 
     var productDescription: XCUIElement {
@@ -49,8 +51,6 @@ final class ProductDetailsPage {
         app.otherElements[AccessibilityID.ProductDetails.colourSelector]
     }
 
-    /// Opens the colour sheet for a long colour run that has no selection yet — the one state where
-    /// `colourSummary` has no swatch to draw.
     var sizeSelector: XCUIElement {
         app.otherElements[AccessibilityID.ProductDetails.sizeSelector]
     }
@@ -91,14 +91,6 @@ final class ProductDetailsPage {
             .matching(NSPredicate(format: "identifier != %@", AccessibilityID.ProductDetails.shareButton))
             .firstMatch
             .tap()
-        return self
-    }
-
-    /// The sheet opens from the summary, never from `colourSelector` — tapping that picks a colour.
-    /// Only rendered for multi-colour products, so callers must check `exists` first.
-    @discardableResult
-    func tapColourSummary() -> Self {
-        colourSummary.tap()
         return self
     }
 

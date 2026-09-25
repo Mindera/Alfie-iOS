@@ -7,7 +7,6 @@ public struct SizingSwatch: ColorAndSizingSwatchProtocol {
 
     public enum ItemState {
         case available
-        case unavailable
         case outOfStock
     }
 
@@ -20,8 +19,6 @@ public struct SizingSwatch: ColorAndSizingSwatchProtocol {
 
 public struct SwatchLayoutConfiguration {
     public let arrangement: Arrangement
-    public let hideSelectionTitle: Bool
-    public let hideOnSingleColor: Bool
 
     public enum Arrangement {
         case horizontal(itemSpacing: CGFloat, scrollable: Bool = true)
@@ -29,9 +26,7 @@ public struct SwatchLayoutConfiguration {
         case grid(columns: Int, columnWidth: CGFloat = .zero)
     }
 
-    public init(arrangement: Arrangement, hideSelectionTitle: Bool = false, hideOnSingleColor: Bool = true) {
+    public init(arrangement: Arrangement) {
         self.arrangement = arrangement
-        self.hideSelectionTitle = hideSelectionTitle
-        self.hideOnSingleColor = hideOnSingleColor
     }
 }

@@ -7,20 +7,16 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     public var productId: String = ""
     public var productTitle: String = ""
-    public var productHasStock: Bool = true
-    public var productHasAnyStock: Bool = true
-    public var isAddToBagEnabled: Bool = true
+    public var addToBagState: AddToBagState = .ready
     public var isAddingToBag: Bool = false
     public var addToBagFeedback: AddToBagFeedback?
     public var bagQuantity: Int = 0
     public var maxBagQuantity: Int = 100
     public var isUpdatingBagQuantity: Bool = false
     public var isInWishlist = false
-    public var canShowSizeSelector: Bool = true
     public var productName: String = ""
     public var productImageUrls: [URL] = []
-    public var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch>
-    public var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch>
+    public var variantSelection: VariantSelectionState
     public var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = []
     public var productDescription: String = ""
     public var shareConfiguration: ShareConfiguration?
@@ -40,8 +36,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 productDescription: String = "",
                 selectedColourName: String? = nil,
                 productReference: String? = nil,
-                colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> = .init(items: []),
-                sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> = .init(items: []),
+                variantSelection: VariantSelectionState = .init(),
                 complementaryInfoToShow: [ProductDetailsComplementaryInfoType] = [],
                 onShouldShowLoadingForSectionCalled: ((ProductDetailsSection) -> Bool)? = nil,
                 onShouldShowSectionCalled: ((ProductDetailsSection) -> Bool)? = nil) {
@@ -53,8 +48,7 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.productDescription = productDescription
         self.selectedColourName = selectedColourName
         self.productReference = productReference
-        self.colorSelectionConfiguration = colorSelectionConfiguration
-        self.sizingSelectionConfiguration = sizingSelectionConfiguration
+        self.variantSelection = variantSelection
         self.complementaryInfoToShow = complementaryInfoToShow
         self.onShouldShowLoadingForSectionCalled = onShouldShowLoadingForSectionCalled
         self.onShouldShowSectionCalled = onShouldShowSectionCalled
@@ -115,9 +109,14 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         onOpenWebFeatureCalled?(feature)
     }
 
-    public var onColorSwatchesFilteredByCalled: ((String) -> [ColorSwatch])?
-    public func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch] {
-        onColorSwatchesFilteredByCalled?(searchTerm) ?? colorSelectionConfiguration.items
+    public var onDidSelectColourCalled: ((ColorSwatch) -> Void)?
+    public func didSelectColour(_ swatch: ColorSwatch) {
+        onDidSelectColourCalled?(swatch)
+    }
+
+    public var onDidSelectSizeCalled: ((SizingSwatch) -> Void)?
+    public func didSelectSize(_ swatch: SizingSwatch) {
+        onDidSelectSizeCalled?(swatch)
     }
 
     public var onDidSelectRelatedProductCalled: ((Product) -> Void)?

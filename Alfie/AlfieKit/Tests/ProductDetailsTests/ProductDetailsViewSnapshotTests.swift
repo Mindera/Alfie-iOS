@@ -11,27 +11,25 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
 
     private func makeViewModel() -> MockProductDetailsViewModel {
         let viewModel = MockProductDetailsViewModel(
-            state: .success(.init(product: .fixture(), selectedVariant: .fixture())),
+            state: .success(.init(product: .fixture())),
             productId: "0273393",
             productTitle: "Tommy Hilfiger",
             productName: "Nolita SW Signature Loafer",
             productDescription: "A refined loafer in soft nappa leather with a signature hardware detail.",
             selectedColourName: "Black",
             productReference: "0273/393",
-            colorSelectionConfiguration: .init(
-                items: [
+            variantSelection: .init(
+                colours: [
                     .init(id: "1", name: "Black", type: .color(.black)),
                     .init(id: "2", name: "Tan", type: .color(.brown)),
                 ],
-                selectedItem: .init(id: "1", name: "Black", type: .color(.black))
-            ),
-            sizingSelectionConfiguration: .init(
-                items: [
+                selectedColour: .init(id: "1", name: "Black", type: .color(.black)),
+                sizes: [
                     .init(id: "1", name: "S", state: .available),
                     .init(id: "2", name: "M", state: .available),
                     .init(id: "3", name: "L", state: .outOfStock),
                 ],
-                selectedItem: .init(id: "1", name: "S", state: .available)
+                selectedSize: .init(id: "1", name: "S", state: .available)
             ),
             complementaryInfoToShow: [.delivery, .paymentOptions, .returns]
         )
@@ -63,9 +61,9 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.productTitle = ""
-        viewModel.colorSelectionConfiguration = .init(
-            items: [.init(id: "1", name: "Black", type: .color(.black))],
-            selectedItem: .init(id: "1", name: "Black", type: .color(.black))
+        viewModel.variantSelection = viewModel.variantSelection.withColours(
+            [.init(id: "1", name: "Black", type: .color(.black))],
+            selected: .init(id: "1", name: "Black", type: .color(.black))
         )
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -78,18 +76,18 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     func test_productDetailsView_withManySizes() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
-        viewModel.sizingSelectionConfiguration = .init(
-            items: [
+        viewModel.variantSelection = viewModel.variantSelection.withSizes(
+            [
                 .init(id: "1", name: "XS", state: .available),
                 .init(id: "2", name: "S", state: .available),
                 .init(id: "3", name: "M", state: .outOfStock),
                 .init(id: "4", name: "L", state: .available),
-                .init(id: "5", name: "XL", state: .unavailable),
+                .init(id: "5", name: "XL", state: .outOfStock),
                 .init(id: "6", name: "XXL", state: .available),
                 .init(id: "7", name: "XXXL", state: .available),
                 .init(id: "8", name: "XXXXL", state: .outOfStock),
             ],
-            selectedItem: .init(id: "2", name: "S", state: .available)
+            selected: .init(id: "2", name: "S", state: .available)
         )
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -102,9 +100,9 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     func test_productDetailsView_withManyColours() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
-        viewModel.colorSelectionConfiguration = .init(
-            items: (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
-            selectedItem: .init(id: "1", name: "Colour 1", type: .color(.black))
+        viewModel.variantSelection = viewModel.variantSelection.withColours(
+            (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
+            selected: .init(id: "1", name: "Colour 1", type: .color(.black))
         )
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -118,9 +116,9 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
     func test_productDetailsView_withManyColoursAndNoSelection() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
-        viewModel.colorSelectionConfiguration = .init(
-            items: (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
-            selectedItem: nil
+        viewModel.variantSelection = viewModel.variantSelection.withColours(
+            (1...7).map { .init(id: "\($0)", name: "Colour \($0)", type: .color(.black)) },
+            selected: nil
         )
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -156,18 +154,18 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// Every size out of stock: `canShowSize` drops the whole selector rather than offering a grid
-    /// where nothing is buyable.
+    /// Every size out of stock still draws the full grid, every chip disabled. Hiding it would
+    /// leave a dead CTA above no explanation of which sizes are gone.
     func test_productDetailsView_withEverySizeOutOfStock() {
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
-        viewModel.sizingSelectionConfiguration = .init(
-            items: [
+        viewModel.variantSelection = viewModel.variantSelection.withSizes(
+            [
                 .init(id: "1", name: "S", state: .outOfStock),
                 .init(id: "2", name: "M", state: .outOfStock),
                 .init(id: "3", name: "L", state: .outOfStock),
             ],
-            selectedItem: nil
+            selected: nil
         )
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -262,4 +260,16 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
 
 private enum Constants {
     static let relatedProductsSnapshotHeight: CGFloat = 2400
+}
+
+/// Each snapshot varies one axis. Replacing the whole value made every test restate the axis it
+/// was not testing, so a change to the shared fixture had to be copied into all of them.
+private extension VariantSelectionState {
+    func withColours(_ colours: [ColorSwatch], selected: ColorSwatch?) -> Self {
+        .init(colours: colours, selectedColour: selected, sizes: sizes, selectedSize: selectedSize)
+    }
+
+    func withSizes(_ sizes: [SizingSwatch], selected: SizingSwatch?) -> Self {
+        .init(colours: colours, selectedColour: selectedColour, sizes: sizes, selectedSize: selected)
+    }
 }

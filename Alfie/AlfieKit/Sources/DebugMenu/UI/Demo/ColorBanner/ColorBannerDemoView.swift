@@ -3,30 +3,16 @@ import SharedUI
 import SwiftUI
 
 struct ColorBannerDemoView: View {
-    private static let selectedTitle: String = "Color:"
-    private static let selectedImageTitle: String = "Pattern:"
+    @State private var selectedItem: ColorSwatch?
+    @State private var selectedImageItem: ColorSwatch?
+
     private static let items: [ColorSwatch] = [
         .init(id: "1", name: "Black", type: .color(.black)),
         .init(id: "2", name: "Gray", type: .color(.gray)),
         .init(id: "3", name: "Red", type: .color(.red), isDisabled: true),
         .init(id: "4", name: "Green", type: .color(.green)),
-        .init(id: "5", name: "Blue", type: .color(.blue)),
+        .init(id: "5", name: "Midnight Navy", type: .color(.blue)),
         .init(id: "6", name: "Yellow", type: .color(.yellow), isDisabled: true),
-        .init(id: "7", name: "Brown", type: .color(.brown), isDisabled: true),
-        .init(id: "8", name: "Orange", type: .color(.orange)),
-        .init(id: "9", name: "Pink", type: .color(.pink)),
-    ]
-
-    private static let itemsSmall: [ColorSwatch] = [
-        .init(id: "1", name: "Black", type: .color(.black)),
-        .init(id: "2", name: "Gray", type: .color(.gray)),
-        .init(id: "3", name: "Red", type: .color(.red), isDisabled: true),
-        .init(id: "4", name: "Green", type: .color(.green)),
-        .init(id: "5", name: "Blue", type: .color(.blue)),
-        .init(id: "6", name: "Yellow", type: .color(.yellow), isDisabled: true),
-        .init(id: "7", name: "Brown", type: .color(.brown), isDisabled: true),
-        .init(id: "8", name: "Orange", type: .color(.orange)),
-        .init(id: "9", name: "Pink", type: .color(.pink)),
     ]
 
     private static let itemsImage: [ColorSwatch] = [
@@ -34,69 +20,50 @@ struct ColorBannerDemoView: View {
         .init(id: "2", name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
         .init(id: "3", name: "Pattern 3", type: .image(Image("pattern3", bundle: .module)), isDisabled: true),
         .init(id: "4", name: "Pattern 4", type: .image(Image("pattern4", bundle: .module))),
-        .init(id: "5", name: "Pattern 5", type: .image(Image("pattern5", bundle: .module))),
-        .init(id: "6", name: "Pattern 6", type: .image(Image("pattern6", bundle: .module)), isDisabled: true),
-        .init(id: "7", name: "Pattern 1", type: .image(Image("pattern1", bundle: .module)), isDisabled: true),
-        .init(id: "8", name: "Pattern 2", type: .image(Image("pattern2", bundle: .module))),
-        .init(id: "9", name: "Pattern 3", type: .image(Image("pattern3", bundle: .module))),
     ]
+
+    private var configuration: SwatchSelectorConfiguration<ColorSwatch> {
+        .init(items: Self.items, selectedItem: selectedItem, onSelect: { selectedItem = $0 })
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: Primitives.Spacing.spacing20) {
                 Spacer()
-                section(title: "Color Swatches - Scrollable") {
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8))
-                    )
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
-                        layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing8))
+
+                section(title: "Colour Cards - 3 columns") {
+                    ColorCardGridView(
+                        configuration: configuration,
+                        columns: 3
                     )
                 }
 
                 Spacer()
 
-                section(title: "Color Swatches - Chips") {
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
-                        layoutConfiguration: .init(
-                            arrangement: .chips(
-                                itemHorizontalSpacing: Primitives.Spacing.spacing8, itemVerticalSpacing: Primitives.Spacing.spacing8
-                            )
-                        )
-                    )
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
-                        layoutConfiguration: .init(
-                            arrangement: .chips(
-                                itemHorizontalSpacing: Primitives.Spacing.spacing8, itemVerticalSpacing: Primitives.Spacing.spacing8
-                            )
-                        )
+                section(title: "Colour Cards - 2 columns") {
+                    ColorCardGridView(
+                        configuration: configuration,
+                        columns: 2
                     )
                 }
 
                 Spacer()
 
-                section(title: "Color Swatches - Grid") {
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.items),
-                        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
-                    )
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedTitle, items: Self.itemsSmall),
-                        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
+                section(title: "Image Swatches") {
+                    ColorCardGridView(
+                        configuration: .init(
+                            items: Self.itemsImage,
+                            selectedItem: selectedImageItem,
+                            onSelect: { selectedImageItem = $0 }
+                        ),
+                        columns: 3
                     )
                 }
 
                 Spacer()
 
-                section(title: "Image Swatches - Grid") {
-                    ColorSelectorComponentView(
-                        configuration: .init(selectedTitle: Self.selectedImageTitle, items: Self.itemsImage),
-                        layoutConfiguration: .init(arrangement: .grid(columns: 5, columnWidth: 50))
-                    )
+                section(title: "Colour Summary") {
+                    ColorSummaryView(selectedItem: Self.items[0], remainingCount: Self.items.count - 1)
                 }
 
                 Spacer()

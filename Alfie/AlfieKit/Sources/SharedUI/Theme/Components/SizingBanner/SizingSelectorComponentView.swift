@@ -2,10 +2,10 @@ import Model
 import SwiftUI
 
 public struct SizingSelectorComponentView: View {
-    @ObservedObject private var configuration: ColorAndSizingSelectorConfiguration<SizingSwatch>
+    private let configuration: SwatchSelectorConfiguration<SizingSwatch>
     private let layoutConfiguration: SwatchLayoutConfiguration
 
-    public init(configuration: ColorAndSizingSelectorConfiguration<SizingSwatch>, layoutConfiguration: SwatchLayoutConfiguration) {
+    public init(configuration: SwatchSelectorConfiguration<SizingSwatch>, layoutConfiguration: SwatchLayoutConfiguration) {
         self.configuration = configuration
         self.layoutConfiguration = layoutConfiguration
     }
@@ -55,9 +55,9 @@ public struct SizingSelectorComponentView: View {
             // A `Button`, not a tap gesture: the swatch is the only way to choose a size, and only a
             // button carries the trait, VoiceOver activation and Voice/Switch/keyboard reachability.
             Button {
-                configuration.selectedItem = item
+                configuration.onSelect(item)
             } label: {
-                SizingSwatchView(item: item, isSelected: configuration.selectedItem == item)
+                SizingSwatchView(item: item, isSelected: configuration.isSelected(item))
                     // The design draws a 40pt chip, 4pt under the minimum target. Outset the hit
                     // region rather than the frame, so the drawn box and the row gaps stay put.
                     .contentShape(Rectangle().inset(by: -theme.spacing.space025))
@@ -79,17 +79,15 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
 #Preview("Grid") {
     SizingSelectorComponentView(
         configuration: .init(
-            selectedTitle: "Size:",
             items: [
                 .init(id: "1", name: "XS", state: .available),
                 .init(id: "2", name: "S", state: .outOfStock),
                 .init(id: "3", name: "M", state: .available),
                 .init(id: "4", name: "L", state: .available),
-                .init(id: "5", name: "XL", state: .unavailable),
-                .init(id: "6", name: "XXL", state: .outOfStock),
-                .init(id: "7", name: "XXXL", state: .unavailable),
-                .init(id: "8", name: "XXXXL", state: .available),
-            ]
+                .init(id: "5", name: "XL", state: .outOfStock),
+                .init(id: "6", name: "XXL", state: .available),
+            ],
+            onSelect: { _ in }
         ),
         layoutConfiguration: .init(arrangement: .grid(columns: 4))
     )
@@ -98,17 +96,15 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
 #Preview("Chips") {
     SizingSelectorComponentView(
         configuration: .init(
-            selectedTitle: "Size:",
             items: [
                 .init(id: "1", name: "XS", state: .available),
                 .init(id: "2", name: "S", state: .outOfStock),
                 .init(id: "3", name: "M", state: .available),
                 .init(id: "4", name: "L", state: .available),
-                .init(id: "5", name: "XL", state: .unavailable),
-                .init(id: "6", name: "XXL", state: .outOfStock),
-                .init(id: "7", name: "XXXL", state: .unavailable),
-                .init(id: "8", name: "XXXXL", state: .available),
-            ]
+                .init(id: "5", name: "XL", state: .outOfStock),
+                .init(id: "6", name: "XXL", state: .available),
+            ],
+            onSelect: { _ in }
         ),
         layoutConfiguration: .init(
             arrangement: .chips(itemHorizontalSpacing: Primitives.Spacing.spacing16, itemVerticalSpacing: Primitives.Spacing.spacing16)
@@ -119,17 +115,15 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
 #Preview("Scrollable Single Row") {
     SizingSelectorComponentView(
         configuration: .init(
-            selectedTitle: "Size:",
             items: [
                 .init(id: "1", name: "XS", state: .available),
                 .init(id: "2", name: "S", state: .outOfStock),
                 .init(id: "3", name: "M", state: .available),
                 .init(id: "4", name: "L", state: .available),
-                .init(id: "5", name: "XL", state: .unavailable),
-                .init(id: "6", name: "XXL", state: .outOfStock),
-                .init(id: "7", name: "XXXL", state: .unavailable),
-                .init(id: "8", name: "XXXXL", state: .available),
-            ]
+                .init(id: "5", name: "XL", state: .outOfStock),
+                .init(id: "6", name: "XXL", state: .available),
+            ],
+            onSelect: { _ in }
         ),
         layoutConfiguration: .init(arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16))
     )

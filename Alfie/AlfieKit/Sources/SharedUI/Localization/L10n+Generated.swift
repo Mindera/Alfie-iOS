@@ -197,8 +197,6 @@ public enum L10n {
       public static let title = L10n.tr("L10n", "pdp.colour_selector.title")
     }
     public enum ColourSummary {
-      /// Opens colour selection
-      public static let accessibilityHint = L10n.tr("L10n", "pdp.colour_summary.accessibility_hint")
       /// Plural format key: pdp.colour_summary.accessibility_label
       public static func accessibilityLabel(_ p1: Any, _ p2: Int) -> String {
         return L10n.tr("L10n", "pdp.colour_summary.accessibility_label", String(describing: p1), p2)
@@ -501,8 +499,6 @@ public enum L10n {
       public static func selected(_ p1: Any) -> String {
         return L10n.tr("L10n", "product.size.selected", String(describing: p1))
       }
-      /// Size
-      public static let title = L10n.tr("L10n", "product.size.title")
       public enum OutOfStock {
         /// VoiceOver value for a crossed-out size swatch. Says "online" because the stock behind it is an online aggregate with no per-store dimension. This is the durable half of the qualification pdp.availability.online_note makes visible: a value is always spoken, whereas a hint is not.
         public static let accessibilityValue = L10n.tr("L10n", "product.size.out_of_stock.accessibility_value")
@@ -834,7 +830,6 @@ public extension L10n {
       case pdpAvailabilityOnlineNote = "pdp.availability.online_note"
       case pdpColourOutOfStockAccessibilityValue = "pdp.colour.out_of_stock.accessibility_value"
       case pdpColourSelectorTitle = "pdp.colour_selector.title"
-      case pdpColourSummaryAccessibilityHint = "pdp.colour_summary.accessibility_hint"
       case pdpColourSummaryAccessibilityLabel = "pdp.colour_summary.accessibility_label"
       case pdpColourSummaryCount = "pdp.colour_summary.count"
       case pdpComplementaryInfoDeliveryTitle = "pdp.complementary_info.delivery.title"
@@ -903,7 +898,6 @@ public extension L10n {
       case productQuantityIncreaseAccessibilityLabel = "product.quantity.increase.accessibility_label"
       case productQuantityRemoveAccessibilityLabel = "product.quantity.remove.accessibility_label"
       case productSizeSelected = "product.size.selected"
-      case productSizeTitle = "product.size.title"
       case productSizeOutOfStockAccessibilityValue = "product.size.out_of_stock.accessibility_value"
       case scannerTitle = "scanner.title"
       case scannerErrorGenericMessage = "scanner.error.generic.message"

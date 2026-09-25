@@ -6,9 +6,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var productId: String { get }
     var productTitle: String { get }
     var productName: String { get }
-    var productHasStock: Bool { get }
-    var productHasAnyStock: Bool { get }
-    var isAddToBagEnabled: Bool { get }
+    /// Drives both the CTA's label and whether it is enabled, so the two cannot disagree.
+    var addToBagState: AddToBagState { get }
     /// True while an add-to-bag write is in flight, so the CTA can show its loading state.
     var isAddingToBag: Bool { get }
     /// The outcome of the last bag write; nil once its Snackbar has been dismissed.
@@ -17,11 +16,10 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var maxBagQuantity: Int { get }
     var isUpdatingBagQuantity: Bool { get }
     var isInWishlist: Bool { get }
-    var canShowSizeSelector: Bool { get }
     var productImageUrls: [URL] { get }
     var productDescription: String { get }
-    var colorSelectionConfiguration: ColorAndSizingSelectorConfiguration<ColorSwatch> { get }
-    var sizingSelectionConfiguration: ColorAndSizingSelectorConfiguration<SizingSwatch> { get }
+    /// Both selection axes and their highlights, derived together so they cannot disagree.
+    var variantSelection: VariantSelectionState { get }
     var complementaryInfoToShow: [ProductDetailsComplementaryInfoType] { get }
     var shareConfiguration: ShareConfiguration? { get }
     var shouldShowMediaPaginatedControl: Bool { get }
@@ -46,7 +44,8 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     func didTapAddToWishlist()
     func didTapBackButton()
     func openWebFeature(_ feature: WebFeature)
-    func colorSwatches(filteredBy searchTerm: String) -> [ColorSwatch]
+    func didSelectColour(_ swatch: ColorSwatch)
+    func didSelectSize(_ swatch: SizingSwatch)
     func didSelectRelatedProduct(_ product: Product)
     func isFavoriteState(for product: Product) -> Bool
     func didTapWishlist(for product: Product, isFavorite: Bool)

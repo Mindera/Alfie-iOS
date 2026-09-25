@@ -37,8 +37,4 @@ public struct ColorSwatch: ColorAndSizingSwatchProtocol {
         self.type = type
         self.isDisabled = isDisabled
     }
-
-    public static func == (lhs: ColorSwatch, rhs: ColorSwatch) -> Bool {
-        lhs.id == rhs.id
-    }
 }

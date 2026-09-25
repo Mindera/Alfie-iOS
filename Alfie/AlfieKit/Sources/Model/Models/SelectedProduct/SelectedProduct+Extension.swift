@@ -2,15 +2,7 @@ import Foundation
 
 public extension SelectedProduct {
     var sizeText: String {
-        var sizeValue: String = ""
-        if let size {
-            sizeValue = size.value
-            if let scale = size.scale {
-                sizeValue += " \(scale)"
-            }
-        }
-
-        return sizeValue
+        size?.displayName ?? ""
     }
 
     var priceType: PriceType {
