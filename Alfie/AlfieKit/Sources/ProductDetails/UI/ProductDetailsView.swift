@@ -603,6 +603,11 @@ extension ProductDetailsView {
                             : L10n.Product.Quantity.Decrease.accessibilityLabel,
                         increase: L10n.Product.Quantity.Increase.accessibilityLabel
                     ),
+                    accessibilityIdentifiers: .init(
+                        value: AccessibilityID.ProductDetails.bagQuantityValue,
+                        decrease: AccessibilityID.ProductDetails.bagQuantityDecreaseButton,
+                        increase: AccessibilityID.ProductDetails.bagQuantityIncreaseButton
+                    ),
                     onDecrease: { viewModel.didTapDecreaseBagQuantity() },
                     onIncrease: { viewModel.didTapIncreaseBagQuantity() }
                 )

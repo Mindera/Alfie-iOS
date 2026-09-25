@@ -14,6 +14,7 @@ final class AuthorizationInterceptorTests: XCTestCase {
     private var chain: MockRequestChain!
 
     override func setUpWithError() throws {
+        try super.setUpWithError()
         mockApiKeyService = MockBFFApiKeyService()
         chain = MockRequestChain()
     }
@@ -21,6 +22,7 @@ final class AuthorizationInterceptorTests: XCTestCase {
     override func tearDownWithError() throws {
         mockApiKeyService = nil
         chain = nil
+        try super.tearDownWithError()
     }
 
     func test_a_stored_key_is_sent_as_a_bearer_credential() {
@@ -51,11 +53,11 @@ final class AuthorizationInterceptorTests: XCTestCase {
         let sut = makeSut()
         let firstRequest = InterceptorTestHelpers.makeRequest()
         sut.interceptAsync(chain: chain, request: firstRequest, response: nil) { _ in }
-
         mockApiKeyService.updateApiKey("second-key")
-
         let secondRequest = InterceptorTestHelpers.makeRequest()
+
         sut.interceptAsync(chain: chain, request: secondRequest, response: nil) { _ in }
+
         XCTAssertEqual(firstRequest.additionalHeaders["Authorization"], "Bearer first-key")
         XCTAssertEqual(secondRequest.additionalHeaders["Authorization"], "Bearer second-key")
     }

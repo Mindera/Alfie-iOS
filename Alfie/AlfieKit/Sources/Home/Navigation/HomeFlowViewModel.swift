@@ -26,6 +26,12 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public var overlayPublisher: AnyPublisher<TabOverlay?, Never> { $tabOverlay.eraseToAnyPublisher() }
     private var subscriptions = Set<AnyCancellable>()
 
+    /// The one way back to search, shared by every screen that offers it — so a test driving any of
+    /// them covers the wiring for all, including the builders reached only through `SearchFlowViewModel`.
+    private var showSearchOverlay: () -> Void {
+        { [weak self] in self?.overlay = .search }
+    }
+
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
         SearchFlowViewModel(
             dependencies: dependencies.searchDependencyContainer,
@@ -87,7 +93,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         HomeViewModel(
             dependencies: dependencies.homeDependencyContainer,
             navigate: { [weak self] route in self?.navigate(route) },
-            showSearch: { [weak self] in self?.overlay = .search },
+            showSearch: showSearchOverlay,
             showScanner: { [weak self] in self?.overlay = .scanner }
         )
     }
@@ -108,7 +114,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: { [weak self] in self?.overlay = .search }
+            showSearch: showSearchOverlay
         )
     }
 
@@ -164,9 +170,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         }
     }
 
-    /// Internal rather than private so a test can reach it: it is otherwise only called from inside
-    /// a closure handed to `SearchFlowViewModel`, which no unit test drives.
-    func makeProductListingViewModelForSearch(
+    private func makeProductListingViewModelForSearch(
         searchTerm: String?,
         category: String?
     ) -> some ProductListingViewModelProtocol {
@@ -184,7 +188,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },
-            showSearch: { [weak self] in self?.overlay = .search }
+            showSearch: showSearchOverlay
         )
     }
 

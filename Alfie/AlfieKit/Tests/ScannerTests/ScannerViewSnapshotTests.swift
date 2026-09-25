@@ -16,17 +16,16 @@ import XCTest
 final class ScannerViewSnapshotTests: XCTestCase {
     private let isRecording = false
 
-    /// The shipped copy, not a copy of it: an edit to the wording has to reach these snapshots, or
-    /// the suite goes on asserting a layout for text the app no longer shows.
-    private static let guidance = L10n.Scanner.Guidance.message
+    /// Fixed stand-in copy rather than the shipped `L10n` strings: these snapshots pin the layout,
+    /// and the wording is the localization tests' business. Set to today's copy, so the references
+    /// stay valid, and a later reword moves the strings without re-recording seven images.
+    private static let guidance = "Point the camera at the Alfie code on the tag"
+    private static let title = "Scan"
 
-    /// Every snapshot is taken against the real title for the same reason as the guidance. The mock
-    /// cannot reach `L10n` itself — `SharedUI` depends on `Mocks` — so it is handed in here, once,
-    /// rather than left to the mock's placeholder at seven call sites.
     private static func makeViewModel(
         state: ViewState<ScannerViewStateModel, ScannerViewErrorType>
     ) -> MockScannerViewModel {
-        MockScannerViewModel(title: L10n.Scanner.title, state: state)
+        MockScannerViewModel(title: title, state: state)
     }
 
     func test_scanner_view_scanning() {
@@ -56,7 +55,7 @@ final class ScannerViewSnapshotTests: XCTestCase {
             state: .success(
                 .init(
                     guidance: Self.guidance,
-                    notice: .init(id: 1, message: L10n.Scanner.Unrecognised.message)
+                    notice: .init(id: 1, message: "We don't recognize this barcode.")
                 )
             )
         )

@@ -43,28 +43,16 @@ struct HandleListTests {
         }
     }
 
-    @Test("a malformed line names its line number and what was wrong", arguments: zip(
-        [
-            "mens jeans slim",           // whitespace inside a handle
-            "mens-jeans?sku=1",          // URL punctuation
-            "/mens-jeans",               // leading slash
-            "mens-jeans/",               // trailing slash
-            "mens//jeans",               // empty path segment
-            "mens-jeans,",               // comma with no SKU
-            "mens-jeans,SKU-1,extra",    // a third field
-            ",SKU-1",                    // no handle
-        ],
-        [
-            "it contains \" \"",
-            "it contains \"?\"",
-            "does not start or end with \"/\"",
-            "does not start or end with \"/\"",
-            "empty path segment",
-            "comma but no SKU",
-            "3 comma-separated fields",
-            "there is no handle",
-        ]
-    ))
+    @Test("a malformed line names its line number and what was wrong", arguments: [
+        ("mens jeans slim", "it contains \" \""),                    // whitespace inside a handle
+        ("mens-jeans?sku=1", "it contains \"?\""),                   // URL punctuation
+        ("/mens-jeans", "does not start or end with \"/\""),         // leading slash
+        ("mens-jeans/", "does not start or end with \"/\""),         // trailing slash
+        ("mens//jeans", "empty path segment"),                       // empty path segment
+        ("mens-jeans,", "comma but no SKU"),                         // comma with no SKU
+        ("mens-jeans,SKU-1,extra", "3 comma-separated fields"),      // a third field
+        (",SKU-1", "there is no handle"),                            // no handle
+    ])
     func malformedLineThrows(line: String, expectedReason: String) {
         do {
             _ = try HandleList.parse("ok-handle\n\(line)")

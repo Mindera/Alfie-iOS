@@ -7,18 +7,18 @@ final class LocalCartServiceTests: XCTestCase {
     private var userDefaults: MockUserDefaults!
     private var sut: LocalCartService!
 
-    override func setUp() {
-        super.setUp()
+    override func setUpWithError() throws {
+        try super.setUpWithError()
         userDefaults = MockUserDefaults()
         userDefaults.onSetCalled = { [unowned self] value, key in userDefaults.forcedValueForKey[key] = value }
         userDefaults.onRemoveCalled = { [unowned self] key in userDefaults.forcedValueForKey[key] = nil }
         sut = LocalCartService(userDefaults: userDefaults, storageKey: "cart")
     }
 
-    override func tearDown() {
+    override func tearDownWithError() throws {
         sut = nil
         userDefaults = nil
-        super.tearDown()
+        try super.tearDownWithError()
     }
 
     func test_add_with_empty_cart_publishes_line_with_totals() async throws {
@@ -38,7 +38,7 @@ final class LocalCartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.lines.map(\.quantity), [2])
     }
 
-    func test_setQuantity_with_existing_line_replaces_quantity() async throws {
+    func test_set_quantity_with_existing_line_replaces_quantity() async throws {
         try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
 
         try await sut.setQuantity(lineId: "v-1", to: 5)
@@ -47,7 +47,7 @@ final class LocalCartServiceTests: XCTestCase {
         XCTAssertEqual(sut.cart?.subtotal?.amount, 5_000)
     }
 
-    func test_setQuantity_with_zero_removes_line() async throws {
+    func test_set_quantity_with_zero_removes_line() async throws {
         try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
         try await sut.add(line: line(variantId: "v-2", quantity: 1, price: 2_000))
 
@@ -80,7 +80,7 @@ final class LocalCartServiceTests: XCTestCase {
         XCTAssertEqual(relaunched.cart?.lines.map(\.quantity), [3])
     }
 
-    func test_discardCart_clears_saved_lines() async throws {
+    func test_discard_cart_clears_saved_lines() async throws {
         try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
 
         await sut.discardCart()
@@ -91,7 +91,7 @@ final class LocalCartServiceTests: XCTestCase {
 
     /// Without a refetch: `discardCart` publishes the cleared cart itself, rather than leaving the
     /// old one in place until something else happens to reload.
-    func test_discardCart_publishes_nil_without_a_refetch() async throws {
+    func test_discard_cart_publishes_nil_without_a_refetch() async throws {
         try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
 
         await sut.discardCart()
@@ -99,29 +99,44 @@ final class LocalCartServiceTests: XCTestCase {
         XCTAssertNil(sut.cart)
     }
 
-    func test_total_with_unknown_price_is_nil() {
-        let total = LocalCartService.total(of: [Money(currencyCode: "GBP", amount: 100, amountFormatted: "£1.00"), nil])
+    /// A priced line alongside one with no price leaves the cart with no subtotal at all: a total
+    /// that quietly skipped the unpriced line would under-report what the shopper owes.
+    func test_add_with_an_unpriced_line_publishes_no_subtotal() async throws {
+        try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
 
-        XCTAssertNil(total)
+        try await sut.add(line: unpricedLine(variantId: "v-2"))
+
+        XCTAssertNil(sut.cart?.subtotal)
+        XCTAssertNil(sut.cart?.grandTotal)
     }
 
-    func test_total_with_mixed_currencies_is_nil() {
-        let total = LocalCartService.total(of: [
-            Money(currencyCode: "GBP", amount: 100, amountFormatted: "£1.00"),
-            Money(currencyCode: "USD", amount: 100, amountFormatted: "$1.00"),
-        ])
+    /// Two currencies cannot be added up, and picking one of them would misstate the other.
+    func test_add_with_a_line_in_another_currency_publishes_no_subtotal() async throws {
+        try await sut.add(line: line(variantId: "v-1", quantity: 1, price: 1_000))
 
-        XCTAssertNil(total)
+        try await sut.add(line: line(variantId: "v-2", quantity: 1, price: 2_000, currencyCode: "USD"))
+
+        XCTAssertNil(sut.cart?.subtotal)
+        XCTAssertNil(sut.cart?.grandTotal)
     }
 
-    private func line(variantId: String, quantity: Int, price: Int) -> CartLineInput {
+    private func line(
+        variantId: String,
+        quantity: Int,
+        price: Int,
+        currencyCode: String = "GBP"
+    ) -> CartLineInput {
         CartLineInput(
             productId: "p-1",
             variantId: variantId,
             quantity: quantity,
             slug: "slug",
             name: "Name",
-            unitPrice: Money(currencyCode: "GBP", amount: price, amountFormatted: "")
+            unitPrice: Money(currencyCode: currencyCode, amount: price, amountFormatted: "")
         )
+    }
+
+    private func unpricedLine(variantId: String) -> CartLineInput {
+        CartLineInput(productId: "p-1", variantId: variantId, quantity: 1, slug: "slug", name: "Name")
     }
 }

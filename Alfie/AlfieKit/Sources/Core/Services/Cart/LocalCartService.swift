@@ -87,7 +87,7 @@ public actor LocalCartService: CartServiceProtocol {
         cartSubject.send(Cart(id: Self.cartId, lines: cartLines, subtotal: subtotal, grandTotal: subtotal))
     }
 
-    static func total(of amounts: [Money?]) -> Money? {
+    private static func total(of amounts: [Money?]) -> Money? {
         let known = amounts.compactMap { $0 }
         guard
             known.count == amounts.count,

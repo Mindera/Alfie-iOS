@@ -13,14 +13,6 @@ public enum AccessibilityID {
         public static let item = "brands.item.button"
     }
 
-    // MARK: - Quantity stepper
-
-    public enum QuantityStepper {
-        public static let value = "quantityStepper.value.label"
-        public static let decreaseButton = "quantityStepper.decrease.button"
-        public static let increaseButton = "quantityStepper.increase.button"
-    }
-
     // MARK: - Bag
 
     public enum Bag {
@@ -112,6 +104,10 @@ public enum AccessibilityID {
         /// The line below the selectors stating that the availability they show is online stock.
         public static let availabilityNote = "productDetails.availability.label"
         public static let addToBagButton = "productDetails.addToBag.button"
+        /// The stepper that replaces the Add to bag button once the chosen variant is in the bag.
+        public static let bagQuantityValue = "productDetails.bagQuantity.value.label"
+        public static let bagQuantityDecreaseButton = "productDetails.bagQuantity.decrease.button"
+        public static let bagQuantityIncreaseButton = "productDetails.bagQuantity.increase.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
         public static let relatedProductsSection = "productDetails.relatedProducts.section"
         public static let relatedProductsTitleLabel = "productDetails.relatedProducts.title.label"

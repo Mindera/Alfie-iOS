@@ -1,8 +1,8 @@
 # Testing
 
 This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`. `AlfieUITests`
-(XCUITest, run from its own scheme) and `Tools/DesignTokenGen` (Swift Testing, its own package) sit in
-neither plan and keep their own conventions.
+(XCUITest, run from its own scheme) and the standalone packages under `Tools/` — `DesignTokenGen` and
+`AlfieCodeGen`, both Swift Testing — sit in neither plan and keep their own conventions.
 
 ## Rules
 

@@ -1555,11 +1555,12 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
         initDebouncedViewModel(scheduler: scheduler, bagQuantity: 1)
         sut.didTapIncreaseBagQuantity()
-
         scheduler.advance(by: .milliseconds(200))
-        sut.didTapIncreaseBagQuantity()
-        scheduler.advance(by: .milliseconds(300))
 
+        sut.didTapIncreaseBagQuantity()
+
+        // Past the first tap's own deadline, which the second tap must have moved.
+        scheduler.advance(by: .milliseconds(300))
         wait(for: [supersededWrite], timeout: .inverted)
         XCTAssertEqual(writtenQuantities, [])
 

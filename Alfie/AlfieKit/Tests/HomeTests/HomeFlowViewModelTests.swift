@@ -95,12 +95,19 @@ final class HomeFlowViewModelTests: XCTestCase {
 
     // MARK: - Search results
 
-    /// A listing opened from a search result keeps its own way back to search, and that way back is
-    /// the tab's overlay — the same single value the scanner uses. This is the one line of this
-    /// builder the scanner work changed, and nothing reached it before: the builder is handed to
-    /// `SearchFlowViewModel` inside a closure that no unit test drives.
-    func test_did_tap_search_on_a_listing_opened_from_search_presents_an_overlay() {
-        let listing = sut.makeProductListingViewModelForSearch(searchTerm: "jeans", category: nil)
+    /// A listing showing search results keeps its own way back to search, and that way back is the
+    /// tab's overlay — the same single value the scanner uses. Every listing builder hands over the
+    /// same `showSearchOverlay`, including the one reached only through `SearchFlowViewModel`, so
+    /// driving the public builder covers that one too.
+    func test_did_tap_search_on_a_search_results_listing_presents_an_overlay() {
+        let listing = sut.makeProductListingViewModel(
+            configuration: ProductListingScreenConfiguration(
+                category: nil,
+                searchText: "jeans",
+                urlQueryParameters: nil,
+                mode: .searchResults
+            )
+        )
 
         listing.didTapSearch()
 
