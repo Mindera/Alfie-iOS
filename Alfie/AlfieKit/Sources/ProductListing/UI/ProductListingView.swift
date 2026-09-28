@@ -216,6 +216,7 @@ extension SnackbarViewConfiguration {
             showCloseButton: true,
             icon: Icon.warning.image,
             actionButtonLabel: L10n.Plp.ErrorView.Button.cta,
+            autoDismissTime: nil,
             onActionTap: onRetry,
             onDismiss: onDismiss
         )
