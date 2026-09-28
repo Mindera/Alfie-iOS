@@ -25,7 +25,7 @@ public final class TabOverlayCoordinator {
         SearchFlowViewModel(
             dependencies: dependencies.search,
             intentViewBuilder: { [weak self] in
-                self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
+                self?.searchIntentViewBuilder(for: $0) ?? AnyView(EmptyView())
             },
             closeSearchAction: { [weak self] in self?.dismiss() }
         )
