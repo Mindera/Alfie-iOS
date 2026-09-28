@@ -76,7 +76,7 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
         case .settings:
             viewModel.didTapSettings()
 
-        case .myAddressBook,
+        case .addressBook,
              .orders, // swiftlint:disable:this indentation_width
              .personalInformation,
              .wallet:
@@ -98,7 +98,7 @@ private extension AccountSection {
             AccessibilityID.Account.wishlistSection
         case .wallet:
             AccessibilityID.Account.walletSection
-        case .myAddressBook:
+        case .addressBook:
             AccessibilityID.Account.addressBookSection
         case .settings:
             AccessibilityID.Account.settingsSection

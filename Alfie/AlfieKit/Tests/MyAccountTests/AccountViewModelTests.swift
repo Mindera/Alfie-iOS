@@ -57,7 +57,7 @@ final class AccountViewModelTests: XCTestCase {
     func test_section_list_follows_the_design_order() {
         XCTAssertEqual(
             sut.sectionList,
-            [.personalInformation, .orders, .wallet, .myAddressBook, .settings]
+            [.personalInformation, .orders, .wallet, .addressBook, .settings]
         )
     }
 
@@ -66,7 +66,7 @@ final class AccountViewModelTests: XCTestCase {
 
         XCTAssertEqual(
             sut.sectionList,
-            [.personalInformation, .orders, .wishlist, .wallet, .myAddressBook, .settings]
+            [.personalInformation, .orders, .wishlist, .wallet, .addressBook, .settings]
         )
     }
 

@@ -5,7 +5,7 @@ public enum AccountSection: CaseIterable {
     case orders
     case wishlist
     case wallet
-    case myAddressBook
+    case addressBook
     case settings
     case signIn
     case signOut
@@ -21,7 +21,7 @@ public enum AccountSection: CaseIterable {
             L10n.Account.wishlist
         case .wallet:
             L10n.Account.wallet
-        case .myAddressBook:
+        case .addressBook:
             L10n.Account.addressBook
         case .settings:
             L10n.Account.settings
@@ -44,7 +44,7 @@ public enum AccountSection: CaseIterable {
             Icon.heart
         case .wallet:
             Icon.creditCard
-        case .myAddressBook:
+        case .addressBook:
             Icon.location
         case .settings:
             Icon.settings

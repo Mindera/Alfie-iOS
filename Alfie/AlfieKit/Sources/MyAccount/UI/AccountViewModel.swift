@@ -38,7 +38,7 @@ public final class AccountViewModel: AccountViewModelProtocol {
                 .orders,
                 featureAvailability[.wishlist] != nil ? .wishlist : nil,
                 .wallet,
-                .myAddressBook,
+                .addressBook,
                 .settings,
             ]
             .compactMap { $0 }
