@@ -3,7 +3,7 @@ import Foundation
 public protocol ProductListingViewModelProtocol: ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
     // A failed page request over loaded products; they stay on screen and the View surfaces this as
-    // a Snackbar. Distinct from `state.error`, which is the full error screen.
+    // a Snackbar. Distinct from `state.error`, which is a blocking error.
     var transientError: ProductListingTransientError? { get }
     var products: [Product] { get }
     var wishlistContent: [SelectedProduct] { get }

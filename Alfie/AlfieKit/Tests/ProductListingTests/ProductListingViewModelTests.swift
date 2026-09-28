@@ -455,7 +455,7 @@ final class ProductListingViewModelTests: XCTestCase {
         await sut.refresh()
 
         // Non-destructive: the loaded products stay on screen (still `.success`) and the failure
-        // surfaces as a transient error, never the full `.error` screen.
+        // surfaces as a transient error, never a blocking error.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
         XCTAssertEqual(sut.transientError, .init(request: .refresh, error: .serverError))

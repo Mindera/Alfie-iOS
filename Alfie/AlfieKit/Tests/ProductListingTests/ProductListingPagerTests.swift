@@ -208,6 +208,28 @@ final class ProductListingPagerTests: XCTestCase {
         XCTAssertNil(commit?.transientError)
     }
 
+    func test_cancelled_first_page_over_a_blocking_error_keeps_it() throws {
+        var sut = ProductListingPager(state: .error(.noInternet))
+        let ticket = try XCTUnwrap(sut.begin(.firstPage))
+
+        let commit = sut.commit(.failure(CancellationError()), for: ticket)
+
+        XCTAssertEqual(sut.state, .error(.noInternet))
+        XCTAssertNil(commit?.transientError)
+    }
+
+    func test_cancelled_refresh_over_a_changed_result_set_raises_a_blocking_error() throws {
+        var sut = makeSUT()
+        sut.resetResultSet()
+        let ticket = try XCTUnwrap(sut.begin(.refresh))
+
+        let commit = sut.commit(.failure(CancellationError()), for: ticket)
+
+        XCTAssertEqual(sut.state, .error(.generic))
+        XCTAssertNil(commit?.transientError)
+        XCTAssertFalse(sut.isFetching)
+    }
+
     func test_first_page_is_not_begun_over_loaded_products() {
         var sut = makeSUT()
 

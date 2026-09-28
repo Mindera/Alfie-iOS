@@ -141,8 +141,6 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         // A transient error describes the previous result set; leaving its Snackbar up over a
         // freshly filtered listing reads as the filter having failed.
         transientError = nil
-        // Discards the cursor (ALFMOB-487) and invalidates any page request in flight, so it
-        // cannot land afterwards and put the pre-filter products back.
         pager.resetResultSet()
         publish(pager.state)
 

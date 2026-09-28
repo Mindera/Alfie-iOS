@@ -72,9 +72,10 @@ struct ProductListingPager {
                 state = .success(.init(title: page.title, products: page.products))
             }
             return Commit(transientError: nil)
-        case (.failure(let error as CancellationError), .firstPage):
-            return fail(with: .from(error: error), for: ticket)
         case (.success(nil), .nextPage), (.failure(is CancellationError), _):
+            if case .loadingFirstPage = ticket.previousState {
+                return fail(with: .generic, for: ticket)
+            }
             state = ticket.previousState
             return Commit(transientError: nil)
         case (.success(nil), _):
@@ -84,6 +85,7 @@ struct ProductListingPager {
         }
     }
 
+    /// A filter or sort change (ALFMOB-487): drops the cursor and any page request in flight.
     mutating func resetResultSet() {
         pagination = nil
         generation += 1
