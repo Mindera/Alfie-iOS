@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ProductListingViewStateModel {
+public struct ProductListingViewStateModel: Equatable {
     public let title: String
     public let products: [Product]
 

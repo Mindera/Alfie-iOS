@@ -661,6 +661,33 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(totalFetches, 1)
     }
 
+    func test_reappearing_while_a_next_page_is_in_flight_does_not_refetch_page_one() async {
+        sut = makeSUT(category: "clothing")
+        let page1 = Array(Product.fixtures.prefix(3))
+        let page2 = Array(Product.fixtures.suffix(2))
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: page1)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        let gate = FetchGate()
+        let nextPageInFlight = expectation(description: "next page fetch is in-flight")
+        let pageOneFetched = expectation(description: "page 1 must not be fetched during a next page")
+        pageOneFetched.isInverted = true
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            await gate.recordAndMaybeWait(signal: nextPageInFlight, secondSignal: pageOneFetched)
+            return ProductListing.fixture(pagination: .fixture(hasNextPage: false), products: page2)
+        }
+
+        sut.didDisplay(sut.products.last!)
+        await fulfillment(of: [nextPageInFlight], timeout: 1)
+        sut.viewDidAppear()
+        await fulfillment(of: [pageOneFetched], timeout: 0.5)
+
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { Task { await gate.open() } })
+        XCTAssertEqual(sut.products.map(\.id), (page1 + page2).map(\.id))
+    }
+
     // MARK: - Retry (error-state recovery)
 
     func test_retry_refetches_first_page_from_error_state() async {

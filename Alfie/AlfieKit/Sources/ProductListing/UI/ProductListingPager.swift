@@ -2,7 +2,7 @@ import Foundation
 import Model
 
 /// Commits page requests onto the loaded products. A failed page request never discards them: it
-/// surfaces as a transient error while any are loaded.
+/// surfaces as a transient error while any are loaded, and as a blocking error otherwise.
 struct ProductListingPager {
     typealias State = PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
 
@@ -10,6 +10,7 @@ struct ProductListingPager {
         let request: ProductListingPageRequest
         let cursor: String?
         fileprivate let generation: Int
+        fileprivate let previousState: State
     }
 
     struct Commit {
@@ -17,43 +18,81 @@ struct ProductListingPager {
         let transientError: ProductListingTransientError?
     }
 
-    var state: State
-    var pagination: ProductListing.Pagination?
-    var generation = 0
-    var isFetching = false
+    private(set) var state: State
+    private(set) var pagination: ProductListing.Pagination?
+    private var generation = 0
+    private var inFlightGeneration: Int?
 
-    init(state: State) {
-        self.state = state
+    var isFetching: Bool {
+        inFlightGeneration == generation
     }
 
-    mutating func beginNextPage() -> Ticket? {
-        guard !isFetching, pagination?.hasNextPage == true, case .success(let loaded) = state else { return nil }
-        isFetching = true
-        state = .loadingNextPage(loaded)
-        return Ticket(request: .nextPage, cursor: pagination?.endCursor, generation: generation)
+    init(state: State, pagination: ProductListing.Pagination? = nil) {
+        self.state = state
+        self.pagination = pagination
+    }
+
+    mutating func begin(_ request: ProductListingPageRequest) -> Ticket? {
+        guard !isFetching else { return nil }
+        let previousState = state
+        let cursor: String?
+
+        switch (request, state) {
+        case (.refresh, _):
+            cursor = nil
+        case (.firstPage, .success), (.firstPage, .loadingNextPage):
+            return nil
+        case (.firstPage, .error):
+            state = .loadingFirstPage(.init(title: "", products: []))
+            cursor = nil
+        case (.firstPage, .loadingFirstPage):
+            cursor = nil
+        case (.nextPage, .success(let loaded)) where pagination?.hasNextPage == true:
+            state = .loadingNextPage(loaded)
+            cursor = pagination?.endCursor
+        case (.nextPage, _):
+            return nil
+        }
+
+        inFlightGeneration = generation
+        return Ticket(request: request, cursor: cursor, generation: generation, previousState: previousState)
     }
 
     mutating func commit(_ result: Result<ProductListing?, Error>, for ticket: Ticket) -> Commit? {
-        isFetching = false
-        guard ticket.generation == generation, let loaded = state.value else { return nil }
+        guard ticket.generation == generation else { return nil }
+        inFlightGeneration = nil
 
-        var transientError: ProductListingTransientError?
-        switch result {
-        case .success(let page?):
+        switch (result, ticket.request) {
+        case (.success(let page?), _):
             pagination = page.pagination
-            state = .success(.init(title: loaded.title, products: loaded.products + page.products))
-        case .success(nil), .failure(is CancellationError):
-            state = .success(loaded)
-        case .failure(let error):
-            state = .success(loaded)
-            transientError = .init(request: ticket.request, error: .from(error: error))
+            if ticket.request == .nextPage, case .success(let loaded) = ticket.previousState {
+                state = .success(.init(title: loaded.title, products: loaded.products + page.products))
+            } else {
+                state = .success(.init(title: page.title, products: page.products))
+            }
+            return Commit(state: state, transientError: nil)
+        case (.success(nil), .nextPage), (.failure(is CancellationError), _):
+            state = ticket.previousState
+            return Commit(state: state, transientError: nil)
+        case (.success(nil), _):
+            return fail(with: .noResults, for: ticket)
+        case (.failure(let error), _):
+            return fail(with: .from(error: error), for: ticket)
         }
-        return Commit(state: state, transientError: transientError)
     }
 
     mutating func resetResultSet() {
         pagination = nil
         generation += 1
         state = .loadingFirstPage(.init(title: "", products: []))
+    }
+
+    private mutating func fail(with error: ProductListingViewErrorType, for ticket: Ticket) -> Commit {
+        guard case .success(let loaded) = ticket.previousState, !loaded.products.isEmpty else {
+            state = .error(error)
+            return Commit(state: state, transientError: nil)
+        }
+        state = .success(loaded)
+        return Commit(state: state, transientError: .init(request: ticket.request, error: error))
     }
 }

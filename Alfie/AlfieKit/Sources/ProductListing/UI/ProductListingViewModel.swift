@@ -90,7 +90,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             wishlistContent = await dependencies.wishlistService.getWishlistContent()
         }
         Task {
-            await loadProductsIfNeeded()
+            await load(.firstPage)
         }
         Task {
             await loadPriceBoundsIfNeeded()
@@ -101,7 +101,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         guard products.last?.id == product.id, !state.isLoadingNextPage else { return }
 
         Task {
-            await loadMoreProducts()
+            await load(.nextPage)
         }
     }
 
@@ -144,50 +144,16 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         // Discards the cursor (ALFMOB-487) and invalidates any page request in flight, so it
         // cannot land afterwards and put the pre-filter products back.
         pager.resetResultSet()
-        state = pager.state
+        publish(pager.state)
 
         Task {
-            await loadProductsIfNeeded()
+            await load(.firstPage)
         }
     }
 
     @MainActor
     public func refresh() async {
-        // Pull-to-refresh keeps the current grid on screen (no `.loadingFirstPage` skeleton flip) and
-        // re-fetches page 1, preserving the active sort + filters. If a load-more or another refresh is
-        // already running, bail — the in-flight fetch wins. The cursor is only reset (to the new page-1
-        // pagination) on success, so a failed refresh leaves paging intact over the preserved grid.
-        guard !pager.isFetching else { return }
-        pager.isFetching = true
-        defer { pager.isFetching = false }
-        transientError = nil
-        let generation = pager.generation
-
-        let productListing: ProductListing?
-
-        do {
-            productListing = try await fetchPage(after: nil)
-        } catch is CancellationError {
-            return
-        } catch {
-            guard generation == pager.generation else { return }
-            dependencies.log.error("Error refreshing product listing: \(error)")
-            transientError = .init(request: .refresh, error: .from(error: error))
-            return
-        }
-
-        // A filter or sort change during the fetch redefined the result set; this response
-        // describes the old one.
-        guard generation == pager.generation else { return }
-
-        guard let productListing else {
-            transientError = .init(request: .refresh, error: .noResults)
-            return
-        }
-
-        pager.pagination = productListing.pagination
-        pager.state = .success(.init(title: productListing.title, products: productListing.products))
-        state = pager.state
+        await load(.refresh)
     }
 
     public func didDismissTransientError() {
@@ -198,53 +164,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     @MainActor
     public func retry() async {
-        // Recovery from the full error screen. Show the loading state for feedback, then re-fetch
-        // page 1. Holds `isFetching` for the whole fetch so a concurrent pull-to-refresh (now
-        // reachable over the error overlay) or a double-tap can't start a second racing page-1 fetch.
-        guard !pager.isFetching else { return }
-        pager.isFetching = true
-        defer { pager.isFetching = false }
-        pager.state = .loadingFirstPage(.init(title: "", products: []))
-        state = pager.state
-        await loadProductsIfNeeded()
+        await load(.firstPage)
     }
 
     // MARK: - Private
-
-    @MainActor
-    private func loadProductsIfNeeded() async {
-        // Not gated on `isFetching`: this is the first-page / filter-apply load, and `didApplyFilters`
-        // has already blanked the grid before calling it — dropping it here would strand an empty
-        // screen. The `isFetching` guard is only for refresh-vs-load-more (which the ticket scoped).
-        guard !state.isSuccess else {
-            return
-        }
-        let generation = pager.generation
-
-        let productListing: ProductListing?
-
-        do {
-            productListing = try await fetchPage(after: nil)
-        } catch {
-            guard generation == pager.generation else { return }
-            dependencies.log.error("Error fetching product listing (first page): \(error)")
-            pager.state = .error(ProductListingViewErrorType.from(error: error))
-            state = pager.state
-            return
-        }
-
-        guard generation == pager.generation else { return }
-
-        guard let productListing else {
-            pager.state = .error(.noResults)
-            state = pager.state
-            return
-        }
-
-        pager.pagination = productListing.pagination
-        pager.state = .success(.init(title: productListing.title, products: productListing.products))
-        state = pager.state
-    }
 
     /// Fetched once per screen. The bounds describe the whole collection: constant across
     /// pagination and unaffected by the active filters, mirroring web (ALFMOB-472). A failure
@@ -273,28 +196,38 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     @MainActor
-    private func loadMoreProducts() async {
-        guard let ticket = pager.beginNextPage() else { return }
-        state = pager.state
+    private func load(_ request: ProductListingPageRequest) async {
+        guard let ticket = pager.begin(request) else { return }
+        if request == .refresh {
+            transientError = nil
+        }
+        publish(pager.state)
 
         let result: Result<ProductListing?, Error>
         do {
             result = .success(try await fetchPage(after: ticket.cursor))
         } catch {
-            dependencies.log.error("Error fetching product listing (next page): \(error)")
+            if !(error is CancellationError) {
+                dependencies.log.error("Error fetching product listing (\(request)): \(error)")
+            }
             result = .failure(error)
         }
 
         guard let commit = pager.commit(result, for: ticket) else { return }
-        state = commit.state
+        publish(commit.state)
         if let error = commit.transientError {
             transientError = error
         }
     }
 
+    private func publish(_ newState: ProductListingPager.State) {
+        guard state != newState else { return }
+        state = newState
+    }
+
     /// Routes a page request to the right operation for the screen's mode: category
     /// browsing hits `productList`, search results hit `searchProducts`. Returns nil when
-    /// the key required for the current mode is missing, which callers surface as no-results.
+    /// the key required for the current mode is missing, which the pager commits as no results.
     private func fetchPage(after: String?) async throws -> ProductListing? {
         switch mode {
         case .listing:
