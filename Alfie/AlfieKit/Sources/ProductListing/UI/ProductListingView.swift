@@ -53,9 +53,6 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             }
         }
         .snackbarView(configuration: $transientErrorSnackbarConfig)
-        // A failed page request over loaded products keeps them and surfaces a transient error here,
-        // not the full error screen. Dismissing the Snackbar clears `transientError` so an identical
-        // later failure re-presents cleanly.
         .onChange(of: viewModel.transientError) { transientError in
             guard let transientError else {
                 transientErrorSnackbarConfig = nil

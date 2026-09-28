@@ -157,8 +157,6 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func didDismissTransientError() {
-        // Clear the transient error once its Snackbar is dismissed, so it never lingers as stale state
-        // and a later identical failure re-presents cleanly.
         transientError = nil
     }
 
@@ -207,14 +205,14 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         do {
             result = .success(try await fetchPage(after: ticket.cursor))
         } catch {
-            if !(error is CancellationError) {
-                dependencies.log.error("Error fetching product listing (\(request)): \(error)")
-            }
             result = .failure(error)
         }
 
         guard let commit = pager.commit(result, for: ticket) else { return }
-        publish(commit.state)
+        if case .failure(let error) = result, !(error is CancellationError) {
+            dependencies.log.error("Error fetching product listing (\(request)): \(error)")
+        }
+        publish(pager.state)
         if let error = commit.transientError {
             transientError = error
         }

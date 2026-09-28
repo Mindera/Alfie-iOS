@@ -18,8 +18,8 @@ final class ProductListingPagerTests: XCTestCase {
             for: ticket
         )
 
-        XCTAssertTrue(commit?.state.isSuccess == true)
-        XCTAssertEqual(commit?.state.value?.products.map(\.id), (page1 + page2).map(\.id))
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.state.value?.products.map(\.id), (page1 + page2).map(\.id))
         XCTAssertNil(commit?.transientError)
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-2")
     }
@@ -40,8 +40,8 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.failure(BFFRequestError(type: .serverError(status: 503))), for: ticket)
 
-        XCTAssertTrue(commit?.state.isSuccess == true)
-        XCTAssertEqual(commit?.state.value?.products.map(\.id), page1.map(\.id))
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.state.value?.products.map(\.id), page1.map(\.id))
         XCTAssertEqual(commit?.transientError, .init(request: .nextPage, error: .serverError))
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-1")
         XCTAssertEqual(sut.pagination?.hasNextPage, true)
@@ -53,8 +53,8 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.success(nil), for: ticket)
 
-        XCTAssertTrue(commit?.state.isSuccess == true)
-        XCTAssertEqual(commit?.state.value?.products.map(\.id), page1.map(\.id))
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.state.value?.products.map(\.id), page1.map(\.id))
         XCTAssertNil(commit?.transientError)
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-1")
     }
@@ -65,8 +65,8 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.failure(CancellationError()), for: ticket)
 
-        XCTAssertTrue(commit?.state.isSuccess == true)
-        XCTAssertEqual(commit?.state.value?.products.map(\.id), page1.map(\.id))
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.state.value?.products.map(\.id), page1.map(\.id))
         XCTAssertNil(commit?.transientError)
     }
 
@@ -145,7 +145,7 @@ final class ProductListingPagerTests: XCTestCase {
         )
 
         XCTAssertNil(ticket.cursor)
-        XCTAssertEqual(commit?.state, .success(.init(title: "Clothing", products: page1)))
+        XCTAssertEqual(sut.state, .success(.init(title: "Clothing", products: page1)))
         XCTAssertNil(commit?.transientError)
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-1")
     }
@@ -165,17 +165,17 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.failure(BFFRequestError(type: .serverError(status: 503))), for: ticket)
 
-        XCTAssertEqual(commit?.state, .error(.serverError))
+        XCTAssertEqual(sut.state, .error(.serverError))
         XCTAssertNil(commit?.transientError)
     }
 
-    func test_nil_first_page_raises_a_no_results_blocking_error() throws {
+    func test_first_page_with_no_results_raises_a_blocking_error() throws {
         var sut = makeSkeletonSUT()
         let ticket = try XCTUnwrap(sut.begin(.firstPage))
 
         let commit = sut.commit(.success(nil), for: ticket)
 
-        XCTAssertEqual(commit?.state, .error(.noResults))
+        XCTAssertEqual(sut.state, .error(.noResults))
         XCTAssertNil(commit?.transientError)
     }
 
@@ -187,15 +187,25 @@ final class ProductListingPagerTests: XCTestCase {
         XCTAssertEqual(sut.state, .loadingFirstPage(.init(title: "", products: [])))
     }
 
-    func test_cancelled_first_page_restores_the_previous_state_and_emits_no_error() throws {
-        var sut = ProductListingPager(state: .error(.serverError))
+    func test_cancelled_first_page_raises_a_blocking_error_rather_than_stranding_the_skeletons() throws {
+        var sut = makeSkeletonSUT()
         let ticket = try XCTUnwrap(sut.begin(.firstPage))
 
         let commit = sut.commit(.failure(CancellationError()), for: ticket)
 
-        XCTAssertEqual(commit?.state, .error(.serverError))
+        XCTAssertEqual(sut.state, .error(.generic))
         XCTAssertNil(commit?.transientError)
         XCTAssertFalse(sut.isFetching)
+    }
+
+    func test_cancelled_refresh_over_a_blocking_error_keeps_it() throws {
+        var sut = ProductListingPager(state: .error(.noInternet))
+        let ticket = try XCTUnwrap(sut.begin(.refresh))
+
+        let commit = sut.commit(.failure(CancellationError()), for: ticket)
+
+        XCTAssertEqual(sut.state, .error(.noInternet))
+        XCTAssertNil(commit?.transientError)
     }
 
     func test_first_page_is_not_begun_over_loaded_products() {
@@ -230,7 +240,7 @@ final class ProductListingPagerTests: XCTestCase {
 
         XCTAssertTrue(sut.isFetching, "A stale commit must not release the current page request's latch")
         let commit = sut.commit(.success(.fixture(products: page1)), for: ticket)
-        XCTAssertEqual(commit?.state.value?.products.map(\.id), page1.map(\.id))
+        XCTAssertEqual(sut.state.value?.products.map(\.id), page1.map(\.id))
     }
 
     func test_first_page_landing_after_the_result_set_changed_is_dropped() throws {
@@ -254,7 +264,7 @@ final class ProductListingPagerTests: XCTestCase {
         )
 
         XCTAssertNil(ticket.cursor)
-        XCTAssertEqual(commit?.state, .success(.init(title: "Fresh", products: page2)))
+        XCTAssertEqual(sut.state, .success(.init(title: "Fresh", products: page2)))
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-new")
     }
 
@@ -272,18 +282,18 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.failure(BFFRequestError(type: .serverError(status: 503))), for: ticket)
 
-        XCTAssertEqual(commit?.state, .success(.init(title: "Clothing", products: page1)))
+        XCTAssertEqual(sut.state, .success(.init(title: "Clothing", products: page1)))
         XCTAssertEqual(commit?.transientError, .init(request: .refresh, error: .serverError))
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-1")
     }
 
-    func test_nil_refresh_over_loaded_products_emits_a_no_results_transient_error() throws {
+    func test_refresh_with_no_results_over_loaded_products_emits_a_transient_error() throws {
         var sut = makeSUT()
         let ticket = try XCTUnwrap(sut.begin(.refresh))
 
         let commit = sut.commit(.success(nil), for: ticket)
 
-        XCTAssertEqual(commit?.state, .success(.init(title: "Clothing", products: page1)))
+        XCTAssertEqual(sut.state, .success(.init(title: "Clothing", products: page1)))
         XCTAssertEqual(commit?.transientError, .init(request: .refresh, error: .noResults))
     }
 
@@ -293,7 +303,7 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.failure(BFFRequestError(type: .serverError(status: 503))), for: ticket)
 
-        XCTAssertEqual(commit?.state, .error(.serverError))
+        XCTAssertEqual(sut.state, .error(.serverError))
         XCTAssertNil(commit?.transientError)
     }
 
@@ -303,7 +313,7 @@ final class ProductListingPagerTests: XCTestCase {
 
         let commit = sut.commit(.failure(CancellationError()), for: ticket)
 
-        XCTAssertEqual(commit?.state, .success(.init(title: "Clothing", products: page1)))
+        XCTAssertEqual(sut.state, .success(.init(title: "Clothing", products: page1)))
         XCTAssertNil(commit?.transientError)
     }
 

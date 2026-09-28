@@ -11,7 +11,7 @@ One fetch of one page of a product listing. Exactly three kinds: **Refresh**, **
 _Avoid_: Load more, following page, pagination request
 
 **Refresh**:
-A page request for page 1 made over loaded products, triggered by pull-to-refresh.
+A page request for page 1 triggered by pull-to-refresh, usually over loaded products. A refresh over a blocking error that fails stays a blocking error.
 
 **First page**:
 A page request for page 1 made when there are no loaded products (screen open, filter or sort applied, retry).
@@ -25,8 +25,8 @@ Real products currently on screen. Skeleton placeholders are not loaded products
 _Avoid_: Grid, products on screen
 
 **No results**:
-A successful page request that matched zero products. An outcome, not a failure.
-_Avoid_: Empty error, no-results error
+A first page or refresh that finds no products to show. On a first page it is a blocking error; on a refresh over loaded products, a transient error.
+_Avoid_: Empty error
 
 **Blocking error**:
 A page request failure shown as a full-screen error that replaces the listing. Only raised when there are no loaded products.

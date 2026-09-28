@@ -419,7 +419,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.state.isSuccess)
 
         // Refresh must hit page 1 (after == nil) while forwarding the active sort + filters, and
-        // replace the grid with the fresh response.
+        // replace the loaded products with the fresh response.
         var refreshedAfter: String? = "unset"
         var refreshedSort: String?
         var refreshedFilters: ProductFilterInput?
@@ -440,7 +440,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertNil(sut.transientError)
     }
 
-    func test_refresh_failure_keeps_grid_and_emits_transient_error() async {
+    func test_refresh_failure_keeps_loaded_products_and_emits_transient_error() async {
         sut = makeSUT(category: "clothing")
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
@@ -454,14 +454,14 @@ final class ProductListingViewModelTests: XCTestCase {
         }
         await sut.refresh()
 
-        // Non-destructive: the grid stays on screen (still `.success`) and the failure surfaces as a
-        // transient `transientError`, never the full `.error` screen.
+        // Non-destructive: the loaded products stay on screen (still `.success`) and the failure
+        // surfaces as a transient error, never the full `.error` screen.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
         XCTAssertEqual(sut.transientError, .init(request: .refresh, error: .serverError))
     }
 
-    func test_refresh_cancellation_keeps_grid_and_emits_no_error() async {
+    func test_refresh_cancellation_keeps_loaded_products_and_emits_no_error() async {
         sut = makeSUT(category: "clothing")
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
@@ -476,7 +476,7 @@ final class ProductListingViewModelTests: XCTestCase {
         await sut.refresh()
 
         // Guards the ViewModel half of the contract: given a service that rethrows `CancellationError`
-        // unmapped, `refresh()` must swallow it — grid intact, no Snackbar. It stubs
+        // unmapped, `refresh()` must swallow it — loaded products intact, no Snackbar. It stubs
         // `MockProductListingService`, a layer above the fix, so it cannot fail for the service half;
         // `ProductServiceTests.test_productList_rethrows_cancellation_unmapped` covers that.
         XCTAssertTrue(sut.state.isSuccess)
@@ -529,6 +529,37 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
         XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noInternet))
+    }
+
+    func test_cancelled_next_page_keeps_loaded_products_and_emits_no_error() {
+        sut = makeSUT(category: "clothing")
+        let page1 = Array(Product.fixtures.prefix(3))
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            guard after == nil else { throw CancellationError() }
+            return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: page1)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+
+        XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
+        XCTAssertNil(sut.transientError)
+    }
+
+    func test_cancelled_first_page_raises_a_blocking_error() {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw CancellationError()
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure, .generic)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_refresh_after_paging_resets_to_first_page() async {

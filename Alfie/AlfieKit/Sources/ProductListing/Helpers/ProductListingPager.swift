@@ -14,9 +14,10 @@ struct ProductListingPager {
     }
 
     struct Commit {
-        let state: State
         let transientError: ProductListingTransientError?
     }
+
+    private static let noProducts = ProductListingViewStateModel(title: "", products: [])
 
     private(set) var state: State
     private(set) var pagination: ProductListing.Pagination?
@@ -43,7 +44,7 @@ struct ProductListingPager {
         case (.firstPage, .success), (.firstPage, .loadingNextPage):
             return nil
         case (.firstPage, .error):
-            state = .loadingFirstPage(.init(title: "", products: []))
+            state = .loadingFirstPage(Self.noProducts)
             cursor = nil
         case (.firstPage, .loadingFirstPage):
             cursor = nil
@@ -70,10 +71,12 @@ struct ProductListingPager {
             } else {
                 state = .success(.init(title: page.title, products: page.products))
             }
-            return Commit(state: state, transientError: nil)
+            return Commit(transientError: nil)
+        case (.failure(let error as CancellationError), .firstPage):
+            return fail(with: .from(error: error), for: ticket)
         case (.success(nil), .nextPage), (.failure(is CancellationError), _):
             state = ticket.previousState
-            return Commit(state: state, transientError: nil)
+            return Commit(transientError: nil)
         case (.success(nil), _):
             return fail(with: .noResults, for: ticket)
         case (.failure(let error), _):
@@ -84,15 +87,15 @@ struct ProductListingPager {
     mutating func resetResultSet() {
         pagination = nil
         generation += 1
-        state = .loadingFirstPage(.init(title: "", products: []))
+        state = .loadingFirstPage(Self.noProducts)
     }
 
     private mutating func fail(with error: ProductListingViewErrorType, for ticket: Ticket) -> Commit {
         guard case .success(let loaded) = ticket.previousState, !loaded.products.isEmpty else {
             state = .error(error)
-            return Commit(state: state, transientError: nil)
+            return Commit(transientError: nil)
         }
         state = .success(loaded)
-        return Commit(state: state, transientError: .init(request: ticket.request, error: error))
+        return Commit(transientError: .init(request: ticket.request, error: error))
     }
 }
