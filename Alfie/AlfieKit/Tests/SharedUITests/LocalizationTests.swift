@@ -40,6 +40,13 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    func test_localizable_product_quantity_with_args() {
+        localizations.forEach { localization in
+            let resources = [1, 2].map { L10n.Product.Quantity.accessibilityLabel($0) }
+            XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
+        }
+    }
+
     func test_localizable_bagBadgeWithArgs() {
         localizations.forEach { localization in
             let resources = [1, 2].map { L10n.Accessibility.bagBadge($0) }
