@@ -420,10 +420,10 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         do {
             let products = try await dependencies.productService.relatedProducts(
                 handle: productHandle,
-                limit: Self.relatedProductsRequestLimit
+                limit: Constants.relatedProductsRequestLimit
             )
             relatedProductsState = .success(
-                Array(products.filter { !isCurrentProduct($0) }.prefix(Self.relatedProductsMaxCount))
+                Array(products.filter { !isCurrentProduct($0) }.prefix(Constants.relatedProductsMaxCount))
             )
         } catch {
             dependencies.log.error("Error fetching related products for \(productHandle): \(error)")
@@ -554,11 +554,6 @@ private extension String {
     var nilWhenEmpty: String? { isEmpty ? nil : self }
 }
 
-extension ProductDetailsViewModel {
-    private static let relatedProductsMaxCount = 6
-    private static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
-}
-
 private struct PendingBagQuantity: Equatable {
     let lineId: String
     let quantity: Int
@@ -567,4 +562,6 @@ private struct PendingBagQuantity: Equatable {
 private enum Constants {
     static let maxLineQuantity = 100
     static let bagQuantityDebounce: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(500)
+    static let relatedProductsMaxCount = 6
+    static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }
