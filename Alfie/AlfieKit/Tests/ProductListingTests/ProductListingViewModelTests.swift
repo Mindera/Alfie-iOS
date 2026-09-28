@@ -437,7 +437,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(refreshedFilters, filters)
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.count, 2)
-        XCTAssertNil(sut.refreshError)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_refresh_failure_keeps_grid_and_emits_transient_error() async {
@@ -455,10 +455,10 @@ final class ProductListingViewModelTests: XCTestCase {
         await sut.refresh()
 
         // Non-destructive: the grid stays on screen (still `.success`) and the failure surfaces as a
-        // transient `refreshError`, never the full `.error` screen.
+        // transient `transientError`, never the full `.error` screen.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
-        XCTAssertEqual(sut.refreshError, .serverError)
+        XCTAssertEqual(sut.transientError, .init(request: .refresh, error: .serverError))
     }
 
     func test_refresh_cancellation_keeps_grid_and_emits_no_error() async {
@@ -481,7 +481,7 @@ final class ProductListingViewModelTests: XCTestCase {
         // `ProductServiceTests.test_productList_rethrows_cancellation_unmapped` covers that.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
-        XCTAssertNil(sut.refreshError)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_load_more_appends_next_page_and_stops_when_no_next_page() {
@@ -509,6 +509,26 @@ final class ProductListingViewModelTests: XCTestCase {
 
         // hasNextPage is now false, so displaying the last item must not fetch again.
         XCTAssertNoEmit(from: sut.$state, afterTrigger: { self.sut.didDisplay(self.sut.products.last!) })
+    }
+
+    func test_failed_next_page_keeps_loaded_products_and_emits_transient_error() {
+        sut = makeSUT(category: "clothing")
+        let page1 = Array(Product.fixtures.prefix(3))
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            guard after == nil else { throw BFFRequestError(type: .noInternet) }
+            return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: page1)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$transientError,
+            where: { $0 != nil },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
+        XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noInternet))
     }
 
     func test_refresh_after_paging_resets_to_first_page() async {
@@ -903,7 +923,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.priceBounds?.minimum, 10)
     }
 
-    func test_applying_filters_clears_a_stale_refresh_error() async {
+    func test_applying_filters_clears_a_stale_transient_error() async {
         // The Snackbar describes the previous result set; left up over a freshly filtered listing
         // it reads as the filter having failed.
         sut = makeSUT(category: "clothing")
@@ -916,7 +936,7 @@ final class ProductListingViewModelTests: XCTestCase {
             throw BFFRequestError(type: .serverError(status: 503))
         }
         await sut.refresh()
-        XCTAssertEqual(sut.refreshError, .serverError)
+        XCTAssertEqual(sut.transientError, .init(request: .refresh, error: .serverError))
 
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
@@ -927,7 +947,7 @@ final class ProductListingViewModelTests: XCTestCase {
             afterTrigger: { self.sut.didApplyFilters(.init(minPrice: 40), sort: nil) }
         )
 
-        XCTAssertNil(sut.refreshError)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_a_page_in_flight_when_filters_change_cannot_overwrite_the_filtered_result() async {

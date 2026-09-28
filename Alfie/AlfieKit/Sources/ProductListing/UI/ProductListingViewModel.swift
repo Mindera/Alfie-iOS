@@ -27,26 +27,12 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public private(set) var state: PaginatedViewState<
         ProductListingViewStateModel, ProductListingViewErrorType
     >
-    // Transient pull-to-refresh failure: the grid stays put and the View shows a Snackbar. Never a
-    // full `.error` screen — a failed refresh must not discard the products already on screen.
-    @Published public private(set) var refreshError: ProductListingViewErrorType?
+    @Published public private(set) var transientError: ProductListingTransientError?
 
-    /// Cursor state for cursor-based pagination. Lives on the ViewModel (which is the
-    /// only caller that needs to drive "load more" decisions); the service itself is
-    /// stateless and just fetches the page identified by `after`.
-    private var pagination: ProductListing.Pagination?
-
-    // True while a load-more or a refresh is in flight, so the two can't race and overwrite each
-    // other (last-writer-wins).
-    private var isFetching = false
+    private var pager: ProductListingPager
 
     // The bounds query is fired at most once per screen, whatever it returns.
     private var didRequestPriceBounds = false
-
-    // Bumped whenever the result set is redefined (a filter or sort change). A page fetch captures
-    // the value at entry and refuses to commit if it no longer matches — otherwise a load-more or
-    // refresh already in flight can land afterwards and restore the pre-filter products and cursor.
-    private var resultSetGeneration = 0
 
     public enum Constants {
         public static let defaultSkeletonItemsSize = 12
@@ -61,7 +47,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public var totalNumberOfProducts: Int {
-        pagination?.totalCount ?? 0
+        pager.pagination?.totalCount ?? 0
     }
 
     public var showSearchButton: Bool {
@@ -89,7 +75,11 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.mode = mode
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
-        state = .loadingFirstPage(.init(title: "", products: Product.skeletons(count: skeletonItemsSize)))
+        let initialState: ProductListingPager.State = .loadingFirstPage(
+            .init(title: "", products: Product.skeletons(count: skeletonItemsSize))
+        )
+        state = initialState
+        pager = .init(state: initialState)
         wishlistContent = []
         self.navigate = navigate
         self.showSearch = showSearch
@@ -148,17 +138,13 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.filters = filters
         sortOption = sort
         showRefine = false
-        // Discard the cursor: an `after` from the previous query addresses a result set that no
-        // longer exists, and would silently paginate into the old one (ALFMOB-487).
-        pagination = nil
-        // A failed pull-to-refresh describes the previous result set; leaving its Snackbar up over
-        // a freshly filtered listing reads as the filter having failed.
-        refreshError = nil
-        // Invalidate anything already in flight. The filter bar stays tappable during a load-more
-        // or refresh, so without this their responses can land after the reset and put the
-        // pre-filter products (and cursor) back.
-        resultSetGeneration += 1
-        state = .loadingFirstPage(.init(title: "", products: []))
+        // A transient error describes the previous result set; leaving its Snackbar up over a
+        // freshly filtered listing reads as the filter having failed.
+        transientError = nil
+        // Discards the cursor (ALFMOB-487) and invalidates any page request in flight, so it
+        // cannot land afterwards and put the pre-filter products back.
+        pager.resetResultSet()
+        state = pager.state
 
         Task {
             await loadProductsIfNeeded()
@@ -171,11 +157,11 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         // re-fetches page 1, preserving the active sort + filters. If a load-more or another refresh is
         // already running, bail — the in-flight fetch wins. The cursor is only reset (to the new page-1
         // pagination) on success, so a failed refresh leaves paging intact over the preserved grid.
-        guard !isFetching else { return }
-        isFetching = true
-        defer { isFetching = false }
-        refreshError = nil
-        let generation = resultSetGeneration
+        guard !pager.isFetching else { return }
+        pager.isFetching = true
+        defer { pager.isFetching = false }
+        transientError = nil
+        let generation = pager.generation
 
         let productListing: ProductListing?
 
@@ -184,29 +170,30 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         } catch is CancellationError {
             return
         } catch {
-            guard generation == resultSetGeneration else { return }
+            guard generation == pager.generation else { return }
             dependencies.log.error("Error refreshing product listing: \(error)")
-            refreshError = ProductListingViewErrorType.from(error: error)
+            transientError = .init(request: .refresh, error: .from(error: error))
             return
         }
 
         // A filter or sort change during the fetch redefined the result set; this response
         // describes the old one.
-        guard generation == resultSetGeneration else { return }
+        guard generation == pager.generation else { return }
 
         guard let productListing else {
-            refreshError = .noResults
+            transientError = .init(request: .refresh, error: .noResults)
             return
         }
 
-        pagination = productListing.pagination
-        state = .success(.init(title: productListing.title, products: productListing.products))
+        pager.pagination = productListing.pagination
+        pager.state = .success(.init(title: productListing.title, products: productListing.products))
+        state = pager.state
     }
 
-    public func didDismissRefreshError() {
+    public func didDismissTransientError() {
         // Clear the transient error once its Snackbar is dismissed, so it never lingers as stale state
         // and a later identical failure re-presents cleanly.
-        refreshError = nil
+        transientError = nil
     }
 
     @MainActor
@@ -214,10 +201,11 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         // Recovery from the full error screen. Show the loading state for feedback, then re-fetch
         // page 1. Holds `isFetching` for the whole fetch so a concurrent pull-to-refresh (now
         // reachable over the error overlay) or a double-tap can't start a second racing page-1 fetch.
-        guard !isFetching else { return }
-        isFetching = true
-        defer { isFetching = false }
-        state = .loadingFirstPage(.init(title: "", products: []))
+        guard !pager.isFetching else { return }
+        pager.isFetching = true
+        defer { pager.isFetching = false }
+        pager.state = .loadingFirstPage(.init(title: "", products: []))
+        state = pager.state
         await loadProductsIfNeeded()
     }
 
@@ -231,28 +219,31 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         guard !state.isSuccess else {
             return
         }
-        let generation = resultSetGeneration
+        let generation = pager.generation
 
         let productListing: ProductListing?
 
         do {
             productListing = try await fetchPage(after: nil)
         } catch {
-            guard generation == resultSetGeneration else { return }
+            guard generation == pager.generation else { return }
             dependencies.log.error("Error fetching product listing (first page): \(error)")
-            state = .error(ProductListingViewErrorType.from(error: error))
+            pager.state = .error(ProductListingViewErrorType.from(error: error))
+            state = pager.state
             return
         }
 
-        guard generation == resultSetGeneration else { return }
+        guard generation == pager.generation else { return }
 
         guard let productListing else {
-            state = .error(.noResults)
+            pager.state = .error(.noResults)
+            state = pager.state
             return
         }
 
-        pagination = productListing.pagination
-        state = .success(.init(title: productListing.title, products: productListing.products))
+        pager.pagination = productListing.pagination
+        pager.state = .success(.init(title: productListing.title, products: productListing.products))
+        state = pager.state
     }
 
     /// Fetched once per screen. The bounds describe the whole collection: constant across
@@ -283,40 +274,22 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     @MainActor
     private func loadMoreProducts() async {
-        guard
-            !isFetching,
-            pagination?.hasNextPage == true,
-            case .success(let model) = state
-        else {
-            return
-        }
-        isFetching = true
-        defer { isFetching = false }
-        let generation = resultSetGeneration
+        guard let ticket = pager.beginNextPage() else { return }
+        state = pager.state
 
-        state = .loadingNextPage(.init(title: title, products: products))
-        let productListing: ProductListing?
-
+        let result: Result<ProductListing?, Error>
         do {
-            productListing = try await fetchPage(after: pagination?.endCursor)
+            result = .success(try await fetchPage(after: ticket.cursor))
         } catch {
-            guard generation == resultSetGeneration else { return }
-            dependencies.log.error("Error fetching product listing (following page): \(error)")
-            state = .error(ProductListingViewErrorType.from(error: error))
-            return
+            dependencies.log.error("Error fetching product listing (next page): \(error)")
+            result = .failure(error)
         }
 
-        // The filter changed while this page was in flight — appending it would splice products
-        // from the old result set onto the new one.
-        guard generation == resultSetGeneration else { return }
-
-        guard let productListing else {
-            state = .error(.noResults)
-            return
+        guard let commit = pager.commit(result, for: ticket) else { return }
+        state = commit.state
+        if let error = commit.transientError {
+            transientError = error
         }
-
-        pagination = productListing.pagination
-        state = .success(.init(title: title, products: model.products + productListing.products))
     }
 
     /// Routes a page request to the right operation for the screen's mode: category

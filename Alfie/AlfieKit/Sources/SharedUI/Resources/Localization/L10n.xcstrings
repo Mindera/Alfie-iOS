@@ -883,6 +883,17 @@
         }
       }
     },
+    "plp.next_page.error_message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't load more products."
+          }
+        }
+      }
+    },
     "plp.number_of_results.message" : {
       "extractionState" : "manual",
       "localizations" : {

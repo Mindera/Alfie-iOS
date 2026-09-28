@@ -22,7 +22,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @StateObject private var viewModel: ViewModel
     @State private var orientation = UIDeviceOrientation.unknown
-    @State private var refreshSnackbarConfig: SnackbarViewConfiguration?
+    @State private var transientErrorSnackbarConfig: SnackbarViewConfiguration?
 
     public init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -52,21 +52,23 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 errorView
             }
         }
-        .snackbarView(configuration: $refreshSnackbarConfig)
-        // A failed pull-to-refresh keeps the grid and surfaces a transient error here, not the full
-        // error screen. Dismissing the Snackbar clears `refreshError` so an identical later failure
-        // re-presents cleanly.
-        .onChange(of: viewModel.refreshError) { refreshError in
-            guard refreshError != nil else {
-                refreshSnackbarConfig = nil
+        .snackbarView(configuration: $transientErrorSnackbarConfig)
+        // A failed page request over loaded products keeps them and surfaces a transient error here,
+        // not the full error screen. Dismissing the Snackbar clears `transientError` so an identical
+        // later failure re-presents cleanly.
+        .onChange(of: viewModel.transientError) { transientError in
+            guard let transientError else {
+                transientErrorSnackbarConfig = nil
                 return
             }
-            refreshSnackbarConfig = .init(
+            transientErrorSnackbarConfig = .init(
                 type: .error,
-                text: L10n.Plp.Refresh.errorMessage,
+                text: transientError.request == .nextPage
+                    ? L10n.Plp.NextPage.errorMessage
+                    : L10n.Plp.Refresh.errorMessage,
                 showCloseButton: true,
                 icon: Icon.warning.image,
-                onDismiss: { viewModel.didDismissRefreshError() }
+                onDismiss: { viewModel.didDismissTransientError() }
             )
         }
         .toolbarView(

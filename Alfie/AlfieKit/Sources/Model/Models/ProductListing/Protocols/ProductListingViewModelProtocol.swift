@@ -2,9 +2,9 @@ import Foundation
 
 public protocol ProductListingViewModelProtocol: ObservableObject {
     var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType> { get }
-    // Transient (non-destructive) failure from pull-to-refresh; the grid stays on screen and the
-    // View surfaces this as a Snackbar. Distinct from `state.error`, which is the full error screen.
-    var refreshError: ProductListingViewErrorType? { get }
+    // A failed page request over loaded products; they stay on screen and the View surfaces this as
+    // a Snackbar. Distinct from `state.error`, which is the full error screen.
+    var transientError: ProductListingTransientError? { get }
     var products: [Product] { get }
     var wishlistContent: [SelectedProduct] { get }
     var style: ProductListingListStyle { get set }
@@ -28,6 +28,6 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func setListStyle(_ style: ProductListingListStyle)
     func didApplyFilters(_ filters: ProductFilterInput?, sort: String?)
     func refresh() async
-    func didDismissRefreshError()
+    func didDismissTransientError()
     func retry() async
 }
