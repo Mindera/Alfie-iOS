@@ -1,5 +1,6 @@
 import Mocks
 import Model
+import SharedUI
 import SnapshotTesting
 import SwiftUI
 import TestUtils
@@ -108,5 +109,22 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
                        record: isRecording)
+    }
+    func test_transientErrorSnackbar_nextPage() {
+        assertTransientErrorSnackbarSnapshot(for: .init(request: .nextPage, error: .noInternet))
+    }
+
+    func test_transientErrorSnackbar_refresh() {
+        assertTransientErrorSnackbarSnapshot(for: .init(request: .refresh, error: .serverError))
+    }
+
+    private func assertTransientErrorSnackbarSnapshot(
+        for transientError: ProductListingTransientError,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let sut = SnackbarView(configuration: .transientError(transientError, onRetry: {}, onDismiss: {}))
+            .padding(Primitives.Spacing.spacing8)
+        assertSnapshot(of: sut.embededInContainer(height: 80), as: .defaultImage(), record: isRecording, testName: testName, line: line)
     }
 }

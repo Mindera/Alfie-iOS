@@ -79,6 +79,11 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
         onDidDismissTransientErrorCalled?()
     }
 
+    public var onRetryTransientErrorCalled: (() -> Void)?
+    public func retryTransientError() async {
+        onRetryTransientErrorCalled?()
+    }
+
     public var onRetryCalled: (() -> Void)?
     public func retry() async {
         onRetryCalled?()

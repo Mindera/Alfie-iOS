@@ -29,5 +29,6 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didApplyFilters(_ filters: ProductFilterInput?, sort: String?)
     func refresh() async
     func didDismissTransientError()
+    func retryTransientError() async
     func retry() async
 }

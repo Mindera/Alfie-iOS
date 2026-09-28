@@ -58,13 +58,9 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 transientErrorSnackbarConfig = nil
                 return
             }
-            transientErrorSnackbarConfig = .init(
-                type: .error,
-                text: transientError.request == .nextPage
-                    ? L10n.Plp.NextPage.errorMessage
-                    : L10n.Plp.Refresh.errorMessage,
-                showCloseButton: true,
-                icon: Icon.warning.image,
+            transientErrorSnackbarConfig = .transientError(
+                transientError,
+                onRetry: { Task { await viewModel.retryTransientError() } },
                 onDismiss: { viewModel.didDismissTransientError() }
             )
         }
@@ -196,6 +192,33 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
         case .generic, .noInternet, .noResults, .none:
             return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
         }
+    }
+}
+
+// MARK: - Transient error Snackbar
+
+extension SnackbarViewConfiguration {
+    static func transientError(
+        _ transientError: ProductListingTransientError,
+        onRetry: @escaping () -> Void,
+        onDismiss: @escaping () -> Void
+    ) -> Self {
+        let text: String
+        switch transientError.request {
+        case .nextPage:
+            text = L10n.Plp.NextPage.errorMessage
+        case .refresh, .firstPage:
+            text = L10n.Plp.Refresh.errorMessage
+        }
+        return .init(
+            type: .error,
+            text: text,
+            showCloseButton: true,
+            icon: Icon.warning.image,
+            actionButtonLabel: L10n.Plp.ErrorView.Button.cta,
+            onActionTap: onRetry,
+            onDismiss: onDismiss
+        )
     }
 }
 

@@ -161,6 +161,12 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     @MainActor
+    public func retryTransientError() async {
+        guard let transientError else { return }
+        await load(transientError.request)
+    }
+
+    @MainActor
     public func retry() async {
         await load(.firstPage)
     }
@@ -196,9 +202,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @MainActor
     private func load(_ request: ProductListingPageRequest) async {
         guard let ticket = pager.begin(request) else { return }
-        if request == .refresh {
-            transientError = nil
-        }
+        transientError = nil
         publish(pager.state)
 
         let result: Result<ProductListing?, Error>
