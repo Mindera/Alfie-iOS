@@ -239,8 +239,6 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         else {
             return
         }
-        let image = variant.media.lazy.compactMap(\.asImage).first
-
         let selectedProduct = SelectedProduct(product: product, selectedVariant: variant)
 
         // Cleared up front so a second write with the same outcome is still a change the View
@@ -253,16 +251,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
                 // `product.id`, not `selectedProduct.id`: the latter is the composite
                 // "<productId>-<sku>" used for local identity, which no platform would resolve.
                 try await dependencies.cartService.add(
-                    line: .init(
-                        productId: product.id,
-                        variantId: variantId,
-                        sku: variant.sku,
-                        slug: product.slug,
-                        name: selectedProduct.name,
-                        imageURL: image?.url,
-                        imageAltText: image?.alt,
-                        unitPrice: variant.price.amount
-                    )
+                    line: .init(productId: product.id, variantId: variantId)
                 )
                 // Only once the cart holds the line — firing on the tap would count adds that failed.
                 // The composite id here is the pre-existing analytics shape, left alone per Q29.
