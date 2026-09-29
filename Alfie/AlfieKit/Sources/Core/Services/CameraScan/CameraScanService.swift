@@ -133,6 +133,9 @@ public final class CameraScanService: NSObject, CameraScanServiceProtocol {
                     return self.fail(with: .permissionDenied)
                 }
 
+                // After the prompt, not before: `DataScannerViewController.isAvailable` reports
+                // `cameraRestricted` as unavailable, so it is false until access has been granted.
+                // Gating the prompt on it would mean never raising the prompt at all.
                 guard self.isScanningAvailable() else {
                     return self.fail(with: .unavailable)
                 }
