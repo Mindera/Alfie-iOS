@@ -12,7 +12,6 @@ import Utils
 final class ServiceProvider: ServiceProviderProtocol {
     let analytics: AlfieAnalyticsTracker
     let apiEndpointService: ApiEndpointServiceProtocol
-    let bffApiKeyService: BFFApiKeyServiceProtocol
     let configurationService: ConfigurationServiceProtocol
     let deepLinkService: DeepLinkServiceProtocol
     let hapticsService: HapticsServiceProtocol
@@ -35,7 +34,6 @@ final class ServiceProvider: ServiceProviderProtocol {
     init() {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
-        self.bffApiKeyService = BFFApiKeyService(userDefaults: userDefaults)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 
         // Assuming Australia for now, to be revised later
@@ -78,7 +76,6 @@ final class ServiceProvider: ServiceProviderProtocol {
         let bffDependencies = BFFClientDependencyContainer(
             reachabilityService: reachabilityService,
             restNetworkClient: restClient,
-            apiKeyService: bffApiKeyService,
             errorReporter: bffErrorReporter
         )
         let apiUrl = apiEndpointService.apiEndpoint(for: apiEndpointService.currentApiEndpoint)
@@ -90,10 +87,7 @@ final class ServiceProvider: ServiceProviderProtocol {
             log: log
         )
         #if DEBUG
-        // Read before the Task: reaching `bffApiKeyService` inside it would capture `self` while the
-        // rest of the graph is still being built.
-        let probeApiKey = bffApiKeyService.currentApiKey
-        Task { await BFFConnectivityProbe(baseUrl: apiUrl, apiKey: probeApiKey, log: log).run() }
+        Task { await BFFConnectivityProbe(baseUrl: apiUrl, log: log).run() }
         #endif
         notificationsService = NotificationsService()
 

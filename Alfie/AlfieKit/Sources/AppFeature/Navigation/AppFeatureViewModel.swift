@@ -73,13 +73,11 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             sessionService: serviceProvider.sessionService,
             makeSettingsView: { [
                 configurationService = serviceProvider.configurationService,
-                apiEndpointService = serviceProvider.apiEndpointService,
-                bffApiKeyService = serviceProvider.bffApiKeyService
+                apiEndpointService = serviceProvider.apiEndpointService
             ] present in
                 SettingsViewFactory.make(
                     configurationService: configurationService,
                     apiEndpointService: apiEndpointService,
-                    bffApiKeyService: bffApiKeyService,
                     present: present
                 )
             }
@@ -137,7 +135,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let homeDependencyContainer = HomeDependencyContainer(
             configurationService: serviceProvider.configurationService,
             apiEndpointService: serviceProvider.apiEndpointService,
-            bffApiKeyService: serviceProvider.bffApiKeyService,
             sessionService: serviceProvider.sessionService
         )
 

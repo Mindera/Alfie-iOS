@@ -7,7 +7,6 @@ final class NetworkInterceptorProvider: InterceptorProvider {
     private let store: ApolloStore
     private let client: URLSessionClient
     private let reachabilityService: ReachabilityServiceProtocol
-    private let apiKeyService: BFFApiKeyServiceProtocol
     private let logRequests: Bool
     private let log: Logger
 
@@ -15,14 +14,12 @@ final class NetworkInterceptorProvider: InterceptorProvider {
         client: URLSessionClient,
         store: ApolloStore,
         reachabilityService: ReachabilityServiceProtocol,
-        apiKeyService: BFFApiKeyServiceProtocol,
         logRequests: Bool,
         log: Logger
     ) {
         self.store = store
         self.client = client
         self.reachabilityService = reachabilityService
-        self.apiKeyService = apiKeyService
         self.logRequests = logRequests
         self.log = log
     }
@@ -50,7 +47,6 @@ final class NetworkInterceptorProvider: InterceptorProvider {
             interceptors.append(CacheReadInterceptor(store: self.store))
         }
         interceptors.append(NetworkPreConditionInterceptor(reachabilityService: self.reachabilityService)) // Custom
-        interceptors.append(AuthorizationInterceptor(apiKeyService: self.apiKeyService)) // Custom
         if logRequests {
             interceptors.append(RequestLogInterceptor(log: log)) // Custom
         }

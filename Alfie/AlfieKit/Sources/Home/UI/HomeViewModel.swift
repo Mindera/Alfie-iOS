@@ -8,7 +8,6 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     private let sessionService: SessionServiceProtocol
     private let configurationService: ConfigurationServiceProtocol
     private let apiEndpointService: ApiEndpointServiceProtocol
-    private let bffApiKeyService: BFFApiKeyServiceProtocol
     private let navigate: (HomeRoute) -> Void
     private let showSearch: () -> Void
     private let showScanner: () -> Void
@@ -37,7 +36,6 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
         self.apiEndpointService = dependencies.apiEndpointService
-        self.bffApiKeyService = dependencies.bffApiKeyService
         self.navigate = navigate
         self.showSearch = showSearch
         self.showScanner = showScanner
@@ -65,7 +63,6 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
                 viewModel: DebugMenuViewModel(
                     configurationService: configurationService,
                     apiEndpointService: apiEndpointService,
-                    bffApiKeyService: bffApiKeyService,
                     closeMenuAction: { [weak self] in self?.fullScreenCover = nil
                     },
                     openForceAppUpdate: { [weak self] in

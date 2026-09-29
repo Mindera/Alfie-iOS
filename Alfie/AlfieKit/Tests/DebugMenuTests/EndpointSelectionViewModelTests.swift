@@ -7,19 +7,16 @@ import XCTest
 final class EndpointSelectionViewModelTests: XCTestCase {
     private var sut: DebugMenu.EndpointSelectionViewModel!
     private var mockEndpointService: MockApiEndpointService!
-    private var mockApiKeyService: MockBFFApiKeyService!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockEndpointService = MockApiEndpointService()
-        mockApiKeyService = MockBFFApiKeyService()
         // Init the sut in every test individually
     }
 
     override func tearDownWithError() throws {
         sut = nil
         mockEndpointService = nil
-        mockApiKeyService = nil
         try super.tearDownWithError()
     }
 
@@ -189,85 +186,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: .default)
     }
 
-    func test_reads_current_api_key_on_init() {
-        mockApiKeyService.currentApiKey = "abc-123"
-
-        sut = makeSut()
-
-        XCTAssertEqual(sut.bffApiKey, "abc-123")
-    }
-
-    func test_saves_api_key_on_service() {
-        sut = makeSut()
-        sut.bffApiKey = "abc-123"
-
-        sut.didTapSave()
-
-        XCTAssertEqual(mockApiKeyService.currentApiKey, "abc-123")
-    }
-
-    /// The key is read per request, so changing only the key must not reboot the app out from under
-    /// whatever the tester was looking at.
-    func test_saving_only_the_api_key_does_not_reboot() {
-        let reboot = expectation(description: "The app is not rebooted")
-        reboot.isInverted = true
-        mockEndpointService.onUpdateApiEndpointAndRebootCalled = { _ in reboot.fulfill() }
-        sut = makeSut()
-        sut.bffApiKey = "abc-123"
-
-        sut.didTapSave()
-
-        wait(for: [reboot], timeout: .inverted)
-        XCTAssertTrue(sut.shouldShowSuccess)
-        XCTAssertFalse(sut.willReboot)
-    }
-
-    func test_saving_an_endpoint_change_reports_a_pending_reboot() {
-        sut = makeSut()
-        sut.selectedEndpointOption = .preProd
-
-        sut.didTapSave()
-
-        XCTAssertTrue(sut.willReboot)
-    }
-
-    func test_save_button_is_enabled_when_only_the_api_key_changed() {
-        sut = makeSut()
-
-        sut.bffApiKey = "abc-123"
-
-        XCTAssertFalse(sut.isSaveDisabled)
-    }
-
-    /// Whitespace-only edits are what the key store discards, so offering Save for them would
-    /// promise a change that never happens.
-    func test_save_button_stays_disabled_when_the_api_key_edit_is_only_whitespace() {
-        sut = makeSut()
-
-        sut.bffApiKey = "   "
-
-        XCTAssertTrue(sut.isSaveDisabled)
-    }
-
-    /// An invalid URL aborts the whole save, so the key must not be written either — otherwise the
-    /// error snackbar would be lying about what was persisted.
-    func test_an_invalid_custom_url_saves_no_api_key() {
-        sut = makeSut()
-        sut.selectedEndpointOption = .custom(url: nil)
-        sut.customEndpointUrl = ""
-        sut.bffApiKey = "abc-123"
-
-        sut.didTapSave()
-
-        XCTAssertTrue(sut.shouldShowUrlError)
-        XCTAssertNil(mockApiKeyService.currentApiKey)
-    }
-
     private func makeSut() -> DebugMenu.EndpointSelectionViewModel {
-        .init(
-            apiEndpointService: mockEndpointService,
-            apiKeyService: mockApiKeyService,
-            closeEndpointSelection: {}
-        )
+        .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
     }
 }

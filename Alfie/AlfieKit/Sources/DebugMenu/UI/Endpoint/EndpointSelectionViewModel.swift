@@ -4,13 +4,10 @@ import Utils
 
 public final class EndpointSelectionViewModel: ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol
-    private let apiKeyService: BFFApiKeyServiceProtocol
     @Published public var selectedEndpointOption: ApiEndpointOption?
     @Published public var customEndpointUrl: String
-    @Published public var bffApiKey: String
     @Published public private(set) var shouldShowUrlError = false
     @Published public private(set) var shouldShowSuccess = false
-    @Published public private(set) var willReboot = false
     private var isSaving = false
     let closeEndpointSelection: () -> Void
 
@@ -22,16 +19,12 @@ public final class EndpointSelectionViewModel: ObservableObject {
         return selectedEndpointOption != .custom(url: nil)
     }
 
-    public var isApiKeyInputDisabled: Bool {
-        isSaving
-    }
-
     public var isSaveDisabled: Bool {
         guard !isSaving else {
             return true
         }
 
-        return !hasEndpointChange && !hasApiKeyChange
+        return !hasEndpointChange
     }
 
     public var availableEndpointOptions = ApiEndpointOption.allCases
@@ -46,14 +39,11 @@ public final class EndpointSelectionViewModel: ObservableObject {
 
     public init(
         apiEndpointService: ApiEndpointServiceProtocol,
-        apiKeyService: BFFApiKeyServiceProtocol,
         closeEndpointSelection: @escaping () -> Void
     ) {
         self.apiEndpointService = apiEndpointService
-        self.apiKeyService = apiKeyService
         self.closeEndpointSelection = closeEndpointSelection
         selectedEndpointOption = apiEndpointService.currentApiEndpoint
-        bffApiKey = apiKeyService.currentApiKey ?? ""
         if case .custom(let url) = apiEndpointService.currentApiEndpoint {
             customEndpointUrl = url?.absoluteString ?? ""
         } else {
@@ -68,10 +58,9 @@ public final class EndpointSelectionViewModel: ObservableObject {
             return
         }
 
-        let endpointChanged = hasEndpointChange
         var customUrl: URL?
 
-        if endpointChanged, case .custom = selectedEndpointOption {
+        if case .custom = selectedEndpointOption {
             guard !customEndpointUrl.isEmpty, let url = URL(string: customEndpointUrl) else {
                 shouldShowUrlError = true
                 return
@@ -79,24 +68,13 @@ public final class EndpointSelectionViewModel: ObservableObject {
             customUrl = url
         }
 
-        apiKeyService.updateApiKey(bffApiKey)
-
-        // The key is read per request, so only an endpoint change needs the app restarted.
-        if endpointChanged {
-            isSaving = true
-            apiEndpointService.updateApiEndpointAndReboot(customUrl.map { .custom(url: $0) } ?? selectedEndpointOption)
-        }
-
-        willReboot = endpointChanged
+        isSaving = true
+        apiEndpointService.updateApiEndpointAndReboot(customUrl.map { .custom(url: $0) } ?? selectedEndpointOption)
         shouldShowSuccess = true
     }
 
     public func didDismissError() {
         shouldShowUrlError = false
-    }
-
-    private var hasApiKeyChange: Bool {
-        bffApiKey.trim() != (apiKeyService.currentApiKey ?? "")
     }
 
     private var hasEndpointChange: Bool {
