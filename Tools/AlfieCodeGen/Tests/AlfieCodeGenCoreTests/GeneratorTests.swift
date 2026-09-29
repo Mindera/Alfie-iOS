@@ -30,6 +30,26 @@ struct GeneratorTests {
         }
     }
 
+    /// A shorter run after a longer one used to leave the surplus behind, and a stale code prints
+    /// exactly as well as a current one — nothing on the tag says which run produced it.
+    @Test("a later run replaces the output rather than adding to it")
+    func laterRunReplacesOutput() throws {
+        let output = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: output) }
+
+        _ = try Generator.run(
+            list: "mens-jeans-slim-indigo\nwomens-coat-wool-camel",
+            outputDirectory: output
+        )
+        let result = try Generator.run(list: "mens-jeans-slim-indigo", outputDirectory: output)
+
+        #expect(result.codes.map(\.file.lastPathComponent) == ["mens-jeans-slim-indigo.png"])
+        #expect(
+            try FileManager.default.contentsOfDirectory(atPath: output.path).sorted()
+                == ["mens-jeans-slim-indigo.png"]
+        )
+    }
+
     @Test("each written file decodes back to that product's link")
     func writtenFilesDecode() throws {
         let output = try temporaryDirectory()
