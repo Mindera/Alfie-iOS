@@ -30,6 +30,30 @@ final class BFFConnectivityProbeTests: XCTestCase {
         XCTAssertEqual(sentRequest?.httpMethod, "POST")
     }
 
+    func test_run_carries_the_configured_bearer_credential() async {
+        var sentRequest: URLRequest?
+        let sut = makeSut(apiKey: "abc-123") { request in
+            sentRequest = request
+            return (Data(), self.response(status: 200))
+        }
+
+        await sut.run()
+
+        XCTAssertEqual(sentRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer abc-123")
+    }
+
+    func test_run_without_a_credential_sends_no_authorization_header() async {
+        var sentRequest: URLRequest?
+        let sut = makeSut { request in
+            sentRequest = request
+            return (Data(), self.response(status: 200))
+        }
+
+        await sut.run()
+
+        XCTAssertNil(sentRequest?.value(forHTTPHeaderField: "Authorization"))
+    }
+
     func test_run_with_http_200_logs_connected() async {
         let sut = makeSut { _ in (Data(), self.response(status: 200)) }
 
@@ -88,10 +112,13 @@ final class BFFConnectivityProbeTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeSut(fetch: @escaping BFFConnectivityProbe.Fetch) -> BFFConnectivityProbe {
+    private func makeSut(
+        apiKey: String? = nil,
+        fetch: @escaping BFFConnectivityProbe.Fetch
+    ) -> BFFConnectivityProbe {
         let log = MockLogger()
         log.onLogCalled = { [weak self] level, message in self?.logs.append((level, message)) }
-        return BFFConnectivityProbe(baseUrl: baseUrl, fetch: fetch, log: log)
+        return BFFConnectivityProbe(baseUrl: baseUrl, apiKey: apiKey, fetch: fetch, log: log)
     }
 
     private func response(status: Int) -> HTTPURLResponse {

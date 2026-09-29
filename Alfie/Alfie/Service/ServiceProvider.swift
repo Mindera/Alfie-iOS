@@ -90,7 +90,10 @@ final class ServiceProvider: ServiceProviderProtocol {
             log: log
         )
         #if DEBUG
-        Task { await BFFConnectivityProbe(baseUrl: apiUrl, log: log).run() }
+        // Read before the Task: reaching `bffApiKeyService` inside it would capture `self` while the
+        // rest of the graph is still being built.
+        let probeApiKey = bffApiKeyService.currentApiKey
+        Task { await BFFConnectivityProbe(baseUrl: apiUrl, apiKey: probeApiKey, log: log).run() }
         #endif
         notificationsService = NotificationsService()
 
