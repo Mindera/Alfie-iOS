@@ -27,9 +27,13 @@ struct EndpointSelectionView: View {
 
             DemoHelper.demoSectionHeader(title: "BFF API Key")
 
-            ThemedInput($viewModel.bffApiKey, isDisabled: .constant(viewModel.isApiKeyInputDisabled))
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
+            ThemedInput(
+                $viewModel.bffApiKey,
+                isDisabled: .constant(viewModel.isApiKeyInputDisabled),
+                isSecure: true
+            )
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
 
             HStack {
                 Spacer()
