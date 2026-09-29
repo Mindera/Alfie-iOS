@@ -333,7 +333,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         var components = URLComponents()
         components.scheme = ThemedURL.internalScheme
         components.host = ThemedURL.internalHost
-        components.path = "/product/\(match.productId)"
+        components.path = "/product/\(match.handle)"
         if let variantId = match.variantId {
             components.queryItems = [URLQueryItem(name: DeepLink.variantIdQueryItem, value: variantId)]
         }

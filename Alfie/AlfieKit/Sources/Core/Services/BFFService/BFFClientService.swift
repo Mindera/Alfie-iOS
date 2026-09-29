@@ -106,9 +106,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 BFFGraphAPI.ProductByBarcodeQuery(barcode: barcode)
             ).productByBarcode
 
-            log.info("productByBarcode ← productId=\(match?.id ?? "nil") variantId=\(match?.variantId ?? "nil")")
+            log.info(
+                "productByBarcode ← productId=\(match?.id ?? "nil") handle=\(match?.slug ?? "nil") "
+                    + "variantId=\(match?.variantId ?? "nil")"
+            )
 
-            return match.map { BarcodeMatch(productId: $0.id, variantId: $0.variantId) }
+            return match.map { BarcodeMatch(handle: $0.slug, variantId: $0.variantId) }
         } catch {
             log.error("productByBarcode failed: \(error)")
             throw error

@@ -37,8 +37,13 @@ final class ScannerViewModelTests: XCTestCase {
     private static let foreignLink = ScannedPayload.qr("https://example.com/not-an-alfie-code")
     private static let barcode = ScannedPayload.ean13("5901234123457")
     private static let otherBarcode = ScannedPayload.ean13("4006381333931")
-    private static let barcodeProductLink = "alfie://alfie.target/product/8"
-    private static let barcodeVariantLink = "alfie://alfie.target/product/8?variantId=22"
+    /// Deliberately not the `productId`: the link has to carry the Handle, and a fixture where the two
+    /// are interchangeable would pass either way.
+    private static let barcodeHandle = "black-wool-coat-8"
+    private static let barcodeMatch = BarcodeMatch(handle: barcodeHandle, variantId: "22")
+    private static let barcodeMatchWithoutVariant = BarcodeMatch(handle: barcodeHandle, variantId: nil)
+    private static let barcodeProductLink = "alfie://alfie.target/product/\(barcodeHandle)"
+    private static let barcodeVariantLink = "alfie://alfie.target/product/\(barcodeHandle)?variantId=22"
     private static let unrecognisedMessage = "We don't recognize this barcode."
     private static let notFoundMessage = "We couldn't find this product."
     private static let lookupFailedMessage = "Something went wrong. Try scanning again."
@@ -64,8 +69,8 @@ final class ScannerViewModelTests: XCTestCase {
             url(Self.alfieCodeWithSku): .productDetail(handle: "slim-indigo-jean", route: nil, query: ["sku": "SKU-42"]),
             url(Self.multiSegmentAlfieCode): .productDetail(handle: "mens/jeans/slim-indigo", route: nil, query: nil),
             url(Self.wishlistAlfieCode): .wishlist,
-            url(Self.barcodeProductLink): .productDetail(handle: "8", route: nil, query: nil),
-            url(Self.barcodeVariantLink): .productDetail(handle: "8", route: nil, query: ["variantId": "22"]),
+            url(Self.barcodeProductLink): .productDetail(handle: Self.barcodeHandle, route: nil, query: nil),
+            url(Self.barcodeVariantLink): .productDetail(handle: Self.barcodeHandle, route: nil, query: ["variantId": "22"]),
         ]
         lookedUpBarcodes = []
         lookupGate = LookupGate()
@@ -456,7 +461,7 @@ final class ScannerViewModelTests: XCTestCase {
         var lookedUp: [String] = []
         productService.onProductByBarcodeCalled = { barcode in
             lookedUp.append(barcode)
-            return BarcodeMatch(productId: "8", variantId: "22")
+            return Self.barcodeMatch
         }
         sut.viewDidAppear()
 
@@ -468,7 +473,7 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     func test_scanning_barcode_matching_variant_opens_product_with_variant_id() throws {
-        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: "22") }
+        productService.onProductByBarcodeCalled = { _ in Self.barcodeMatch }
         sut.viewDidAppear()
 
         recogniseAndAwaitRecognition(Self.barcode)
@@ -479,7 +484,7 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     func test_scanning_barcode_matching_product_only_opens_product_without_variant_id() throws {
-        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: nil) }
+        productService.onProductByBarcodeCalled = { _ in Self.barcodeMatchWithoutVariant }
         sut.viewDidAppear()
 
         recogniseAndAwaitRecognition(Self.barcode)
@@ -566,7 +571,7 @@ final class ScannerViewModelTests: XCTestCase {
     func test_closing_while_looking_up_cancels_lookup() {
         let started = expectation(description: "lookup started")
         let cancelled = expectation(description: "lookup cancelled")
-        holdLookups(started: started, cancelled: cancelled, answer: BarcodeMatch(productId: "8", variantId: "22"))
+        holdLookups(started: started, cancelled: cancelled, answer: Self.barcodeMatch)
         sut.viewDidAppear()
         scanService.recognise(Self.barcode)
         wait(for: [started], timeout: .default)
@@ -581,7 +586,7 @@ final class ScannerViewModelTests: XCTestCase {
     func test_backgrounding_while_looking_up_cancels_lookup_and_clears_loader() {
         let started = expectation(description: "lookup started")
         let cancelled = expectation(description: "lookup cancelled")
-        holdLookups(started: started, cancelled: cancelled, answer: BarcodeMatch(productId: "8", variantId: "22"))
+        holdLookups(started: started, cancelled: cancelled, answer: Self.barcodeMatch)
         sut.viewDidAppear()
         scanService.recognise(Self.barcode)
         wait(for: [started], timeout: .default)
@@ -903,22 +908,22 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     func test_scanning_barcode_matching_variant_reports_success_with_sku_flag() {
-        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: "22") }
+        productService.onProductByBarcodeCalled = { _ in Self.barcodeMatch }
         sut.viewDidAppear()
 
         recogniseAndAwaitRecognition(Self.barcode)
 
-        XCTAssertEqual(reportedScanSuccessHandles, ["8"])
+        XCTAssertEqual(reportedScanSuccessHandles, [Self.barcodeHandle])
         XCTAssertEqual(reportedScanSuccessSkuFlags, [true])
     }
 
     func test_scanning_barcode_matching_product_only_reports_success_without_sku_flag() {
-        productService.onProductByBarcodeCalled = { _ in BarcodeMatch(productId: "8", variantId: nil) }
+        productService.onProductByBarcodeCalled = { _ in Self.barcodeMatchWithoutVariant }
         sut.viewDidAppear()
 
         recogniseAndAwaitRecognition(Self.barcode)
 
-        XCTAssertEqual(reportedScanSuccessHandles, ["8"])
+        XCTAssertEqual(reportedScanSuccessHandles, [Self.barcodeHandle])
         XCTAssertEqual(reportedScanSuccessSkuFlags, [false])
     }
 

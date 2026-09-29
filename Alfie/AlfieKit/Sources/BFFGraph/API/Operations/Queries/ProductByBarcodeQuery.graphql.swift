@@ -8,7 +8,7 @@ public extension BFFGraphAPI {
     public static let operationName: String = "ProductByBarcodeQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query ProductByBarcodeQuery($barcode: String!) { productByBarcode(barcode: $barcode) { __typename id variantId } }"#
+        #"query ProductByBarcodeQuery($barcode: String!) { productByBarcode(barcode: $barcode) { __typename id slug variantId } }"#
       ))
 
     public var barcode: String
@@ -41,10 +41,12 @@ public extension BFFGraphAPI {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("id", BFFGraphAPI.ID.self),
+          .field("slug", String.self),
           .field("variantId", BFFGraphAPI.ID?.self),
         ] }
 
         public var id: BFFGraphAPI.ID { __data["id"] }
+        public var slug: String { __data["slug"] }
         public var variantId: BFFGraphAPI.ID? { __data["variantId"] }
       }
     }

@@ -25,13 +25,13 @@ final class ProductServiceTests: XCTestCase {
         var capturedBarcode: String?
         mockClientService.onProductByBarcodeCalled = { barcode in
             capturedBarcode = barcode
-            return BarcodeMatch(productId: "8", variantId: "22")
+            return BarcodeMatch(handle: "black-wool-coat-8", variantId: "22")
         }
 
         let match = try await sut.productByBarcode("5901234123457")
 
         XCTAssertEqual(capturedBarcode, "5901234123457")
-        XCTAssertEqual(match, BarcodeMatch(productId: "8", variantId: "22"))
+        XCTAssertEqual(match, BarcodeMatch(handle: "black-wool-coat-8", variantId: "22"))
     }
 
     func test_product_by_barcode_with_no_match_returns_nil() async throws {

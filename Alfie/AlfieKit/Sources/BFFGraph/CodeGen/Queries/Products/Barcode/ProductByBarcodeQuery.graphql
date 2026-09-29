@@ -3,6 +3,7 @@ query ProductByBarcodeQuery(
 ) {
     productByBarcode(barcode: $barcode) {
         id
+        slug
         variantId
     }
 }

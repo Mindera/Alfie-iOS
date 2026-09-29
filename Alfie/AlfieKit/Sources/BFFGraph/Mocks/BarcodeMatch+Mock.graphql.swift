@@ -11,6 +11,7 @@ class BarcodeMatch: MockObject {
 
   struct MockFields {
     @Field<BFFGraphAPI.ID>("id") public var id
+    @Field<String>("slug") public var slug
     @Field<BFFGraphAPI.ID>("variantId") public var variantId
   }
 }
@@ -18,10 +19,12 @@ class BarcodeMatch: MockObject {
 extension Mock where O == BarcodeMatch {
   convenience init(
     id: BFFGraphAPI.ID? = nil,
+    slug: String? = nil,
     variantId: BFFGraphAPI.ID? = nil
   ) {
     self.init()
     _setScalar(id, for: \.id)
+    _setScalar(slug, for: \.slug)
     _setScalar(variantId, for: \.variantId)
   }
 }
