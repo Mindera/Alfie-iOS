@@ -8,6 +8,9 @@ final class BarcodeIntegrationTests: IntegrationTestCase {
     /// "this platform does not implement this": a 501. Every other failure — auth, schema, a server
     /// having a bad day — fails the test and says what it was, rather than passing as a skip.
     ///
+    /// A bare HTTP 501 with no GraphQL body would fail rather than skip. Which shape a non-SCAYLE
+    /// BFF actually answers with is unverified, and guessing it would widen the skip on no evidence.
+    ///
     /// See issue #156 for forwarding the platform properly.
     func test_product_by_barcode_with_unknown_barcode_returns_nil() async throws {
         let match: BarcodeMatch?
@@ -23,8 +26,11 @@ final class BarcodeIntegrationTests: IntegrationTestCase {
         XCTAssertNil(match)
     }
 
+    /// Only a GraphQL error carrying `extensions.status` can say 501 here. `.serverError` is built
+    /// in one place, for the 500/502/503/504 the retry interceptor treats as transient, so a
+    /// `.serverError(status: 501)` never occurs and testing for it only implied cover it never had.
     private static func isUnimplemented(_ error: BFFRequestError) -> Bool {
-        error.graphqlErrorStatus == notImplemented || error.type == .serverError(status: notImplemented)
+        error.graphqlErrorStatus == notImplemented
     }
 
     private static let notImplemented = 501
