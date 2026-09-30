@@ -29,7 +29,7 @@ final class ScannerViewModelTests: XCTestCase {
     private var scheduler: TestScheduler!
     private var sut: ScannerViewModel!
 
-    /// The format the generator prints — see `Tools/AlfieCodeGen` and ADR-0001.
+    /// The format an Alfie code carries — see ADR-0001.
     private static let alfieCode = ScannedPayload.qr("https://localhost:4000/product/slim-indigo-jean")
     private static let alfieCodeWithSku = ScannedPayload.qr("https://localhost:4000/product/slim-indigo-jean?sku=SKU-42")
     private static let multiSegmentAlfieCode = ScannedPayload.qr("https://localhost:4000/product/mens/jeans/slim-indigo")

@@ -33,7 +33,9 @@ holds. Encoding the Handle directly removes the lookup entirely.
   Product it names. The rest of this decision stands — Alfie codes are still printed, and still win
   when both are in frame.
 - Printing is now a dependency of the feature: adding Products to a demo means regenerating and
-  reprinting codes.
+  reprinting codes. The generator that did this in-repo was **removed on 2026-10-01** along with
+  the demo, so that regeneration now needs a tool from outside this repository. Nothing about the
+  code's format changed — the app still reads `https://<host>/product/<handle>?sku=<sku>`.
 - The app needs no new BFF query, no new credential, and no associated-domains entitlement, because
   the Handle arrives inside the code and the URL is parsed in-app.
 - If in-store scanning ever becomes a production feature across a real estate of stock, this

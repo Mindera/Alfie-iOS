@@ -564,7 +564,7 @@ The developer will verify the camera path manually on device.
     parser cannot tell a route suffix from a Handle segment without a catalogue to ask — this is the
     same trade BigCommerce route paths force. Worth revisiting if a `/product/` sub-route is ever
     added.
-- A generator script lives in `Tools/`: it takes a list of Handles and writes print-ready PNG files.
+- ~~A generator script lives in `Tools/`: it takes a list of Handles and writes print-ready PNG files.~~ **Removed 2026-10-01**, with the demo it served. Producing Alfie codes for any future demo means a tool outside this repository; the app's side of the format is unchanged.
 - New Swift files must be added to the Xcode project by a human — agents must not edit
   `project.pbxproj`.
 - For the demo, print codes for five to eight Products, of which at least two have an out-of-stock
@@ -627,3 +627,4 @@ The developer will verify the camera path manually on device.
 | 2026-09-14 | Review fixes: explainer is a native sheet owned by `ScannerViewModel` and skipped on unsupported devices; Back cancels the pending open; notice timer and close button in the ViewModel/view; header stays black in failure states; `sku` preselection documented as applying to all product links | Khoi Nguyen |
 | 2026-09-17 | ADR-0002: Barcodes resolved through the BFF's `productByBarcode` on SCAYLE (Alfie-BFF PR #46); symbology-based classification; Scenario 4 replaced by lookup scenarios 4–4f; `variantId` deep-link preselection; lookup keys, edge cases, limitation and tests updated | Khoi Nguyen |
 | 2026-09-18 | Code 128 added beside EAN-13, because Selfridges tags print their GTIN-13 in a Code 128 symbol; Scenario 4, Q2 and the test checklist widened from EAN-13 to "a Barcode"; the real-tag and reference-key limitations recorded | Khoi Nguyen |
+| 2026-10-01 | `Tools/AlfieCodeGen` and `generate-alfie-codes.sh` removed as demo-only tooling, so the repository no longer produces printable Alfie codes; #135 is not delivered by this branch | Khoi Nguyen |
