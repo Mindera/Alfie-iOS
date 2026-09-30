@@ -59,7 +59,9 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
             urlQueryParameters: productListingScreenConfiguration.urlQueryParameters,
             mode: productListingScreenConfiguration.mode,
             navigate: { [weak self] in self?.navigate($0) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.isSearchPresented = true },
+            goBack: {},
+            editSearchTerm: {}
         )
     }
 
@@ -73,7 +75,9 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate($0) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.isSearchPresented = true },
+            goBack: {},
+            editSearchTerm: {}
         )
     }
 
@@ -181,7 +185,9 @@ public final class ProductListingFlowViewModel: ObservableObject, FlowViewModelP
                     )
                 }
             },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.isSearchPresented = true },
+            goBack: { [weak self] in self?.searchFlowViewModel.pop() },
+            editSearchTerm: { [weak self] in self?.searchFlowViewModel.navigate(.search) }
         )
     }
 

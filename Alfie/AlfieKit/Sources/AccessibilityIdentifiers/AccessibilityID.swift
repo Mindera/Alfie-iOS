@@ -122,6 +122,8 @@ public enum AccessibilityID {
         public static let retryButton = "productListing.retry.button"
         public static let filterChips = "productListing.filterChips"
         public static func filterChip(index: Int) -> String { "productListing.filterChip.\(index).button" }
+        public static let searchBackButton = "productListing.search.back.button"
+        public static let searchBar = "productListing.search.bar"
 
         // MARK: Refine sheet
 

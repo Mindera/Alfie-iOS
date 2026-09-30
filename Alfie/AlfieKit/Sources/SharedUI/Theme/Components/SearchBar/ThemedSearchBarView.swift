@@ -159,7 +159,6 @@ public struct ThemedSearchBarView: View {
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
     @State private var isCancelButtonVisible = false
-    @State private var isClearButtonVisible = false
 
     private let defaultPlaceholder: String
     private let focusedPlaceholder: String
@@ -180,6 +179,10 @@ public struct ThemedSearchBarView: View {
         isFocused ? focusedPlaceholder : defaultPlaceholder
     }
 
+    private var isClearButtonVisible: Bool {
+        isFocused && !text.isEmpty
+    }
+
     public init(
         searchText: Binding<String>,
         placeholder: String,
@@ -198,6 +201,7 @@ public struct ThemedSearchBarView: View {
         onFocusChange: ((Bool) -> Void)? = nil
     ) {
         _searchText = searchText
+        _text = State(initialValue: searchText.wrappedValue)
         defaultPlaceholder = placeholder
         focusedPlaceholder = placeholderOnFocus ?? defaultPlaceholder
         self.theme = theme
@@ -252,19 +256,25 @@ public struct ThemedSearchBarView: View {
                     isFocused = true
                 }
                 .overlay(textFieldOverlayIcon, alignment: .trailing)
-                .onAppear {
+                .task {
                     guard case .on(let delay) = autoFocusWhenAppearing else { return }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        isFocused = true
-                    }
+                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    guard !Task.isCancelled else { return }
+                    isFocused = true
+                }
+                .onDisappear {
+                    isFocused = false
                 }
                 .onChange(of: isFocused) { newValue in
                     isCancelButtonVisible = newValue && dismissConfiguration.isCancelType
                     onFocusChange?(newValue)
                 }
                 .onChange(of: text) { newValue in
-                    isClearButtonVisible = !newValue.isEmpty
                     searchText = newValue
+                }
+                .onChange(of: searchText) { newValue in
+                    guard newValue != text else { return }
+                    text = newValue
                 }
                 .onSubmit {
                     onSubmitTap?()

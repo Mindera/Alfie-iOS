@@ -109,4 +109,14 @@ final class ProductListingViewSnapshotTests: XCTestCase {
                        as: .defaultImage(),
                        record: isRecording)
     }
+
+    /// Search results swap the title for a back chevron and a read-only bar holding the search term.
+    func test_productListingView_searchResultsHeader() {
+        let viewModel = makeViewModel(products: makeProducts(4))
+        viewModel.searchTerm = "cream"
+        let sut = NavigationStack { ProductListingView(viewModel: viewModel) }
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
 }

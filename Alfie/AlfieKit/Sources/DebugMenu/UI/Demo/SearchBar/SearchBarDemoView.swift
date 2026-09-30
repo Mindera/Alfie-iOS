@@ -64,6 +64,13 @@ struct SearchBarDemoView: View {
             )
             .animation(.standard, value: searchBarTheme)
 
+            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
+                Text.build(theme.font.body.small("Read-only Search Bar:"))
+                SearchBarEntryButton(placeholder: placeholder, accessibilityIdentifier: "", action: {})
+                SearchBarEntryButton(placeholder: placeholder, searchTerm: "cream", accessibilityIdentifier: "", action: {})
+            }
+            .padding(.horizontal, Primitives.Spacing.spacing12)
+
             VStack(alignment: .leading) {
                 Text.build(theme.font.body.small("Search Bar Theme:"))
                 Picker(selection: $searchBarTheme) {

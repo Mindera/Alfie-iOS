@@ -24,6 +24,8 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
     private let showSearch: () -> Void
+    private let goBack: () -> Void
+    private let editSearchTerm: () -> Void
     @Published public private(set) var state: PaginatedViewState<
         ProductListingViewStateModel, ProductListingViewErrorType
     >
@@ -60,6 +62,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         state.value?.title ?? ""
     }
 
+    public var searchTerm: String? {
+        mode == .searchResults ? query : nil
+    }
+
     public var totalNumberOfProducts: Int {
         pagination?.totalCount ?? 0
     }
@@ -81,7 +87,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize,
         navigate: @escaping (ProductListingRoute) -> Void,
-        showSearch: @escaping () -> Void
+        showSearch: @escaping () -> Void,
+        goBack: @escaping () -> Void,
+        editSearchTerm: @escaping () -> Void
     ) {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
@@ -93,6 +101,8 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         wishlistContent = []
         self.navigate = navigate
         self.showSearch = showSearch
+        self.goBack = goBack
+        self.editSearchTerm = editSearchTerm
     }
 
     public func viewDidAppear() {
@@ -129,6 +139,14 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
 
     public func didTapSearch() {
         showSearch()
+    }
+
+    public func didTapBack() {
+        goBack()
+    }
+
+    public func didTapSearchBar() {
+        editSearchTerm()
     }
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {

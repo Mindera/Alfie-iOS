@@ -69,16 +69,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 onDismiss: { viewModel.didDismissRefreshError() }
             )
         }
-        .toolbarView(
-            configuration: .init(
-                category: viewModel.title,
-                searchText: nil,
-                urlQueryParameters: nil,
-                mode: .listing
-            ),
-            showSearchButton: viewModel.showSearchButton,
-            openSearchAction: viewModel.didTapSearch
-        )
+        .toolbarView(for: viewModel)
         .onAppear {
             viewModel.viewDidAppear()
         }
@@ -204,6 +195,32 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
 
 private enum AccessibilityID {
     static let searchBtn = "search-btn"
+}
+
+// MARK: - Toolbar
+
+private extension View {
+    @ViewBuilder
+    func toolbarView(for viewModel: some ProductListingViewModelProtocol) -> some View {
+        if let searchTerm = viewModel.searchTerm {
+            searchResultsToolbarView(
+                searchTerm: searchTerm,
+                backAction: viewModel.didTapBack,
+                searchBarAction: viewModel.didTapSearchBar
+            )
+        } else {
+            toolbarView(
+                configuration: .init(
+                    category: viewModel.title,
+                    searchText: nil,
+                    urlQueryParameters: nil,
+                    mode: .listing
+                ),
+                showSearchButton: viewModel.showSearchButton,
+                openSearchAction: viewModel.didTapSearch
+            )
+        }
+    }
 }
 
 // MARK: - Private Methods

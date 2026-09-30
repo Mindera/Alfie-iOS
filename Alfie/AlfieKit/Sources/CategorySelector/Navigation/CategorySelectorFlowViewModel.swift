@@ -99,7 +99,9 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.isSearchPresented = true },
+            goBack: {},
+            editSearchTerm: {}
         )
     }
 
@@ -208,7 +210,9 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
                     )
                 }
             },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.isSearchPresented = true },
+            goBack: { [weak self] in self?.searchFlowViewModel.pop() },
+            editSearchTerm: { [weak self] in self?.searchFlowViewModel.navigate(.search) }
         )
     }
 

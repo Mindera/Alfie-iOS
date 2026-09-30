@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Foundation
 import SharedUI
 import SwiftUI
@@ -30,6 +31,42 @@ extension View {
                 }
             )
         )
+    }
+
+    func searchResultsToolbarView(
+        searchTerm: String,
+        backAction: @escaping () -> Void,
+        searchBarAction: @escaping () -> Void
+    ) -> some View {
+        self
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: Primitives.Spacing.spacing0) {
+                VStack(spacing: Primitives.Spacing.spacing0) {
+                    HStack(spacing: Primitives.Spacing.spacing8) {
+                        Button(action: backAction) {
+                            ThemedIcon(
+                                .chevronLeft,
+                                size: .medium,
+                                tint: Primitives.Colours.neutrals800,
+                                accessibilityLabel: L10n.Accessibility.back
+                            )
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifiers.AccessibilityID.ProductListing.searchBackButton)
+
+                        SearchBarEntryButton(
+                            placeholder: L10n.SearchBar.placeholder,
+                            searchTerm: searchTerm,
+                            accessibilityIdentifier: AccessibilityIdentifiers.AccessibilityID.ProductListing.searchBar,
+                            action: searchBarAction
+                        )
+                    }
+                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .padding(.vertical, Primitives.Spacing.spacing8)
+
+                    ThemedDivider.horizontalThin
+                }
+                .background(Primitives.Colours.neutrals0)
+            }
     }
 }
 

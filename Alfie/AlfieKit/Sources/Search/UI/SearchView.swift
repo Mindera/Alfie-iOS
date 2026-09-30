@@ -7,10 +7,12 @@ import Mocks
 
 public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
+    private let autoFocus: Bool
     private let transition: SearchBarTransition? // Move to VM?
 
-    public init(viewModel: ViewModel, transition: SearchBarTransition? = nil) {
+    public init(viewModel: ViewModel, autoFocus: Bool = true, transition: SearchBarTransition? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.autoFocus = autoFocus
         self.transition = transition
     }
 
@@ -35,7 +37,7 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
             dismissConfiguration: .init(type: .back),
             contentOverlayColorWhenFocused: Primitives.Colours.neutrals0,
             showDivider: true,
-            autoFocus: true,
+            autoFocus: autoFocus,
             transition: transition,
             onCancel: { onCancel() },
             onSubmit: { _ in onSubmit() }
