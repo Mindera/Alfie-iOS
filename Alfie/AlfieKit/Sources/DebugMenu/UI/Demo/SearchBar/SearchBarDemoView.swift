@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import SharedUI
 import SwiftUI
 
@@ -66,8 +67,17 @@ struct SearchBarDemoView: View {
 
             VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
                 Text.build(theme.font.body.small("Read-only Search Bar:"))
-                SearchBarEntryButton(placeholder: placeholder, accessibilityIdentifier: "", action: {})
-                SearchBarEntryButton(placeholder: placeholder, searchTerm: "cream", accessibilityIdentifier: "", action: {})
+                SearchBarEntryButton(
+                    placeholder: placeholder,
+                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoPlaceholderButton,
+                    action: {}
+                )
+                SearchBarEntryButton(
+                    placeholder: placeholder,
+                    searchTerm: "cream",
+                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoSearchTermButton,
+                    action: {}
+                )
             }
             .padding(.horizontal, Primitives.Spacing.spacing12)
 

@@ -115,6 +115,7 @@ public enum AccessibilityID {
 
     public enum ProductListing {
         public static let screen = "productListing"
+        public static let titleHeader = "productListing.title.header"
         public static let filterButton = "productListing.filter.button"
         public static let resultsLabel = "productListing.results.label"
         public static let listStyleGridButton = "productListing.listStyle.grid.button"
@@ -123,7 +124,7 @@ public enum AccessibilityID {
         public static let filterChips = "productListing.filterChips"
         public static func filterChip(index: Int) -> String { "productListing.filterChip.\(index).button" }
         public static let searchBackButton = "productListing.search.back.button"
-        public static let searchBar = "productListing.search.bar"
+        public static let searchBarButton = "productListing.search.bar.button"
 
         // MARK: Refine sheet
 
@@ -159,5 +160,12 @@ public enum AccessibilityID {
 
     public enum Account {
         public static let settingsSection = "account.settings.section"
+    }
+
+    // MARK: - DebugMenu
+
+    public enum DebugMenu {
+        public static let searchBarDemoPlaceholderButton = "debugMenu.searchBarDemo.placeholder.button"
+        public static let searchBarDemoSearchTermButton = "debugMenu.searchBarDemo.searchTerm.button"
     }
 }

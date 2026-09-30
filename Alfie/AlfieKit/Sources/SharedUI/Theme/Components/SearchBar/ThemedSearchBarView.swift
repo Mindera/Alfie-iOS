@@ -159,6 +159,7 @@ public struct ThemedSearchBarView: View {
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
     @State private var isCancelButtonVisible = false
+    @State private var isClearButtonVisible = false
 
     private let defaultPlaceholder: String
     private let focusedPlaceholder: String
@@ -177,10 +178,6 @@ public struct ThemedSearchBarView: View {
 
     private var currentPlaceholder: String {
         isFocused ? focusedPlaceholder : defaultPlaceholder
-    }
-
-    private var isClearButtonVisible: Bool {
-        isFocused && !text.isEmpty
     }
 
     public init(
@@ -270,6 +267,7 @@ public struct ThemedSearchBarView: View {
                     onFocusChange?(newValue)
                 }
                 .onChange(of: text) { newValue in
+                    isClearButtonVisible = !newValue.isEmpty
                     searchText = newValue
                 }
                 .onChange(of: searchText) { newValue in
@@ -353,17 +351,7 @@ public struct ThemedSearchBarView: View {
 
         switch dismissConfiguration.type {
         case .back:
-            Button {
-                dismissBlock()
-            } label: {
-                ThemedIcon(
-                    .chevronLeft,
-                    size: .medium,
-                    tint: Primitives.Colours.neutrals800,
-                    accessibilityLabel: L10n.Accessibility.back
-                )
-            }
-            .accessibilityIdentifier(dismissConfiguration.accessibilityId)
+            ThemedBackButton(accessibilityIdentifier: dismissConfiguration.accessibilityId, action: dismissBlock)
 
         case .cancel(let title):
             Button {

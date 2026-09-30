@@ -7,25 +7,39 @@ import XCTest
 @testable import Search
 
 final class SearchFlowViewModelTests: XCTestCase {
-    private func makeSUT(closeSearchAction: @escaping () -> Void = {}) -> SearchFlowViewModel {
+    private func makeSUT() -> SearchFlowViewModel {
         SearchFlowViewModel(
             dependencies: SearchDependencyContainer(
                 recentsService: MockRecentsService(),
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
                 log: Log.DummyLogger()
             ),
-            intentViewBuilder: { _ in AnyView(EmptyView()) },
-            closeSearchAction: closeSearchAction
+            intentViewBuilder: { _ in AnyView(EmptyView()) }
         )
+    }
+
+    private func makePresentedSUT() -> SearchFlowViewModel {
+        let sut = makeSUT()
+        sut.present()
+        return sut
     }
 
     private let searchResults = SearchRoute.searchIntent(.productListing(searchTerm: "cream", category: nil))
 
-    func test_init_focuses_search_bar_on_appear() {
+    func test_init_focuses_search_bar_on_appear_and_is_not_presented() {
         let sut = makeSUT()
 
         XCTAssertTrue(sut.focusesSearchBarOnAppear)
         XCTAssertTrue(sut.path.isEmpty)
+        XCTAssertFalse(sut.isPresented)
+    }
+
+    func test_present_presents_search() {
+        let sut = makeSUT()
+
+        sut.present()
+
+        XCTAssertTrue(sut.isPresented)
     }
 
     func test_opening_search_results_stops_focusing_search_bar_on_appear() {
@@ -57,16 +71,15 @@ final class SearchFlowViewModelTests: XCTestCase {
         XCTAssertTrue(sut.path.isEmpty)
     }
 
-    func test_closing_search_focuses_search_bar_next_time_it_opens() {
-        var closeCount = 0
-        let sut = makeSUT(closeSearchAction: { closeCount += 1 })
+    func test_closing_search_from_search_screen_dismisses_it_and_focuses_search_bar_next_time() {
+        let sut = makePresentedSUT()
         sut.navigate(searchResults)
         sut.pop()
 
         sut.makeSearchModel().closeSearch()
 
+        XCTAssertFalse(sut.isPresented)
         XCTAssertTrue(sut.focusesSearchBarOnAppear)
-        XCTAssertEqual(closeCount, 1)
     }
 
     // MARK: - Search screen on top
@@ -77,8 +90,16 @@ final class SearchFlowViewModelTests: XCTestCase {
         return ({ values }, subscription)
     }
 
-    func test_pushing_search_results_takes_search_screen_off_top() {
+    func test_search_screen_is_not_on_top_while_search_is_not_presented() {
         let sut = makeSUT()
+
+        let recorder = recordSearchScreenOnTop(of: sut)
+
+        XCTAssertEqual(recorder.values(), [false])
+    }
+
+    func test_pushing_search_results_takes_search_screen_off_top() {
+        let sut = makePresentedSUT()
         let recorder = recordSearchScreenOnTop(of: sut)
 
         sut.navigate(searchResults)
@@ -87,7 +108,7 @@ final class SearchFlowViewModelTests: XCTestCase {
     }
 
     func test_popping_back_to_search_screen_puts_it_on_top_again() {
-        let sut = makeSUT()
+        let sut = makePresentedSUT()
         sut.navigate(searchResults)
         let recorder = recordSearchScreenOnTop(of: sut)
 
@@ -97,7 +118,7 @@ final class SearchFlowViewModelTests: XCTestCase {
     }
 
     func test_pushing_a_product_page_over_search_results_keeps_search_screen_off_top() {
-        let sut = makeSUT()
+        let sut = makePresentedSUT()
         sut.navigate(searchResults)
         let recorder = recordSearchScreenOnTop(of: sut)
 
@@ -106,13 +127,25 @@ final class SearchFlowViewModelTests: XCTestCase {
         XCTAssertEqual(recorder.values(), [false])
     }
 
-    func test_reset_returns_to_search_screen_and_focuses_search_bar() {
-        let sut = makeSUT()
+    func test_close_dismisses_search_returns_to_search_screen_and_focuses_search_bar() {
+        let sut = makePresentedSUT()
         sut.navigate(searchResults)
 
-        sut.reset()
+        sut.close()
 
+        XCTAssertFalse(sut.isPresented)
         XCTAssertTrue(sut.path.isEmpty)
         XCTAssertTrue(sut.focusesSearchBarOnAppear)
+    }
+
+    func test_close_emits_no_search_overlay() {
+        let sut = makePresentedSUT()
+        var overlays: [AnyView?] = []
+        let subscription = sut.overlayViewPublisher.sink { overlays.append($0) }
+
+        sut.close()
+
+        XCTAssertEqual(overlays.map { $0 != nil }, [true, false])
+        subscription.cancel()
     }
 }

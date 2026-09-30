@@ -13,50 +13,22 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public typealias Route = HomeRoute
     @Published public var path = NavigationPath()
     private let dependencies: HomeFlowDependencyContainer
-    @Published private var isSearchPresented = false
-    @Published private var overlayView: AnyView?
-    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
-    public var isSearchScreenOnTopPublisher: AnyPublisher<Bool, Never> {
-        $isSearchPresented
-            .combineLatest(searchFlowViewModel.isSearchScreenOnTopPublisher)
-            .map { $0 && $1 }
-            .removeDuplicates()
-            .eraseToAnyPublisher()
-    }
-    private var subscriptions = Set<AnyCancellable>()
+    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { searchFlowViewModel.overlayViewPublisher }
+    public var isSearchScreenOnTopPublisher: AnyPublisher<Bool, Never> { searchFlowViewModel.isSearchScreenOnTopPublisher }
 
-    private lazy var searchFlowViewModel: SearchFlowViewModel = {
-        SearchFlowViewModel(
-            dependencies: dependencies.searchDependencyContainer,
-            intentViewBuilder: { [weak self] in
-                self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
-            },
-            closeSearchAction: { [weak self] in self?.isSearchPresented = false }
-        )
-    }()
+    private lazy var searchFlowViewModel = SearchFlowViewModel(
+        dependencies: dependencies.searchDependencyContainer,
+        intentViewBuilder: { [weak self] in
+            self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
+        }
+    )
 
     public init(dependencies: HomeFlowDependencyContainer) {
         self.dependencies = dependencies
-        setupBindings()
     }
 
     public func closeSearch() {
-        isSearchPresented = false
-        searchFlowViewModel.reset()
-    }
-
-    private func setupBindings() {
-        $isSearchPresented
-            .sink { [weak self] isSearchPresented in
-                guard let self else { return }
-
-                if isSearchPresented {
-                    overlayView = AnyView(SearchFlowView(viewModel: searchFlowViewModel))
-                } else {
-                    overlayView = nil
-                }
-            }
-            .store(in: &subscriptions)
+        searchFlowViewModel.close()
     }
 
     // MARK: - View Models for HomeRoute
@@ -65,7 +37,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
         HomeViewModel(
             dependencies: dependencies.homeDependencyContainer,
             navigate: { [weak self] route in self?.navigate(route) },
-            showSearch: { [weak self] in self?.isSearchPresented = true }
+            showSearch: { [weak self] in self?.searchFlowViewModel.present() }
         )
     }
 
@@ -85,9 +57,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: { [weak self] in self?.isSearchPresented = true },
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: { [weak self] in self?.searchFlowViewModel.present() })
         )
     }
 
@@ -198,9 +168,10 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
                     )
                 }
             },
-            showSearch: { [weak self] in self?.isSearchPresented = true },
-            goBack: { [weak self] in self?.searchFlowViewModel.pop() },
-            editSearchTerm: { [weak self] in self?.searchFlowViewModel.navigate(.search) }
+            searchNavigation: .searchResults(
+                goBack: { [weak self] in self?.searchFlowViewModel.pop() },
+                editSearchTerm: { [weak self] in self?.searchFlowViewModel.navigate(.search) }
+            )
         )
     }
 

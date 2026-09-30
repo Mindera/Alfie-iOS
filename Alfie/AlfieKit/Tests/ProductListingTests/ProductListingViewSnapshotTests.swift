@@ -110,8 +110,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// Search results swap the title for a back chevron and a read-only bar holding the search term.
-    func test_productListingView_searchResultsHeader() {
+    func test_search_results_header_shows_back_chevron_and_search_term() {
         let viewModel = makeViewModel(products: makeProducts(4))
         viewModel.searchTerm = "cream"
         let sut = NavigationStack { ProductListingView(viewModel: viewModel) }

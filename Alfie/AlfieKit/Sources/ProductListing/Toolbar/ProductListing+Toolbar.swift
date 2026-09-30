@@ -19,7 +19,7 @@ extension View {
                 principalItems: {
                     ThemedToolbarTitle(
                         style: .text(configuration.category.orEmpty),
-                        accessibilityId: AccessibilityID.titleHeader
+                        accessibilityId: AccessibilityID.ProductListing.titleHeader
                     )
                 },
                 trailingItems: {
@@ -43,20 +43,15 @@ extension View {
             .safeAreaInset(edge: .top, spacing: Primitives.Spacing.spacing0) {
                 VStack(spacing: Primitives.Spacing.spacing0) {
                     HStack(spacing: Primitives.Spacing.spacing8) {
-                        Button(action: backAction) {
-                            ThemedIcon(
-                                .chevronLeft,
-                                size: .medium,
-                                tint: Primitives.Colours.neutrals800,
-                                accessibilityLabel: L10n.Accessibility.back
-                            )
-                        }
-                        .accessibilityIdentifier(AccessibilityIdentifiers.AccessibilityID.ProductListing.searchBackButton)
+                        ThemedBackButton(
+                            accessibilityIdentifier: AccessibilityID.ProductListing.searchBackButton,
+                            action: backAction
+                        )
 
                         SearchBarEntryButton(
                             placeholder: L10n.SearchBar.placeholder,
                             searchTerm: searchTerm,
-                            accessibilityIdentifier: AccessibilityIdentifiers.AccessibilityID.ProductListing.searchBar,
+                            accessibilityIdentifier: AccessibilityID.ProductListing.searchBarButton,
                             action: searchBarAction
                         )
                     }
@@ -68,10 +63,4 @@ extension View {
                 .background(Primitives.Colours.neutrals0)
             }
     }
-}
-
-// MARK: - AccessibilityId
-
-private enum AccessibilityID {
-    static let titleHeader = "title-header"
 }

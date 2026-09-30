@@ -172,7 +172,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             title: title,
             message: message,
             buttons: [
-                .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityIdentifiers.AccessibilityID.ProductListing.retryButton) {
+                .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityID.ProductListing.retryButton) {
                     Task { await viewModel.retry() }
                 },
             ]
@@ -189,12 +189,6 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
         }
     }
-}
-
-// MARK: - AccessibilityId
-
-private enum AccessibilityID {
-    static let searchBtn = "search-btn"
 }
 
 // MARK: - Toolbar

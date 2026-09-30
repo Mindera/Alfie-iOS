@@ -20,7 +20,7 @@ final class SearchViewSnapshotTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_searchView_blank() {
+    func test_search_view_without_recent_searches_is_blank() {
         mockViewModel.state = .blank
 
         let sut = SearchView(viewModel: mockViewModel)
@@ -28,7 +28,7 @@ final class SearchViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
     }
 
-    func test_searchView_withRecentSearches() {
+    func test_search_view_with_recent_searches_lists_them() {
         mockViewModel.state = .recentSearches
         mockViewModel.recentSearchesViewModel.recentSearches = [
             .text(value: "jeans"),

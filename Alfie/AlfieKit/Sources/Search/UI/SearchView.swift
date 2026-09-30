@@ -8,7 +8,7 @@ import Mocks
 public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     private let autoFocus: Bool
-    private let transition: SearchBarTransition? // Move to VM?
+    private let transition: SearchBarTransition?
 
     public init(viewModel: ViewModel, autoFocus: Bool = true, transition: SearchBarTransition? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel)

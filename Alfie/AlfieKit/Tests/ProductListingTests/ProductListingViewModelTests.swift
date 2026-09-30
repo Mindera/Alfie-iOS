@@ -24,9 +24,7 @@ final class ProductListingViewModelTests: XCTestCase {
                 log: log
             ),
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
     }
 
@@ -128,8 +126,7 @@ final class ProductListingViewModelTests: XCTestCase {
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = ProductListingViewModel.Constants.defaultSkeletonItemsSize,
         wishlistService: WishlistServiceProtocol? = nil,
-        goBack: @escaping () -> Void = {},
-        editSearchTerm: @escaping () -> Void = {}
+        searchNavigation: ProductListingSearchNavigation = .listing(openSearch: {})
     ) -> ProductListingViewModel {
         .init(
             dependencies: ProductListingDependencyContainer(
@@ -147,9 +144,7 @@ final class ProductListingViewModelTests: XCTestCase {
             mode: mode,
             skeletonItemsSize: skeletonItemsSize,
             navigate: { _ in },
-            showSearch: {},
-            goBack: goBack,
-            editSearchTerm: editSearchTerm
+            searchNavigation: searchNavigation
         )
     }
 
@@ -173,8 +168,10 @@ final class ProductListingViewModelTests: XCTestCase {
         sut = makeSUT(
             searchText: "cream",
             mode: .searchResults,
-            goBack: { goBackCount += 1 },
-            editSearchTerm: { editSearchTermCount += 1 }
+            searchNavigation: .searchResults(
+                goBack: { goBackCount += 1 },
+                editSearchTerm: { editSearchTermCount += 1 }
+            )
         )
 
         sut.didTapBack()
@@ -189,8 +186,10 @@ final class ProductListingViewModelTests: XCTestCase {
         sut = makeSUT(
             searchText: "cream",
             mode: .searchResults,
-            goBack: { goBackCount += 1 },
-            editSearchTerm: { editSearchTermCount += 1 }
+            searchNavigation: .searchResults(
+                goBack: { goBackCount += 1 },
+                editSearchTerm: { editSearchTermCount += 1 }
+            )
         )
 
         sut.didTapSearchBar()
@@ -213,9 +212,7 @@ final class ProductListingViewModelTests: XCTestCase {
             urlQueryParameters: ["category": "women/clothing"],
             skeletonItemsSize: 2,
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -237,9 +234,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             urlQueryParameters: ["category": "women/clothing"],
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -330,9 +325,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             urlQueryParameters: ["category": "women/clothing"],
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         // First call (after == nil) returns a page with hasNextPage=true + cursor.
@@ -393,9 +386,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             mode: .listing,
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         mockProductListing.onProductListPageCalled = { collectionHandle, _, sort, _ in
@@ -427,9 +418,7 @@ final class ProductListingViewModelTests: XCTestCase {
             mode: .listing,
             skeletonItemsSize: 2,
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -450,9 +439,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             mode: .searchResults,
             navigate: { _ in },
-            showSearch: {},
-            goBack: {},
-            editSearchTerm: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         mockProductListing.onSearchPageCalled = { searchTerm, _, sort, _ in

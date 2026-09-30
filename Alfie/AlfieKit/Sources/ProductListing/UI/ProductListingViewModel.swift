@@ -23,9 +23,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public internal(set) var priceBounds: PriceFilterBounds?
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
-    private let showSearch: () -> Void
-    private let goBack: () -> Void
-    private let editSearchTerm: () -> Void
+    private let searchNavigation: ProductListingSearchNavigation
     @Published public private(set) var state: PaginatedViewState<
         ProductListingViewStateModel, ProductListingViewErrorType
     >
@@ -87,9 +85,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize,
         navigate: @escaping (ProductListingRoute) -> Void,
-        showSearch: @escaping () -> Void,
-        goBack: @escaping () -> Void,
-        editSearchTerm: @escaping () -> Void
+        searchNavigation: ProductListingSearchNavigation
     ) {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
@@ -100,9 +96,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         state = .loadingFirstPage(.init(title: "", products: Product.skeletons(count: skeletonItemsSize)))
         wishlistContent = []
         self.navigate = navigate
-        self.showSearch = showSearch
-        self.goBack = goBack
-        self.editSearchTerm = editSearchTerm
+        self.searchNavigation = searchNavigation
     }
 
     public func viewDidAppear() {
@@ -138,15 +132,15 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func didTapSearch() {
-        showSearch()
+        searchNavigation.openSearch()
     }
 
     public func didTapBack() {
-        goBack()
+        searchNavigation.goBack()
     }
 
     public func didTapSearchBar() {
-        editSearchTerm()
+        searchNavigation.editSearchTerm()
     }
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {

@@ -21,17 +21,13 @@ final class RootTabViewModelTabBarTests: XCTestCase {
     }
 
     private func makeSUT(initialTab: Model.Tab = .home) -> some RootTabViewModelProtocol {
-        let flows = AppFeatureViewModel(
-            serviceProvider: MockServiceProvider(),
-            log: Log.DummyLogger(),
-            startupCompletionDelay: 0,
-            scheduler: .immediate
-        ).rootTabViewModel
+        let serviceProvider = MockServiceProvider()
+        let flows = makeAppFeatureViewModel(serviceProvider: serviceProvider).rootTabViewModel
 
         return RootTabViewModel(
             tabs: flows.tabs,
             initialTab: initialTab,
-            serviceProvider: MockServiceProvider(),
+            serviceProvider: serviceProvider,
             bagFlowViewModel: flows.bagFlowViewModel,
             categorySelectorFlowViewModel: flows.categorySelectorFlowViewModel,
             homeFlowViewModel: flows.homeFlowViewModel,
@@ -95,17 +91,19 @@ final class RootTabViewModelTabBarTests: XCTestCase {
 
     // MARK: - App graph wiring
 
-    private func makeAppRootTabViewModel() -> some RootTabViewModelProtocol {
+    private func makeAppFeatureViewModel(
+        serviceProvider: MockServiceProvider = MockServiceProvider()
+    ) -> AppFeatureViewModel {
         AppFeatureViewModel(
-            serviceProvider: MockServiceProvider(),
+            serviceProvider: serviceProvider,
             log: Log.DummyLogger(),
             startupCompletionDelay: 0,
             scheduler: .immediate
-        ).rootTabViewModel
+        )
     }
 
     func test_opening_search_from_home_hides_tab_bar_and_keeps_home_highlighted() {
-        let sut = makeAppRootTabViewModel()
+        let sut = makeAppFeatureViewModel().rootTabViewModel
 
         sut.homeFlowViewModel.makeHomeViewModel().didTapSearch()
 
@@ -114,7 +112,7 @@ final class RootTabViewModelTabBarTests: XCTestCase {
     }
 
     func test_opening_search_from_shop_hides_tab_bar_and_keeps_shop_highlighted() {
-        let sut = makeAppRootTabViewModel()
+        let sut = makeAppFeatureViewModel().rootTabViewModel
         sut.selectedTab = .shop
 
         sut.categorySelectorFlowViewModel.presentSearch()
@@ -124,7 +122,7 @@ final class RootTabViewModelTabBarTests: XCTestCase {
     }
 
     func test_tapping_a_tab_while_search_is_open_closes_search_and_shows_tab_bar() {
-        let sut = makeAppRootTabViewModel()
+        let sut = makeAppFeatureViewModel().rootTabViewModel
         sut.homeFlowViewModel.makeHomeViewModel().didTapSearch()
 
         sut.selectedTab = .shop
