@@ -36,8 +36,10 @@ holds. Encoding the Handle directly removes the lookup entirely.
   reprinting codes. The generator that did this in-repo was **removed on 2026-10-01** along with
   the demo, so that regeneration now needs a tool from outside this repository. Nothing about the
   code's format changed — the app still reads `https://<host>/product/<handle>?sku=<sku>`.
-- The app needs no new BFF query, no new credential, and no associated-domains entitlement, because
-  the Handle arrives inside the code and the URL is parsed in-app.
+- ~~The app needs no new BFF query,~~ no new credential, and no associated-domains entitlement,
+  because the Handle arrives inside the code and the URL is parsed in-app. That still holds for the
+  Alfie-code path. **Superseded in part by ADR-0002:** the Barcode path does add a query,
+  `productByBarcode`, which resolves on SCAYLE only. It added no credential and no entitlement.
 - If in-store scanning ever becomes a production feature across a real estate of stock, this
   decision should be revisited — at that scale, tagging every garment is likely harder than
   provisioning an Admin credential.
