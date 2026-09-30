@@ -1236,28 +1236,6 @@
         }
       }
     },
-    "search.screen.empty_view.message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search for designers, categories and products"
-          }
-        }
-      }
-    },
-    "search.screen.empty_view.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Find what you're looking for"
-          }
-        }
-      }
-    },
     "search.screen.no_results_view.link" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1287,17 +1265,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "We were unable to find any results for your search ‘%@’"
-          }
-        }
-      }
-    },
-    "search.screen.recent_searches.clear_all.button.cta" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear"
           }
         }
       }

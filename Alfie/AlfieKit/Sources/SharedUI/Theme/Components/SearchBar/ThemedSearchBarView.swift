@@ -218,14 +218,12 @@ public struct ThemedSearchBarView: View {
         static let autoFocusTimeDelay: CGFloat = 0
         static let borderLineWidth: CGFloat = 1
         static let trailingIconSize: CGFloat = 16
-        static let cancelIconSize: CGFloat = 16
     }
 
     public var body: some View {
         HStack {
-            if isCancelButtonVisible && dismissConfiguration.type == .back {
+            if dismissConfiguration.type == .back {
                 cancelButton
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
             HStack {
@@ -261,7 +259,7 @@ public struct ThemedSearchBarView: View {
                     }
                 }
                 .onChange(of: isFocused) { newValue in
-                    isCancelButtonVisible = newValue && dismissConfiguration.type != .hidden
+                    isCancelButtonVisible = newValue && dismissConfiguration.isCancelType
                     onFocusChange?(newValue)
                 }
                 .onChange(of: text) { newValue in
@@ -348,12 +346,12 @@ public struct ThemedSearchBarView: View {
             Button {
                 dismissBlock()
             } label: {
-                Icon.arrowLeft.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .tint(Primitives.Colours.neutrals800)
-                    .frame(size: Constants.cancelIconSize)
+                ThemedIcon(
+                    .chevronLeft,
+                    size: .medium,
+                    tint: Primitives.Colours.neutrals800,
+                    accessibilityLabel: L10n.Accessibility.back
+                )
             }
             .accessibilityIdentifier(dismissConfiguration.accessibilityId)
 

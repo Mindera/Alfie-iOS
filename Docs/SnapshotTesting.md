@@ -90,6 +90,7 @@ of the build.
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
 | `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error, related products (6, 3, skeleton) |
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, both error states |
+| `SearchViewSnapshotTests` | `SearchTests` | Search screen blank and with recent searches |
 | `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one, unpriced totals |
 
 Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every

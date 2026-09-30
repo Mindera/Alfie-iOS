@@ -24,10 +24,6 @@ public final class RecentSearchesViewModel: RecentSearchesViewModelProtocol {
         navigate(.searchIntent(.productListing(searchTerm: recentSearch.value, category: nil)))
     }
 
-    public func didTapClearAll() {
-        recentsService?.removeAll()
-    }
-
     public func didTapRemove(on recentSearch: RecentSearch) {
         recentsService?.remove(recentSearch)
     }

@@ -17,7 +17,7 @@ final class RecentSearchesViewModelTests: XCTestCase {
             .recentSearch3,
             .recentSearch4
         ]).eraseToAnyPublisher()
-        sut = RecentSearchesViewModel(recentsService: mockRecentsService) { _ in }
+        sut = makeSUT()
     }
 
     override func tearDown() {
@@ -40,13 +40,17 @@ final class RecentSearchesViewModelTests: XCTestCase {
         waitForExpectations(timeout: .default)
     }
 
-    func test_DidTapClearAll_InRecentsService_CallsRemoveAll() {
-        let expectation = expectation(description: "DidTapClearAll_InRecentsService_CallsRemoveAll")
-        mockRecentsService.onRemoveAll = {
-            expectation.fulfill()
-        }
-        sut.didTapClearAll()
-        waitForExpectations(timeout: .default)
+    private func makeSUT(navigate: @escaping (SearchRoute) -> Void = { _ in }) -> RecentSearchesViewModel {
+        RecentSearchesViewModel(recentsService: mockRecentsService, navigate: navigate)
+    }
+
+    func test_did_tap_recent_search_navigates_to_search_results_for_its_search_term() {
+        var capturedRoutes: [SearchRoute] = []
+        sut = makeSUT { capturedRoutes.append($0) }
+
+        sut.didTapRecentSearch(.text(value: "linen"))
+
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen", category: nil))])
     }
 
     func test_OnViewDidDisappear_InRecentsService_CallsSave() {
