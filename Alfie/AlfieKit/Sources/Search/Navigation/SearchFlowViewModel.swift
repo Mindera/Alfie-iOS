@@ -1,3 +1,4 @@
+import Combine
 import Core
 import Model
 import SwiftUI
@@ -9,6 +10,10 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
     private let dependencies: SearchDependencyContainer
     let intentViewBuilder: (SearchIntent) -> AnyView
     private let closeSearchAction: () -> Void
+
+    public var isSearchScreenOnTopPublisher: AnyPublisher<Bool, Never> {
+        $path.map(\.isEmpty).removeDuplicates().eraseToAnyPublisher()
+    }
 
     public init(
         dependencies: SearchDependencyContainer,
@@ -27,10 +32,15 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
             dependencies: dependencies,
             navigate: { [weak self] in self?.navigate($0) },
             closeSearchAction: { [weak self] in
-                self?.focusesSearchBarOnAppear = true
+                self?.reset()
                 self?.closeSearchAction()
             }
         )
+    }
+
+    public func reset() {
+        focusesSearchBarOnAppear = true
+        popToRoot()
     }
 
     // MARK: - FlowViewModelProtocol
@@ -38,8 +48,7 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
     public func navigate(_ route: SearchRoute) {
         switch route {
         case .search:
-            focusesSearchBarOnAppear = true
-            popToRoot()
+            reset()
 
         case .searchIntent:
             focusesSearchBarOnAppear = false

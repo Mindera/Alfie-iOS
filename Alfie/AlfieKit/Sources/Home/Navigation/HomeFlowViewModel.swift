@@ -16,6 +16,13 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     @Published private var isSearchPresented = false
     @Published private var overlayView: AnyView?
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { $overlayView.eraseToAnyPublisher() }
+    public var isSearchScreenOnTopPublisher: AnyPublisher<Bool, Never> {
+        $isSearchPresented
+            .combineLatest(searchFlowViewModel.isSearchScreenOnTopPublisher)
+            .map { $0 && $1 }
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+    }
     private var subscriptions = Set<AnyCancellable>()
 
     private lazy var searchFlowViewModel: SearchFlowViewModel = {
@@ -31,6 +38,11 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     public init(dependencies: HomeFlowDependencyContainer) {
         self.dependencies = dependencies
         setupBindings()
+    }
+
+    public func closeSearch() {
+        isSearchPresented = false
+        searchFlowViewModel.reset()
     }
 
     private func setupBindings() {

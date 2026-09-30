@@ -31,8 +31,9 @@ WishlistFlowVM.Route == WishlistRoute {
     public let myAccountFlowViewModel: MyAccountFlowViewModel
     @Published public private(set) var overlayView: AnyView?
     @Published public private(set) var bagBadgeValue: Int?
-    @Published public var isOverlayVisible = false
+    @Published public private(set) var isTabBarHidden = false
     @Published public var isReadyForNavigation = false
+    private let closeSearch: () -> Void
     private var subscriptions = Set<AnyCancellable>()
 
     public init(
@@ -44,6 +45,8 @@ WishlistFlowVM.Route == WishlistRoute {
         homeFlowViewModel: HomeFlowVM,
         wishlistFlowViewModel: WishlistFlowVM,
         myAccountFlowViewModel: MyAccountFlowViewModel,
+        isSearchScreenOnTop: AnyPublisher<Bool, Never>,
+        closeSearch: @escaping () -> Void,
         scheduler: AnySchedulerOf<DispatchQueue> = .main
     ) {
         guard tabs.contains(initialTab) else {
@@ -59,11 +62,14 @@ WishlistFlowVM.Route == WishlistRoute {
         self.homeFlowViewModel = homeFlowViewModel
         self.wishlistFlowViewModel = wishlistFlowViewModel
         self.myAccountFlowViewModel = myAccountFlowViewModel
+        self.closeSearch = closeSearch
 
-        setupBindings()
+        setupBindings(isSearchScreenOnTop: isSearchScreenOnTop)
     }
 
     public func popToRoot(in tab: Model.Tab) {
+        closeSearch()
+
         switch tab {
         case .bag:
             bagFlowViewModel.popToRoot()
@@ -85,7 +91,6 @@ WishlistFlowVM.Route == WishlistRoute {
     public func navigate(_ route: TabRoute) {
         guard tabs.contains(route.tab) else { return }
         selectedTab = route.tab
-        overlayView = nil
 
         switch route {
         case .bag(let bagRoute):
@@ -105,7 +110,7 @@ WishlistFlowVM.Route == WishlistRoute {
         }
     }
 
-    private func setupBindings() {
+    private func setupBindings(isSearchScreenOnTop: AnyPublisher<Bool, Never>) {
         homeFlowViewModel.overlayViewPublisher
             .assignWeakly(to: \.overlayView, on: self)
             .store(in: &subscriptions)
@@ -114,9 +119,13 @@ WishlistFlowVM.Route == WishlistRoute {
             .assignWeakly(to: \.overlayView, on: self)
             .store(in: &subscriptions)
 
-        $overlayView
-            .map { $0 != nil }
-            .assignWeakly(to: \.isOverlayVisible, on: self)
+        isSearchScreenOnTop
+            .assignWeakly(to: \.isTabBarHidden, on: self)
+            .store(in: &subscriptions)
+
+        $selectedTab
+            .dropFirst()
+            .sink { [weak self] _ in self?.closeSearch() }
             .store(in: &subscriptions)
 
         // The cart service is the cart's single owner, so the badge follows every add, remove and

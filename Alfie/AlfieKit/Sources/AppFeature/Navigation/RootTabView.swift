@@ -52,7 +52,13 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
             // not survive each flow's NavigationStack, so scroll views would still run underneath.
             .padding(.bottom, tabBarSize.height)
 
-            if !viewModel.isOverlayVisible {
+            if let overlay = viewModel.overlayView {
+                overlay
+                    .padding(.bottom, viewModel.isTabBarHidden ? 0 : tabBarSize.height)
+                    .zIndex(1)
+            }
+
+            if !viewModel.isTabBarHidden {
                 CustomTabBarView(
                     tabs: viewModel.tabs,
                     currentTab: $viewModel.selectedTab,
@@ -67,16 +73,11 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
                     )
                 )
                 .transition(.move(edge: .bottom))
-                .zIndex(1)
-            }
-
-            if let overlay = viewModel.overlayView {
-                overlay
-                    .zIndex(2)
+                .zIndex(2)
             }
         }
         .ignoresSafeArea(.keyboard)
-        .animation(.easeInOut(duration: 0.3), value: viewModel.isOverlayVisible)
+        .animation(.easeInOut(duration: 0.3), value: viewModel.isTabBarHidden)
         .onAppear {
             viewModel.isReadyForNavigation = true
         }
