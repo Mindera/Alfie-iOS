@@ -263,6 +263,7 @@ final class ProductListingPagerTests: XCTestCase {
         XCTAssertTrue(sut.isFetching, "A stale commit must not release the current page request's latch")
         let commit = sut.commit(.success(.fixture(products: page1)), for: ticket)
         XCTAssertEqual(sut.state.value?.products.map(\.id), page1.map(\.id))
+        XCTAssertNil(commit?.transientError)
     }
 
     func test_first_page_landing_after_the_result_set_changed_is_dropped() throws {

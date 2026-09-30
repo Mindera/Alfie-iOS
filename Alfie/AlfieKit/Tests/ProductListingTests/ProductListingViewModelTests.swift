@@ -827,6 +827,45 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.products.map(\.id), refreshed.map(\.id))
     }
 
+    func test_retrying_a_failed_refresh_shows_a_loader_until_it_lands() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+        await sut.refresh()
+        var isRetryingWhileInFlight = false
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            isRetryingWhileInFlight = self.sut.isRetryingRefresh
+            return ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
+        }
+
+        await sut.retryTransientError()
+
+        XCTAssertTrue(isRetryingWhileInFlight)
+        XCTAssertFalse(sut.isRetryingRefresh)
+    }
+
+    func test_pulling_to_refresh_shows_no_retry_loader() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        var isRetryingWhileInFlight = true
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            isRetryingWhileInFlight = self.sut.isRetryingRefresh
+            return ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
+        }
+
+        await sut.refresh()
+
+        XCTAssertFalse(isRetryingWhileInFlight)
+    }
+
     func test_retrying_without_a_transient_error_sends_nothing() async {
         sut = makeSUT(category: "clothing")
         mockProductListing.onProductListPageCalled = { _, _, _, _ in

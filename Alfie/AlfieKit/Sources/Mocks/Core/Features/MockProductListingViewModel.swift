@@ -6,6 +6,7 @@ import SwiftUI
 public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var state: PaginatedViewState<ProductListingViewStateModel, ProductListingViewErrorType>
     public var transientError: ProductListingTransientError?
+    public var isRetryingRefresh = false
     public var products: [Product]
     public var wishlistContent: [SelectedProduct]
     public var title: String = "Title"

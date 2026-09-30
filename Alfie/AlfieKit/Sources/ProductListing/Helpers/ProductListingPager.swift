@@ -93,11 +93,15 @@ struct ProductListingPager {
     }
 
     private mutating func fail(with error: ProductListingViewErrorType, for ticket: Ticket) -> Commit {
-        guard case .success(let loaded) = ticket.previousState, !loaded.products.isEmpty else {
+        guard
+            let request = ProductListingTransientError.Request(ticket.request),
+            case .success(let loaded) = ticket.previousState,
+            !loaded.products.isEmpty
+        else {
             state = .error(error)
             return Commit(transientError: nil)
         }
         state = .success(loaded)
-        return Commit(transientError: .init(request: ticket.request, error: error))
+        return Commit(transientError: .init(request: request, error: error))
     }
 }

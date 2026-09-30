@@ -5,6 +5,8 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     // A failed page request over loaded products; they stay on screen and the View surfaces this as
     // a Snackbar. Distinct from `state.error`, which is a blocking error.
     var transientError: ProductListingTransientError? { get }
+    // Pull-to-refresh draws its own spinner; a refresh re-sent from the Snackbar has none.
+    var isRetryingRefresh: Bool { get }
     var products: [Product] { get }
     var wishlistContent: [SelectedProduct] { get }
     var style: ProductListingListStyle { get set }

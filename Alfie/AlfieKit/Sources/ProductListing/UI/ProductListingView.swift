@@ -36,6 +36,10 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                     .fill(.clear)
             } else {
                 infoFilterBarView
+                if viewModel.isRetryingRefresh {
+                    LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
+                        .padding(.top, theme.spacing.space200)
+                }
                 productCardList
                     .animation(.standardDecelerate, value: viewModel.style)
             }
@@ -207,7 +211,7 @@ extension SnackbarViewConfiguration {
         switch transientError.request {
         case .nextPage:
             text = L10n.Plp.NextPage.errorMessage
-        case .refresh, .firstPage:
+        case .refresh:
             text = L10n.Plp.Refresh.errorMessage
         }
         return .init(

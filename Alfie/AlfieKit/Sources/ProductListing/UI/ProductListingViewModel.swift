@@ -28,6 +28,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         ProductListingViewStateModel, ProductListingViewErrorType
     >
     @Published public private(set) var transientError: ProductListingTransientError?
+    @Published public private(set) var isRetryingRefresh = false
 
     private var pager: ProductListingPager
 
@@ -162,7 +163,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     public func retryTransientError() async {
         guard let request = transientError?.request else { return }
         transientError = nil
-        await load(request)
+        isRetryingRefresh = request == .refresh
+        defer { isRetryingRefresh = false }
+        await load(request.pageRequest)
     }
 
     @MainActor

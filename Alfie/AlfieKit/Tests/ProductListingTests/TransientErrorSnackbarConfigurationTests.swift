@@ -34,7 +34,7 @@ final class TransientErrorSnackbarConfigurationTests: XCTestCase {
     }
 
     private func makeSUT(
-        request: ProductListingPageRequest,
+        request: ProductListingTransientError.Request,
         onRetry: @escaping () -> Void = {}
     ) -> SnackbarViewConfiguration {
         .transientError(.init(request: request, error: .generic), onRetry: onRetry, onDismiss: {})
