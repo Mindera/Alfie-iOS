@@ -31,7 +31,6 @@ WishlistFlowVM.Route == WishlistRoute {
     public let myAccountFlowViewModel: MyAccountFlowViewModel
     @Published public private(set) var overlayView: AnyView?
     @Published public private(set) var bagBadgeValue: Int?
-    @Published public private(set) var isTabBarHidden = false
     @Published public var isReadyForNavigation = false
     private let closeSearch: () -> Void
     private var subscriptions = Set<AnyCancellable>()
@@ -45,7 +44,6 @@ WishlistFlowVM.Route == WishlistRoute {
         homeFlowViewModel: HomeFlowVM,
         wishlistFlowViewModel: WishlistFlowVM,
         myAccountFlowViewModel: MyAccountFlowViewModel,
-        isSearchScreenOnTop: AnyPublisher<Bool, Never>,
         closeSearch: @escaping () -> Void,
         scheduler: AnySchedulerOf<DispatchQueue> = .main
     ) {
@@ -64,7 +62,7 @@ WishlistFlowVM.Route == WishlistRoute {
         self.myAccountFlowViewModel = myAccountFlowViewModel
         self.closeSearch = closeSearch
 
-        setupBindings(isSearchScreenOnTop: isSearchScreenOnTop)
+        setupBindings()
     }
 
     public func popToRoot(in tab: Model.Tab) {
@@ -110,17 +108,13 @@ WishlistFlowVM.Route == WishlistRoute {
         }
     }
 
-    private func setupBindings(isSearchScreenOnTop: AnyPublisher<Bool, Never>) {
+    private func setupBindings() {
         homeFlowViewModel.overlayViewPublisher
             .assignWeakly(to: \.overlayView, on: self)
             .store(in: &subscriptions)
 
         categorySelectorFlowViewModel.overlayViewPublisher
             .assignWeakly(to: \.overlayView, on: self)
-            .store(in: &subscriptions)
-
-        isSearchScreenOnTop
-            .assignWeakly(to: \.isTabBarHidden, on: self)
             .store(in: &subscriptions)
 
         $selectedTab

@@ -186,11 +186,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             homeFlowViewModel: homeFlowViewModel,
             wishlistFlowViewModel: wishlistFlowViewModel,
             myAccountFlowViewModel: myAccountFlowViewModel,
-            isSearchScreenOnTop: homeFlowViewModel.isSearchScreenOnTopPublisher
-                .combineLatest(categorySelectorFlowViewModel.isSearchScreenOnTopPublisher)
-                .map { $0 || $1 }
-                .removeDuplicates()
-                .eraseToAnyPublisher(),
             closeSearch: { [weak homeFlowViewModel, weak categorySelectorFlowViewModel] in
                 homeFlowViewModel?.closeSearch()
                 categorySelectorFlowViewModel?.closeSearch()

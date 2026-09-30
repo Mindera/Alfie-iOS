@@ -35,6 +35,7 @@ public struct SearchBarEntryButton: View {
             )
             .allowsHitTesting(false)
             .accessibilityHidden(true)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(accessibilityIdentifier)

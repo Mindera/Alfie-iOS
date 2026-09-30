@@ -20,14 +20,6 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
             .eraseToAnyPublisher()
     }
 
-    public var isSearchScreenOnTopPublisher: AnyPublisher<Bool, Never> {
-        $isPresented
-            .combineLatest($path.map(\.isEmpty))
-            .map { $0 && $1 }
-            .removeDuplicates()
-            .eraseToAnyPublisher()
-    }
-
     public init(
         dependencies: SearchDependencyContainer,
         intentViewBuilder: @escaping (SearchIntent) -> AnyView

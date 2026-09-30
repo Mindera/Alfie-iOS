@@ -82,51 +82,6 @@ final class SearchFlowViewModelTests: XCTestCase {
         XCTAssertTrue(sut.focusesSearchBarOnAppear)
     }
 
-    // MARK: - Search screen on top
-
-    private func recordSearchScreenOnTop(of sut: SearchFlowViewModel) -> (values: () -> [Bool], subscription: AnyCancellable) {
-        var values: [Bool] = []
-        let subscription = sut.isSearchScreenOnTopPublisher.sink { values.append($0) }
-        return ({ values }, subscription)
-    }
-
-    func test_search_screen_is_not_on_top_while_search_is_not_presented() {
-        let sut = makeSUT()
-
-        let recorder = recordSearchScreenOnTop(of: sut)
-
-        XCTAssertEqual(recorder.values(), [false])
-    }
-
-    func test_pushing_search_results_takes_search_screen_off_top() {
-        let sut = makePresentedSUT()
-        let recorder = recordSearchScreenOnTop(of: sut)
-
-        sut.navigate(searchResults)
-
-        XCTAssertEqual(recorder.values(), [true, false])
-    }
-
-    func test_popping_back_to_search_screen_puts_it_on_top_again() {
-        let sut = makePresentedSUT()
-        sut.navigate(searchResults)
-        let recorder = recordSearchScreenOnTop(of: sut)
-
-        sut.pop()
-
-        XCTAssertEqual(recorder.values(), [false, true])
-    }
-
-    func test_pushing_a_product_page_over_search_results_keeps_search_screen_off_top() {
-        let sut = makePresentedSUT()
-        sut.navigate(searchResults)
-        let recorder = recordSearchScreenOnTop(of: sut)
-
-        sut.navigate(.searchIntent(.productDetails(productID: "1", product: nil)))
-
-        XCTAssertEqual(recorder.values(), [false])
-    }
-
     func test_close_dismisses_search_returns_to_search_screen_and_focuses_search_bar() {
         let sut = makePresentedSUT()
         sut.navigate(searchResults)

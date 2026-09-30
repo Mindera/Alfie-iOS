@@ -14,7 +14,6 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
     @Published public var path = NavigationPath()
     private let dependencies: CategorySelectorFlowDependencyContainer
     public var overlayViewPublisher: AnyPublisher<AnyView?, Never> { searchFlowViewModel.overlayViewPublisher }
-    public var isSearchScreenOnTopPublisher: AnyPublisher<Bool, Never> { searchFlowViewModel.isSearchScreenOnTopPublisher }
 
     private lazy var searchFlowViewModel = SearchFlowViewModel(
         dependencies: dependencies.searchDependencyContainer,

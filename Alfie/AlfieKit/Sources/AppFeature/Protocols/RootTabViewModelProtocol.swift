@@ -15,7 +15,6 @@ public protocol RootTabViewModelProtocol: ObservableObject {
 
     var tabs: [Model.Tab] { get }
     var selectedTab: Model.Tab { get set }
-    var isTabBarHidden: Bool { get }
     var isReadyForNavigation: Bool { get set }
     var overlayView: AnyView? { get }
     /// Total quantity in the cart, for the bag tab's badge. `nil` when there is no badge to show.
