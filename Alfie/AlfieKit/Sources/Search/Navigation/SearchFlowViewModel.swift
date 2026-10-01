@@ -6,7 +6,7 @@ import SwiftUI
 public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = SearchRoute
     @Published public var path = NavigationPath()
-    @Published public private(set) var isPresented = false
+    @Published private(set) var isPresented = false
     @Published public private(set) var focusesSearchBarOnAppear = true
     private let dependencies: SearchDependencyContainer
     let intentViewBuilder: (SearchIntent) -> AnyView

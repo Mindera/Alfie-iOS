@@ -52,15 +52,6 @@ public final class RecentsService: RecentsServiceProtocol {
         saveIfNeeded()
     }
 
-    public func removeAll() {
-        guard !recentSearchesSubject.value.isEmpty else {
-            return
-        }
-        recentSearchesSubject.value.removeAll()
-        hasPendingChanges = true
-        saveIfNeeded()
-    }
-
     public func save() {
         guard hasPendingChanges else {
             return

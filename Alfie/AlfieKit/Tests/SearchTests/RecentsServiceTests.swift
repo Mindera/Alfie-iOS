@@ -108,30 +108,6 @@ final class RecentsServiceTests: XCTestCase {
         waitForExpectations(timeout: .default)
     }
 
-    func test_RemoveAll_ReturnsEmptySearches() {
-        sut.add(.recentSearch1)
-        sut.add(.recentSearch2)
-        sut.add(.recentSearch3)
-
-        sut.removeAll()
-
-        XCTAssertTrue(sut.recentSearches.isEmpty)
-    }
-    
-    func test_RemoveAll_WithAutoSave_SavesInStorage() {
-        let expectation = expectation(description: "RemoveAll_WithAutoSave_SavesInStorage")
-        expectation.expectedFulfillmentCount = 3
-        mockStorageService.onSaveCalled = { _, _ in
-            expectation.fulfill()
-        }
-
-        sut.add(.recentSearch1)
-        sut.add(.recentSearch2)
-        sut.removeAll()
-
-        waitForExpectations(timeout: .default)
-    }
-
     func test_Save_AddRecentSearch_SavesInStorage() {
         let expectation = expectation(description: "Save_AddRecentSearch_SavesInStorage")
         mockStorageService.onSaveCalled = { _, _ in

@@ -18,7 +18,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
     private lazy var searchFlowViewModel = SearchFlowViewModel(
         dependencies: dependencies.searchDependencyContainer,
         intentViewBuilder: { [weak self] in
-            self?.searchIntentViewBuilder(for: $0) ?? AnyView(Text("Something went wrong"))
+            self?.searchIntentViewBuilder(for: $0) ?? AnyView(EmptyView())
         }
     )
 

@@ -216,7 +216,6 @@ public struct ThemedSearchBarView: View {
     }
 
     private enum Constants {
-        static let autoFocusTimeDelay: CGFloat = 0
         static let borderLineWidth: CGFloat = 1
         static let trailingIconSize: CGFloat = 16
     }

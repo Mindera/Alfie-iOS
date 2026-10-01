@@ -439,7 +439,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             mode: .searchResults,
             navigate: { _ in },
-            searchNavigation: .listing(openSearch: {})
+            searchNavigation: .searchResults(goBack: {}, editSearchTerm: {})
         )
 
         mockProductListing.onSearchPageCalled = { searchTerm, _, sort, _ in

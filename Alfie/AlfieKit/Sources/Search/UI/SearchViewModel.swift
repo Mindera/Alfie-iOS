@@ -27,7 +27,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     public var recentSearchesViewModel: RecentSearchesViewModel {
         RecentSearchesViewModel(
             recentsService: dependencies.recentsService,
-            navigate: navigate
+            showResults: { [weak self] in self?.showResults(for: $0) }
         )
     }
 
@@ -84,7 +84,7 @@ extension SearchViewModel {
         }
         dependencies.recentsService?.add(.text(value: term))
         dependencies.analytics.trackSearch(term: term)
-        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
+        showResults(for: term)
     }
 
     public func viewDidAppear() {
@@ -112,6 +112,11 @@ extension SearchViewModel {
             return
         }
         handleEmptyText()
+    }
+
+    private func showResults(for term: String) {
+        searchText = term
+        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
     }
 
     private func handleEmptyText() {

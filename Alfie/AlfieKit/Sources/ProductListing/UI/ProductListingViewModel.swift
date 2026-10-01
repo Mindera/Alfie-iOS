@@ -132,15 +132,18 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func didTapSearch() {
-        searchNavigation.openSearch()
+        guard case .listing(let openSearch) = searchNavigation else { return }
+        openSearch()
     }
 
     public func didTapBack() {
-        searchNavigation.goBack()
+        guard case .searchResults(let goBack, _) = searchNavigation else { return }
+        goBack()
     }
 
     public func didTapSearchBar() {
-        searchNavigation.editSearchTerm()
+        guard case .searchResults(_, let editSearchTerm) = searchNavigation else { return }
+        editSearchTerm()
     }
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {

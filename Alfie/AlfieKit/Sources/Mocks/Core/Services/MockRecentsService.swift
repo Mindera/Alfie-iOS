@@ -17,11 +17,6 @@ public final class MockRecentsService: RecentsServiceProtocol {
         onRemove?(recentSearch)
     }
 
-    public var onRemoveAll: (() -> Void)?
-    public func removeAll() {
-        onRemoveAll?()
-    }
-
     public var onSave: (() -> Void)?
     public func save() {
         onSave?()

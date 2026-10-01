@@ -6,6 +6,5 @@ public protocol RecentsServiceProtocol {
 
     func add(_ recentSearch: RecentSearch)
     func remove(_ recentSearch: RecentSearch)
-    func removeAll()
     func save()
 }

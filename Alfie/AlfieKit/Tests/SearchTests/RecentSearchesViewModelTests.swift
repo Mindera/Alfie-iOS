@@ -40,17 +40,17 @@ final class RecentSearchesViewModelTests: XCTestCase {
         waitForExpectations(timeout: .default)
     }
 
-    private func makeSUT(navigate: @escaping (SearchRoute) -> Void = { _ in }) -> RecentSearchesViewModel {
-        RecentSearchesViewModel(recentsService: mockRecentsService, navigate: navigate)
+    private func makeSUT(showResults: @escaping (String) -> Void = { _ in }) -> RecentSearchesViewModel {
+        RecentSearchesViewModel(recentsService: mockRecentsService, showResults: showResults)
     }
 
-    func test_did_tap_recent_search_navigates_to_search_results_for_its_search_term() {
-        var capturedRoutes: [SearchRoute] = []
-        sut = makeSUT { capturedRoutes.append($0) }
+    func test_did_tap_recent_search_shows_results_for_its_search_term() {
+        var capturedTerms: [String] = []
+        sut = makeSUT { capturedTerms.append($0) }
 
         sut.didTapRecentSearch(.text(value: "linen"))
 
-        XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen", category: nil))])
+        XCTAssertEqual(capturedTerms, ["linen"])
     }
 
     func test_OnViewDidDisappear_InRecentsService_CallsSave() {
