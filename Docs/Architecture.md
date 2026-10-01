@@ -237,6 +237,7 @@ Each feature is a self-contained module with its own navigation, views, and view
 - **ProductListing**: Product listing/search results
 - **ProductDetails**: Product detail pages
 - **Search**: Search functionality
+- **Scanner**: Camera scanning of the Alfie code on a swing tag, opening the product it names
 - **CategorySelector**: Shop tab with category navigation
 - **Wishlist**: Wishlist feature
 - **Bag**: Shopping bag feature

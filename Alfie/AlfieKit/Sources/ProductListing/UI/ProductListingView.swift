@@ -129,7 +129,6 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             ) {
                 viewModel.showRefine.toggle()
             }
-            ProductListingFilterChips()
         }
         .padding(.bottom, theme.spacing.space100)
         .onChange(of: viewModel.style, perform: viewModel.setListStyle)

@@ -10,6 +10,7 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol
     private let navigate: (HomeRoute) -> Void
     private let showSearch: () -> Void
+    private let showScanner: () -> Void
     @Published private var isUserSignedIn = false
     private var subscriptions: Set<AnyCancellable> = []
 
@@ -29,13 +30,15 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     init(
         dependencies: HomeDependencyContainer,
         navigate: @escaping (HomeRoute) -> Void,
-        showSearch: @escaping () -> Void
+        showSearch: @escaping () -> Void,
+        showScanner: @escaping () -> Void
     ) {
         self.sessionService = dependencies.sessionService
         self.configurationService = dependencies.configurationService
         self.apiEndpointService = dependencies.apiEndpointService
         self.navigate = navigate
         self.showSearch = showSearch
+        self.showScanner = showScanner
 
         setupBindings()
     }
@@ -79,5 +82,9 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
 
     public func didTapSearch() {
         showSearch()
+    }
+
+    public func didTapScan() {
+        showScanner()
     }
 }

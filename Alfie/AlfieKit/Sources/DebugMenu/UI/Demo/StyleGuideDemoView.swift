@@ -26,7 +26,7 @@ public struct StyleGuideDemoView: View {
                 link(for: .motion, text: "Motion")
                 link(for: .price, text: "Price")
                 link(for: .pdpImageGallery, text: "PDP Image Gallery")
-                link(for: .pdpSnapImageGallery, text: "PDP Snap Image Gallery")
+                link(for: .pdpPagedImageGallery, text: "PDP Paged Image Gallery")
                 link(for: .productCard, text: "Product Card")
                 link(for: .productCarousel, text: "Product Carousel")
                 link(for: .progressBar, text: "Progress Bar")
@@ -181,8 +181,8 @@ public struct StyleGuideDemoView: View {
             CarouselDemoView()
                 .modifier(ContainerDemoViewModifier(embedInScrollView: false))
 
-        case .pdpSnapImageGallery:
-            SnapCarouselDemoView()
+        case .pdpPagedImageGallery:
+            PagedImageGalleryDemoView()
                 .modifier(ContainerDemoViewModifier(embedInScrollView: false))
 
         case .productCard:
@@ -233,7 +233,7 @@ public struct StyleGuideDemoView: View {
         case motion
         case pageControl
         case pdpImageGallery
-        case pdpSnapImageGallery
+        case pdpPagedImageGallery
         case price
         case productCard
         case productCarousel

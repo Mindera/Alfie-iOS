@@ -1,0 +1,9 @@
+query ProductByBarcodeQuery(
+    $barcode: String!
+) {
+    productByBarcode(barcode: $barcode) {
+        id
+        slug
+        variantId
+    }
+}
