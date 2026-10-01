@@ -1,10 +1,8 @@
 import AlicerceLogging
-import CombineSchedulers
 import Foundation
 import Model
 
 public final class ProductDetailsDependencyContainer {
-    let scheduler: AnySchedulerOf<DispatchQueue>
     let productService: ProductServiceProtocol
     let webUrlProvider: WebURLProviderProtocol
     let cartService: CartServiceProtocol
@@ -14,7 +12,6 @@ public final class ProductDetailsDependencyContainer {
     let log: Logger
 
     public init(
-        scheduler: AnySchedulerOf<DispatchQueue> = .main,
         productService: ProductServiceProtocol,
         webUrlProvider: WebURLProviderProtocol,
         cartService: CartServiceProtocol,
@@ -23,7 +20,6 @@ public final class ProductDetailsDependencyContainer {
         analytics: AlfieAnalyticsTracker,
         log: Logger
     ) {
-        self.scheduler = scheduler
         self.productService = productService
         self.webUrlProvider = webUrlProvider
         self.cartService = cartService

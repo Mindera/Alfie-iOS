@@ -9,6 +9,10 @@ public struct SizingSwatchView: View {
         .resolve(for: item.state, isSelected: isSelected)
     }
 
+    /// Both out-of-stock marks the design draws: the diagonal line across the chip and the bell in
+    /// its corner.
+    private var isOutOfStock: Bool { item.state == .outOfStock }
+
     public init(item: SizingSwatch, isSelected: Bool) {
         self.item = item
         self.isSelected = isSelected
@@ -37,20 +41,18 @@ public struct SizingSwatchView: View {
                 }
             )
             .overlay(alignment: .topTrailing) {
-                outOfStockBellView(appearance)
+                outOfStockBellView()
             }
             .accessibilityElement(children: .combine)
             // Selection is drawn as a border, which assistive technology cannot see. The button
             // trait comes from the `Button` the selector wraps this in.
             .accessibilityAddTraits(isSelected ? .isSelected : [])
-            .accessibilityValueOrNone(
-                appearance.isCrossedOut ? L10n.Product.Size.OutOfStock.accessibilityValue : nil
-            )
+            .accessibilityValueOrNone(isOutOfStock ? L10n.Product.Size.OutOfStock.accessibilityValue : nil)
     }
 
     @ViewBuilder
     private func outOfStockSlashView(_ appearance: SizingSwatchAppearance) -> some View {
-        if appearance.isCrossedOut {
+        if isOutOfStock {
             UnavailableCrossedOutShape(direction: .topLeadingToBottomTrailing)
                 .stroke(appearance.borderColor, style: StrokeStyle(lineWidth: appearance.borderWidth))
                 .padding(appearance.borderWidth)
@@ -60,8 +62,8 @@ public struct SizingSwatchView: View {
     /// Decoration only: notify-me has no service behind it yet, so the bell carries no tap target
     /// and no accessibility label. The design insets it from the corner rather than centring it.
     @ViewBuilder
-    private func outOfStockBellView(_ appearance: SizingSwatchAppearance) -> some View {
-        if appearance.isCrossedOut {
+    private func outOfStockBellView() -> some View {
+        if isOutOfStock {
             ThemedIcon(.bell, tint: Theme.contentContentTerciary)
                 .padding(.top, theme.spacing.space050)
                 .padding(.trailing, theme.spacing.space025)
@@ -76,8 +78,6 @@ public struct SizingSwatchView: View {
 
         SizingSwatchView(item: .init(id: "2", name: "Selected", state: .available), isSelected: true)
 
-        SizingSwatchView(item: .init(id: "3", name: "Unavailable", state: .unavailable), isSelected: false)
-
-        SizingSwatchView(item: .init(id: "4", name: "Out of Stock", state: .outOfStock), isSelected: false)
+        SizingSwatchView(item: .init(id: "3", name: "Out of Stock", state: .outOfStock), isSelected: false)
     }
 }

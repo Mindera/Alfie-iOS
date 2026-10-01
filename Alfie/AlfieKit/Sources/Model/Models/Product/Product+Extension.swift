@@ -20,14 +20,17 @@ public extension Product {
     }
 
     var sizeText: String {
-        var sizeValue: String = ""
-        if let size = defaultVariant.size {
-            sizeValue = size.value
-            if let scale = size.scale {
-                sizeValue += " \(scale)"
-            }
-        }
+        defaultVariant.size?.displayName ?? ""
+    }
+}
 
-        return sizeValue
+public extension Product.ProductSize {
+    /// How a size reads wherever it is shown — the PDP chip, the product card, and the size text
+    /// persisted with a Bag or Wishlist row. One rule, so those three cannot drift apart.
+    var displayName: String {
+        guard let scale else {
+            return value
+        }
+        return "\(value) \(scale)"
     }
 }

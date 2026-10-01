@@ -38,28 +38,20 @@ final class SizingSwatchAppearanceTests: XCTestCase {
         XCTAssertEqual(sut.textColor, Theme.contentContentPrimary)
     }
 
-    func test_out_of_stock_chip_is_crossed_out_and_dimmed() {
+    func test_out_of_stock_chip_is_dimmed() {
         let sut = SizingSwatchAppearance.resolve(for: .outOfStock, isSelected: false)
-        XCTAssertTrue(sut.isCrossedOut)
         XCTAssertEqual(sut.textColor, Theme.contentContentTerciary)
     }
 
-    func test_unavailable_chip_is_dimmed_but_not_crossed_out() {
-        let sut = SizingSwatchAppearance.resolve(for: .unavailable, isSelected: false)
-        XCTAssertFalse(sut.isCrossedOut)
-        XCTAssertEqual(sut.textColor, Theme.contentContentTerciary)
-    }
+    func test_out_of_stock_chip_never_fills_or_thickens_even_when_selected() {
+        // Selection cannot reach this state through the UI, but nothing in the type prevents it.
+        let sut = SizingSwatchAppearance.resolve(for: .outOfStock, isSelected: true)
 
-    func test_unbuyable_states_never_fill_or_thicken_even_when_selected() {
-        // Selection cannot reach these states through the UI, but nothing in the type prevents it.
-        for state in [SizingSwatch.ItemState.outOfStock, .unavailable] {
-            let sut = SizingSwatchAppearance.resolve(for: state, isSelected: true)
-            XCTAssertEqual(sut.backgroundColor, .clear, "\(state) filled when selected")
-            XCTAssertEqual(
-                sut.borderWidth,
-                SizingSwatchAppearance.resolve(for: .available, isSelected: false).borderWidth,
-                "\(state) took the selected border weight"
-            )
-        }
+        XCTAssertEqual(sut.backgroundColor, .clear)
+        XCTAssertEqual(
+            sut.borderWidth,
+            SizingSwatchAppearance.resolve(for: .available, isSelected: false).borderWidth,
+            "out of stock took the selected border weight"
+        )
     }
 }

@@ -30,9 +30,13 @@ extension Product {
 }
 
 extension Product.Variant {
+    /// `size` defaults to a real, *stable* size rather than nil: a sizeless variant cannot reach
+    /// the colour x size derivation at all, which is how four green colour tests used to pass
+    /// without ever crossing the seam they were written for. Stable so that two default variants
+    /// read as one size, not two invented ones — pass an explicit size to vary the axis.
     public static func fixture(id: String? = nil,
                                sku: String = UUID().uuidString,
-                               size: Product.ProductSize? = nil,
+                               size: Product.ProductSize? = .fixture(id: "fixture-size", value: "M"),
                                colour: Product.Colour? = nil,
                                attributes: AttributeCollection? = nil,
                                stock: Int = 1,
