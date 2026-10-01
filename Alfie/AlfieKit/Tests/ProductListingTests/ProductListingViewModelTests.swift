@@ -1,3 +1,4 @@
+import Combine
 import Mocks
 import Model
 import TestUtils
@@ -864,6 +865,17 @@ final class ProductListingViewModelTests: XCTestCase {
         await sut.refresh()
 
         XCTAssertFalse(isRetryingWhileInFlight)
+    }
+
+    func test_retrying_a_failed_next_page_leaves_the_retry_loader_flag_unpublished() async {
+        _ = loadFirstPageThenFailTheNextPageOnce()
+        var publishes = 0
+        let cancellable = sut.$isRetryingRefresh.dropFirst().sink { _ in publishes += 1 }
+
+        await sut.retryTransientError()
+
+        XCTAssertEqual(publishes, 0)
+        cancellable.cancel()
     }
 
     func test_retrying_without_a_transient_error_sends_nothing() async {

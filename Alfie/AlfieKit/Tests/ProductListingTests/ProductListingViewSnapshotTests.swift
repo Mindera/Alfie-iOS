@@ -111,7 +111,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    func test_retrying_a_refresh_shows_a_loader_above_the_products() {
+    func test_retrying_a_refresh_shows_a_loader_pinned_over_the_products() {
         let viewModel = makeViewModel(products: makeProducts(4))
         viewModel.isRetryingRefresh = true
         let sut = ProductListingView(viewModel: viewModel)

@@ -163,8 +163,9 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     public func retryTransientError() async {
         guard let request = transientError?.request else { return }
         transientError = nil
-        isRetryingRefresh = request == .refresh
-        defer { isRetryingRefresh = false }
+        let isRefresh = request == .refresh
+        if isRefresh { isRetryingRefresh = true }
+        defer { if isRefresh { isRetryingRefresh = false } }
         await load(request.pageRequest)
     }
 

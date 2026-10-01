@@ -36,10 +36,6 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                     .fill(.clear)
             } else {
                 infoFilterBarView
-                if viewModel.isRetryingRefresh {
-                    LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
-                        .padding(.top, theme.spacing.space200)
-                }
                 productCardList
                     .animation(.standardDecelerate, value: viewModel.style)
             }
@@ -54,6 +50,15 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
         .overlay(alignment: .center) {
             if viewModel.state.didFail {
                 errorView
+            }
+        }
+        .overlay(alignment: .top) {
+            if viewModel.isRetryingRefresh {
+                LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
+                    .padding(theme.spacing.space200)
+                    .background(Primitives.Colours.neutrals0)
+                    .cornerRadius(Sizing.radiusSoft)
+                    .padding(.top, theme.spacing.space100)
             }
         }
         .snackbarView(configuration: $transientErrorSnackbarConfig)
