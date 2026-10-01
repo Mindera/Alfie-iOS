@@ -17,7 +17,13 @@ public struct ThemedBackButton: View {
                 tint: Primitives.Colours.neutrals800,
                 accessibilityLabel: L10n.Accessibility.back
             )
+            .frame(width: Constants.minimumTapTarget, height: Constants.minimumTapTarget)
+            .contentShape(Rectangle())
         }
         .accessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private enum Constants {
+        static let minimumTapTarget: CGFloat = 44
     }
 }
