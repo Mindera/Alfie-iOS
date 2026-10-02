@@ -80,6 +80,12 @@ final class HomeFlowViewModelTests: XCTestCase {
         XCTAssertNil(overlays.last ?? nil)
     }
 
+    func test_dismiss_overlay_without_a_presented_overlay_emits_nothing() {
+        sut.dismissOverlay()
+
+        XCTAssertEqual(overlays.count, 1)
+    }
+
     /// Presenting one overlay and then the other replaces it rather than stacking: `overlay` holds a
     /// single value, so the scanner cannot open behind the search screen.
     func test_did_tap_scan_while_search_is_presented_replaces_the_overlay() {

@@ -56,11 +56,15 @@ extension View {
                         )
                     }
                     .padding(.horizontal, Primitives.Spacing.spacing16)
-                    .padding(.vertical, Primitives.Spacing.spacing8)
+                    .frame(height: Constants.searchResultsHeaderHeight)
 
                     ThemedDivider.horizontalThin
                 }
                 .background(Primitives.Colours.neutrals0)
             }
     }
+}
+
+private enum Constants {
+    static let searchResultsHeaderHeight: CGFloat = 48
 }

@@ -74,6 +74,7 @@ public final class TabOverlayCoordinator {
             )
 
         case nil:
+            guard tabOverlay != nil else { return }
             tabOverlay = nil
             searchFlowViewModel.reset()
         }
