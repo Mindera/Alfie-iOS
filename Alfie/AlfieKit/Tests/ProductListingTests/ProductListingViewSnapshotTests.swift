@@ -111,6 +111,15 @@ final class ProductListingViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
+    func test_search_results_header_shows_back_chevron_and_search_term() {
+        let viewModel = makeViewModel(products: makeProducts(4))
+        viewModel.searchTerm = "cream"
+        let sut = NavigationStack { ProductListingView(viewModel: viewModel) }
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
     func test_retrying_a_refresh_shows_a_loader_pinned_over_the_products() {
         let viewModel = makeViewModel(products: makeProducts(4))
         viewModel.isRetryingRefresh = true

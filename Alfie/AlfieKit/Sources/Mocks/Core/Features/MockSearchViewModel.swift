@@ -4,11 +4,11 @@ public final class MockSearchViewModel: SearchViewModelProtocol {
     public typealias RecentSearchesViewModel = MockRecentSearchesViewModel
 
     public var searchText: String = ""
-    public var state: SearchViewState = .empty
+    public var state: SearchViewState = .blank
     public var isSearchSubmissionAllowed = true
     public var recentSearchesViewModel: MockRecentSearchesViewModel = MockRecentSearchesViewModel()
 
-    public init(state: SearchViewState = .empty,
+    public init(state: SearchViewState = .blank,
                 searchText: String = "") {
         self.state = state
         self.searchText = searchText

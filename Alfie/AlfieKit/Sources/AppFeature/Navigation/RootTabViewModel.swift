@@ -64,7 +64,10 @@ WishlistFlowVM.Route == WishlistRoute {
     }
 
     public func popToRoot(in tab: Model.Tab) {
-        dismissOverlays()
+        guard overlay == nil else {
+            dismissOverlays()
+            return
+        }
 
         switch tab {
         case .bag:

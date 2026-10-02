@@ -74,7 +74,9 @@ public final class TabOverlayCoordinator {
             )
 
         case nil:
+            guard tabOverlay != nil else { return }
             tabOverlay = nil
+            searchFlowViewModel.reset()
         }
     }
 
@@ -132,7 +134,10 @@ public final class TabOverlayCoordinator {
             urlQueryParameters: nil,
             mode: .searchResults,
             navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },
-            showSearch: showSearch
+            searchNavigation: .searchResults(
+                goBack: { [weak self] in self?.searchFlowViewModel.pop() },
+                editSearchTerm: { [weak self] in self?.searchFlowViewModel.navigate(.search) }
+            )
         )
     }
 

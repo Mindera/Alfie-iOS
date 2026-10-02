@@ -10,7 +10,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     private let dependencies: SearchDependencyContainer
     private let didUpdateSearchTermPassthrough: PassthroughSubject<String, Never> = .init()
     private var subscriptions: Set<AnyCancellable> = .init()
-    @Published public var state: SearchViewState = .empty
+    @Published public var state: SearchViewState = .blank
     @Published public var searchText: String {
         didSet {
             guard oldValue != searchText else {
@@ -27,7 +27,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     public var recentSearchesViewModel: RecentSearchesViewModel {
         RecentSearchesViewModel(
             recentsService: dependencies.recentsService,
-            navigate: navigate
+            showResults: { [weak self] in self?.showResults(for: $0) }
         )
     }
 
@@ -51,7 +51,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
         self.navigate = navigate
         self.closeSearchAction = closeSearchAction
         self.searchText = ""
-        self.state = canShowRecentSearches ? .recentSearches : .empty
+        self.state = canShowRecentSearches ? .recentSearches : .blank
         configureSubscriptions()
     }
 }
@@ -84,7 +84,7 @@ extension SearchViewModel {
         }
         dependencies.recentsService?.add(.text(value: term))
         dependencies.analytics.trackSearch(term: term)
-        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
+        showResults(for: term)
     }
 
     public func viewDidAppear() {
@@ -108,17 +108,18 @@ extension SearchViewModel {
 extension SearchViewModel {
     private func handleChange(on searchText: String) {
         guard searchText.isEmpty else {
-            state = .empty
+            state = .blank
             return
         }
         handleEmptyText()
     }
 
+    private func showResults(for term: String) {
+        searchText = term
+        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
+    }
+
     private func handleEmptyText() {
-        if canShowRecentSearches {
-            state = .recentSearches
-        } else {
-            state = .empty
-        }
+        state = canShowRecentSearches ? .recentSearches : .blank
     }
 }

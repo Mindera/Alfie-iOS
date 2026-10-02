@@ -25,7 +25,7 @@ final class ProductListingViewModelTests: XCTestCase {
                 log: log
             ),
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .listing(openSearch: {})
         )
     }
 
@@ -126,7 +126,8 @@ final class ProductListingViewModelTests: XCTestCase {
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = ProductListingViewModel.Constants.defaultSkeletonItemsSize,
-        wishlistService: WishlistServiceProtocol? = nil
+        wishlistService: WishlistServiceProtocol? = nil,
+        searchNavigation: ProductListingSearchNavigation = .listing(openSearch: {})
     ) -> ProductListingViewModel {
         .init(
             dependencies: ProductListingDependencyContainer(
@@ -144,8 +145,58 @@ final class ProductListingViewModelTests: XCTestCase {
             mode: mode,
             skeletonItemsSize: skeletonItemsSize,
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: searchNavigation
         )
+    }
+
+    // MARK: - Search results header
+
+    func test_search_mode_exposes_search_term() {
+        sut = makeSUT(searchText: "cream", mode: .searchResults)
+
+        XCTAssertEqual(sut.searchTerm, "cream")
+    }
+
+    func test_browse_mode_has_no_search_term() {
+        sut = makeSUT(category: "clothing", urlQueryParameters: ["category": "women/clothing"], mode: .listing)
+
+        XCTAssertNil(sut.searchTerm)
+    }
+
+    func test_did_tap_back_goes_back_to_search_screen() {
+        var goBackCount = 0
+        var editSearchTermCount = 0
+        sut = makeSUT(
+            searchText: "cream",
+            mode: .searchResults,
+            searchNavigation: .searchResults(
+                goBack: { goBackCount += 1 },
+                editSearchTerm: { editSearchTermCount += 1 }
+            )
+        )
+
+        sut.didTapBack()
+
+        XCTAssertEqual(goBackCount, 1)
+        XCTAssertEqual(editSearchTermCount, 0)
+    }
+
+    func test_did_tap_search_bar_goes_back_to_search_screen_to_edit_search_term() {
+        var goBackCount = 0
+        var editSearchTermCount = 0
+        sut = makeSUT(
+            searchText: "cream",
+            mode: .searchResults,
+            searchNavigation: .searchResults(
+                goBack: { goBackCount += 1 },
+                editSearchTerm: { editSearchTermCount += 1 }
+            )
+        )
+
+        sut.didTapSearchBar()
+
+        XCTAssertEqual(editSearchTermCount, 1)
+        XCTAssertEqual(goBackCount, 0)
     }
 
     func test_loading_first_page_shows_skeleton_items() {
@@ -162,7 +213,7 @@ final class ProductListingViewModelTests: XCTestCase {
             urlQueryParameters: ["category": "women/clothing"],
             skeletonItemsSize: 2,
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -184,7 +235,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             urlQueryParameters: ["category": "women/clothing"],
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -275,7 +326,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             urlQueryParameters: ["category": "women/clothing"],
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         // First call (after == nil) returns a page with hasNextPage=true + cursor.
@@ -336,7 +387,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             mode: .listing,
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         mockProductListing.onProductListPageCalled = { collectionHandle, _, sort, _ in
@@ -368,7 +419,7 @@ final class ProductListingViewModelTests: XCTestCase {
             mode: .listing,
             skeletonItemsSize: 2,
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .listing(openSearch: {})
         )
 
         XCTAssertTrue(sut.state.isLoadingFirstPage)
@@ -389,7 +440,7 @@ final class ProductListingViewModelTests: XCTestCase {
             sort: "sort",
             mode: .searchResults,
             navigate: { _ in },
-            showSearch: {}
+            searchNavigation: .searchResults(goBack: {}, editSearchTerm: {})
         )
 
         mockProductListing.onSearchPageCalled = { searchTerm, _, sort, _ in

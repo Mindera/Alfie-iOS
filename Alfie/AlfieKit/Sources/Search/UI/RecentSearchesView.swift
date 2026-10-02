@@ -25,14 +25,11 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
     }
 
     private var recentSearchesHeader: some View {
-        HStack(alignment: .lastTextBaseline) {
-            Text.build(theme.font.heading.small(L10n.Search.Screen.RecentSearches.Header.title))
-                .accessibilityIdentifier(AccessibilityId.recentSearchHeaderTitle)
-            Spacer()
-            clearAllButton
-        }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
-        .padding(.bottom, Primitives.Spacing.spacing16)
+        Text.build(theme.font.heading.small(L10n.Search.Screen.RecentSearches.Header.title))
+            .accessibilityIdentifier(AccessibilityId.recentSearchHeaderTitle)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.bottom, Primitives.Spacing.spacing16)
     }
 
     private var recentSearchesList: some View {
@@ -51,7 +48,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 Spacer()
                 recentSearchRemoveButton(for: recentSearch)
             }
-            .padding(.horizontal, Primitives.Spacing.spacing24)
+            .padding(.horizontal, Primitives.Spacing.spacing16)
         }
         .padding(.vertical, Primitives.Spacing.spacing8)
         .modifier(TapHighlightableModifier { viewModel.didTapRecentSearch(recentSearch) })
@@ -74,29 +71,11 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
         .accessibilityIdentifier(AccessibilityId.removeRecentSearchButton)
         .accessibilityLabel(Text(L10n.Accessibility.removeRecentSearch))
     }
-
-    private var clearAllButton: some View {
-        Button(action: {
-            withAnimation {
-                viewModel.didTapClearAll()
-            }
-        }, label: {
-            Text.build(theme.font.body.small(L10n.Search.Screen.RecentSearches.ClearAll.Button.cta, underline: true))
-                .foregroundStyle(Primitives.Colours.neutrals800)
-        })
-        .accessibilityIdentifier(AccessibilityId.clearRecentSearchesButton)
-    }
-}
-
-private enum Constants {
-    static let emptyViewSearchIconWidth: CGFloat = 48
-    static let emptyViewSearchIconHeight: CGFloat = 48
 }
 
 private enum AccessibilityId {
     static let recentSearchHeaderTitle = "recent-search-title"
     static let recentSearchItem = "recent-search-item"
-    static let clearRecentSearchesButton = "clear-recent-searches"
     static let removeRecentSearchButton = "remove-recent-search-item"
 }
 

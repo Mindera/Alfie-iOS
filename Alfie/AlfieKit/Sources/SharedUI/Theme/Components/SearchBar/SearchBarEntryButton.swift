@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A non-editable search entry point: a VoiceOver-operable `Button` wrapping a display-only
 /// `ThemedSearchBarView` (`.soft`). Tapping runs `action` — typically presenting the full search
-/// flow. Shared by the Home and Shop headers so the button/accessibility wrapping lives in one place.
+/// flow. A `searchTerm`, when given, is shown in place of the placeholder.
 ///
 /// The inner bar is `.allowsHitTesting(false)` + `.accessibilityHidden(true)`, so the `Button` is the
 /// single accessible element (its label/id come from the parameters). Callers own outer layout
@@ -25,17 +25,20 @@ public struct SearchBarEntryButton: View {
     }
 
     private let placeholder: String
+    private let searchTerm: String?
     private let accessibilityIdentifier: String
     private let scan: ScanConfiguration?
     private let action: () -> Void
 
     public init(
         placeholder: String,
+        searchTerm: String? = nil,
         accessibilityIdentifier: String,
         scan: ScanConfiguration? = nil,
         action: @escaping () -> Void
     ) {
         self.placeholder = placeholder
+        self.searchTerm = searchTerm
         self.accessibilityIdentifier = accessibilityIdentifier
         self.scan = scan
         self.action = action
@@ -53,7 +56,7 @@ public struct SearchBarEntryButton: View {
     private var searchButton: some View {
         Button(action: action) {
             ThemedSearchBarView(
-                searchText: .constant(""),
+                searchText: .constant(searchTerm ?? ""),
                 placeholder: placeholder,
                 theme: Constants.barTheme,
                 dismissConfiguration: .init(type: .hidden),
@@ -65,7 +68,7 @@ public struct SearchBarEntryButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(accessibilityIdentifier)
-        .accessibilityLabel(placeholder)
+        .accessibilityLabel(searchTerm ?? placeholder)
     }
 
     /// A Scan control moves the magnifier to the leading edge so the two bracket the text; without

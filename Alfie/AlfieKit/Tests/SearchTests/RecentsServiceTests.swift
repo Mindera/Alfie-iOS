@@ -117,7 +117,7 @@ final class RecentsServiceTests: XCTestCase {
 
         XCTAssertTrue(sut.recentSearches.isEmpty)
     }
-    
+
     func test_RemoveAll_WithAutoSave_SavesInStorage() {
         let expectation = expectation(description: "RemoveAll_WithAutoSave_SavesInStorage")
         expectation.expectedFulfillmentCount = 3

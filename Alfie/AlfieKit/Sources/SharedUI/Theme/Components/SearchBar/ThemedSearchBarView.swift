@@ -226,6 +226,7 @@ public struct ThemedSearchBarView: View {
         onFocusChange: ((Bool) -> Void)? = nil
     ) {
         _searchText = searchText
+        _text = State(initialValue: searchText.wrappedValue)
         defaultPlaceholder = placeholder
         focusedPlaceholder = placeholderOnFocus ?? defaultPlaceholder
         self.theme = theme
@@ -244,17 +245,14 @@ public struct ThemedSearchBarView: View {
     }
 
     private enum Constants {
-        static let autoFocusTimeDelay: CGFloat = 0
         static let borderLineWidth: CGFloat = 1
         static let trailingIconSize: CGFloat = 16
-        static let cancelIconSize: CGFloat = 16
     }
 
     public var body: some View {
         HStack {
-            if isCancelButtonVisible && dismissConfiguration.type == .back {
+            if dismissConfiguration.type == .back {
                 cancelButton
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
             HStack(spacing: iconLayout.hasTrailingAccessory ? theme.horizontalContentPadding : 0) {
@@ -287,19 +285,26 @@ public struct ThemedSearchBarView: View {
                     isFocused = true
                 }
                 .overlay(textFieldOverlayIcon, alignment: .trailing)
-                .onAppear {
+                .task {
                     guard case .on(let delay) = autoFocusWhenAppearing else { return }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        isFocused = true
-                    }
+                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    guard !Task.isCancelled else { return }
+                    isFocused = true
+                }
+                .onDisappear {
+                    isFocused = false
                 }
                 .onChange(of: isFocused) { newValue in
-                    isCancelButtonVisible = newValue && dismissConfiguration.type != .hidden
+                    isCancelButtonVisible = newValue && dismissConfiguration.isCancelType
                     onFocusChange?(newValue)
                 }
                 .onChange(of: text) { newValue in
                     isClearButtonVisible = !newValue.isEmpty
                     searchText = newValue
+                }
+                .onChange(of: searchText) { newValue in
+                    guard newValue != text else { return }
+                    text = newValue
                 }
                 .onSubmit {
                     onSubmitTap?()
@@ -392,17 +397,7 @@ public struct ThemedSearchBarView: View {
 
         switch dismissConfiguration.type {
         case .back:
-            Button {
-                dismissBlock()
-            } label: {
-                Icon.arrowLeft.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .tint(Primitives.Colours.neutrals800)
-                    .frame(size: Constants.cancelIconSize)
-            }
-            .accessibilityIdentifier(dismissConfiguration.accessibilityId)
+            ThemedBackButton(accessibilityIdentifier: dismissConfiguration.accessibilityId, action: dismissBlock)
 
         case .cancel(let title):
             Button {

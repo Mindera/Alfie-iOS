@@ -85,7 +85,7 @@ public final class CategorySelectorFlowViewModel: CategorySelectorFlowViewModelP
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: overlays.showSearch
+            searchNavigation: .listing(openSearch: overlays.showSearch)
         )
     }
 

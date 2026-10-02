@@ -10,6 +10,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var products: [Product]
     public var wishlistContent: [SelectedProduct]
     public var title: String = "Title"
+    public var searchTerm: String?
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
     public var sortOption: String?
@@ -53,6 +54,16 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var didTapSearchCalled: (() -> Void)?
     public func didTapSearch() {
         didTapSearchCalled?()
+    }
+
+    public var onDidTapBackCalled: (() -> Void)?
+    public func didTapBack() {
+        onDidTapBackCalled?()
+    }
+
+    public var onDidTapSearchBarCalled: (() -> Void)?
+    public func didTapSearchBar() {
+        onDidTapSearchBarCalled?()
     }
 
     public var onSetListStyleCalled: ((ProductListingListStyle) -> Void)?

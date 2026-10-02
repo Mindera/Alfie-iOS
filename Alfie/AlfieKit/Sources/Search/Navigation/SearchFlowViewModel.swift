@@ -5,6 +5,7 @@ import SwiftUI
 public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = SearchRoute
     @Published public var path = NavigationPath()
+    @Published public private(set) var focusesSearchBarOnAppear = true
     private let dependencies: SearchDependencyContainer
     let intentViewBuilder: (SearchIntent) -> AnyView
     private let closeSearchAction: () -> Void
@@ -29,12 +30,20 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
         )
     }
 
+    public func reset() {
+        focusesSearchBarOnAppear = true
+        popToRoot()
+    }
+
     // MARK: - FlowViewModelProtocol
 
     public func navigate(_ route: SearchRoute) {
-        if case .search = route {
-            popToRoot()
-        } else {
+        switch route {
+        case .search:
+            reset()
+
+        case .searchIntent:
+            focusesSearchBarOnAppear = false
             path.append(route)
         }
     }
