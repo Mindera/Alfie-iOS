@@ -1,5 +1,6 @@
 import Mocks
 import Model
+import SharedUI
 import SnapshotTesting
 import SwiftUI
 import TestUtils
@@ -115,6 +116,25 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         viewModel.searchTerm = "cream"
         let sut = NavigationStack { ProductListingView(viewModel: viewModel) }
         assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_retrying_a_refresh_shows_a_loader_pinned_over_the_products() {
+        let viewModel = makeViewModel(products: makeProducts(4))
+        viewModel.isRetryingRefresh = true
+        let sut = ProductListingView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_transient_error_snackbar_shows_a_retry_action_beside_close() {
+        let sut = SnackbarView(
+            configuration: .transientError(.init(request: .nextPage, error: .noInternet), onRetry: {}, onDismiss: {})
+        )
+        .padding(Primitives.Spacing.spacing8)
+        assertSnapshot(of: sut.embededInContainer(height: 80),
                        as: .defaultImage(),
                        record: isRecording)
     }

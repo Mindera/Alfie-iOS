@@ -22,7 +22,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @StateObject private var viewModel: ViewModel
     @State private var orientation = UIDeviceOrientation.unknown
-    @State private var refreshSnackbarConfig: SnackbarViewConfiguration?
+    @State private var transientErrorSnackbarConfig: SnackbarViewConfiguration?
 
     public init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -52,21 +52,25 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 errorView
             }
         }
-        .snackbarView(configuration: $refreshSnackbarConfig)
-        // A failed pull-to-refresh keeps the grid and surfaces a transient error here, not the full
-        // error screen. Dismissing the Snackbar clears `refreshError` so an identical later failure
-        // re-presents cleanly.
-        .onChange(of: viewModel.refreshError) { refreshError in
-            guard refreshError != nil else {
-                refreshSnackbarConfig = nil
+        .overlay(alignment: .top) {
+            if viewModel.isRetryingRefresh {
+                LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
+                    .padding(theme.spacing.space200)
+                    .background(Primitives.Colours.neutrals0)
+                    .cornerRadius(Sizing.radiusSoft)
+                    .padding(.top, theme.spacing.space100)
+            }
+        }
+        .snackbarView(configuration: $transientErrorSnackbarConfig)
+        .onChange(of: viewModel.transientError) { transientError in
+            guard let transientError else {
+                transientErrorSnackbarConfig = nil
                 return
             }
-            refreshSnackbarConfig = .init(
-                type: .error,
-                text: L10n.Plp.Refresh.errorMessage,
-                showCloseButton: true,
-                icon: Icon.warning.image,
-                onDismiss: { viewModel.didDismissRefreshError() }
+            transientErrorSnackbarConfig = .transientError(
+                transientError,
+                onRetry: { Task { await viewModel.retryTransientError() } },
+                onDismiss: { viewModel.didDismissTransientError() }
             )
         }
         .toolbarView(for: viewModel)
@@ -187,6 +191,34 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
         case .generic, .noInternet, .noResults, .none:
             return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
         }
+    }
+}
+
+// MARK: - Transient error Snackbar
+
+extension SnackbarViewConfiguration {
+    static func transientError(
+        _ transientError: ProductListingTransientError,
+        onRetry: @escaping () -> Void,
+        onDismiss: @escaping () -> Void
+    ) -> Self {
+        let text: String
+        switch transientError.request {
+        case .nextPage:
+            text = L10n.Plp.NextPage.errorMessage
+        case .refresh:
+            text = L10n.Plp.Refresh.errorMessage
+        }
+        return .init(
+            type: .error,
+            text: text,
+            showCloseButton: true,
+            icon: Icon.warning.image,
+            actionButtonLabel: L10n.Plp.ErrorView.Button.cta,
+            autoDismissTime: nil,
+            onActionTap: onRetry,
+            onDismiss: onDismiss
+        )
     }
 }
 
