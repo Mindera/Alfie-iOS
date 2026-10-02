@@ -45,6 +45,17 @@ extension BFFGraphAPI.CartLineInput {
     }
 }
 
+extension BFFGraphAPI.UpdateCartLineInput {
+    init(domain: Model.CartLineUpdate) {
+        self.init(
+            id: domain.id,
+            productId: .some(domain.productId),
+            quantity: domain.quantity,
+            variantId: .some(domain.variantId)
+        )
+    }
+}
+
 // MARK: - Diagnostics
 
 extension Cart {

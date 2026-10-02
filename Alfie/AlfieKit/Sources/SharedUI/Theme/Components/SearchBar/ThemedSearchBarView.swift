@@ -171,6 +171,33 @@ public struct ThemedSearchBarView: View {
     private let autoFocusWhenAppearing: AutoFocusSetting
     private let inputAccessibilityId: String
     private let clearAccessibilityId: String
+    /// Where the magnifying glass sits, and what — if anything — shares the bar with it.
+    ///
+    /// One choice rather than two, because it is one decision: a bar with a second control needs the
+    /// magnifier out of that control's corner, and a bar without one has nothing to make room for.
+    public enum IconLayout {
+        /// The magnifying glass overlays the trailing end of the text. The bar's default.
+        case magnifierOnly
+        /// The magnifying glass leads and the Scan glyph trails, the two bracketing the text. For a
+        /// bar with the tag scanner behind it.
+        ///
+        /// Names the one accessory there is rather than taking any view: there is exactly one second
+        /// control, and the bar already owns the glyph that draws it. A second accessory should add
+        /// a case here, where the layout it needs can be stated, rather than arrive as an opaque
+        /// view the bar cannot reason about.
+        case magnifierLeadingScanTrailing
+
+        var hasTrailingAccessory: Bool {
+            switch self {
+            case .magnifierOnly:
+                return false
+            case .magnifierLeadingScanTrailing:
+                return true
+            }
+        }
+    }
+
+    private let iconLayout: IconLayout
     public let onCancelTap: (() -> Void)?
     public let onClearTap: (() -> Void)?
     public let onSubmitTap: (() -> Void)?
@@ -192,6 +219,7 @@ public struct ThemedSearchBarView: View {
         autoFocusWhenAppearing: AutoFocusSetting = .off,
         inputAccessibilityId: String? = nil,
         clearAccessibilityId: String? = nil,
+        iconLayout: IconLayout = .magnifierOnly,
         onCancelTap: (() -> Void)? = nil,
         onClearTap: (() -> Void)? = nil,
         onSubmitTap: (() -> Void)? = nil,
@@ -208,6 +236,7 @@ public struct ThemedSearchBarView: View {
         self.autoFocusWhenAppearing = autoFocusWhenAppearing
         self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityId.inputAccessibilityId
         self.clearAccessibilityId = clearAccessibilityId ?? AccessibilityId.clearAccessibilityId
+        self.iconLayout = iconLayout
         self.onCancelTap = onCancelTap
         self.onClearTap = onClearTap
         self.onSubmitTap = onSubmitTap
@@ -228,7 +257,11 @@ public struct ThemedSearchBarView: View {
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
-            HStack {
+            HStack(spacing: iconLayout.hasTrailingAccessory ? theme.horizontalContentPadding : 0) {
+                if iconLayout.hasTrailingAccessory {
+                    magnifyingGlassIcon
+                }
+
                 TextField(
                     "",
                     text: $text,
@@ -271,6 +304,8 @@ public struct ThemedSearchBarView: View {
                 .onSubmit {
                     onSubmitTap?()
                 }
+
+                trailingAccessory
             }
             .padding(.horizontal, theme.horizontalContentPadding)
             .padding(.vertical, Primitives.Spacing.spacing16)
@@ -317,10 +352,22 @@ public struct ThemedSearchBarView: View {
             .accessibilityHidden(true)
     }
 
+    /// The clear button always overlays the text. The magnifying glass only joins it here under
+    /// ``IconLayout/magnifierOnly`` — otherwise it has already been placed at the leading edge.
+    /// Matches the bar's own magnifying glass, so the pair bracketing the text reads as one set.
+    ///
+    /// `SharedUI.Theme` spelled out because ``ThemedSearchBarView/Theme`` — the bar's own set of
+    /// looks — shadows the design-token namespace inside this type.
+    @ViewBuilder private var trailingAccessory: some View {
+        if iconLayout.hasTrailingAccessory {
+            ThemedIcon(.scanBarcode, size: .small, tint: SharedUI.Theme.contentContentPrimary)
+        }
+    }
+
     @ViewBuilder private var textFieldOverlayIcon: some View {
         if isClearButtonVisible {
             clearButton
-        } else {
+        } else if !iconLayout.hasTrailingAccessory {
             magnifyingGlassIcon
         }
     }

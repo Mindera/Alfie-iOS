@@ -12,6 +12,17 @@ public final class MockProductService: ProductServiceProtocol {
         return product
     }
 
+    public var onProductByBarcodeCalled: ((String) async throws -> BarcodeMatch?)?
+    public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
+        // `nil` is a real answer — no Product carries that Barcode — so the closure is unwrapped
+        // rather than its result. Otherwise an unset stub reads as a deliberate no-match, and a
+        // lookup test passes without ever being configured.
+        guard let onProductByBarcodeCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return try await onProductByBarcodeCalled(barcode)
+    }
+
     public var onProductListCalled: ((String, String?, Int, String?, ProductFilterInput?) throws -> ProductListing)?
     public func productList(
         collectionHandle: String,

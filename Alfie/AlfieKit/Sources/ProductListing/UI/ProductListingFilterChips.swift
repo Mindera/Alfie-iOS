@@ -4,9 +4,10 @@ import SwiftUI
 
 // MARK: - ProductListingFilterChips
 
-/// Horizontal row of filter chips shown under the PLP filter bar. The labels are mock stand-ins for
-/// the (not-yet-available) server-driven filter facets; selection is local-only, with no filtering
-/// behaviour. Replace `mockFilters` + the local selection with the real facets once the BFF exposes them.
+/// Horizontal row of filter chips for the PLP filter bar. Not currently rendered: the labels are mock
+/// stand-ins for the (not-yet-available) server-driven filter facets and selection does no filtering.
+/// Replace `filters` + the local selection with the real facets once the BFF exposes them, then put it
+/// back in `ProductListingView.infoFilterBarView`.
 struct ProductListingFilterChips: View {
     @State private var selectedIndices: Set<Int> = []
 

@@ -66,11 +66,49 @@ final class MainMenuConverterTests: XCTestCase {
         XCTAssertTrue(items.isEmpty)
     }
 
-    func test_unknown_multi_segment_url_is_dropped() {
-        // Not a recognized Shopify route (collections/pages/blogs/products) — dropped rather than
-        // guessed into a bogus collection handle.
-        let items = makeMenu(items: [Mock<MenuItem>(id: "1", title: "Deep", url: "/shop/new/dresses")])
-            .convertToNavigationItems()
+    /// The guard used to test only the first segment, so a nested product route reached the PLP as
+    /// if its last segment were a category handle.
+    func test_nested_page_blog_product_links_are_dropped() {
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Contact", url: "/shop/pages/x"),
+            Mock<MenuItem>(id: "2", title: "News", url: "/shop/blogs/y"),
+            Mock<MenuItem>(id: "3", title: "Shirt", url: "/shop/products/z")
+        ]).convertToNavigationItems()
+
+        XCTAssertTrue(items.isEmpty)
+    }
+
+    /// SCAYLE nests a category under its parent, and the handle the PLP wants is the last segment:
+    /// `women/women-108` lists 217 products on staging, where the first segment `women` is a
+    /// different, smaller category. Dropping these is what hid Women, New In and Jewellery from the
+    /// store menu.
+    func test_scayle_category_path_maps_to_its_last_segment() throws {
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Women", url: "women/women-108"),
+            Mock<MenuItem>(id: "2", title: "New In", url: "new/new-in-85"),
+            Mock<MenuItem>(id: "3", title: "Jewellery", url: "jewellery-watches/jewellery-watches-556")
+        ]).convertToNavigationItems()
+
+        XCTAssertEqual(items.map(\.url), ["/women-108", "/new-in-85", "/jewellery-watches-556"])
+        XCTAssertEqual(items.map(\.type), [.listing, .listing, .listing])
+    }
+
+    func test_deeply_nested_category_path_maps_to_its_last_segment() throws {
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "All Clothing", url: "women/women/all-clothing-109")
+        ]).convertToNavigationItems()
+
+        let item = try XCTUnwrap(items.first)
+        XCTAssertEqual(item.url, "/all-clothing-109")
+    }
+
+    /// An absolute link outside `collections` is off-app content, not a PLP — staging's
+    /// `Reselfridges` item points at a `scayle.shop` content page.
+    func test_absolute_non_collection_url_is_dropped() {
+        let items = makeMenu(items: [
+            Mock<MenuItem>(id: "1", title: "Reselfridges", url: "https://example.sf.scayle.shop/gb/content/reselfridges")
+        ]).convertToNavigationItems()
+
         XCTAssertTrue(items.isEmpty)
     }
 

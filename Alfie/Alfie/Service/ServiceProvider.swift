@@ -86,6 +86,9 @@ final class ServiceProvider: ServiceProviderProtocol {
             dependencies: bffDependencies,
             log: log
         )
+        #if DEBUG
+        Task { await BFFConnectivityProbe(baseUrl: apiUrl, log: log).run() }
+        #endif
         notificationsService = NotificationsService()
 
         // API Services

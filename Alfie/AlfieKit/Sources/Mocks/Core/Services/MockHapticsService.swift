@@ -1,8 +1,8 @@
 import Model
 
 public final class MockHapticsService: HapticsServiceProtocol {
-    var onPrepareCalled: ((HapticType) -> Void)?
-    var onTriggerCalled: ((HapticType) -> Void)?
+    public var onPrepareCalled: ((HapticType) -> Void)?
+    public var onTriggerCalled: ((HapticType) -> Void)?
 
     public init() {}
 
