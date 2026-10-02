@@ -56,3 +56,5 @@ public extension PaginatedViewState {
         return type
     }
 }
+
+extension PaginatedViewState: Equatable where Value: Equatable, StateError: Equatable {}

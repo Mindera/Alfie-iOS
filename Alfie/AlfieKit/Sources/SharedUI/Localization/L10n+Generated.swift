@@ -328,6 +328,10 @@ public enum L10n {
         public static let title = L10n.tr("L10n", "plp.list_style.option.title")
       }
     }
+    public enum NextPage {
+      /// Couldn't load more products.
+      public static let errorMessage = L10n.tr("L10n", "plp.next_page.error_message")
+    }
     public enum NumberOfResults {
       /// Plural format key: plp.number_of_results.message
       public static func message(_ p1: Int) -> String {
@@ -862,6 +866,7 @@ public extension L10n {
       case plpErrorViewServerErrorMessage = "plp.error_view.server_error.message"
       case plpErrorViewServerErrorTitle = "plp.error_view.server_error.title"
       case plpListStyleOptionTitle = "plp.list_style.option.title"
+      case plpNextPageErrorMessage = "plp.next_page.error_message"
       case plpNumberOfResultsMessage = "plp.number_of_results.message"
       case plpQuickFilterCottonLabel = "plp.quick_filter.cotton.label"
       case plpQuickFilterLinenLabel = "plp.quick_filter.linen.label"

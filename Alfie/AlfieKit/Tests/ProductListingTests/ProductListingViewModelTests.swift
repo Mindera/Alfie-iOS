@@ -1,3 +1,4 @@
+import Combine
 import Mocks
 import Model
 import TestUtils
@@ -419,7 +420,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.state.isSuccess)
 
         // Refresh must hit page 1 (after == nil) while forwarding the active sort + filters, and
-        // replace the grid with the fresh response.
+        // replace the loaded products with the fresh response.
         var refreshedAfter: String? = "unset"
         var refreshedSort: String?
         var refreshedFilters: ProductFilterInput?
@@ -437,10 +438,10 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(refreshedFilters, filters)
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.count, 2)
-        XCTAssertNil(sut.refreshError)
+        XCTAssertNil(sut.transientError)
     }
 
-    func test_refresh_failure_keeps_grid_and_emits_transient_error() async {
+    func test_refresh_failure_keeps_loaded_products_and_emits_transient_error() async {
         sut = makeSUT(category: "clothing")
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
@@ -454,14 +455,14 @@ final class ProductListingViewModelTests: XCTestCase {
         }
         await sut.refresh()
 
-        // Non-destructive: the grid stays on screen (still `.success`) and the failure surfaces as a
-        // transient `refreshError`, never the full `.error` screen.
+        // Non-destructive: the loaded products stay on screen (still `.success`) and the failure
+        // surfaces as a transient error, never a blocking error.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
-        XCTAssertEqual(sut.refreshError, .serverError)
+        XCTAssertEqual(sut.transientError, .init(request: .refresh, error: .serverError))
     }
 
-    func test_refresh_cancellation_keeps_grid_and_emits_no_error() async {
+    func test_refresh_cancellation_keeps_loaded_products_and_emits_no_error() async {
         sut = makeSUT(category: "clothing")
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
@@ -476,12 +477,12 @@ final class ProductListingViewModelTests: XCTestCase {
         await sut.refresh()
 
         // Guards the ViewModel half of the contract: given a service that rethrows `CancellationError`
-        // unmapped, `refresh()` must swallow it — grid intact, no Snackbar. It stubs
+        // unmapped, `refresh()` must swallow it — loaded products intact, no Snackbar. It stubs
         // `MockProductListingService`, a layer above the fix, so it cannot fail for the service half;
         // `ProductServiceTests.test_productList_rethrows_cancellation_unmapped` covers that.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
-        XCTAssertNil(sut.refreshError)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_load_more_appends_next_page_and_stops_when_no_next_page() {
@@ -509,6 +510,57 @@ final class ProductListingViewModelTests: XCTestCase {
 
         // hasNextPage is now false, so displaying the last item must not fetch again.
         XCTAssertNoEmit(from: sut.$state, afterTrigger: { self.sut.didDisplay(self.sut.products.last!) })
+    }
+
+    func test_failed_next_page_keeps_loaded_products_and_emits_transient_error() {
+        sut = makeSUT(category: "clothing")
+        let page1 = Array(Product.fixtures.prefix(3))
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            guard after == nil else { throw BFFRequestError(type: .noInternet) }
+            return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: page1)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$transientError,
+            where: { $0 != nil },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
+        XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noInternet))
+    }
+
+    func test_cancelled_next_page_keeps_loaded_products_and_emits_no_error() {
+        sut = makeSUT(category: "clothing")
+        let page1 = Array(Product.fixtures.prefix(3))
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            guard after == nil else { throw CancellationError() }
+            return ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: page1)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+
+        XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
+        XCTAssertNil(sut.transientError)
+    }
+
+    func test_cancelled_first_page_raises_a_blocking_error() {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw CancellationError()
+        }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure, .generic)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_refresh_after_paging_resets_to_first_page() async {
@@ -641,6 +693,33 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(totalFetches, 1)
     }
 
+    func test_reappearing_while_a_next_page_is_in_flight_does_not_refetch_page_one() async {
+        sut = makeSUT(category: "clothing")
+        let page1 = Array(Product.fixtures.prefix(3))
+        let page2 = Array(Product.fixtures.suffix(2))
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: page1)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        let gate = FetchGate()
+        let nextPageInFlight = expectation(description: "next page fetch is in-flight")
+        let pageOneFetched = expectation(description: "page 1 must not be fetched during a next page")
+        pageOneFetched.isInverted = true
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            await gate.recordAndMaybeWait(signal: nextPageInFlight, secondSignal: pageOneFetched)
+            return ProductListing.fixture(pagination: .fixture(hasNextPage: false), products: page2)
+        }
+
+        sut.didDisplay(sut.products.last!)
+        await fulfillment(of: [nextPageInFlight], timeout: 1)
+        sut.viewDidAppear()
+        await fulfillment(of: [pageOneFetched], timeout: 0.5)
+
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { Task { await gate.open() } })
+        XCTAssertEqual(sut.products.map(\.id), (page1 + page2).map(\.id))
+    }
+
     // MARK: - Retry (error-state recovery)
 
     func test_retry_refetches_first_page_from_error_state() async {
@@ -707,6 +786,173 @@ final class ProductListingViewModelTests: XCTestCase {
         let totalFetches = await gate.entries
         XCTAssertEqual(totalFetches, 1)
         XCTAssertTrue(sut.state.isSuccess)
+    }
+
+    // MARK: - Retry (transient-error recovery)
+
+    func test_retrying_a_failed_next_page_resends_it_with_the_same_cursor_and_clears_the_error() async {
+        let recorder = loadFirstPageThenFailTheNextPageOnce()
+
+        await sut.retryTransientError()
+
+        XCTAssertEqual(recorder.cursors, [nil, "cursor-1", "cursor-1"])
+        XCTAssertNil(recorder.errorWhenResent)
+        XCTAssertNil(sut.transientError)
+        XCTAssertEqual(sut.products.map(\.id), (recorder.page1 + recorder.page2).map(\.id))
+    }
+
+    func test_retrying_a_failed_refresh_resends_the_refresh_and_clears_the_error() async {
+        sut = makeSUT(category: "clothing")
+        let refreshed = Array(Product.fixtures.suffix(2))
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+        await sut.refresh()
+        var cursor: String?? = .none
+        var errorWhenResent: ProductListingTransientError?
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            cursor = after
+            errorWhenResent = self.sut.transientError
+            return ProductListing.fixture(products: refreshed)
+        }
+
+        await sut.retryTransientError()
+
+        XCTAssertEqual(cursor, .some(nil))
+        XCTAssertNil(errorWhenResent)
+        XCTAssertNil(sut.transientError)
+        XCTAssertEqual(sut.products.map(\.id), refreshed.map(\.id))
+    }
+
+    func test_retrying_a_failed_refresh_shows_a_loader_until_it_lands() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+        await sut.refresh()
+        var isRetryingWhileInFlight = false
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            isRetryingWhileInFlight = self.sut.isRetryingRefresh
+            return ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
+        }
+
+        await sut.retryTransientError()
+
+        XCTAssertTrue(isRetryingWhileInFlight)
+        XCTAssertFalse(sut.isRetryingRefresh)
+    }
+
+    func test_pulling_to_refresh_shows_no_retry_loader() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        var isRetryingWhileInFlight = true
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            isRetryingWhileInFlight = self.sut.isRetryingRefresh
+            return ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
+        }
+
+        await sut.refresh()
+
+        XCTAssertFalse(isRetryingWhileInFlight)
+    }
+
+    func test_retrying_a_failed_next_page_leaves_the_retry_loader_flag_unpublished() async {
+        _ = loadFirstPageThenFailTheNextPageOnce()
+        var publishes = 0
+        let cancellable = sut.$isRetryingRefresh.dropFirst().sink { _ in publishes += 1 }
+
+        await sut.retryTransientError()
+
+        XCTAssertEqual(publishes, 0)
+        cancellable.cancel()
+    }
+
+    func test_retrying_without_a_transient_error_sends_nothing() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        var fetches = 0
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            fetches += 1
+            return ProductListing.fixture(products: [])
+        }
+
+        await sut.retryTransientError()
+
+        XCTAssertEqual(fetches, 0)
+    }
+
+    func test_scrolling_back_to_the_last_product_retries_a_failed_next_page_and_clears_the_error() {
+        let recorder = loadFirstPageThenFailTheNextPageOnce()
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+
+        XCTAssertEqual(recorder.cursors, [nil, "cursor-1", "cursor-1"])
+        XCTAssertNil(recorder.errorWhenResent)
+        XCTAssertNil(sut.transientError)
+        XCTAssertEqual(sut.products.map(\.id), (recorder.page1 + recorder.page2).map(\.id))
+    }
+
+    func test_a_next_page_clears_a_transient_error_left_by_a_refresh() async {
+        sut = makeSUT(category: "clothing")
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(endCursor: "cursor-1", hasNextPage: true), products: Array(Product.fixtures.prefix(3)))
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .serverError(status: 503))
+        }
+        await sut.refresh()
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            ProductListing.fixture(pagination: .fixture(hasNextPage: false), products: Array(Product.fixtures.suffix(2)))
+        }
+
+        XCTAssertEmitsValue(
+            from: sut.$transientError,
+            where: { $0 == nil },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+    }
+
+    private func loadFirstPageThenFailTheNextPageOnce() -> NextPageRecorder {
+        sut = makeSUT(category: "clothing")
+        let recorder = NextPageRecorder()
+        mockProductListing.onProductListPageCalled = { _, after, _, _ in
+            recorder.cursors.append(after)
+            guard after != nil else {
+                return ProductListing.fixture(
+                    pagination: .fixture(endCursor: "cursor-1", hasNextPage: true),
+                    products: recorder.page1
+                )
+            }
+            guard recorder.cursors.count > 2 else { throw BFFRequestError(type: .noInternet) }
+            recorder.errorWhenResent = self.sut.transientError
+            return ProductListing.fixture(pagination: .fixture(hasNextPage: false), products: recorder.page2)
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+        XCTAssertEmitsValue(
+            from: sut.$transientError,
+            where: { $0 != nil },
+            afterTrigger: { self.sut.didDisplay(self.sut.products.last!) }
+        )
+        return recorder
     }
 
     // MARK: - Filter lifetime (ALFMOB-487)
@@ -903,7 +1149,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.priceBounds?.minimum, 10)
     }
 
-    func test_applying_filters_clears_a_stale_refresh_error() async {
+    func test_applying_filters_clears_a_stale_transient_error() async {
         // The Snackbar describes the previous result set; left up over a freshly filtered listing
         // it reads as the filter having failed.
         sut = makeSUT(category: "clothing")
@@ -916,7 +1162,7 @@ final class ProductListingViewModelTests: XCTestCase {
             throw BFFRequestError(type: .serverError(status: 503))
         }
         await sut.refresh()
-        XCTAssertEqual(sut.refreshError, .serverError)
+        XCTAssertEqual(sut.transientError, .init(request: .refresh, error: .serverError))
 
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.suffix(2)))
@@ -927,7 +1173,7 @@ final class ProductListingViewModelTests: XCTestCase {
             afterTrigger: { self.sut.didApplyFilters(.init(minPrice: 40), sort: nil) }
         )
 
-        XCTAssertNil(sut.refreshError)
+        XCTAssertNil(sut.transientError)
     }
 
     func test_a_page_in_flight_when_filters_change_cannot_overwrite_the_filtered_result() async {
@@ -966,6 +1212,13 @@ final class ProductListingViewModelTests: XCTestCase {
     private func money(_ amount: Int) -> Money {
         Money(currencyCode: "GBP", amount: amount, amountFormatted: "")
     }
+}
+
+private final class NextPageRecorder {
+    let page1 = Array(Product.fixtures.prefix(3))
+    let page2 = Array(Product.fixtures.suffix(2))
+    var cursors: [String?] = []
+    var errorWhenResent: ProductListingTransientError?
 }
 
 /// Test gate that holds the first fetch suspended until released, and counts how many fetches ran —
