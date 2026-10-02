@@ -1,4 +1,3 @@
-import Combine
 import Core
 import Model
 import SwiftUI
@@ -6,26 +5,19 @@ import SwiftUI
 public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol {
     public typealias Route = SearchRoute
     @Published public var path = NavigationPath()
-    @Published private(set) var isPresented = false
     @Published public private(set) var focusesSearchBarOnAppear = true
     private let dependencies: SearchDependencyContainer
     let intentViewBuilder: (SearchIntent) -> AnyView
-
-    public var overlayViewPublisher: AnyPublisher<AnyView?, Never> {
-        $isPresented
-            .map { [weak self] isPresented in
-                guard let self, isPresented else { return nil }
-                return AnyView(SearchFlowView(viewModel: self))
-            }
-            .eraseToAnyPublisher()
-    }
+    private let closeSearchAction: () -> Void
 
     public init(
         dependencies: SearchDependencyContainer,
-        intentViewBuilder: @escaping (SearchIntent) -> AnyView
+        intentViewBuilder: @escaping (SearchIntent) -> AnyView,
+        closeSearchAction: @escaping () -> Void
     ) {
         self.dependencies = dependencies
         self.intentViewBuilder = intentViewBuilder
+        self.closeSearchAction = closeSearchAction
     }
 
     // MARK: - View Models for SearchRoute
@@ -34,20 +26,11 @@ public final class SearchFlowViewModel: ObservableObject, FlowViewModelProtocol 
         SearchViewModel(
             dependencies: dependencies,
             navigate: { [weak self] in self?.navigate($0) },
-            closeSearchAction: { [weak self] in self?.close() }
+            closeSearchAction: { [weak self] in self?.closeSearchAction() }
         )
     }
 
-    public func present() {
-        isPresented = true
-    }
-
-    public func close() {
-        isPresented = false
-        reset()
-    }
-
-    private func reset() {
+    public func reset() {
         focusesSearchBarOnAppear = true
         popToRoot()
     }

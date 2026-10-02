@@ -21,3 +21,9 @@ mutation RemoveFromCartMutation($cartId: String!, $lineId: String!) {
         ...CartFragment
     }
 }
+
+mutation UpdateCartMutation($input: UpdateCartInput!) {
+    updateCart(input: $input) {
+        ...CartFragment
+    }
+}

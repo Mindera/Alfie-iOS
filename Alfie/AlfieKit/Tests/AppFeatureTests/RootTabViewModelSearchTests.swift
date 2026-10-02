@@ -19,7 +19,7 @@ final class RootTabViewModelSearchTests: XCTestCase {
 
         sut.homeFlowViewModel.makeHomeViewModel().didTapSearch()
 
-        XCTAssertNotNil(sut.overlayView)
+        XCTAssertNotNil(sut.overlay)
         XCTAssertEqual(sut.selectedTab, .home)
     }
 
@@ -29,7 +29,7 @@ final class RootTabViewModelSearchTests: XCTestCase {
 
         sut.categorySelectorFlowViewModel.presentSearch()
 
-        XCTAssertNotNil(sut.overlayView)
+        XCTAssertNotNil(sut.overlay)
         XCTAssertEqual(sut.selectedTab, .shop)
     }
 
@@ -39,7 +39,7 @@ final class RootTabViewModelSearchTests: XCTestCase {
 
         sut.selectedTab = .shop
 
-        XCTAssertNil(sut.overlayView)
+        XCTAssertNil(sut.overlay)
         XCTAssertEqual(sut.selectedTab, .shop)
     }
 
@@ -50,7 +50,7 @@ final class RootTabViewModelSearchTests: XCTestCase {
 
         sut.popToRoot(in: .home)
 
-        XCTAssertNil(sut.overlayView)
+        XCTAssertNil(sut.overlay)
         XCTAssertEqual(sut.selectedTab, .home)
         XCTAssertEqual(sut.homeFlowViewModel.path.count, 1)
     }

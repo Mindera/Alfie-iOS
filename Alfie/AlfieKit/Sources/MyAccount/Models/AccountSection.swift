@@ -1,55 +1,57 @@
 import SharedUI
 
 public enum AccountSection: CaseIterable {
-    case myAddressBook
-    case myDetails
-    case myOrders
+    case personalInformation
+    case orders
+    case wishlist
+    case wallet
+    case addressBook
     case settings
     case signIn
     case signOut
-    case wallet
-    case wishlist
 
     var title: String {
+        // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-        case .myAddressBook:
-            "My Address Book"
-        case .myDetails:
-            "My Details"
-        case .myOrders:
-            "My Orders"
+        case .personalInformation:
+            L10n.Account.personalInformation
+        case .orders:
+            L10n.Account.orders
+        case .wishlist:
+            L10n.Account.wishlist
+        case .wallet:
+            L10n.Account.wallet
+        case .addressBook:
+            L10n.Account.addressBook
         case .settings:
             L10n.Account.settings
         case .signIn:
-            "Sign In"
+            L10n.Account.signIn
         case .signOut:
-            "Sign Out"
-        case .wallet:
-            "Wallet"
-        case .wishlist:
-            "Wishlist"
+            L10n.Account.signOut
         }
+        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     var icon: Icon {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
-        case .myAddressBook:
-            Icon.location
-        case .myDetails:
+        case .personalInformation:
             Icon.user
-        case .myOrders:
-            Icon.store
+        case .orders:
+            Icon.package
+        case .wishlist:
+            Icon.heart
+        case .wallet:
+            Icon.creditCard
+        case .addressBook:
+            Icon.location
         case .settings:
             Icon.settings
         case .signIn:
             Icon.logIn
         case .signOut:
             Icon.logOut
-        case .wallet:
-            Icon.chat2
-        case .wishlist:
-            Icon.heart
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }

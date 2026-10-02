@@ -22,7 +22,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     func test_reads_current_endpoint_on_init() {
         mockEndpointService.currentApiEndpoint = .preProd
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         XCTAssertEqual(sut.selectedEndpointOption, .preProd)
     }
 
@@ -30,7 +30,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         let urlString = "https://www.endpoint.com"
         let url = try XCTUnwrap(URL(string: urlString))
         mockEndpointService.currentApiEndpoint = .custom(url: url)
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         XCTAssertEqual(sut.selectedEndpointOption, .custom(url: url))
         XCTAssertEqual(sut.customEndpointUrl, urlString)
     }
@@ -41,12 +41,12 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         mockEndpointService.onApiEndpointForOptionCalled = { _ in
             URL(string: urlString)!
         }
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         XCTAssertEqual(sut.customEndpointUrl, urlString)
     }
 
     func test_shows_url_error_when_saving_empty_url() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = ""
         sut.didTapSave()
@@ -54,7 +54,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
     }
 
     func test_clears_url_error_when_dismissing() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = ""
         sut.didTapSave()
@@ -64,33 +64,33 @@ final class EndpointSelectionViewModelTests: XCTestCase {
     }
 
     func test_shows_success_when_saving() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .preProd
         sut.didTapSave()
         XCTAssertTrue(sut.shouldShowSuccess)
     }
 
     func test_input_is_disabled_when_saving() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .preProd
         sut.didTapSave()
         XCTAssertTrue(sut.isInputDisabled)
     }
 
     func test_input_is_disabled_when_selected_option_is_not_custom() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .preProd
         XCTAssertTrue(sut.isInputDisabled)
     }
 
     func test_input_is_enabled_when_selected_option_is_custom() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         XCTAssertFalse(sut.isInputDisabled)
     }
 
     func test_save_button_is_disabled_when_saving() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .preProd
         sut.didTapSave()
         XCTAssertTrue(sut.isSaveDisabled)
@@ -98,7 +98,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     func test_save_button_is_disabled_when_current_option_equals_selected_option() {
         mockEndpointService.currentApiEndpoint = .preProd
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .preProd
         XCTAssertTrue(sut.isSaveDisabled)
     }
@@ -107,7 +107,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         let urlString = "https://www.endpoint.com"
         let url = URL(string: urlString)!
         mockEndpointService.currentApiEndpoint = .custom(url: url)
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = urlString
         XCTAssertTrue(sut.isSaveDisabled)
@@ -118,7 +118,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         let alternativeUrlString = "https://www.other-endpoint.com"
         let url = URL(string: originalUrlString)!
         mockEndpointService.currentApiEndpoint = .custom(url: url)
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = alternativeUrlString
         XCTAssertFalse(sut.isSaveDisabled)
@@ -126,23 +126,23 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     func test_save_button_is_enabled_when_current_custom_option_has_nil_url() {
         mockEndpointService.currentApiEndpoint = .custom(url: nil)
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         XCTAssertFalse(sut.isSaveDisabled)
     }
 
     func test_reports_all_endpoint_options_as_available() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         XCTAssertEqual(sut.availableEndpointOptions, ApiEndpointOption.allCases)
     }
 
     func test_reports_only_dev_and_custom_endpoint_options_as_selectable() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         XCTAssertEqual(sut.disabledEndpointOptions, [.preProd, .prod])
     }
 
     func test_reports_no_endpoint_options_as_selectable_when_saving() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = "https://www.endpoint.com"
         sut.didTapSave()
@@ -150,7 +150,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
     }
 
     func test_does_nothing_when_no_option_is_selected_when_saving() {
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = nil
         sut.didTapSave()
         XCTAssertFalse(sut.shouldShowUrlError)
@@ -164,7 +164,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .preProd
         sut.didTapSave()
         wait(for: [expectation], timeout: .default)
@@ -179,10 +179,14 @@ final class EndpointSelectionViewModelTests: XCTestCase {
             expectation.fulfill()
         }
 
-        sut = .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
+        sut = makeSut()
         sut.selectedEndpointOption = .custom(url: nil)
         sut.customEndpointUrl = urlString
         sut.didTapSave()
         wait(for: [expectation], timeout: .default)
+    }
+
+    private func makeSut() -> DebugMenu.EndpointSelectionViewModel {
+        .init(apiEndpointService: mockEndpointService, closeEndpointSelection: {})
     }
 }

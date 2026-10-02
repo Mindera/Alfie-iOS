@@ -29,10 +29,10 @@ WishlistFlowVM.Route == WishlistRoute {
     public let homeFlowViewModel: HomeFlowVM
     public let wishlistFlowViewModel: WishlistFlowVM
     public let myAccountFlowViewModel: MyAccountFlowViewModel
-    @Published public private(set) var overlayView: AnyView?
+    @Published public private(set) var overlay: TabOverlay?
     @Published public private(set) var bagBadgeValue: Int?
+    @Published public private(set) var isTabBarHidden = false
     @Published public var isReadyForNavigation = false
-    private let closeSearch: () -> Void
     private var subscriptions = Set<AnyCancellable>()
 
     public init(
@@ -44,7 +44,6 @@ WishlistFlowVM.Route == WishlistRoute {
         homeFlowViewModel: HomeFlowVM,
         wishlistFlowViewModel: WishlistFlowVM,
         myAccountFlowViewModel: MyAccountFlowViewModel,
-        closeSearch: @escaping () -> Void,
         scheduler: AnySchedulerOf<DispatchQueue> = .main
     ) {
         guard tabs.contains(initialTab) else {
@@ -60,14 +59,13 @@ WishlistFlowVM.Route == WishlistRoute {
         self.homeFlowViewModel = homeFlowViewModel
         self.wishlistFlowViewModel = wishlistFlowViewModel
         self.myAccountFlowViewModel = myAccountFlowViewModel
-        self.closeSearch = closeSearch
 
         setupBindings()
     }
 
     public func popToRoot(in tab: Model.Tab) {
-        guard overlayView == nil else {
-            closeSearch()
+        guard overlay == nil else {
+            dismissOverlays()
             return
         }
 
@@ -92,6 +90,7 @@ WishlistFlowVM.Route == WishlistRoute {
     public func navigate(_ route: TabRoute) {
         guard tabs.contains(route.tab) else { return }
         selectedTab = route.tab
+        dismissOverlays()
 
         switch route {
         case .bag(let bagRoute):
@@ -111,18 +110,26 @@ WishlistFlowVM.Route == WishlistRoute {
         }
     }
 
+    private func dismissOverlays() {
+        homeFlowViewModel.dismissOverlay()
+        categorySelectorFlowViewModel.dismissOverlay()
+    }
+
     private func setupBindings() {
-        homeFlowViewModel.overlayViewPublisher
-            .assignWeakly(to: \.overlayView, on: self)
+        homeFlowViewModel.overlayPublisher
+            .merge(with: categorySelectorFlowViewModel.overlayPublisher)
+            .assignWeakly(to: \.overlay, on: self)
             .store(in: &subscriptions)
 
-        categorySelectorFlowViewModel.overlayViewPublisher
-            .assignWeakly(to: \.overlayView, on: self)
+        $overlay
+            .map { $0?.hidesTabBar ?? false }
+            .assignWeakly(to: \.isTabBarHidden, on: self)
             .store(in: &subscriptions)
 
         $selectedTab
+            .removeDuplicates()
             .dropFirst()
-            .sink { [weak self] _ in self?.closeSearch() }
+            .sink { [weak self] _ in self?.dismissOverlays() }
             .store(in: &subscriptions)
 
         // The cart service is the cart's single owner, so the badge follows every add, remove and

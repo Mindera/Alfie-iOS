@@ -1,5 +1,6 @@
 import Foundation
 import Model
+import Utils
 
 public final class EndpointSelectionViewModel: ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol
@@ -23,14 +24,7 @@ public final class EndpointSelectionViewModel: ObservableObject {
             return true
         }
 
-        if case .custom = selectedEndpointOption {
-            if case .custom(let url) = apiEndpointService.currentApiEndpoint, let url {
-                return url.absoluteString == customEndpointUrl
-            } else {
-                return false
-            }
-        }
-        return selectedEndpointOption == apiEndpointService.currentApiEndpoint
+        return !hasEndpointChange
     }
 
     public var availableEndpointOptions = ApiEndpointOption.allCases
@@ -64,23 +58,37 @@ public final class EndpointSelectionViewModel: ObservableObject {
             return
         }
 
+        var customUrl: URL?
+
         if case .custom = selectedEndpointOption {
             guard !customEndpointUrl.isEmpty, let url = URL(string: customEndpointUrl) else {
                 shouldShowUrlError = true
                 return
             }
-
-            isSaving = true
-            apiEndpointService.updateApiEndpointAndReboot(.custom(url: url))
-        } else {
-            isSaving = true
-            apiEndpointService.updateApiEndpointAndReboot(selectedEndpointOption)
+            customUrl = url
         }
 
+        isSaving = true
+        apiEndpointService.updateApiEndpointAndReboot(customUrl.map { .custom(url: $0) } ?? selectedEndpointOption)
         shouldShowSuccess = true
     }
 
     public func didDismissError() {
         shouldShowUrlError = false
+    }
+
+    private var hasEndpointChange: Bool {
+        guard let selectedEndpointOption else {
+            return false
+        }
+
+        if case .custom = selectedEndpointOption {
+            if case .custom(let url) = apiEndpointService.currentApiEndpoint, let url {
+                return url.absoluteString != customEndpointUrl
+            }
+            return true
+        }
+
+        return selectedEndpointOption != apiEndpointService.currentApiEndpoint
     }
 }

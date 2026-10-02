@@ -12,6 +12,13 @@ type Barcode {
   value: String!
 }
 
+type BarcodeMatch {
+  id: ID!
+  name: String!
+  slug: String!
+  variantId: ID
+}
+
 type Cart {
   checkoutUrl: String
   createdAt: String
@@ -245,6 +252,7 @@ type Query {
   cartCheckoutUrl(cartId: String!): String!
   categoryPriceRange(collectionHandle: String!): CategoryPriceRange
   menu(handle: String! = "main-menu"): Menu!
+  productByBarcode(barcode: String!): BarcodeMatch
   productDetails(handle: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
   productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, sort: ProductSortEnum! = NEWEST): ProductListResponse!
   relatedProducts(handle: String!, limit: Int! = 8): [OmniProduct!]!

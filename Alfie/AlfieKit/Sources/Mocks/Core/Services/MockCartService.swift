@@ -40,6 +40,19 @@ public final class MockCartService: CartServiceProtocol {
         cartSubject.send(try await onRemoveCalled(lineId))
     }
 
+    public var onSetQuantityCalled: ((String, Int) async throws -> Cart?)?
+
+    public func setQuantity(lineId: String, to quantity: Int) async throws {
+        guard let onSetQuantityCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        cartSubject.send(try await onSetQuantityCalled(lineId, quantity))
+    }
+
+    public func send(cart: Cart?) {
+        cartSubject.send(cart)
+    }
+
     /// Unlike the closures above this does not stand in for a result — `discardCart()` cannot fail
     /// and asks the server nothing — it is how a test observes that the call arrived. It has to be
     /// a callback rather than a counter the test polls: `discardCart()` is a `nonisolated async`

@@ -25,6 +25,7 @@ Alfie/
 │   │   ├── MyAccount/              # Account feature module
 │   │   ├── ProductDetails/         # Product details feature module
 │   │   ├── ProductListing/         # Product listing feature module
+│   │   ├── Scanner/                # Scan feature module (Alfie code on a swing tag)
 │   │   ├── Search/                 # Search feature module
 │   │   ├── SharedUI/               # Localization, theme, components
 │   │   ├── TestUtils/              # Test helpers
@@ -33,6 +34,9 @@ Alfie/
 │   │   └── Wishlist/               # Wishlist feature module
 │   └── Tests/                      # Unit tests, one target per module
 └── scripts/                        # verify/build/test, Apollo codegen, design-token pipeline
+
+Tools/                              # Standalone SwiftPM tools, outside the AlfieKit graph
+└── DesignTokenGen/                 # Design-token → Swift code generator
 ```
 
 ## Common Commands

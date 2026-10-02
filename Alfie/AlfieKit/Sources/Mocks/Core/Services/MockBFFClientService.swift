@@ -16,6 +16,17 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return product
     }
 
+    public var onProductByBarcodeCalled: ((String) async throws -> BarcodeMatch?)?
+    public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
+        // `nil` is a real answer — no Product carries that Barcode — so the closure is unwrapped
+        // rather than its result. Otherwise an unset stub reads as a deliberate no-match, and a
+        // lookup test passes without ever being configured.
+        guard let onProductByBarcodeCalled else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return try await onProductByBarcodeCalled(barcode)
+    }
+
     public var onProductListCalled: ((String, String?, Int, String?, ProductFilterInput?) throws -> ProductListing)?
     public func productList(collectionHandle: String, after: String?, limit: Int, sort: String?, filters: ProductFilterInput?) async throws -> ProductListing {
         guard let productListing = try onProductListCalled?(collectionHandle, after, limit, sort, filters) else {
@@ -72,6 +83,14 @@ public class MockBFFClientService: BFFClientServiceProtocol {
     public var onRemoveFromCartCalled: ((String, String) throws -> Cart)?
     public func removeFromCart(cartId: String, lineId: String) async throws -> Cart {
         guard let cart = try onRemoveFromCartCalled?(cartId, lineId) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return cart
+    }
+
+    public var onUpdateCartCalled: ((String, [CartLineUpdate]) async throws -> Cart)?
+    public func updateCart(cartId: String, lines: [CartLineUpdate]) async throws -> Cart {
+        guard let cart = try await onUpdateCartCalled?(cartId, lines) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return cart

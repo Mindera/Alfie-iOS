@@ -8,6 +8,7 @@ final class HomeViewModelTests: XCTestCase {
     private var mockSessionService: MockSessionService!
     private var capturedRoute: HomeRoute?
     private var showSearchCalled = false
+    private var showScannerCalled = false
     private var sut: HomeViewModel!
 
     override func setUp() {
@@ -15,6 +16,7 @@ final class HomeViewModelTests: XCTestCase {
         mockSessionService = MockSessionService()
         capturedRoute = nil
         showSearchCalled = false
+        showScannerCalled = false
         sut = HomeViewModel(
             dependencies: HomeDependencyContainer(
                 configurationService: MockConfigurationService(),
@@ -22,13 +24,15 @@ final class HomeViewModelTests: XCTestCase {
                 sessionService: mockSessionService
             ),
             navigate: { [weak self] route in self?.capturedRoute = route },
-            showSearch: { [weak self] in self?.showSearchCalled = true }
+            showSearch: { [weak self] in self?.showSearchCalled = true },
+            showScanner: { [weak self] in self?.showScannerCalled = true }
         )
     }
 
     override func tearDown() {
         sut = nil
         mockSessionService = nil
+        showScannerCalled = false
         super.tearDown()
     }
 
@@ -52,6 +56,13 @@ final class HomeViewModelTests: XCTestCase {
     func test_DidTapSearch_CallsShowSearch() {
         sut.didTapSearch()
         XCTAssertTrue(showSearchCalled)
+    }
+
+    func test_did_tap_scan_shows_the_scanner_not_search() {
+        sut.didTapScan()
+
+        XCTAssertTrue(showScannerCalled)
+        XCTAssertFalse(showSearchCalled)
     }
 
     func test_DidTapMyAccount_NavigatesToMyAccount() {

@@ -13,6 +13,7 @@ class Query: MockObject {
     @Field<Cart>("cart") public var cart
     @Field<CategoryPriceRange>("categoryPriceRange") public var categoryPriceRange
     @Field<Menu>("menu") public var menu
+    @Field<BarcodeMatch>("productByBarcode") public var productByBarcode
     @Field<OmniProduct>("productDetails") public var productDetails
     @Field<ProductListResponse>("productList") public var productList
     @Field<[OmniProduct]>("relatedProducts") public var relatedProducts
@@ -25,6 +26,7 @@ extension Mock where O == Query {
     cart: Mock<Cart>? = nil,
     categoryPriceRange: Mock<CategoryPriceRange>? = nil,
     menu: Mock<Menu>? = nil,
+    productByBarcode: Mock<BarcodeMatch>? = nil,
     productDetails: Mock<OmniProduct>? = nil,
     productList: Mock<ProductListResponse>? = nil,
     relatedProducts: [Mock<OmniProduct>]? = nil,
@@ -34,6 +36,7 @@ extension Mock where O == Query {
     _setEntity(cart, for: \.cart)
     _setEntity(categoryPriceRange, for: \.categoryPriceRange)
     _setEntity(menu, for: \.menu)
+    _setEntity(productByBarcode, for: \.productByBarcode)
     _setEntity(productDetails, for: \.productDetails)
     _setEntity(productList, for: \.productList)
     _setList(relatedProducts, for: \.relatedProducts)

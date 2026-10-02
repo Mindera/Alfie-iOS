@@ -65,12 +65,20 @@ let package = Package(
             targets: ["ProductListing"]
         ),
         .library(
+            name: "Scanner",
+            targets: ["Scanner"]
+        ),
+        .library(
             name: "Search",
             targets: ["Search"]
         ),
         .library(
             name: "SharedUI",
             targets: ["SharedUI"]
+        ),
+        .library(
+            name: "TabFlow",
+            targets: ["TabFlow"]
         ),
         .library(
             name: "TestUtils",
@@ -116,6 +124,7 @@ let package = Package(
                 "Home",
                 "Mocks",
                 "Model",
+                "Scanner",
                 "Search",
                 "SharedUI",
                 "Utils",
@@ -154,8 +163,10 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
+                "TabFlow",
                 "Utils",
                 "Web",
                 "Wishlist",
@@ -188,6 +199,7 @@ let package = Package(
                 "Mocks",
                 "Model",
                 "SharedUI",
+                "Utils",
             ]
         ),
 
@@ -212,8 +224,11 @@ let package = Package(
                 "MyAccount",
                 "ProductDetails",
                 "ProductListing",
+                "Scanner",
                 "Search",
                 "SharedUI",
+                "TabFlow",
+                "Utils",
                 "Web",
                 "Wishlist",
             ],
@@ -277,6 +292,19 @@ let package = Package(
         ),
 
         .target(
+            name: "Scanner",
+            dependencies: [
+                "AccessibilityIdentifiers",
+                "Core",
+                "Mocks",
+                "Model",
+                "SharedUI",
+                "Utils",
+                .product(name: "AlicerceLogging", package: "Alicerce"),
+            ]
+        ),
+
+        .target(
             name: "Search",
             dependencies: [
                 "Model",
@@ -309,6 +337,18 @@ let package = Package(
             ]
         ),
         
+        .target(
+            name: "TabFlow",
+            dependencies: [
+                "Model",
+                "ProductDetails",
+                "ProductListing",
+                "Scanner",
+                "Search",
+                "Web",
+            ]
+        ),
+
         .target(
             name: "TestUtils",
             dependencies: [
@@ -377,8 +417,14 @@ let package = Package(
             dependencies: [
                 "CategorySelector",
                 "Mocks",
+                "MyAccount",
+                "ProductDetails",
                 "ProductListing",
+                "Scanner",
+                "Search",
                 "TestUtils",
+                "Web",
+                "Wishlist",
             ]
         ),
 
@@ -445,6 +491,18 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "ScannerTests",
+            dependencies: [
+                "Core",
+                "DeepLink",
+                "Mocks",
+                "Scanner",
+                "SharedUI",
+                "TestUtils",
+            ]
+        ),
+
+        .testTarget(
             name: "SearchTests",
             dependencies: [
                 "Core",
@@ -478,7 +536,14 @@ let package = Package(
             dependencies: [
                 "Home",
                 "Mocks",
+                "MyAccount",
+                "ProductDetails",
+                "ProductListing",
+                "Scanner",
+                "Search",
                 "TestUtils",
+                "Web",
+                "Wishlist",
             ]
         ),
 

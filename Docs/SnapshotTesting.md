@@ -92,6 +92,7 @@ of the build.
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, both error states, search results header |
 | `SearchViewSnapshotTests` | `SearchTests` | Search screen blank and with recent searches |
 | `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one, unpriced totals |
+| `ScannerViewSnapshotTests` | `ScannerTests` | Scanner chrome over the camera, wrapping guidance, the unrecognised-code notice, the recognised (green) viewfinder, the camera-access explainer, permission denied, device unsupported, camera unavailable |
 
 Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every
 rollout PR. Add them per screen once the design settles, covering the full state matrix
