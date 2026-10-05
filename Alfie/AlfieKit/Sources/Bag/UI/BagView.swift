@@ -20,7 +20,6 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             .onAppear {
                 viewModel.viewDidAppear()
             }
-            .snackbarView(configuration: $removalSnackbarConfiguration)
             // A failed removal is transient and never leaves the bag. Dismissing the Snackbar
             // clears the outcome so an identical later one re-presents cleanly.
             .onChange(of: viewModel.removalFailure) { failure in
@@ -41,93 +40,39 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     @ViewBuilder private var content: some View {
         switch viewModel.state {
         case .loading:
-            loadingView
+            BagLoadingView()
 
         case .success(let cart):
             // A shopper with no cart and a cart with nothing left in it are the same empty bag.
             if let cart, !cart.lines.isEmpty {
-                bagView(cart)
+                VStack(spacing: 0) {
+                    // The Snackbar belongs to the list, so it rises above the summary, not over it.
+                    BagLineList(
+                        lines: cart.lines,
+                        onSelect: viewModel.didSelectLine,
+                        onDelete: viewModel.didSelectDelete
+                    )
+                    .snackbarView(configuration: $removalSnackbarConfiguration)
+                    BagPurchaseSummary(total: cart.grandTotal.amountFormattedOrUnavailable)
+                }
             } else {
-                emptyView
+                BagEmptyView()
             }
 
         case .error(let error):
-            errorView(error)
+            ErrorView(
+                title: L10n.Bag.ErrorView.title,
+                message: Self.errorMessage(for: error.type),
+                buttons: [
+                    .init(
+                        cta: L10n.Bag.ErrorView.Retry.cta,
+                        accessibilityId: AccessibilityID.Bag.errorRetryButton,
+                        action: viewModel.didTapRetry
+                    ),
+                ]
+            )
+            .accessibilityIdentifier(AccessibilityID.Bag.errorView)
         }
-    }
-
-    // MARK: - Content
-
-    private func bagView(_ cart: Cart) -> some View {
-        List {
-            ForEach(cart.lines) { line in
-                // The divider sits outside the row's `Button`, so it is not part of the tap target.
-                VStack(spacing: Constants.lineSpacing) {
-                    BagLineRow(line: line) { viewModel.didSelectLine(line) }
-                    if line.id != cart.lines.last?.id {
-                        BagDivider()
-                            .padding(.horizontal, Sizing.spacingSpacingMd)
-                    }
-                }
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets())
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    // A `Button` rather than `.onDelete` so it can carry an accessibility
-                    // identifier, and no full swipe: the removal is a server write, so it takes
-                    // a deliberate tap on Remove rather than firing off the end of a gesture.
-                    Button(role: .destructive) {
-                        viewModel.didSelectDelete(line)
-                    } label: {
-                        Label {
-                            Text(L10n.Bag.Remove.cta)
-                        } icon: {
-                            Icon.close.image
-                        }
-                    }
-                    .tint(Theme.surfaceBackgroundDestructive)
-                    .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
-                }
-            }
-        }
-        .listStyle(.plain)
-        .listRowSpacing(Constants.lineSpacing)
-        .padding(.top, Sizing.spacingSpacingMd)
-        .accessibilityIdentifier(AccessibilityID.Bag.bagView)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            BagPurchaseSummary(total: cart.grandTotal.amountFormattedOrUnavailable)
-        }
-    }
-
-    // MARK: - Empty
-
-    private var emptyView: some View {
-        VStack(spacing: Sizing.spacingSpacingMd) {
-            ThemedIcon(.bag, tint: Theme.contentContentPrimary)
-            Text.build(theme.font.body.medium(L10n.Bag.Empty.title))
-                .foregroundStyle(Theme.contentContentPrimary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.horizontal, Sizing.spacingSpacingMd)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
-    }
-
-    // MARK: - Error
-
-    private func errorView(_ error: BFFRequestError) -> some View {
-        ErrorView(
-            title: L10n.Bag.ErrorView.title,
-            message: Self.errorMessage(for: error.type),
-            buttons: [
-                .init(
-                    cta: L10n.Bag.ErrorView.Retry.cta,
-                    accessibilityId: AccessibilityID.Bag.errorRetryButton,
-                    action: viewModel.didTapRetry
-                ),
-            ]
-        )
-        .accessibilityIdentifier(AccessibilityID.Bag.errorView)
     }
 
     /// The title is the same for every error, so only the message varies. Switched exhaustively
@@ -148,13 +93,71 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             return L10n.Bag.ErrorView.Generic.message
         }
     }
+}
 
-    // MARK: - Loading
+private struct BagLineList: View {
+    let lines: [CartLine]
+    let onSelect: (CartLine) -> Void
+    let onDelete: (CartLine) -> Void
 
-    /// Skeleton rows rather than a spinner, so the wait is shaped like the bag that follows it.
-    /// The shimmer is applied per row: it hides what it covers and overlays a single rectangle, so
-    /// wrapping the stack instead would wash the whole screen grey.
-    private var loadingView: some View {
+    var body: some View {
+        List {
+            ForEach(lines) { line in
+                // The divider sits outside the row's `Button`, so it is not part of the tap target.
+                VStack(spacing: Constants.lineSpacing) {
+                    BagLineRow(line: line) { onSelect(line) }
+                    if line.id != lines.last?.id {
+                        BagDivider()
+                            .padding(.horizontal, Sizing.spacingSpacingMd)
+                    }
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    // A `Button` rather than `.onDelete` so it can carry an accessibility
+                    // identifier, and no full swipe: the removal is a server write, so it takes
+                    // a deliberate tap on Remove rather than firing off the end of a gesture.
+                    Button(role: .destructive) {
+                        onDelete(line)
+                    } label: {
+                        Label {
+                            Text(L10n.Bag.Remove.cta)
+                        } icon: {
+                            Icon.close.image
+                        }
+                    }
+                    .tint(Theme.surfaceBackgroundDestructive)
+                    .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
+                }
+            }
+        }
+        .listStyle(.plain)
+        .listRowSpacing(Constants.lineSpacing)
+        .padding(.top, Sizing.spacingSpacingMd)
+        .accessibilityIdentifier(AccessibilityID.Bag.bagView)
+    }
+}
+
+private struct BagEmptyView: View {
+    var body: some View {
+        VStack(spacing: Sizing.spacingSpacingMd) {
+            ThemedIcon(.bag, tint: Theme.contentContentPrimary)
+            Text.build(theme.font.body.medium(L10n.Bag.Empty.title))
+                .foregroundStyle(Theme.contentContentPrimary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, Sizing.spacingSpacingMd)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
+    }
+}
+
+/// Skeleton rows rather than a spinner, so the wait is shaped like the bag that follows it.
+/// The shimmer is applied per row: it hides what it covers and overlays a single rectangle, so
+/// wrapping the stack instead would wash the whole screen grey.
+private struct BagLoadingView: View {
+    var body: some View {
         VStack(spacing: Constants.skeletonRowSpacing) {
             ForEach(0 ..< Constants.skeletonRowCount, id: \.self) { _ in
                 Color.clear
