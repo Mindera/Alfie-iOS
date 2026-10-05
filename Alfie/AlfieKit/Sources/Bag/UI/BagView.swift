@@ -65,15 +65,19 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets())
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        // Swipe is the only removal affordance this epic ships (Q27). A `Button`
-                        // rather than `.onDelete` so it can carry an accessibility identifier, and
-                        // no full swipe: the removal is a server write, so it takes a deliberate
-                        // tap on Remove rather than firing off the end of a gesture.
+                        // A `Button` rather than `.onDelete` so it can carry an accessibility
+                        // identifier, and no full swipe: the removal is a server write, so it takes
+                        // a deliberate tap on Remove rather than firing off the end of a gesture.
                         Button(role: .destructive) {
                             viewModel.didSelectDelete(line)
                         } label: {
-                            Text(L10n.Bag.Remove.cta)
+                            Label {
+                                Text(L10n.Bag.Remove.cta)
+                            } icon: {
+                                Icon.close.image
+                            }
                         }
+                        .tint(Theme.surfaceBackgroundDestructive)
                         .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
                     }
             }

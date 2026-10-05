@@ -275,6 +275,8 @@ stock-aware — the cart exposes no inventory, so an over-order fails at the pla
   stack, so back returns to the bag. Keyed on `CartItem.slug`, which AF-114 added after this epic
   shipped; a line without one is not tappable and renders exactly as before. This supersedes T6 and
   Q13, which dropped the navigation on the premise that no product handle was available.
+  The line's SKU and variant id travel with the slug (#170), so the page opens on the bagged
+  variant with its quantity stepper showing — which is where a quantity is edited.
 
 ### Routes and FlowViewModel Methods
 
@@ -293,7 +295,7 @@ them. The empty state has no call to action (Q34), so no cross-tab navigation is
 | `bag.quantity.label` | "Quantity: %d" | Per-row quantity |
 | `bag.subtotal.title` | "Subtotal" | Totals row |
 | `bag.total.title` | "Total" | Totals row |
-| `bag.remove.cta` | "Remove" | Swipe action |
+| `bag.remove.cta` | "Remove" | Swipe action, under the close icon on `Theme.surfaceBackgroundDestructive` |
 | `bag.error_view.title` | "Oops!" | Error state title |
 | `bag.error_view.generic.message` | "Something went wrong" | Generic error |
 | `bag.error_view.no_internet.message` | "Check your connection" | Offline error |
@@ -440,7 +442,8 @@ This feature ships them using existing design tokens and `SharedUI` components, 
 
 ALFMOB-443 restyles the bag to Figma node `270:114940`. The line card (#169) is a 114 × 152 image
 tile, the name, "Quantity: N" and the line total; Known Limitations lists where it departs from the
-design.
+design. The swipe action (#170) is the design's red Remove with the close icon above its label; it
+stays a native swipe action, so the design's fixed 100pt width is not reproduced.
 
 ---
 
@@ -464,10 +467,11 @@ and a loading announcement for the cart fetch.
 - ~~**A bag row is not tappable and does not reach the PDP.**~~ **Superseded by #129.** AF-114 added
   `slug` to `CartItem`, which removed the premise behind T6, and the row now opens its product.
   What remains limited:
-  - **The product opens on its default variant, not the one in the bag.** Colour preselection
-    matches on SKU and size is never auto-selected by design, so Add to bag starts disabled until a
-    size is picked. Passing the line's variant through would need a new `ProductDetailsConfiguration`
-    case and a variant-resolution change in the PDP; deliberately out of scope.
+  - ~~**The product opens on its default variant, not the one in the bag.**~~ **Superseded by
+    #170.** The row passes the line's SKU and variant id with its slug through
+    `ProductDetailsConfiguration.deepLink`, so the PDP opens with the bagged colour and size
+    selected and its quantity stepper showing. A line with no SKU resolves by variant id; one the
+    PDP can match by neither falls back to the default variant.
   - **A stale slug is a dead end.** A cart can outlive a product by up to 30 days, and the
     product-details error screen offers only Go back — no retry, which could never resolve a
     not-found handle anyway. Accepted; #130 pins those error states under test.
@@ -485,8 +489,8 @@ and a loading announcement for the cart fetch.
     total is what sums to the Total.
   - **A line with no image keeps its image tile**, so the list stays aligned.
 - **Quantity is editable on the PDP only.** The PDP swaps Add to bag for a `− n +` stepper once the
-  selected variant is in the bag (Q37). The bag row is still display-only, so reducing a quantity
-  from the bag means removing the line; its stepper stays with ALFMOB-443.
+  selected variant is in the bag (Q37). The bag row is display-only and gets no stepper: tapping
+  it opens the PDP on the bagged variant, where the stepper is already showing (#170).
 - **The stepper's ceiling is online stock, capped at 100.** Stock is the PDP's last-fetched figure,
   so a stock drop since then surfaces as the quantity error snackbar rather than a greyed `+`.
 - **A cold open can briefly offer Add to bag for a variant already in the bag.** The cart is fetched
@@ -565,7 +569,7 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q26 | **PDP add-to-bag shows an in-flight indicator, then a snackbar.** `ThemedButton(isLoading:)` on the CTA (`ProductDetailsView.swift:523`), `.success` "Added to bag" / `.error` on failure. **No auto-navigation to the bag on success.** | Today it is fire-and-forget with no feedback at all (`ProductDetailsViewModel.swift:207`); pessimistic writes (Q8) give it an in-flight state and a failure case. Pieces already exist — `ThemedButton.swift:25`, `SnackbarView.swift:7`, with `ProductListingView` as the wiring precedent. Auto-navigation is a product decision outside this epic. |
 | Q28 | **Empty bag reuses `ErrorView`** with bag copy. ~~…and a "Start shopping" CTA switching to the Shop tab.~~ **The CTA half is superseded by Q34** — title and message only. | Per Q19 an empty bag is `.success(cart)` with `lines.isEmpty`. `SharedUI` has no `EmptyState` component, and `ErrorView` already renders title + message (`ErrorView.swift:42`). `CLAUDE.md` requires reaching for existing `SharedUI` components before writing a new view. The component choice stands; only the CTA was dropped. |
 | Q29 | **Analytics fire on success only.** The schema changes (a `quantity` dimension, a separate `variantId` parameter, normalising `productID`) are **deferred** — not done in this epic. | Writes can now fail, so firing on intent would inflate add-to-bag against real cart contents. The schema changes are deferred because they alter an existing event stream whose downstream owner has not been identified; the pre-existing `productID` inconsistency (`ProductDetailsViewModel.swift:211` sends a composite, `BagViewModel.swift:38` sends a bare id) is recorded under Verified Facts and left in place. |
-| Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. The stepper is deferred to ALFMOB-443 **with a design request raised**. | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
+| Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. ~~The stepper is deferred to ALFMOB-443 **with a design request raised**.~~ **Closed by #170: the bag gets no stepper; quantity is edited on the PDP, which the row opens on the bagged variant.** | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
 | Q30 | ~~**Author exactly four operations**~~ **Amended by Q37**, which adds `UpdateCart` on the same fragment. — `CreateCart`, `AddToCart`, `RemoveFromCart`, `Cart` — with a minimal fragment: `id`, `lineItems`, `totals { subtotal, grandTotal }`. Every line input sends both `productId` and `variantId`. | Q27 removes `updateCart`; checkout removes `cartCheckoutUrl`. `status` is a hardcoded `"active"`, `platformId` is transitional, `externalReferences` is platform plumbing, `checkoutUrl` is unwired. Authoring `updateCart` "for later" would freeze a schema shape before ALFMOB-443 needs it. |
 | Q31 | **Write snapshot tests for all four bag states**, accepting that ALFMOB-443 will regenerate the baselines. | Regenerating a baseline is one command, and 443 regenerating them deliberately is what baselines are for. The alternative is implementing the cart with no visual regression net during the epic that replaces the bag's entire data source. |
 | Q32 | **The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope, so the bag is a dead end by design. |
@@ -704,3 +708,4 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 | 2026-08-26 | Full spec written; 30 decisions closed, 7 questions deferred to the team | khoi.nguyen |
 | 2026-09-16 | PDP quantity stepper (Q37); Q20, Q27, Q30, analytics, L10n and Known Limitations updated | khoi.nguyen |
 | 2026-10-05 | ALFMOB-443 line card restyle (#169): Scenario 4, L10n, Design References and accepted design mismatches | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 line tap opens the bagged variant, swipe Remove restyle (#170): Exit Points and Known Limitations | khoi.nguyen |
