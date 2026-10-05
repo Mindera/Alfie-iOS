@@ -73,16 +73,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 onDismiss: { viewModel.didDismissTransientError() }
             )
         }
-        .toolbarView(
-            configuration: .init(
-                category: viewModel.title,
-                searchText: nil,
-                urlQueryParameters: nil,
-                mode: .listing
-            ),
-            showSearchButton: viewModel.showSearchButton,
-            openSearchAction: viewModel.didTapSearch
-        )
+        .toolbarView(for: viewModel)
         .onAppear {
             viewModel.viewDidAppear()
         }
@@ -184,7 +175,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
             title: title,
             message: message,
             buttons: [
-                .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityIdentifiers.AccessibilityID.ProductListing.retryButton) {
+                .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityID.ProductListing.retryButton) {
                     Task { await viewModel.retry() }
                 },
             ]
@@ -231,10 +222,30 @@ extension SnackbarViewConfiguration {
     }
 }
 
-// MARK: - AccessibilityId
+// MARK: - Toolbar
 
-private enum AccessibilityID {
-    static let searchBtn = "search-btn"
+private extension View {
+    @ViewBuilder
+    func toolbarView(for viewModel: some ProductListingViewModelProtocol) -> some View {
+        if let searchTerm = viewModel.searchTerm {
+            searchResultsToolbarView(
+                searchTerm: searchTerm,
+                backAction: viewModel.didTapBack,
+                searchBarAction: viewModel.didTapSearchBar
+            )
+        } else {
+            toolbarView(
+                configuration: .init(
+                    category: viewModel.title,
+                    searchText: nil,
+                    urlQueryParameters: nil,
+                    mode: .listing
+                ),
+                showSearchButton: viewModel.showSearchButton,
+                openSearchAction: viewModel.didTapSearch
+            )
+        }
+    }
 }
 
 // MARK: - Private Methods

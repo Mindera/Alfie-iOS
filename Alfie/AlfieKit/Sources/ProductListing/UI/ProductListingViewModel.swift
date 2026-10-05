@@ -23,7 +23,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     @Published public internal(set) var priceBounds: PriceFilterBounds?
     @Published public private(set) var wishlistContent: [SelectedProduct]
     private let navigate: (ProductListingRoute) -> Void
-    private let showSearch: () -> Void
+    private let searchNavigation: ProductListingSearchNavigation
     @Published public private(set) var state: PaginatedViewState<
         ProductListingViewStateModel, ProductListingViewErrorType
     >
@@ -47,6 +47,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         state.value?.title ?? ""
     }
 
+    public var searchTerm: String? {
+        mode == .searchResults ? query : nil
+    }
+
     public var totalNumberOfProducts: Int {
         pager.pagination?.totalCount ?? 0
     }
@@ -68,7 +72,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         mode: ProductListingViewMode = .listing,
         skeletonItemsSize: Int = Constants.defaultSkeletonItemsSize,
         navigate: @escaping (ProductListingRoute) -> Void,
-        showSearch: @escaping () -> Void
+        searchNavigation: ProductListingSearchNavigation
     ) {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
@@ -83,7 +87,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         pager = .init(state: initialState)
         wishlistContent = []
         self.navigate = navigate
-        self.showSearch = showSearch
+        self.searchNavigation = searchNavigation
     }
 
     public func viewDidAppear() {
@@ -119,7 +123,18 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public func didTapSearch() {
-        showSearch()
+        guard case .listing(let openSearch) = searchNavigation else { return }
+        openSearch()
+    }
+
+    public func didTapBack() {
+        guard case .searchResults(let goBack, _) = searchNavigation else { return }
+        goBack()
+    }
+
+    public func didTapSearchBar() {
+        guard case .searchResults(_, let editSearchTerm) = searchNavigation else { return }
+        editSearchTerm()
     }
 
     public func didTapAddToWishlist(for product: Product, isFavorite: Bool) {

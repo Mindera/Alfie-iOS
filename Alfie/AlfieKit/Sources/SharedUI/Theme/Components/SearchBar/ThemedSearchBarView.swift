@@ -7,12 +7,14 @@ public struct ThemedSearchBarView: View {
         case light
         case dark
         case soft
+        case softMedium
         case softLarge
 
         // swiftlint:disable vertical_whitespace_between_cases
         var focusedBackgroundColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals100
@@ -24,6 +26,7 @@ public struct ThemedSearchBarView: View {
         var unfocusedBackgroundColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .dark:
                 focusedBackgroundColor
@@ -35,6 +38,7 @@ public struct ThemedSearchBarView: View {
         var focusedBorderColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge:
                 Primitives.Colours.neutrals200
             case .light:
@@ -47,6 +51,7 @@ public struct ThemedSearchBarView: View {
         var unfocusedBorderColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                     .dark:
                     .clear
@@ -58,6 +63,7 @@ public struct ThemedSearchBarView: View {
         var searchTermColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals800
@@ -69,6 +75,7 @@ public struct ThemedSearchBarView: View {
         var placeholderColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals500
@@ -84,6 +91,7 @@ public struct ThemedSearchBarView: View {
         var iconColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals800
@@ -99,6 +107,8 @@ public struct ThemedSearchBarView: View {
                 32
             case .dark:
                 38
+            case .softMedium:
+                40
             case .softLarge:
                 44
             }
@@ -106,7 +116,8 @@ public struct ThemedSearchBarView: View {
 
         var cornerRadius: CGFloat {
             switch self {
-            case .soft:
+            case .soft,
+                .softMedium:
                 Sizing.radiusSoft
             case .light,
                 .dark,
@@ -117,7 +128,8 @@ public struct ThemedSearchBarView: View {
 
         var horizontalContentPadding: CGFloat {
             switch self {
-            case .soft:
+            case .soft,
+                .softMedium:
                 Primitives.Spacing.spacing8
             case .light,
                 .dark,
@@ -226,6 +238,7 @@ public struct ThemedSearchBarView: View {
         onFocusChange: ((Bool) -> Void)? = nil
     ) {
         _searchText = searchText
+        _text = State(initialValue: searchText.wrappedValue)
         defaultPlaceholder = placeholder
         focusedPlaceholder = placeholderOnFocus ?? defaultPlaceholder
         self.theme = theme
@@ -244,17 +257,14 @@ public struct ThemedSearchBarView: View {
     }
 
     private enum Constants {
-        static let autoFocusTimeDelay: CGFloat = 0
         static let borderLineWidth: CGFloat = 1
         static let trailingIconSize: CGFloat = 16
-        static let cancelIconSize: CGFloat = 16
     }
 
     public var body: some View {
         HStack {
-            if isCancelButtonVisible && dismissConfiguration.type == .back {
+            if dismissConfiguration.type == .back {
                 cancelButton
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
             HStack(spacing: iconLayout.hasTrailingAccessory ? theme.horizontalContentPadding : 0) {
@@ -287,19 +297,26 @@ public struct ThemedSearchBarView: View {
                     isFocused = true
                 }
                 .overlay(textFieldOverlayIcon, alignment: .trailing)
-                .onAppear {
+                .task {
                     guard case .on(let delay) = autoFocusWhenAppearing else { return }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        isFocused = true
-                    }
+                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    guard !Task.isCancelled else { return }
+                    isFocused = true
+                }
+                .onDisappear {
+                    isFocused = false
                 }
                 .onChange(of: isFocused) { newValue in
-                    isCancelButtonVisible = newValue && dismissConfiguration.type != .hidden
+                    isCancelButtonVisible = newValue && dismissConfiguration.isCancelType
                     onFocusChange?(newValue)
                 }
                 .onChange(of: text) { newValue in
                     isClearButtonVisible = !newValue.isEmpty
                     searchText = newValue
+                }
+                .onChange(of: searchText) { newValue in
+                    guard newValue != text else { return }
+                    text = newValue
                 }
                 .onSubmit {
                     onSubmitTap?()
@@ -392,17 +409,7 @@ public struct ThemedSearchBarView: View {
 
         switch dismissConfiguration.type {
         case .back:
-            Button {
-                dismissBlock()
-            } label: {
-                Icon.arrowLeft.image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .tint(Primitives.Colours.neutrals800)
-                    .frame(size: Constants.cancelIconSize)
-            }
-            .accessibilityIdentifier(dismissConfiguration.accessibilityId)
+            ThemedBackButton(accessibilityIdentifier: dismissConfiguration.accessibilityId, action: dismissBlock)
 
         case .cancel(let title):
             Button {
