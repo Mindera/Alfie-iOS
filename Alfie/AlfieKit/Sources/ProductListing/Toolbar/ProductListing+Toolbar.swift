@@ -52,6 +52,7 @@ extension View {
                             placeholder: L10n.SearchBar.placeholder,
                             searchTerm: searchTerm,
                             accessibilityIdentifier: AccessibilityID.ProductListing.searchBarButton,
+                            theme: .softMedium,
                             action: searchBarAction
                         )
                     }

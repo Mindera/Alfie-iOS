@@ -100,6 +100,8 @@ struct SearchBarDemoView: View {
 private extension ThemedSearchBarView.Theme {
     var name: String {
         switch self {
+        case .softMedium:
+            "Soft Medium"
         case .softLarge:
             "Soft Large"
         default:

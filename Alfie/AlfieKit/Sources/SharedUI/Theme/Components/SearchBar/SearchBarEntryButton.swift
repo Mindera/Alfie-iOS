@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A non-editable search entry point: a VoiceOver-operable `Button` wrapping a display-only
-/// `ThemedSearchBarView` (`.soft`). Tapping runs `action` — typically presenting the full search
+/// `ThemedSearchBarView` (`.soft` unless a `theme` is given). Tapping runs `action` — typically presenting the full search
 /// flow. A `searchTerm`, when given, is shown in place of the placeholder.
 ///
 /// The inner bar is `.allowsHitTesting(false)` + `.accessibilityHidden(true)`, so the `Button` is the
@@ -28,6 +28,7 @@ public struct SearchBarEntryButton: View {
     private let searchTerm: String?
     private let accessibilityIdentifier: String
     private let scan: ScanConfiguration?
+    private let theme: ThemedSearchBarView.Theme
     private let action: () -> Void
 
     public init(
@@ -35,12 +36,14 @@ public struct SearchBarEntryButton: View {
         searchTerm: String? = nil,
         accessibilityIdentifier: String,
         scan: ScanConfiguration? = nil,
+        theme: ThemedSearchBarView.Theme = .soft,
         action: @escaping () -> Void
     ) {
         self.placeholder = placeholder
         self.searchTerm = searchTerm
         self.accessibilityIdentifier = accessibilityIdentifier
         self.scan = scan
+        self.theme = theme
         self.action = action
     }
 
@@ -58,7 +61,7 @@ public struct SearchBarEntryButton: View {
             ThemedSearchBarView(
                 searchText: .constant(searchTerm ?? ""),
                 placeholder: placeholder,
-                theme: Constants.barTheme,
+                theme: theme,
                 dismissConfiguration: .init(type: .hidden),
                 iconLayout: iconLayout
             )
@@ -85,17 +88,11 @@ public struct SearchBarEntryButton: View {
     private func scanTapTarget(_ scan: ScanConfiguration) -> some View {
         Button(action: scan.action) {
             Color.clear
-                .frame(size: Constants.scanTapTargetSize)
+                .frame(size: theme.searchBarHeight)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(scan.accessibilityIdentifier)
         .accessibilityLabel(L10n.Accessibility.scan)
-    }
-
-    private enum Constants {
-        static let barTheme: ThemedSearchBarView.Theme = .soft
-        /// Taken from the bar rather than copied, so the square tracks the bar's height.
-        static let scanTapTargetSize = barTheme.searchBarHeight
     }
 }

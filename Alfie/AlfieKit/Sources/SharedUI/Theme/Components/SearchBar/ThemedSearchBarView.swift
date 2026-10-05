@@ -7,12 +7,14 @@ public struct ThemedSearchBarView: View {
         case light
         case dark
         case soft
+        case softMedium
         case softLarge
 
         // swiftlint:disable vertical_whitespace_between_cases
         var focusedBackgroundColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals100
@@ -24,6 +26,7 @@ public struct ThemedSearchBarView: View {
         var unfocusedBackgroundColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .dark:
                 focusedBackgroundColor
@@ -35,6 +38,7 @@ public struct ThemedSearchBarView: View {
         var focusedBorderColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge:
                 Primitives.Colours.neutrals200
             case .light:
@@ -47,6 +51,7 @@ public struct ThemedSearchBarView: View {
         var unfocusedBorderColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                     .dark:
                     .clear
@@ -58,6 +63,7 @@ public struct ThemedSearchBarView: View {
         var searchTermColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals800
@@ -69,6 +75,7 @@ public struct ThemedSearchBarView: View {
         var placeholderColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals500
@@ -84,6 +91,7 @@ public struct ThemedSearchBarView: View {
         var iconColor: Color {
             switch self {
             case .soft,
+                .softMedium,
                 .softLarge,
                 .light:
                 Primitives.Colours.neutrals800
@@ -99,6 +107,8 @@ public struct ThemedSearchBarView: View {
                 32
             case .dark:
                 38
+            case .softMedium:
+                40
             case .softLarge:
                 44
             }
@@ -106,7 +116,8 @@ public struct ThemedSearchBarView: View {
 
         var cornerRadius: CGFloat {
             switch self {
-            case .soft:
+            case .soft,
+                .softMedium:
                 Sizing.radiusSoft
             case .light,
                 .dark,
@@ -117,7 +128,8 @@ public struct ThemedSearchBarView: View {
 
         var horizontalContentPadding: CGFloat {
             switch self {
-            case .soft:
+            case .soft,
+                .softMedium:
                 Primitives.Spacing.spacing8
             case .light,
                 .dark,
