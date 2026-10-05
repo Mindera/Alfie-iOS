@@ -55,6 +55,11 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                     .snackbarView(configuration: $removalSnackbarConfiguration)
                     BagPurchaseSummary(total: cart.grandTotal.amountFormattedOrUnavailable)
                 }
+                // The Snackbar goes with the list, so a failure cannot outlive it and re-present later.
+                .onDisappear {
+                    removalSnackbarConfiguration = nil
+                    viewModel.didDismissRemovalFailure()
+                }
             } else {
                 BagEmptyView()
             }
@@ -171,17 +176,6 @@ private struct BagLoadingView: View {
         // four unlabelled shapes it would otherwise read as blank.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(L10n.Loading.title)
-    }
-}
-
-struct BagDivider: View {
-    var body: some View {
-        ThemedDivider(configuration: .init(
-            orientation: .horizontal,
-            thickness: Sizing.borderBorderWeightDefault,
-            color: Theme.borderSoft
-        ))
-        .accessibilityHidden(true)
     }
 }
 

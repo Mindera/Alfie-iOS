@@ -26,7 +26,6 @@ final class BagViewSnapshotTests: XCTestCase {
                     lineTotal: money("£420.00")
                 ),
             ],
-            subtotal: money("£659.00"),
             grandTotal: money("£664.99")
         ))))
 
@@ -38,7 +37,6 @@ final class BagViewSnapshotTests: XCTestCase {
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
             lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: nil)],
-            subtotal: money("£59.00"),
             grandTotal: money("£59.00")
         ))))
 
@@ -70,14 +68,13 @@ final class BagViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
     }
 
-    func test_bagView_withATotalTheServerCouldNotPrice() {
+    func test_bag_view_with_an_unpriceable_total_shows_the_dash() {
         // The em dash covers every amount on the screen, not just the line total. The grand total
         // is the number a shopper checks before checking out, so a fabricated £0.00 is the worst
         // place of all to state a price they are not being charged (Q36).
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
             lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: nil)],
-            subtotal: nil,
             grandTotal: nil
         ))))
 

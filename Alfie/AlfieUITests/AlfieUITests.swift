@@ -133,6 +133,7 @@ final class AlfieUITests: XCTestCase {
             lineCountAfterAdd = bag.lineItems.count
             XCTAssertGreaterThan(lineCountAfterAdd, 0, "The bag should hold at least the line just added")
             XCTAssertTrue(bag.grandTotal.exists, "A bag with lines shows a total")
+            XCTAssertTrue(bag.continueButton.exists, "A bag with lines shows Continue")
         }
 
         XCTContext.runActivity(named: "Tapping a line opens its product, and back returns to the bag") { _ in

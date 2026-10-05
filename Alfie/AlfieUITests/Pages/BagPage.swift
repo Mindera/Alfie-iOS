@@ -40,6 +40,10 @@ final class BagPage {
         app.otherElements[AccessibilityID.Bag.grandTotal]
     }
 
+    var continueButton: XCUIElement {
+        app.buttons[AccessibilityID.Bag.continueButton]
+    }
+
     // MARK: - Actions
 
     @discardableResult

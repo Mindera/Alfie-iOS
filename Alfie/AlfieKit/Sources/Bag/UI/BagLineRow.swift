@@ -19,21 +19,18 @@ struct BagLineRow: View {
     let onTap: () -> Void
 
     var body: some View {
-        // A single root keeps the row's structure constant, so `List` can template row identity.
-        VStack(spacing: 0) {
-            if line.slug == nil {
-                BagLineContent(line: line)
-                    .accessibilityElement(children: .contain)
-                    .accessibilityIdentifier(rowIdentifier)
-            } else {
-                Button(action: onTap) {
-                    // Without a content shape the transparent gaps in the text column are not hit-tested.
-                    BagLineContent(line: line)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
+        if line.slug == nil {
+            BagLineContent(line: line)
+                .accessibilityElement(children: .contain)
                 .accessibilityIdentifier(rowIdentifier)
+        } else {
+            Button(action: onTap) {
+                // Without a content shape the transparent gaps in the text column are not hit-tested.
+                BagLineContent(line: line)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(rowIdentifier)
         }
     }
 
@@ -67,7 +64,7 @@ private struct BagLineContent: View {
                 }
             }
             .foregroundStyle(Theme.contentContentPrimary)
-            .frame(minHeight: Constants.imageSize.height)
+            .frame(minHeight: BagLineRow.minHeight)
         }
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, Sizing.spacingSpacingMd)

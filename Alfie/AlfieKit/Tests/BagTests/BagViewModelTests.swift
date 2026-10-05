@@ -211,7 +211,7 @@ final class BagViewModelTests: XCTestCase {
 
     // MARK: - Opening a line's product
 
-    func test_didSelectLine_opensTheProductDetailsPageOnTheVariantInTheBag() {
+    func test_did_select_line_opens_the_pdp_on_the_bagged_variant() {
         let line = CartLine.fixture(id: "line-1", variantId: "variant-9", sku: "SKU-9", slug: "silk-shirt")
 
         sut.didSelectLine(line)
@@ -222,7 +222,7 @@ final class BagViewModelTests: XCTestCase {
         )
     }
 
-    func test_didSelectLine_withNoSku_stillOpensTheVariantByItsId() {
+    func test_did_select_line_with_no_sku_opens_the_variant_by_id() {
         let line = CartLine.fixture(id: "line-1", variantId: "variant-9", sku: nil, slug: "silk-shirt")
 
         sut.didSelectLine(line)

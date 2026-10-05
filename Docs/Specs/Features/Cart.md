@@ -87,7 +87,7 @@ AND a purchase summary pinned above the tab bar shows the total, a shipping-and-
 **WHEN** the user swipes a row and confirms delete
 **THEN** the line is removed from the server cart
 AND the returned cart replaces the client's cart state
-AND the totals update
+AND the total updates
 
 ### Scenario 7: Adding to the bag fails
 
@@ -270,7 +270,7 @@ stock-aware — the cart exposes no inventory, so an over-order fails at the pla
 ### Exit Points
 
 - Tap back / switch tab → Previous screen
-- Toolbar → Account, Wishlist (unchanged)
+- Toolbar: centred title only, no leading or trailing items
 - **Tapping a bag row opens that line's product detail page** (#129), pushed on the Bag tab's own
   stack, so back returns to the bag. Keyed on `CartItem.slug`, which AF-114 added after this epic
   shipped; a line without one is not tappable and renders exactly as before. This supersedes T6 and
@@ -352,7 +352,7 @@ under Verified Facts.
 | Add exceeds available stock | Platform rejects with `BAD_REQUEST`; surface the error snackbar |
 | Cart already has 50 lines | BFF rejects; surface the error snackbar |
 | Product has no purchasable variant (`Variant.id == nil`) | Add-to-bag is disabled locally; no request is made |
-| Line has a null `name` or `image` | Render the row without them; both are nullable on `CartItem` |
+| Line has a null `name` or `image` | Render the row without the name; a missing image keeps the plain image tile. Both are nullable on `CartItem` |
 | Removing the last line on BigCommerce | The platform destroys the cart and the BFF returns a synthetic empty cart with a dead id. Treat the next 404 as Scenario 9. |
 | User taps add-to-bag repeatedly | The button is disabled while in flight (Q8), so each tap is one request |
 
@@ -455,8 +455,8 @@ note and the full-width primary Continue button. It is absent in the empty, load
 
 ## Accessibility
 
-New `AccessibilityID.Bag` entries: `bagView` · `lineItem` · `lineItemQuantity` · `lineItemRemove` ·
-`grandTotal` · `continueButton` (#172, replacing `subtotal`) · `emptyState` · `errorView` · `errorRetry`.
+New `AccessibilityID.Bag` entries: `bagView` · `lineItem` · `lineItemRemoveButton` ·
+`grandTotal` · `continueButton` (#172, replacing `subtotal`) · `emptyState` · `errorView` · `errorRetryButton`.
 
 `Bag+Toolbar.swift` and `HorizontalProductCard.swift` declare private, local `AccessibilityID` enums
 rather than using the shared module. That predates this feature and is deliberately left alone.
@@ -494,6 +494,8 @@ and a loading announcement for the cart fetch.
   - **One price per line, and it is the line total.** The unit price is no longer shown; the line
     total is what sums to the Total.
   - **A line with no image keeps its image tile**, so the list stays aligned.
+  - **Quantity and price stack when they do not fit on one row** (large Dynamic Type): the price
+    drops under the quantity, leading-aligned, and the card grows past the image height.
 - **Quantity is editable on the PDP only.** The PDP swaps Add to bag for a `− n +` stepper once the
   selected variant is in the bag (Q37). The bag row is display-only and gets no stepper: tapping
   it opens the PDP on the bagged variant, where the stepper is already showing (#170).
@@ -717,3 +719,4 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 | 2026-10-05 | ALFMOB-443 line tap opens the bagged variant, swipe Remove restyle (#170): Exit Points and Known Limitations | khoi.nguyen |
 | 2026-10-05 | ALFMOB-443 list dividers and rhythm, card-height skeleton, icon-and-one-line empty state (#171): Scenario 5, L10n, Q28, Q34 | khoi.nguyen |
 | 2026-10-05 | ALFMOB-443 pinned Total-only purchase summary with a no-op Continue button (#172): Scenario 4, L10n, Accessibility, Q32 | khoi.nguyen |
+| 2026-10-05 | PR #174 self-review: toolbar, null-image, identifier names and the stacked quantity/price fallback brought in line with the code | khoi.nguyen |
