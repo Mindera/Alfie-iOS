@@ -393,7 +393,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Qty: %d"
+            "value" : "Quantity: %d"
           }
         }
       }

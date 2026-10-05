@@ -95,7 +95,7 @@ public enum L10n {
       }
     }
     public enum Quantity {
-      /// Qty: %d
+      /// Quantity: %d
       public static func label(_ p1: Int) -> String {
         return L10n.tr("L10n", "bag.quantity.label", p1)
       }

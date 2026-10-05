@@ -2,7 +2,7 @@
 
 **Status**: Ready for implementation
 **Created**: 2026-08-26
-**Last Updated**: 2026-09-16
+**Last Updated**: 2026-10-05
 **Jira**: ALFMOB-491 (epic) · ALFMOB-498 (this spec)
 **Implementation PRs**: #121 (Story 1 — headless cart round-trip) · #122 (add to bag from the PDP) · #124 (the bag screen renders and empties the cart)
 
@@ -72,8 +72,7 @@ AND the bag does not show two rows for the same variant
 
 **GIVEN** the user has added items
 **WHEN** the user opens the _Bag tab_
-**THEN** the bag shows the cart's line items, each with its image, name, quantity, unit price and
-line total
+**THEN** the bag shows the cart's line items, each with its image, name, quantity and line total
 AND the subtotal and total are shown
 
 ### Scenario 5: The bag is empty
@@ -291,7 +290,7 @@ them. The empty state has no call to action (Q34), so no cross-tab navigation is
 |-----|---------|-------|
 | `bag.empty.title` | "Your bag is empty" | Empty state title |
 | `bag.empty.message` | "Items you add will appear here" | Empty state message |
-| `bag.quantity.label` | "Qty: %d" | Per-row quantity |
+| `bag.quantity.label` | "Quantity: %d" | Per-row quantity |
 | `bag.subtotal.title` | "Subtotal" | Totals row |
 | `bag.total.title` | "Total" | Totals row |
 | `bag.remove.cta` | "Remove" | Swipe action |
@@ -439,6 +438,10 @@ empty state. A design request is raised alongside ALFMOB-443, which owns the bag
 This feature ships them using existing design tokens and `SharedUI` components, to be restyled by
 443.
 
+ALFMOB-443 restyles the bag to Figma node `270:114940`. The line card (#169) is a 114 × 152 image
+tile, the name, "Quantity: N" and the line total; Known Limitations lists where it departs from the
+design.
+
 ---
 
 ## Accessibility
@@ -472,6 +475,15 @@ and a loading announcement for the cart fetch.
     tapped. There is no fetch-by-id path in the product service to fall back on.
 - **The bag row shows no brand, colour, size or was-price.** `CartItem` carries none of them and no
   enrichment is asked for.
+- **The bag row departs from the modern design (ALFMOB-443) where the BFF or scope stops it.**
+  Accepted, with no follow-up raised:
+  - **Reference number, colour and size** — `CartItem` carries none of them.
+  - **"Only N left" and unavailable-item messages** — the cart exposes no stock.
+  - **Quantity editing** — the row shows "Quantity: N" as plain text, with no dropdown chevron.
+  - **Save to wishlist** on the swipe, and the per-line **"more"** button.
+  - **One price per line, and it is the line total.** The unit price is no longer shown; the line
+    total is what sums to the Total.
+  - **A line with no image keeps its image tile**, so the list stays aligned.
 - **Quantity is editable on the PDP only.** The PDP swaps Add to bag for a `− n +` stepper once the
   selected variant is in the bag (Q37). The bag row is still display-only, so reducing a quantity
   from the bag means removing the line; its stepper stays with ALFMOB-443.
@@ -691,3 +703,4 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 | 2026-08-26 | Decision log and verified facts opened during the design session | khoi.nguyen |
 | 2026-08-26 | Full spec written; 30 decisions closed, 7 questions deferred to the team | khoi.nguyen |
 | 2026-09-16 | PDP quantity stepper (Q37); Q20, Q27, Q30, analytics, L10n and Known Limitations updated | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 line card restyle (#169): Scenario 4, L10n, Design References and accepted design mismatches | khoi.nguyen |
