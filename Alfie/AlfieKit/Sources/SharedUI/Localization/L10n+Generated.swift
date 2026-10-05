@@ -73,9 +73,7 @@ public enum L10n {
       public static let unavailable = L10n.tr("L10n", "bag.amount.unavailable")
     }
     public enum Empty {
-      /// Items you add will appear here
-      public static let message = L10n.tr("L10n", "bag.empty.message")
-      /// Your bag is empty
+      /// Your bag is empty.
       public static let title = L10n.tr("L10n", "bag.empty.title")
     }
     public enum ErrorView {
@@ -808,7 +806,6 @@ public extension L10n {
       case accountWishlist = "account.wishlist"
       case bagTitle = "bag.title"
       case bagAmountUnavailable = "bag.amount.unavailable"
-      case bagEmptyMessage = "bag.empty.message"
       case bagEmptyTitle = "bag.empty.title"
       case bagErrorViewTitle = "bag.error_view.title"
       case bagErrorViewGenericMessage = "bag.error_view.generic.message"

@@ -85,7 +85,6 @@ final class BagViewSnapshotTests: XCTestCase {
     }
 
     func test_bagView_empty() {
-        // No retry button: nothing has gone wrong (Q28/Q34).
         let sut = BagView(viewModel: MockBagViewModel(state: .success(nil)))
 
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)

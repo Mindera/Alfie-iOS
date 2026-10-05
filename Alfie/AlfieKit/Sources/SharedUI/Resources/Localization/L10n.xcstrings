@@ -321,24 +321,13 @@
         }
       }
     },
-    "bag.empty.message" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Items you add will appear here"
-          }
-        }
-      }
-    },
     "bag.empty.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your bag is empty"
+            "value" : "Your bag is empty."
           }
         }
       }

@@ -44,6 +44,10 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(L10n.Bag.Quantity.label(2), "Quantity: 2")
     }
 
+    func test_bagEmpty_isOneSentence() {
+        XCTAssertEqual(L10n.Bag.Empty.title, "Your bag is empty.")
+    }
+
     func test_localizable_product_quantity_with_args() {
         localizations.forEach { localization in
             let resources = [1, 2].map { L10n.Product.Quantity.accessibilityLabel($0) }

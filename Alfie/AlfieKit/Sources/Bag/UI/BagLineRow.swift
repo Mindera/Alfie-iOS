@@ -40,6 +40,10 @@ struct BagLineRow: View {
     }
 }
 
+extension BagLineRow {
+    static let imageSize = CGSize(width: 114, height: 152)
+}
+
 private struct BagLineContent: View {
     let line: CartLine
 
@@ -65,7 +69,7 @@ private struct BagLineContent: View {
                 }
             }
             .foregroundStyle(Theme.contentContentPrimary)
-            .frame(minHeight: Constants.imageSize.height)
+            .frame(minHeight: BagLineRow.imageSize.height)
         }
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, Sizing.spacingSpacingMd)
@@ -86,7 +90,7 @@ private struct BagLineImage: View {
 
     var body: some View {
         Theme.surfaceForegroundPrimary
-            .frame(width: Constants.imageSize.width, height: Constants.imageSize.height)
+            .frame(width: BagLineRow.imageSize.width, height: BagLineRow.imageSize.height)
             .overlay {
                 if let url {
                     RemoteImage(url: url) { image in
@@ -104,6 +108,5 @@ private struct BagLineImage: View {
 }
 
 private enum Constants {
-    static let imageSize = CGSize(width: 114, height: 152)
     static let nameLineLimit: Int = 2
 }
