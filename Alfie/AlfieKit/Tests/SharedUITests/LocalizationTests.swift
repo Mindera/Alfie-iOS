@@ -44,7 +44,7 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(L10n.Bag.Quantity.label(2), "Quantity: 2")
     }
 
-    func test_bagEmpty_isOneSentence() {
+    func test_bag_empty_title_ends_with_full_stop() {
         XCTAssertEqual(L10n.Bag.Empty.title, "Your bag is empty.")
     }
 

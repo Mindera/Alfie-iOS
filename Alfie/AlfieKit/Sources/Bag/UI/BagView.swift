@@ -62,7 +62,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         List {
             ForEach(cart.lines) { line in
                 // The divider sits outside the row's `Button`, so it is not part of the tap target.
-                VStack(spacing: Sizing.spacingSpacingXs) {
+                VStack(spacing: Constants.lineSpacing) {
                     BagLineRow(line: line) { viewModel.didSelectLine(line) }
                     if line.id != cart.lines.last?.id {
                         BagLineDivider()
@@ -94,7 +94,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 .padding(.bottom, Primitives.Spacing.spacing16)
         }
         .listStyle(.plain)
-        .listRowSpacing(Sizing.spacingSpacingXs)
+        .listRowSpacing(Constants.lineSpacing)
         .padding(.top, Sizing.spacingSpacingMd)
         .accessibilityIdentifier(AccessibilityID.Bag.bagView)
     }
@@ -193,7 +193,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
         VStack(spacing: Constants.skeletonRowSpacing) {
             ForEach(0 ..< Constants.skeletonRowCount, id: \.self) { _ in
                 Color.clear
-                    .frame(height: BagLineRow.imageSize.height)
+                    .frame(height: BagLineRow.minHeight)
                     .shimmering(while: .constant(true), cornerRadius: Sizing.radiusSoft)
             }
             Spacer()
@@ -220,8 +220,8 @@ private struct BagLineDivider: View {
 
 private enum Constants {
     static let skeletonRowCount = 4
-    /// The pitch between two Lines: the divider and the gap on either side of it.
-    static let skeletonRowSpacing = Sizing.spacingSpacingXs * 2 + Sizing.borderBorderWeightDefault
+    static let lineSpacing = Sizing.spacingSpacingXs
+    static let skeletonRowSpacing = lineSpacing * 2 + Sizing.borderBorderWeightDefault
 }
 
 #if DEBUG

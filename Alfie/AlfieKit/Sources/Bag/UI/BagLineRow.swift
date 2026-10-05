@@ -13,6 +13,8 @@ import SwiftUI
 /// The row owns its horizontal inset. Applied from `BagView` it would wrap the `Button` instead of
 /// sitting inside its label, leaving a strip down both edges where a tap does nothing.
 struct BagLineRow: View {
+    static let minHeight = Constants.imageSize.height
+
     let line: CartLine
     let onTap: () -> Void
 
@@ -40,10 +42,6 @@ struct BagLineRow: View {
     }
 }
 
-extension BagLineRow {
-    static let imageSize = CGSize(width: 114, height: 152)
-}
-
 private struct BagLineContent: View {
     let line: CartLine
 
@@ -69,7 +67,7 @@ private struct BagLineContent: View {
                 }
             }
             .foregroundStyle(Theme.contentContentPrimary)
-            .frame(minHeight: BagLineRow.imageSize.height)
+            .frame(minHeight: Constants.imageSize.height)
         }
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, Sizing.spacingSpacingMd)
@@ -90,7 +88,7 @@ private struct BagLineImage: View {
 
     var body: some View {
         Theme.surfaceForegroundPrimary
-            .frame(width: BagLineRow.imageSize.width, height: BagLineRow.imageSize.height)
+            .frame(width: Constants.imageSize.width, height: Constants.imageSize.height)
             .overlay {
                 if let url {
                     RemoteImage(url: url) { image in
@@ -108,5 +106,6 @@ private struct BagLineImage: View {
 }
 
 private enum Constants {
+    static let imageSize = CGSize(width: 114, height: 152)
     static let nameLineLimit: Int = 2
 }
