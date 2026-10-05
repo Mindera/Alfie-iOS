@@ -14,6 +14,7 @@ public struct SearchFlowView: View {
             NavigationStack(path: $viewModel.path) {
                 SearchView(
                     viewModel: viewModel.makeSearchModel(),
+                    autoFocus: viewModel.focusesSearchBarOnAppear,
                     transition: .matchedGeometryEffect(
                         id: Constants.searchBarGeometryID,
                         namespace: animation

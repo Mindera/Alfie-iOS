@@ -7,18 +7,20 @@ import Mocks
 
 public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
-    private let transition: SearchBarTransition? // Move to VM?
+    private let autoFocus: Bool
+    private let transition: SearchBarTransition?
 
-    public init(viewModel: ViewModel, transition: SearchBarTransition? = nil) {
+    public init(viewModel: ViewModel, autoFocus: Bool = true, transition: SearchBarTransition? = nil) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.autoFocus = autoFocus
         self.transition = transition
     }
 
     public var body: some View {
         VStack(spacing: Primitives.Spacing.spacing0) {
             ThemedDivider.horizontalThin
-            Spacer()
             searchContentView
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .onAppear {
             viewModel.viewDidAppear()
@@ -35,7 +37,7 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
             dismissConfiguration: .init(type: .back),
             contentOverlayColorWhenFocused: Primitives.Colours.neutrals0,
             showDivider: true,
-            autoFocus: true,
+            autoFocus: autoFocus,
             transition: transition,
             onCancel: { onCancel() },
             onSubmit: { _ in onSubmit() }
@@ -49,38 +51,11 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
 extension SearchView {
     @ViewBuilder private var searchContentView: some View {
         switch viewModel.state {
-        case .empty:
-            emptyView
+        case .blank:
+            Color.clear
         case .recentSearches:
             RecentSearchesView(viewModel: viewModel.recentSearchesViewModel)
         }
-    }
-
-    private var emptyView: some View {
-        VStack(spacing: Primitives.Spacing.spacing16) {
-            Spacer()
-            imageForIcon(Icon.search)
-            Text.build(theme.font.body.medium(L10n.Search.Screen.EmptyView.title))
-                .foregroundStyle(Primitives.Colours.neutrals900)
-            Text.build(theme.font.body.small(L10n.Search.Screen.EmptyView.message))
-                .foregroundStyle(Primitives.Colours.neutrals900)
-            Spacer()
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(AccessibilityId.emptyView)
-    }
-}
-
-// MARK: - Helpers
-
-extension SearchView {
-    private func imageForIcon(_ icon: Icon) -> some View {
-        icon.image
-            .renderingMode(.template)
-            .resizable()
-            .foregroundStyle(Primitives.Colours.neutrals900)
-            .scaledToFit()
-            .frame(width: Constants.iconSize, height: Constants.iconSize)
     }
 }
 
@@ -99,23 +74,11 @@ extension SearchView {
     }
 }
 
-// MARK: - Accessibility Id's
-
-private enum AccessibilityId {
-    static let emptyView = "empty-screen"
-}
-
-// MARK: - Constants
-
-private enum Constants {
-    static let iconSize: CGFloat = 48
-}
-
 // MARK: - Previews
 
 #if DEBUG
-#Preview("Empty") {
-    SearchView(viewModel: MockSearchViewModel(state: .empty))
+#Preview("Blank") {
+    SearchView(viewModel: MockSearchViewModel(state: .blank))
 }
 
 #Preview("Recent Searches") {

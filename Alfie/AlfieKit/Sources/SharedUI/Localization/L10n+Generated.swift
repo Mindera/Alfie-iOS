@@ -563,12 +563,6 @@ public enum L10n {
   }
   public enum Search {
     public enum Screen {
-      public enum EmptyView {
-        /// Search for designers, categories and products
-        public static let message = L10n.tr("L10n", "search.screen.empty_view.message")
-        /// Find what you're looking for
-        public static let title = L10n.tr("L10n", "search.screen.empty_view.title")
-      }
       public enum NoResultsView {
         /// View all brands sold at Alfie
         public static let link = L10n.tr("L10n", "search.screen.no_results_view.link")
@@ -580,12 +574,6 @@ public enum L10n {
         }
       }
       public enum RecentSearches {
-        public enum ClearAll {
-          public enum Button {
-            /// Clear
-            public static let cta = L10n.tr("L10n", "search.screen.recent_searches.clear_all.button.cta")
-          }
-        }
         public enum Header {
           /// Your Recent Searches
           public static let title = L10n.tr("L10n", "search.screen.recent_searches.header.title")
@@ -919,12 +907,9 @@ public extension L10n {
       case scannerLookupFailedMessage = "scanner.lookup_failed.message"
       case scannerNotFoundMessage = "scanner.not_found.message"
       case scannerUnrecognisedMessage = "scanner.unrecognised.message"
-      case searchScreenEmptyViewMessage = "search.screen.empty_view.message"
-      case searchScreenEmptyViewTitle = "search.screen.empty_view.title"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"
       case searchScreenNoResultsViewMessage = "search.screen.no_results_view.message"
       case searchScreenNoResultsViewTerm = "search.screen.no_results_view.term"
-      case searchScreenRecentSearchesClearAllButtonCta = "search.screen.recent_searches.clear_all.button.cta"
       case searchScreenRecentSearchesHeaderTitle = "search.screen.recent_searches.header.title"
       case searchScreenSuggestionsMoreButtonCta = "search.screen.suggestions.more.button.cta"
       case searchScreenSuggestionsBrandsHeaderTitle = "search.screen.suggestions_brands.header.title"

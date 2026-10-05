@@ -1,4 +1,5 @@
 import AlicerceLogging
+import Combine
 import XCTest
 import Mocks
 import Model
@@ -35,9 +36,10 @@ final class SearchViewModelTests: XCTestCase {
 
     // MARK: - Initial state
 
-    func test_init_withNoRecentSearches_isEmptyState() {
+    func test_init_without_recent_searches_is_blank() {
         let sut = makeSUT()
-        XCTAssertEqual(sut.state, .empty)
+
+        XCTAssertEqual(sut.state, .blank)
     }
 
     func test_init_withRecentSearches_isRecentSearchesState() {
@@ -48,34 +50,58 @@ final class SearchViewModelTests: XCTestCase {
 
     // MARK: - Search text changes
 
-    func test_searchText_withNonEmptyText_setsEmptyState() {
+    func test_typing_with_recent_searches_is_blank() {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         let sut = makeSUT()
-        XCTAssertEqual(sut.state, .recentSearches)
 
         sut.searchText = "shoes"
 
-        XCTAssertEqual(sut.state, .empty)
+        XCTAssertEqual(sut.state, .blank)
     }
 
     func test_searchText_clearedWithRecentSearches_setsRecentSearchesState() {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         let sut = makeSUT()
         sut.searchText = "shoes"
-        XCTAssertEqual(sut.state, .empty)
 
         sut.searchText = ""
 
         XCTAssertEqual(sut.state, .recentSearches)
     }
 
-    func test_searchText_clearedWithoutRecentSearches_setsEmptyState() {
+    func test_clearing_search_text_without_recent_searches_is_blank() {
         let sut = makeSUT()
         sut.searchText = "shoes"
 
         sut.searchText = ""
 
-        XCTAssertEqual(sut.state, .empty)
+        XCTAssertEqual(sut.state, .blank)
+    }
+
+    // MARK: - Recent searches changes
+
+    func test_removing_last_recent_search_is_blank() {
+        let recentSearches = CurrentValueSubject<[RecentSearch], Never>([.text(value: "polo")])
+        mockRecentsService.recentSearches = [.text(value: "polo")]
+        mockRecentsService.recentSearchesPublisher = recentSearches.eraseToAnyPublisher()
+        let sut = makeSUT()
+
+        mockRecentsService.recentSearches = []
+        recentSearches.send([])
+
+        XCTAssertEqual(sut.state, .blank)
+    }
+
+    func test_recent_searches_changing_while_typing_stays_blank() {
+        let recentSearches = CurrentValueSubject<[RecentSearch], Never>([])
+        mockRecentsService.recentSearchesPublisher = recentSearches.eraseToAnyPublisher()
+        let sut = makeSUT()
+        sut.searchText = "shoes"
+
+        mockRecentsService.recentSearches = [.text(value: "polo")]
+        recentSearches.send([.text(value: "polo")])
+
+        XCTAssertEqual(sut.state, .blank)
     }
 
     // MARK: - Submission
@@ -157,24 +183,44 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEqual(searchTerm, "shoes")
     }
 
+    func test_submitting_search_keeps_trimmed_search_term_in_field() {
+        let sut = makeSUT()
+        sut.searchText = "  shoes  "
+
+        sut.onSubmitSearch()
+
+        XCTAssertEqual(sut.searchText, "shoes")
+    }
+
+    func test_tapping_recent_search_shows_its_results_and_puts_search_term_in_field() {
+        mockRecentsService.recentSearches = [.text(value: "linen")]
+        var capturedRoutes: [SearchRoute] = []
+        let sut = makeSUT(navigate: { capturedRoutes.append($0) })
+
+        sut.recentSearchesViewModel.didTapRecentSearch(.text(value: "linen"))
+
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen", category: nil))])
+        XCTAssertEqual(sut.searchText, "linen")
+    }
+
     // MARK: - Lifecycle
 
     func test_viewDidAppear_withRecentSearches_setsRecentSearchesState() {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         let sut = makeSUT()
-        sut.state = .empty
+        sut.state = .blank
 
         sut.viewDidAppear()
 
         XCTAssertEqual(sut.state, .recentSearches)
     }
 
-    func test_viewDidAppear_withoutRecentSearches_doesNotChangeState() {
+    func test_view_did_appear_without_recent_searches_stays_blank() {
         let sut = makeSUT()
 
         sut.viewDidAppear()
 
-        XCTAssertEqual(sut.state, .empty)
+        XCTAssertEqual(sut.state, .blank)
     }
 
     func test_viewDidDisappear_savesRecentSearches() {

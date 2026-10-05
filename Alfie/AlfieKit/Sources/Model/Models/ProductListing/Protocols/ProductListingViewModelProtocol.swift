@@ -17,6 +17,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     /// has no filterable range — the row is then not shown.
     var priceBounds: PriceFilterBounds? { get }
     var title: String { get }
+    var searchTerm: String? { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
     var isWishlistEnabled: Bool { get }
@@ -26,6 +27,8 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     func didSelect(_ product: Product)
     func isFavoriteState(for product: Product) -> Bool
     func didTapSearch()
+    func didTapBack()
+    func didTapSearchBar()
     func didTapAddToWishlist(for product: Product, isFavorite: Bool)
     func setListStyle(_ style: ProductListingListStyle)
     func didApplyFilters(_ filters: ProductFilterInput?, sort: String?)

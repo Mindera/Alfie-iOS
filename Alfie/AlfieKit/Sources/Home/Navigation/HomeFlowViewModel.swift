@@ -60,7 +60,7 @@ public final class HomeFlowViewModel: HomeFlowViewModelProtocol {
             urlQueryParameters: configuration.urlQueryParameters,
             mode: configuration.mode,
             navigate: { [weak self] in self?.navigate(.productListing($0)) },
-            showSearch: overlays.showSearch
+            searchNavigation: .listing(openSearch: overlays.showSearch)
         )
     }
 

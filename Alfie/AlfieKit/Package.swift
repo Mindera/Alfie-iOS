@@ -194,6 +194,7 @@ let package = Package(
         .target(
             name: "DebugMenu",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Mocks",
                 "Model",
