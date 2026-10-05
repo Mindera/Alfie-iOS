@@ -264,11 +264,11 @@ final class AlfieUITests: XCTestCase {
         )
         guard
             let items = (menu["menu"] as? [String: Any])?["items"] as? [[String: Any]],
-            let url = Self.firstLeafURL(in: items)
+            let url = Self.firstLeafURL(in: items),
+            let collectionHandle = Self.collectionHandle(from: url)
         else {
-            throw SeedError.badResponse("no leaf menu item: \(menu)")
+            throw SeedError.badResponse("no leaf menu item with a collection handle: \(menu)")
         }
-        let collectionHandle = url.hasPrefix("/") ? String(url.dropFirst()) : url
 
         let listing = try bffQuery(
             """
@@ -320,6 +320,16 @@ final class AlfieUITests: XCTestCase {
             }
         }
         return nil
+    }
+
+    /// Mirrors the app's menu converter: Shopify serves `[https://host]/collections/<handle>`, SCAYLE
+    /// a category path whose last segment is the handle.
+    private static func collectionHandle(from url: String) -> String? {
+        let segments = (URLComponents(string: url)?.path ?? url).split(separator: "/").map(String.init)
+        if let index = segments.firstIndex(of: "collections") {
+            return segments.indices.contains(index + 1) ? segments[index + 1] : nil
+        }
+        return segments.last
     }
 
     /// Posts one GraphQL document to the BFF and returns its `data` object. Synchronous because a
