@@ -124,7 +124,7 @@ final class AlfieUITests: XCTestCase {
         let bag = BagPage(app: app)
         var lineCountAfterAdd = 0
 
-        XCTContext.runActivity(named: "The bag shows the line that was added, with totals") { _ in
+        XCTContext.runActivity(named: "The bag shows the line that was added, with its total") { _ in
             bag.open()
             XCTAssertTrue(
                 bag.lineItems.element(boundBy: 0).waitForExistence(timeout: writeTimeout),
@@ -132,7 +132,6 @@ final class AlfieUITests: XCTestCase {
             )
             lineCountAfterAdd = bag.lineItems.count
             XCTAssertGreaterThan(lineCountAfterAdd, 0, "The bag should hold at least the line just added")
-            XCTAssertTrue(bag.subtotal.exists, "A bag with lines shows a subtotal")
             XCTAssertTrue(bag.grandTotal.exists, "A bag with lines shows a total")
         }
 

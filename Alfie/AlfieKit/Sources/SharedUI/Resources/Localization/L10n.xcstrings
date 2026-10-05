@@ -321,6 +321,17 @@
         }
       }
     },
+    "bag.continue.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
     "bag.empty.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -398,17 +409,6 @@
         }
       }
     },
-    "bag.subtotal.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subtotal"
-          }
-        }
-      }
-    },
     "bag.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -416,6 +416,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bag"
+          }
+        }
+      }
+    },
+    "bag.total.caption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipping and taxes are calculated in checkout."
           }
         }
       }

@@ -36,10 +36,6 @@ final class BagPage {
         )
     }
 
-    var subtotal: XCUIElement {
-        app.otherElements[AccessibilityID.Bag.subtotal]
-    }
-
     var grandTotal: XCUIElement {
         app.otherElements[AccessibilityID.Bag.grandTotal]
     }

@@ -87,50 +87,14 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                     .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
                 }
             }
-            totalsView(cart)
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets())
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.bottom, Primitives.Spacing.spacing16)
         }
         .listStyle(.plain)
         .listRowSpacing(Constants.lineSpacing)
         .padding(.top, Sizing.spacingSpacingMd)
         .accessibilityIdentifier(AccessibilityID.Bag.bagView)
-    }
-
-    /// Subtotal and total, with no checkout CTA — the bag is a dead end by design this epic (Q32).
-    private func totalsView(_ cart: Cart) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing8) {
-            Divider()
-                .padding(.bottom, Primitives.Spacing.spacing8)
-            totalRow(
-                title: L10n.Bag.Subtotal.title,
-                amount: cart.subtotal.amountFormattedOrUnavailable,
-                accessibilityId: AccessibilityID.Bag.subtotal
-            )
-            totalRow(
-                title: L10n.Bag.Total.title,
-                amount: cart.grandTotal.amountFormattedOrUnavailable,
-                accessibilityId: AccessibilityID.Bag.grandTotal,
-                isProminent: true
-            )
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            BagPurchaseSummary(total: cart.grandTotal.amountFormattedOrUnavailable)
         }
-    }
-
-    private func totalRow(
-        title: String,
-        amount: String,
-        accessibilityId: String,
-        isProminent: Bool = false
-    ) -> some View {
-        HStack {
-            Text.build(isProminent ? theme.font.body.medium(title) : theme.font.body.small(title))
-            Spacer()
-            Text.build(isProminent ? theme.font.body.medium(amount) : theme.font.body.small(amount))
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(accessibilityId)
     }
 
     // MARK: - Empty

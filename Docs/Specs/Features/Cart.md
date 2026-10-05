@@ -73,7 +73,7 @@ AND the bag does not show two rows for the same variant
 **GIVEN** the user has added items
 **WHEN** the user opens the _Bag tab_
 **THEN** the bag shows the cart's lines, each with its image, name, quantity and line total
-AND the subtotal and total are shown
+AND a purchase summary pinned above the tab bar shows the total, a shipping-and-taxes note and a Continue button that does nothing yet
 
 ### Scenario 5: The bag is empty
 
@@ -292,8 +292,9 @@ them. The empty state has no call to action (Q34), so no cross-tab navigation is
 |-----|---------|-------|
 | `bag.empty.title` | "Your bag is empty." | Empty state, the only line of copy (#171) |
 | `bag.quantity.label` | "Quantity: %d" | Per-row quantity |
-| `bag.subtotal.title` | "Subtotal" | Totals row |
-| `bag.total.title` | "Total" | Totals row |
+| `bag.total.title` | "Total" | Purchase summary |
+| `bag.total.caption` | "Shipping and taxes are calculated in checkout." | Purchase summary note (#172) |
+| `bag.continue.cta` | "Continue" | Purchase summary button; no action yet (#172) |
 | `bag.remove.cta` | "Remove" | Swipe action, under the close icon on `Theme.surfaceBackgroundDestructive` |
 | `bag.error_view.title` | "Oops!" | Error state title |
 | `bag.error_view.generic.message` | "Something went wrong" | Generic error |
@@ -446,12 +447,16 @@ stays a native swipe action, so the design's fixed 100pt width is not reproduced
 Lines are 16pt from the screen edges, 8pt apart either side of a 1pt `Theme.borderSoft` divider (#171);
 the loading skeleton repeats that pitch at the card's height.
 
+The purchase summary is pinned above the tab bar whenever the bag has lines (#172): white surface, 1pt
+`Theme.borderSoft` top border, 8pt vertical / 16pt horizontal padding, 8pt between the Total row, the
+note and the full-width primary Continue button. It is absent in the empty, loading and error states.
+
 ---
 
 ## Accessibility
 
 New `AccessibilityID.Bag` entries: `bagView` · `lineItem` · `lineItemQuantity` · `lineItemRemove` ·
-`subtotal` · `grandTotal` · `emptyState` · `errorView` · `errorRetry`.
+`grandTotal` · `continueButton` (#172, replacing `subtotal`) · `emptyState` · `errorView` · `errorRetry`.
 
 `Bag+Toolbar.swift` and `HorizontalProductCard.swift` declare private, local `AccessibilityID` enums
 rather than using the shared module. That predates this feature and is deliberately left alone.
@@ -573,7 +578,7 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. ~~The stepper is deferred to ALFMOB-443 **with a design request raised**.~~ **Closed by #170: the bag gets no stepper; quantity is edited on the PDP, which the row opens on the bagged variant.** | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
 | Q30 | ~~**Author exactly four operations**~~ **Amended by Q37**, which adds `UpdateCart` on the same fragment. — `CreateCart`, `AddToCart`, `RemoveFromCart`, `Cart` — with a minimal fragment: `id`, `lineItems`, `totals { subtotal, grandTotal }`. Every line input sends both `productId` and `variantId`. | Q27 removes `updateCart`; checkout removes `cartCheckoutUrl`. `status` is a hardcoded `"active"`, `platformId` is transitional, `externalReferences` is platform plumbing, `checkoutUrl` is unwired. Authoring `updateCart` "for later" would freeze a schema shape before ALFMOB-443 needs it. |
 | Q31 | **Write snapshot tests for all four bag states**, accepting that ALFMOB-443 will regenerate the baselines. | Regenerating a baseline is one command, and 443 regenerating them deliberately is what baselines are for. The alternative is implementing the cart with no visual regression net during the epic that replaces the bag's entire data source. |
-| Q32 | **The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope, so the bag is a dead end by design. |
+| Q32 | ~~**The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.**~~ **Superseded by #172: a Total-only purchase summary pinned above the tab bar, with a Continue button that is shown enabled and does nothing — checkout is still out of scope, so no ViewModel method or route backs it.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope, so the bag is a dead end by design. |
 | Q33 | **Twelve new L10n keys and a new `AccessibilityID.Bag` enum**, following the existing `plp.error_view.*` pattern. The private local `AccessibilityID` enums in `Bag+Toolbar.swift` and `HorizontalProductCard.swift` are **left alone**. | Those private enums contradict the `CLAUDE.md` rule, but they predate this feature and are unrelated to it — folding a cleanup in would break the surgical-changes rule. Noted, not fixed. |
 | Q34 | **The empty state has no call to action** — ~~title and message only~~ icon and one line since #171. **Supersedes the CTA in Q28.** | ~~`ErrorView.buttons` defaults to `[]`, so this is free.~~ A "Start shopping" CTA would need a cross-tab escape hatch threaded through `FlowViewModel` into `RootTabViewModel.navigate(.shop)` — new navigation plumbing for one button on a screen the user is one tap from leaving via the tab bar. |
 | Q35 | **Nine implementation stories**, raised as GitHub Issues in the order given under Story Breakdown. All nine are now unblocked. | Sequenced so the iOS-only groundwork runs first; with T1–T7 answered nothing waits on another team. |
@@ -711,3 +716,4 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 | 2026-10-05 | ALFMOB-443 line card restyle (#169): Scenario 4, L10n, Design References and accepted design mismatches | khoi.nguyen |
 | 2026-10-05 | ALFMOB-443 line tap opens the bagged variant, swipe Remove restyle (#170): Exit Points and Known Limitations | khoi.nguyen |
 | 2026-10-05 | ALFMOB-443 list dividers and rhythm, card-height skeleton, icon-and-one-line empty state (#171): Scenario 5, L10n, Q28, Q34 | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 pinned Total-only purchase summary with a no-op Continue button (#172): Scenario 4, L10n, Accessibility, Q32 | khoi.nguyen |
