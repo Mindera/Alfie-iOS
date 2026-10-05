@@ -17,13 +17,12 @@ final class BagViewSnapshotTests: XCTestCase {
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
             lines: [
-                .fixture(id: "line-1", name: "Silk Shirt", quantity: 2, unitPrice: money("£29.50"), lineTotal: money("£59.00")),
-                .fixture(id: "line-2", name: "Wool Overcoat", quantity: 1, unitPrice: money("£180.00"), lineTotal: money("£180.00")),
+                .fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: money("£59.00")),
+                .fixture(id: "line-2", name: "Wool Overcoat", quantity: 1, lineTotal: money("£180.00")),
                 .fixture(
                     id: "line-3",
                     name: "Double-Breasted Recycled Cashmere Blend Tailored Coat",
                     quantity: 1,
-                    unitPrice: money("£420.00"),
                     lineTotal: money("£420.00")
                 ),
             ],
@@ -38,7 +37,7 @@ final class BagViewSnapshotTests: XCTestCase {
         // A non-finite line total renders an em dash. £0.00 would read as "this item is free" (Q36).
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
-            lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, unitPrice: money("£29.50"), lineTotal: nil)],
+            lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: nil)],
             subtotal: money("£59.00"),
             grandTotal: money("£59.00")
         ))))
@@ -48,13 +47,13 @@ final class BagViewSnapshotTests: XCTestCase {
 
     /// `CartItem.name` and `CartItem.image` are both nullable, and this fixture has neither:
     /// the row keeps its tile and its quantity and price, rather than disappearing.
+    /// Snapshotted outside `BagView` because the claim is about the row, not the `List` around it.
     func test_bagLineRow_withALineTheServerCouldNotName() {
         let row = BagLineRow(
             line: .fixture(
                 id: "line-1",
                 name: nil,
                 quantity: 1,
-                unitPrice: money("£29.50"),
                 lineTotal: money("£29.50")
             ),
             onTap: {}
@@ -76,7 +75,7 @@ final class BagViewSnapshotTests: XCTestCase {
         // place of all to state a price they are not being charged (Q36).
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
-            lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, unitPrice: nil, lineTotal: nil)],
+            lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: nil)],
             subtotal: nil,
             grandTotal: nil
         ))))

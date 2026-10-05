@@ -42,26 +42,28 @@ struct BagLineRow: View {
     }
 
     private var content: some View {
-        HStack(alignment: .top, spacing: Primitives.Spacing.spacing8) {
+        HStack(alignment: .top, spacing: Sizing.spacingSpacingXs) {
             BagLineImage(url: line.imageURL, altText: line.imageAltText)
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
-                // A line with no name is still a line the shopper is being charged for.
+            VStack(alignment: .leading, spacing: Sizing.spacingSpacingXs) {
                 if let name = line.name {
                     Text.build(theme.font.body.medium(name))
                         .lineLimit(Constants.nameLineLimit)
                 }
                 Spacer(minLength: 0)
-                HStack(alignment: .firstTextBaseline, spacing: Primitives.Spacing.spacing8) {
+                HStack(alignment: .firstTextBaseline, spacing: Sizing.spacingSpacingXs) {
                     Text.build(theme.font.body.medium(L10n.Bag.Quantity.label(line.quantity)))
+                        .lineLimit(1)
                     Spacer(minLength: 0)
                     Text.build(theme.font.body.mediumBold(line.lineTotal.amountFormattedOrUnavailable))
+                        .lineLimit(1)
+                        .layoutPriority(1)
                 }
             }
             .foregroundStyle(Theme.contentContentPrimary)
             .frame(minHeight: Constants.imageSize.height)
         }
         .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, Sizing.spacingSpacingMd)
     }
 }
 
@@ -74,20 +76,17 @@ private struct BagLineImage: View {
             .frame(width: Constants.imageSize.width, height: Constants.imageSize.height)
             .overlay {
                 if let url {
-                    RemoteImage(
-                        url: url,
-                        success: { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        },
-                        placeholder: { Theme.surfaceForegroundPrimary },
-                        failure: { _ in Theme.surfaceForegroundPrimary }
-                    )
+                    RemoteImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    }
                     .accessibilityLabel(altText ?? "")
+                    .accessibilityHidden(altText == nil)
                 }
             }
             .clipped()
+            .contentShape(Rectangle())
     }
 }
 
