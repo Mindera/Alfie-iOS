@@ -442,14 +442,16 @@ This feature ships them using existing design tokens and `SharedUI` components, 
 
 ALFMOB-443 restyles the bag to Figma node `270:114940`. The line card (#169) is a 114 × 152 image
 tile, the name, "Quantity: N" and the line total; Known Limitations lists where it departs from the
-design. The swipe action (#170) is the design's red Remove with the close icon above its label; it
+design. It shows one price, the line total, which is what sums to the Total; the unit price is not
+shown. A line with no image keeps its tile, so the list stays aligned. Quantity and price end 4pt
+above the image's bottom edge. The swipe action (#170) is the design's red Remove with the close icon above its label; it
 stays a native swipe action, so the design's fixed 100pt width is not reproduced.
 Lines are 16pt from the screen edges, 8pt apart either side of a 1pt `Theme.borderSoft` divider (#171);
 the loading skeleton repeats that pitch at the card's height.
 
 The purchase summary is pinned above the tab bar whenever the bag has lines (#172): white surface, 1pt
-`Theme.borderSoft` top border, 8pt vertical / 16pt horizontal padding, 8pt between the Total row, the
-note and the full-width primary Continue button. It is absent in the empty, loading and error states.
+`Theme.borderSoft` top border, 8pt vertical / 16pt horizontal padding, the note directly under the
+Total row, and 8pt between that pair and the full-width primary Continue button. It is absent in the empty, loading and error states.
 
 ---
 
@@ -491,9 +493,6 @@ and a loading announcement for the cart fetch.
   - **"Only N left" and unavailable-item messages** — the cart exposes no stock.
   - **Quantity editing** — the row shows "Quantity: N" as plain text, with no dropdown chevron.
   - **Save to wishlist** on the swipe, and the per-line **"more"** button.
-  - **One price per line, and it is the line total.** The unit price is no longer shown; the line
-    total is what sums to the Total.
-  - **A line with no image keeps its image tile**, so the list stays aligned.
   - **Quantity and price stack when they do not fit on one row** (large Dynamic Type): the price
     drops under the quantity, leading-aligned, and the card grows past the image height.
 - **Quantity is editable on the PDP only.** The PDP swaps Add to bag for a `− n +` stepper once the
@@ -720,3 +719,4 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 | 2026-10-05 | ALFMOB-443 list dividers and rhythm, card-height skeleton, icon-and-one-line empty state (#171): Scenario 5, L10n, Q28, Q34 | khoi.nguyen |
 | 2026-10-05 | ALFMOB-443 pinned Total-only purchase summary with a no-op Continue button (#172): Scenario 4, L10n, Accessibility, Q32 | khoi.nguyen |
 | 2026-10-05 | PR #174 self-review: toolbar, null-image, identifier names and the stacked quantity/price fallback brought in line with the code | khoi.nguyen |
+| 2026-10-05 | PR #174 review: summary and quantity-row spacing matched to Figma; conforming line-card behaviour moved from Known Limitations to Design References | khoi.nguyen |

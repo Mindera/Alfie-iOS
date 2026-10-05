@@ -62,6 +62,7 @@ private struct BagLineContent: View {
                         lineTotal
                     }
                 }
+                .padding(.vertical, Sizing.spacingSpacing2xs)
             }
             .foregroundStyle(Theme.contentContentPrimary)
             .frame(minHeight: BagLineRow.minHeight)
