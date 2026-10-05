@@ -37,7 +37,7 @@ final class BagPage {
     }
 
     var grandTotal: XCUIElement {
-        app.otherElements[AccessibilityID.Bag.grandTotal]
+        app.descendants(matching: .any)[AccessibilityID.Bag.grandTotal]
     }
 
     var continueButton: XCUIElement {
