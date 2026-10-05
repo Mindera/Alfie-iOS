@@ -72,12 +72,12 @@ AND the bag does not show two rows for the same variant
 
 **GIVEN** the user has added items
 **WHEN** the user opens the _Bag tab_
-**THEN** the bag shows the cart's line items, each with its image, name, quantity and line total
+**THEN** the bag shows the cart's lines, each with its image, name, quantity and line total
 AND the subtotal and total are shown
 
 ### Scenario 5: The bag is empty
 
-**GIVEN** the user has a cart with no line items, or no cart at all
+**GIVEN** the user has a cart with no lines, or no cart at all
 **WHEN** the user opens the _Bag tab_
 **THEN** an empty state is shown with a title and message and no call to action
 

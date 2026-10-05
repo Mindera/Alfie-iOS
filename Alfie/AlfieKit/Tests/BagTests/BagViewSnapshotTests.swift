@@ -47,7 +47,8 @@ final class BagViewSnapshotTests: XCTestCase {
 
     /// `CartItem.name` and `CartItem.image` are both nullable, and this fixture has neither:
     /// the row keeps its tile and its quantity and price, rather than disappearing.
-    /// Snapshotted outside `BagView` because the claim is about the row, not the `List` around it.
+    /// Snapshotted outside `BagView`: `List` resolved this row's height 1pt differently on CI than
+    /// on the recording machine, and the claim is about the row, which lays out deterministically.
     func test_bagLineRow_withALineTheServerCouldNotName() {
         let row = BagLineRow(
             line: .fixture(
