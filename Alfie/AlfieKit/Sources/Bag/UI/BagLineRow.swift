@@ -17,34 +17,33 @@ struct BagLineRow: View {
     let onTap: () -> Void
 
     var body: some View {
-        if line.slug == nil {
-            content
-                .accessibilityElement(children: .contain)
+        // A single root keeps the row's structure constant, so `List` can template row identity.
+        VStack(spacing: 0) {
+            if line.slug == nil {
+                BagLineContent(line: line)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityIdentifier(rowIdentifier)
+            } else {
+                Button(action: onTap) {
+                    // Without a content shape the transparent gaps in the text column are not hit-tested.
+                    BagLineContent(line: line)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier(rowIdentifier)
-        } else {
-            Button(action: onTap) {
-                // Without a content shape the transparent gaps in the text column are not hit-tested.
-                content
-                    .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(rowIdentifier)
         }
     }
 
     private var rowIdentifier: String {
         AccessibilityID.Bag.lineItem(id: line.id)
     }
+}
 
-    private var quantity: some View {
-        Text.build(theme.font.body.medium(L10n.Bag.Quantity.label(line.quantity)))
-    }
+private struct BagLineContent: View {
+    let line: CartLine
 
-    private var lineTotal: some View {
-        Text.build(theme.font.body.mediumBold(line.lineTotal.amountFormattedOrUnavailable))
-    }
-
-    private var content: some View {
+    var body: some View {
         HStack(alignment: .top, spacing: Sizing.spacingSpacingXs) {
             BagLineImage(url: line.imageURL, altText: line.imageAltText)
             VStack(alignment: .leading, spacing: Sizing.spacingSpacingXs) {
@@ -70,6 +69,14 @@ struct BagLineRow: View {
         }
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, Sizing.spacingSpacingMd)
+    }
+
+    private var quantity: some View {
+        Text.build(theme.font.body.medium(L10n.Bag.Quantity.label(line.quantity)))
+    }
+
+    private var lineTotal: some View {
+        Text.build(theme.font.body.mediumBold(line.lineTotal.amountFormattedOrUnavailable))
     }
 }
 
