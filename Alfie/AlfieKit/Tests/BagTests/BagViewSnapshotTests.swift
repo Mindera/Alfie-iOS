@@ -70,7 +70,7 @@ final class BagViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
     }
 
-    func test_bagView_withTotalsTheServerCouldNotPrice() {
+    func test_bagView_withATotalTheServerCouldNotPrice() {
         // The em dash covers every amount on the screen, not just the line total. The grand total
         // is the number a shopper checks before checking out, so a fabricated £0.00 is the worst
         // place of all to state a price they are not being charged (Q36).

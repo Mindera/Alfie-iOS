@@ -435,10 +435,10 @@ under Verified Facts.
 
 ## Design References
 
-No Figma design exists for the bag's new elements — the quantity display, the totals row and the
+~~No Figma design exists for the bag's new elements — the quantity display, the totals row and the
 empty state. A design request is raised alongside ALFMOB-443, which owns the bag's visual redesign.
 This feature ships them using existing design tokens and `SharedUI` components, to be restyled by
-443.
+443.~~ **Superseded by ALFMOB-443, below.**
 
 ALFMOB-443 restyles the bag to Figma node `270:114940`. The line card (#169) is a 114 × 152 image
 tile, the name, "Quantity: N" and the line total; Known Limitations lists where it departs from the
@@ -469,7 +469,7 @@ and a loading announcement for the cart fetch.
 ## Known Limitations
 
 - **Checkout is not wired.** `cartCheckoutUrl` stays unused and `WebFeature.checkout` untouched. The
-  bag is a dead end by design. (`cartCheckoutUrl` also throws a bare `Error` on Shopify.)
+  bag shows a Continue button since #172, but it does nothing: no ViewModel method or route backs it. (`cartCheckoutUrl` also throws a bare `Error` on Shopify.)
 - ~~**A bag row is not tappable and does not reach the PDP.**~~ **Superseded by #129.** AF-114 added
   `slug` to `CartItem`, which removed the premise behind T6, and the row now opens its product.
   What remains limited:
@@ -578,7 +578,7 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. ~~The stepper is deferred to ALFMOB-443 **with a design request raised**.~~ **Closed by #170: the bag gets no stepper; quantity is edited on the PDP, which the row opens on the bagged variant.** | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
 | Q30 | ~~**Author exactly four operations**~~ **Amended by Q37**, which adds `UpdateCart` on the same fragment. — `CreateCart`, `AddToCart`, `RemoveFromCart`, `Cart` — with a minimal fragment: `id`, `lineItems`, `totals { subtotal, grandTotal }`. Every line input sends both `productId` and `variantId`. | Q27 removes `updateCart`; checkout removes `cartCheckoutUrl`. `status` is a hardcoded `"active"`, `platformId` is transitional, `externalReferences` is platform plumbing, `checkoutUrl` is unwired. Authoring `updateCart` "for later" would freeze a schema shape before ALFMOB-443 needs it. |
 | Q31 | **Write snapshot tests for all four bag states**, accepting that ALFMOB-443 will regenerate the baselines. | Regenerating a baseline is one command, and 443 regenerating them deliberately is what baselines are for. The alternative is implementing the cart with no visual regression net during the epic that replaces the bag's entire data source. |
-| Q32 | ~~**The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.**~~ **Superseded by #172: a Total-only purchase summary pinned above the tab bar, with a Continue button that is shown enabled and does nothing — checkout is still out of scope, so no ViewModel method or route backs it.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope, so the bag is a dead end by design. |
+| Q32 | ~~**The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.**~~ **Superseded by #172: a Total-only purchase summary pinned above the tab bar, with a Continue button that is shown enabled and does nothing — checkout is still out of scope, so no ViewModel method or route backs it.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope~~, so the bag is a dead end by design~~. |
 | Q33 | **Twelve new L10n keys and a new `AccessibilityID.Bag` enum**, following the existing `plp.error_view.*` pattern. The private local `AccessibilityID` enums in `Bag+Toolbar.swift` and `HorizontalProductCard.swift` are **left alone**. | Those private enums contradict the `CLAUDE.md` rule, but they predate this feature and are unrelated to it — folding a cleanup in would break the surgical-changes rule. Noted, not fixed. |
 | Q34 | **The empty state has no call to action** — ~~title and message only~~ icon and one line since #171. **Supersedes the CTA in Q28.** | ~~`ErrorView.buttons` defaults to `[]`, so this is free.~~ A "Start shopping" CTA would need a cross-tab escape hatch threaded through `FlowViewModel` into `RootTabViewModel.navigate(.shop)` — new navigation plumbing for one button on a screen the user is one tap from leaving via the tab bar. |
 | Q35 | **Nine implementation stories**, raised as GitHub Issues in the order given under Story Breakdown. All nine are now unblocked. | Sequenced so the iOS-only groundwork runs first; with T1–T7 answered nothing waits on another team. |

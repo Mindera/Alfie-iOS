@@ -65,7 +65,8 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                 VStack(spacing: Constants.lineSpacing) {
                     BagLineRow(line: line) { viewModel.didSelectLine(line) }
                     if line.id != cart.lines.last?.id {
-                        BagLineDivider()
+                        BagDivider()
+                            .padding(.horizontal, Sizing.spacingSpacingMd)
                     }
                 }
                 .listRowSeparator(.hidden)
@@ -170,14 +171,13 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     }
 }
 
-private struct BagLineDivider: View {
+struct BagDivider: View {
     var body: some View {
         ThemedDivider(configuration: .init(
             orientation: .horizontal,
             thickness: Sizing.borderBorderWeightDefault,
             color: Theme.borderSoft
         ))
-        .padding(.horizontal, Sizing.spacingSpacingMd)
         .accessibilityHidden(true)
     }
 }

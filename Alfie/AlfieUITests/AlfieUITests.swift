@@ -41,7 +41,7 @@ final class AlfieUITests: XCTestCase {
     /// End-to-end journey: Home → Shop → first category → first product → add to bag →
     /// success Snackbar.
     ///
-    /// …then Bag tab → the line is there with totals → tap it → its PDP opens → back → swipe →
+    /// …then Bag tab → the line is there with its total → tap it → its PDP opens → back → swipe →
     /// Remove → it is gone.
     ///
     /// Needs a reachable BFF: both the add and the removal are real round trips, not local

@@ -27,12 +27,7 @@ struct BagPurchaseSummary: View {
         .padding(.horizontal, Sizing.spacingSpacingMd)
         .background(Theme.surfaceBackgroundPrimary)
         .overlay(alignment: .top) {
-            ThemedDivider(configuration: .init(
-                orientation: .horizontal,
-                thickness: Sizing.borderBorderWeightDefault,
-                color: Theme.borderSoft
-            ))
-            .accessibilityHidden(true)
+            BagDivider()
         }
     }
 }
