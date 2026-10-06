@@ -708,6 +708,12 @@ public enum L10n {
   public enum Wishlist {
     /// Wishlist
     public static let title = L10n.tr("L10n", "wishlist.title")
+    public enum Empty {
+      /// Tap this icon in the products you like to see them here.
+      public static let message = L10n.tr("L10n", "wishlist.empty.message")
+      /// Your wishlist is empty.
+      public static let title = L10n.tr("L10n", "wishlist.empty.title")
+    }
   }
 }
 
@@ -934,6 +940,8 @@ public extension L10n {
       case webViewReturnOptionsFeatureTitle = "web_view.return_options_feature.title"
       case webViewStoreServicesFeatureTitle = "web_view.store_services_feature.title"
       case wishlistTitle = "wishlist.title"
+      case wishlistEmptyMessage = "wishlist.empty.message"
+      case wishlistEmptyTitle = "wishlist.empty.title"
   }
 }
 #endif

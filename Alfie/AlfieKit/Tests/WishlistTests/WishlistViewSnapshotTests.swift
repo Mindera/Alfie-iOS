@@ -13,12 +13,20 @@ final class WishlistViewSnapshotTests: XCTestCase {
 
     func test_wishlistView_populated() {
         let sut = NavigationStack {
-            WishlistView(viewModel: MockWishlistViewModel(products: [
+            WishlistView(viewModel: MockWishlistViewModel(state: .success([
                 selectedProduct(id: "1", name: "Structured Leather Crossbody Bag"),
                 selectedProduct(id: "2", name: "Capucines BB"),
                 selectedProduct(id: "3", name: "Low Key Hobo", stock: 0),
                 selectedProduct(id: "4", name: "Double-Breasted Recycled Cashmere Blend Tailored Coat"),
-            ]))
+            ])))
+        }
+
+        assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
+    }
+
+    func test_wishlistView_empty() {
+        let sut = NavigationStack {
+            WishlistView(viewModel: MockWishlistViewModel(state: .success([])))
         }
 
         assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)

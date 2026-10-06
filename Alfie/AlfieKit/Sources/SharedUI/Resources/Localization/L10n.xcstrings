@@ -1932,6 +1932,28 @@
         }
       }
     },
+    "wishlist.empty.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap this icon in the products you like to see them here."
+          }
+        }
+      }
+    },
+    "wishlist.empty.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wishlist is empty."
+          }
+        }
+      }
+    },
     "wishlist.title" : {
       "extractionState" : "manual",
       "localizations" : {

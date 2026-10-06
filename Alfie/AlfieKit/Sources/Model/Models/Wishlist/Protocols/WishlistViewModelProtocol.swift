@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol WishlistViewModelProtocol: ObservableObject {
-    var products: [SelectedProduct] { get }
+    var state: ViewState<[SelectedProduct], Never> { get }
     var hasNavigationSeparator: Bool { get }
 
     func viewDidAppear()

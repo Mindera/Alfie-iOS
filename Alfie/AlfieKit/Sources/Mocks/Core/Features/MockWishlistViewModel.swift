@@ -1,11 +1,11 @@
 import Model
 
 public class MockWishlistViewModel: WishlistViewModelProtocol {
-    public var products: [SelectedProduct]
+    public var state: ViewState<[SelectedProduct], Never>
     public var hasNavigationSeparator: Bool
 
-    public init(products: [SelectedProduct] = [], hasNavigationSeparator: Bool = false) {
-        self.products = products
+    public init(state: ViewState<[SelectedProduct], Never> = .success([]), hasNavigationSeparator: Bool = false) {
+        self.state = state
         self.hasNavigationSeparator = hasNavigationSeparator
     }
 

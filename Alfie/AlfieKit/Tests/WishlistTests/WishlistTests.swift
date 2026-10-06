@@ -51,10 +51,10 @@ final class WishlistTests: XCTestCase {
         ])
         let sut = makeSUT(wishlistService: wishlistService)
 
-        // The delete reloads `products` from the service; both variants share `product-1` so all go.
+        // The delete reloads `state` from the service; both variants share `product-1` so all go.
         XCTAssertEmitsValue(
-            from: sut.$products,
-            where: { $0.isEmpty },
+            from: sut.$state,
+            where: { $0.value?.isEmpty == true },
             afterTrigger: { sut.didSelectDelete(for: SelectedProduct(product: product, selectedVariant: redVariant)) }
         )
     }
@@ -64,11 +64,11 @@ final class WishlistTests: XCTestCase {
         let wishlistService = MockWishlistService(products: [SelectedProduct(product: product)])
         let sut = makeSUT(wishlistService: wishlistService)
 
-        XCTAssertEmitsValue(from: sut.$products, where: { $0.count == 1 }, afterTrigger: { sut.viewDidAppear() })
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.value?.count == 1 }, afterTrigger: { sut.viewDidAppear() })
 
         XCTAssertEmitsValue(
-            from: sut.$products,
-            where: { $0.isEmpty },
+            from: sut.$state,
+            where: { $0.value?.isEmpty == true },
             afterTrigger: { sut.didSelectDelete(for: SelectedProduct(product: product)) }
         )
     }
@@ -82,12 +82,53 @@ final class WishlistTests: XCTestCase {
         )
 
         XCTAssertEmitsValue(
-            from: sut.$products,
-            where: { $0.isEmpty },
+            from: sut.$state,
+            where: { $0.value?.isEmpty == true },
             afterTrigger: { sut.didSelectDelete(for: SelectedProduct(product: product)) }
         )
 
         XCTAssertEqual(analytics.trackedValues(of: .productID, for: .removeFromWishlist), ["product-1"])
+    }
+
+    // MARK: - WishlistViewModel.state
+
+    func test_the_wishlist_is_loading_until_it_first_appears() {
+        let sut = makeSUT()
+
+        XCTAssertTrue(sut.state.isLoading)
+    }
+
+    func test_a_wishlist_with_nothing_saved_is_empty() {
+        let sut = makeSUT()
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value?.isEmpty == true },
+            afterTrigger: { sut.viewDidAppear() }
+        )
+    }
+
+    func test_a_variant_saved_elsewhere_shows_when_the_wishlist_appears_again() {
+        let wishlistService = MockWishlistService()
+        let saved = SelectedProduct(product: .fixture(id: "product-1"))
+        let sut = makeSUT(wishlistService: wishlistService)
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value?.isEmpty == true },
+            afterTrigger: { sut.viewDidAppear() }
+        )
+        let hasSaved = expectation(description: "saved")
+        Task {
+            await wishlistService.addProduct(saved)
+            hasSaved.fulfill()
+        }
+        wait(for: [hasSaved], timeout: .default)
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value == [saved] },
+            afterTrigger: { sut.viewDidAppear() }
+        )
     }
 
     // MARK: - Helpers

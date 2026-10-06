@@ -2,7 +2,7 @@ import Foundation
 import Model
 
 public final class WishlistViewModel: WishlistViewModelProtocol {
-    @Published public private(set) var products: [SelectedProduct]
+    @Published public private(set) var state: ViewState<[SelectedProduct], Never> = .loading
 
     public var hasNavigationSeparator: Bool
     private let dependencies: WishlistDependencyContainer
@@ -16,14 +16,13 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
         self.hasNavigationSeparator = hasNavigationSeparator
         self.dependencies = dependencies
         self.navigate = navigate
-        products = []
     }
 
     // MARK: - WishListViewModelProtocol
 
     public func viewDidAppear() {
         Task { @MainActor in
-            products = await dependencies.wishlistService.getWishlistContent()
+            state = .success(await dependencies.wishlistService.getWishlistContent())
         }
     }
 
@@ -37,7 +36,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
         Task { @MainActor in
             await dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
             dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
-            products = await dependencies.wishlistService.getWishlistContent()
+            state = .success(await dependencies.wishlistService.getWishlistContent())
         }
     }
 

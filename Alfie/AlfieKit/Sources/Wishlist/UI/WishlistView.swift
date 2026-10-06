@@ -14,6 +14,37 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
     }
 
     public var body: some View {
+        content
+            .toolbarView(hasDivider: viewModel.hasNavigationSeparator)
+            .onAppear {
+                viewModel.viewDidAppear()
+            }
+    }
+}
+
+// MARK: - Private Methods
+
+private extension WishlistView {
+    @ViewBuilder var content: some View {
+        switch viewModel.state {
+        case .loading:
+            Color.clear
+
+        case .success(let products):
+            if products.isEmpty {
+                EmptyStateView(
+                    icon: .heart,
+                    title: L10n.Wishlist.Empty.title,
+                    message: L10n.Wishlist.Empty.message
+                )
+                .accessibilityIdentifier(AccessibilityID.Wishlist.emptyState)
+            } else {
+                grid(of: products)
+            }
+        }
+    }
+
+    func grid(of products: [SelectedProduct]) -> some View {
         ScrollView {
             LazyVGrid(
                 columns: Array(
@@ -22,7 +53,7 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                 ),
                 spacing: theme.spacing.space200
             ) {
-                ForEach(viewModel.products) { product in
+                ForEach(products) { product in
                     Button(
                         action: { viewModel.didTapProduct(product) },
                         label: { productCard(for: product) }
@@ -35,16 +66,8 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.Wishlist.grid)
         }
-        .toolbarView(hasDivider: viewModel.hasNavigationSeparator)
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
     }
-}
 
-// MARK: - Private Methods
-
-private extension WishlistView {
     func productCard(for product: SelectedProduct) -> some View {
         VerticalProductCard(
             viewModel: .init(
