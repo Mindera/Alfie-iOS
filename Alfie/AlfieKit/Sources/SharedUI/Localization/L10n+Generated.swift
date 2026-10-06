@@ -6,8 +6,6 @@ import Foundation
 
 public enum L10n {
   public enum Accessibility {
-    /// Account
-    public static let account = L10n.tr("L10n", "accessibility.account")
     /// Back
     public static let back = L10n.tr("L10n", "accessibility.back")
     /// Plural format key: accessibility.bag_badge
@@ -462,10 +460,6 @@ public enum L10n {
         public static let cta = L10n.tr("L10n", "product.add_to_wishlist.button.cta")
       }
     }
-    public enum Color {
-      /// Colour
-      public static let title = L10n.tr("L10n", "product.color.title")
-    }
     public enum OneSize {
       /// One Size
       public static let title = L10n.tr("L10n", "product.one_size.title")
@@ -767,7 +761,6 @@ private extension String.LocalizationValue.StringInterpolation {
 public extension L10n {
   enum Keys: String, RawRepresentable, CaseIterable {
 
-      case accessibilityAccount = "accessibility.account"
       case accessibilityBack = "accessibility.back"
       case accessibilityBagBadge = "accessibility.bag_badge"
       case accessibilityClearSearch = "accessibility.clearSearch"
@@ -882,7 +875,6 @@ public extension L10n {
       case productAddToBagErrorMessage = "product.add_to_bag.error.message"
       case productAddToBagSuccessMessage = "product.add_to_bag.success.message"
       case productAddToWishlistButtonCta = "product.add_to_wishlist.button.cta"
-      case productColorTitle = "product.color.title"
       case productOneSizeTitle = "product.one_size.title"
       case productOutOfStockButtonCta = "product.out_of_stock.button.cta"
       case productQuantityAccessibilityLabel = "product.quantity.accessibility_label"

@@ -1,5 +1,4 @@
 import Model
-import MyAccount
 import ProductDetails
 import SwiftUI
 import Web
@@ -24,12 +23,6 @@ public final class WishlistFlowViewModel: WishlistFlowViewModelProtocol {
         }
     }
 
-    public func makeAccountViewModel() -> AccountViewModel {
-        AccountViewModel(dependencies: dependencies.myAccountDependencyContainer) { [weak self] in
-            self?.navigate(.myAccount($0))
-        }
-    }
-
     public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
@@ -45,17 +38,6 @@ public final class WishlistFlowViewModel: WishlistFlowViewModelProtocol {
             webFeature: feature,
             dependencies: dependencies.webDependencyContainer
         )
-    }
-
-    // MARK: - View Models for MyAccountIntent
-
-    public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
-        switch intent {
-        case .wishlist:
-            AnyView(
-                WishlistView(viewModel: makeWishlistViewModel(isRoot: false))
-            )
-        }
     }
 
     // MARK: - FlowViewModelProtocol

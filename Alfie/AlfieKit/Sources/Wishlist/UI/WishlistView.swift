@@ -32,6 +32,7 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                 }
             }
             .padding(theme.spacing.space200)
+            .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.Wishlist.grid)
         }
         .toolbarView(hasDivider: viewModel.hasNavigationSeparator)

@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "accessibility.account" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Account"
-          }
-        }
-      }
-    },
     "accessibility.back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1300,17 +1289,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add to wishlist"
-          }
-        }
-      }
-    },
-    "product.color.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Colour"
           }
         }
       }

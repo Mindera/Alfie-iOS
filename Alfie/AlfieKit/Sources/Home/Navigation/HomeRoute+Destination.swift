@@ -37,11 +37,9 @@ public extension HomeRoute {
 
         case .wishlist(let wishlistRoute):
             wishlistRoute.destination(
-                accountViewModel: accountViewModel,
                 productDetailsViewModel: productDetailsViewModel,
                 webViewModel: webViewModel,
-                wishlistViewModel: wishlistViewModel,
-                myAccountIntentViewBuilder: myAccountIntentViewBuilder
+                wishlistViewModel: wishlistViewModel
             )
         }
     }

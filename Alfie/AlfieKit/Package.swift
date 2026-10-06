@@ -376,7 +376,6 @@ let package = Package(
                 "AccessibilityIdentifiers",
                 "Core",
                 "Model",
-                "MyAccount",
                 "ProductDetails",
                 "SharedUI",
                 "Web",

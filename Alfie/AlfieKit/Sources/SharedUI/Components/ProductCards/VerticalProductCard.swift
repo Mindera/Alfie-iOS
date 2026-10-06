@@ -156,8 +156,14 @@ public struct VerticalProductCard: View {
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
                     .foregroundStyle(Primitives.Colours.neutrals900, Primitives.Colours.neutrals0)
+                    .padding([.top, .trailing], topTrailingEdgePadding)
+                    .frame(
+                        minWidth: Constants.actionMinTapSize,
+                        minHeight: Constants.actionMinTapSize,
+                        alignment: .topTrailing
+                    )
+                    .contentShape(Rectangle())
             })
-            .padding([.top, .trailing], topTrailingEdgePadding)
             .accessibilityIdentifier(actionAccessibilityIdentifier ?? AccessibilityId.productWishlistButton)
             .accessibilityLabel(Text(actionAccessibilityLabel ?? L10n.Accessibility.wishlist))
         }
@@ -178,6 +184,7 @@ private enum Constants {
     static let productNameLineLimit: Int = 2
     static let iconSmallSize: CGFloat = 24
     static let iconLargeSize: CGFloat = 32
+    static let actionMinTapSize: CGFloat = 44
     static let imageAspectRatio: CGFloat = 0.75
 }
 

@@ -175,7 +175,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let wishlistFlowViewModel = WishlistFlowViewModel(
             dependencies: .init(
                 wishlistDependencyContainer: wishlistDependencyContainer,
-                myAccountDependencyContainer: myAccountDependencyContainer,
                 productDetailsDependencyContainer: productDetailsDependencyContainer,
                 webDependencyContainer: webDependencyContainer
             )
