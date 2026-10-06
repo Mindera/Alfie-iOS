@@ -9,6 +9,7 @@ public struct SnackbarViewConfiguration: Equatable {
         case error
     }
 
+    public let id: AnyHashable?
     public let type: SnackbarViewType
     public let text: String
     public let showCloseButton: Bool
@@ -23,6 +24,7 @@ public struct SnackbarViewConfiguration: Equatable {
 
     /// Creates a configuration for displaying a Snackbar.
     /// - Parameters:
+    ///   - id: tells two presentations with the same content apart, so the second one restarts the automatic dismissal
     ///   - type: the type of snackbar to display
     ///   - text: a message to show on the snackbar (can be truncated if line limit is exceeded)
     ///   - showCloseButton: should a close button be shown
@@ -34,6 +36,7 @@ public struct SnackbarViewConfiguration: Equatable {
     ///   - onActionTap: an option closure to be called when the user taps the action button (the snackbar won't dismiss automatically)
     ///   - onDismiss: an optional closure to be called when the snackbar is dismissed, either automatically of by the user
     public init(
+        id: AnyHashable? = nil,
         type: SnackbarViewType = .info,
         text: String,
         showCloseButton: Bool = false,
@@ -45,6 +48,7 @@ public struct SnackbarViewConfiguration: Equatable {
         onActionTap: (() -> Void)? = nil,
         onDismiss: (() -> Void)? = nil
     ) {
+        self.id = id
         self.type = type
         self.text = text
         self.showCloseButton = showCloseButton
@@ -59,6 +63,7 @@ public struct SnackbarViewConfiguration: Equatable {
     }
 
     public static func == (lhs: SnackbarViewConfiguration, rhs: SnackbarViewConfiguration) -> Bool {
+        lhs.id == rhs.id &&
         lhs.type == rhs.type &&
         lhs.text == rhs.text &&
         lhs.showCloseButton == rhs.showCloseButton &&
@@ -113,6 +118,7 @@ public struct SnackbarView: View {
                             .foregroundStyle(foregroundColor)
                             .padding(Primitives.Spacing.spacing16)
                     })
+                    .accessibilityIdentifier(AccessibilityID.Snackbar.actionButton)
                 }
                 if configuration.showCloseButton {
                     Button(action: {
@@ -132,6 +138,8 @@ public struct SnackbarView: View {
             .frame(minHeight: Constants.minHeight)
         }
         .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(AccessibilityID.Snackbar.view)
     }
 
     private var backgroundColor: Color {

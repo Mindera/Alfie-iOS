@@ -716,6 +716,14 @@ public enum L10n {
       /// Your wishlist is empty.
       public static let title = L10n.tr("L10n", "wishlist.empty.title")
     }
+    public enum Removed {
+      /// Removed.
+      public static let message = L10n.tr("L10n", "wishlist.removed.message")
+      public enum Undo {
+        /// Undo
+        public static let cta = L10n.tr("L10n", "wishlist.removed.undo.cta")
+      }
+    }
   }
 }
 
@@ -945,6 +953,8 @@ public extension L10n {
       case wishlistTitle = "wishlist.title"
       case wishlistEmptyMessage = "wishlist.empty.message"
       case wishlistEmptyTitle = "wishlist.empty.title"
+      case wishlistRemovedMessage = "wishlist.removed.message"
+      case wishlistRemovedUndoCta = "wishlist.removed.undo.cta"
   }
 }
 #endif

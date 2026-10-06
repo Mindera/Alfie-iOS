@@ -132,6 +132,7 @@ public enum AccessibilityID {
     public enum Snackbar {
         public static let view = "snackbar.view"
         public static let text = "snackbar.text"
+        public static let actionButton = "snackbar.action.button"
     }
 
     // MARK: - ProductListing

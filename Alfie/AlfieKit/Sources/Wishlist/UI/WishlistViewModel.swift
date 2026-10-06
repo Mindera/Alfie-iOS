@@ -3,6 +3,7 @@ import Model
 
 public final class WishlistViewModel: WishlistViewModelProtocol {
     @Published public private(set) var state: ViewState<[SelectedProduct], Never> = .loading
+    @Published public private(set) var undoableRemoval: WishlistRemoval?
 
     public var hasNavigationSeparator: Bool
     private let dependencies: WishlistDependencyContainer
@@ -33,11 +34,35 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didSelectDelete(for selectedProduct: SelectedProduct) {
+        let productId = selectedProduct.product.id
+        undoableRemoval = nil
         Task { @MainActor in
-            await dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
-            dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
+            let removal = WishlistRemoval(
+                productId: productId,
+                from: await dependencies.wishlistService.getWishlistContent()
+            )
+            await dependencies.wishlistService.removeProduct(withId: productId)
+            dependencies.analytics.trackRemoveFromWishlist(productID: productId)
+            await reload()
+            undoableRemoval = removal
+        }
+    }
+
+    public func didTapUndoRemoval() {
+        guard let removal = undoableRemoval else { return }
+
+        undoableRemoval = nil
+        Task { @MainActor in
+            for entry in removal.entries {
+                await dependencies.wishlistService.restoreProduct(entry.selectedProduct, at: entry.position)
+            }
+            dependencies.analytics.trackAddToWishlist(productID: removal.productId)
             await reload()
         }
+    }
+
+    public func didDismissRemovalSnackbar() {
+        undoableRemoval = nil
     }
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {

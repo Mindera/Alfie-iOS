@@ -1965,6 +1965,28 @@
         }
       }
     },
+    "wishlist.removed.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed."
+          }
+        }
+      }
+    },
+    "wishlist.removed.undo.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
     "wishlist.title" : {
       "extractionState" : "manual",
       "localizations" : {

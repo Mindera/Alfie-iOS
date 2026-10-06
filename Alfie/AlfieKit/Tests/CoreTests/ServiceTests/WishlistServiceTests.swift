@@ -146,6 +146,54 @@ final class WishlistServiceTests: XCTestCase {
         XCTAssertEqual(content.count, 1)
     }
 
+    // MARK: - restoreProduct(_:at:)
+
+    func test_a_variant_restored_at_the_first_position_comes_first() async {
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), saved("p2")])
+
+        await sut.restoreProduct(saved("restored"), at: 0)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["restored", "p1", "p2"])
+    }
+
+    func test_a_variant_restored_at_a_middle_position_sits_between_its_neighbours() async {
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), saved("p2")])
+
+        await sut.restoreProduct(saved("restored"), at: 1)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "restored", "p2"])
+    }
+
+    func test_a_variant_restored_past_the_end_comes_last() async {
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), saved("p2")])
+
+        await sut.restoreProduct(saved("restored"), at: 5)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "p2", "restored"])
+    }
+
+    func test_restoring_a_variant_that_is_still_saved_changes_nothing() async {
+        let stillSaved = saved("p2")
+        let (sut, store) = makeSUT(initialContent: [saved("p1"), stillSaved])
+
+        await sut.restoreProduct(stillSaved, at: 0)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "p2"])
+        XCTAssertTrue(store.saveInvocations.isEmpty)
+    }
+
+    func test_a_restored_variant_is_persisted_at_its_position() async {
+        let (sut, store) = makeSUT(initialContent: [saved("p1")])
+
+        await sut.restoreProduct(saved("restored"), at: 0)
+
+        XCTAssertEqual(store.saveInvocations.last?.map(\.product.id), ["restored", "p1"])
+    }
+
     // MARK: - Caching
 
     func test_storeLoadedOnceAtInit_notOnEveryRead() async {
@@ -170,6 +218,10 @@ final class WishlistServiceTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    private func saved(_ productId: String) -> SelectedProduct {
+        SelectedProduct(product: .fixture(id: productId))
+    }
 
     private func makeSUT(
         initialContent: [SelectedProduct] = [],

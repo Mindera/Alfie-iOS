@@ -15,10 +15,35 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
 
     public var body: some View {
         content
+            .snackbarView(configuration: removalSnackbar)
             .toolbarView(hasDivider: viewModel.hasNavigationSeparator)
             .onAppear {
                 viewModel.viewDidAppear()
             }
+            .onDisappear {
+                viewModel.didDismissRemovalSnackbar()
+            }
+    }
+
+    private var removalSnackbar: Binding<SnackbarViewConfiguration?> {
+        Binding(
+            get: {
+                viewModel.undoableRemoval.map { removal in
+                    SnackbarViewConfiguration(
+                        id: removal.id,
+                        text: L10n.Wishlist.Removed.message,
+                        icon: nil,
+                        actionButtonLabel: L10n.Wishlist.Removed.Undo.cta,
+                        onActionTap: viewModel.didTapUndoRemoval
+                    )
+                }
+            },
+            set: { configuration in
+                if configuration == nil {
+                    viewModel.didDismissRemovalSnackbar()
+                }
+            }
+        )
     }
 
     @ViewBuilder private var content: some View {
@@ -104,6 +129,16 @@ private enum Constants {
 #if DEBUG
 #Preview("Success") {
     WishlistView(viewModel: MockWishlistViewModel(state: .success([SelectedProduct(product: .fixture())])))
+}
+
+#Preview("Removed") {
+    let removed = SelectedProduct(product: .fixture(id: "removed"))
+    return WishlistView(
+        viewModel: MockWishlistViewModel(
+            state: .success([SelectedProduct(product: .fixture())]),
+            undoableRemoval: WishlistRemoval(productId: removed.product.id, from: [removed])
+        )
+    )
 }
 
 #Preview("Empty") {

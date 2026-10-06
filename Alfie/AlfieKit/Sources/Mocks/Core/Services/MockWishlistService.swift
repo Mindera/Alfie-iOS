@@ -18,6 +18,12 @@ public final class MockWishlistService: WishlistServiceProtocol {
         products = products.filter { $0.product.id != productId }
     }
 
+    public func restoreProduct(_ product: SelectedProduct, at position: Int) async {
+        guard !products.contains(where: { $0.id == product.id }) else { return }
+
+        products.insert(product, at: min(max(position, 0), products.count))
+    }
+
     public func getWishlistContent() async -> [SelectedProduct] {
         products
     }

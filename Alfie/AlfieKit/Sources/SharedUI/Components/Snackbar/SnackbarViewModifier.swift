@@ -3,11 +3,9 @@ import SwiftUI
 /// Adds  a snackbar to a view, configured using a `SnackbarViewConfiguration`, that can be set to nil to hide the snackbar
 public struct SnackbarViewModifier: ViewModifier {
     @Binding public var configuration: SnackbarViewConfiguration?
-    @State private var workItem: DispatchWorkItem?
 
     public init(configuration: Binding<SnackbarViewConfiguration?>) {
         self._configuration = configuration
-        scheduleDismissIfNecessary()
     }
 
     @ViewBuilder
@@ -22,6 +20,9 @@ public struct SnackbarViewModifier: ViewModifier {
                 .animation(.spring(), value: configuration),
                 alignment: alignment
             )
+            .task(id: configuration) {
+                await dismissAutomaticallyIfNecessary()
+            }
     }
 
     public func dismiss() {
@@ -29,9 +30,6 @@ public struct SnackbarViewModifier: ViewModifier {
         defer {
             completion?()
         }
-
-        workItem?.cancel()
-        workItem = nil
 
         withAnimation {
             configuration = nil
@@ -61,23 +59,21 @@ public struct SnackbarViewModifier: ViewModifier {
         return configuration.showFromTop ? .top : .bottom
     }
 
-    private func scheduleDismissIfNecessary() {
+    @MainActor
+    private func dismissAutomaticallyIfNecessary() async {
         guard
-            let configuration,
-            let autoDismissTime = configuration.autoDismissTime,
+            let autoDismissTime = configuration?.autoDismissTime,
             autoDismissTime > 0
         else {
             return
         }
 
-        workItem?.cancel()
-
-        let task = DispatchWorkItem {
-            dismiss()
+        try? await Task.sleep(nanoseconds: UInt64(autoDismissTime * Double(NSEC_PER_SEC)))
+        guard !Task.isCancelled else {
+            return
         }
 
-        workItem = task
-        DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissTime, execute: task)
+        dismiss()
     }
 }
 

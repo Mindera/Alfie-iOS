@@ -23,6 +23,13 @@ public actor WishlistService: WishlistServiceProtocol {
         store.save(products)
     }
 
+    public func restoreProduct(_ product: SelectedProduct, at position: Int) {
+        guard !products.contains(where: { $0.id == product.id }) else { return }
+
+        products.insert(product, at: min(max(position, 0), products.count))
+        store.save(products)
+    }
+
     public func getWishlistContent() -> [SelectedProduct] {
         products
     }

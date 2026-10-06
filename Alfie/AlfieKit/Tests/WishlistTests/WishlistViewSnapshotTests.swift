@@ -24,6 +24,26 @@ final class WishlistViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
     }
 
+    func test_a_wishlist_after_a_removal_shows_the_removed_snackbar() {
+        let sut = NavigationStack {
+            WishlistView(
+                viewModel: MockWishlistViewModel(
+                    state: .success([
+                        selectedProduct(id: "1", name: "Structured Leather Crossbody Bag"),
+                        selectedProduct(id: "3", name: "Low Key Hobo", stock: 0),
+                        selectedProduct(id: "4", name: "Double-Breasted Recycled Cashmere Blend Tailored Coat"),
+                    ]),
+                    undoableRemoval: WishlistRemoval(
+                        productId: "2",
+                        from: [selectedProduct(id: "2", name: "Capucines BB")]
+                    )
+                )
+            )
+        }
+
+        assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
+    }
+
     func test_a_wishlist_with_nothing_saved_shows_the_empty_state() {
         let sut = NavigationStack {
             WishlistView(viewModel: MockWishlistViewModel(state: .success([])))
