@@ -76,3 +76,17 @@ _Avoid_: Error screen, full-screen error
 **Transient error**:
 A page request failure shown as a dismissible Snackbar over loaded products, which stay on screen.
 _Avoid_: Refresh error
+
+### Bag
+
+**Bag**:
+What the shopper sees of their pending purchase, and the name of the tab that shows it.
+_Avoid_: basket, cart (in anything shopper-facing)
+
+**Cart**:
+The server-side object a Bag renders. It outlives the app session and is owned by the commerce platform.
+_Avoid_: bag (for the server object), basket
+
+**Line**:
+One Variant with a quantity in a Cart. Re-adding the same Variant raises its quantity instead of adding a second Line.
+_Avoid_: item, line item, product

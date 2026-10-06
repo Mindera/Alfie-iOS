@@ -211,14 +211,26 @@ final class BagViewModelTests: XCTestCase {
 
     // MARK: - Opening a line's product
 
-    func test_didSelectLine_opensTheProductDetailsPageForThatLinesSlug() {
-        // The slug is the product handle, which is the only key a product detail page can be
-        // fetched by — the line's product id has no fetch path anywhere in the product service.
-        let line = CartLine.fixture(id: "line-1", slug: "silk-shirt")
+    func test_did_select_line_opens_the_pdp_on_the_bagged_variant() {
+        let line = CartLine.fixture(id: "line-1", variantId: "variant-9", sku: "SKU-9", slug: "silk-shirt")
 
         sut.didSelectLine(line)
 
-        XCTAssertEqual(capturedRoutes, [.productDetails(.productDetails(.deepLink(handle: "silk-shirt")))])
+        XCTAssertEqual(
+            capturedRoutes,
+            [.productDetails(.productDetails(.deepLink(handle: "silk-shirt", sku: "SKU-9", variantId: "variant-9")))]
+        )
+    }
+
+    func test_did_select_line_with_no_sku_opens_the_variant_by_id() {
+        let line = CartLine.fixture(id: "line-1", variantId: "variant-9", sku: nil, slug: "silk-shirt")
+
+        sut.didSelectLine(line)
+
+        XCTAssertEqual(
+            capturedRoutes,
+            [.productDetails(.productDetails(.deepLink(handle: "silk-shirt", sku: nil, variantId: "variant-9")))]
+        )
     }
 
     func test_didSelectLine_withNoSlug_goesNowhereRatherThanToADeadHandle() {

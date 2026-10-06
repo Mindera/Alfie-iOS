@@ -36,12 +36,12 @@ final class BagPage {
         )
     }
 
-    var subtotal: XCUIElement {
-        app.otherElements[AccessibilityID.Bag.subtotal]
+    var grandTotal: XCUIElement {
+        app.descendants(matching: .any)[AccessibilityID.Bag.grandTotal]
     }
 
-    var grandTotal: XCUIElement {
-        app.otherElements[AccessibilityID.Bag.grandTotal]
+    var continueButton: XCUIElement {
+        app.buttons[AccessibilityID.Bag.continueButton]
     }
 
     // MARK: - Actions

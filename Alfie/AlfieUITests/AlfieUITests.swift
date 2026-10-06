@@ -41,7 +41,7 @@ final class AlfieUITests: XCTestCase {
     /// End-to-end journey: Home → Shop → first category → first product → add to bag →
     /// success Snackbar.
     ///
-    /// …then Bag tab → the line is there with totals → tap it → its PDP opens → back → swipe →
+    /// …then Bag tab → the line is there with its total → tap it → its PDP opens → back → swipe →
     /// Remove → it is gone.
     ///
     /// Needs a reachable BFF: both the add and the removal are real round trips, not local
@@ -124,7 +124,7 @@ final class AlfieUITests: XCTestCase {
         let bag = BagPage(app: app)
         var lineCountAfterAdd = 0
 
-        XCTContext.runActivity(named: "The bag shows the line that was added, with totals") { _ in
+        XCTContext.runActivity(named: "The bag shows the line that was added, with its total") { _ in
             bag.open()
             XCTAssertTrue(
                 bag.lineItems.element(boundBy: 0).waitForExistence(timeout: writeTimeout),
@@ -132,8 +132,8 @@ final class AlfieUITests: XCTestCase {
             )
             lineCountAfterAdd = bag.lineItems.count
             XCTAssertGreaterThan(lineCountAfterAdd, 0, "The bag should hold at least the line just added")
-            XCTAssertTrue(bag.subtotal.exists, "A bag with lines shows a subtotal")
             XCTAssertTrue(bag.grandTotal.exists, "A bag with lines shows a total")
+            XCTAssertTrue(bag.continueButton.exists, "A bag with lines shows Continue")
         }
 
         XCTContext.runActivity(named: "Tapping a line opens its product, and back returns to the bag") { _ in
@@ -264,11 +264,11 @@ final class AlfieUITests: XCTestCase {
         )
         guard
             let items = (menu["menu"] as? [String: Any])?["items"] as? [[String: Any]],
-            let url = Self.firstLeafURL(in: items)
+            let url = Self.firstLeafURL(in: items),
+            let collectionHandle = Self.collectionHandle(from: url)
         else {
-            throw SeedError.badResponse("no leaf menu item: \(menu)")
+            throw SeedError.badResponse("no leaf menu item with a collection handle: \(menu)")
         }
-        let collectionHandle = url.hasPrefix("/") ? String(url.dropFirst()) : url
 
         let listing = try bffQuery(
             """
@@ -320,6 +320,16 @@ final class AlfieUITests: XCTestCase {
             }
         }
         return nil
+    }
+
+    /// Mirrors the app's menu converter: Shopify serves `[https://host]/collections/<handle>`, SCAYLE
+    /// a category path whose last segment is the handle.
+    private static func collectionHandle(from url: String) -> String? {
+        let segments = (URLComponents(string: url)?.path ?? url).split(separator: "/").map(String.init)
+        if let index = segments.firstIndex(of: "collections") {
+            return segments.indices.contains(index + 1) ? segments[index + 1] : nil
+        }
+        return segments.last
     }
 
     /// Posts one GraphQL document to the BFF and returns its `data` object. Synchronous because a
