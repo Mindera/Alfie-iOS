@@ -24,6 +24,21 @@ final class WishlistTests: XCTestCase {
         )
     }
 
+    // MARK: - WishlistViewModel.didTapProduct
+
+    func test_tapping_a_card_opens_product_details_for_that_variant() {
+        let selected = SelectedProduct(product: .fixture(id: "product-1"))
+        var capturedRoutes: [WishlistRoute] = []
+        let sut = makeSUT(navigate: { capturedRoutes.append($0) })
+
+        sut.didTapProduct(selected)
+
+        XCTAssertEqual(
+            capturedRoutes,
+            [.productDetails(.productDetails(.selectedProduct(selected)))]
+        )
+    }
+
     // MARK: - WishlistViewModel.didSelectDelete
 
     func test_didSelectDelete_removesProductFromWishlistByProductId() {
@@ -58,17 +73,35 @@ final class WishlistTests: XCTestCase {
         )
     }
 
+    func test_removing_a_variant_tracks_the_removal_with_its_product_id() {
+        let product = Product.fixture(id: "product-1")
+        let analytics = MockAnalyticsTracker()
+        let sut = makeSUT(
+            wishlistService: MockWishlistService(products: [SelectedProduct(product: product)]),
+            analytics: analytics
+        )
+
+        XCTAssertEmitsValue(
+            from: sut.$products,
+            where: { $0.isEmpty },
+            afterTrigger: { sut.didSelectDelete(for: SelectedProduct(product: product)) }
+        )
+
+        XCTAssertEqual(analytics.trackedValues(of: .productID, for: .removeFromWishlist), ["product-1"])
+    }
+
     // MARK: - Helpers
 
     private func makeSUT(
         wishlistService: WishlistServiceProtocol = MockWishlistService(),
+        analytics: MockAnalyticsTracker = MockAnalyticsTracker(),
         navigate: @escaping (WishlistRoute) -> Void = { _ in },
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> WishlistViewModel {
         let dependencies = WishlistDependencyContainer(
             wishlistService: wishlistService,
-            analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
+            analytics: analytics.eraseToAnyAnalyticsTracker()
         )
         let sut = WishlistViewModel(
             hasNavigationSeparator: false,

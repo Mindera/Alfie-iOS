@@ -197,6 +197,16 @@ public enum AccessibilityID {
         public static let wishlistSection = "account.wishlist.section"
     }
 
+    // MARK: - Wishlist
+
+    public enum Wishlist {
+        public static let titleHeader = "wishlist.title.header"
+        public static let grid = "wishlist.grid.view"
+
+        public static func item(id: String) -> String { "wishlist.item.\(id)" }
+        public static func removeButton(id: String) -> String { item(id: id) + ".remove.button" }
+    }
+
     // MARK: - DebugMenu
 
     public enum DebugMenu {

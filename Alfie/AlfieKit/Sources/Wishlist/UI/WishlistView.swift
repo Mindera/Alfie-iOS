@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -16,32 +17,24 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
         ScrollView {
             LazyVGrid(
                 columns: Array(
-                    repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
-                    count: 2
+                    repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+                    count: Constants.columns
                 ),
-                spacing: Primitives.Spacing.spacing16
+                spacing: theme.spacing.space200
             ) {
                 ForEach(viewModel.products) { product in
                     Button(
                         action: { viewModel.didTapProduct(product) },
-                        label: {
-                            VerticalProductCard(
-                                viewModel: viewModel.productCardViewModel(for: product)
-                            ) { _, type in
-                                handleUserAction(forProduct: product, actionType: type)
-                            }
-                        }
+                        label: { productCard(for: product) }
                     )
                     .buttonStyle(.plain)
-                    .listRowInsets(EdgeInsets())
+                    .accessibilityIdentifier(AccessibilityID.Wishlist.item(id: product.id))
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(theme.spacing.space200)
+            .accessibilityIdentifier(AccessibilityID.Wishlist.grid)
         }
-        .padding(.vertical, Primitives.Spacing.spacing16)
-        .toolbarView(hasDivider: viewModel.hasNavigationSeparator) {
-            viewModel.didTapMyAccount()
-        }
+        .toolbarView(hasDivider: viewModel.hasNavigationSeparator)
         .onAppear {
             viewModel.viewDidAppear()
         }
@@ -51,18 +44,37 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
 // MARK: - Private Methods
 
 private extension WishlistView {
+    func productCard(for product: SelectedProduct) -> some View {
+        VerticalProductCard(
+            viewModel: .init(
+                configuration: .init(size: .medium),
+                selectedProduct: product,
+                addToBagTitle: L10n.Product.AddToBag.Button.cta,
+                outOfStockTitle: L10n.Product.OutOfStock.Button.cta
+            ),
+            onUserAction: { _, type in
+                handleUserAction(forProduct: product, actionType: type)
+            },
+            isFavorite: true,
+            actionAccessibilityIdentifier: AccessibilityID.Wishlist.removeButton(id: product.id),
+            actionAccessibilityLabel: L10n.Accessibility.removeFromWishlist
+        )
+    }
+
     func handleUserAction(forProduct product: SelectedProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
-        case .remove:
+        case .wishlist:
             viewModel.didSelectDelete(for: product)
         case .addToBag:
             viewModel.didTapAddToBag(for: product)
-        case .wishlist:
-            return
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
+}
+
+private enum Constants {
+    static let columns = 2
 }
 
 #if DEBUG

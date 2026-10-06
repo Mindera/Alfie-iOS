@@ -1,6 +1,5 @@
 import Foundation
 import Model
-import SharedUI
 
 public final class WishlistViewModel: WishlistViewModelProtocol {
     @Published public private(set) var products: [SelectedProduct]
@@ -44,25 +43,5 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {
         navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
-    }
-
-    public func didTapMyAccount() {
-        navigate(.myAccount(.myAccount))
-    }
-
-    public func productCardViewModel(for selectedProduct: SelectedProduct) -> VerticalProductCardViewModel {
-        .init(
-            configuration: .init(size: .medium, hideDetails: false, actionType: .remove),
-            productId: selectedProduct.id,
-            image: selectedProduct.media.first?.asImage?.url,
-            designer: selectedProduct.brand.name,
-            name: selectedProduct.name,
-            priceType: selectedProduct.priceType,
-            colorTitle: L10n.Product.Color.title + ":",
-            color: selectedProduct.colour?.name ?? "",
-            addToBagTitle: L10n.Product.AddToBag.Button.cta,
-            outOfStockTitle: L10n.Product.OutOfStock.Button.cta,
-            isAddToBagDisabled: selectedProduct.stock == .zero
-        )
     }
 }

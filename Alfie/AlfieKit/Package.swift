@@ -373,6 +373,7 @@ let package = Package(
         .target(
             name: "Wishlist",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Core",
                 "Model",
                 "MyAccount",
