@@ -33,11 +33,19 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
-    func test_localizable_bagQuantityWithArgs() {
+    func test_localizable_bag_quantity_with_args() {
         localizations.forEach { localization in
             let resources = [1, 2].map { L10n.Bag.Quantity.label($0) }
             XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
         }
+    }
+
+    func test_bag_quantity_label_spells_out_quantity() {
+        XCTAssertEqual(L10n.Bag.Quantity.label(2), "Quantity: 2")
+    }
+
+    func test_bag_empty_title_resolves_its_copy() {
+        XCTAssertEqual(L10n.Bag.Empty.title, "Your bag is empty.")
     }
 
     func test_localizable_product_quantity_with_args() {

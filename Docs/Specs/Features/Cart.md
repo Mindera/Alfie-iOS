@@ -2,7 +2,7 @@
 
 **Status**: Ready for implementation
 **Created**: 2026-08-26
-**Last Updated**: 2026-09-16
+**Last Updated**: 2026-10-05
 **Jira**: ALFMOB-491 (epic) · ALFMOB-498 (this spec)
 **Implementation PRs**: #121 (Story 1 — headless cart round-trip) · #122 (add to bag from the PDP) · #124 (the bag screen renders and empties the cart)
 
@@ -72,15 +72,14 @@ AND the bag does not show two rows for the same variant
 
 **GIVEN** the user has added items
 **WHEN** the user opens the _Bag tab_
-**THEN** the bag shows the cart's line items, each with its image, name, quantity, unit price and
-line total
-AND the subtotal and total are shown
+**THEN** the bag shows the cart's lines, each with its image, name, quantity and line total
+AND a purchase summary pinned above the tab bar shows the total, a shipping-and-taxes note and a Continue button that does nothing yet
 
 ### Scenario 5: The bag is empty
 
-**GIVEN** the user has a cart with no line items, or no cart at all
+**GIVEN** the user has a cart with no lines, or no cart at all
 **WHEN** the user opens the _Bag tab_
-**THEN** an empty state is shown with a title and message and no call to action
+**THEN** an empty state is shown with the bag icon and a single line of copy, and no call to action
 
 ### Scenario 6: Removing a line
 
@@ -88,7 +87,7 @@ AND the subtotal and total are shown
 **WHEN** the user swipes a row and confirms delete
 **THEN** the line is removed from the server cart
 AND the returned cart replaces the client's cart state
-AND the totals update
+AND the total updates
 
 ### Scenario 7: Adding to the bag fails
 
@@ -271,11 +270,13 @@ stock-aware — the cart exposes no inventory, so an over-order fails at the pla
 ### Exit Points
 
 - Tap back / switch tab → Previous screen
-- Toolbar → Account, Wishlist (unchanged)
+- Toolbar: centred title only, no leading or trailing items
 - **Tapping a bag row opens that line's product detail page** (#129), pushed on the Bag tab's own
   stack, so back returns to the bag. Keyed on `CartItem.slug`, which AF-114 added after this epic
   shipped; a line without one is not tappable and renders exactly as before. This supersedes T6 and
   Q13, which dropped the navigation on the premise that no product handle was available.
+  The line's SKU and variant id travel with the slug (#170), so the page opens on the bagged
+  variant with its quantity stepper showing — which is where a quantity is edited.
 
 ### Routes and FlowViewModel Methods
 
@@ -289,12 +290,12 @@ them. The empty state has no call to action (Q34), so no cross-tab navigation is
 
 | Key | English | Notes |
 |-----|---------|-------|
-| `bag.empty.title` | "Your bag is empty" | Empty state title |
-| `bag.empty.message` | "Items you add will appear here" | Empty state message |
-| `bag.quantity.label` | "Qty: %d" | Per-row quantity |
-| `bag.subtotal.title` | "Subtotal" | Totals row |
-| `bag.total.title` | "Total" | Totals row |
-| `bag.remove.cta` | "Remove" | Swipe action |
+| `bag.empty.title` | "Your bag is empty." | Empty state, the only line of copy (#171) |
+| `bag.quantity.label` | "Quantity: %d" | Per-row quantity |
+| `bag.total.title` | "Total" | Purchase summary |
+| `bag.total.caption` | "Shipping and taxes are calculated in checkout." | Purchase summary note (#172) |
+| `bag.continue.cta` | "Continue" | Purchase summary button; no action yet (#172) |
+| `bag.remove.cta` | "Remove" | Swipe action, under the close icon on `Theme.surfaceBackgroundDestructive` |
 | `bag.error_view.title` | "Oops!" | Error state title |
 | `bag.error_view.generic.message` | "Something went wrong" | Generic error |
 | `bag.error_view.no_internet.message` | "Check your connection" | Offline error |
@@ -351,7 +352,7 @@ under Verified Facts.
 | Add exceeds available stock | Platform rejects with `BAD_REQUEST`; surface the error snackbar |
 | Cart already has 50 lines | BFF rejects; surface the error snackbar |
 | Product has no purchasable variant (`Variant.id == nil`) | Add-to-bag is disabled locally; no request is made |
-| Line has a null `name` or `image` | Render the row without them; both are nullable on `CartItem` |
+| Line has a null `name` or `image` | Render the row without the name; a missing image keeps the plain image tile. Both are nullable on `CartItem` |
 | Removing the last line on BigCommerce | The platform destroys the cart and the BFF returns a synthetic empty cart with a dead id. Treat the next 404 as Scenario 9. |
 | User taps add-to-bag repeatedly | The button is disabled while in flight (Q8), so each tap is one request |
 
@@ -434,17 +435,30 @@ under Verified Facts.
 
 ## Design References
 
-No Figma design exists for the bag's new elements — the quantity display, the totals row and the
+~~No Figma design exists for the bag's new elements — the quantity display, the totals row and the
 empty state. A design request is raised alongside ALFMOB-443, which owns the bag's visual redesign.
 This feature ships them using existing design tokens and `SharedUI` components, to be restyled by
-443.
+443.~~ **Superseded by ALFMOB-443, below.**
+
+ALFMOB-443 restyles the bag to Figma node `270:114940`. The line card (#169) is a 114 × 152 image
+tile, the name, "Quantity: N" and the line total; Known Limitations lists where it departs from the
+design. It shows one price, the line total, which is what sums to the Total; the unit price is not
+shown. A line with no image keeps its tile, so the list stays aligned. Quantity and price end 4pt
+above the image's bottom edge. The swipe action (#170) is the design's red Remove with the close icon above its label; it
+stays a native swipe action, so the design's fixed 100pt width is not reproduced.
+Lines are 16pt from the screen edges, 8pt apart either side of a 1pt `Theme.borderSoft` divider (#171);
+the loading skeleton repeats that pitch at the card's height.
+
+The purchase summary is pinned above the tab bar whenever the bag has lines (#172): white surface, 1pt
+`Theme.borderSoft` top border, 8pt vertical / 16pt horizontal padding, the note directly under the
+Total row, and 8pt between that pair and the full-width primary Continue button. It is absent in the empty, loading and error states.
 
 ---
 
 ## Accessibility
 
-New `AccessibilityID.Bag` entries: `bagView` · `lineItem` · `lineItemQuantity` · `lineItemRemove` ·
-`subtotal` · `grandTotal` · `emptyState` · `errorView` · `errorRetry`.
+New `AccessibilityID.Bag` entries: `bagView` · `lineItem` · `lineItemRemoveButton` ·
+`grandTotal` · `continueButton` (#172, replacing `subtotal`) · `emptyState` · `errorView` · `errorRetryButton`.
 
 `Bag+Toolbar.swift` and `HorizontalProductCard.swift` declare private, local `AccessibilityID` enums
 rather than using the shared module. That predates this feature and is deliberately left alone.
@@ -457,14 +471,15 @@ and a loading announcement for the cart fetch.
 ## Known Limitations
 
 - **Checkout is not wired.** `cartCheckoutUrl` stays unused and `WebFeature.checkout` untouched. The
-  bag is a dead end by design. (`cartCheckoutUrl` also throws a bare `Error` on Shopify.)
+  bag shows a Continue button since #172, but it does nothing: no ViewModel method or route backs it. (`cartCheckoutUrl` also throws a bare `Error` on Shopify.)
 - ~~**A bag row is not tappable and does not reach the PDP.**~~ **Superseded by #129.** AF-114 added
   `slug` to `CartItem`, which removed the premise behind T6, and the row now opens its product.
   What remains limited:
-  - **The product opens on its default variant, not the one in the bag.** Colour preselection
-    matches on SKU and size is never auto-selected by design, so Add to bag starts disabled until a
-    size is picked. Passing the line's variant through would need a new `ProductDetailsConfiguration`
-    case and a variant-resolution change in the PDP; deliberately out of scope.
+  - ~~**The product opens on its default variant, not the one in the bag.**~~ **Superseded by
+    #170.** The row passes the line's SKU and variant id with its slug through
+    `ProductDetailsConfiguration.deepLink`, so the PDP opens with the bagged colour and size
+    selected and its quantity stepper showing. A line with no SKU resolves by variant id; one the
+    PDP can match by neither falls back to the default variant.
   - **A stale slug is a dead end.** A cart can outlive a product by up to 30 days, and the
     product-details error screen offers only Go back — no retry, which could never resolve a
     not-found handle anyway. Accepted; #130 pins those error states under test.
@@ -472,9 +487,17 @@ and a loading announcement for the cart fetch.
     tapped. There is no fetch-by-id path in the product service to fall back on.
 - **The bag row shows no brand, colour, size or was-price.** `CartItem` carries none of them and no
   enrichment is asked for.
+- **The bag row departs from the modern design (ALFMOB-443) where the BFF or scope stops it.**
+  Accepted, with no follow-up raised:
+  - **Reference number, colour and size** — `CartItem` carries none of them.
+  - **"Only N left" and unavailable-item messages** — the cart exposes no stock.
+  - **Quantity editing** — the row shows "Quantity: N" as plain text, with no dropdown chevron.
+  - **Save to wishlist** on the swipe, and the per-line **"more"** button.
+  - **Quantity and price stack when they do not fit on one row** (large Dynamic Type): the price
+    drops under the quantity, leading-aligned, and the card grows past the image height.
 - **Quantity is editable on the PDP only.** The PDP swaps Add to bag for a `− n +` stepper once the
-  selected variant is in the bag (Q37). The bag row is still display-only, so reducing a quantity
-  from the bag means removing the line; its stepper stays with ALFMOB-443.
+  selected variant is in the bag (Q37). The bag row is display-only and gets no stepper: tapping
+  it opens the PDP on the bagged variant, where the stepper is already showing (#170).
 - **The stepper's ceiling is online stock, capped at 100.** Stock is the PDP's last-fetched figure,
   so a stock drop since then surfaces as the quantity error snackbar rather than a greyed `+`.
 - **A cold open can briefly offer Add to bag for a variant already in the bag.** The cart is fetched
@@ -551,14 +574,14 @@ Raised as GitHub Issues (per `Docs/agents/issue-tracker.md`). With the team ques
 | Q24 | **No local-bag migration. ALFMOB-499 closes as won't-do**, and the epic's AC "products already in a user's local bag survive the upgrade" is struck. | The app is not released, so no user has a saved bag. Once the bag store is deleted nothing reads `StorageKey.bagItems` again, so a stale blob on a dev device is inert — the cleanup costs zero lines. This removes the slug re-fetch, per-slug batching, partial-failure UX and their tests entirely. |
 | Q25 | **No offline support.** An offline read is `.error(.noInternet)` → `ErrorView` with retry; an offline write is blocked with an error snackbar. | A persisted cart mirror re-introduces the local source of truth this epic exists to delete, and would go stale against a server another device can mutate. The Apollo store is an `InMemoryNormalizedCache`, so a "cached cart" cannot survive a relaunch anyway. Within a session `.success(cart)` still holds the last good cart, so a write blip leaves the displayed bag intact. |
 | Q26 | **PDP add-to-bag shows an in-flight indicator, then a snackbar.** `ThemedButton(isLoading:)` on the CTA (`ProductDetailsView.swift:523`), `.success` "Added to bag" / `.error` on failure. **No auto-navigation to the bag on success.** | Today it is fire-and-forget with no feedback at all (`ProductDetailsViewModel.swift:207`); pessimistic writes (Q8) give it an in-flight state and a failure case. Pieces already exist — `ThemedButton.swift:25`, `SnackbarView.swift:7`, with `ProductListingView` as the wiring precedent. Auto-navigation is a product decision outside this epic. |
-| Q28 | **Empty bag reuses `ErrorView`** with bag copy. ~~…and a "Start shopping" CTA switching to the Shop tab.~~ **The CTA half is superseded by Q34** — title and message only. | Per Q19 an empty bag is `.success(cart)` with `lines.isEmpty`. `SharedUI` has no `EmptyState` component, and `ErrorView` already renders title + message (`ErrorView.swift:42`). `CLAUDE.md` requires reaching for existing `SharedUI` components before writing a new view. The component choice stands; only the CTA was dropped. |
+| Q28 | ~~**Empty bag reuses `ErrorView`** with bag copy.~~ **Superseded by #171: the bag draws its own empty state, a 24pt icon over one line, which `ErrorView`'s 48pt icon and title-plus-message layout do not give.** ~~…and a "Start shopping" CTA switching to the Shop tab.~~ **The CTA half is superseded by Q34.** | Per Q19 an empty bag is `.success(cart)` with `lines.isEmpty`. `SharedUI` has no `EmptyState` component, and `ErrorView` already renders title + message (`ErrorView.swift:42`). `CLAUDE.md` requires reaching for existing `SharedUI` components before writing a new view. ~~The component choice stands; only the CTA was dropped.~~ The component choice held until #171, when the modern design's empty state stopped fitting `ErrorView`. |
 | Q29 | **Analytics fire on success only.** The schema changes (a `quantity` dimension, a separate `variantId` parameter, normalising `productID`) are **deferred** — not done in this epic. | Writes can now fail, so firing on intent would inflate add-to-bag against real cart contents. The schema changes are deferred because they alter an existing event stream whose downstream owner has not been identified; the pre-existing `productID` inconsistency (`ProductDetailsViewModel.swift:211` sends a composite, `BagViewModel.swift:38` sends a bare id) is recorded under Verified Facts and left in place. |
-| Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. The stepper is deferred to ALFMOB-443 **with a design request raised**. | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
+| Q27 | ~~**Quantity is display-only this epic.**~~ **Partly superseded by Q37** for the PDP; the bag row is still display-only. The row shows the quantity as text; increasing means tapping add-to-bag again on the PDP (which merges server-side and shows the Q26 loading indicator); the only removal affordance is the existing swipe-to-delete wired to `removeFromCart`. ~~The stepper is deferred to ALFMOB-443 **with a design request raised**.~~ **Closed by #170: the bag gets no stepper; quantity is edited on the PDP, which the row opens on the bagged variant.** | Designing a control blind that ALFMOB-443 would redesign weeks later is the double-work Q9 chose to avoid, and this removes `updateCart`, the `QuantityStepper` component, the debounce and the whole concurrent-update race. **Two costs taken deliberately:** a user cannot decrement without deleting the line and re-adding, and this strikes two of ALFMOB-491's stated ACs (the stepper in Scope, and "changing a quantity updates totals without a full reload") — to be recorded on the epic. **Load-bearing risk:** the increase path depends entirely on `addToCart` merging duplicate variants, which is documented platform behaviour but covered by no test in the BFF. The first implementation story must smoke-test it against the real Shopify store. |
 | Q30 | ~~**Author exactly four operations**~~ **Amended by Q37**, which adds `UpdateCart` on the same fragment. — `CreateCart`, `AddToCart`, `RemoveFromCart`, `Cart` — with a minimal fragment: `id`, `lineItems`, `totals { subtotal, grandTotal }`. Every line input sends both `productId` and `variantId`. | Q27 removes `updateCart`; checkout removes `cartCheckoutUrl`. `status` is a hardcoded `"active"`, `platformId` is transitional, `externalReferences` is platform plumbing, `checkoutUrl` is unwired. Authoring `updateCart` "for later" would freeze a schema shape before ALFMOB-443 needs it. |
 | Q31 | **Write snapshot tests for all four bag states**, accepting that ALFMOB-443 will regenerate the baselines. | Regenerating a baseline is one command, and 443 regenerating them deliberately is what baselines are for. The alternative is implementing the cart with no visual regression net during the epic that replaces the bag's entire data source. |
-| Q32 | **The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope, so the bag is a dead end by design. |
+| Q32 | ~~**The bag gets a totals row** (subtotal + total), styled with existing tokens, flagged to design alongside the stepper. **No checkout CTA.**~~ **Superseded by #172: a Total-only purchase summary pinned above the tab bar, with a Continue button that is shown enabled and does nothing — checkout is still out of scope, so no ViewModel method or route backs it.** | Explicit epic scope ("view bag against real line items and totals"), and unlike a stepper it is static text with no interaction model to get wrong. Checkout is out of scope~~, so the bag is a dead end by design~~. |
 | Q33 | **Twelve new L10n keys and a new `AccessibilityID.Bag` enum**, following the existing `plp.error_view.*` pattern. The private local `AccessibilityID` enums in `Bag+Toolbar.swift` and `HorizontalProductCard.swift` are **left alone**. | Those private enums contradict the `CLAUDE.md` rule, but they predate this feature and are unrelated to it — folding a cleanup in would break the surgical-changes rule. Noted, not fixed. |
-| Q34 | **The empty state has no call to action** — title and message only. **Supersedes the CTA in Q28.** | `ErrorView.buttons` defaults to `[]`, so this is free. A "Start shopping" CTA would need a cross-tab escape hatch threaded through `FlowViewModel` into `RootTabViewModel.navigate(.shop)` — new navigation plumbing for one button on a screen the user is one tap from leaving via the tab bar. |
+| Q34 | **The empty state has no call to action** — ~~title and message only~~ icon and one line since #171. **Supersedes the CTA in Q28.** | ~~`ErrorView.buttons` defaults to `[]`, so this is free.~~ A "Start shopping" CTA would need a cross-tab escape hatch threaded through `FlowViewModel` into `RootTabViewModel.navigate(.shop)` — new navigation plumbing for one button on a screen the user is one tap from leaving via the tab bar. |
 | Q35 | **Nine implementation stories**, raised as GitHub Issues in the order given under Story Breakdown. All nine are now unblocked. | Sequenced so the iOS-only groundwork runs first; with T1–T7 answered nothing waits on another team. |
 | Q1 | **The cart id lives in `UserDefaults`, with no client-side TTL.** Stored on create, read on every operation, discarded on a 404 and on sign-out. | Closed by T1: carts expire after 30 days of inactivity, but "inactivity" is not something the client can track reliably — a second device or the web can touch the same cart. The server's 404 is the only authoritative expiry signal, so a client-side timer would either expire a live cart or lag a dead one. `UserDefaults` because the id is a non-secret server handle to a guest cart, and `UserDefaultsStore` already exists. |
 | Q2 | **The cart is created lazily, by the first add.** `createCart(input:)` carries that first line, so create-and-add is one round trip. Opening an empty bag creates nothing. | Closed by T2: the BFF will **not** implicitly create a cart from an unknown id, so iOS owns creation. Consequence for recovery: a 404 from `addToCart` is not an error the user sees — discard the id, `createCart` with the same line, report success (Scenario 12). A 404 from `CartQuery` just renders empty; nothing is created until there is something to put in it. |
@@ -691,3 +714,9 @@ Alfie-BFF at `origin/main` `6aa0783` (25 Aug 2026).
 | 2026-08-26 | Decision log and verified facts opened during the design session | khoi.nguyen |
 | 2026-08-26 | Full spec written; 30 decisions closed, 7 questions deferred to the team | khoi.nguyen |
 | 2026-09-16 | PDP quantity stepper (Q37); Q20, Q27, Q30, analytics, L10n and Known Limitations updated | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 line card restyle (#169): Scenario 4, L10n, Design References and accepted design mismatches | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 line tap opens the bagged variant, swipe Remove restyle (#170): Exit Points and Known Limitations | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 list dividers and rhythm, card-height skeleton, icon-and-one-line empty state (#171): Scenario 5, L10n, Q28, Q34 | khoi.nguyen |
+| 2026-10-05 | ALFMOB-443 pinned Total-only purchase summary with a no-op Continue button (#172): Scenario 4, L10n, Accessibility, Q32 | khoi.nguyen |
+| 2026-10-05 | PR #174 self-review: toolbar, null-image, identifier names and the stacked quantity/price fallback brought in line with the code | khoi.nguyen |
+| 2026-10-05 | PR #174 review: summary and quantity-row spacing matched to Figma; conforming line-card behaviour moved from Known Limitations to Design References | khoi.nguyen |

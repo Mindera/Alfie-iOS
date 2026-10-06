@@ -72,10 +72,12 @@ public enum L10n {
       /// —
       public static let unavailable = L10n.tr("L10n", "bag.amount.unavailable")
     }
+    public enum Continue {
+      /// Continue
+      public static let cta = L10n.tr("L10n", "bag.continue.cta")
+    }
     public enum Empty {
-      /// Items you add will appear here
-      public static let message = L10n.tr("L10n", "bag.empty.message")
-      /// Your bag is empty
+      /// Your bag is empty.
       public static let title = L10n.tr("L10n", "bag.empty.title")
     }
     public enum ErrorView {
@@ -95,7 +97,7 @@ public enum L10n {
       }
     }
     public enum Quantity {
-      /// Qty: %d
+      /// Quantity: %d
       public static func label(_ p1: Int) -> String {
         return L10n.tr("L10n", "bag.quantity.label", p1)
       }
@@ -104,11 +106,9 @@ public enum L10n {
       /// Remove
       public static let cta = L10n.tr("L10n", "bag.remove.cta")
     }
-    public enum Subtotal {
-      /// Subtotal
-      public static let title = L10n.tr("L10n", "bag.subtotal.title")
-    }
     public enum Total {
+      /// Shipping and taxes are calculated in checkout.
+      public static let caption = L10n.tr("L10n", "bag.total.caption")
       /// Total
       public static let title = L10n.tr("L10n", "bag.total.title")
     }
@@ -796,7 +796,7 @@ public extension L10n {
       case accountWishlist = "account.wishlist"
       case bagTitle = "bag.title"
       case bagAmountUnavailable = "bag.amount.unavailable"
-      case bagEmptyMessage = "bag.empty.message"
+      case bagContinueCta = "bag.continue.cta"
       case bagEmptyTitle = "bag.empty.title"
       case bagErrorViewTitle = "bag.error_view.title"
       case bagErrorViewGenericMessage = "bag.error_view.generic.message"
@@ -804,7 +804,7 @@ public extension L10n {
       case bagErrorViewRetryCta = "bag.error_view.retry.cta"
       case bagQuantityLabel = "bag.quantity.label"
       case bagRemoveCta = "bag.remove.cta"
-      case bagSubtotalTitle = "bag.subtotal.title"
+      case bagTotalCaption = "bag.total.caption"
       case bagTotalTitle = "bag.total.title"
       case featureToggleTitle = "feature_toggle.title"
       case featureToggleAppUpdateOptionTitle = "feature_toggle.app_update.option.title"

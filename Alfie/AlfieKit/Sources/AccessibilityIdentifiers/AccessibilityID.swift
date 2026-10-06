@@ -17,8 +17,8 @@ public enum AccessibilityID {
 
     public enum Bag {
         public static let bagView = "bag.list.view"
-        public static let subtotal = "bag.subtotal.label"
         public static let grandTotal = "bag.grandTotal.label"
+        public static let continueButton = "bag.continue.button"
         public static let emptyState = "bag.emptyState.view"
         public static let errorView = "bag.error.view"
         public static let errorRetryButton = "bag.error.retry.button"

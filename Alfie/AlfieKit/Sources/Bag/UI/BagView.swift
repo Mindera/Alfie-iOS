@@ -20,7 +20,6 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             .onAppear {
                 viewModel.viewDidAppear()
             }
-            .snackbarView(configuration: $removalSnackbarConfiguration)
             // A failed removal is transient and never leaves the bag. Dismissing the Snackbar
             // clears the outcome so an identical later one re-presents cleanly.
             .onChange(of: viewModel.removalFailure) { failure in
@@ -41,115 +40,44 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
     @ViewBuilder private var content: some View {
         switch viewModel.state {
         case .loading:
-            loadingView
+            BagLoadingView()
 
         case .success(let cart):
             // A shopper with no cart and a cart with nothing left in it are the same empty bag.
             if let cart, !cart.lines.isEmpty {
-                bagView(cart)
+                VStack(spacing: 0) {
+                    // The Snackbar belongs to the list, so it rises above the summary, not over it.
+                    BagLineList(
+                        lines: cart.lines,
+                        onSelect: viewModel.didSelectLine,
+                        onDelete: viewModel.didSelectDelete
+                    )
+                    .snackbarView(configuration: $removalSnackbarConfiguration)
+                    BagPurchaseSummary(total: cart.grandTotal.amountFormattedOrUnavailable)
+                }
+                // The Snackbar goes with the list, so a failure cannot outlive it and re-present later.
+                .onDisappear {
+                    removalSnackbarConfiguration = nil
+                    viewModel.didDismissRemovalFailure()
+                }
             } else {
-                emptyView
+                BagEmptyView()
             }
 
         case .error(let error):
-            errorView(error)
-        }
-    }
-
-    // MARK: - Content
-
-    private func bagView(_ cart: Cart) -> some View {
-        List {
-            ForEach(cart.lines) { line in
-                BagLineRow(line: line) { viewModel.didSelectLine(line) }
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets())
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        // Swipe is the only removal affordance this epic ships (Q27). A `Button`
-                        // rather than `.onDelete` so it can carry an accessibility identifier, and
-                        // no full swipe: the removal is a server write, so it takes a deliberate
-                        // tap on Remove rather than firing off the end of a gesture.
-                        Button(role: .destructive) {
-                            viewModel.didSelectDelete(line)
-                        } label: {
-                            Text(L10n.Bag.Remove.cta)
-                        }
-                        .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
-                    }
-            }
-            totalsView(cart)
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets())
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.bottom, Primitives.Spacing.spacing16)
-        }
-        .listStyle(.plain)
-        .listRowSpacing(Primitives.Spacing.spacing16)
-        .padding(.top, Primitives.Spacing.spacing16)
-        .accessibilityIdentifier(AccessibilityID.Bag.bagView)
-    }
-
-    /// Subtotal and total, with no checkout CTA — the bag is a dead end by design this epic (Q32).
-    private func totalsView(_ cart: Cart) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing8) {
-            Divider()
-                .padding(.bottom, Primitives.Spacing.spacing8)
-            totalRow(
-                title: L10n.Bag.Subtotal.title,
-                amount: cart.subtotal.amountFormattedOrUnavailable,
-                accessibilityId: AccessibilityID.Bag.subtotal
+            ErrorView(
+                title: L10n.Bag.ErrorView.title,
+                message: Self.errorMessage(for: error.type),
+                buttons: [
+                    .init(
+                        cta: L10n.Bag.ErrorView.Retry.cta,
+                        accessibilityId: AccessibilityID.Bag.errorRetryButton,
+                        action: viewModel.didTapRetry
+                    ),
+                ]
             )
-            totalRow(
-                title: L10n.Bag.Total.title,
-                amount: cart.grandTotal.amountFormattedOrUnavailable,
-                accessibilityId: AccessibilityID.Bag.grandTotal,
-                isProminent: true
-            )
+            .accessibilityIdentifier(AccessibilityID.Bag.errorView)
         }
-    }
-
-    private func totalRow(
-        title: String,
-        amount: String,
-        accessibilityId: String,
-        isProminent: Bool = false
-    ) -> some View {
-        HStack {
-            Text.build(isProminent ? theme.font.body.medium(title) : theme.font.body.small(title))
-            Spacer()
-            Text.build(isProminent ? theme.font.body.medium(amount) : theme.font.body.small(amount))
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(accessibilityId)
-    }
-
-    // MARK: - Empty
-
-    /// Nothing has gone wrong, so there is no retry — title and message only (Q28/Q34).
-    private var emptyView: some View {
-        ErrorView(
-            icon: Icon.bag.image,
-            title: L10n.Bag.Empty.title,
-            message: L10n.Bag.Empty.message
-        )
-        .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
-    }
-
-    // MARK: - Error
-
-    private func errorView(_ error: BFFRequestError) -> some View {
-        ErrorView(
-            title: L10n.Bag.ErrorView.title,
-            message: Self.errorMessage(for: error.type),
-            buttons: [
-                .init(
-                    cta: L10n.Bag.ErrorView.Retry.cta,
-                    accessibilityId: AccessibilityID.Bag.errorRetryButton,
-                    action: viewModel.didTapRetry
-                ),
-            ]
-        )
-        .accessibilityIdentifier(AccessibilityID.Bag.errorView)
     }
 
     /// The title is the same for every error, so only the message varies. Switched exhaustively
@@ -170,22 +98,80 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             return L10n.Bag.ErrorView.Generic.message
         }
     }
+}
 
-    // MARK: - Loading
+private struct BagLineList: View {
+    let lines: [CartLine]
+    let onSelect: (CartLine) -> Void
+    let onDelete: (CartLine) -> Void
 
-    /// Skeleton rows rather than a spinner, so the wait is shaped like the bag that follows it.
-    /// The shimmer is applied per row: it hides what it covers and overlays a single rectangle, so
-    /// wrapping the stack instead would wash the whole screen grey.
-    private var loadingView: some View {
-        VStack(spacing: Primitives.Spacing.spacing16) {
+    var body: some View {
+        List {
+            ForEach(lines) { line in
+                // The divider sits outside the row's `Button`, so it is not part of the tap target.
+                VStack(spacing: Constants.lineSpacing) {
+                    BagLineRow(line: line) { onSelect(line) }
+                    if line.id != lines.last?.id {
+                        BagDivider()
+                            .padding(.horizontal, Sizing.spacingSpacingMd)
+                    }
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    // A `Button` rather than `.onDelete` so it can carry an accessibility
+                    // identifier, and no full swipe: the removal is a server write, so it takes
+                    // a deliberate tap on Remove rather than firing off the end of a gesture.
+                    Button(role: .destructive) {
+                        onDelete(line)
+                    } label: {
+                        Label {
+                            Text(L10n.Bag.Remove.cta)
+                        } icon: {
+                            Icon.close.image
+                        }
+                    }
+                    .tint(Theme.surfaceBackgroundDestructive)
+                    .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
+                }
+            }
+        }
+        .listStyle(.plain)
+        .listRowSpacing(Constants.lineSpacing)
+        .padding(.top, Sizing.spacingSpacingMd)
+        .accessibilityIdentifier(AccessibilityID.Bag.bagView)
+    }
+}
+
+private struct BagEmptyView: View {
+    var body: some View {
+        VStack(spacing: Sizing.spacingSpacingMd) {
+            ThemedIcon(.bag, tint: Theme.contentContentPrimary)
+            Text.build(theme.font.body.medium(L10n.Bag.Empty.title))
+                .foregroundStyle(Theme.contentContentPrimary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, Sizing.spacingSpacingMd)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
+    }
+}
+
+/// Skeleton rows rather than a spinner, so the wait is shaped like the bag that follows it.
+/// The shimmer is applied per row: it hides what it covers and overlays a single rectangle, so
+/// wrapping the stack instead would wash the whole screen grey.
+private struct BagLoadingView: View {
+    var body: some View {
+        VStack(spacing: Constants.skeletonRowSpacing) {
             ForEach(0 ..< Constants.skeletonRowCount, id: \.self) { _ in
                 Color.clear
-                    .frame(height: Constants.skeletonRowHeight)
+                    .frame(height: BagLineRow.minHeight)
                     .shimmering(while: .constant(true), cornerRadius: Sizing.radiusSoft)
             }
             Spacer()
         }
-        .padding(Primitives.Spacing.spacing16)
+        .padding(Sizing.spacingSpacingMd)
         // The skeleton is decorative. VoiceOver gets one element announcing the fetch rather than
         // four unlabelled shapes it would otherwise read as blank.
         .accessibilityElement(children: .ignore)
@@ -195,7 +181,8 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
 
 private enum Constants {
     static let skeletonRowCount = 4
-    static let skeletonRowHeight: CGFloat = 100
+    static let lineSpacing = Sizing.spacingSpacingXs
+    static let skeletonRowSpacing = lineSpacing * 2 + Sizing.borderBorderWeightDefault
 }
 
 #if DEBUG
