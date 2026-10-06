@@ -33,6 +33,7 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                     title: L10n.Wishlist.Empty.title,
                     message: L10n.Wishlist.Empty.message
                 )
+                .accessibilityLabel(L10n.Accessibility.wishlistEmpty)
                 .accessibilityIdentifier(AccessibilityID.Wishlist.emptyState)
             } else {
                 grid(of: products)
@@ -48,21 +49,20 @@ private extension WishlistView {
         ScrollView {
             LazyVGrid(
                 columns: Array(
-                    repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+                    repeating: GridItem(.flexible(), spacing: Sizing.spacingSpacingXs, alignment: .top),
                     count: Constants.columns
                 ),
-                spacing: theme.spacing.space200
+                spacing: Sizing.spacingSpacingMd
             ) {
                 ForEach(products) { product in
-                    Button(
-                        action: { viewModel.didTapProduct(product) },
-                        label: { productCard(for: product) }
-                    )
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier(AccessibilityID.Wishlist.item(id: product.id))
+                    productCard(for: product)
+                        .onTapGesture {
+                            viewModel.didTapProduct(product)
+                        }
+                        .accessibilityIdentifier(AccessibilityID.Wishlist.item(id: product.id))
                 }
             }
-            .padding(theme.spacing.space200)
+            .padding(Sizing.spacingSpacingMd)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.Wishlist.grid)
         }
@@ -102,15 +102,15 @@ private enum Constants {
 }
 
 #if DEBUG
-#Preview {
-    WishlistView(
-        viewModel: WishlistViewModel(
-            hasNavigationSeparator: true,
-            dependencies: WishlistDependencyContainer(
-                wishlistService: MockWishlistService(),
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
-            )
-        ) { _ in }
-    )
+#Preview("Success") {
+    WishlistView(viewModel: MockWishlistViewModel(state: .success([SelectedProduct(product: .fixture())])))
+}
+
+#Preview("Empty") {
+    WishlistView(viewModel: MockWishlistViewModel(state: .success([])))
+}
+
+#Preview("Loading") {
+    WishlistView(viewModel: MockWishlistViewModel(state: .loading))
 }
 #endif

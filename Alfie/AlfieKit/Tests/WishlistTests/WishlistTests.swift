@@ -109,20 +109,15 @@ final class WishlistTests: XCTestCase {
     }
 
     func test_a_variant_saved_elsewhere_shows_when_the_wishlist_appears_again() {
-        let wishlistService = MockWishlistService()
         let saved = SelectedProduct(product: .fixture(id: "product-1"))
+        let wishlistService = MockWishlistService()
         let sut = makeSUT(wishlistService: wishlistService)
         XCTAssertEmitsValue(
             from: sut.$state,
             where: { $0.value?.isEmpty == true },
             afterTrigger: { sut.viewDidAppear() }
         )
-        let hasSaved = expectation(description: "saved")
-        Task {
-            await wishlistService.addProduct(saved)
-            hasSaved.fulfill()
-        }
-        wait(for: [hasSaved], timeout: .default)
+        save(saved, in: wishlistService)
 
         XCTAssertEmitsValue(
             from: sut.$state,
@@ -132,6 +127,15 @@ final class WishlistTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    private func save(_ selectedProduct: SelectedProduct, in wishlistService: MockWishlistService) {
+        let hasSaved = expectation(description: "The Variant is saved")
+        Task {
+            await wishlistService.addProduct(selectedProduct)
+            hasSaved.fulfill()
+        }
+        wait(for: [hasSaved], timeout: .default)
+    }
 
     private func makeSUT(
         wishlistService: WishlistServiceProtocol = MockWishlistService(),

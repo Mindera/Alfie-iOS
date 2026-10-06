@@ -11,7 +11,7 @@ import XCTest
 final class WishlistViewSnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_wishlistView_populated() {
+    func test_a_wishlist_with_saved_variants_shows_the_grid() {
         let sut = NavigationStack {
             WishlistView(viewModel: MockWishlistViewModel(state: .success([
                 selectedProduct(id: "1", name: "Structured Leather Crossbody Bag"),
@@ -24,7 +24,7 @@ final class WishlistViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
     }
 
-    func test_wishlistView_empty() {
+    func test_a_wishlist_with_nothing_saved_shows_the_empty_state() {
         let sut = NavigationStack {
             WishlistView(viewModel: MockWishlistViewModel(state: .success([])))
         }

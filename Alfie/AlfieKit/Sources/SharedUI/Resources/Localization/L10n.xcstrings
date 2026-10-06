@@ -321,6 +321,17 @@
         }
       }
     },
+    "accessibility.wishlistEmpty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wishlist is empty. Tap the heart on products you like to see them here."
+          }
+        }
+      }
+    },
     "bag.empty.title" : {
       "extractionState" : "manual",
       "localizations" : {

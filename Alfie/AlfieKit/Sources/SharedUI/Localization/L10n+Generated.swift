@@ -40,6 +40,8 @@ public enum L10n {
     public static let share = L10n.tr("L10n", "accessibility.share")
     /// Wishlist
     public static let wishlist = L10n.tr("L10n", "accessibility.wishlist")
+    /// Your wishlist is empty. Tap the heart on products you like to see them here.
+    public static let wishlistEmpty = L10n.tr("L10n", "accessibility.wishlistEmpty")
   }
   public enum Account {
     /// My Address Book
@@ -783,6 +785,7 @@ public extension L10n {
       case accessibilitySettings = "accessibility.settings"
       case accessibilityShare = "accessibility.share"
       case accessibilityWishlist = "accessibility.wishlist"
+      case accessibilityWishlistEmpty = "accessibility.wishlistEmpty"
       case accountAddressBook = "account.address_book"
       case accountGreeting = "account.greeting"
       case accountMemberSince = "account.member_since"
