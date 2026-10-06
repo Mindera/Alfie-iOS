@@ -76,3 +76,17 @@ _Avoid_: Error screen, full-screen error
 **Transient error**:
 A page request failure shown as a dismissible Snackbar over loaded products, which stay on screen.
 _Avoid_: Refresh error
+
+### Cart
+
+**Cart**:
+The server-side record of the lines a shopper intends to buy. A guest Cart is not bound to an account.
+_Avoid_: Basket, order
+
+**Bag**:
+The tab and screen that show the shopper their Cart.
+_Avoid_: Basket, cart screen
+
+**Bag badge**:
+The number on the Bag tab: the summed quantity across the Cart's lines, absent when the Cart is empty.
+_Avoid_: Cart count, line count
