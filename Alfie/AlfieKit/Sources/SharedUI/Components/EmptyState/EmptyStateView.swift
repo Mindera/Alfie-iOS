@@ -25,6 +25,7 @@ public struct EmptyStateView: View {
             .multilineTextAlignment(.center)
         }
         .padding(.horizontal, Sizing.spacingSpacingXl)
+        .padding(.vertical, Sizing.spacingSpacingXs)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .combine)
     }

@@ -22,7 +22,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
 
     public func viewDidAppear() {
         Task { @MainActor in
-            state = .success(await dependencies.wishlistService.getWishlistContent())
+            await reload()
         }
     }
 
@@ -36,11 +36,16 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
         Task { @MainActor in
             await dependencies.wishlistService.removeProduct(withId: selectedProduct.product.id)
             dependencies.analytics.trackRemoveFromWishlist(productID: selectedProduct.product.id)
-            state = .success(await dependencies.wishlistService.getWishlistContent())
+            await reload()
         }
     }
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {
         navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
+    }
+
+    @MainActor
+    private func reload() async {
+        state = .success(await dependencies.wishlistService.getWishlistContent())
     }
 }

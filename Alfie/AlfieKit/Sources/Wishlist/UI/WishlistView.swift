@@ -20,12 +20,8 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                 viewModel.viewDidAppear()
             }
     }
-}
 
-// MARK: - Private Methods
-
-private extension WishlistView {
-    @ViewBuilder var content: some View {
+    @ViewBuilder private var content: some View {
         switch viewModel.state {
         case .loading:
             Color.clear
@@ -43,7 +39,11 @@ private extension WishlistView {
             }
         }
     }
+}
 
+// MARK: - Private Methods
+
+private extension WishlistView {
     func grid(of products: [SelectedProduct]) -> some View {
         ScrollView {
             LazyVGrid(
