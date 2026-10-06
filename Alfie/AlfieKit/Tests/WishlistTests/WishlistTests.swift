@@ -8,7 +8,7 @@ import XCTest
 final class WishlistTests: XCTestCase {
     // MARK: - WishlistViewModel.didTapAddToBag
 
-    func test_didTapAddToBag_navigatesToProductDetailsWithSelectedProduct() {
+    func test_tapping_add_to_bag_opens_product_details_for_that_variant() {
         let colour = Product.Colour.fixture(id: "green", name: "Green")
         let variant = Product.Variant.fixture(size: .fixture(value: "M"), colour: colour)
         let product = Product.fixture(defaultVariant: variant, variants: [variant])
@@ -41,7 +41,7 @@ final class WishlistTests: XCTestCase {
 
     // MARK: - WishlistViewModel.didSelectDelete
 
-    func test_didSelectDelete_removesProductFromWishlistByProductId() {
+    func test_removing_a_variant_removes_every_variant_of_its_product() {
         let blueVariant = Product.Variant.fixture(colour: .fixture(id: "blue", name: "Blue"))
         let redVariant = Product.Variant.fixture(colour: .fixture(id: "red", name: "Red"))
         let product = Product.fixture(id: "product-1", defaultVariant: redVariant, variants: [blueVariant, redVariant])
@@ -59,7 +59,7 @@ final class WishlistTests: XCTestCase {
         )
     }
 
-    func test_didSelectDelete_refreshesPublishedProducts() {
+    func test_removing_the_only_variant_empties_the_wishlist() {
         let product = Product.fixture(id: "product-1")
         let wishlistService = MockWishlistService(products: [SelectedProduct(product: product)])
         let sut = makeSUT(wishlistService: wishlistService)
@@ -199,6 +199,21 @@ final class WishlistTests: XCTestCase {
         remove("p1", from: sut)
 
         sut.viewDidDisappear()
+
+        XCTAssertNil(sut.undoableRemoval)
+    }
+
+    func test_a_removal_that_finishes_after_the_shopper_leaves_is_final() {
+        let sut = makeSUT(wishlistService: MockWishlistService(products: saved("p1", "p2")))
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.value?.map(\.product.id) == ["p2"] },
+            afterTrigger: {
+                sut.didSelectDelete(for: SelectedProduct(product: .fixture(id: "p1")))
+                sut.viewDidDisappear()
+            }
+        )
 
         XCTAssertNil(sut.undoableRemoval)
     }

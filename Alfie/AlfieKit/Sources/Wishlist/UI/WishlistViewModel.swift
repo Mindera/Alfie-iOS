@@ -8,6 +8,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     public var hasNavigationSeparator: Bool
     private let dependencies: WishlistDependencyContainer
     private let navigate: (WishlistRoute) -> Void
+    private var visit = 0
 
     public init(
         hasNavigationSeparator: Bool,
@@ -22,6 +23,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     // MARK: - WishListViewModelProtocol
 
     public func viewDidDisappear() {
+        visit += 1
         undoableRemoval = nil
     }
 
@@ -32,18 +34,19 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didTapProduct(_ selectedProduct: SelectedProduct) {
-        navigate(
-            .productDetails(.productDetails(.selectedProduct(selectedProduct)))
-        )
+        openProductDetails(for: selectedProduct)
     }
 
     public func didSelectDelete(for selectedProduct: SelectedProduct) {
         let productId = selectedProduct.product.id
+        let visit = visit
         undoableRemoval = nil
         Task { @MainActor in
             let removal = await dependencies.wishlistService.removeProduct(withId: productId)
             dependencies.analytics.trackRemoveFromWishlist(productID: productId)
             await reload()
+            guard visit == self.visit else { return }
+
             undoableRemoval = removal
         }
     }
@@ -64,6 +67,10 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
     }
 
     public func didTapAddToBag(for selectedProduct: SelectedProduct) {
+        openProductDetails(for: selectedProduct)
+    }
+
+    private func openProductDetails(for selectedProduct: SelectedProduct) {
         navigate(.productDetails(.productDetails(.selectedProduct(selectedProduct))))
     }
 
