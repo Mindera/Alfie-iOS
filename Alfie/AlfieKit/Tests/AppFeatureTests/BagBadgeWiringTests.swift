@@ -16,14 +16,17 @@ import XCTest
 /// already reaches it.
 final class BagBadgeWiringTests: XCTestCase {
     private var cartService: MockCartService!
+    private var spawnedWork: SpawnedWork!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         cartService = .init()
+        spawnedWork = .init()
     }
 
     override func tearDownWithError() throws {
         cartService = nil
+        spawnedWork = nil
         try super.tearDownWithError()
     }
 
@@ -52,16 +55,13 @@ final class BagBadgeWiringTests: XCTestCase {
     /// The gap a shopper actually hits: add items, kill the app, come back. The cart id survives in
     /// `UserDefaults` but the cart does not, so the badge is only right at launch if something reads
     /// it back — and the bag screen's own fetch is too late, it only runs once they open the bag.
-    ///
-    /// The launch read is a `Task` the graph owns and nothing here can await, so the wait accepts a
-    /// value that has already landed as readily as one that arrives next. Waiting only for the next
-    /// emission means racing that `Task`, and losing the race on a loaded runner.
-    func test_launching_reads_the_stored_cart_so_the_badge_is_right_before_the_bag_is_opened() {
+    func test_launching_reads_the_stored_cart_so_the_badge_is_right_before_the_bag_is_opened() async {
         cartService.onFetchCalled = { .fixture(lines: [.fixture(quantity: 2)]) }
 
         let sut = makeSut()
+        await spawnedWork.run()
 
-        XCTAssertEventuallyEmitsValueEqualTo(from: sut.rootTabViewModel.$bagBadgeValue, expectedValue: 2)
+        XCTAssertEqual(sut.rootTabViewModel.bagBadgeValue, 2)
     }
 
     // MARK: - Helpers
@@ -73,7 +73,8 @@ final class BagBadgeWiringTests: XCTestCase {
             serviceProvider: MockServiceProvider(cartService: cartService),
             log: Log.DummyLogger(),
             startupCompletionDelay: 0,
-            scheduler: .immediate
+            scheduler: .immediate,
+            spawn: spawnedWork.spawn
         )
     }
 
