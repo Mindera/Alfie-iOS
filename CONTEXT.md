@@ -90,3 +90,9 @@ _Avoid_: bag (for the server object), basket
 **Line**:
 One Variant with a quantity in a Cart. Re-adding the same Variant raises its quantity instead of adding a second Line.
 _Avoid_: item, line item, product
+
+### Wishlist
+
+**Wishlist**:
+The Variants a shopper has saved to come back to, kept on the device. It needs no sign-in.
+_Avoid_: favourites, saved items, likes
