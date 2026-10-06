@@ -19,6 +19,8 @@ import Web
 import Wishlist
 
 public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
+    public typealias Spawn = (@escaping () async -> Void) -> Void
+
     private let configurationService: ConfigurationServiceProtocol
 
     @Published public private(set) var currentScreen: AppStartupScreen = .loading
@@ -51,7 +53,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         log: Logger,
         startupCompletionDelay: CGFloat = 2,
         scheduler: AnySchedulerOf<DispatchQueue> = .main,
-        spawn: @escaping (@escaping () async -> Void) -> Void = { operation in
+        spawn: @escaping Spawn = { operation in
             Task { await operation() }
         }
     ) {
@@ -233,7 +235,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
     private func discardCartOnSignOut(
         sessionService: SessionServiceProtocol,
         cartService: CartServiceProtocol,
-        spawn: @escaping (@escaping () async -> Void) -> Void
+        spawn: @escaping Spawn
     ) {
         sessionService.isUserSignedInPublisher
             .removeDuplicates()
@@ -255,7 +257,7 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
     /// and the bag screen's own fetch reports it when the shopper actually goes to the bag.
     private func loadStoredCartAtLaunch(
         cartService: CartServiceProtocol,
-        spawn: (@escaping () async -> Void) -> Void
+        spawn: Spawn
     ) {
         spawn { try? await cartService.fetch() }
     }

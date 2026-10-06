@@ -31,7 +31,7 @@ final class BagBadgeWiringTests: XCTestCase {
     }
 
     func test_cart_with_lines_reaches_the_badge_as_a_summed_quantity() async throws {
-        let sut = makeSut()
+        let sut = makeSUT()
 
         try await publish(.fixture(lines: [
             .fixture(id: "line-1", quantity: 3),
@@ -43,7 +43,7 @@ final class BagBadgeWiringTests: XCTestCase {
 
     /// Removing the last line has to take the badge away with it, not leave a stale count behind.
     func test_emptying_the_cart_clears_the_badge() async throws {
-        let sut = makeSut()
+        let sut = makeSUT()
         try await publish(.fixture(lines: [.fixture(quantity: 3)]))
         XCTAssertEqual(sut.rootTabViewModel.bagBadgeValue, 3)
 
@@ -58,7 +58,7 @@ final class BagBadgeWiringTests: XCTestCase {
     func test_launching_reads_the_stored_cart_so_the_badge_is_right_before_the_bag_is_opened() async {
         cartService.onFetchCalled = { .fixture(lines: [.fixture(quantity: 2)]) }
 
-        let sut = makeSut()
+        let sut = makeSUT()
         await spawnedWork.run()
 
         XCTAssertEqual(sut.rootTabViewModel.bagBadgeValue, 2)
@@ -68,7 +68,7 @@ final class BagBadgeWiringTests: XCTestCase {
 
     /// `.immediate` so the badge lands with the cart emission instead of a main-queue hop later: the
     /// hop is what made the assertions race the scheduler on a loaded CI runner.
-    private func makeSut() -> AppFeatureViewModel {
+    private func makeSUT() -> AppFeatureViewModel {
         AppFeatureViewModel(
             serviceProvider: MockServiceProvider(cartService: cartService),
             log: Log.DummyLogger(),
