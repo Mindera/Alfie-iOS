@@ -21,6 +21,10 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
 
     // MARK: - WishListViewModelProtocol
 
+    public func viewDidDisappear() {
+        undoableRemoval = nil
+    }
+
     public func viewDidAppear() {
         Task { @MainActor in
             await reload()
@@ -37,11 +41,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
         let productId = selectedProduct.product.id
         undoableRemoval = nil
         Task { @MainActor in
-            let removal = WishlistRemoval(
-                productId: productId,
-                from: await dependencies.wishlistService.getWishlistContent()
-            )
-            await dependencies.wishlistService.removeProduct(withId: productId)
+            let removal = await dependencies.wishlistService.removeProduct(withId: productId)
             dependencies.analytics.trackRemoveFromWishlist(productID: productId)
             await reload()
             undoableRemoval = removal
@@ -53,9 +53,7 @@ public final class WishlistViewModel: WishlistViewModelProtocol {
 
         undoableRemoval = nil
         Task { @MainActor in
-            for entry in removal.entries {
-                await dependencies.wishlistService.restoreProduct(entry.selectedProduct, at: entry.position)
-            }
+            await dependencies.wishlistService.restore(removal)
             dependencies.analytics.trackAddToWishlist(productID: removal.productId)
             await reload()
         }

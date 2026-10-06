@@ -194,6 +194,15 @@ final class WishlistTests: XCTestCase {
         XCTAssertNil(sut.undoableRemoval)
     }
 
+    func test_a_removal_is_final_once_the_shopper_leaves_the_wishlist() {
+        let sut = makeSUT(wishlistService: MockWishlistService(products: saved("p1", "p2")))
+        remove("p1", from: sut)
+
+        sut.viewDidDisappear()
+
+        XCTAssertNil(sut.undoableRemoval)
+    }
+
     func test_removing_the_last_variant_empties_the_wishlist_and_offers_to_undo() {
         let sut = makeSUT(wishlistService: MockWishlistService(products: saved("p1")))
 

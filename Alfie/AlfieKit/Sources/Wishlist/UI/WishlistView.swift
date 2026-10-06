@@ -21,7 +21,7 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
                 viewModel.viewDidAppear()
             }
             .onDisappear {
-                viewModel.didDismissRemovalSnackbar()
+                viewModel.viewDidDisappear()
             }
     }
 

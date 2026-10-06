@@ -20,4 +20,12 @@ public struct WishlistRemoval: Equatable, Identifiable {
         self.productId = productId
         self.entries = entries
     }
+
+    public func restored(into content: [SelectedProduct]) -> [SelectedProduct] {
+        entries.reduce(into: content) { content, entry in
+            guard !content.contains(where: { $0.id == entry.selectedProduct.id }) else { return }
+
+            content.insert(entry.selectedProduct, at: min(entry.position, content.count))
+        }
+    }
 }

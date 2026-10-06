@@ -6,6 +6,7 @@ public protocol WishlistViewModelProtocol: ObservableObject {
     var hasNavigationSeparator: Bool { get }
 
     func viewDidAppear()
+    func viewDidDisappear()
     func didTapProduct(_ selectedProduct: SelectedProduct)
     func didSelectDelete(for selectedProduct: SelectedProduct)
     func didTapAddToBag(for selectedProduct: SelectedProduct)

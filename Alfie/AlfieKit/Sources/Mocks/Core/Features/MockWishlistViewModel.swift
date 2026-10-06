@@ -20,6 +20,11 @@ public class MockWishlistViewModel: WishlistViewModelProtocol {
         onViewDidAppearCalled?()
     }
 
+    public var onViewDidDisappearCalled: (() -> Void)?
+    public func viewDidDisappear() {
+        onViewDidDisappearCalled?()
+    }
+
     public var onDidTapProductCalled: ((SelectedProduct) -> Void)?
     public func didTapProduct(_ selectedProduct: SelectedProduct) {
         onDidTapProductCalled?(selectedProduct)
