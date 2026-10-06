@@ -219,9 +219,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             spawn: spawn
         )
         loadStoredCartAtLaunch(cartService: serviceProvider.cartService, spawn: spawn)
-        WebViewPreload.preloadWebView {
-            log.debug("Preloaded WebView")
-        }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + startupCompletionDelay) {
             self.isLoading.send(false)
