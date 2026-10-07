@@ -19,6 +19,8 @@ import Web
 import Wishlist
 
 public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
+    public typealias Spawn = (@escaping () async -> Void) -> Void
+
     private let configurationService: ConfigurationServiceProtocol
 
     @Published public private(set) var currentScreen: AppStartupScreen = .loading
@@ -50,7 +52,10 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         serviceProvider: ServiceProviderProtocol,
         log: Logger,
         startupCompletionDelay: CGFloat = 2,
-        scheduler: AnySchedulerOf<DispatchQueue> = .main
+        scheduler: AnySchedulerOf<DispatchQueue> = .main,
+        spawn: @escaping Spawn = { operation in
+            Task { await operation() }
+        }
     ) {
         self.configurationService = serviceProvider.configurationService
 
@@ -212,9 +217,10 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         setupSubscriptions()
         discardCartOnSignOut(
             sessionService: serviceProvider.sessionService,
-            cartService: serviceProvider.cartService
+            cartService: serviceProvider.cartService,
+            spawn: spawn
         )
-        loadStoredCartAtLaunch(cartService: serviceProvider.cartService)
+        loadStoredCartAtLaunch(cartService: serviceProvider.cartService, spawn: spawn)
         WebViewPreload.preloadWebView {
             log.debug("Preloaded WebView")
         }
@@ -231,14 +237,15 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
     /// "signed out" every cold launch begins with would empty the bag before it was ever shown.
     private func discardCartOnSignOut(
         sessionService: SessionServiceProtocol,
-        cartService: CartServiceProtocol
+        cartService: CartServiceProtocol,
+        spawn: @escaping Spawn
     ) {
         sessionService.isUserSignedInPublisher
             .removeDuplicates()
             .dropFirst()
             .filter { !$0 }
             .sink { _ in
-                Task { await cartService.discardCart() }
+                spawn { await cartService.discardCart() }
             }
             .store(in: &subscriptions)
     }
@@ -251,8 +258,11 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
     /// Costs nothing when there is no stored id: `fetch()` publishes `nil` without asking the
     /// server. A failure is dropped rather than surfaced — startup is the wrong moment to raise it,
     /// and the bag screen's own fetch reports it when the shopper actually goes to the bag.
-    private func loadStoredCartAtLaunch(cartService: CartServiceProtocol) {
-        Task { try? await cartService.fetch() }
+    private func loadStoredCartAtLaunch(
+        cartService: CartServiceProtocol,
+        spawn: Spawn
+    ) {
+        spawn { try? await cartService.fetch() }
     }
 
     private func setupSubscriptions() {

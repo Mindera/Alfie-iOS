@@ -60,26 +60,6 @@ extension XCTestCase {
         )
     }
 
-    /// Passes whether the value arrived before this call or after it: unlike `XCTAssertEmitsValue`
-    /// it keeps what the publisher already holds instead of dropping it. For work a type starts by
-    /// itself — a `Task` in an initialiser — there is no trigger to drop against, and dropping means
-    /// racing it.
-    public func XCTAssertEventuallyEmitsValueEqualTo<P: Publisher>(
-        from publisher: P,
-        expectedValue: P.Output,
-        timeout: TimeInterval = .default
-    ) where P.Failure == Never, P.Output: Equatable {
-        let expectation = expectation(description: #function)
-        var cancellable: AnyCancellable?
-
-        cancellable = publisher
-            .first { $0 == expectedValue }
-            .sink { _ in expectation.fulfill() }
-
-        wait(for: [expectation], timeout: timeout)
-        cancellable?.cancel()
-    }
-
     public func XCTAssertNoEmit<P: Publisher>(
         from publisher: P,
         afterTrigger eventTrigger: @escaping (() -> Void) = {},

@@ -90,3 +90,7 @@ _Avoid_: bag (for the server object), basket
 **Line**:
 One Variant with a quantity in a Cart. Re-adding the same Variant raises its quantity instead of adding a second Line.
 _Avoid_: item, line item, product
+
+**Bag badge**:
+The number on the Bag tab: the summed quantity across the Cart's Lines, absent when the Cart is empty.
+_Avoid_: Cart count, line count
