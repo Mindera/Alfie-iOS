@@ -3,6 +3,7 @@ import Model
 
 public class MockApiEndpointService: ApiEndpointServiceProtocol {
     public var currentApiEndpoint: ApiEndpointOption = .dev
+    public var lastCustomApiEndpoint: URL?
 
     public var onUpdateApiEndpointAndRebootCalled: ((ApiEndpointOption) -> Void)?
     public func updateApiEndpointAndReboot(_ option: ApiEndpointOption) {

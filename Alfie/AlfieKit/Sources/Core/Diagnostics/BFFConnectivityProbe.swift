@@ -5,15 +5,18 @@ public struct BFFConnectivityProbe {
     public typealias Fetch = (URLRequest) async throws -> (Data, URLResponse)
 
     private let baseUrl: URL
+    private let apiKey: String?
     private let fetch: Fetch
     private let log: Logger
 
     public init(
         baseUrl: URL,
+        apiKey: String?,
         fetch: @escaping Fetch = { try await URLSession.shared.data(for: $0) },
         log: Logger
     ) {
         self.baseUrl = baseUrl
+        self.apiKey = apiKey
         self.fetch = fetch
         self.log = log
     }
@@ -23,6 +26,11 @@ public struct BFFConnectivityProbe {
         var request = URLRequest(url: url, timeoutInterval: 10)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        // The same credential the real requests carry. Without it an authenticated BFF answers 401 and
+        // the probe reports a reachable endpoint as a problem, which is the opposite of its job.
+        if let apiKey {
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        }
         request.httpBody = Data(#"{"query":"{ __typename }"}"#.utf8)
 
         log.info("BFF probe → POST \(url.absoluteString)")

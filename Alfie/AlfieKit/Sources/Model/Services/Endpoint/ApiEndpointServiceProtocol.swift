@@ -40,6 +40,7 @@ public enum ApiEndpointOption: CaseIterable, Hashable, RawRepresentable {
 
 public protocol ApiEndpointServiceProtocol {
     var currentApiEndpoint: ApiEndpointOption { get }
+    var lastCustomApiEndpoint: URL? { get }
 
     func updateApiEndpointAndReboot(_ option: ApiEndpointOption)
     func apiEndpoint(for option: ApiEndpointOption) -> URL
