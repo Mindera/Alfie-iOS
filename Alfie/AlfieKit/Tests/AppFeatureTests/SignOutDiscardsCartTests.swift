@@ -11,60 +11,59 @@ final class SignOutDiscardsCartTests: XCTestCase {
     private var sut: AppFeatureViewModel!
     private var cartService: MockCartService!
     private var sessionService: MockSessionService!
+    private var spawnedWork: SpawnedWork!
+    private var discardCount: Int!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
         cartService = .init()
         sessionService = .init()
+        spawnedWork = .init()
+        discardCount = 0
+        cartService.onDiscardCartCalled = { [unowned self] in self.discardCount += 1 }
     }
 
     override func tearDownWithError() throws {
         sut = nil
         cartService = nil
         sessionService = nil
+        spawnedWork = nil
+        discardCount = nil
         try super.tearDownWithError()
     }
 
-    func test_signingOut_discardsTheCart() {
-        let discarded = expectation(description: "the sign-out reaches the cart")
-        cartService.onDiscardCartCalled = { discarded.fulfill() }
+    func test_signing_out_discards_the_cart() async {
         makeSUT()
         sessionService.signInUser()
 
         sessionService.signOutUser()
+        await spawnedWork.run()
 
-        // `.default` rather than a literal: the discard is a `Task` hop, so what is being waited on
-        // is the scheduler, not the work. It lands in a millisecond on a quiet machine and blew
-        // through a one-second bound on a loaded CI runner, which is a false failure about nothing.
-        wait(for: [discarded], timeout: .default)
+        XCTAssertEqual(discardCount, 1)
     }
 
     /// The publisher replays its current value on subscribe, and that value is "signed out" on every
     /// cold launch. Without the `dropFirst` this test pins, the bag would be emptied before it was
     /// ever shown — a shopper who added something, killed the app and came back would find it gone.
-    func test_launchingSignedOut_leavesTheCartAlone() {
-        let discarded = notDiscarded()
-
+    func test_launching_signed_out_leaves_the_cart_alone() async {
         makeSUT()
+        await spawnedWork.run()
 
-        wait(for: [discarded], timeout: 0.2)
+        XCTAssertEqual(discardCount, 0)
     }
 
     /// Signing in must not take the bag away either — a guest cart carries over into the session.
-    func test_signingIn_leavesTheCartAlone() {
-        let discarded = notDiscarded()
+    func test_signing_in_leaves_the_cart_alone() async {
         makeSUT()
 
         sessionService.signInUser()
+        await spawnedWork.run()
 
-        wait(for: [discarded], timeout: 0.2)
+        XCTAssertEqual(discardCount, 0)
     }
 
     // MARK: - Helpers
 
-    /// Built here rather than in `setUp` so a test can install its expectation before the graph
-    /// subscribes. Constructing the SUT first would leave the negative tests unable to fail: the
-    /// discard they forbid could land in the gap before the callback was set.
     private func makeSUT() {
         sut = AppFeatureViewModel(
             serviceProvider: MockServiceProvider(
@@ -72,17 +71,8 @@ final class SignOutDiscardsCartTests: XCTestCase {
                 sessionService: sessionService
             ),
             log: Log.DummyLogger(),
-            startupCompletionDelay: 0
+            startupCompletionDelay: 0,
+            spawn: spawnedWork.spawn
         )
-    }
-
-    /// An inverted expectation, so a discard that should not happen is given every chance to happen
-    /// anyway and fails the test when it does. A plain assertion made after the fact would run
-    /// before the `Task` behind `discardCart()` had a chance to, and so would never fail.
-    private func notDiscarded() -> XCTestExpectation {
-        let discarded = expectation(description: "the cart is left alone")
-        discarded.isInverted = true
-        cartService.onDiscardCartCalled = { discarded.fulfill() }
-        return discarded
     }
 }
