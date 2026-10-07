@@ -6,9 +6,6 @@ import Foundation
 import Mocks
 import XCTest
 
-/// The BFF rejects every request without a `Bearer` credential, so the header this interceptor adds
-/// is what makes the app work at all. It reads the key per request rather than capturing it at init,
-/// which is what lets a key typed into the debug menu take effect without rebooting the app.
 final class AuthorizationInterceptorTests: XCTestCase {
     private var mockApiKeyService: MockBFFApiKeyService!
     private var chain: MockRequestChain!

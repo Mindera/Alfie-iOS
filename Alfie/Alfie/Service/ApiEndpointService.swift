@@ -28,10 +28,6 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     }
 
     var lastCustomApiEndpoint: URL? {
-        if case .custom(let url) = currentApiEndpoint, let url {
-            return url
-        }
-
         let storedCustomUrl: String? = userDefaults.value(for: customApiUrlUserDefaultsKey)
         return storedCustomUrl.flatMap { URL(string: $0) }
     }
@@ -39,8 +35,8 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     func updateApiEndpointAndReboot(_ option: ApiEndpointOption) {
         log.debug("API endpoint changed to \(option.url.absoluteString), will reboot app")
         userDefaults.set(option.url.absoluteString, for: apiUrlUserDefaultsKey)
-        if case .custom(let url) = option, let url {
-            userDefaults.set(url.absoluteString, for: customApiUrlUserDefaultsKey)
+        if let customUrl = option.customUrl ?? currentApiEndpoint.customUrl {
+            userDefaults.set(customUrl.absoluteString, for: customApiUrlUserDefaultsKey)
         }
         // Make sure user defaults are synced before rebooting the app
         DispatchQueue.main.asyncAfter(deadline: .now() + rebootDelay) { [weak self] in
@@ -88,6 +84,14 @@ enum ApiEndpointUrl: String {
 }
 
 private extension ApiEndpointOption {
+    var customUrl: URL? {
+        guard case .custom(let url) = self else {
+            return nil
+        }
+
+        return url
+    }
+
     var url: URL {
         let url: URL? = switch self {
         case .custom(let customUrl):

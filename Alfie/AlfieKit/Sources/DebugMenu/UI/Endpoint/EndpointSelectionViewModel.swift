@@ -73,9 +73,9 @@ public final class EndpointSelectionViewModel: ObservableObject {
                 return
             }
             customUrl = url
+            apiKeyService.updateApiKey(bffApiKey)
         }
 
-        apiKeyService.updateApiKey(bffApiKey)
         isSaving = true
         apiEndpointService.updateApiEndpointAndReboot(customUrl.map { .custom(url: $0) } ?? selectedEndpointOption)
         shouldShowSuccess = true
@@ -86,7 +86,11 @@ public final class EndpointSelectionViewModel: ObservableObject {
     }
 
     private var hasApiKeyChange: Bool {
-        bffApiKey.trim() != (apiKeyService.storedApiKey ?? "")
+        guard case .custom = selectedEndpointOption else {
+            return false
+        }
+
+        return bffApiKey.trim() != (apiKeyService.storedApiKey ?? "")
     }
 
     private var hasEndpointChange: Bool {

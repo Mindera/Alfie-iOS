@@ -26,8 +26,6 @@ public struct BFFConnectivityProbe {
         var request = URLRequest(url: url, timeoutInterval: 10)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        // The same credential the real requests carry. Without it an authenticated BFF answers 401 and
-        // the probe reports a reachable endpoint as a problem, which is the opposite of its job.
         if let apiKey {
             request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         }

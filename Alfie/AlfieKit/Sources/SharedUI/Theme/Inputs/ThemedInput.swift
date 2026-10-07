@@ -36,8 +36,6 @@ public struct ThemedInput: View {
     }
 
     public var body: some View {
-        // `SecureField` and `TextField` are different types, so this is a branch rather than one
-        // field with a flag on it. Both take the same `TextFieldStyle`.
         Group {
             if isSecure {
                 SecureField("\(placeholder ?? "")", text: $text)

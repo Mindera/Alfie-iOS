@@ -199,6 +199,8 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     func test_saves_api_key_on_service() {
         sut = makeSut()
+        sut.selectedEndpointOption = .custom(url: nil)
+        sut.customEndpointUrl = "https://www.endpoint.com"
         sut.bffApiKey = "abc-123"
 
         sut.didTapSave()
@@ -240,7 +242,9 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertFalse(sut.shouldShowUrlError)
     }
 
-    func test_save_button_is_enabled_when_only_the_api_key_changed() {
+    func test_save_button_is_enabled_when_only_the_api_key_changed() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
+        mockEndpointService.currentApiEndpoint = .custom(url: url)
         sut = makeSut()
 
         sut.bffApiKey = "abc-123"
@@ -282,6 +286,42 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
         XCTAssertEqual(sut.customEndpointUrl, urlString)
         XCTAssertEqual(sut.bffApiKey, "abc-123")
+    }
+
+    func test_reselecting_custom_saves_the_remembered_custom_url() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
+        mockEndpointService.currentApiEndpoint = .dev
+        mockEndpointService.lastCustomApiEndpoint = url
+        var savedOption: ApiEndpointOption?
+        mockEndpointService.onUpdateApiEndpointAndRebootCalled = { savedOption = $0 }
+        sut = makeSut()
+        sut.selectedEndpointOption = .custom(url: nil)
+
+        sut.didTapSave()
+
+        XCTAssertEqual(savedOption, .custom(url: url))
+    }
+
+    func test_an_api_key_edited_before_leaving_custom_is_not_saved() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
+        mockEndpointService.currentApiEndpoint = .custom(url: url)
+        mockApiKeyService.storedApiKey = "abc-123"
+        sut = makeSut()
+        sut.bffApiKey = "edited"
+        sut.selectedEndpointOption = .dev
+
+        sut.didTapSave()
+
+        XCTAssertEqual(mockApiKeyService.storedApiKey, "abc-123")
+    }
+
+    func test_save_button_ignores_an_api_key_edit_when_custom_is_not_selected() {
+        mockEndpointService.currentApiEndpoint = .dev
+        sut = makeSut()
+
+        sut.bffApiKey = "abc-123"
+
+        XCTAssertTrue(sut.isSaveDisabled)
     }
 
     private func makeSut() -> DebugMenu.EndpointSelectionViewModel {
