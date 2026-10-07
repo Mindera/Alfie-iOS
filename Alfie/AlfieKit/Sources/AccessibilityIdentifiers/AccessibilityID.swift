@@ -132,6 +132,7 @@ public enum AccessibilityID {
     public enum Snackbar {
         public static let view = "snackbar.view"
         public static let text = "snackbar.text"
+        public static let actionButton = "snackbar.action.button"
     }
 
     // MARK: - ProductListing
@@ -195,6 +196,17 @@ public enum AccessibilityID {
         public static let signOutSection = "account.signOut.section"
         public static let walletSection = "account.wallet.section"
         public static let wishlistSection = "account.wishlist.section"
+    }
+
+    // MARK: - Wishlist
+
+    public enum Wishlist {
+        public static let titleHeader = "wishlist.title.header"
+        public static let grid = "wishlist.grid.view"
+        public static let emptyState = "wishlist.emptyState.view"
+
+        public static func item(id: String) -> String { "wishlist.item.\(id)" }
+        public static func removeButton(id: String) -> String { item(id: id) + ".remove.button" }
     }
 
     // MARK: - DebugMenu

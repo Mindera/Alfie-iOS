@@ -1,13 +1,11 @@
+import AccessibilityIdentifiers
 import Foundation
 import SharedUI
 import SwiftUI
 
 extension View {
     @ViewBuilder
-    func toolbarView(
-        hasDivider: Bool,
-        myAccountAction: @escaping () -> Void
-    ) -> some View {
+    func toolbarView(hasDivider: Bool) -> some View {
         self.modifier(
             DefaultToolbarModifier(
                 hasDivider: hasDivider,
@@ -17,26 +15,13 @@ extension View {
                 principalItems: {
                     ThemedToolbarTitle(
                         style: .text(L10n.Wishlist.title),
-                        accessibilityId: AccessibilityID.titleHeader
+                        accessibilityId: AccessibilityID.Wishlist.titleHeader
                     )
                 },
                 trailingItems: {
-                    if hasDivider {
-                        EmptyView()
-                    } else {
-                        ToolbarItemProvider.accountItem(size: .big) {
-                            myAccountAction()
-                        }
-                    }
+                    EmptyView()
                 }
             )
         )
     }
-}
-
-// MARK: - AccessibilityId
-
-private enum AccessibilityID {
-    static let accountBtn = "account-btn"
-    static let titleHeader = "title-header"
 }

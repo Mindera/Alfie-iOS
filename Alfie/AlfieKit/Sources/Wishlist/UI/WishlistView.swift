@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -13,37 +14,55 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
     }
 
     public var body: some View {
-        ScrollView {
-            LazyVGrid(
-                columns: Array(
-                    repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
-                    count: 2
-                ),
-                spacing: Primitives.Spacing.spacing16
-            ) {
-                ForEach(viewModel.products) { product in
-                    Button(
-                        action: { viewModel.didTapProduct(product) },
-                        label: {
-                            VerticalProductCard(
-                                viewModel: viewModel.productCardViewModel(for: product)
-                            ) { _, type in
-                                handleUserAction(forProduct: product, actionType: type)
-                            }
-                        }
+        content
+            .snackbarView(configuration: removalSnackbar)
+            .toolbarView(hasDivider: viewModel.hasNavigationSeparator)
+            .onAppear {
+                viewModel.viewDidAppear()
+            }
+            .onDisappear {
+                viewModel.viewDidDisappear()
+            }
+    }
+
+    private var removalSnackbar: Binding<SnackbarViewConfiguration?> {
+        Binding(
+            get: {
+                viewModel.undoableRemoval.map { removal in
+                    SnackbarViewConfiguration(
+                        id: removal.id,
+                        text: L10n.Wishlist.Removed.message,
+                        icon: nil,
+                        actionButtonLabel: L10n.Wishlist.Removed.Undo.cta,
+                        onActionTap: viewModel.didTapUndoRemoval
                     )
-                    .buttonStyle(.plain)
-                    .listRowInsets(EdgeInsets())
+                }
+            },
+            set: { configuration in
+                if configuration == nil {
+                    viewModel.didDismissRemovalSnackbar()
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-        }
-        .padding(.vertical, Primitives.Spacing.spacing16)
-        .toolbarView(hasDivider: viewModel.hasNavigationSeparator) {
-            viewModel.didTapMyAccount()
-        }
-        .onAppear {
-            viewModel.viewDidAppear()
+        )
+    }
+
+    @ViewBuilder private var content: some View {
+        switch viewModel.state {
+        case .loading:
+            Color.clear
+
+        case .success(let products):
+            if products.isEmpty {
+                EmptyStateView(
+                    icon: .heart,
+                    title: L10n.Wishlist.Empty.title,
+                    message: L10n.Wishlist.Empty.message
+                )
+                .accessibilityLabel(L10n.Accessibility.wishlistEmpty)
+                .accessibilityIdentifier(AccessibilityID.Wishlist.emptyState)
+            } else {
+                grid(of: products)
+            }
         }
     }
 }
@@ -51,30 +70,82 @@ public struct WishlistView<ViewModel: WishlistViewModelProtocol>: View {
 // MARK: - Private Methods
 
 private extension WishlistView {
+    func grid(of products: [SelectedProduct]) -> some View {
+        ScrollView {
+            LazyVGrid(
+                columns: Array(
+                    repeating: GridItem(.flexible(), spacing: Sizing.spacingSpacingXs, alignment: .top),
+                    count: Constants.columns
+                ),
+                spacing: Sizing.spacingSpacingMd
+            ) {
+                ForEach(products) { product in
+                    productCard(for: product)
+                        .onTapGesture {
+                            viewModel.didTapProduct(product)
+                        }
+                        .accessibilityIdentifier(AccessibilityID.Wishlist.item(id: product.id))
+                }
+            }
+            .padding(Sizing.spacingSpacingMd)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(AccessibilityID.Wishlist.grid)
+        }
+    }
+
+    func productCard(for product: SelectedProduct) -> some View {
+        VerticalProductCard(
+            viewModel: .init(
+                configuration: .init(size: .medium),
+                selectedProduct: product,
+                addToBagTitle: L10n.Product.AddToBag.Button.cta,
+                outOfStockTitle: L10n.Product.OutOfStock.Button.cta
+            ),
+            onUserAction: { _, type in
+                handleUserAction(forProduct: product, actionType: type)
+            },
+            isFavorite: true,
+            actionAccessibilityIdentifier: AccessibilityID.Wishlist.removeButton(id: product.id),
+            actionAccessibilityLabel: L10n.Accessibility.removeFromWishlist
+        )
+    }
+
     func handleUserAction(forProduct product: SelectedProduct, actionType: VerticalProductCard.ProductUserActionType) {
         // swiftlint:disable vertical_whitespace_between_cases
         switch actionType {
-        case .remove:
+        case .wishlist:
             viewModel.didSelectDelete(for: product)
         case .addToBag:
             viewModel.didTapAddToBag(for: product)
-        case .wishlist:
-            return
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
 }
 
+private enum Constants {
+    static let columns = 2
+}
+
 #if DEBUG
-#Preview {
-    WishlistView(
-        viewModel: WishlistViewModel(
-            hasNavigationSeparator: true,
-            dependencies: WishlistDependencyContainer(
-                wishlistService: MockWishlistService(),
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker()
-            )
-        ) { _ in }
+#Preview("Success") {
+    WishlistView(viewModel: MockWishlistViewModel(state: .success([SelectedProduct(product: .fixture())])))
+}
+
+#Preview("Removed") {
+    let removed = SelectedProduct(product: .fixture(id: "removed"))
+    return WishlistView(
+        viewModel: MockWishlistViewModel(
+            state: .success([SelectedProduct(product: .fixture())]),
+            undoableRemoval: WishlistRemoval(productId: removed.product.id, from: [removed])
+        )
     )
+}
+
+#Preview("Empty") {
+    WishlistView(viewModel: MockWishlistViewModel(state: .success([])))
+}
+
+#Preview("Loading") {
+    WishlistView(viewModel: MockWishlistViewModel(state: .loading))
 }
 #endif

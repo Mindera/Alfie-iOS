@@ -146,6 +146,86 @@ final class WishlistServiceTests: XCTestCase {
         XCTAssertEqual(content.count, 1)
     }
 
+    // MARK: - restore(_:)
+
+    func test_a_removed_first_variant_is_restored_at_the_first_position() async throws {
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), saved("p2"), saved("p3")])
+        let removal = try await remove("p1", from: sut)
+
+        await sut.restore(removal)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "p2", "p3"])
+    }
+
+    func test_a_removed_middle_variant_is_restored_between_its_neighbours() async throws {
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), saved("p2"), saved("p3")])
+        let removal = try await remove("p2", from: sut)
+
+        await sut.restore(removal)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "p2", "p3"])
+    }
+
+    func test_a_variant_whose_position_is_now_past_the_end_is_restored_last() async throws {
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), saved("p2"), saved("p3")])
+        let removal = try await remove("p3", from: sut)
+        await sut.removeProduct(withId: "p2")
+
+        await sut.restore(removal)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "p3"])
+    }
+
+    func test_every_removed_variant_of_a_product_is_restored_at_its_position() async throws {
+        let blue = Product.Variant.fixture(sku: "blue")
+        let red = Product.Variant.fixture(sku: "red")
+        let product = Product.fixture(id: "p1", defaultVariant: blue, variants: [blue, red])
+        let stored = [
+            SelectedProduct(product: product, selectedVariant: blue),
+            saved("p2"),
+            SelectedProduct(product: product, selectedVariant: red)
+        ]
+        let (sut, _) = makeSUT(initialContent: stored)
+        let removal = try await remove("p1", from: sut)
+
+        await sut.restore(removal)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content, stored)
+    }
+
+    func test_restoring_a_variant_that_was_saved_again_changes_nothing() async throws {
+        let savedAgain = saved("p2")
+        let (sut, _) = makeSUT(initialContent: [saved("p1"), savedAgain])
+        let removal = try await remove("p2", from: sut)
+        await sut.addProduct(savedAgain)
+
+        await sut.restore(removal)
+
+        let content = await sut.getWishlistContent()
+        XCTAssertEqual(content.map(\.product.id), ["p1", "p2"])
+    }
+
+    func test_a_restored_variant_is_persisted_at_its_position() async throws {
+        let (sut, store) = makeSUT(initialContent: [saved("p1"), saved("p2")])
+        let removal = try await remove("p1", from: sut)
+
+        await sut.restore(removal)
+
+        XCTAssertEqual(store.saveInvocations.last?.map(\.product.id), ["p1", "p2"])
+    }
+
+    func test_removing_a_product_that_is_not_saved_leaves_nothing_to_restore() async {
+        let (sut, _) = makeSUT(initialContent: [saved("p1")])
+
+        let removal = await sut.removeProduct(withId: "missing")
+
+        XCTAssertNil(removal)
+    }
+
     // MARK: - Caching
 
     func test_storeLoadedOnceAtInit_notOnEveryRead() async {
@@ -170,6 +250,20 @@ final class WishlistServiceTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    private func saved(_ productId: String) -> SelectedProduct {
+        SelectedProduct(product: .fixture(id: productId))
+    }
+
+    private func remove(
+        _ productId: String,
+        from sut: WishlistService,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async throws -> WishlistRemoval {
+        let removal = await sut.removeProduct(withId: productId)
+        return try XCTUnwrap(removal, file: file, line: line)
+    }
 
     private func makeSUT(
         initialContent: [SelectedProduct] = [],

@@ -67,15 +67,6 @@ public enum ToolbarItemProvider {
         }
     }
 
-    public static func accountItem(
-        size: ToolBarButtonSize = .normal,
-        openAccountAction: @escaping () -> Void
-    ) -> some View {
-        ThemedToolbarButton(icon: .user, accessibilityId: AccessibilityId.accountBtn, accessibilityLabel: L10n.Accessibility.account, toolBarButtonSize: size) {
-            openAccountAction()
-        }
-    }
-
     public static func debugMenuItem(
         size: ToolBarButtonSize = .normal,
         openDebugMenuAction: @escaping () -> Void
@@ -110,7 +101,6 @@ private enum AccessibilityId {
     static let searchBtn = "search-btn"
     static let wishlistBtn = "wishlist-btn"
     static let listBtn = "list-btn"
-    static let accountBtn = "account-btn"
     static let titleHeader = "title-header"
     static let backBtn = "back-btn"
 }

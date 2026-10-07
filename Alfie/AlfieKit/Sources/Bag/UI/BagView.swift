@@ -61,7 +61,8 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                     viewModel.didDismissRemovalFailure()
                 }
             } else {
-                BagEmptyView()
+                EmptyStateView(icon: .bag, title: L10n.Bag.Empty.title)
+                    .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
             }
 
         case .error(let error):
@@ -140,21 +141,6 @@ private struct BagLineList: View {
         .listRowSpacing(Constants.lineSpacing)
         .padding(.top, Sizing.spacingSpacingMd)
         .accessibilityIdentifier(AccessibilityID.Bag.bagView)
-    }
-}
-
-private struct BagEmptyView: View {
-    var body: some View {
-        VStack(spacing: Sizing.spacingSpacingMd) {
-            ThemedIcon(.bag, tint: Theme.contentContentPrimary)
-            Text.build(theme.font.body.medium(L10n.Bag.Empty.title))
-                .foregroundStyle(Theme.contentContentPrimary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.horizontal, Sizing.spacingSpacingMd)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(AccessibilityID.Bag.emptyState)
     }
 }
 

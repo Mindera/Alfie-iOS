@@ -94,3 +94,9 @@ _Avoid_: item, line item, product
 **Bag badge**:
 The number on the Bag tab: the summed quantity across the Cart's Lines, absent when the Cart is empty.
 _Avoid_: Cart count, line count
+
+### Wishlist
+
+**Wishlist**:
+The Variants a shopper has saved to come back to, kept on the device. It needs no sign-in.
+_Avoid_: favourites, saved items, likes

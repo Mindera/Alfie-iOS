@@ -48,6 +48,29 @@ final class LocalizationTests: XCTestCase {
         XCTAssertEqual(L10n.Bag.Empty.title, "Your bag is empty.")
     }
 
+    func test_wishlist_empty_title_resolves_its_copy() {
+        XCTAssertEqual(L10n.Wishlist.Empty.title, "Your wishlist is empty.")
+    }
+
+    func test_wishlist_empty_message_resolves_its_copy() {
+        XCTAssertEqual(L10n.Wishlist.Empty.message, "Tap this icon in the products you like to see them here.")
+    }
+
+    func test_wishlist_removed_message_resolves_its_copy() {
+        XCTAssertEqual(L10n.Wishlist.Removed.message, "Removed.")
+    }
+
+    func test_wishlist_removed_undo_resolves_its_copy() {
+        XCTAssertEqual(L10n.Wishlist.Removed.Undo.cta, "Undo")
+    }
+
+    func test_wishlist_empty_accessibility_label_resolves_its_copy() {
+        XCTAssertEqual(
+            L10n.Accessibility.wishlistEmpty,
+            "Your wishlist is empty. Tap the heart on products you like to see them here."
+        )
+    }
+
     func test_localizable_product_quantity_with_args() {
         localizations.forEach { localization in
             let resources = [1, 2].map { L10n.Product.Quantity.accessibilityLabel($0) }

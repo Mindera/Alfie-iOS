@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "accessibility.account" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Account"
-          }
-        }
-      }
-    },
     "accessibility.back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -328,6 +317,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continue"
+          }
+        }
+      }
+    },
+    "accessibility.wishlistEmpty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wishlist is empty. Tap the heart on products you like to see them here."
           }
         }
       }
@@ -1304,17 +1304,6 @@
         }
       }
     },
-    "product.color.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Colour"
-          }
-        }
-      }
-    },
     "product.one_size.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1950,6 +1939,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Store & Services"
+          }
+        }
+      }
+    },
+    "wishlist.empty.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap this icon in the products you like to see them here."
+          }
+        }
+      }
+    },
+    "wishlist.empty.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your wishlist is empty."
+          }
+        }
+      }
+    },
+    "wishlist.removed.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removed."
+          }
+        }
+      }
+    },
+    "wishlist.removed.undo.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo"
           }
         }
       }

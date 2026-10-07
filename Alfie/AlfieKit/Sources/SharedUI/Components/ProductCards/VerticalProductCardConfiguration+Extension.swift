@@ -72,10 +72,5 @@ extension VerticalProductCardConfiguration {
             Primitives.Spacing.spacing24
         }
     }
-
-    var smallTextFont: UIFont {
-        // All sizes map to the same token; no per-size distinction after token migration.
-        DesignSystem.shared.font.body.small.uiFont
-    }
     // swiftlint:enable vertical_whitespace_between_cases
 }

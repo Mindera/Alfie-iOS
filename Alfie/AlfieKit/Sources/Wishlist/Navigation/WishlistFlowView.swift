@@ -12,11 +12,9 @@ public struct WishlistFlowView<ViewModel: WishlistFlowViewModelProtocol>: View {
             WishlistView(viewModel: viewModel.makeWishlistViewModel(isRoot: true))
                 .navigationDestination(for: WishlistRoute.self) { route in
                     route.destination(
-                        accountViewModel: viewModel.makeAccountViewModel,
                         productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
                         webViewModel: viewModel.makeWebViewModel(feature:),
-                        wishlistViewModel: { viewModel.makeWishlistViewModel(isRoot: false) },
-                        myAccountIntentViewBuilder: viewModel.myAccountIntentViewBuilder
+                        wishlistViewModel: { viewModel.makeWishlistViewModel(isRoot: false) }
                     )
                 }
         }

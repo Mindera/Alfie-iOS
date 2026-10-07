@@ -18,8 +18,16 @@ public actor WishlistService: WishlistServiceProtocol {
         store.save(products)
     }
 
-    public func removeProduct(withId productId: String) {
+    @discardableResult
+    public func removeProduct(withId productId: String) -> WishlistRemoval? {
+        let removal = WishlistRemoval(productId: productId, from: products)
         products = products.filter { $0.product.id != productId }
+        store.save(products)
+        return removal
+    }
+
+    public func restore(_ removal: WishlistRemoval) {
+        products = removal.restored(into: products)
         store.save(products)
     }
 

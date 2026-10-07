@@ -6,8 +6,6 @@ import Foundation
 
 public enum L10n {
   public enum Accessibility {
-    /// Account
-    public static let account = L10n.tr("L10n", "accessibility.account")
     /// Back
     public static let back = L10n.tr("L10n", "accessibility.back")
     /// Plural format key: accessibility.bag_badge
@@ -42,6 +40,8 @@ public enum L10n {
     public static let share = L10n.tr("L10n", "accessibility.share")
     /// Wishlist
     public static let wishlist = L10n.tr("L10n", "accessibility.wishlist")
+    /// Your wishlist is empty. Tap the heart on products you like to see them here.
+    public static let wishlistEmpty = L10n.tr("L10n", "accessibility.wishlistEmpty")
   }
   public enum Account {
     /// My Address Book
@@ -462,10 +462,6 @@ public enum L10n {
         public static let cta = L10n.tr("L10n", "product.add_to_wishlist.button.cta")
       }
     }
-    public enum Color {
-      /// Colour
-      public static let title = L10n.tr("L10n", "product.color.title")
-    }
     public enum OneSize {
       /// One Size
       public static let title = L10n.tr("L10n", "product.one_size.title")
@@ -714,6 +710,20 @@ public enum L10n {
   public enum Wishlist {
     /// Wishlist
     public static let title = L10n.tr("L10n", "wishlist.title")
+    public enum Empty {
+      /// Tap this icon in the products you like to see them here.
+      public static let message = L10n.tr("L10n", "wishlist.empty.message")
+      /// Your wishlist is empty.
+      public static let title = L10n.tr("L10n", "wishlist.empty.title")
+    }
+    public enum Removed {
+      /// Removed.
+      public static let message = L10n.tr("L10n", "wishlist.removed.message")
+      public enum Undo {
+        /// Undo
+        public static let cta = L10n.tr("L10n", "wishlist.removed.undo.cta")
+      }
+    }
   }
 }
 
@@ -767,7 +777,6 @@ private extension String.LocalizationValue.StringInterpolation {
 public extension L10n {
   enum Keys: String, RawRepresentable, CaseIterable {
 
-      case accessibilityAccount = "accessibility.account"
       case accessibilityBack = "accessibility.back"
       case accessibilityBagBadge = "accessibility.bag_badge"
       case accessibilityClearSearch = "accessibility.clearSearch"
@@ -784,6 +793,7 @@ public extension L10n {
       case accessibilitySettings = "accessibility.settings"
       case accessibilityShare = "accessibility.share"
       case accessibilityWishlist = "accessibility.wishlist"
+      case accessibilityWishlistEmpty = "accessibility.wishlistEmpty"
       case accountAddressBook = "account.address_book"
       case accountGreeting = "account.greeting"
       case accountMemberSince = "account.member_since"
@@ -882,7 +892,6 @@ public extension L10n {
       case productAddToBagErrorMessage = "product.add_to_bag.error.message"
       case productAddToBagSuccessMessage = "product.add_to_bag.success.message"
       case productAddToWishlistButtonCta = "product.add_to_wishlist.button.cta"
-      case productColorTitle = "product.color.title"
       case productOneSizeTitle = "product.one_size.title"
       case productOutOfStockButtonCta = "product.out_of_stock.button.cta"
       case productQuantityAccessibilityLabel = "product.quantity.accessibility_label"
@@ -942,6 +951,10 @@ public extension L10n {
       case webViewReturnOptionsFeatureTitle = "web_view.return_options_feature.title"
       case webViewStoreServicesFeatureTitle = "web_view.store_services_feature.title"
       case wishlistTitle = "wishlist.title"
+      case wishlistEmptyMessage = "wishlist.empty.message"
+      case wishlistEmptyTitle = "wishlist.empty.title"
+      case wishlistRemovedMessage = "wishlist.removed.message"
+      case wishlistRemovedUndoCta = "wishlist.removed.undo.cta"
   }
 }
 #endif

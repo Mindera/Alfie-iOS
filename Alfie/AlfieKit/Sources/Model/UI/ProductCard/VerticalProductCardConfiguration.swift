@@ -7,11 +7,6 @@ public struct VerticalProductCardConfiguration {
         case large
     }
 
-    public enum ActionType {
-        case wishlist
-        case remove
-    }
-
     public enum CardIntrinsicSize {
         case fixed(size: CGFloat)
         case flexible
@@ -27,20 +22,14 @@ public struct VerticalProductCardConfiguration {
     public let size: Size
     public let hidePrice: Bool
     public let hideAction: Bool
-    public let hideDetails: Bool
-    public let actionType: ActionType
 
     public init(
         size: Size,
         hidePrice: Bool = false,
-        hideAction: Bool = false,
-        hideDetails: Bool = true,
-        actionType: ActionType = .wishlist
+        hideAction: Bool = false
     ) {
         self.size = size
         self.hidePrice = hidePrice
         self.hideAction = hideAction
-        self.hideDetails = hideDetails
-        self.actionType = actionType
     }
 }
