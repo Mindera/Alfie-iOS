@@ -30,7 +30,7 @@ final class BFFConnectivityProbeTests: XCTestCase {
         XCTAssertEqual(sentRequest?.httpMethod, "POST")
     }
 
-    func test_run_carries_the_configured_bearer_credential() async {
+    func test_run_carries_the_configured_api_key() async {
         var sentRequest: URLRequest?
         let sut = makeSut(apiKey: "abc-123") { request in
             sentRequest = request
@@ -42,7 +42,7 @@ final class BFFConnectivityProbeTests: XCTestCase {
         XCTAssertEqual(sentRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer abc-123")
     }
 
-    func test_run_without_a_credential_sends_no_authorization_header() async {
+    func test_run_without_an_api_key_sends_no_authorization_header() async {
         var sentRequest: URLRequest?
         let sut = makeSut { request in
             sentRequest = request

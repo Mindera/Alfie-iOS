@@ -213,7 +213,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         mockEndpointService.currentApiEndpoint = .custom(url: url)
         let reboot = expectation(description: "The app is rebooted")
         mockEndpointService.onUpdateApiEndpointAndRebootCalled = { option in
-            XCTAssertEqual(option, .custom(url: url))
+            XCTAssertEqual(option.customUrl, url)
             reboot.fulfill()
         }
         sut = makeSut()
@@ -229,7 +229,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         let urlString = "https://www.endpoint.com"
         let saved = expectation(description: "The endpoint is saved")
         mockEndpointService.onUpdateApiEndpointAndRebootCalled = { option in
-            XCTAssertEqual(option, .custom(url: URL(string: urlString)))
+            XCTAssertEqual(option.customUrl?.absoluteString, urlString)
             saved.fulfill()
         }
         sut = makeSut()
@@ -254,7 +254,9 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     /// Whitespace-only edits are what the key store discards, so offering Save for them would
     /// promise a change that never happens.
-    func test_save_button_stays_disabled_when_the_api_key_edit_is_only_whitespace() {
+    func test_save_button_stays_disabled_when_the_api_key_edit_is_only_whitespace() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
+        mockEndpointService.currentApiEndpoint = .custom(url: url)
         sut = makeSut()
 
         sut.bffApiKey = "   "
@@ -299,7 +301,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
         sut.didTapSave()
 
-        XCTAssertEqual(savedOption, .custom(url: url))
+        XCTAssertEqual(savedOption?.customUrl, url)
     }
 
     func test_an_api_key_edited_before_leaving_custom_is_not_saved() throws {

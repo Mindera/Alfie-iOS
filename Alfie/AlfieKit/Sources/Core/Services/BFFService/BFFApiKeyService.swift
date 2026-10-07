@@ -22,7 +22,7 @@ public final class BFFApiKeyService: BFFApiKeyServiceProtocol {
     }
 
     public var currentApiKey: String? {
-        guard case .custom = apiEndpointService.currentApiEndpoint else {
+        guard apiEndpointService.currentApiEndpoint.customUrl != nil else {
             return nil
         }
 

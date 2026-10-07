@@ -44,6 +44,14 @@ final class BFFApiKeyServiceTests: XCTestCase {
         }
     }
 
+    func test_current_api_key_is_nil_when_the_custom_endpoint_has_no_url() {
+        sut.updateApiKey("abc-123")
+
+        apiEndpointService.currentApiEndpoint = .custom(url: nil)
+
+        XCTAssertNil(sut.currentApiKey)
+    }
+
     func test_stored_api_key_survives_a_switch_away_from_custom() {
         sut.updateApiKey("abc-123")
 

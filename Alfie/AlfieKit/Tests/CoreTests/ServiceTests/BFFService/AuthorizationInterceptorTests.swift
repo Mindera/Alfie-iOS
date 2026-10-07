@@ -22,7 +22,7 @@ final class AuthorizationInterceptorTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_a_stored_key_is_sent_as_a_bearer_credential() {
+    func test_a_stored_key_is_sent_as_a_bearer_authorization_header() {
         mockApiKeyService.currentApiKey = "abc-123"
         let request = InterceptorTestHelpers.makeRequest()
 
@@ -39,7 +39,7 @@ final class AuthorizationInterceptorTests: XCTestCase {
 
         XCTAssertNil(
             request.additionalHeaders["Authorization"],
-            "An empty credential must be absent, not sent as `Bearer `"
+            "An empty key must be absent, not sent as `Bearer `"
         )
     }
 
