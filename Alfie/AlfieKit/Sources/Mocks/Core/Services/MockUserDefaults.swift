@@ -12,6 +12,13 @@ public final class MockUserDefaults: UserDefaultsProtocol {
 
     public init() {}
 
+    public static func storing() -> MockUserDefaults {
+        let mock = MockUserDefaults()
+        mock.onSetCalled = { [unowned mock] value, key in mock.forcedValueForKey[key] = value }
+        mock.onRemoveCalled = { [unowned mock] key in mock.forcedValueForKey[key] = nil }
+        return mock
+    }
+
     public func set<T>(_ value: T, for key: String) {
         valuesAndKeysSet[key] = value
         onSetCalled?(value, key)

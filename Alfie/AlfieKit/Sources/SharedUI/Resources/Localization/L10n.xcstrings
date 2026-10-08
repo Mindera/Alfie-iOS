@@ -442,6 +442,17 @@
         }
       }
     },
+    "debug_menu.endpoint.api_key.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BFF API key (optional)"
+          }
+        }
+      }
+    },
     "feature_toggle.app_update.option.title" : {
       "extractionState" : "manual",
       "localizations" : {

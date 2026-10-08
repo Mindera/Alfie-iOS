@@ -25,6 +25,15 @@ struct EndpointSelectionView: View {
 
             ThemedInput($viewModel.customEndpointUrl, isDisabled: .constant(viewModel.isInputDisabled))
 
+            ThemedInput(
+                $viewModel.bffApiKey,
+                placeholder: L10n.DebugMenu.Endpoint.ApiKey.placeholder,
+                isDisabled: .constant(viewModel.isInputDisabled),
+                isSecure: true
+            )
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+
             HStack {
                 Spacer()
                 ThemedButton(
@@ -74,7 +83,8 @@ struct EndpointSelectionView: View {
 #Preview {
     EndpointSelectionView(
         viewModel: EndpointSelectionViewModel(
-            apiEndpointService: MockApiEndpointService()
+            apiEndpointService: MockApiEndpointService(),
+            apiKeyService: MockBFFApiKeyService()
         ) { }
     )
 }

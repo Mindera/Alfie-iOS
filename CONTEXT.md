@@ -100,3 +100,9 @@ _Avoid_: Cart count, line count
 **Wishlist**:
 The Variants a shopper has saved to come back to, kept on the device. It needs no sign-in.
 _Avoid_: favourites, saved items, likes
+
+### BFF access
+
+**BFF API key**:
+The opaque token the app presents to the BFF to be let in. It identifies the calling app, not a shopper, and is the same whichever commerce platform the BFF fronts.
+_Avoid_: Bearer credential, auth token, platform token
