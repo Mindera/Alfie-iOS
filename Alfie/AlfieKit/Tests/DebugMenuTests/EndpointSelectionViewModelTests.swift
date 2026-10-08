@@ -252,8 +252,6 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isSaveDisabled)
     }
 
-    /// Whitespace-only edits are what the key store discards, so offering Save for them would
-    /// promise a change that never happens.
     func test_save_button_stays_disabled_when_the_api_key_edit_is_only_whitespace() throws {
         let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
         mockEndpointService.currentApiEndpoint = .custom(url: url)

@@ -10,9 +10,7 @@ final class BFFApiKeyServiceTests: XCTestCase {
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        userDefaults = MockUserDefaults()
-        userDefaults.onSetCalled = { [unowned self] value, key in userDefaults.forcedValueForKey[key] = value }
-        userDefaults.onRemoveCalled = { [unowned self] key in userDefaults.forcedValueForKey[key] = nil }
+        userDefaults = .storing()
         apiEndpointService = MockApiEndpointService(currentApiEndpoint: .custom(url: URL(string: "https://bff.example.com/")))
         sut = BFFApiKeyService(userDefaults: userDefaults, apiEndpointService: apiEndpointService, storageKey: "key")
     }
@@ -46,18 +44,20 @@ final class BFFApiKeyServiceTests: XCTestCase {
 
     func test_current_api_key_is_nil_when_the_custom_endpoint_has_no_url() {
         sut.updateApiKey("abc-123")
-
         apiEndpointService.currentApiEndpoint = .custom(url: nil)
 
-        XCTAssertNil(sut.currentApiKey)
+        let apiKey = sut.currentApiKey
+
+        XCTAssertNil(apiKey)
     }
 
     func test_stored_api_key_survives_a_switch_away_from_custom() {
         sut.updateApiKey("abc-123")
-
         apiEndpointService.currentApiEndpoint = .dev
 
-        XCTAssertEqual(sut.storedApiKey, "abc-123")
+        let apiKey = sut.storedApiKey
+
+        XCTAssertEqual(apiKey, "abc-123")
     }
 
     /// A key pasted from a password manager or a chat message routinely arrives with a trailing
@@ -85,7 +85,7 @@ final class BFFApiKeyServiceTests: XCTestCase {
     }
 
     /// Guards the read side rather than the write side: a key stored blank by an earlier build must
-    /// still read as absent, so no `Bearer ` header goes out with an empty credential.
+    /// still read as absent, so no `Bearer ` header goes out with an empty key.
     func test_current_api_key_with_a_blank_value_already_stored_is_nil() {
         userDefaults.forcedValueForKey["key"] = "  "
 

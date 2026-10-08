@@ -27,7 +27,7 @@ struct EndpointSelectionView: View {
 
             ThemedInput(
                 $viewModel.bffApiKey,
-                placeholder: "BFF API key (optional)",
+                placeholder: L10n.DebugMenu.Endpoint.ApiKey.placeholder,
                 isDisabled: .constant(viewModel.isInputDisabled),
                 isSecure: true
             )

@@ -83,7 +83,7 @@ final class ApiEndpointServiceTests: XCTestCase {
 
     func test_remembers_the_custom_url_after_switching_to_another_endpoint() throws {
         let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
-        let mockUserDefaults = makeStoringUserDefaults()
+        let mockUserDefaults = MockUserDefaults.storing()
         createSut(userDefaults: mockUserDefaults)
         sut.updateApiEndpointAndReboot(.custom(url: url))
         sut.updateApiEndpointAndReboot(.dev)
@@ -96,7 +96,7 @@ final class ApiEndpointServiceTests: XCTestCase {
 
     func test_remembers_a_custom_url_that_was_active_before_it_was_stored_separately() throws {
         let urlString = "https://www.endpoint.com"
-        let mockUserDefaults = makeStoringUserDefaults()
+        let mockUserDefaults = MockUserDefaults.storing()
         mockUserDefaults.forcedValueForKey[Self.userDefaultsKey] = urlString
         createSut(userDefaults: mockUserDefaults)
         sut.updateApiEndpointAndReboot(.dev)
@@ -124,14 +124,6 @@ final class ApiEndpointServiceTests: XCTestCase {
     }
 
     // MARK: - Private
-
-    private func makeStoringUserDefaults() -> MockUserDefaults {
-        let mockUserDefaults = MockUserDefaults()
-        mockUserDefaults.onSetCalled = { [unowned mockUserDefaults] value, key in
-            mockUserDefaults.forcedValueForKey[key] = value
-        }
-        return mockUserDefaults
-    }
 
     private func createSut(userDefaults: UserDefaultsProtocol? = nil) {
         sut = .init(

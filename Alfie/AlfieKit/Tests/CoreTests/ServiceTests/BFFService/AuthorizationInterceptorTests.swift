@@ -22,7 +22,7 @@ final class AuthorizationInterceptorTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_a_stored_key_is_sent_as_a_bearer_authorization_header() {
+    func test_the_current_key_is_sent_as_a_bearer_authorization_header() {
         mockApiKeyService.currentApiKey = "abc-123"
         let request = InterceptorTestHelpers.makeRequest()
 
@@ -31,7 +31,7 @@ final class AuthorizationInterceptorTests: XCTestCase {
         XCTAssertEqual(request.additionalHeaders["Authorization"], "Bearer abc-123")
     }
 
-    func test_no_stored_key_sends_no_authorization_header() {
+    func test_no_current_key_sends_no_authorization_header() {
         mockApiKeyService.currentApiKey = nil
         let request = InterceptorTestHelpers.makeRequest()
 

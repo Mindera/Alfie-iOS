@@ -50,7 +50,7 @@ final class NetworkInterceptorProvider: InterceptorProvider {
             interceptors.append(CacheReadInterceptor(store: self.store))
         }
         interceptors.append(NetworkPreConditionInterceptor(reachabilityService: self.reachabilityService)) // Custom
-        interceptors.append(AuthorizationInterceptor(apiKeyService: self.apiKeyService)) // Custom
+        interceptors.append(AuthorizationInterceptor(apiKeyService: self.apiKeyService))
         if logRequests {
             interceptors.append(RequestLogInterceptor(log: log)) // Custom
         }

@@ -3,7 +3,7 @@ import Model
 import Utils
 
 /// The key belongs to the Custom endpoint: sending it to any other endpoint would hand a staging
-/// credential to a host it was never meant for.
+/// key to a host it was never meant for.
 public final class BFFApiKeyService: BFFApiKeyServiceProtocol {
     public static let defaultStorageKey = "com.alfie.config.bff.apiKey"
 
