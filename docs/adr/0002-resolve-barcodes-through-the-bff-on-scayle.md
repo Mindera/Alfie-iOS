@@ -5,7 +5,7 @@ status: accepted
 # Resolve Barcodes through the BFF on SCAYLE
 
 ADR-0001 printed an **Alfie code** because the BFF could not resolve a **Barcode**. On SCAYLE it now
-can: `productByBarcode(barcode:)` (Alfie-BFF PR #46) filters the catalogue by the `ean` attribute and
+can: `productByBarcode(barcode:)` (Alfie-BFF PR #46) filters the catalogue by the Variant's `ean` and
 returns the Product's id, plus the Variant's id when exactly one Variant carries the code. The
 scanner therefore resolves a Barcode through the BFF and opens the Product it names. Alfie
 codes are still printed and still win when both are in frame, because they need no lookup.
@@ -30,5 +30,18 @@ A Barcode here is the value, not the symbology: Selfridges price tags carry a GT
   the generic lookup-failed notice.
 - The handoff reuses the deep-link path: `alfie://alfie.target/product/<id>?variantId=<id>`. The PDP
   preselects by SKU, then Variant id, then its default Variant.
+- `ean` is a first-class string on a SCAYLE Variant with its own `filters[ean]` parameter, not a
+  tenant attribute. The generic attribute filter takes integer attribute ids and cannot carry a
+  Barcode, so the lookup must stay off that path.
+- SCAYLE stores `ean` as an opaque string and matches it byte for byte. The Barcode is sent exactly
+  as scanned, leading zeros included, and nothing normalises it on the way; the stored value has to
+  be what the bars encode, not the digits printed beneath them.
+- SCAYLE cannot say which Variant matched: the filter returns Products, and its storefront Variant
+  carries no `ean`. Falling back to the Product when the Variant is ambiguous is the only behaviour
+  the platform supports, not caution on our side.
+- A production tag may encode a Variant's reference key instead of its `ean`, as SCAYLE's
+  omnichannel guidance tells retailers to. Such a scan misses and looks identical to absent data.
+  `/v2/search/resolve` matches either on the token the BFF already holds, but lets a category match
+  beat a Product match.
 - A scan now waits on the network. While a lookup is in flight the camera keeps running but every
   code, including an Alfie code, is ignored, and closing the scanner cancels the lookup.

@@ -67,8 +67,7 @@ Read the guide when its trigger fires:
 
 | Read | When |
 |---|---|
-| `docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module |
-| `docs/Development.md` | Starting a feature from a spec |
+| `docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module; deciding where a new file goes |
 | `docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
 | `docs/Localization.md` | Adding or renaming an `L10n` key |
 | `docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures |
@@ -78,7 +77,6 @@ Read the guide when its trigger fires:
 | `docs/Iconography.md` | Adding or re-mapping an icon |
 | `docs/CodeStyle.md` | Naming and formatting questions |
 | `docs/QuickReference.md` | Commands, directory layout, dependency versions |
-| `docs/Specs/TEMPLATE.md` | Writing a new feature spec |
 
 ---
 
@@ -103,9 +101,3 @@ Single-context: `GLOSSARY.md` at the root, ADRs in `docs/adr/`. See `docs/agents
 ### Prototypes
 
 A UI prototype is a `#if DEBUG` Debug Menu screen, a logic prototype is Swift; both live on a `prototype/<name>` branch. See `docs/agents/prototype.md`.
-
-## Agent definitions
-
-Role-scoped prompts live in `.ai/agents/<name>.agent.md` — `feature-orchestrator`, `spec-writer`,
-`graphql-specialist`, `feature-developer`, `localization-specialist`, `testing-specialist`,
-`security-specialist`. Read one when the user names it; they are not auto-loaded.

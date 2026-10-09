@@ -479,7 +479,6 @@ extension ProductDetailsView {
     /// `Inventory { available: Int }` with no location dimension, and neither commerce adapter queries
     /// location-scoped inventory. Without this line a shopper standing in a store reads a crossed-out
     /// size chip as "not in this shop" — which is not what it means, and not something the stack can say.
-    /// See `docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
     ///
     /// This is the visible half. The spoken half rides on the swatches' own out-of-stock
     /// `accessibilityValue` — "Out of stock online" — rather than an `accessibilityHint` here: Speak
