@@ -21,7 +21,8 @@ endpoint is `http://localhost:3000/graphql`.
 ### 2. Point the app at it
 
 A **Debug** build already targets the local BFF — the default `dev` endpoint is
-`http://localhost:3000/`, so just build and run.
+`http://localhost:3000/`, so just build and run. The older Alfie-Mocks server on
+`localhost:4000` is legacy — reachable via the `dev` toggle in `ApiEndpointService`, not the default.
 
 To point the app at a different BFF (a remote host, a different port), use the in-app
 **Debug Menu** endpoint selector (opened from the toolbar on the Home screen):

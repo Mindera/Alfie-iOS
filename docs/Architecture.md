@@ -194,6 +194,9 @@ public enum FeatureRoute: Hashable {
 }
 ```
 
+A case that hands off to another feature carries that feature's own `Route`, not its
+configuration, so a `navigate` call nests one level per module it crosses.
+
 ### Tab-Based Navigation
 - **AppRoute**: Top-level routing (tabs)
 - **TabRoute**: Routes to each tab's flow (`home`, `bag`, `shop`, `wishlist`)
@@ -287,12 +290,12 @@ Paths are relative to `Alfie/AlfieKit/Sources/` unless they start with `Alfie/`.
 | Route | A case on the parent feature's `Route` enum |
 | Strings | `SharedUI/Resources/Localization/L10n.xcstrings` (see `Localization.md`) |
 
-### Files That Need Xcode
+### What Needs Xcode
 
-Everything under `AlfieKit/Sources/` and `AlfieKit/Tests/` is a Swift package and is picked up
-automatically, as are `.graphql` files. A new `.swift` file under `Alfie/Alfie/` (the app target) is
-not: `project.pbxproj` is never edited by hand, so ask the user to add it in Xcode (Add Files to
-"Alfie"…, with the `Alfie` target ticked), then run `verify.sh`.
+A new file needs no Xcode step: `AlfieKit/` is a Swift package, and the app target's `Alfie/Alfie/`
+folder is file-system-synchronized. Target membership exceptions, build settings, build phases and
+package-product linkage live in `project.pbxproj`, which is never edited by hand: ask the user to
+make those changes in Xcode.
 
 ### Module Dependencies
 

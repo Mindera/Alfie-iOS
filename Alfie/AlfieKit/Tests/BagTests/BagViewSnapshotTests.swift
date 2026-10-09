@@ -33,7 +33,7 @@ final class BagViewSnapshotTests: XCTestCase {
     }
 
     func test_bagView_withALineTheServerCouldNotPrice() {
-        // A non-finite line total renders an em dash. £0.00 would read as "this item is free" (Q36).
+        // A non-finite line total renders an em dash. £0.00 would read as "this item is free".
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
             lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: nil)],
@@ -71,7 +71,7 @@ final class BagViewSnapshotTests: XCTestCase {
     func test_bag_view_with_an_unpriceable_total_shows_the_dash() {
         // The em dash covers every amount on the screen, not just the line total. The grand total
         // is the number a shopper checks before checking out, so a fabricated £0.00 is the worst
-        // place of all to state a price they are not being charged (Q36).
+        // place of all to state a price they are not being charged.
         let sut = BagView(viewModel: MockBagViewModel(state: .success(.fixture(
             id: "cart-1",
             lines: [.fixture(id: "line-1", name: "Silk Shirt", quantity: 2, lineTotal: nil)],

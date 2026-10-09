@@ -1,7 +1,7 @@
 # Coding Standards
 
 The index of every document that says how code is written in this repo, plus the review and
-security rules, which have no guide of their own. A review checks a diff against all of them.
+security rules, which have no guide of their own. A review checks a diff against the rules here and each guide the diff touches.
 
 ## Hard rules
 

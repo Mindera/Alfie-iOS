@@ -1,10 +1,7 @@
 # Alfie iOS
 
-**Alfie** is a native iOS e-commerce application built with:
-- **SwiftUI** (iOS 16+)
-- **MVVM Architecture** with Flow-based navigation
-- **Swift Package Manager** modular structure (`AlfieKit/`)
-- **GraphQL BFF API** (Apollo iOS client)
+Native iOS e-commerce app: SwiftUI (iOS 16+), MVVM with Flow-based navigation, SwiftPM modules in
+`AlfieKit/`, a GraphQL BFF through Apollo iOS.
 
 ---
 
@@ -20,15 +17,15 @@
 - Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier
 - Reach for existing `SharedUI` components before writing a new view
 - Invoke `/swiftui-specialist` when writing or reviewing SwiftUI; gate its API suggestions on this project's deployment target (`@Observable` and `@Entry` don't qualify today) and let the MVVM rules here win on conflict
-- Finish every code change on a passing `./Alfie/scripts/verify.sh` (cadence in §Verification)
+- Finish every code change on §Verification's "Done"
 
 ### ❌ NEVER
 
 | Never | Instead |
 |---|---|
-| Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh` |
+| Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh`, or build (`L10n`) |
 | Call `fatalError` | Call `queuedFatalError` |
-| Edit `Alfie.xcodeproj/project.pbxproj` (only a new file under `Alfie/Alfie/` needs it) | Ask the user to add the file through Xcode (`docs/Architecture.md` §Files That Need Xcode) |
+| Edit `Alfie.xcodeproj/project.pbxproj` | Ask the user to make the change in Xcode (new files need none: `docs/Architecture.md` §What Needs Xcode) |
 | Commit sensitive files unencrypted | Follow `docs/QuickReference.md` §Adding Sensitive Files (`git secret`) |
 
 ---
@@ -45,8 +42,10 @@
 itself, which needs Node and the `Alfie-BFF` repo beside this one; from a worktree, point
 `ALFIE_BFF_PATH` at it. `--skip-integration` drops the integration stage.
 
-Done means the output ends **"✅ FULL VERIFICATION PASSED"**, or
-**"✅ VERIFICATION PASSED (... integration skipped)"** when skipped.
+Done means an unfiltered `verify.sh` prints **"✅ FULL VERIFICATION PASSED"**. Only when Node or
+`Alfie-BFF` is unavailable: an unfiltered `--skip-integration` run printing
+**"✅ VERIFICATION PASSED (... integration skipped)"**, reported as integration skipped. A
+`prototype/*` branch follows `docs/agents/prototype.md` §Done instead.
 
 Run one verification at a time: the scripts write to fixed `/tmp/alfie_*` paths, so parallel runs
 (including from another worktree) clobber each other.
@@ -65,8 +64,8 @@ Run one verification at a time: the scripts write to fixed `/tmp/alfie_*` paths,
 | `docs/Accessibility.md` | Adding UI that a UI test will target |
 | `docs/DesignTokens.md` | Picking a colour, spacing, radius or type value; refreshing tokens |
 | `docs/Iconography.md` | Adding or re-mapping an icon |
-| `docs/CodeStyle.md` | Naming a type or file; writing a `#Preview` or async call |
-| `docs/QuickReference.md` | Adding a sensitive file; running codegen or setup commands |
+| `docs/CodeStyle.md` | Naming a type or file; writing a `#Preview` |
+| `docs/QuickReference.md` | Setting up a checkout (`brew bundle`, `git secret reveal`) |
 
 ---
 
@@ -94,4 +93,4 @@ Before `/prototype` builds anything, read `docs/agents/prototype.md`: it replace
 
 ### Research
 
-A `/research` note lives on a pushed `research/<name>` branch with a pointer on the issue that asked for it, never on `main` (ADR-0005).
+A `/research` note is `research/<name>.md` on a pushed `research/<name>` branch, with a pointer on the issue that asked for it, never on `main` (ADR-0005).

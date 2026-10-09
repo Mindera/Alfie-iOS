@@ -21,6 +21,8 @@ deferred: load them with `ToolSearch` first.
 - **Read a ticket**: `getJiraIssue` with `issueIdOrKey: "ALFMOB-<id>"`,
   `responseContentFormat: "markdown"`; add `comment` to `fields` for the discussion.
 - **Search**: `searchJiraIssuesUsingJql`, e.g. `project = ALFMOB AND status != Done ORDER BY updated DESC`.
+- **Write, when asked**: `addCommentToJiraIssue`; `getTransitionsForJiraIssue` then
+  `transitionJiraIssue`; `createJiraIssue`.
 
 ## Conventions
 
@@ -55,6 +57,11 @@ for the key; omit the line only when the user confirms there is none.
 
 `ALFMOB-<id>` → read it from Jira. `#<n>` → **Read an issue** above; if its body starts with a
 `Jira:` line, read that ticket too.
+
+## When a skill says "the way the issue tracker closes work"
+
+Through PRs: the PR body carries `Closes #<n>` for the spec and for each ticket it resolves. The
+Jira ticket is transitioned by a human.
 
 ## Wayfinding operations
 

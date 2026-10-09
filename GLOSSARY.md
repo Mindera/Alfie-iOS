@@ -1,8 +1,8 @@
 # Alfie
 
 A native iOS storefront for a fashion retailer, backed by a GraphQL BFF that fronts a commerce
-platform (SCAYLE, Shopify or BigCommerce). This glossary fixes the vocabulary for the catalogue and for the
-physical-retail features that reach into it.
+platform (SCAYLE, Shopify or BigCommerce). This glossary fixes the vocabulary for the catalogue, product listing, the
+Bag and Wishlist, and the physical-retail features that reach into them.
 
 ## Language
 

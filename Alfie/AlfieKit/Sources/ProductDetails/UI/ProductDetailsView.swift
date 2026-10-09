@@ -715,6 +715,8 @@ extension ProductDetailsView {
             .frame(minHeight: Constants.complementaryInfoCellMinHeight)
             .modifier(
                 TapHighlightableModifier {
+                    // A pushed screen, not an embedded web view: one per row inside this scroll
+                    // view means nested scrolling and a height nothing can know up front.
                     guard let feature = viewModel.complementaryInfoWebFeature(for: type) else { return }
                     viewModel.openWebFeature(feature)
                 }

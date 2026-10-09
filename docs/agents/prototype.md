@@ -13,7 +13,8 @@ PR. Leave a pointer to the branch on the implementation issue.
 A screen in the Debug Menu, in place of a route with a URL search param:
 
 - Add the view under `Alfie/AlfieKit/Sources/DebugMenu/UI/Prototype/`, wrapped in `#if DEBUG`.
-- Register it as a `DebugNavigation` case with a link in `DebugMenuView`, inside `#if DEBUG`.
+- Register it as a `DebugNavigation` case with a link in `DebugMenuView`; wrap the link and its
+  destination in `#if DEBUG`, as the `featureToggle` entry is.
 - Variants switch through a segmented control pinned to the bottom of the screen, in place of the
   floating bottom bar.
 - Feed it from `Mocks` (`Mock<Feature>ViewModel`, fixtures); no BFF calls.
@@ -30,3 +31,8 @@ A Swift script, in place of the single HTML file:
 - Self-contained: copy the types it needs rather than importing AlfieKit modules.
 - Drive the state machine from a list of named scenarios and print the full state after every action.
 - Run: `swift Alfie/AlfieKit/Prototypes/<name>/main.swift`.
+
+## Done
+
+`./Alfie/scripts/build-for-verification.sh` passes (UI prototype) or the script runs (logic
+prototype), and the branch is pushed. A prototype skips the full `verify.sh` run.
