@@ -42,7 +42,7 @@ Tools/                              # Standalone SwiftPM tools, outside the Alfi
 ## Common Commands
 
 ```bash
-# Full verification (build + unit + integration) - ALWAYS RUN AFTER CODE CHANGES
+# Full verification (build + unit + integration) - run once before calling work done
 ./Alfie/scripts/verify.sh
 
 # Fast unit-only run (no local BFF / Node needed)
@@ -81,7 +81,7 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 
 ## Code Review Guidelines
 
-**Block merge** on any violation of the ✅ ALWAYS / ❌ NEVER lists in `AGENTS.md` §Critical Rules,
+**Block merge** on any violation of the ✅ ALWAYS / ❌ NEVER lists in `CLAUDE.md` §Critical Rules,
 plus credentials or secrets committed in code.
 
 **High priority** (fix before merge, not a hard block):

@@ -4,6 +4,9 @@ This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xc
 (XCUITest, run from its own scheme) and the standalone package `Tools/DesignTokenGen` (Swift Testing)
 sit in neither plan and keep their own conventions.
 
+`/tdd` drives the red-green loop; where its guidance on how a test is written differs from this
+file, this file wins.
+
 ## Rules
 
 Every rule here binds both writing a test and reviewing one. A review is not done until each has been
