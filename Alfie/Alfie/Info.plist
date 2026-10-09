@@ -8,6 +8,13 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Alfie uses the camera to scan the Alfie code on a product's swing tag, so it can open that product's page.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Alfie connects to a development server on your local network.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
