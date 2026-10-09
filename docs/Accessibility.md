@@ -111,6 +111,6 @@ For each file:
 
 ## Verification
 
-- **Build + unit tests:** `./Alfie/scripts/verify.sh --skip-integration` (omit the flag to also run integration tests against a local BFF)
+- **Build + tests:** `CLAUDE.md` §Verification
 - **Identifier propagation:** Run on a simulator → Xcode → Open Developer Tool → Accessibility Inspector → hover the element → confirm the identifier matches.
 - **UI tests:** `xcodebuild test -scheme Alfie -only-testing:AlfieUITests/ProductListingUITests` (after Xcode linkage above).

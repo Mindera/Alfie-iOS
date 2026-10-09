@@ -1,8 +1,8 @@
 # Alfie
 
 A native iOS storefront for a fashion retailer, backed by a GraphQL BFF that fronts a commerce
-platform (SCAYLE, Shopify or BigCommerce). This glossary fixes the vocabulary for the catalogue and for the
-physical-retail features that reach into it.
+platform (SCAYLE, Shopify or BigCommerce). This glossary fixes the vocabulary for the catalogue, product listing, the
+Bag and Wishlist, and the physical-retail features that reach into them.
 
 ## Language
 
@@ -32,7 +32,7 @@ colour and size a shopper arrives on.
 The card attached to a garment in store, carrying its printed identifiers.
 
 **Barcode**:
-The machine-readable number already printed on a Swing tag (EAN-13 or UPC-A). Issued by the
+The machine-readable number already printed on a Swing tag (as an EAN-13, UPC-A or Code 128 symbol). Issued by the
 manufacturer, it holds only digits and cannot carry a Handle, so it is resolved through the
 catalogue (SCAYLE only). It usually identifies one Variant; when several Variants share it, it
 resolves to the Product alone and no colour or size is preselected.

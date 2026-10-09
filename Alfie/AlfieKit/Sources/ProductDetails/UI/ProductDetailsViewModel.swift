@@ -254,7 +254,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
                     line: .init(productId: product.id, variantId: variantId)
                 )
                 // Only once the cart holds the line — firing on the tap would count adds that failed.
-                // The composite id here is the pre-existing analytics shape, left alone per Q29.
+                // The composite id here is the pre-existing analytics shape, left alone.
                 dependencies.analytics.trackAddToBag(productID: selectedProduct.id)
                 addToBagFeedback = .success
             } catch {

@@ -10,6 +10,8 @@ public final class UserDefaultsStore: WishlistStoreProtocol {
         self.storageKey = storageKey
     }
 
+    /// Any decode failure reads as an empty wishlist, so a `PersistedProductDTO` shape change
+    /// silently drops what was stored.
     public func load() -> [SelectedProduct] {
         guard
             let data: Data = userDefaults.value(for: storageKey),

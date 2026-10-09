@@ -19,7 +19,7 @@ from `Icons.xcassets`. There are **no SF-Symbol fallbacks** — the Figma "SF Sy
 supplies bundled glyphs for the letter/chart/system icons that have no Tabler equivalent.
 
 Assets are configured **Render As: Template Image** + **Preserve Vector Data**, so they tint via
-`foregroundStyle`/`tint`.
+`foregroundStyle`. `.tint` is a silent no-op on a template image.
 
 Prefer **`ThemedIcon(_:size:tint:)`** over `Icon.x.image` at call sites — it binds size to the
 `Sizing.iconsIcon{Small,Medium,Large,Xlarge}` (16/24/32/40) tokens and applies the template tint, so

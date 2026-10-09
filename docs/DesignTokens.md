@@ -81,6 +81,9 @@ same-name collision between the `sizing` and `.primitives` collections.
   touch the generator or the tokens.
 - The generated `*+Generated.swift` files carry an `AUTO-GENERATED` + `// swiftlint:disable all`
   header and are excluded from SwiftLint; edit the tokens upstream, not the output.
+- A new typography token is not reachable from the theme until its group struct in
+  `SharedUI/Theme/Typography/Specifications/TypographyGroups.swift` (`TypographyBody`,
+  `TypographyLabel`, …) gains a matching property by hand, as `mediumBold` did.
 - Call sites consume the generated tokens directly: use the semantic `Theme.*` / `Typography.*` /
   `Sizing.*` symbols, and reach for `Primitives.*` only when no semantic token covers the value.
   Migration off the legacy asset-catalog `Colors`/`Spacing` types is still in progress, so both

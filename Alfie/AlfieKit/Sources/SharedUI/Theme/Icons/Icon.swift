@@ -5,7 +5,7 @@ import class UIKit.UIImage
 /// The Alfie icon set. Every case resolves to a bundled vector asset in `Icons.xcassets`, exported
 /// from the Figma Iconography page (the "Arrows & System", "E-commerce" and "SF Symbol - iOS"
 /// sections). Raw values are the kebab-case asset names, except aliased cases (`reload`) that keep a
-/// unique raw value and resolve via `assetName`. See `Docs/Iconography.md` for the mapping + re-export.
+/// unique raw value and resolve via `assetName`. See `docs/Iconography.md` for the mapping + re-export.
 public enum Icon: String, IconRepresentable, CaseIterable {
     case aCircle = "a-circle"
     case accountFill = "account-fill"

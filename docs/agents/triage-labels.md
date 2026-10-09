@@ -10,8 +10,4 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 | `ready-for-human`          | `ready-for-human`    | Requires human implementation            |
 | `wontfix`                  | `wontfix`            | Will not be actioned                     |
 
-These labels live on **GitHub Issues**, not Jira - see `issue-tracker.md`.
-`gh label list` is authoritative for which of these already exist; create any that are
-missing with `gh label create <name> --description "..."`, using the description from the table.
-
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.

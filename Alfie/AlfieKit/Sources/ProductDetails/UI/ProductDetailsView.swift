@@ -479,7 +479,6 @@ extension ProductDetailsView {
     /// `Inventory { available: Int }` with no location dimension, and neither commerce adapter queries
     /// location-scoped inventory. Without this line a shopper standing in a store reads a crossed-out
     /// size chip as "not in this shop" — which is not what it means, and not something the stack can say.
-    /// See `Docs/Specs/Features/InStoreScanToPDP.md` §Known Limitations.
     ///
     /// This is the visible half. The spoken half rides on the swatches' own out-of-stock
     /// `accessibilityValue` — "Out of stock online" — rather than an `accessibilityHint` here: Speak
@@ -716,6 +715,8 @@ extension ProductDetailsView {
             .frame(minHeight: Constants.complementaryInfoCellMinHeight)
             .modifier(
                 TapHighlightableModifier {
+                    // A pushed screen, not an embedded web view: one per row inside this scroll
+                    // view means nested scrolling and a height nothing can know up front.
                     guard let feature = viewModel.complementaryInfoWebFeature(for: type) else { return }
                     viewModel.openWebFeature(feature)
                 }

@@ -14,6 +14,8 @@
 3. **Mark for Review** if not officially approved
 4. **Build project** to auto-generate `L10n+Generated.swift`
 5. **Use in code**: `Text(L10n.Feature.title)` or `Text(L10n.Feature.Subtitle.message("argument"))`
+6. **Commit** `Alfie/Checksums/swiftgen_checksum.txt` with the catalog: the app build's Run SwiftGen
+   phase rewrites it whenever `L10n.xcstrings` changes
 
 **Usage Pattern**:
 ```swift

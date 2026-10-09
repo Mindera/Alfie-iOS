@@ -194,6 +194,9 @@ public enum FeatureRoute: Hashable {
 }
 ```
 
+A case that hands off to another feature carries that feature's own `Route`, not its
+configuration, so a `navigate` call nests one level per module it crosses.
+
 ### Tab-Based Navigation
 - **AppRoute**: Top-level routing (tabs)
 - **TabRoute**: Routes to each tab's flow (`home`, `bag`, `shop`, `wishlist`)
@@ -267,6 +270,32 @@ Each feature module follows this structure:
 └── Toolbar/  (optional)
     └── <Feature>+Toolbar.swift
 ```
+
+### Where Each Piece of a Feature Goes
+
+Paths are relative to `Alfie/AlfieKit/Sources/` unless they start with `Alfie/`.
+
+| Piece | Location |
+|---|---|
+| Domain models | `Model/Models/<Feature>/` |
+| Service protocol | `Model/Services/<Feature>/` |
+| GraphQL operations and fragments | `BFFGraph/CodeGen/Queries/<Feature>/` (file layout and codegen in `GraphQL.md`) |
+| Converters | `Core/Services/BFFService/Converters/<Feature>+Converter.swift` |
+| Service implementation | `Core/Services/API/<Feature>/` when BFF-backed, otherwise `Core/Services/<Feature>/` |
+| Service registration | `Alfie/Alfie/Service/ServiceProvider.swift` |
+| Feature module | `<Feature>/`, laid out as above |
+| Mock ViewModel | `Mocks/Core/Features/Mock<Feature>ViewModel.swift` |
+| Target and product | `Alfie/AlfieKit/Package.swift` |
+| Tests | `Alfie/AlfieKit/Tests/<Feature>Tests/`; a new test target also goes in `Package.swift` and `Alfie/Alfie/Alfie.xctestplan` |
+| Route | A case on the parent feature's `Route` enum |
+| Strings | `SharedUI/Resources/Localization/L10n.xcstrings` (see `Localization.md`) |
+
+### What Needs Xcode
+
+A new file needs no Xcode step: `AlfieKit/` is a Swift package, and the app target's `Alfie/Alfie/`
+folder is file-system-synchronized. Target membership exceptions, build settings, build phases and
+package-product linkage live in `project.pbxproj`, which is never edited by hand: ask the user to
+make those changes in Xcode.
 
 ### Module Dependencies
 
