@@ -17,7 +17,7 @@ A screen in the Debug Menu, in place of a route with a URL search param:
 - Variants switch through a segmented control pinned to the bottom of the screen, in place of the
   floating bottom bar.
 - Feed it from `Mocks` (`Mock<Feature>ViewModel`, fixtures); no BFF calls.
-- Run: launch the Debug scheme, open the Debug Menu, tap the entry.
+- Run: launch the `Alfie` scheme in the Debug configuration, open the Debug Menu, tap the entry.
 
 Files under `AlfieKit/Sources/` are auto-discovered, so `project.pbxproj` stays untouched.
 

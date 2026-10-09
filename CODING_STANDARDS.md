@@ -1,7 +1,7 @@
 # Coding Standards
 
-The index of every document that says how code is written in this repo. A review checks a diff
-against all of them.
+The index of every document that says how code is written in this repo, plus the security rules,
+which have no guide of their own. A review checks a diff against all of them.
 
 ## Hard rules
 
@@ -30,12 +30,14 @@ Block merge:
 
 - Credentials, API keys or secrets in code
 - Sensitive data in UserDefaults rather than the Keychain
-- An API call over anything but HTTPS
+- An API call to a remote host over anything but HTTPS
 - Sensitive data or PII in logs, Crashlytics or Braze events
 - A sensitive file (`GoogleService-Info.plist`) committed outside git-secret
 
 Fix before merge:
 
 - User input or deep-link parameters used without validation
+- A GraphQL operation built by string interpolation rather than variables
+- A missing authorization check, or auth headers set outside the Apollo client
 - Sensitive data in an error message
-- Sign-out that leaves user data behind
+- Sign-out that leaves user data behind, or a session with no timeout

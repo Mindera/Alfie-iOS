@@ -18,7 +18,8 @@ Single-context repo:
 ├── GLOSSARY.md
 ├── docs/adr/
 │   ├── 0001-print-our-own-alfie-code.md
-│   └── 0002-resolve-barcodes-through-the-bff-on-scayle.md
+│   ├── 0002-resolve-barcodes-through-the-bff-on-scayle.md
+│   └── …
 └── Alfie/
 ```
 

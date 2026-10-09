@@ -27,13 +27,16 @@ stale against it.
 
 - Offline, the Bag is an error with retry and a write is refused with a snackbar. Within a session
   the last good Cart stays on screen through a failed write.
-- Controls disable while a write is in flight. Cart writes queue behind each other, because an
-  update sends the whole Line list and two in flight would clobber each other.
+- The PDP's add and quantity controls disable while their write is in flight; a Bag removal has no
+  such guard.
+- Every cart operation, reads included, queues behind the one before it. Unordered, two adds each
+  create a Cart and orphan the first Line, a remove overtaken by an add puts the removed Line back,
+  and a read sent before a write can publish the older Cart after it.
 - A failed quantity update re-reads the Cart: BigCommerce applies an update Line by Line and can
   fail with earlier Lines committed.
 - Mutations are excluded from the retry interceptor and the Apollo cache. A retried add would add
   the Line twice.
 - The Bag badge is summed on the client from the Cart's Lines; the BFF has no total-quantity field
   and needs none.
-- An empty Bag is a loaded Cart with no Lines, not a separate state.
+- An empty Bag is not a state of its own: no Cart and a Cart with no Lines render the same.
 - Analytics fire only after a write succeeds.

@@ -125,7 +125,7 @@ Treat them as correct, in review and when writing.
 | Feature and service mocks are hand-written, never generated | They double as `#Preview` fixtures, so they live in a production target. A generator would add a third codegen step and make them un-hand-tunable, losing the throwing unset closure. Spying inside the closure already gives call counts. |
 | Table-driven `for` loops over cases | XCTest has no parameterized tests; the loop is the workaround. |
 | `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. The typed form is the house idiom. |
-| No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the acceptance criterion (`(AC 5)`, `(Q36)`). |
+| No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the issue the behaviour comes from (`(#170)`). Older citations such as `(AC 5)` or `(Q36)` index specs retired in ADR-0005. |
 | No CI test retries | Retries suit unreliable external services; CI runs the unit plan only, so a flake there is a real bug. |
 | Test code is held to this document, not to SwiftLint | `Alfie/.swiftlint.yml` excludes `AlfieKit/Tests` and `AlfieKit/Sources/Mocks`, so no lint runs on either. Review test code against the rules above — naming, seams, the state matrix — and leave formatting alone. Lifting the exclusion is a repo-wide call, not a per-PR one. |
 

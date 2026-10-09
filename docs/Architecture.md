@@ -278,7 +278,7 @@ Paths are relative to `Alfie/AlfieKit/Sources/` unless they start with `Alfie/`.
 | Service protocol | `Model/Services/<Feature>/` |
 | GraphQL operations and fragments | `BFFGraph/CodeGen/Queries/<Feature>/Queries.graphql`, `Fragments/` beside it; then `run-apollo-codegen.sh` (see `GraphQL.md`) |
 | Converters | `Core/Services/BFFService/Converters/<Feature>+Converter.swift` |
-| Service implementation | `Core/Services/<Feature>/` |
+| Service implementation | `Core/Services/API/<Feature>/` when BFF-backed, otherwise `Core/Services/<Feature>/` |
 | Service registration | `Alfie/Alfie/Service/ServiceProvider.swift` |
 | Feature module | `<Feature>/`, laid out as above |
 | Mock ViewModel | `Mocks/Core/Features/Mock<Feature>ViewModel.swift` |

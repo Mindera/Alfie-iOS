@@ -90,8 +90,7 @@ plus credentials or secrets committed in code.
 - GraphQL queries without fragments
 - Missing localization translations
 
-**Security**: no API keys/tokens/passwords in code, Keychain rather than UserDefaults for sensitive
-data, no PII in logs, input validation on deep links.
+**Security**: `CODING_STANDARDS.md` §Security lists what blocks merge and what is fixed before it.
 
 ## Security & Sensitive Files
 
