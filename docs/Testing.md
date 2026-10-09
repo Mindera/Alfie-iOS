@@ -70,7 +70,7 @@ checked against the diff.
 | Comment out, delete or placeholder (`XCTAssertTrue(true)`) a failing test | Fix it, or `XCTSkip("reason")` with a linked issue |
 | Chase a coverage number | Cover the behaviours that would hurt if they broke |
 | Set an `accuracy:` looser than the maths needs, or widen one so a failing test goes quiet | Use the tightest value that passes, and name the constant when it budgets something physical. A loose tolerance **blocks the review** — see §Tolerances |
-| Loosen snapshot `precision` to absorb a diff | Re-record the reference (`Docs/SnapshotTesting.md`) |
+| Loosen snapshot `precision` to absorb a diff | Re-record the reference (`docs/SnapshotTesting.md`) |
 | Assert screen *content* through a snapshot | Snapshot the layout; unit-test the content |
 | Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan`; `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone |
 
@@ -147,7 +147,7 @@ puts it in nearly every module, so anything added there ships in the app binary.
 ## Snapshot Testing
 
 Snapshot tests live in the module test targets and run as part of `verify.sh`. See
-`Docs/SnapshotTesting.md` for the device/OS pin, the precision policy, and the record loop.
+`docs/SnapshotTesting.md` for the device/OS pin, the precision policy, and the record loop.
 
 ## Code Coverage
 

@@ -27,8 +27,8 @@ Use these status markers in your spec:
 ## File Organization
 
 Specs live in `Features/`, one file per feature, named `<FeatureName>.md`. `TEMPLATE.md` is the
-starting point (`ls Docs/Specs/Features/` for what exists today).
+starting point (`ls docs/Specs/Features/` for what exists today).
 
 ## See also
 
-See `AGENTS.md` for the critical rules, and `Docs/Development.md` for the spec-to-implementation loop.
+See `AGENTS.md` for the critical rules, and `docs/Development.md` for the spec-to-implementation loop.

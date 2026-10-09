@@ -19,10 +19,10 @@ one read-only query.
 
 The central design decision is that Alfie **prints its own Alfie code**, a QR code that already
 contains the Handle, and prefers it over anything else on the tag. See
-`Docs/adr/0001-print-our-own-alfie-code.md`. The **Barcode** a Swing tag prints is also resolved,
+`docs/adr/0001-print-our-own-alfie-code.md`. The **Barcode** a Swing tag prints is also resolved,
 through the BFF's `productByBarcode` query (Alfie-BFF PR #46), but only on SCAYLE: the Shopify
 Storefront API has no `barcode:` filter, and reaching Shopify's Admin API would mean provisioning an
-Admin-scoped token for a customer-facing service. See `Docs/adr/0002-resolve-barcodes-through-the-bff-on-scayle.md`,
+Admin-scoped token for a customer-facing service. See `docs/adr/0002-resolve-barcodes-through-the-bff-on-scayle.md`,
 which partly supersedes ADR-0001.
 
 ---
@@ -537,7 +537,7 @@ The developer will verify the camera path manually on device.
   tells retailers to encode a Variant's **reference key** in in-store barcodes, and `productByBarcode`
   filters on the `ean` attribute only. A production scan could therefore miss for a reason that
   looks identical to absent data. `/v2/search/resolve` matches either and is reachable on the token
-  the BFF already holds; see `Docs/Research/scayle-barcode-handling.md`.
+  the BFF already holds; see `docs/Research/scayle-barcode-handling.md`.
 - **The printed URL does not resolve in a browser.** It points at `localhost:4000`, which is the
   configured host. Scanning an Alfie code with the iOS Camera app will not open Alfie.
 - **The shopper must already have Alfie installed.** No App Clip, no universal links.

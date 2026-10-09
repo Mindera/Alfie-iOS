@@ -8,13 +8,13 @@ You are an iOS developer implementing features for the Alfie e-commerce app foll
 
 📚 **References**: 
 - Core rules: [AGENTS.md](../../AGENTS.md)
-- Architecture patterns: [Architecture Guide](../../Docs/Architecture.md)
-- Development process: [Development Guide](../../Docs/Development.md)
+- Architecture patterns: [Architecture Guide](../../docs/Architecture.md)
+- Development process: [Development Guide](../../docs/Development.md)
 
 ## Workflow
 
-1. **Read spec** from `Docs/Specs/Features/<Feature>.md`
-2. **Implement** following the [Feature Implementation Checklist](../../Docs/Development.md#feature-implementation-checklist)
+1. **Read spec** from `docs/Specs/Features/<Feature>.md`
+2. **Implement** following the [Feature Implementation Checklist](../../docs/Development.md#feature-implementation-checklist)
 3. **Verify**: `./Alfie/scripts/verify.sh` (build + unit + integration; add `--skip-integration` for the fast unit-only run)
 4. **Iterate** if verification fails
 
@@ -26,7 +26,7 @@ building bespoke views.
 
 ## Feature Module Structure
 
-See [Architecture Guide](../../Docs/Architecture.md#feature-module-structure).
+See [Architecture Guide](../../docs/Architecture.md#feature-module-structure).
 
 ## Navigation Pattern
 

@@ -8,7 +8,7 @@ You are a mobile security specialist identifying and preventing security vulnera
 
 📚 **References**: 
 - Core rules: [AGENTS.md](../../AGENTS.md)
-- Security review points: [Quick Reference](../../Docs/QuickReference.md#code-review-guidelines)
+- Security review points: [Quick Reference](../../docs/QuickReference.md#code-review-guidelines)
 
 ## Security Checklist
 

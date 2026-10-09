@@ -9,14 +9,14 @@ https://github.com/user-attachments/assets/864d30fa-7172-4900-94d0-ee928192b793
 ## Prerequisites
 
 1. This project contains sensitive files encrypted using `git-secret`. Before starting, you must decrypt them locally to build the project. To do this, request the **public and private GPG keys** from the team. See [this section](#sensitive-files) for details.
-2. This project fetches data from the **Alfie-BFF** GraphQL API, run locally on `localhost:3000`. See [`Docs/GraphQL.md`](Docs/GraphQL.md) for the local loop.
+2. This project fetches data from the **Alfie-BFF** GraphQL API, run locally on `localhost:3000`. See [`docs/GraphQL.md`](docs/GraphQL.md) for the local loop.
 
 ## Architecture
 
 MVVM with flow-based navigation, in Swift Package modules under `Alfie/AlfieKit/`. Each feature
 module owns its Views, ViewModels, DependencyContainers and Navigation (FlowViewModel + Route).
 
-See [`Docs/Architecture.md`](Docs/Architecture.md) for the layer-by-layer patterns, the module
+See [`docs/Architecture.md`](docs/Architecture.md) for the layer-by-layer patterns, the module
 graph, and the service/dependency-injection rules.
 
 ---
@@ -187,7 +187,7 @@ For more information about SPM plugins, see the official [documentation](https:/
 
 This project uses GraphQL to fetch data from the BFF API. The schema is **owned by the BFF** and synced into this repo (committed at `Alfie/AlfieKit/Sources/BFFGraph/CodeGen/Schema/schema.graphqls`), so codegen and builds stay self-contained.
 
-For the BFF integration workflow, see [`Docs/GraphQL.md`](Docs/GraphQL.md):
+For the BFF integration workflow, see [`docs/GraphQL.md`](docs/GraphQL.md):
 
 - **Running the app against a local BFF** — starting the BFF, pointing the app at it
 - **Syncing the BFF schema** — `Alfie/scripts/sync-bff-schema.sh`

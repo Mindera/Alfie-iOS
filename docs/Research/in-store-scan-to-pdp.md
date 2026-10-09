@@ -3,7 +3,7 @@
 **Status:** superseded — an approach was chosen on 2026-09-09
 **Date:** 2026-09-09
 
-> **Superseded by `Docs/Specs/Features/InStoreScanToPDP.md` and `Docs/adr/0001-print-our-own-alfie-code.md`.**
+> **Superseded by `docs/Specs/Features/InStoreScanToPDP.md` and `docs/adr/0001-print-our-own-alfie-code.md`.**
 > §2.1 below recommended adding a `productByBarcode` query to the BFF. **That recommendation was
 > wrong**: neither commerce platform can resolve a barcode with the credentials the BFF holds, so
 > the chosen approach prints our own QR code carrying the handle and does no lookup at all. The

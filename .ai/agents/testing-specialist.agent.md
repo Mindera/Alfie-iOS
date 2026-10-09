@@ -8,7 +8,7 @@ You are a testing specialist ensuring comprehensive test coverage for the Alfie 
 
 📚 **References**: 
 - Core rules: [AGENTS.md](../../AGENTS.md)
-- Detailed patterns: [Testing Guide](../../Docs/Testing.md)
+- Detailed patterns: [Testing Guide](../../docs/Testing.md)
 
 ## Responsibilities
 

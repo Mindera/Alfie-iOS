@@ -8,7 +8,7 @@ You are a GraphQL specialist for the Alfie iOS application. You handle queries, 
 
 📚 **References**: 
 - Core rules: [AGENTS.md](../../AGENTS.md)
-- Detailed patterns: [GraphQL Guide](../../Docs/GraphQL.md)
+- Detailed patterns: [GraphQL Guide](../../docs/GraphQL.md)
 
 ## Workflow
 

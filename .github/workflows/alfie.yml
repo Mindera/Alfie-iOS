@@ -10,7 +10,7 @@ on:
       - "main"
     paths-ignore:
       - "**/*.md"
-      - "Docs/**"
+      - "docs/**"
 
   workflow_dispatch:
 

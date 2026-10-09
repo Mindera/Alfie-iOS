@@ -17,7 +17,7 @@
 - Use `L10n` for every user-facing string (keys live in `L10n.xcstrings`)
 - Define a protocol for every ViewModel, so it can be mocked
 - Route all navigation through `FlowViewModel` closures passed into the `ViewModel`
-- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier (see `Docs/Accessibility.md`)
+- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier (see `docs/Accessibility.md`)
 - Reach for existing `SharedUI` components before writing a new view
 - Invoke `/swiftui-specialist` when writing or reviewing SwiftUI; gate its API suggestions on this project's deployment target (`@Observable` and `@Entry` don't qualify today) and let the MVVM rules here win on conflict
 - Run `./Alfie/scripts/verify.sh` after every code change, and finish on a pass
@@ -46,7 +46,7 @@ the fast unit-only loop. Only mark work complete after **"✅ FULL VERIFICATION 
 **"✅ VERIFICATION PASSED (... integration skipped)"** when skipped).
 
 An unfiltered run leaves a coverage bundle at `/tmp/alfie_test.xcresult`, with a sidecar recording
-which commit it describes — see `Docs/Testing.md` §Code Coverage before reading it.
+which commit it describes — see `docs/Testing.md` §Code Coverage before reading it.
 
 ---
 
@@ -56,18 +56,18 @@ Read the guide when its trigger fires:
 
 | Read | When |
 |---|---|
-| `Docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module |
-| `Docs/Development.md` | Starting a feature from a spec |
-| `Docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
-| `Docs/Localization.md` | Adding or renaming an `L10n` key |
-| `Docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures |
-| `Docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
-| `Docs/Accessibility.md` | Adding UI that a UI test will target |
-| `Docs/DesignTokens.md` | Picking a colour, spacing, radius or type value; refreshing tokens |
-| `Docs/Iconography.md` | Adding or re-mapping an icon |
-| `Docs/CodeStyle.md` | Naming and formatting questions |
-| `Docs/QuickReference.md` | Commands, directory layout, dependency versions |
-| `Docs/Specs/TEMPLATE.md` | Writing a new feature spec |
+| `docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module |
+| `docs/Development.md` | Starting a feature from a spec |
+| `docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
+| `docs/Localization.md` | Adding or renaming an `L10n` key |
+| `docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures |
+| `docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
+| `docs/Accessibility.md` | Adding UI that a UI test will target |
+| `docs/DesignTokens.md` | Picking a colour, spacing, radius or type value; refreshing tokens |
+| `docs/Iconography.md` | Adding or re-mapping an icon |
+| `docs/CodeStyle.md` | Naming and formatting questions |
+| `docs/QuickReference.md` | Commands, directory layout, dependency versions |
+| `docs/Specs/TEMPLATE.md` | Writing a new feature spec |
 
 ---
 
@@ -75,9 +75,9 @@ Read the guide when its trigger fires:
 
 | Topic | Guide |
 |---|---|
-| Jira (`ALFMOB`) for team tickets, GitHub Issues for agent-generated work | `Docs/agents/issue-tracker.md` |
-| The five canonical triage labels, applied on GitHub Issues | `Docs/agents/triage-labels.md` |
-| Domain vocabulary and ADRs (single-context repo; both created lazily) | `Docs/agents/domain.md` |
+| Jira (`ALFMOB`) for team tickets, GitHub Issues for agent-generated work | `docs/agents/issue-tracker.md` |
+| The five canonical triage labels, applied on GitHub Issues | `docs/agents/triage-labels.md` |
+| Domain vocabulary and ADRs (single-context repo; both created lazily) | `docs/agents/domain.md` |
 
 ## Agent definitions
 

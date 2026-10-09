@@ -4,9 +4,9 @@
 
 ### Phase 1: Write the Spec First
 
-Create a comprehensive spec document in `Docs/Specs/Features/<FeatureName>.md`.
+Create a comprehensive spec document in `docs/Specs/Features/<FeatureName>.md`.
 
-`Docs/Specs/TEMPLATE.md` defines the required sections — its headings are the checklist.
+`docs/Specs/TEMPLATE.md` defines the required sections — its headings are the checklist.
 
 ### Phase 2: Break Down Into Tasks
 
@@ -28,7 +28,7 @@ Tackle tasks **one by one**, following the implementation checklist below.
 
 Use this checklist for systematic feature implementation:
 
-1. ✅ **Create Spec Document** in `Docs/Specs/Features/<Feature>.md`
+1. ✅ **Create Spec Document** in `docs/Specs/Features/<Feature>.md`
 2. ✅ **Define Domain Models** in `Alfie/AlfieKit/Sources/Model/Models/<Feature>/`
 3. ✅ **Create Service Protocol** in `Alfie/AlfieKit/Sources/Model/Services/<Feature>/`
 4. ✅ **Add GraphQL Query** (if API needed):

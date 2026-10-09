@@ -8,7 +8,7 @@ You are the Feature Orchestrator for the Alfie iOS application. You coordinate s
 
 📚 **References**: 
 - Core rules: [AGENTS.md](../../AGENTS.md)
-- Development process: [Development Guide](../../Docs/Development.md)
+- Development process: [Development Guide](../../docs/Development.md)
 
 ## Your Role
 
@@ -22,7 +22,7 @@ You are the Feature Orchestrator for the Alfie iOS application. You coordinate s
 
 | Phase | Agent | Output |
 |-------|-------|--------|
-| 1. Specification | `spec-writer` | `Docs/Specs/Features/<Feature>.md` |
+| 1. Specification | `spec-writer` | `docs/Specs/Features/<Feature>.md` |
 | 2. Security Review | `security-specialist` | Security requirements |
 | 3. GraphQL Layer | `graphql-specialist` | Queries, fragments, converters |
 | 4. Localization | `localization-specialist` | L10n.xcstrings entries |
@@ -66,7 +66,7 @@ Business goal: [Why building this]
 ### Phase 3: GraphQL
 ```
 @graphql-specialist Implement GraphQL layer for [Feature Name].
-Spec: Docs/Specs/Features/<Feature>.md
+Spec: docs/Specs/Features/<Feature>.md
 ```
 
 ### Phase 4: Localization
@@ -78,14 +78,14 @@ Keys needed: [list from spec]
 ### Phase 5: Implementation
 ```
 @feature-developer Implement [Feature Name].
-Spec: Docs/Specs/Features/<Feature>.md
+Spec: docs/Specs/Features/<Feature>.md
 Prerequisites complete: ✅ GraphQL, ✅ L10n
 ```
 
 ### Phase 6: Testing
 ```
 @testing-specialist Write tests for [Feature Name].
-Spec: Docs/Specs/Features/<Feature>.md (Testing Strategy section)
+Spec: docs/Specs/Features/<Feature>.md (Testing Strategy section)
 ```
 
 ### Phase 7: Security Audit
@@ -157,5 +157,5 @@ Legend: ✅ Complete | 🔄 In Progress | ⬜ Not Started
 ## References
 
 - [AGENTS.md](../../AGENTS.md) - Core rules and project overview
-- [Development Guide](../../Docs/Development.md) - Feature implementation checklist
-- [Spec Template](../../Docs/Specs/TEMPLATE.md) - Feature specification template
+- [Development Guide](../../docs/Development.md) - Feature implementation checklist
+- [Spec Template](../../docs/Specs/TEMPLATE.md) - Feature specification template

@@ -6,11 +6,11 @@ tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'todo']
 
 You are a spec writer creating detailed feature specifications for the Alfie iOS application.
 
-📚 **Reference**: Use [Docs/Specs/TEMPLATE.md](../../Docs/Specs/TEMPLATE.md) as the structure template.
+📚 **Reference**: Use [docs/Specs/TEMPLATE.md](../../docs/Specs/TEMPLATE.md) as the structure template.
 
 ## Output Location
 
-`Docs/Specs/Features/<Feature>.md`
+`docs/Specs/Features/<Feature>.md`
 
 ## Required Sections
 

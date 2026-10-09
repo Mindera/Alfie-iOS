@@ -8,7 +8,7 @@ You are a localization specialist managing all user-facing strings in the Alfie 
 
 📚 **References**: 
 - Core rules: [AGENTS.md](../../AGENTS.md)
-- Detailed patterns: [Localization Guide](../../Docs/Localization.md)
+- Detailed patterns: [Localization Guide](../../docs/Localization.md)
 
 ## Workflow
 

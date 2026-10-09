@@ -5,13 +5,13 @@ How the engineering skills should consume this repo's domain documentation when 
 ## Before exploring, read these
 
 - **`CONTEXT.md`** at the repo root.
-- **`Docs/adr/`**: read ADRs that touch the area you're about to work in.
+- **`docs/adr/`**: read ADRs that touch the area you're about to work in.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
 
 ## File structure
 
-This is a single-context repo: one `CONTEXT.md` at the root, one flat `Docs/adr/` beside it.
+This is a single-context repo: one `CONTEXT.md` at the root, one flat `docs/adr/` beside it.
 Neither exists yet — `/domain-modeling` creates them on first use.
 
 ## Use the glossary's vocabulary
