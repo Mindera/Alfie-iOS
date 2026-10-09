@@ -129,6 +129,7 @@ final class HomeFlowViewModelTests: XCTestCase {
             homeDependencyContainer: HomeDependencyContainer(
                 configurationService: serviceProvider.configurationService,
                 apiEndpointService: serviceProvider.apiEndpointService,
+                bffApiKeyService: serviceProvider.bffApiKeyService,
                 sessionService: serviceProvider.sessionService
             ),
             myAccountDependencyContainer: MyAccountDependencyContainer(

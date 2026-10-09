@@ -19,6 +19,14 @@ public enum ApiEndpointOption: CaseIterable, Hashable, RawRepresentable {
         }
     }
 
+    public var customUrl: URL? {
+        guard case .custom(let url) = self else {
+            return nil
+        }
+
+        return url
+    }
+
     public static var allCases: [ApiEndpointOption] {
         [.dev, .preProd, .prod, .custom(url: nil)]
     }
@@ -40,6 +48,7 @@ public enum ApiEndpointOption: CaseIterable, Hashable, RawRepresentable {
 
 public protocol ApiEndpointServiceProtocol {
     var currentApiEndpoint: ApiEndpointOption { get }
+    var lastCustomApiEndpoint: URL? { get }
 
     func updateApiEndpointAndReboot(_ option: ApiEndpointOption)
     func apiEndpoint(for option: ApiEndpointOption) -> URL

@@ -17,12 +17,22 @@ final class RequestLogInterceptor: ApolloInterceptor {
         response: HTTPResponse<Operation>?,
         completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
     ) {
-        log.debug("[GraphQL] Outgoing request: \(request)")
+        log.debug("[GraphQL] Outgoing request: \(request.descriptionRedactingAuthorization)")
         chain.proceedAsync(
             request: request,
             response: response,
             interceptor: self,
             completion: completion
         )
+    }
+}
+
+private extension HTTPRequest {
+    var descriptionRedactingAuthorization: String {
+        guard let authorization = additionalHeaders["Authorization"] else {
+            return debugDescription
+        }
+
+        return debugDescription.replacingOccurrences(of: authorization, with: "<redacted>")
     }
 }
