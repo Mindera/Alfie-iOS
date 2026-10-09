@@ -58,7 +58,7 @@ Read the guide when its trigger fires:
 |---|---|
 | `Docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module |
 | `Docs/Development.md` | Starting a feature from a spec |
-| `Docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
+| `Docs/GraphQL.md` | Touching `.graphql` files, after a BFF schema change, or a physical iPhone can't reach the Mac's BFF |
 | `Docs/Localization.md` | Adding or renaming an `L10n` key |
 | `Docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures |
 | `Docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
