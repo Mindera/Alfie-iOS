@@ -7,31 +7,31 @@ Alfie/
 ├── Alfie/                          # Main app target (minimal code)
 │   ├── Views/                      # App-specific views (Info only)
 │   ├── Service/                    # ServiceProvider
-│   ├── Delegate/                   # AppDelegate
+│   ├── Delegate/
 │   └── Configuration/              # App config, URLs, sensitive files
-├── AlfieKit/                       # Swift Package (feature modules)
-│   ├── Sources/
-│   │   ├── AccessibilityIdentifiers/ # AccessibilityID enums for UI tests
+├── AlfieKit/                       # Swift Package
+│   ├── Sources/                    # One folder per module; feature modules are unlabelled below
+│   │   ├── AccessibilityIdentifiers/
 │   │   ├── AppFeature/             # App shell, tab bar, root navigation
 │   │   ├── BFFGraph/               # GraphQL (queries, schema, codegen)
-│   │   ├── Bag/                    # Bag feature module
-│   │   ├── CategorySelector/       # Shop tab feature module
-│   │   ├── Core/                   # Core services layer
-│   │   ├── DebugMenu/              # Debug menu (DEBUG only)
-│   │   ├── DeepLink/               # Deep linking
-│   │   ├── Home/                   # Home feature module
-│   │   ├── Mocks/                  # Test mocks
+│   │   ├── Bag/
+│   │   ├── CategorySelector/       # Shop tab
+│   │   ├── Core/                   # Services layer
+│   │   ├── DebugMenu/              # DEBUG only
+│   │   ├── DeepLink/
+│   │   ├── Home/
+│   │   ├── Mocks/                  # Mocks and fixtures; a production target
 │   │   ├── Model/                  # Domain models, protocols
-│   │   ├── MyAccount/              # Account feature module
-│   │   ├── ProductDetails/         # Product details feature module
-│   │   ├── ProductListing/         # Product listing feature module
-│   │   ├── Scanner/                # Scan feature module (Alfie code on a swing tag)
-│   │   ├── Search/                 # Search feature module
+│   │   ├── MyAccount/
+│   │   ├── ProductDetails/
+│   │   ├── ProductListing/
+│   │   ├── Scanner/
+│   │   ├── Search/
 │   │   ├── SharedUI/               # Localization, theme, components
-│   │   ├── TestUtils/              # Test helpers
-│   │   ├── Utils/                  # Utilities
-│   │   ├── Web/                    # WebView feature module
-│   │   └── Wishlist/               # Wishlist feature module
+│   │   ├── TestUtils/
+│   │   ├── Utils/
+│   │   ├── Web/
+│   │   └── Wishlist/
 │   └── Tests/                      # Unit tests, one target per module
 └── scripts/                        # verify/build/test, Apollo codegen, design-token pipeline
 
@@ -41,13 +41,9 @@ Tools/                              # Standalone SwiftPM tools, outside the Alfi
 
 ## Common Commands
 
+Build and test commands are in `CLAUDE.md` §Verification.
+
 ```bash
-# Full verification (build + unit + integration) - run once before calling work done
-./Alfie/scripts/verify.sh
-
-# Fast unit-only run (no local BFF / Node needed)
-./Alfie/scripts/verify.sh --skip-integration
-
 # Integration tests only (boots a local BFF, runs them, tears it down)
 ./Alfie/scripts/run-integration-tests.sh
 
@@ -79,19 +75,6 @@ swift package --allow-writing-to-package-directory generate-code-for-resources
 - **SwiftGen**: Code generation for resources (Mindera fork)
 - **swift-snapshot-testing**: Snapshot tests
 
-## Code Review Guidelines
-
-**Block merge** on any violation of the ✅ ALWAYS / ❌ NEVER lists in `CLAUDE.md` §Critical Rules,
-plus credentials or secrets committed in code.
-
-**High priority** (fix before merge, not a hard block):
-
-- Missing tests for ViewModels
-- GraphQL queries without fragments
-- Missing localization translations
-
-**Security**: `CODING_STANDARDS.md` §Security lists what blocks merge and what is fixed before it.
-
 ## Security & Sensitive Files
 
 ### git-secret
@@ -111,8 +94,6 @@ git rm --cached path-to-sensitive-file
 git secret add path-to-sensitive-file
 git secret hide
 ```
-
-**Never commit unencrypted sensitive files.**
 
 ## Additional Context
 

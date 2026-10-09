@@ -7,8 +7,7 @@ GitHub issues derived from a Jira ticket. Use the `gh` CLI for all GitHub operat
 
 1. A Jira ticket `ALFMOB-<id>` exists first.
 2. Grill it (`/grill-with-docs`), then publish the spec and tickets as GitHub issues.
-3. Each derived issue's body starts with `Jira: ALFMOB-<id>`.
-4. Branch: `feat/ALFMOB-<id>-<slug>`. Work with no Jira ticket: `feat/gh-<n>-<slug>`, where `<n>` is
+3. Branch: `feat/ALFMOB-<id>-<slug>`. Work with no Jira ticket: `feat/gh-<n>-<slug>`, where `<n>` is
    the GitHub issue number.
 
 ## Jira
@@ -22,8 +21,6 @@ deferred: load them with `ToolSearch` first.
 - **Read a ticket**: `getJiraIssue` with `issueIdOrKey: "ALFMOB-<id>"`,
   `responseContentFormat: "markdown"`; add `comment` to `fields` for the discussion.
 - **Search**: `searchJiraIssuesUsingJql`, e.g. `project = ALFMOB AND status != Done ORDER BY updated DESC`.
-
-Triage labels are never applied in Jira; see `triage-labels.md`.
 
 ## Conventions
 

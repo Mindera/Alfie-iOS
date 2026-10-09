@@ -19,8 +19,8 @@ stale against it.
   source of truth in the view.
 - **A persisted mirror for offline reads.** Rejected. It brings back the local source of truth this
   design removes, and goes stale against a Cart other surfaces can change.
-- **Each caller fetches its own Cart.** Rejected. Two client-side copies drifting apart is the
-  failure a server-side quantity field would not have fixed.
+- **Each caller fetches its own Cart.** Rejected. The Bag screen and the Bag badge would hold
+  copies that drift apart.
 - **Migrate the old local bag.** Rejected. The app was unreleased, so no shopper had one.
 
 ## Consequences
@@ -34,8 +34,11 @@ stale against it.
   and a read sent before a write can publish the older Cart after it.
 - A failed quantity update re-reads the Cart: BigCommerce applies an update Line by Line and can
   fail with earlier Lines committed.
-- Mutations are excluded from the retry interceptor and the Apollo cache. A retried add would add
-  the Line twice.
+- Mutations are excluded from the retry interceptor and the Apollo cache. A retried add would
+  raise the Line's quantity twice.
+- The BFF bounds a Cart at 50 Lines and a Line at quantity 1–100, and neither bound knows stock:
+  an over-order fails at the platform as a `BAD_REQUEST`. The app surfaces the rejection rather
+  than enforcing the bounds itself.
 - The Bag badge is summed on the client from the Cart's Lines; the BFF has no total-quantity field
   and needs none.
 - An empty Bag is not a state of its own: no Cart and a Cart with no Lines render the same.

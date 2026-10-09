@@ -17,7 +17,7 @@
 - Use `L10n` for every user-facing string (keys live in `L10n.xcstrings`)
 - Define a protocol for every ViewModel, so it can be mocked
 - Route all navigation through `FlowViewModel` closures passed into the `ViewModel`
-- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier (see `docs/Accessibility.md`)
+- Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier
 - Reach for existing `SharedUI` components before writing a new view
 - Invoke `/swiftui-specialist` when writing or reviewing SwiftUI; gate its API suggestions on this project's deployment target (`@Observable` and `@Entry` don't qualify today) and let the MVVM rules here win on conflict
 - Finish every code change on a passing `./Alfie/scripts/verify.sh` (cadence in §Verification)
@@ -28,55 +28,45 @@
 |---|---|
 | Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh` |
 | Call `fatalError` | Call `queuedFatalError` |
-| Edit `Alfie.xcodeproj/project.pbxproj` | Ask the user to add the file through Xcode |
-| Commit sensitive files unencrypted | `git secret add` then `git secret hide` |
+| Edit `Alfie.xcodeproj/project.pbxproj` (only a new file under `Alfie/Alfie/` needs it) | Ask the user to add the file through Xcode (`docs/Architecture.md` §Files That Need Xcode) |
+| Commit sensitive files unencrypted | Follow `docs/QuickReference.md` §Adding Sensitive Files (`git secret`) |
 
 ---
 
 ## Verification
 
-```bash
-./Alfie/scripts/verify.sh                     # build + unit + integration (boots a local BFF)
-./Alfie/scripts/verify.sh --skip-integration  # build + unit only (fast, no BFF/Node needed)
-```
-
-By default this runs build + unit tests (mocked BFF) + integration tests against a real local BFF
-(see `run-integration-tests.sh`, needs Node + the `Alfie-BFF` repo). Use `--skip-integration` for
-the fast unit-only loop. Only mark work complete after **"✅ FULL VERIFICATION PASSED"** (or
-**"✅ VERIFICATION PASSED (... integration skipped)"** when skipped).
-
-When a skill names a check, run this one:
-
-| Skill says | Run | When |
+| Check | Run | When |
 |---|---|---|
 | Typecheck | `./Alfie/scripts/build-for-verification.sh` | While editing |
 | A single test file | `./Alfie/scripts/verify.sh --skip-integration --filter <Target>[/<Class>]` | After each slice |
 | The full test suite | `./Alfie/scripts/verify.sh` | Once, before calling the work done |
 
+`verify.sh` runs build + unit tests (mocked BFF) + integration tests against a local BFF it boots
+itself, which needs Node and the `Alfie-BFF` repo beside this one; from a worktree, point
+`ALFIE_BFF_PATH` at it. `--skip-integration` drops the integration stage.
+
+Done means the output ends **"✅ FULL VERIFICATION PASSED"**, or
+**"✅ VERIFICATION PASSED (... integration skipped)"** when skipped.
+
 Run one verification at a time: the scripts write to fixed `/tmp/alfie_*` paths, so parallel runs
 (including from another worktree) clobber each other.
-
-An unfiltered run leaves a coverage bundle at `/tmp/alfie_test.xcresult`, with a sidecar recording
-which commit it describes — see `docs/Testing.md` §Code Coverage before reading it.
 
 ---
 
 ## Detailed Documentation
-
-Read the guide when its trigger fires:
 
 | Read | When |
 |---|---|
 | `docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module; deciding where a new file goes |
 | `docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
 | `docs/Localization.md` | Adding or renaming an `L10n` key |
-| `docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures |
+| `docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures; reading coverage from `/tmp/alfie_test.xcresult` |
 | `docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
 | `docs/Accessibility.md` | Adding UI that a UI test will target |
 | `docs/DesignTokens.md` | Picking a colour, spacing, radius or type value; refreshing tokens |
 | `docs/Iconography.md` | Adding or re-mapping an icon |
-| `docs/CodeStyle.md` | Naming and formatting questions |
-| `docs/QuickReference.md` | Commands, directory layout, dependency versions |
+| `docs/CodeStyle.md` | Naming a type or file; writing a `#Preview` or async call |
+| `docs/QuickReference.md` | Adding a sensitive file; running codegen or setup commands |
 
 ---
 
@@ -96,8 +86,12 @@ Single-context: `GLOSSARY.md` at the root, ADRs in `docs/adr/`. See `docs/agents
 
 ### Coding standards
 
-`CODING_STANDARDS.md` at the root indexes every guide that says how code is written here.
+Reviewing a diff: check it against `CODING_STANDARDS.md` at the root, the index of every guide plus the review and security rules.
 
 ### Prototypes
 
-A UI prototype is a `#if DEBUG` Debug Menu screen, a logic prototype is Swift; both live on a `prototype/<name>` branch. See `docs/agents/prototype.md`.
+Before `/prototype` builds anything, read `docs/agents/prototype.md`: it replaces the skill's web artifacts with a Debug Menu screen or a Swift script.
+
+### Research
+
+A `/research` note lives on a pushed `research/<name>` branch with a pointer on the issue that asked for it, never on `main` (ADR-0005).

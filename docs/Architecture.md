@@ -276,22 +276,23 @@ Paths are relative to `Alfie/AlfieKit/Sources/` unless they start with `Alfie/`.
 |---|---|
 | Domain models | `Model/Models/<Feature>/` |
 | Service protocol | `Model/Services/<Feature>/` |
-| GraphQL operations and fragments | `BFFGraph/CodeGen/Queries/<Feature>/Queries.graphql`, `Fragments/` beside it; then `run-apollo-codegen.sh` (see `GraphQL.md`) |
+| GraphQL operations and fragments | `BFFGraph/CodeGen/Queries/<Feature>/` (file layout and codegen in `GraphQL.md`) |
 | Converters | `Core/Services/BFFService/Converters/<Feature>+Converter.swift` |
 | Service implementation | `Core/Services/API/<Feature>/` when BFF-backed, otherwise `Core/Services/<Feature>/` |
 | Service registration | `Alfie/Alfie/Service/ServiceProvider.swift` |
 | Feature module | `<Feature>/`, laid out as above |
 | Mock ViewModel | `Mocks/Core/Features/Mock<Feature>ViewModel.swift` |
 | Target and product | `Alfie/AlfieKit/Package.swift` |
+| Tests | `Alfie/AlfieKit/Tests/<Feature>Tests/`; a new test target also goes in `Package.swift` and `Alfie/Alfie/Alfie.xctestplan` |
 | Route | A case on the parent feature's `Route` enum |
-| Strings | `L10n.xcstrings` (see `Localization.md`) |
+| Strings | `SharedUI/Resources/Localization/L10n.xcstrings` (see `Localization.md`) |
 
 ### Files That Need Xcode
 
 Everything under `AlfieKit/Sources/` and `AlfieKit/Tests/` is a Swift package and is picked up
 automatically, as are `.graphql` files. A new `.swift` file under `Alfie/Alfie/` (the app target) is
 not: `project.pbxproj` is never edited by hand, so ask the user to add it in Xcode (Add Files to
-"Alfie"…, with the `Alfie` target ticked), then verify.
+"Alfie"…, with the `Alfie` target ticked), then run `verify.sh`.
 
 ### Module Dependencies
 

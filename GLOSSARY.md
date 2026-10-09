@@ -32,7 +32,7 @@ colour and size a shopper arrives on.
 The card attached to a garment in store, carrying its printed identifiers.
 
 **Barcode**:
-The machine-readable number already printed on a Swing tag (EAN-13 or UPC-A). Issued by the
+The machine-readable number already printed on a Swing tag (as an EAN-13, UPC-A or Code 128 symbol). Issued by the
 manufacturer, it holds only digits and cannot carry a Handle, so it is resolved through the
 catalogue (SCAYLE only). It usually identifies one Variant; when several Variants share it, it
 resolves to the Product alone and no colour or size is preselected.

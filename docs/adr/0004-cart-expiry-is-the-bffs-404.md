@@ -29,9 +29,14 @@ the app owns creation, and the create call carries that first Line.
 
 - A 404 on add is not shown to the shopper: discard the id, create a Cart with the same Line,
   report success. On Shopify the BFF currently answers an unknown Cart on add and update with a
-  400, so this recovery is unreachable there until #155 is settled.
+  400, so this recovery is unreachable there until Alfie-iOS #155 is settled.
 - A 404 on read discards the id, renders an empty Bag and creates nothing.
-- A 404 on remove is shown to the shopper and the id is kept: that removal did not happen.
+- A 404 on a Bag removal is shown to the shopper and the id is kept: that removal did not happen.
+- A 404 on a quantity change, the PDP's change to zero included, is shown to the shopper too, but
+  the re-read that follows a failed change meets the same 404, so the id is discarded and the Bag
+  empties.
+- Removing the last Line on BigCommerce destroys the Cart: the BFF returns an empty Cart whose id
+  is already dead, and the next operation meets the 404 above.
 - A malformed id surfaces as a 500 and never self-heals. Unreachable in practice, since the only
   ids stored are ones the server issued.
 - Sign-out drops the id so a shared device does not hand the next shopper the previous Bag. When
