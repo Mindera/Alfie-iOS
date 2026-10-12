@@ -75,6 +75,21 @@ final class MutationInterceptorChainTests: XCTestCase {
         XCTAssertTrue(chain.contains { $0 is CacheWriteInterceptor })
     }
 
+    // MARK: - Authorization
+
+    func test_the_api_key_is_attached_before_the_request_is_sent() throws {
+        let chain = makeProvider().interceptors(for: BFFGraphAPI.ProductListQuery(
+            collectionHandle: "test",
+            after: .none,
+            limit: 1,
+            filters: .none
+        ))
+
+        let authorization = try XCTUnwrap(chain.firstIndex { $0 is AuthorizationInterceptor })
+        let fetch = try XCTUnwrap(chain.firstIndex { $0 is NetworkFetchInterceptor })
+        XCTAssertLessThan(authorization, fetch)
+    }
+
     // MARK: - Helpers
 
     private func makeProvider() -> NetworkInterceptorProvider {

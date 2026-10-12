@@ -324,6 +324,34 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertTrue(sut.isSaveDisabled)
     }
 
+    func test_a_custom_url_equal_to_a_preset_is_rejected_and_saves_nothing() throws {
+        let devUrl = try XCTUnwrap(URL(string: "http://localhost:3000/"))
+        mockEndpointService.currentApiEndpoint = .dev
+        mockEndpointService.onApiEndpointForOptionCalled = { _ in devUrl }
+        var savedOption: ApiEndpointOption?
+        mockEndpointService.onUpdateApiEndpointAndRebootCalled = { savedOption = $0 }
+        sut = makeSut()
+        sut.selectedEndpointOption = .custom(url: nil)
+        sut.bffApiKey = "abc-123"
+
+        sut.didTapSave()
+
+        XCTAssertEqual(sut.urlError, .matchesPreset)
+        XCTAssertFalse(sut.shouldShowSuccess)
+        XCTAssertNil(savedOption)
+        XCTAssertNil(mockApiKeyService.storedApiKey)
+    }
+
+    func test_an_unparseable_custom_url_reports_an_invalid_url() {
+        sut = makeSut()
+        sut.selectedEndpointOption = .custom(url: nil)
+        sut.customEndpointUrl = ""
+
+        sut.didTapSave()
+
+        XCTAssertEqual(sut.urlError, .invalid)
+    }
+
     private func makeSut() -> DebugMenu.EndpointSelectionViewModel {
         .init(
             apiEndpointService: mockEndpointService,
