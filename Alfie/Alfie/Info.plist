@@ -14,7 +14,7 @@
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Alfie connects to a development server on your local network.</string>
+	<string>Alfie connects to a server on your local network when you choose a custom environment.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
