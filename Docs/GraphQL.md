@@ -59,6 +59,10 @@ iPhone ──Wi-Fi──▶ Mac <wifi-ip>:8090 (bff-device-proxy.py) ──▶ 1
 Done when the launch log shows `BFF probe ✅ connected: HTTP 200` (`BFFConnectivityProbe`, Debug
 builds) and the proxy prints `HIT <phone-ip> POST /graphql` followed by `-> 200`.
 
+This works in builds from Xcode only. The fastlane `release` lane strips `NSAppTransportSecurity` and
+`NSLocalNetworkUsageDescription` from `Info.plist` (`strip_local_network_plist_keys`), so TestFlight
+and App Store builds cannot load a LAN BFF.
+
 Run the proxy on a trusted network only: it listens on every interface, so any device on the Wi-Fi
 can reach the BFF, and the BFF API key crosses the Wi-Fi as a plain-HTTP `Authorization` header.
 
@@ -82,7 +86,7 @@ serve `http://<wifi-ip>:3000/` directly, with no proxy.
 | HTTP `502`, proxy prints `-> 502` | Proxy is up, BFF is down or slower than 30s — start the BFF |
 | `-1001` timed out | Wrong IP, or phone on another Wi-Fi |
 | `-1009`, path `Local network prohibited` | Local Network denied on the phone — Settings → Alfie |
-| `-1022` | ATS exception missing from `Info.plist` (`NSAllowsLocalNetworking`) |
+| `-1022` | ATS exception missing from `Info.plist` (`NSAllowsLocalNetworking`) — expected in a `release`-lane build |
 
 `curl` from the Mac to its own Wi-Fi address succeeds in every one of these cases, so it proves
 only that the BFF is up. The Mac's firewall and endpoint-security software (ESET, Cortex XDR) are
