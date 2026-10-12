@@ -84,7 +84,8 @@ same-name collision between the `sizing` and `.primitives` collections.
 - A new typography token is not reachable from the theme until its group struct in
   `SharedUI/Theme/Typography/Specifications/TypographyGroups.swift` (`TypographyBody`,
   `TypographyLabel`, …) gains a matching property by hand, as `mediumBold` did.
-- Call sites consume the generated tokens directly: use the semantic `Theme.*` / `Typography.*` /
-  `Sizing.*` symbols, and reach for `Primitives.*` only when no semantic token covers the value.
-  Migration off the legacy asset-catalog `Colors`/`Spacing` types is still in progress, so both
-  appear in the tree — new code targets the generated tokens.
+- Colour: use the semantic `Theme.*` symbols, and reach for `Primitives.Colours.*` only when no
+  semantic token covers the value. Much of `SharedUI` and the Debug Menu still reads the raw
+  palette (#186), so copy the rule, not the neighbouring file.
+- Type: `Text.build(theme.font.<group>.<size>(text))`. `Typography.*` is read only by the theme's
+  own group structs.
