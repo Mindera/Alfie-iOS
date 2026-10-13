@@ -1,5 +1,6 @@
 import AlicerceLogging
 import Foundation
+import Model
 
 public struct BFFConnectivityProbe {
     public typealias Fetch = (URLRequest) async throws -> (Data, URLResponse)
@@ -27,7 +28,10 @@ public struct BFFConnectivityProbe {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let apiKey {
-            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(
+                BearerAuthorization.headerValue(token: apiKey),
+                forHTTPHeaderField: BearerAuthorization.headerName
+            )
         }
         request.httpBody = Data(#"{"query":"{ __typename }"}"#.utf8)
 

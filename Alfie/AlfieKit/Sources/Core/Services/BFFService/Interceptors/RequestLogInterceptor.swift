@@ -2,6 +2,7 @@ import AlicerceLogging
 import Apollo
 import BFFGraph
 import Foundation
+import Model
 
 final class RequestLogInterceptor: ApolloInterceptor {
     var id: String = UUID().uuidString
@@ -29,7 +30,7 @@ final class RequestLogInterceptor: ApolloInterceptor {
 
 private extension HTTPRequest {
     var descriptionRedactingAuthorization: String {
-        guard let authorization = additionalHeaders["Authorization"] else {
+        guard let authorization = additionalHeaders[BearerAuthorization.headerName] else {
             return debugDescription
         }
 

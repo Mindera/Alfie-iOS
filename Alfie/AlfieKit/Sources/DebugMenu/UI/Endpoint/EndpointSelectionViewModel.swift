@@ -2,16 +2,25 @@ import Foundation
 import Model
 import Utils
 
+public enum EndpointUrlError {
+    case invalid
+    case matchesPreset
+}
+
 public final class EndpointSelectionViewModel: ObservableObject {
     private let apiEndpointService: ApiEndpointServiceProtocol
     private let apiKeyService: BFFApiKeyServiceProtocol
     @Published public var selectedEndpointOption: ApiEndpointOption?
     @Published public var customEndpointUrl: String
     @Published public var bffApiKey: String
-    @Published public private(set) var shouldShowUrlError = false
+    @Published public private(set) var urlError: EndpointUrlError?
     @Published public private(set) var shouldShowSuccess = false
     private var isSaving = false
     let closeEndpointSelection: () -> Void
+
+    public var shouldShowUrlError: Bool {
+        urlError != nil
+    }
 
     public var isInputDisabled: Bool {
         guard !isSaving else {
@@ -59,7 +68,7 @@ public final class EndpointSelectionViewModel: ObservableObject {
     }
 
     public func didTapSave() {
-        shouldShowUrlError = false
+        urlError = nil
 
         guard let selectedEndpointOption else {
             return
@@ -69,7 +78,11 @@ public final class EndpointSelectionViewModel: ObservableObject {
 
         if case .custom = selectedEndpointOption {
             guard !customEndpointUrl.isEmpty, let url = URL(string: customEndpointUrl) else {
-                shouldShowUrlError = true
+                urlError = .invalid
+                return
+            }
+            guard !presetUrls.contains(url.absoluteString) else {
+                urlError = .matchesPreset
                 return
             }
             customUrl = url
@@ -82,7 +95,11 @@ public final class EndpointSelectionViewModel: ObservableObject {
     }
 
     public func didDismissError() {
-        shouldShowUrlError = false
+        urlError = nil
+    }
+
+    private var presetUrls: [String] {
+        [ApiEndpointOption.dev, .preProd, .prod].map { apiEndpointService.apiEndpoint(for: $0).absoluteString }
     }
 
     private var hasApiKeyChange: Bool {
