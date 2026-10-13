@@ -9,7 +9,8 @@ physical-retail features that reach into it.
 ### Catalogue
 
 **Product**:
-A style offered for sale, independent of colour and size. What a PDP is about.
+A style offered for sale, independent of colour and size. What a PDP is about. On SCAYLE a Product
+is one colour of a style; other colours are separate Products.
 _Avoid_: item, article, SKU
 
 **Handle**:
@@ -19,7 +20,8 @@ is the Product's name followed by its numeric id.
 _Avoid_: slug, product ID
 
 **Variant**:
-A Product in one specific colour and size. The thing a shopper physically picks up and buys.
+A Product in one specific colour and size. The thing a shopper physically picks up and buys. On
+SCAYLE the Variants of a Product differ by size only.
 _Avoid_: option, size, item
 
 **SKU**:
