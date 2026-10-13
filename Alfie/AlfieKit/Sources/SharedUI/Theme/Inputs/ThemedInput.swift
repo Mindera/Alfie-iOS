@@ -11,6 +11,7 @@ public struct ThemedInput: View {
     @Binding private var isRequired: Bool
     private let limit: Int?
     private let icon: Icon?
+    private let isSecure: Bool
 
     public init(
         _ text: Binding<String>,
@@ -20,7 +21,8 @@ public struct ThemedInput: View {
         limit: Int? = nil,
         isDisabled: Binding<Bool> = .constant(false),
         isRequired: Binding<Bool> = .constant(false),
-        icon: Icon? = nil
+        icon: Icon? = nil,
+        isSecure: Bool = false
     ) {
         _text = text
         self.title = title
@@ -30,25 +32,32 @@ public struct ThemedInput: View {
         _isDisabled = isDisabled
         _isRequired = isRequired
         self.icon = icon
+        self.isSecure = isSecure
     }
 
     public var body: some View {
-        TextField("\(placeholder ?? "")", text: $text)
-            .textFieldStyle(
-                ThemedTextStyle(
-                    title: title,
-                    status: status,
-                    isDisabled: isDisabled,
-                    isRequired: isRequired,
-                    limit: limit,
-                    count: .init(get: { text.count }, set: { _ in }),
-                    icon: icon
-                )
-            )
-            .onChange(of: text) { newValue in
-                guard let limit else { return }
-                text = "\(newValue.prefix(limit))"
+        Group {
+            if isSecure {
+                SecureField("\(placeholder ?? "")", text: $text)
+            } else {
+                TextField("\(placeholder ?? "")", text: $text)
             }
+        }
+        .textFieldStyle(
+            ThemedTextStyle(
+                title: title,
+                status: status,
+                isDisabled: isDisabled,
+                isRequired: isRequired,
+                limit: limit,
+                count: .init(get: { text.count }, set: { _ in }),
+                icon: icon
+            )
+        )
+        .onChange(of: text) { newValue in
+            guard let limit else { return }
+            text = "\(newValue.prefix(limit))"
+        }
     }
 }
 

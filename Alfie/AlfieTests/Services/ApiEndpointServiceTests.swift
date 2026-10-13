@@ -7,6 +7,7 @@ import Model
 final class ApiEndpointServiceTests: XCTestCase {
     private static let userDefaultsSuiteName = "com.alfie.test.defaults"
     private static let userDefaultsKey = "com.alfie.test.api.endpoint"
+    private static let customUrlUserDefaultsKey = "com.alfie.test.api.endpoint.custom"
     private var sut: ApiEndpointService!
     private var userDefaults: UserDefaults!
     private var mockAppDelegate: MockAppDelegate!
@@ -80,6 +81,37 @@ final class ApiEndpointServiceTests: XCTestCase {
         XCTAssertEqual(userDefaults.value(forKey: Self.userDefaultsKey) as? String, urlString)
     }
 
+    func test_remembers_the_custom_url_after_switching_to_another_endpoint() throws {
+        let url = try XCTUnwrap(URL(string: "https://www.endpoint.com"))
+        let mockUserDefaults = MockUserDefaults.storing()
+        createSut(userDefaults: mockUserDefaults)
+        sut.updateApiEndpointAndReboot(.custom(url: url))
+        sut.updateApiEndpointAndReboot(.dev)
+
+        createSut(userDefaults: mockUserDefaults)
+
+        XCTAssertEqual(sut.currentApiEndpoint, .dev)
+        XCTAssertEqual(sut.lastCustomApiEndpoint, url)
+    }
+
+    func test_remembers_a_custom_url_that_was_active_before_it_was_stored_separately() throws {
+        let urlString = "https://www.endpoint.com"
+        let mockUserDefaults = MockUserDefaults.storing()
+        mockUserDefaults.forcedValueForKey[Self.userDefaultsKey] = urlString
+        createSut(userDefaults: mockUserDefaults)
+        sut.updateApiEndpointAndReboot(.dev)
+
+        createSut(userDefaults: mockUserDefaults)
+
+        XCTAssertEqual(sut.lastCustomApiEndpoint, URL(string: urlString))
+    }
+
+    func test_has_no_remembered_custom_url_when_none_was_saved() {
+        createSut(userDefaults: MockUserDefaults())
+
+        XCTAssertNil(sut.lastCustomApiEndpoint)
+    }
+
     func test_calls_reboot_when_saving_selected_endpoint() {
         let expectation = expectation(description: "Wait for reboot call")
         mockAppDelegate.onRebootAppCalled = {
@@ -93,11 +125,12 @@ final class ApiEndpointServiceTests: XCTestCase {
 
     // MARK: - Private
 
-    private func createSut() {
+    private func createSut(userDefaults: UserDefaultsProtocol? = nil) {
         sut = .init(
             appDelegate: mockAppDelegate,
-            userDefaults: userDefaults,
+            userDefaults: userDefaults ?? self.userDefaults,
             userDefaultsKey: Self.userDefaultsKey,
+            customUrlUserDefaultsKey: Self.customUrlUserDefaultsKey,
             rebootDelay: .inverted
         )
     }

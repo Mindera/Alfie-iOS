@@ -442,6 +442,28 @@
         }
       }
     },
+    "debug_menu.endpoint.api_key.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BFF API key (optional)"
+          }
+        }
+      }
+    },
+    "debug_menu.endpoint.url_error.matches_preset" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This URL belongs to a preset endpoint. For a local BFF, use 127.0.0.1 instead of localhost."
+          }
+        }
+      }
+    },
     "feature_toggle.app_update.option.title" : {
       "extractionState" : "manual",
       "localizations" : {

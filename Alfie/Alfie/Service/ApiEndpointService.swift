@@ -4,6 +4,7 @@ import Model
 
 final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     private let apiUrlUserDefaultsKey: String
+    private let customApiUrlUserDefaultsKey: String
     private let userDefaults: UserDefaultsProtocol
     private let rebootDelay: TimeInterval
     private weak var appDelegate: AppDelegateProtocol?
@@ -14,19 +15,29 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
         appDelegate: AppDelegateProtocol,
         userDefaults: UserDefaultsProtocol,
         userDefaultsKey: String = "com.alfie.config.api.endpoint",
+        customUrlUserDefaultsKey: String = "com.alfie.config.api.endpoint.custom",
         rebootDelay: TimeInterval = 5
     ) {
         self.appDelegate = appDelegate
         self.userDefaults = userDefaults
         self.apiUrlUserDefaultsKey = userDefaultsKey
+        self.customApiUrlUserDefaultsKey = customUrlUserDefaultsKey
         self.rebootDelay = rebootDelay
         let storedApiUrl: String? = userDefaults.value(for: userDefaultsKey)
         self.currentApiEndpoint = ApiEndpointOption.option(with: storedApiUrl)
     }
 
+    var lastCustomApiEndpoint: URL? {
+        let storedCustomUrl: String? = userDefaults.value(for: customApiUrlUserDefaultsKey)
+        return storedCustomUrl.flatMap { URL(string: $0) }
+    }
+
     func updateApiEndpointAndReboot(_ option: ApiEndpointOption) {
         log.debug("API endpoint changed to \(option.url.absoluteString), will reboot app")
         userDefaults.set(option.url.absoluteString, for: apiUrlUserDefaultsKey)
+        if let customUrlToRemember = option.customUrl ?? currentApiEndpoint.customUrl {
+            userDefaults.set(customUrlToRemember.absoluteString, for: customApiUrlUserDefaultsKey)
+        }
         // Make sure user defaults are synced before rebooting the app
         DispatchQueue.main.asyncAfter(deadline: .now() + rebootDelay) { [weak self] in
             self?.appDelegate?.rebootApp()

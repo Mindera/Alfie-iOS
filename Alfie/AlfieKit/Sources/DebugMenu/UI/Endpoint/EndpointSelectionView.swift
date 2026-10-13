@@ -25,6 +25,15 @@ struct EndpointSelectionView: View {
 
             ThemedInput($viewModel.customEndpointUrl, isDisabled: .constant(viewModel.isInputDisabled))
 
+            ThemedInput(
+                $viewModel.bffApiKey,
+                placeholder: L10n.DebugMenu.Endpoint.ApiKey.placeholder,
+                isDisabled: .constant(viewModel.isInputDisabled),
+                isSecure: true
+            )
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+
             HStack {
                 Spacer()
                 ThemedButton(
@@ -38,12 +47,12 @@ struct EndpointSelectionView: View {
         }
         .padding(.horizontal, Primitives.Spacing.spacing16)
         .snackbarView(configuration: $snackbarConfig)
-        .onChange(of: viewModel.shouldShowUrlError) { shouldShowUrlError in
-            if shouldShowUrlError {
+        .onChange(of: viewModel.urlError) { urlError in
+            if let urlError {
                 // swiftlint:disable:next trailing_closure
                 snackbarConfig = .init(
                     type: .error,
-                    text: "Invalid endpoint URL",
+                    text: urlError.message,
                     showCloseButton: true,
                     icon: Icon.warning.image,
                     onDismiss: { viewModel.didDismissError() }
@@ -70,11 +79,24 @@ struct EndpointSelectionView: View {
     }
 }
 
+private extension EndpointUrlError {
+    var message: String {
+        switch self {
+        case .invalid:
+            "Invalid endpoint URL"
+
+        case .matchesPreset:
+            L10n.DebugMenu.Endpoint.UrlError.matchesPreset
+        }
+    }
+}
+
 #if DEBUG
 #Preview {
     EndpointSelectionView(
         viewModel: EndpointSelectionViewModel(
-            apiEndpointService: MockApiEndpointService()
+            apiEndpointService: MockApiEndpointService(),
+            apiKeyService: MockBFFApiKeyService()
         ) { }
     )
 }
