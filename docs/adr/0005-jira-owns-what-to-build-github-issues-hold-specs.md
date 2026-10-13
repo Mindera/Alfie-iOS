@@ -24,8 +24,9 @@ The retired documents remain in history at `043ec40e`, the last commit on `main`
 - **GitHub issues as the only tracker.** Rejected. The team plans and prioritises in Jira.
 - **Publish specs and tickets to Jira.** Rejected for now. The skills are built around `gh`, and
   agent-written tickets would crowd the team's board. Jira stays read-only to agents unless asked.
-- **Keep the role prompts for Copilot and Codex.** Rejected. The team uses Claude Code only, which
-  is also why `CLAUDE.md` is the one instruction file.
+- **Keep the role prompts for Copilot and Codex.** Rejected. The team writes code with Claude Code
+  only, which is also why `CLAUDE.md` is the one instruction file. Copilot still reviews pull
+  requests, so `.github/copilot-instructions.md` stays as a pointer to it.
 
 ## Consequences
 
