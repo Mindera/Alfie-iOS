@@ -3,10 +3,6 @@ import Foundation
 import Utils
 
 public final class NetworkClient: NetworkClientProtocol {
-    private enum Headers: String {
-        case authorization = "Authorization"
-    }
-
     private let logRequests: Bool
     private let logResponses: Bool
     private let log: Logger
@@ -23,8 +19,8 @@ public final class NetworkClient: NetworkClientProtocol {
         var request = URLRequest(url: url)
         if let authenticationToken {
             request.setValue(
-                authorizationHeader(token: authenticationToken),
-                forHTTPHeaderField: Headers.authorization.rawValue
+                BearerAuthorization.headerValue(token: authenticationToken),
+                forHTTPHeaderField: BearerAuthorization.headerName
             )
         }
 
@@ -56,8 +52,8 @@ public final class NetworkClient: NetworkClientProtocol {
         request.httpMethod = "POST"
         if let authenticationToken {
             request.setValue(
-                authorizationHeader(token: authenticationToken),
-                forHTTPHeaderField: Headers.authorization.rawValue
+                BearerAuthorization.headerValue(token: authenticationToken),
+                forHTTPHeaderField: BearerAuthorization.headerName
             )
         }
 
@@ -75,11 +71,5 @@ public final class NetworkClient: NetworkClientProtocol {
         guard let response = response as? HTTPURLResponse, !response.isError else {
             throw NetworkError.fromResponse(response) ?? .genericClient
         }
-    }
-
-    // MARK: - Private
-
-    private func authorizationHeader(token: String) -> String {
-        "Bearer \(token)"
     }
 }

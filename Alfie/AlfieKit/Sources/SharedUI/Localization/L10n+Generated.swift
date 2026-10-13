@@ -113,6 +113,18 @@ public enum L10n {
       public static let title = L10n.tr("L10n", "bag.total.title")
     }
   }
+  public enum DebugMenu {
+    public enum Endpoint {
+      public enum ApiKey {
+        /// BFF API key (optional)
+        public static let placeholder = L10n.tr("L10n", "debug_menu.endpoint.api_key.placeholder")
+      }
+      public enum UrlError {
+        /// This URL belongs to a preset endpoint. For a local BFF, use 127.0.0.1 instead of localhost.
+        public static let matchesPreset = L10n.tr("L10n", "debug_menu.endpoint.url_error.matches_preset")
+      }
+    }
+  }
   public enum FeatureToggle {
     /// Feature Toggle
     public static let title = L10n.tr("L10n", "feature_toggle.title")
@@ -816,6 +828,8 @@ public extension L10n {
       case bagRemoveCta = "bag.remove.cta"
       case bagTotalCaption = "bag.total.caption"
       case bagTotalTitle = "bag.total.title"
+      case debugMenuEndpointApiKeyPlaceholder = "debug_menu.endpoint.api_key.placeholder"
+      case debugMenuEndpointUrlErrorMatchesPreset = "debug_menu.endpoint.url_error.matches_preset"
       case featureToggleTitle = "feature_toggle.title"
       case featureToggleAppUpdateOptionTitle = "feature_toggle.app_update.option.title"
       case featureToggleDebugConfigurationOptionTitle = "feature_toggle.debug_configuration.option.title"
