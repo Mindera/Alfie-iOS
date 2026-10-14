@@ -106,3 +106,7 @@ _Avoid_: favourites, saved items, likes
 **BFF API key**:
 The opaque token the app presents to the BFF to be let in. It identifies the calling app, not a shopper, and is the same whichever commerce platform the BFF fronts.
 _Avoid_: Bearer credential, auth token, platform token
+
+**Mock platform**:
+A commerce platform the BFF fronts that has no remote: it serves a fixed catalogue from local fixtures, read-only, for local development and tests. Chosen like any other commerce platform, never deployed.
+_Avoid_: mock server, Alfie-Mocks (its predecessor), mock BFF, test double (those are in-process fakes, not a platform)
