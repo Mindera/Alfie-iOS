@@ -108,5 +108,9 @@ The opaque token the app presents to the BFF to be let in. It identifies the cal
 _Avoid_: Bearer credential, auth token, platform token
 
 **Mock platform**:
-A commerce platform the BFF fronts that has no remote: it serves a fixed catalogue from local fixtures, read-only, for local development and tests. Chosen like any other commerce platform, never deployed.
+A commerce platform the BFF fronts that has no remote: it serves the Mock catalogue, read-only, for local development and tests. Chosen like any other commerce platform, never deployed.
 _Avoid_: mock server, Alfie-Mocks (its predecessor), mock BFF, test double (those are in-process fakes, not a platform)
+
+**Mock catalogue**:
+The fixed, hand-written set of Products the Mock platform serves, chosen to cover the app's critical features rather than to resemble any real store. The app's tests adapt to it, not the other way round.
+_Avoid_: seed data (that is the app's integration-test configuration), sample data, test data, fixtures (the files that hold it)
