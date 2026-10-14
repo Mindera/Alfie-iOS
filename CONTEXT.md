@@ -13,10 +13,16 @@ A style offered for sale, independent of colour and size. What a PDP is about.
 _Avoid_: item, article, SKU
 
 **Handle**:
-The identifier that addresses a Product in the BFF and in a link. On Shopify it is the platform's
-native product handle; on BigCommerce it is a site route path, so it may contain `/`; on SCAYLE it
-is the Product's name followed by its numeric id.
+The identifier that addresses a Product or a Collection in the BFF and in a link. On Shopify it is
+the platform's native handle; on BigCommerce it is a site route path, so it may contain `/`; on
+SCAYLE it is the name followed by the numeric id. On the Mock platform a Collection's Handle is a
+path (`women/dresses`), so a link and a menu entry address it the same way.
 _Avoid_: slug, product ID
+
+**Collection**:
+A named group of Products that a shopper browses as one listing, such as Women, Women › Dresses or
+Sale, addressed by its Handle. A Product can be in many Collections at once.
+_Avoid_: category (the BigCommerce and SCAYLE word), department
 
 **Variant**:
 A Product in one specific colour and size. The thing a shopper physically picks up and buys.
@@ -112,5 +118,5 @@ A commerce platform the BFF fronts that has no remote: it serves the Mock catalo
 _Avoid_: mock server, Alfie-Mocks (its predecessor), mock BFF, test double (those are in-process fakes, not a platform)
 
 **Mock catalogue**:
-The fixed, hand-written set of Products the Mock platform serves, chosen to cover the app's critical features rather than to resemble any real store. The app's tests adapt to it, not the other way round.
+The fixed, hand-written set of Products and Collections the Mock platform serves, chosen to cover the app's critical features rather than to resemble any real store. The app's tests adapt to it, not the other way round.
 _Avoid_: seed data (that is the app's integration-test configuration), sample data, test data, fixtures (the files that hold it)
