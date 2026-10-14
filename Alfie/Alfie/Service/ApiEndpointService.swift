@@ -62,18 +62,12 @@ enum ApiEndpointUrl: String {
     // Local dev: aligned with the BFF default port. BFFClientService appends `graphql` /
     // `config/webviews` to this base, so it must stay an origin root (trailing slash, no path).
     case dev = "http://localhost:3000/"
-    case preProd = "https://preprod.bff.tbd.invalid/"
-    case prod = "https://prod.bff.tbd.invalid/"
 
     static func url(for option: ApiEndpointOption) -> String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch option {
         case .dev:
             useLegacyMockDev ? legacyMockDevUrl : ApiEndpointUrl.dev.rawValue
-        case .preProd:
-            ApiEndpointUrl.preProd.rawValue
-        case .prod:
-            ApiEndpointUrl.prod.rawValue
         case .custom:
             ApiEndpointUrl.dev.rawValue
         }
@@ -118,6 +112,6 @@ private extension ApiEndpointOption {
     }
 
     static var defaultOption: ApiEndpointOption {
-        ReleaseConfigurator.isRelease ? .prod : .dev
+        .dev
     }
 }
