@@ -25,9 +25,6 @@ extension AppFeatureView {
             SplashView()
                 .transition(.opacity)
 
-        case .error:
-            Text("Error!")
-
         case .forceUpdate:
             if let configuration = viewModel.appUpdateInfoConfiguration {
                 ForceAppUpdateView(configuration: configuration)
