@@ -26,7 +26,7 @@ extension AppFeatureView {
                 .transition(.opacity)
 
         case .error:
-            Text("Error!") // TODO: Replace with actual error screen
+            Text("Error!")
 
         case .forceUpdate:
             if let configuration = viewModel.appUpdateInfoConfiguration {
