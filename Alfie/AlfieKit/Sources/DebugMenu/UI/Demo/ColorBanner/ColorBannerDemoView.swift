@@ -23,7 +23,7 @@ struct ColorBannerDemoView: View {
     ]
 
     private var configuration: SwatchSelectorConfiguration<ColorSwatch> {
-        .init(items: Self.items, selectedItem: selectedItem, onSelect: { selectedItem = $0 })
+        .init(items: Self.items, selectedItem: selectedItem) { selectedItem = $0 }
     }
 
     var body: some View {
@@ -53,9 +53,8 @@ struct ColorBannerDemoView: View {
                     ColorCardGridView(
                         configuration: .init(
                             items: Self.itemsImage,
-                            selectedItem: selectedImageItem,
-                            onSelect: { selectedImageItem = $0 }
-                        ),
+                            selectedItem: selectedImageItem
+                        ) { selectedImageItem = $0 },
                         columns: 3
                     )
                 }

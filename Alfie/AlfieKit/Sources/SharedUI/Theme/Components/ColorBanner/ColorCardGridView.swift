@@ -95,9 +95,8 @@ private enum Constants {
                 .init(id: "4", name: "Midnight Navy", type: .color(.blue)),
                 .init(id: "5", name: "Sand", type: .color(.brown), isDisabled: true),
             ],
-            selectedItem: .init(id: "2", name: "Black", type: .color(.black)),
-            onSelect: { _ in }
-        ),
+            selectedItem: .init(id: "2", name: "Black", type: .color(.black))
+        ) { _ in },
         columns: 3
     )
 }

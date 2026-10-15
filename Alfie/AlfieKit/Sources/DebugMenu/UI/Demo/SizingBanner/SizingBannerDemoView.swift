@@ -17,7 +17,7 @@ struct SizingBannerDemoView: View {
     ]
 
     private var configuration: SwatchSelectorConfiguration<SizingSwatch> {
-        .init(items: Self.items, selectedItem: selectedItem, onSelect: { selectedItem = $0 })
+        .init(items: Self.items, selectedItem: selectedItem) { selectedItem = $0 }
     }
 
     var body: some View {

@@ -70,7 +70,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 // button and the price. `ProductListingView` can use the default; it has no
                 // sticky bottom bar.
                 showFromTop: true,
-                onDismiss: { viewModel.didDismissAddToBagFeedback() }
+                onDismiss: viewModel.didDismissAddToBagFeedback
             )
         }
     }

@@ -69,15 +69,13 @@ struct SearchBarDemoView: View {
                 Text.build(theme.font.body.small("Read-only Search Bar:"))
                 SearchBarEntryButton(
                     placeholder: placeholder,
-                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoPlaceholderButton,
-                    action: {}
-                )
+                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoPlaceholderButton
+                ) {}
                 SearchBarEntryButton(
                     placeholder: placeholder,
                     searchTerm: "cream",
-                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoSearchTermButton,
-                    action: {}
-                )
+                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoSearchTermButton
+                ) {}
             }
             .padding(.horizontal, Primitives.Spacing.spacing12)
 

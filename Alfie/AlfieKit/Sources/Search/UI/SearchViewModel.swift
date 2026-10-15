@@ -26,9 +26,8 @@ public final class SearchViewModel: SearchViewModelProtocol {
 
     public var recentSearchesViewModel: RecentSearchesViewModel {
         RecentSearchesViewModel(
-            recentsService: dependencies.recentsService,
-            showResults: { [weak self] in self?.showResults(for: $0) }
-        )
+            recentsService: dependencies.recentsService
+        ) { [weak self] in self?.showResults(for: $0) }
     }
 
     // MARK: - Internal Properties

@@ -117,9 +117,8 @@ private extension AccountSection {
         viewModel: AccountViewModel(
             dependencies: .init(
                 configurationService: MockConfigurationService(),
-                sessionService: MockSessionService(),
-                makeSettingsView: { _ in AnyView(EmptyView()) }
-            )
+                sessionService: MockSessionService()
+            ) { _ in AnyView(EmptyView()) }
         ) { _ in
         }
     )
