@@ -16,7 +16,7 @@ Native iOS e-commerce app: SwiftUI (iOS 16+), MVVM with Flow-based navigation, S
 - Route all navigation through `FlowViewModel` closures passed into the `ViewModel`
 - Use `AccessibilityID` from the `AccessibilityIdentifiers` module for every UI test identifier
 - Reach for existing `SharedUI` components before writing a new view
-- Invoke `/swiftui-specialist` when writing or reviewing SwiftUI; gate its API suggestions on this project's deployment target (`@Observable` and `@Entry` don't qualify today) and let the MVVM rules here win on conflict
+- Invoke `/swiftui-specialist` (`.claude/skills/`) when writing or reviewing SwiftUI; gate its API suggestions on this project's deployment target (`@Observable` and `@Entry` don't qualify today) and let the MVVM rules here win on conflict
 - Finish every code change on §Verification's "Done"
 
 ### ❌ NEVER
@@ -70,6 +70,9 @@ Run one verification at a time: the scripts write to fixed `/tmp/alfie_*` paths,
 ---
 
 ## Agent skills
+
+The `mattpocock-skills` plugin is pinned in `.claude/settings.json`; install it once per checkout
+(`docs/QuickReference.md` §Common Commands). Project skills live in `.claude/skills/`.
 
 ### Issue tracker
 

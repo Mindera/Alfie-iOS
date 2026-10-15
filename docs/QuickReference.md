@@ -12,6 +12,10 @@ brew bundle install
 # Decrypt sensitive files (requires GPG keys)
 git secret reveal
 
+# Agent skills: trust the folder in Claude Code, then install the plugin pinned in
+# .claude/settings.json (a version bump is a change to its "ref")
+claude plugin install mattpocock-skills@mattpocock --scope project
+
 # Integration tests only (boots a local BFF, runs them, tears it down)
 ./Alfie/scripts/run-integration-tests.sh
 ```
