@@ -37,6 +37,64 @@ The app reboots to apply the change.
 
 See [Syncing the BFF Schema](#syncing-the-bff-schema) below — run `./sync-bff-schema.sh`.
 
+## Running on a Physical iPhone Against the Mac's BFF
+
+On a device, `localhost` is the phone. The phone reaches the Mac's BFF over Wi-Fi through a
+forwarding proxy on port **8090**:
+
+```
+iPhone ──Wi-Fi──▶ Mac <wifi-ip>:8090 (bff-device-proxy.py) ──▶ 127.0.0.1:3000 (BFF)
+```
+
+1. Start the BFF on the Mac (port 3000, see above).
+2. Start the proxy with **Apple's** Python and leave it running; it prints one line per request:
+   ```bash
+   /usr/bin/python3 Alfie/scripts/bff-device-proxy.py        # [listen-port] [upstream]
+   ```
+3. Read the Mac's Wi-Fi address: `ipconfig getifaddr en0` (`en1` on a desktop Mac; list ports with
+   `networksetup -listallhardwareports`). It is DHCP, so re-read it each session — a stale address
+   shows up as `URLError -1001` (timeout).
+4. iPhone on the same Wi-Fi. Debug Menu → **Custom** → `http://<wifi-ip>:8090/` → Save.
+5. Allow the **Local Network** prompt on the phone.
+
+Done when the launch log shows `BFF probe ✅ connected: HTTP 200` (`BFFConnectivityProbe`, Debug
+builds) and the proxy prints `HIT <phone-ip> POST /graphql` followed by `-> 200`.
+
+This works in builds from Xcode only. The fastlane `release` lane strips `NSAppTransportSecurity` and
+`NSLocalNetworkUsageDescription` from `Info.plist` (`strip_local_network_plist_keys`), so TestFlight
+and App Store builds cannot load a LAN BFF.
+
+Run the proxy on a trusted network only: it listens on every interface, so any device on the Wi-Fi
+can reach the BFF, and the BFF API key crosses the Wi-Fi as a plain-HTTP `Authorization` header.
+
+### Why the proxy
+
+A BFF started by an agent or background session (Claude Code, a CI-style runner) answers the Mac
+itself but not other devices: the phone completes the TCP handshake with `<wifi-ip>:3000`, sends
+its request, and is reset. The probe reports `URLError -1005`. The cause is attributed to macOS
+Local Network privacy acting on that `node` process; `/usr/bin/python3` is Apple-signed and is let
+through.
+
+A BFF started from your own Terminal, with the Mac's Local Network prompt allowed, is expected to
+serve `http://<wifi-ip>:3000/` directly, with no proxy.
+
+### Reading a failed probe
+
+| Probe says | Meaning |
+|---|---|
+| `-1004` could not connect | Nothing listens on that port — start the proxy |
+| `-1005` connection lost | Reached `:3000` directly and was reset — use the proxy port |
+| HTTP `502`, proxy prints `-> 502` | Proxy is up, BFF is down or slower than 30s — start the BFF |
+| `-1001` timed out | Wrong IP, or phone on another Wi-Fi |
+| `-1009`, path `Local network prohibited` | Local Network denied on the phone — Settings → Alfie |
+| `-1022` | ATS exception missing from `Info.plist` (`NSAllowsLocalNetworking`) — expected in a `release`-lane build |
+
+`curl` from the Mac to its own Wi-Fi address succeeds in every one of these cases, so it proves
+only that the BFF is up. The Mac's firewall and endpoint-security software (ESET, Cortex XDR) are
+not involved.
+
+`GET /config/webviews` answering 404 is the BFF build lacking that route, not a connection fault.
+
 ## Syncing the BFF Schema
 
 The GraphQL schema is **owned by the BFF**, not hand-written in this repo. The BFF

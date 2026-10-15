@@ -57,7 +57,7 @@ Run one verification at a time: the scripts write to fixed `/tmp/alfie_*` paths,
 | Read | When |
 |---|---|
 | `docs/Architecture.md` | Adding a ViewModel, Flow, Route or feature module; deciding where a new file goes |
-| `docs/GraphQL.md` | Touching `.graphql` files, or after a BFF schema change |
+| `docs/GraphQL.md` | Touching `.graphql` files, after a BFF schema change, or a physical iPhone can't reach the Mac's BFF |
 | `docs/Localization.md` | Adding or renaming an `L10n` key |
 | `docs/Testing.md` | Writing or reviewing unit tests, mocks or fixtures; reading coverage from `/tmp/alfie_test.xcresult` |
 | `docs/SnapshotTesting.md` | A view's rendered output changes, or a snapshot test fails |
