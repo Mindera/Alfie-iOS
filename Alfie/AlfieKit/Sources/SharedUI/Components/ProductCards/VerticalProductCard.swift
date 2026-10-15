@@ -143,8 +143,8 @@ public struct VerticalProductCard: View {
         switch viewModel.configuration.size {
         case .small:
             EmptyView()
-        case .medium,
-             .large: // swiftlint:disable:this indentation_width
+
+        case .medium, .large:
             let topTrailingEdgePadding = viewModel.configuration.size == .medium
                 ? Primitives.Spacing.spacing4
                 : Primitives.Spacing.spacing8

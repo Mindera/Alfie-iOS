@@ -17,9 +17,7 @@ extension VerticalProductCardConfiguration {
     var verticalInterSpacing: CGFloat {
         // Figma: 8pt between image, details and price for the PLP grid/list cards.
         switch size {
-        case .small,
-             .medium,
-             .large: // swiftlint:disable:this indentation_width
+        case .small, .medium, .large:
             Primitives.Spacing.spacing8
         }
     }

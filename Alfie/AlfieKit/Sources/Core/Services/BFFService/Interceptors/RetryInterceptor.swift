@@ -78,9 +78,10 @@ final class RetryInterceptor: ApolloInterceptor {
     ) {
         // Never retry non-idempotent operations, and only act on completed responses
         // that carry a status code we care about.
-        guard Operation.isQuery,
-              let statusCode = response?.httpResponse.statusCode,
-              let kind = TransientFailureKind(statusCode: statusCode)
+        guard
+            Operation.isQuery,
+            let statusCode = response?.httpResponse.statusCode,
+            let kind = TransientFailureKind(statusCode: statusCode)
         else {
             chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
             return

@@ -377,9 +377,10 @@ extension ProductDetailsView {
             forColourCount: selection.colours.count,
             hasSelection: selection.selectedColour != nil
         )
-        if viewModel.shouldShow(section: .colorSelector),
-           let selectedColour = selection.selectedColour,
-           let remainingCount {
+        if
+            viewModel.shouldShow(section: .colorSelector),
+            let selectedColour = selection.selectedColour,
+            let remainingCount {
             ColorSummaryView(selectedItem: selectedColour, remainingCount: remainingCount)
                 .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
