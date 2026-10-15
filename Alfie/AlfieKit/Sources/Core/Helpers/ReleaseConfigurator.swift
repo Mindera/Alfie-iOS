@@ -19,10 +19,6 @@ public enum ReleaseConfigurator {
         #endif
     }
 
-    public static var isRelease: Bool {
-        appConfiguration == .appStore
-    }
-
     public static var appConfiguration: AppType {
         if isDebug {
             return .debug

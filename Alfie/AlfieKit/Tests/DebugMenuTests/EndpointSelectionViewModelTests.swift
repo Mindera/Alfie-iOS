@@ -92,10 +92,14 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isInputDisabled)
     }
 
-    func test_save_button_is_disabled_when_saving() {
+    func test_save_button_is_disabled_when_saving() throws {
+        mockEndpointService.currentApiEndpoint = .custom(url: try XCTUnwrap(URL(string: "https://www.endpoint.com")))
         sut = makeSut()
         sut.selectedEndpointOption = .dev
+        XCTAssertFalse(sut.isSaveDisabled)
+
         sut.didTapSave()
+
         XCTAssertTrue(sut.isSaveDisabled)
     }
 
@@ -160,7 +164,8 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertFalse(sut.shouldShowSuccess)
     }
 
-    func test_saves_selected_option_on_service() {
+    func test_saves_selected_option_on_service() throws {
+        mockEndpointService.currentApiEndpoint = .custom(url: try XCTUnwrap(URL(string: "https://www.endpoint.com")))
         let expectation = expectation(description: "Wait for service call")
         mockEndpointService.onUpdateApiEndpointAndRebootCalled = { option in
             XCTAssertEqual(option, .dev)
