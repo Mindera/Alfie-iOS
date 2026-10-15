@@ -42,6 +42,14 @@ Native iOS e-commerce app: SwiftUI (iOS 16+), MVVM with Flow-based navigation, S
 itself, which needs Node and the `Alfie-BFF` repo beside this one; from a worktree, point
 `ALFIE_BFF_PATH` at it. `--skip-integration` drops the integration stage.
 
+Keep `Alfie-BFF` on an up-to-date `main` (`yarn install` after pulling) and run integration against
+Shopify, the one platform with a complete Cart today (SCAYLE's is AF-127), whatever `PLATFORM` its
+`.env` sets:
+
+```bash
+ALFIE_BFF_START_CMD="PLATFORM=shopify npm run start:dev" ./Alfie/scripts/verify.sh
+```
+
 Done means an unfiltered `verify.sh` prints **"✅ FULL VERIFICATION PASSED"**. Only when Node or
 `Alfie-BFF` is unavailable: an unfiltered `--skip-integration` run printing
 **"✅ VERIFICATION PASSED (... integration skipped)"**, reported as integration skipped. A
