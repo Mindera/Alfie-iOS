@@ -21,9 +21,14 @@ public struct LoadingSpinner: View {
 
     private var dimension: CGFloat {
         switch size {
-        case .small: theme.spacing.space300
-        case .medium: theme.spacing.space400
-        case .large: theme.spacing.space600
+        case .small:
+            theme.spacing.space300
+
+        case .medium:
+            theme.spacing.space400
+
+        case .large:
+            theme.spacing.space600
         }
     }
 

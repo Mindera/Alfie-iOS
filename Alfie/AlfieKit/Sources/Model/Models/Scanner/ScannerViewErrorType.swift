@@ -15,9 +15,14 @@ public enum ScannerViewErrorType: Error, Equatable {
 
     public static func from(failure: CameraScanFailure) -> Self {
         switch failure {
-        case .permissionDenied: return .cameraPermissionDenied
-        case .deviceNotSupported: return .deviceNotSupported
-        case .unavailable: return .generic
+        case .permissionDenied:
+            return .cameraPermissionDenied
+
+        case .deviceNotSupported:
+            return .deviceNotSupported
+
+        case .unavailable:
+            return .generic
         }
     }
 
@@ -26,9 +31,14 @@ public enum ScannerViewErrorType: Error, Equatable {
     /// cannot drift apart.
     public var analyticsReason: ScanFailureReason {
         switch self {
-        case .cameraPermissionDenied: return .permissionDenied
-        case .deviceNotSupported: return .unsupported
-        case .generic: return .generic
+        case .cameraPermissionDenied:
+            return .permissionDenied
+
+        case .deviceNotSupported:
+            return .unsupported
+
+        case .generic:
+            return .generic
         }
     }
 }

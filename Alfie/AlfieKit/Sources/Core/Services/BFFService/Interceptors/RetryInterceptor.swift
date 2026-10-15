@@ -129,16 +129,24 @@ private enum TransientFailureKind {
 
     init?(statusCode: Int) {
         switch statusCode {
-        case 500, 502, 503, 504: self = .server
-        case 429, 430: self = .rateLimit
-        default: return nil
+        case 500, 502, 503, 504:
+            self = .server
+
+        case 429, 430:
+            self = .rateLimit
+
+        default:
+            return nil
         }
     }
 
     func toErrorType(statusCode: Int, retryAfter: TimeInterval?) -> BFFRequestError.BFFRequestErrorType {
         switch self {
-        case .server: return .serverError(status: statusCode)
-        case .rateLimit: return .rateLimited(retryAfter: retryAfter)
+        case .server:
+            return .serverError(status: statusCode)
+
+        case .rateLimit:
+            return .rateLimited(retryAfter: retryAfter)
         }
     }
 }
