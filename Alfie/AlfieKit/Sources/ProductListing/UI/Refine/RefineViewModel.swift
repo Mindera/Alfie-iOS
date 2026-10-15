@@ -15,6 +15,7 @@ protocol RefineViewModelProtocol: ObservableObject {
     var hasActiveFilters: Bool { get }
     var currencySymbol: String? { get }
     var priceSummary: String? { get }
+
     func removeAllFilters()
     func apply()
 }

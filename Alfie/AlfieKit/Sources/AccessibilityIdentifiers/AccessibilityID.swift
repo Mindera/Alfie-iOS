@@ -32,6 +32,7 @@ public enum AccessibilityID {
         /// Exposed as well as composed: a row's Remove button is nested under the row's own
         /// identifier, so this is the part that tells the two apart.
         public static let lineItemRemoveButtonSuffix = ".remove.button"
+
         public static func lineItemRemoveButton(id: String) -> String {
             lineItem(id: id) + lineItemRemoveButtonSuffix
         }
@@ -110,6 +111,7 @@ public enum AccessibilityID {
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
         public static let relatedProductsSection = "productDetails.relatedProducts.section"
         public static let relatedProductsTitleLabel = "productDetails.relatedProducts.title.label"
+
         public static func relatedProductCard(id: String) -> String { "productDetails.relatedProducts.\(id).card" }
         public static func relatedProductWishlistButton(id: String) -> String {
             "productDetails.relatedProducts.\(id).wishlist.button"
@@ -145,7 +147,9 @@ public enum AccessibilityID {
         public static let listStyleListButton = "productListing.listStyle.list.button"
         public static let retryButton = "productListing.retry.button"
         public static let filterChips = "productListing.filterChips"
+
         public static func filterChip(index: Int) -> String { "productListing.filterChip.\(index).button" }
+
         public static let searchBackButton = "productListing.search.back.button"
         public static let searchBarButton = "productListing.search.bar.button"
 
