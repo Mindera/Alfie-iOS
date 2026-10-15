@@ -304,6 +304,7 @@ extension ProductDetailsView {
 
             case .decrement:
                 stepMediaIndex(by: -1)
+
             @unknown default:
                 break
             }

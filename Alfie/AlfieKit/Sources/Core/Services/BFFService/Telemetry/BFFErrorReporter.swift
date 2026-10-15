@@ -52,14 +52,19 @@ public final class BFFErrorReporter: BFFErrorReporterProtocol {
         switch type {
         case .rateLimited:
             return "rate_limited"
+
         case .timeout:
             return "timeout"
+
         case .serverError:
             return "server_error"
+
         case .noInternet:
             return "network"
+
         case .product, .cart, .emptyResponse:
             return "graphql"
+
         case .generic:
             return "generic"
         }

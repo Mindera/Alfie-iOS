@@ -12,8 +12,10 @@ extension BFFGraphAPI.ProductSortEnum {
         switch sortOption {
         case "HIGH_TO_LOW":
             return .priceDesc
+
         case "LOW_TO_HIGH":
             return .priceAsc
+
         case "A_Z":
             return .nameAsc
 
