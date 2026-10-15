@@ -533,7 +533,10 @@ extension ProductDetailsView {
                     }
                 }
             }
-            .padding(.top, viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0)
+            .padding(
+                .top,
+                viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0
+            )
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsSection)
         }

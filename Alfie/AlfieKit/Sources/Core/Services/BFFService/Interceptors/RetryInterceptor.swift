@@ -32,7 +32,10 @@ final class RetryInterceptor: ApolloInterceptor {
             maxRetries: Int = 3,
             perAttemptCap: TimeInterval = 8,
             retryAfterCap: TimeInterval = 30,
-            scheduleRetry: @escaping @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { delay, work in
+            scheduleRetry: @escaping @Sendable (
+                _ delay: TimeInterval,
+                _ work: @escaping @Sendable () -> Void
+            ) -> Void = { delay, work in
                 DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay, execute: work)
             }
         ) {

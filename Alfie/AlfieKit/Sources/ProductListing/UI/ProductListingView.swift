@@ -142,7 +142,10 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
 
     private var gridStruct: [GridItem] {
         // Figma product grid gap is `16px 8px` (row 16, column 8); GridItem spacing is the column gap.
-        Array(repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top), count: numberOfCardsPerRow)
+        Array(
+            repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+            count: numberOfCardsPerRow
+        )
     }
 
     private var numberOfCardsPerRow: Int {
