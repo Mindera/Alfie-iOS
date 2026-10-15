@@ -219,8 +219,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         switch viewModel.state.failure {
         case .rateLimited:
             return L10n.Pdp.ErrorView.RateLimited.title
+
         case .serverError:
             return L10n.Pdp.ErrorView.ServerError.title
+
         default:
             return L10n.Pdp.ErrorView.title
         }
@@ -299,6 +301,7 @@ extension ProductDetailsView {
             switch direction {
             case .increment:
                 stepMediaIndex(by: 1)
+
             case .decrement:
                 stepMediaIndex(by: -1)
             @unknown default:

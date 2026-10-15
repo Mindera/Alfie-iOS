@@ -186,8 +186,10 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
         switch error {
         case .rateLimited:
             return (L10n.Plp.ErrorView.RateLimited.title, L10n.Plp.ErrorView.RateLimited.message)
+
         case .serverError:
             return (L10n.Plp.ErrorView.ServerError.title, L10n.Plp.ErrorView.ServerError.message)
+
         case .generic, .noInternet, .noResults, .none:
             return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
         }
@@ -206,6 +208,7 @@ extension SnackbarViewConfiguration {
         switch transientError.request {
         case .nextPage:
             text = L10n.Plp.NextPage.errorMessage
+
         case .refresh:
             text = L10n.Plp.Refresh.errorMessage
         }

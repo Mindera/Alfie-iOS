@@ -55,8 +55,7 @@ extension BFFGraphAPI.ProductDetailsFragment {
     private func defaultVariantIndex(in variants: [BFFGraphAPI.ProductDetailsFragment.Variant]) -> Int? {
         if
             let defaultVariantId,
-            let index = variants.firstIndex(where: { $0.id == defaultVariantId })
-        {
+            let index = variants.firstIndex(where: { $0.id == defaultVariantId }) {
             return index
         }
         if let index = variants.firstIndex(where: { ($0.inventory?.available ?? 0) > 0 }) {

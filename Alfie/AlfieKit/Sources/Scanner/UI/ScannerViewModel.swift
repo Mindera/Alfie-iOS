@@ -261,6 +261,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         switch payload.symbology {
         case .ean13, .code128:
             return .barcode(value: payload.value)
+
         case .qr:
             if let url = URL(string: payload.value), opensInApp(deepLinkService.deepLinkType(url)) {
                 return .alfieCode(url)
@@ -382,6 +383,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
         switch linkType {
         case .none, .unknown, .webView:
             return false
+
         case .home, .shop, .bag, .wishlist, .account, .productList, .productDetail:
             return true
         }

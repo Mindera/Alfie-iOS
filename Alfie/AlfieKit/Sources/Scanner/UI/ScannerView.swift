@@ -207,7 +207,6 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
             .transition(.opacity)
         }
     }
-
 }
 
 private enum Constants {

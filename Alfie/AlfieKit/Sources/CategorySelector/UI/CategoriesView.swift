@@ -88,8 +88,10 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             switch viewModel.state.failure {
             case .rateLimited:
                 return (L10n.Shop.Categories.ErrorView.RateLimited.title, L10n.Shop.Categories.ErrorView.RateLimited.message)
+
             case .serverError:
                 return (L10n.Shop.Categories.ErrorView.ServerError.title, L10n.Shop.Categories.ErrorView.ServerError.message)
+
             default:
                 return (L10n.Shop.Categories.ErrorView.title, L10n.Shop.Categories.ErrorView.message)
             }

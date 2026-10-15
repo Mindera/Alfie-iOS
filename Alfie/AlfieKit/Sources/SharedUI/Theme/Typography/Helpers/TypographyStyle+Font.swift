@@ -34,11 +34,13 @@ extension TypographyStyle {
         switch fontFamily {
         case Primitives.Typography.fontFamilyPrimaryIos:
             return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
+
         case Primitives.Typography.fontFamilyBrand:
             // If the bundled brand face isn't registered, fall back to the system font at the
             // token's size/weight rather than `UIFont()` (which loses both).
             return UIFont(name: FontNames.libreBaskerville.rawValue, size: fontSize)
                 ?? .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
+
         default:
             return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
         }

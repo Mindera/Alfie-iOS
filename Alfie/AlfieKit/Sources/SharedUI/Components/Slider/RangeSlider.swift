@@ -207,6 +207,7 @@ public struct RangeSlider: View {
         switch thumb {
         case .lower:
             configuration.lowerValue = value
+
         case .upper:
             configuration.upperValue = value
         }

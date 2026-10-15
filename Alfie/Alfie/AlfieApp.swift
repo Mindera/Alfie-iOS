@@ -71,4 +71,3 @@ struct AlfieApp: App {
         appDelegate.serviceProvider.deepLinkService.openUrls([url])
     }
 }
-

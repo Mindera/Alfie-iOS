@@ -243,6 +243,7 @@ struct ProductListingFilter: View {
         switch route {
         case .price:
             return L10n.Plp.Refine.Price.Option.title
+
         case .sort:
             return L10n.Plp.SortBy.Option.title
         }

@@ -36,6 +36,7 @@ public final class SearchService: SearchServiceProtocol {
             switch error.type {
             case .emptyResponse, .product(.noProducts):
                 throw BFFRequestError(type: .product(.noProducts(category: nil, query: searchTerm, sort: sort)))
+
             default:
                 throw BFFRequestError(type: .product(.generic))
             }

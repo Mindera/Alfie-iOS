@@ -56,6 +56,7 @@ struct ProductListingListStyleSelector: View {
             switch style {
             case .grid:
                 return isSelected ? .grid2Fill : .grid
+
             case .list:
                 return isSelected ? .grid1Fill : .listplp
             }

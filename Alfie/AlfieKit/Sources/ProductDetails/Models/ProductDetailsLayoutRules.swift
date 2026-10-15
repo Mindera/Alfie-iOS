@@ -45,11 +45,14 @@ enum ProductDetailsLayoutRules {
                 display: L10n.Pdp.DescriptionMetadata.colourAndReference(colourName, reference),
                 accessibilityLabel: L10n.Pdp.DescriptionMetadata.accessibilityLabel(colourName, reference)
             )
+
         case let (colourName?, nil):
             return .init(display: colourName, accessibilityLabel: colourName)
+
         case let (nil, reference?):
             let reference = L10n.Pdp.ProductReference.value(reference)
             return .init(display: reference, accessibilityLabel: reference)
+
         case (nil, nil):
             return nil
         }

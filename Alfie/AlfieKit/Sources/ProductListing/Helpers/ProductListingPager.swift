@@ -41,16 +41,21 @@ struct ProductListingPager {
         switch (request, state) {
         case (.refresh, _):
             cursor = nil
+
         case (.firstPage, .success), (.firstPage, .loadingNextPage):
             return nil
+
         case (.firstPage, .error):
             state = .loadingFirstPage(Self.noProducts)
             cursor = nil
+
         case (.firstPage, .loadingFirstPage):
             cursor = nil
+
         case (.nextPage, .success(let loaded)) where pagination?.hasNextPage == true:
             state = .loadingNextPage(loaded)
             cursor = pagination?.endCursor
+
         case (.nextPage, _):
             return nil
         }
@@ -72,14 +77,17 @@ struct ProductListingPager {
                 state = .success(.init(title: page.title, products: page.products))
             }
             return Commit(transientError: nil)
+
         case (.success(nil), .nextPage), (.failure(is CancellationError), _):
             if case .loadingFirstPage = ticket.previousState {
                 return fail(with: .generic, for: ticket)
             }
             state = ticket.previousState
             return Commit(transientError: nil)
+
         case (.success(nil), _):
             return fail(with: .noResults, for: ticket)
+
         case (.failure(let error), _):
             return fail(with: .from(error: error), for: ticket)
         }

@@ -6,7 +6,6 @@
 /// Use static constants for fixed elements and pure functions for dynamic ones
 /// (always derived from a stable model id, never from an array index).
 public enum AccessibilityID {
-
     // MARK: - Brands
 
     public enum Brands {

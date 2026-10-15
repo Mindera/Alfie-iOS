@@ -16,6 +16,7 @@ extension BFFGraphAPI.ProductSortEnum {
             return .priceAsc
         case "A_Z":
             return .nameAsc
+
         default:
             return .newest
         }
