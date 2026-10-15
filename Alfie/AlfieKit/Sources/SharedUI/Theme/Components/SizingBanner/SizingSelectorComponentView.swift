@@ -86,8 +86,9 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
                 .init(id: "4", name: "L", state: .available),
                 .init(id: "5", name: "XL", state: .outOfStock),
                 .init(id: "6", name: "XXL", state: .available),
-            ]
-        ) { _ in },
+            ],
+            onSelect: { _ in }
+        ),
         arrangement: .grid(columns: 4)
     )
 }
@@ -102,8 +103,9 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
                 .init(id: "4", name: "L", state: .available),
                 .init(id: "5", name: "XL", state: .outOfStock),
                 .init(id: "6", name: "XXL", state: .available),
-            ]
-        ) { _ in },
+            ],
+            onSelect: { _ in }
+        ),
         arrangement: .chips(
             itemHorizontalSpacing: Primitives.Spacing.spacing16,
             itemVerticalSpacing: Primitives.Spacing.spacing16
@@ -121,8 +123,9 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
                 .init(id: "4", name: "L", state: .available),
                 .init(id: "5", name: "XL", state: .outOfStock),
                 .init(id: "6", name: "XXL", state: .available),
-            ]
-        ) { _ in },
+            ],
+            onSelect: { _ in }
+        ),
         arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16)
     )
 }

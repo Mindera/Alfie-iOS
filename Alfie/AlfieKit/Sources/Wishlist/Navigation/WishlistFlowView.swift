@@ -13,8 +13,9 @@ public struct WishlistFlowView<ViewModel: WishlistFlowViewModelProtocol>: View {
                 .navigationDestination(for: WishlistRoute.self) { route in
                     route.destination(
                         productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
-                        webViewModel: viewModel.makeWebViewModel(feature:)
-                    ) { viewModel.makeWishlistViewModel(isRoot: false) }
+                        webViewModel: viewModel.makeWebViewModel(feature:),
+                        wishlistViewModel: { viewModel.makeWishlistViewModel(isRoot: false) }
+                    )
                 }
         }
     }

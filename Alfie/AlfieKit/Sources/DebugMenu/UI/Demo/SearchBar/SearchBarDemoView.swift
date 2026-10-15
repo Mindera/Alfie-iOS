@@ -16,7 +16,6 @@ struct SearchBarDemoView: View {
             DemoHelper.demoSectionHeader(title: "Search Bar")
                 .padding(.horizontal, Primitives.Spacing.spacing16)
 
-            // swiftlint:disable:next trailing_closure
             ScrollViewWithOffsetReader(offset: $scrollOffset) {
                 LazyVGrid(columns: [
                     GridItem(.flexible(minimum: 200)),
@@ -69,13 +68,15 @@ struct SearchBarDemoView: View {
                 Text.build(theme.font.body.small("Read-only Search Bar:"))
                 SearchBarEntryButton(
                     placeholder: placeholder,
-                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoPlaceholderButton
-                ) {}
+                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoPlaceholderButton,
+                    action: {}
+                )
                 SearchBarEntryButton(
                     placeholder: placeholder,
                     searchTerm: "cream",
-                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoSearchTermButton
-                ) {}
+                    accessibilityIdentifier: AccessibilityID.DebugMenu.searchBarDemoSearchTermButton,
+                    action: {}
+                )
             }
             .padding(.horizontal, Primitives.Spacing.spacing12)
 

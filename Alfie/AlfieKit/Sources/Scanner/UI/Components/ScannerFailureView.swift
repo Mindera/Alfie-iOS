@@ -61,14 +61,14 @@ struct ScannerFailureView: View {
 
 #if DEBUG
 #Preview("Permission denied") {
-    ScannerFailureView(error: .cameraPermissionDenied) { }
+    ScannerFailureView(error: .cameraPermissionDenied, openSettings: { })
 }
 
 #Preview("Device not supported") {
-    ScannerFailureView(error: .deviceNotSupported) { }
+    ScannerFailureView(error: .deviceNotSupported, openSettings: { })
 }
 
 #Preview("Generic") {
-    ScannerFailureView(error: .generic) { }
+    ScannerFailureView(error: .generic, openSettings: { })
 }
 #endif

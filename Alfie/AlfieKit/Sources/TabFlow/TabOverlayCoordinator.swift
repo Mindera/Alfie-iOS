@@ -85,8 +85,9 @@ public final class TabOverlayCoordinator {
     private func makeScannerViewModel() -> ScannerViewModel {
         ScannerPresentation.makeViewModel(
             dependencies: dependencies.scanner,
-            source: .searchBar
-        ) { [weak self] in self?.dismiss() }
+            source: .searchBar,
+            close: { [weak self] in self?.dismiss() }
+        )
     }
 
     // MARK: - View Models for SearchIntent

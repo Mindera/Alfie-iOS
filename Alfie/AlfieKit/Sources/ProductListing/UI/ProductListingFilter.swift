@@ -266,6 +266,7 @@ struct ProductListingFilter: View {
         listStyle: .constant(.grid),
         priceBounds: .init(currencyCode: "GBP", minimum: 8, maximum: 480),
         appliedFilters: nil,
-        appliedSort: nil
-    ) { _, _ in }
+        appliedSort: nil,
+        onApply: { _, _ in }
+    )
 }
