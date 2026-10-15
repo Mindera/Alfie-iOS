@@ -73,16 +73,15 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
             analytics: serviceProvider.analytics,
             log: log
         )
+        let settingsConfigurationService = serviceProvider.configurationService
+        let apiEndpointService = serviceProvider.apiEndpointService
+        let bffApiKeyService = serviceProvider.bffApiKeyService
         let myAccountDependencyContainer = MyAccountDependencyContainer(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService
-        ) { [
-            configurationService = serviceProvider.configurationService,
-            apiEndpointService = serviceProvider.apiEndpointService,
-            bffApiKeyService = serviceProvider.bffApiKeyService
-        ] present in
+        ) { present in
             SettingsViewFactory.make(
-                configurationService: configurationService,
+                configurationService: settingsConfigurationService,
                 apiEndpointService: apiEndpointService,
                 bffApiKeyService: bffApiKeyService,
                 present: present
