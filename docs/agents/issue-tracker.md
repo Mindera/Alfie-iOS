@@ -15,14 +15,14 @@ GitHub issues derived from a Jira ticket. Use the `gh` CLI for all GitHub operat
 Site: `https://mindera.atlassian.net` · Project key: `ALFMOB` ·
 cloudId: `d1f0340d-c33e-48c9-b29a-f13d9b14e217`
 
-Read-only unless the user asks for a write. Access is through the Atlassian MCP tools, which are
-deferred: load them with `ToolSearch` first.
+Read-only unless the user asks for a write. Access is through the Atlassian MCP connector
+(`https://mcp.atlassian.com/v2/mcp`); its tools are deferred, so find them with `ToolSearch`, and
+their names change between connector versions, so match each step by what it does.
 
-- **Read a ticket**: `getJiraIssue` with `issueIdOrKey: "ALFMOB-<id>"`,
-  `responseContentFormat: "markdown"`; add `comment` to `fields` for the discussion.
-- **Search**: `searchJiraIssuesUsingJql`, e.g. `project = ALFMOB AND status != Done ORDER BY updated DESC`.
-- **Write, when asked**: `addCommentToJiraIssue`; `getTransitionsForJiraIssue` then
-  `transitionJiraIssue`; `createJiraIssue`.
+- **Read a ticket**: fetch `ALFMOB-<id>` as markdown. Its comments are a separate list call; the
+  ticket itself carries only a comment count.
+- **Search**: JQL, e.g. `project = ALFMOB AND status != Done ORDER BY updated DESC`.
+- **Write, when asked**: add a comment, transition the ticket, or create one.
 
 ## Conventions
 

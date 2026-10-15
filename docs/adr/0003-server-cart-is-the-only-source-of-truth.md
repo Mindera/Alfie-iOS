@@ -36,8 +36,9 @@ stale against it.
   fail with earlier Lines committed.
 - Mutations are excluded from the retry interceptor and the Apollo cache. A retried add would
   raise the Line's quantity twice.
-- The BFF bounds a Cart at 50 Lines and a Line at quantity 1–100, and neither bound knows stock:
-  an over-order fails at the platform as a `BAD_REQUEST`. The app surfaces the rejection rather
+- The BFF accepts at most 50 Lines per request, each with a quantity of 1–100. It limits neither
+  the Cart itself nor a Line's running quantity, and knows nothing of stock: an over-order fails
+  at the platform as a `BAD_REQUEST`. The app surfaces the rejection rather
   than enforcing the bounds itself.
 - The Bag badge is summed on the client from the Cart's Lines; the BFF has no total-quantity field
   and needs none.

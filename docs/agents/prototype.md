@@ -13,8 +13,9 @@ PR. Leave a pointer to the branch on the implementation issue.
 A screen in the Debug Menu, in place of a route with a URL search param:
 
 - Add the view under `Alfie/AlfieKit/Sources/DebugMenu/UI/Prototype/`, wrapped in `#if DEBUG`.
-- Register it as a `DebugNavigation` case with a link in `DebugMenuView`; wrap the link and its
-  destination in `#if DEBUG`, as the `featureToggle` entry is.
+- Register it as a `DebugNavigation` case with a link in `DebugMenuView`. The prototype view
+  exists only in DEBUG, so wrap the enum case, its destination arm and its link together in
+  `#if DEBUG`, or the release build won't compile. (`featureToggle` wraps only its link.)
 - Variants switch through a segmented control pinned to the bottom of the screen, in place of the
   floating bottom bar.
 - Feed it from `Mocks` (`Mock<Feature>ViewModel`, fixtures); no BFF calls.

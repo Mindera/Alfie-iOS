@@ -14,7 +14,7 @@ research notes merged to `main`, and seven role prompts under `.ai/agents/`. Tho
 once the feature shipped, the role prompts contradicted the guides (Given-When-Then against
 `docs/Testing.md`), and the layer-by-layer task breakdown fought the vertical slices the skills cut.
 
-The retired documents remain in history at `043ec40e`, the last commit on `main` that holds them
+The retired documents remain in history at `043ec40e`, a `main` commit that still holds them
 (under `Docs/` and `.ai/agents/`).
 
 ## Considered options

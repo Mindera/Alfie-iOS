@@ -89,3 +89,5 @@ same-name collision between the `sizing` and `.primitives` collections.
   palette (#186), so copy the rule, not the neighbouring file.
 - Type: `Text.build(theme.font.<group>.<size>(text))`. `Typography.*` is read only by the theme's
   own group structs.
+- Spacing and radius: no rule yet (#186) between `Sizing.*`, `theme.spacing.*` and
+  `Primitives.Spacing.*`; match the module you're in.

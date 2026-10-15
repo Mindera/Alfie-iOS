@@ -33,14 +33,14 @@ The card attached to a garment in store, carrying its printed identifiers.
 
 **Barcode**:
 The machine-readable number already printed on a Swing tag (as an EAN-13, UPC-A or Code 128 symbol). Issued by the
-manufacturer, it holds only digits and cannot carry a Handle, so it is resolved through the
-catalogue (SCAYLE only). It usually identifies one Variant; when several Variants share it, it
+manufacturer, usually a GTIN's digits, it cannot carry a Handle, so it is looked up exactly as
+scanned through the catalogue (SCAYLE only). It usually identifies one Variant; when several Variants share it, it
 resolves to the Product alone and no colour or size is preselected.
 _Avoid_: EAN, UPC, GTIN (use these only when the specific symbology matters)
 
 **Alfie code**:
 A QR code Alfie generates and prints, encoding a link to a Product and the Variant it is attached
-to. Distinct from a Barcode: it is ours, it is not digits-only, and it needs no catalogue lookup to
+to. Distinct from a Barcode: it is ours, it is a QR code, and it needs no catalogue lookup to
 interpret.
 _Avoid_: QR, product code, scan code, barcode (designs say "Scan Barcode" for the feature; the
 thing scanned is still an Alfie code)
