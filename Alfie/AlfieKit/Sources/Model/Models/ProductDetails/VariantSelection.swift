@@ -92,9 +92,7 @@ public struct VariantSelection: Equatable {
     /// What the gallery, share sheet and description metadata read. Follows the colour on its own,
     /// and narrows to the exact variant once a size is chosen.
     public var displayVariant: Product.Variant? {
-        if
-            let selectedSize,
-            let exact = variantsForSelectedColour.first(where: { $0.size?.id == selectedSize.id }) {
+        if let selectedSize, let exact = variantsForSelectedColour.first(where: { $0.size?.id == selectedSize.id }) {
             return exact
         }
 
