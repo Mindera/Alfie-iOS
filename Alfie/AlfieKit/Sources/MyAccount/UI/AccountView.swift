@@ -80,7 +80,6 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
              .orders, // swiftlint:disable:this indentation_width
              .personalInformation,
              .wallet:
-            // TODO: Implement in a future ticket
             break
         }
     }

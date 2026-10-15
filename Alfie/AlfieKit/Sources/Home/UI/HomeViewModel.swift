@@ -23,7 +23,6 @@ public class HomeViewModel: HomeViewModelProtocol, ObservableObject {
         isUserSignedIn ? L10n.Home.SignOut.Button.cta : L10n.Home.SignIn.Button.cta
     }
 
-    // TODO: Replace with BFF-provided home content when the API is ready.
     public var heroBanners: [HomeHeroBanner] { HomeHeroBanner.placeholders }
 
     @Published public var fullScreenCover: AnyView?

@@ -24,9 +24,9 @@ final class EndpointSelectionViewModelTests: XCTestCase {
     }
 
     func test_reads_current_endpoint_on_init() {
-        mockEndpointService.currentApiEndpoint = .preProd
+        mockEndpointService.currentApiEndpoint = .custom(url: nil)
         sut = makeSut()
-        XCTAssertEqual(sut.selectedEndpointOption, .preProd)
+        XCTAssertEqual(sut.selectedEndpointOption, .custom(url: nil))
     }
 
     func test_reads_custom_endpoint_url_on_init() throws {
@@ -40,7 +40,7 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     func test_sets_default_custom_url_on_init_when_custom_option_is_not_selected() throws {
         let urlString = "https://www.endpoint.com"
-        mockEndpointService.currentApiEndpoint = .preProd
+        mockEndpointService.currentApiEndpoint = .dev
         mockEndpointService.onApiEndpointForOptionCalled = { _ in
             URL(string: urlString)!
         }
@@ -68,21 +68,21 @@ final class EndpointSelectionViewModelTests: XCTestCase {
 
     func test_shows_success_when_saving() {
         sut = makeSut()
-        sut.selectedEndpointOption = .preProd
+        sut.selectedEndpointOption = .dev
         sut.didTapSave()
         XCTAssertTrue(sut.shouldShowSuccess)
     }
 
     func test_input_is_disabled_when_saving() {
         sut = makeSut()
-        sut.selectedEndpointOption = .preProd
+        sut.selectedEndpointOption = .dev
         sut.didTapSave()
         XCTAssertTrue(sut.isInputDisabled)
     }
 
     func test_input_is_disabled_when_selected_option_is_not_custom() {
         sut = makeSut()
-        sut.selectedEndpointOption = .preProd
+        sut.selectedEndpointOption = .dev
         XCTAssertTrue(sut.isInputDisabled)
     }
 
@@ -92,17 +92,21 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertFalse(sut.isInputDisabled)
     }
 
-    func test_save_button_is_disabled_when_saving() {
+    func test_save_button_is_disabled_when_saving() throws {
+        mockEndpointService.currentApiEndpoint = .custom(url: try XCTUnwrap(URL(string: "https://www.endpoint.com")))
         sut = makeSut()
-        sut.selectedEndpointOption = .preProd
+        sut.selectedEndpointOption = .dev
+        XCTAssertFalse(sut.isSaveDisabled)
+
         sut.didTapSave()
+
         XCTAssertTrue(sut.isSaveDisabled)
     }
 
     func test_save_button_is_disabled_when_current_option_equals_selected_option() {
-        mockEndpointService.currentApiEndpoint = .preProd
+        mockEndpointService.currentApiEndpoint = .dev
         sut = makeSut()
-        sut.selectedEndpointOption = .preProd
+        sut.selectedEndpointOption = .dev
         XCTAssertTrue(sut.isSaveDisabled)
     }
 
@@ -139,9 +143,9 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertEqual(sut.availableEndpointOptions, ApiEndpointOption.allCases)
     }
 
-    func test_reports_only_dev_and_custom_endpoint_options_as_selectable() {
+    func test_reports_all_endpoint_options_as_selectable() {
         sut = makeSut()
-        XCTAssertEqual(sut.disabledEndpointOptions, [.preProd, .prod])
+        XCTAssertEqual(sut.disabledEndpointOptions, [])
     }
 
     func test_reports_no_endpoint_options_as_selectable_when_saving() {
@@ -160,15 +164,16 @@ final class EndpointSelectionViewModelTests: XCTestCase {
         XCTAssertFalse(sut.shouldShowSuccess)
     }
 
-    func test_saves_selected_option_on_service() {
+    func test_saves_selected_option_on_service() throws {
+        mockEndpointService.currentApiEndpoint = .custom(url: try XCTUnwrap(URL(string: "https://www.endpoint.com")))
         let expectation = expectation(description: "Wait for service call")
         mockEndpointService.onUpdateApiEndpointAndRebootCalled = { option in
-            XCTAssertEqual(option, .preProd)
+            XCTAssertEqual(option, .dev)
             expectation.fulfill()
         }
 
         sut = makeSut()
-        sut.selectedEndpointOption = .preProd
+        sut.selectedEndpointOption = .dev
         sut.didTapSave()
         wait(for: [expectation], timeout: .default)
     }

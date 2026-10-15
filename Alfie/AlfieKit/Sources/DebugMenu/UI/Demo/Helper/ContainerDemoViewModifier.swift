@@ -2,8 +2,6 @@ import SharedUI
 import SwiftUI
 
 public struct ContainerDemoViewModifier: ViewModifier {
-    // TODO: replace usage of dismiss with a coordinator, here and in other demo views (not possible for now, as we have a crash due to a missing env obj, to be fixed later)
-    @Environment(\.dismiss) private var dismiss
     private let headerTitle: String
     private let embedInScrollView: Bool
 

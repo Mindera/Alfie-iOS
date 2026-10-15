@@ -2,18 +2,12 @@ import Foundation
 
 public enum ApiEndpointOption: CaseIterable, Hashable, RawRepresentable {
     case dev
-    case preProd
-    case prod
     case custom(url: URL?)
 
     public var label: String {
         switch self {
         case .dev:
             "Development"
-        case .preProd:
-            "Pre-production"
-        case .prod:
-            "Production"
         case .custom:
             "Custom"
         }
@@ -28,7 +22,7 @@ public enum ApiEndpointOption: CaseIterable, Hashable, RawRepresentable {
     }
 
     public static var allCases: [ApiEndpointOption] {
-        [.dev, .preProd, .prod, .custom(url: nil)]
+        [.dev, .custom(url: nil)]
     }
 
     public var rawValue: String {

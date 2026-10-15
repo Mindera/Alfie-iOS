@@ -41,11 +41,7 @@ public final class EndpointSelectionViewModel: ObservableObject {
     public var availableEndpointOptions = ApiEndpointOption.allCases
 
     public var disabledEndpointOptions: [ApiEndpointOption] {
-        guard !isSaving else {
-            return ApiEndpointOption.allCases
-        }
-
-        return [.preProd, .prod]
+        isSaving ? ApiEndpointOption.allCases : []
     }
 
     public init(
@@ -99,7 +95,7 @@ public final class EndpointSelectionViewModel: ObservableObject {
     }
 
     private var presetUrls: [String] {
-        [ApiEndpointOption.dev, .preProd, .prod].map { apiEndpointService.apiEndpoint(for: $0).absoluteString }
+        [apiEndpointService.apiEndpoint(for: .dev).absoluteString]
     }
 
     private var hasApiKeyChange: Bool {

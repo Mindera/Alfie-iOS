@@ -37,8 +37,6 @@ struct ToolbarDemoView: View {
         }
     }
 
-    // TODO: replace usage of dismiss with a coordinator, here and in other demo views (not possible for now, as we have a crash due to a missing env obj, to be fixed later)
-    @Environment(\.dismiss) private var dismiss
     @State private var showLogo = true
     @State private var alwaysShowDivider = true
     @State private var darkMode = false
