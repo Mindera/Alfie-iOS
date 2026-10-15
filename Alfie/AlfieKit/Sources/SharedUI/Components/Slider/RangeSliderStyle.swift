@@ -21,6 +21,7 @@ struct RangeSliderStyle {
         switch thumb {
         case .lower:
             return value ?? bounds.lowerBound
+
         case .upper:
             return value ?? bounds.upperBound
         }
@@ -73,6 +74,7 @@ struct RangeSliderStyle {
         switch thumb {
         case .lower:
             return min(raw, effectiveValue(upper, for: .upper))
+
         case .upper:
             return max(raw, effectiveValue(lower, for: .lower))
         }
@@ -91,6 +93,7 @@ struct RangeSliderStyle {
         case .lower:
             return stepped(lowerValue + delta, for: .lower)
                 .clamped(to: bounds.lowerBound...max(bounds.lowerBound, upperValue))
+
         case .upper:
             return stepped(upperValue + delta, for: .upper)
                 .clamped(to: min(lowerValue, bounds.upperBound)...bounds.upperBound)

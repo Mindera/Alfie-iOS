@@ -10,11 +10,20 @@ public enum ProductListingViewErrorType: Error, CaseIterable {
     public static func from(error: Error) -> ProductListingViewErrorType {
         guard let bff = error as? BFFRequestError else { return .generic }
         switch bff.type {
-        case .rateLimited: return .rateLimited
-        case .serverError: return .serverError
-        case .noInternet: return .noInternet
-        case .product(.noProduct), .product(.noProducts), .emptyResponse: return .noResults
-        case .timeout, .product(.generic), .cart, .generic: return .generic
+        case .rateLimited:
+            return .rateLimited
+
+        case .serverError:
+            return .serverError
+
+        case .noInternet:
+            return .noInternet
+
+        case .product(.noProduct), .product(.noProducts), .emptyResponse:
+            return .noResults
+
+        case .timeout, .product(.generic), .cart, .generic:
+            return .generic
         }
     }
 }

@@ -32,7 +32,7 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                     text: Self.errorMessage(for: failure),
                     showCloseButton: true,
                     icon: Icon.warning.image,
-                    onDismiss: { viewModel.didDismissRemovalFailure() }
+                    onDismiss: viewModel.didDismissRemovalFailure
                 )
             }
     }

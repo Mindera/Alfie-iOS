@@ -22,9 +22,9 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                 accessibilityIdentifier: AccessibilityID.Home.searchInput,
                 scan: .init(
                     accessibilityIdentifier: AccessibilityID.Home.scanButton,
-                    action: { viewModel.didTapScan() }
+                    action: viewModel.didTapScan
                 ),
-                action: { viewModel.didTapSearch() }
+                action: viewModel.didTapSearch
             )
             .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
             .padding(.horizontal, theme.spacing.space200)

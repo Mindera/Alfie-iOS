@@ -10,9 +10,6 @@ struct SnackbarDemoView: View {
 
     @State private var snackbarConfig: SnackbarViewConfiguration?
 
-    // TODO: replace usage of dismiss with a coordinator, here and in other demo views (not possible for now, as we have a crash due to a missing env obj, to be fixed later)
-    @Environment(\.dismiss) private var dismiss
-
     var body: some View {
         VStack(spacing: Primitives.Spacing.spacing20) {
             DemoHelper.demoHeader(title: "Catalogue App")

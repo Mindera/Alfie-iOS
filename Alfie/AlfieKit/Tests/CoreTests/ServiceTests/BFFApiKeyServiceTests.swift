@@ -35,11 +35,9 @@ final class BFFApiKeyServiceTests: XCTestCase {
     func test_current_api_key_is_nil_when_the_active_endpoint_is_not_custom() {
         sut.updateApiKey("abc-123")
 
-        [ApiEndpointOption.dev, .preProd, .prod].forEach { option in
-            apiEndpointService.currentApiEndpoint = option
+        apiEndpointService.currentApiEndpoint = .dev
 
-            XCTAssertNil(sut.currentApiKey, "A key was offered to \(option.label)")
-        }
+        XCTAssertNil(sut.currentApiKey)
     }
 
     func test_current_api_key_is_nil_when_the_custom_endpoint_has_no_url() {

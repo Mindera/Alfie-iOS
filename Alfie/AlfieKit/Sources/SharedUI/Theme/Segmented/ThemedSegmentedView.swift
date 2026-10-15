@@ -71,11 +71,18 @@ public struct ThemedSegmentView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
-                        .padding(.trailing, type == .compact ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8)
-                        .foregroundStyle(currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500)
+                        .padding(
+                            .trailing,
+                            type == .compact ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8
+                        )
+                        .foregroundStyle(
+                            currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500
+                        )
                 }
                 Text.build(theme.font.body.medium(segment.title))
-                    .foregroundStyle(currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500)
+                    .foregroundStyle(
+                        currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500
+                    )
                     .padding(.vertical, type == .compact ? Primitives.Spacing.spacing8 : Primitives.Spacing.spacing16)
                     .lineLimit(1)
                 Spacer()

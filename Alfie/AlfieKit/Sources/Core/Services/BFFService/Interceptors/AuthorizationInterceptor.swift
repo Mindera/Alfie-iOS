@@ -19,7 +19,10 @@ final class AuthorizationInterceptor: ApolloInterceptor {
         completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
     ) where Operation: GraphQLOperation {
         if let apiKey = apiKeyService.currentApiKey {
-            request.addHeader(name: BearerAuthorization.headerName, value: BearerAuthorization.headerValue(token: apiKey))
+            request.addHeader(
+                name: BearerAuthorization.headerName,
+                value: BearerAuthorization.headerValue(token: apiKey)
+            )
         }
 
         chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)

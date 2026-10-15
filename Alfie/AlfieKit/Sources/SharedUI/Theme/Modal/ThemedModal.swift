@@ -19,6 +19,10 @@ struct ThemedModal<Modal: View>: ViewModifier {
         self.modal = modal
     }
 
+    private var horizontalInset: CGFloat {
+        horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
+    }
+
     func body(content: Content) -> some View {
         content
             .fullScreenCover(isPresented: $isPresented) {
@@ -103,19 +107,13 @@ struct ThemedModal<Modal: View>: ViewModifier {
                                             }
                                         }
                                     }
-                                    .padding(
-                                        .horizontal,
-                                        horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
-                                    )
+                                    .padding(.horizontal, horizontalInset)
                                     .edgesIgnoringSafeArea(.bottom)
                                     .background {
                                         RoundedRectangle(cornerRadius: Sizing.radiusStrong)
                                             .fill(Primitives.Colours.neutrals0)
                                             .edgesIgnoringSafeArea(.bottom)
-                                            .padding(
-                                                .horizontal,
-                                                horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
-                                            )
+                                            .padding(.horizontal, horizontalInset)
                                     }
                                     .offset(y: offset.height)
                                     .transition(.move(edge: .bottom))

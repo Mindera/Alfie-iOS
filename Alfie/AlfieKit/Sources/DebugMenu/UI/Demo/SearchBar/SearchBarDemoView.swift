@@ -16,7 +16,6 @@ struct SearchBarDemoView: View {
             DemoHelper.demoSectionHeader(title: "Search Bar")
                 .padding(.horizontal, Primitives.Spacing.spacing16)
 
-            // swiftlint:disable:next trailing_closure
             ScrollViewWithOffsetReader(offset: $scrollOffset) {
                 LazyVGrid(columns: [
                     GridItem(.flexible(minimum: 200)),

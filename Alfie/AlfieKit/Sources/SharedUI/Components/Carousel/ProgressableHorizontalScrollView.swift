@@ -95,7 +95,10 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
 
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
-            progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing80, verticalPadding: Primitives.Spacing.spacing32)
+            progressBarConfiguration: .init(
+                horizontalPadding: Primitives.Spacing.spacing80,
+                verticalPadding: Primitives.Spacing.spacing32
+            )
         ) {
             HStack {
                 ForEach(1...3, id: \.self) { index in
@@ -114,7 +117,10 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
 
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
-            progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing80, verticalPadding: Primitives.Spacing.spacing32)
+            progressBarConfiguration: .init(
+                horizontalPadding: Primitives.Spacing.spacing80,
+                verticalPadding: Primitives.Spacing.spacing32
+            )
         ) {
             HStack {
                 ForEach(1...10, id: \.self) { index in

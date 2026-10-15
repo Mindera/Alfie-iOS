@@ -124,7 +124,6 @@ private extension AppDelegate {
 
         return Log.MultiLogger<Log.NoModule, Log.NoMetadataKey>(
             destinations: [
-                // swiftlint:disable:next trailing_closure
                 Log.ConsoleLogDestination(
                     formatter: Log.StringLogItemFormatter { Log.ItemFormat.string },
                     minLevel: .verbose,

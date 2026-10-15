@@ -70,7 +70,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 // button and the price. `ProductListingView` can use the default; it has no
                 // sticky bottom bar.
                 showFromTop: true,
-                onDismiss: { viewModel.didDismissAddToBagFeedback() }
+                onDismiss: viewModel.didDismissAddToBagFeedback
             )
         }
     }
@@ -219,8 +219,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         switch viewModel.state.failure {
         case .rateLimited:
             return L10n.Pdp.ErrorView.RateLimited.title
+
         case .serverError:
             return L10n.Pdp.ErrorView.ServerError.title
+
         default:
             return L10n.Pdp.ErrorView.title
         }
@@ -299,8 +301,10 @@ extension ProductDetailsView {
             switch direction {
             case .increment:
                 stepMediaIndex(by: 1)
+
             case .decrement:
                 stepMediaIndex(by: -1)
+
             @unknown default:
                 break
             }
@@ -374,10 +378,8 @@ extension ProductDetailsView {
             forColourCount: selection.colours.count,
             hasSelection: selection.selectedColour != nil
         )
-        if viewModel.shouldShow(section: .colorSelector),
-           let selectedColour = selection.selectedColour,
-           let remainingCount {
-            ColorSummaryView(selectedItem: selectedColour, remainingCount: remainingCount)
+        if viewModel.shouldShow(section: .colorSelector), let colour = selection.selectedColour, let remainingCount {
+            ColorSummaryView(selectedItem: colour, remainingCount: remainingCount)
                 .shimmering(while: shimmeringBinding(for: .colorSelector), animateOnStateTransition: false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.colourSummary)
         }
@@ -529,7 +531,10 @@ extension ProductDetailsView {
                     }
                 }
             }
-            .padding(.top, viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0)
+            .padding(
+                .top,
+                viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0
+            )
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsSection)
         }

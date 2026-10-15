@@ -45,7 +45,12 @@ public enum ToolbarItemProvider {
         size: ToolBarButtonSize = .normal,
         openSearchAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .search, accessibilityId: AccessibilityId.searchBtn, accessibilityLabel: L10n.Accessibility.search, toolBarButtonSize: .normal) {
+        ThemedToolbarButton(
+            icon: .search,
+            accessibilityId: AccessibilityId.searchBtn,
+            accessibilityLabel: L10n.Accessibility.search,
+            toolBarButtonSize: .normal
+        ) {
             openSearchAction()
         }
     }
@@ -56,13 +61,23 @@ public enum ToolbarItemProvider {
         size: ToolBarButtonSize = .normal,
         openWishlistAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .heart, accessibilityId: AccessibilityId.wishlistBtn, accessibilityLabel: L10n.Accessibility.wishlist, toolBarButtonSize: size) {
+        ThemedToolbarButton(
+            icon: .heart,
+            accessibilityId: AccessibilityId.wishlistBtn,
+            accessibilityLabel: L10n.Accessibility.wishlist,
+            toolBarButtonSize: size
+        ) {
             openWishlistAction()
         }
     }
 
     private static func listItem(size: ToolBarButtonSize = .normal) -> some View {
-        ThemedToolbarButton(icon: .list, accessibilityId: AccessibilityId.listBtn, accessibilityLabel: L10n.Accessibility.menu, toolBarButtonSize: size) {
+        ThemedToolbarButton(
+            icon: .list,
+            accessibilityId: AccessibilityId.listBtn,
+            accessibilityLabel: L10n.Accessibility.menu,
+            toolBarButtonSize: size
+        ) {
             log.debug("LIST ICON PRESSED")
         }
     }
@@ -71,7 +86,12 @@ public enum ToolbarItemProvider {
         size: ToolBarButtonSize = .normal,
         openDebugMenuAction: @escaping () -> Void
     ) -> some View {
-        ThemedToolbarButton(icon: .settings, accessibilityId: AccessibilityId.settingsBtn, accessibilityLabel: L10n.Accessibility.settings, toolBarButtonSize: size) {
+        ThemedToolbarButton(
+            icon: .settings,
+            accessibilityId: AccessibilityId.settingsBtn,
+            accessibilityLabel: L10n.Accessibility.settings,
+            toolBarButtonSize: size
+        ) {
             openDebugMenuAction()
         }
     }

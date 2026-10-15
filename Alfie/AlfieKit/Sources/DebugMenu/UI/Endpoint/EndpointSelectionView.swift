@@ -49,7 +49,6 @@ struct EndpointSelectionView: View {
         .snackbarView(configuration: $snackbarConfig)
         .onChange(of: viewModel.urlError) { urlError in
             if let urlError {
-                // swiftlint:disable:next trailing_closure
                 snackbarConfig = .init(
                     type: .error,
                     text: urlError.message,
@@ -63,7 +62,6 @@ struct EndpointSelectionView: View {
         }
         .onChange(of: viewModel.shouldShowSuccess) { shouldShowSuccess in
             if shouldShowSuccess {
-                // swiftlint:disable:next trailing_closure
                 snackbarConfig = .init(
                     type: .success,
                     text: "Done. The app will now restart automatically.",

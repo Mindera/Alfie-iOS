@@ -15,6 +15,7 @@ protocol RefineViewModelProtocol: ObservableObject {
     var hasActiveFilters: Bool { get }
     var currencySymbol: String? { get }
     var priceSummary: String? { get }
+
     func removeAllFilters()
     func apply()
 }
@@ -98,10 +99,13 @@ final class RefineViewModel: RefineViewModelProtocol {
         switch (minimum, maximum) {
         case (let minimum?, let maximum?):
             return L10n.Plp.Refine.Price.Summary.between(minimum, maximum)
+
         case (let minimum?, nil):
             return L10n.Plp.Refine.Price.Summary.from(minimum)
+
         case (nil, let maximum?):
             return L10n.Plp.Refine.Price.Summary.upTo(maximum)
+
         case (nil, nil):
             return nil
         }

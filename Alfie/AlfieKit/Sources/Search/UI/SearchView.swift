@@ -53,6 +53,7 @@ extension SearchView {
         switch viewModel.state {
         case .blank:
             Color.clear
+
         case .recentSearches:
             RecentSearchesView(viewModel: viewModel.recentSearchesViewModel)
         }

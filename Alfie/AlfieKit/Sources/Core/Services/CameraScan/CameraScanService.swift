@@ -231,10 +231,13 @@ extension CameraScanService {
         switch symbology {
         case .qr:
             return .qr(value)
+
         case .ean13:
             return .ean13(value)
+
         case .code128:
             return .code128(value)
+
         default:
             return nil
         }

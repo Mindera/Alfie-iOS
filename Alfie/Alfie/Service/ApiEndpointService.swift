@@ -54,7 +54,7 @@ enum ApiEndpointUrl: String {
     /// (`localhost:4000`) instead of the BFF (`localhost:3000`). Useful during the
     /// schema-divergence transition while iOS queries are migrated to the BFF.
     /// Flip in code and rebuild.
-    static var useLegacyMockDev: Bool = false
+    static var useLegacyMockDev = false
 
     /// Legacy Alfie-Mocks server URL — used as the `dev` URL when `useLegacyMockDev` is `true`.
     static let legacyMockDevUrl = "http://localhost:4000/"
@@ -62,20 +62,12 @@ enum ApiEndpointUrl: String {
     // Local dev: aligned with the BFF default port. BFFClientService appends `graphql` /
     // `config/webviews` to this base, so it must stay an origin root (trailing slash, no path).
     case dev = "http://localhost:3000/"
-    // TODO: Real PreProd/Prod BFF environment URLs are not provisioned yet — these are
-    // explicit TBD placeholders. Replace once the real environments exist.
-    case preProd = "https://preprod.bff.tbd.invalid/"
-    case prod = "https://prod.bff.tbd.invalid/"
 
     static func url(for option: ApiEndpointOption) -> String {
         // swiftlint:disable vertical_whitespace_between_cases
         switch option {
         case .dev:
             useLegacyMockDev ? legacyMockDevUrl : ApiEndpointUrl.dev.rawValue
-        case .preProd:
-            ApiEndpointUrl.preProd.rawValue
-        case .prod:
-            ApiEndpointUrl.prod.rawValue
         case .custom:
             ApiEndpointUrl.dev.rawValue
         }
@@ -120,6 +112,6 @@ private extension ApiEndpointOption {
     }
 
     static var defaultOption: ApiEndpointOption {
-        ReleaseConfigurator.isRelease ? .prod : .dev
+        .dev
     }
 }

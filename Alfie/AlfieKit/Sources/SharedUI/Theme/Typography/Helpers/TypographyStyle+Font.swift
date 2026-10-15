@@ -8,16 +8,35 @@ extension UIFont.Weight {
     /// Tokens currently only use 400 (regular) and 500 (medium); anything else falls back to regular.
     public init(tokenWeight: Int) {
         switch tokenWeight {
-        case 100: self = .ultraLight
-        case 200: self = .thin
-        case 300: self = .light
-        case 400: self = .regular
-        case 500: self = .medium
-        case 600: self = .semibold
-        case 700: self = .bold
-        case 800: self = .heavy
-        case 900: self = .black
-        default: self = .regular
+        case 100:
+            self = .ultraLight
+
+        case 200:
+            self = .thin
+
+        case 300:
+            self = .light
+
+        case 400:
+            self = .regular
+
+        case 500:
+            self = .medium
+
+        case 600:
+            self = .semibold
+
+        case 700:
+            self = .bold
+
+        case 800:
+            self = .heavy
+
+        case 900:
+            self = .black
+
+        default:
+            self = .regular
         }
     }
 }
@@ -34,11 +53,13 @@ extension TypographyStyle {
         switch fontFamily {
         case Primitives.Typography.fontFamilyPrimaryIos:
             return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
+
         case Primitives.Typography.fontFamilyBrand:
             // If the bundled brand face isn't registered, fall back to the system font at the
             // token's size/weight rather than `UIFont()` (which loses both).
             return UIFont(name: FontNames.libreBaskerville.rawValue, size: fontSize)
                 ?? .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
+
         default:
             return .systemFont(ofSize: fontSize, weight: .init(tokenWeight: fontWeight))
         }

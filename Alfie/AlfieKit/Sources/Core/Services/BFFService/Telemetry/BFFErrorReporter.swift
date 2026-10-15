@@ -50,12 +50,23 @@ public final class BFFErrorReporter: BFFErrorReporterProtocol {
 
     static func category(for type: BFFRequestError.BFFRequestErrorType) -> String {
         switch type {
-        case .rateLimited: return "rate_limited"
-        case .timeout: return "timeout"
-        case .serverError: return "server_error"
-        case .noInternet: return "network"
-        case .product, .cart, .emptyResponse: return "graphql"
-        case .generic: return "generic"
+        case .rateLimited:
+            return "rate_limited"
+
+        case .timeout:
+            return "timeout"
+
+        case .serverError:
+            return "server_error"
+
+        case .noInternet:
+            return "network"
+
+        case .product, .cart, .emptyResponse:
+            return "graphql"
+
+        case .generic:
+            return "generic"
         }
     }
 
@@ -63,6 +74,7 @@ public final class BFFErrorReporter: BFFErrorReporterProtocol {
         switch type {
         case .serverError, .generic:
             return true
+
         case .product, .cart, .emptyResponse, .rateLimited, .timeout, .noInternet:
             // "No products", an expired cart and similar GraphQL-level signals are legitimate
             // empty states, not failures — keep them out of Crashlytics. Rate-limit /

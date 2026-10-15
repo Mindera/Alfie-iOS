@@ -61,6 +61,7 @@ public final class ProductService: ProductServiceProtocol {
             switch error.type {
             case .emptyResponse, .product(.noProducts):
                 throw BFFRequestError(type: .product(.noProducts(category: collectionHandle, query: nil, sort: sort)))
+
             default:
                 throw BFFRequestError(type: .product(.generic))
             }

@@ -134,21 +134,27 @@ private extension QuantityStepper.Accessibility {
         QuantityStepper(
             quantity: 1,
             bounds: 0...100,
-            accessibility: .preview(quantity: 1, decrease: "Remove")
-        ) {} onIncrease: {}
+            accessibility: .preview(quantity: 1, decrease: "Remove"),
+            onDecrease: {},
+            onIncrease: {}
+        )
 
         QuantityStepper(
             quantity: 100,
             bounds: 0...100,
-            accessibility: .preview(quantity: 100, decrease: "Decrease")
-        ) {} onIncrease: {}
+            accessibility: .preview(quantity: 100, decrease: "Decrease"),
+            onDecrease: {},
+            onIncrease: {}
+        )
 
         QuantityStepper(
             quantity: 3,
             bounds: 0...100,
             isDisabled: true,
-            accessibility: .preview(quantity: 3, decrease: "Decrease")
-        ) {} onIncrease: {}
+            accessibility: .preview(quantity: 3, decrease: "Decrease"),
+            onDecrease: {},
+            onIncrease: {}
+        )
     }
     .padding()
 }

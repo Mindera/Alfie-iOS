@@ -92,17 +92,23 @@ private struct ThemedTextStyle: TextFieldStyle {
                     if let title {
                         Text.build(theme.font.body.medium(title))
                             .lineLimit(1)
-                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
+                            .foregroundStyle(
+                                isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500
+                            )
                     }
                     if isRequired {
                         Text.build(theme.font.body.medium("*"))
-                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.semanticError700)
+                            .foregroundStyle(
+                                isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.semanticError700
+                            )
                             .padding(.leading, Primitives.Spacing.spacing2)
                     }
                     if let limit {
                         Spacer()
                         Text.build(theme.font.body.medium("\(count)/\(limit)"))
-                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500)
+                            .foregroundStyle(
+                                isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500
+                            )
                     }
                 }
                 .padding(.bottom, Primitives.Spacing.spacing8)
@@ -129,7 +135,9 @@ private struct ThemedTextStyle: TextFieldStyle {
                             .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
                             .padding(.trailing, Constants.inputPadding)
-                            .foregroundStyle(isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals800)
+                            .foregroundStyle(
+                                isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals800
+                            )
                     }
                 }
             }

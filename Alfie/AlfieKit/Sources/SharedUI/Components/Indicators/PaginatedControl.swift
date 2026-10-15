@@ -29,7 +29,12 @@ public struct PaginatedControl: View {
             Button {
                 decrementIndex()
             } label: {
-                ThemedIcon(.chevronLeft, size: .small, tint: configuration.tintColor, accessibilityLabel: L10n.Accessibility.previousPage)
+                ThemedIcon(
+                    .chevronLeft,
+                    size: .small,
+                    tint: configuration.tintColor,
+                    accessibilityLabel: L10n.Accessibility.previousPage
+                )
             }
 
             HStack(spacing: Primitives.Spacing.spacing0) {
@@ -53,7 +58,12 @@ public struct PaginatedControl: View {
             Button {
                 incrementIndex()
             } label: {
-                ThemedIcon(.chevronRight, size: .small, tint: configuration.tintColor, accessibilityLabel: L10n.Accessibility.nextPage)
+                ThemedIcon(
+                    .chevronRight,
+                    size: .small,
+                    tint: configuration.tintColor,
+                    accessibilityLabel: L10n.Accessibility.nextPage
+                )
             }
         }
     }
