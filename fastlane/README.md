@@ -31,6 +31,14 @@ Run Tests
 
 Build and deploy app release to TestFlight
 
+### ios strip_local_network_plist_keys
+
+```sh
+[bundle exec] fastlane ios strip_local_network_plist_keys
+```
+
+Remove the Info.plist keys that only development builds need to reach a BFF on the local network
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

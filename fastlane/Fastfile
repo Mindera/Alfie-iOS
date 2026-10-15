@@ -39,10 +39,23 @@ platform :ios do
     sh("git config user.name '#{ENV['GIT_USER_NAME']}'; git config user.email '#{ENV['GIT_EMAIL']}'")
     sh("git tag #{new_tag}; git push origin #{new_tag}")
 
+    strip_local_network_plist_keys
     gym
     app_store_connect_api_key
     upload_to_testflight
     upload_symbols_to_crashlytics
+  end
+
+  desc "Remove the Info.plist keys that only development builds need to reach a BFF on the local network"
+  lane :strip_local_network_plist_keys do
+    update_info_plist(
+      xcodeproj: ENV['GYM_PROJECT'],
+      plist_path: "Alfie/Info.plist",
+      block: proc do |plist|
+        plist.delete("NSAppTransportSecurity")
+        plist.delete("NSLocalNetworkUsageDescription")
+      end
+    )
   end
 
   # Helper lane to renew Code Signing certificates/provisioning profiles
