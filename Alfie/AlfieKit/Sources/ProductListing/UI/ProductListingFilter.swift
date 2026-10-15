@@ -102,7 +102,8 @@ struct ProductListingFilter: View {
     /// Figma places Remove All on both the panel and the sub-screen headers. With one filterable
     /// dimension the two are the same operation (ALFMOB-486), so they share behaviour but carry
     /// distinct identifiers — both can be in the hierarchy at once while a sub-screen is pushed.
-    @ViewBuilder private func removeAllButton(accessibilityIdentifier: String) -> some View {
+    @ViewBuilder
+    private func removeAllButton(accessibilityIdentifier: String) -> some View {
         // Hidden rather than disabled while there is nothing to remove (ALFMOB-486 left the
         // visual state to implementation).
         if viewModel.hasActiveFilters {
@@ -192,7 +193,8 @@ struct ProductListingFilter: View {
 
     // MARK: - Sub-screens
 
-    @ViewBuilder private func destination(for route: RefineRoute) -> some View {
+    @ViewBuilder
+    private func destination(for route: RefineRoute) -> some View {
         Group {
             switch route {
             case .price:
