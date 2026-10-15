@@ -24,7 +24,7 @@ enum RetryAfterParser {
         let patterns = [
             "EEE, dd MMM yyyy HH:mm:ss zzz", // IMF-fixdate
             "EEEE, dd-MMM-yy HH:mm:ss zzz",  // RFC 850
-            "EEE MMM d HH:mm:ss yyyy",         // asctime
+            "EEE MMM d HH:mm:ss yyyy",       // asctime
         ]
         return patterns.map { pattern in
             let formatter = DateFormatter()

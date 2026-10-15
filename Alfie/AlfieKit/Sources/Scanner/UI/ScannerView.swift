@@ -62,7 +62,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 .background(Theme.surfaceBackgroundInvertedPrimary.ignoresSafeArea(edges: .top))
 
             if let error = viewModel.failure {
-                ScannerFailureView(error: error) { viewModel.didTapOpenSettings() }
+                ScannerFailureView(error: error, openSettings: viewModel.didTapOpenSettings)
                     .frame(maxHeight: .infinity)
                     .background(Theme.surfaceBackgroundPrimary)
             } else {
@@ -200,8 +200,9 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                     showCloseButton: true,
                     icon: Icon.warning.image,
                     autoDismissTime: nil
-                )
-            ) { viewModel.didDismissNotice() }
+                ),
+                onCloseTap: viewModel.didDismissNotice
+            )
             .accessibilityIdentifier(AccessibilityID.Scanner.notice)
             .transition(.opacity)
         }
