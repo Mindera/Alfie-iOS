@@ -35,7 +35,11 @@ public struct ThemedDivider: View {
         )
     )
     public static var verticalThin = ThemedDivider(
-        configuration: .init(orientation: .vertical, thickness: Constants.thinThickness, color: Primitives.Colours.neutrals100)
+        configuration: .init(
+            orientation: .vertical,
+            thickness: Constants.thinThickness,
+            color: Primitives.Colours.neutrals100
+        )
     )
     public static var horizontalThick = ThemedDivider(
         configuration: .init(
@@ -45,7 +49,11 @@ public struct ThemedDivider: View {
         )
     )
     public static var verticalThick = ThemedDivider(
-        configuration: .init(orientation: .vertical, thickness: Constants.thickThickness, color: Primitives.Colours.neutrals100)
+        configuration: .init(
+            orientation: .vertical,
+            thickness: Constants.thickThickness,
+            color: Primitives.Colours.neutrals100
+        )
     )
     private let configuration: ThemedDividerConfiguration
 
@@ -86,7 +94,11 @@ public struct ThemedDivider: View {
         Spacer()
         HStack {
             ThemedDivider(
-                configuration: .init(orientation: .horizontal, thickness: 5.0, color: Primitives.Colours.semanticError400)
+                configuration: .init(
+                    orientation: .horizontal,
+                    thickness: 5.0,
+                    color: Primitives.Colours.semanticError400
+                )
             )
             Spacer()
             ThemedDivider(

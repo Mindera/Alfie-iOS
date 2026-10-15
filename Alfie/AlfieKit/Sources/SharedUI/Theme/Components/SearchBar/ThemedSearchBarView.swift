@@ -203,6 +203,7 @@ public struct ThemedSearchBarView: View {
             switch self {
             case .magnifierOnly:
                 return false
+
             case .magnifierLeadingScanTrailing:
                 return true
             }

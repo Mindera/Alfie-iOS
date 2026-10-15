@@ -22,8 +22,10 @@ private extension ProductDetailsConfiguration {
         switch self {
         case .id(let id), .deepLink(let id, _, _):
             id
+
         case .product(let product):
             product.id
+
         case .selectedProduct(let selectedProduct):
             selectedProduct.product.id
         }
@@ -33,8 +35,10 @@ private extension ProductDetailsConfiguration {
         switch self {
         case .id, .deepLink:
             nil
+
         case .product(let product):
             product
+
         case .selectedProduct(let selectedProduct):
             selectedProduct.product
         }

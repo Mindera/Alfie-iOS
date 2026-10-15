@@ -53,10 +53,7 @@ extension BFFGraphAPI.ProductDetailsFragment {
     /// Resolution rule: the variant whose `id` matches `defaultVariantId`; else the first
     /// in-stock variant; else the first variant. Returns nil only when there are no variants.
     private func defaultVariantIndex(in variants: [BFFGraphAPI.ProductDetailsFragment.Variant]) -> Int? {
-        if
-            let defaultVariantId,
-            let index = variants.firstIndex(where: { $0.id == defaultVariantId })
-        {
+        if let defaultVariantId, let index = variants.firstIndex(where: { $0.id == defaultVariantId }) {
             return index
         }
         if let index = variants.firstIndex(where: { ($0.inventory?.available ?? 0) > 0 }) {

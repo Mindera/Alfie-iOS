@@ -144,7 +144,7 @@ struct DeepLinkDemoView: View {
     }
 
     private enum ShopLinks: String, CaseIterable {
-        case shop = "shop"
+        case shop
 
         var label: String {
             switch self {

@@ -54,7 +54,7 @@ enum ApiEndpointUrl: String {
     /// (`localhost:4000`) instead of the BFF (`localhost:3000`). Useful during the
     /// schema-divergence transition while iOS queries are migrated to the BFF.
     /// Flip in code and rebuild.
-    static var useLegacyMockDev: Bool = false
+    static var useLegacyMockDev = false
 
     /// Legacy Alfie-Mocks server URL — used as the `dev` URL when `useLegacyMockDev` is `true`.
     static let legacyMockDevUrl = "http://localhost:4000/"

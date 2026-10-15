@@ -258,6 +258,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
                 sort: sortOption,
                 filters: filters
             )
+
         case .searchResults:
             guard let searchTerm = query else { return nil }
             return try await dependencies.productListingService.searchPage(

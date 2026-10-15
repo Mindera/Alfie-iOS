@@ -18,9 +18,14 @@ public enum ScannedCode: Equatable {
     /// Barcode in turn outranks a code that is not ours at all.
     public var precedence: Int {
         switch self {
-        case .alfieCode: return 0
-        case .barcode: return 1
-        case .unrecognised: return 2
+        case .alfieCode:
+            return 0
+
+        case .barcode:
+            return 1
+
+        case .unrecognised:
+            return 2
         }
     }
 }

@@ -80,16 +80,30 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     }
 
     private func placeholderView(_ category: NavigationItem) -> some View {
-        categoriesListItem(for: category.title, font: rowFont, isShimmering: true, foregroundColor: Theme.contentContentPrimaryDisabled, showChevron: true)
+        categoriesListItem(
+            for: category.title,
+            font: rowFont,
+            isShimmering: true,
+            foregroundColor: Theme.contentContentPrimaryDisabled,
+            showChevron: true
+        )
     }
 
     private var errorView: some View {
         let (title, message): (String, String) = {
             switch viewModel.state.failure {
             case .rateLimited:
-                return (L10n.Shop.Categories.ErrorView.RateLimited.title, L10n.Shop.Categories.ErrorView.RateLimited.message)
+                return (
+                    L10n.Shop.Categories.ErrorView.RateLimited.title,
+                    L10n.Shop.Categories.ErrorView.RateLimited.message
+                )
+
             case .serverError:
-                return (L10n.Shop.Categories.ErrorView.ServerError.title, L10n.Shop.Categories.ErrorView.ServerError.message)
+                return (
+                    L10n.Shop.Categories.ErrorView.ServerError.title,
+                    L10n.Shop.Categories.ErrorView.ServerError.message
+                )
+
             default:
                 return (L10n.Shop.Categories.ErrorView.title, L10n.Shop.Categories.ErrorView.message)
             }
@@ -100,7 +114,10 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             title: title,
             message: message,
             buttons: [
-                .init(cta: L10n.Shop.Categories.ErrorView.Button.cta, accessibilityId: AccessibilityID.Categories.retryButton) {
+                .init(
+                    cta: L10n.Shop.Categories.ErrorView.Button.cta,
+                    accessibilityId: AccessibilityID.Categories.retryButton
+                ) {
                     Task { await viewModel.retry() }
                 },
             ]

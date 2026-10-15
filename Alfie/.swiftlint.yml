@@ -65,6 +65,8 @@ identifier_name:
 large_tuple: 3
 function_body_length: 200
 type_body_length: 400
+trailing_closure:
+  only_single_muted_parameter: true
 trailing_comma:
   mandatory_comma: true
 line_length:

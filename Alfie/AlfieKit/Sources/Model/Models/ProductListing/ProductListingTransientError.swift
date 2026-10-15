@@ -7,16 +7,24 @@ public struct ProductListingTransientError: Equatable {
 
         public init?(_ pageRequest: ProductListingPageRequest) {
             switch pageRequest {
-            case .refresh: self = .refresh
-            case .nextPage: self = .nextPage
-            case .firstPage: return nil
+            case .refresh:
+                self = .refresh
+
+            case .nextPage:
+                self = .nextPage
+
+            case .firstPage:
+                return nil
             }
         }
 
         public var pageRequest: ProductListingPageRequest {
             switch self {
-            case .refresh: .refresh
-            case .nextPage: .nextPage
+            case .refresh:
+                .refresh
+
+            case .nextPage:
+                .nextPage
             }
         }
     }

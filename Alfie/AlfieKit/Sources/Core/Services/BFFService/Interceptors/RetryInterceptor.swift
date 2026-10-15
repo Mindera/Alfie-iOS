@@ -32,7 +32,10 @@ final class RetryInterceptor: ApolloInterceptor {
             maxRetries: Int = 3,
             perAttemptCap: TimeInterval = 8,
             retryAfterCap: TimeInterval = 30,
-            scheduleRetry: @escaping @Sendable (_ delay: TimeInterval, _ work: @escaping @Sendable () -> Void) -> Void = { delay, work in
+            scheduleRetry: @escaping @Sendable (
+                _ delay: TimeInterval,
+                _ work: @escaping @Sendable () -> Void
+            ) -> Void = { delay, work in
                 DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay, execute: work)
             }
         ) {
@@ -75,9 +78,10 @@ final class RetryInterceptor: ApolloInterceptor {
     ) {
         // Never retry non-idempotent operations, and only act on completed responses
         // that carry a status code we care about.
-        guard Operation.isQuery,
-              let statusCode = response?.httpResponse.statusCode,
-              let kind = TransientFailureKind(statusCode: statusCode)
+        guard
+            Operation.isQuery,
+            let statusCode = response?.httpResponse.statusCode,
+            let kind = TransientFailureKind(statusCode: statusCode)
         else {
             chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
             return
@@ -129,16 +133,24 @@ private enum TransientFailureKind {
 
     init?(statusCode: Int) {
         switch statusCode {
-        case 500, 502, 503, 504: self = .server
-        case 429, 430: self = .rateLimit
-        default: return nil
+        case 500, 502, 503, 504:
+            self = .server
+
+        case 429, 430:
+            self = .rateLimit
+
+        default:
+            return nil
         }
     }
 
     func toErrorType(statusCode: Int, retryAfter: TimeInterval?) -> BFFRequestError.BFFRequestErrorType {
         switch self {
-        case .server: return .serverError(status: statusCode)
-        case .rateLimit: return .rateLimited(retryAfter: retryAfter)
+        case .server:
+            return .serverError(status: statusCode)
+
+        case .rateLimit:
+            return .rateLimited(retryAfter: retryAfter)
         }
     }
 }

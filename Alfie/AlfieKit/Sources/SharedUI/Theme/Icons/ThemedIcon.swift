@@ -14,10 +14,13 @@ public struct ThemedIcon: View {
             switch self {
             case .small:
                 return Sizing.iconsIconSmall
+
             case .medium:
                 return Sizing.iconsIconMedium
+
             case .large:
                 return Sizing.iconsIconLarge
+
             case .xlarge:
                 return Sizing.iconsIconXlarge
             }

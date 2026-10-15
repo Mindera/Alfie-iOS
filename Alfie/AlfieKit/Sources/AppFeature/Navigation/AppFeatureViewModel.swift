@@ -74,15 +74,11 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let myAccountDependencyContainer = MyAccountDependencyContainer(
             configurationService: serviceProvider.configurationService,
             sessionService: serviceProvider.sessionService,
-            makeSettingsView: { [
-                configurationService = serviceProvider.configurationService,
-                apiEndpointService = serviceProvider.apiEndpointService,
-                bffApiKeyService = serviceProvider.bffApiKeyService
-            ] present in
+            makeSettingsView: { present in
                 SettingsViewFactory.make(
-                    configurationService: configurationService,
-                    apiEndpointService: apiEndpointService,
-                    bffApiKeyService: bffApiKeyService,
+                    configurationService: serviceProvider.configurationService,
+                    apiEndpointService: serviceProvider.apiEndpointService,
+                    bffApiKeyService: serviceProvider.bffApiKeyService,
                     present: present
                 )
             }

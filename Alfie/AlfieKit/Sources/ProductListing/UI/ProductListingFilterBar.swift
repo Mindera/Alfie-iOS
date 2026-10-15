@@ -61,7 +61,6 @@ struct ProductListingFilterBar: View {
     private enum Constants {
         static let fullOpacityResults: CGFloat = 1
     }
-
 }
 
 #Preview {
