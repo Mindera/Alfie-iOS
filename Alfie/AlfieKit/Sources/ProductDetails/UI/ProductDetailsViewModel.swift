@@ -12,6 +12,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     private let openWebfeatureAction: (WebFeature) -> Void
     private let openProductAction: (Product) -> Void
     private var hasRequestedRelatedProducts = false
+    private var isFetchingProduct = false
 
     @Published public private(set) var state: ViewState<
         ProductDetailsViewStateModel, ProductDetailsViewErrorType
@@ -460,10 +461,12 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
 
     @MainActor
     private func loadProductIfNeeded() async {
-        guard !state.isSuccess else {
+        guard !state.isSuccess, !isFetchingProduct else {
             return
         }
 
+        isFetchingProduct = true
+        defer { isFetchingProduct = false }
         state = .loading
 
         let product: Product

@@ -124,6 +124,32 @@ final class ProductDetailsRetryTests: XCTestCase {
         await gate.open()
     }
 
+    func test_the_view_reappearing_while_retry_loads_does_not_load_the_product_twice() async {
+        arrangeAppearedScreen(
+            productResponse: { _ in throw BFFRequestError(type: .generic) },
+            relatedProductsResponse: { _, _ in [] }
+        )
+        let gate = ResponseGate()
+        let productRequested = expectation(description: "Product is requested")
+        productRequested.assertForOverFulfill = false
+        let secondProductRequest = expectation(description: "Product is not requested again")
+        secondProductRequest.isInverted = true
+        var productRequests = 0
+        mockBFFClient.onGetProductCalled = { _ in
+            productRequests += 1
+            if productRequests > 1 { secondProductRequest.fulfill() }
+            await gate.hold(signal: productRequested)
+            return .fixture()
+        }
+        sut.didTapRetry()
+        await fulfillment(of: [productRequested], timeout: .default)
+
+        sut.viewDidAppear()
+
+        await fulfillment(of: [secondProductRequest], timeout: .inverted)
+        await gate.open()
+    }
+
     private func arrangeAppearedScreen(
         productResponse: @escaping (String) async throws -> Product,
         relatedProductsResponse: @escaping (String, Int) async throws -> [Product]
