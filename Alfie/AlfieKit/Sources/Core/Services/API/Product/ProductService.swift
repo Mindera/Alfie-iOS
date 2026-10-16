@@ -42,43 +42,17 @@ public final class ProductService: ProductServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        do {
-            return try await bffClient.productList(
-                collectionHandle: collectionHandle,
-                after: after,
-                limit: limit,
-                sort: sort,
-                filters: filters
-            )
-        } catch let error as CancellationError {
-            // SwiftUI cancels the `.refreshable` task routinely; mapping that here is what raised an
-            // error Snackbar over a perfectly good grid. See the note in `getProduct`.
-            throw error
-        } catch let error as BFFRequestError {
-            // Only "no data" responses should surface as a noProducts state; genuine
-            // failures (network, decoding, server errors) get the generic product error so
-            // the UI can render an error state rather than a misleading empty list.
-            switch error.type {
-            case .emptyResponse, .product(.noProducts):
-                throw BFFRequestError(type: .product(.noProducts(category: collectionHandle, query: nil, sort: sort)))
-
-            default:
-                throw BFFRequestError(type: .product(.generic))
-            }
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
+        try await bffClient.productList(
+            collectionHandle: collectionHandle,
+            after: after,
+            limit: limit,
+            sort: sort,
+            filters: filters
+        )
     }
 
     public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
-        do {
-            return try await bffClient.categoryPriceRange(collectionHandle: collectionHandle)
-        } catch let error as CancellationError {
-            // See the note in `getProduct`.
-            throw error
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
+        try await bffClient.categoryPriceRange(collectionHandle: collectionHandle)
     }
 
     public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {

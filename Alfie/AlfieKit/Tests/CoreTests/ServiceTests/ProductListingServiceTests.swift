@@ -72,17 +72,26 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertTrue(listing.pagination.hasNextPage)
     }
 
-    func test_productListPage_propagates_bff_errors() async {
-        mockClientService.onProductListCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
+    func test_productListPage_passes_bff_errors_through_untouched() async {
+        let underlying = URLError(.badServerResponse)
+        let thrown = BFFRequestError(
+            type: .serverError(status: 503),
+            error: underlying,
+            retryCount: 2,
+            graphqlErrorCode: "INTERNAL_SERVER_ERROR",
+            graphqlErrorStatus: 503
+        )
+        mockClientService.onProductListCalled = { _, _, _, _, _ in throw thrown }
 
         do {
             _ = try await sut.productListPage(collectionHandle: "c", after: nil, sort: nil, filters: nil)
-            XCTFail("Expected productListPage() to throw")
+            XCTFail("Expected a throw")
         } catch let error as BFFRequestError {
-            // ProductService maps non-emptyResponse BFF errors to .product(.generic)
-            XCTAssertEqual(error.type, .product(.generic))
+            XCTAssertEqual(error.type, .serverError(status: 503))
+            XCTAssertEqual(error.retryCount, 2)
+            XCTAssertEqual(error.graphqlErrorCode, "INTERNAL_SERVER_ERROR")
+            XCTAssertEqual(error.graphqlErrorStatus, 503)
+            XCTAssertEqual((error.error as? URLError)?.code, .badServerResponse)
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -108,17 +117,26 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertEqual(call.filters, filters)
     }
 
-    func test_searchPage_propagates_bff_errors() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
+    func test_searchPage_passes_bff_errors_through_untouched() async {
+        let underlying = URLError(.badServerResponse)
+        let thrown = BFFRequestError(
+            type: .serverError(status: 503),
+            error: underlying,
+            retryCount: 2,
+            graphqlErrorCode: "INTERNAL_SERVER_ERROR",
+            graphqlErrorStatus: 503
+        )
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw thrown }
 
         do {
             _ = try await sut.searchPage(searchTerm: "polo", after: nil, sort: nil, filters: nil)
-            XCTFail("Expected searchPage() to throw")
+            XCTFail("Expected a throw")
         } catch let error as BFFRequestError {
-            // SearchService maps non-emptyResponse BFF errors to .product(.generic)
-            XCTAssertEqual(error.type, .product(.generic))
+            XCTAssertEqual(error.type, .serverError(status: 503))
+            XCTAssertEqual(error.retryCount, 2)
+            XCTAssertEqual(error.graphqlErrorCode, "INTERNAL_SERVER_ERROR")
+            XCTAssertEqual(error.graphqlErrorStatus, 503)
+            XCTAssertEqual((error.error as? URLError)?.code, .badServerResponse)
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

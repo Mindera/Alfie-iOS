@@ -940,6 +940,28 @@
         }
       }
     },
+    "plp.error_view.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check your connection and try again."
+          }
+        }
+      }
+    },
+    "plp.error_view.no_connection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No connection"
+          }
+        }
+      }
+    },
     "plp.error_view.rate_limited.message" : {
       "extractionState" : "manual",
       "localizations" : {

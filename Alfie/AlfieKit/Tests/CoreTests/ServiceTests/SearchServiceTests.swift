@@ -19,51 +19,26 @@ final class SearchServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_searchProducts_maps_emptyResponse_to_noProducts() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .emptyResponse)
-        }
+    func test_searchProducts_passes_bff_errors_through_untouched() async {
+        let underlying = URLError(.badServerResponse)
+        let thrown = BFFRequestError(
+            type: .serverError(status: 503),
+            error: underlying,
+            retryCount: 2,
+            graphqlErrorCode: "INTERNAL_SERVER_ERROR",
+            graphqlErrorStatus: 503
+        )
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw thrown }
 
         do {
             _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected searchProducts to throw")
+            XCTFail("Expected a throw")
         } catch let error as BFFRequestError {
-            guard case .product(.noProducts) = error.type else {
-                XCTFail("Expected .product(.noProducts), got \(error.type)")
-                return
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_searchProducts_maps_other_bff_errors_to_generic_product_error() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
-
-        do {
-            _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected searchProducts to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_searchProducts_rethrows_cancellation_unmapped() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw CancellationError()
-        }
-
-        do {
-            _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected searchProducts to throw")
-        } catch is CancellationError {
-            // The PLP attaches `.refreshable` in both modes, so a search-results refresh reaches
-            // here rather than `ProductService`. Without this the cancellation guard in
-            // `ProductListingViewModel.refresh()` is just as unreachable as it was for `.listing`.
+            XCTAssertEqual(error.type, .serverError(status: 503))
+            XCTAssertEqual(error.retryCount, 2)
+            XCTAssertEqual(error.graphqlErrorCode, "INTERNAL_SERVER_ERROR")
+            XCTAssertEqual(error.graphqlErrorStatus, 503)
+            XCTAssertEqual((error.error as? URLError)?.code, .badServerResponse)
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

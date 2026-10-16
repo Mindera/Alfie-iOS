@@ -321,6 +321,12 @@ public enum L10n {
         /// Retry
         public static let cta = L10n.tr("L10n", "plp.error_view.button.cta")
       }
+      public enum NoConnection {
+        /// Check your connection and try again.
+        public static let message = L10n.tr("L10n", "plp.error_view.no_connection.message")
+        /// No connection
+        public static let title = L10n.tr("L10n", "plp.error_view.no_connection.title")
+      }
       public enum RateLimited {
         /// Please wait a moment and try again.
         public static let message = L10n.tr("L10n", "plp.error_view.rate_limited.message")
@@ -873,6 +879,8 @@ public extension L10n {
       case plpErrorViewMessage = "plp.error_view.message"
       case plpErrorViewTitle = "plp.error_view.title"
       case plpErrorViewButtonCta = "plp.error_view.button.cta"
+      case plpErrorViewNoConnectionMessage = "plp.error_view.no_connection.message"
+      case plpErrorViewNoConnectionTitle = "plp.error_view.no_connection.title"
       case plpErrorViewRateLimitedMessage = "plp.error_view.rate_limited.message"
       case plpErrorViewRateLimitedTitle = "plp.error_view.rate_limited.title"
       case plpErrorViewServerErrorMessage = "plp.error_view.server_error.message"
