@@ -1,4 +1,3 @@
-import Core
 import Mocks
 import Model
 import TestUtils
@@ -66,24 +65,6 @@ final class ProductListingBlockingErrorTests: XCTestCase {
         searchText: String? = nil,
         mode: ProductListingViewMode
     ) -> ProductListingViewModel {
-        .init(
-            dependencies: ProductListingDependencyContainer(
-                productListingService: ProductListingService(
-                    productService: ProductService(bffClient: mockClientService),
-                    searchService: SearchService(bffClient: mockClientService),
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: MockWishlistService(),
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService(),
-                log: MockLogger()
-            ),
-            category: category,
-            searchText: searchText,
-            mode: mode,
-            navigate: { _ in },
-            searchNavigation: mode == .listing ? .listing(openSearch: {}) : .searchResults(goBack: {}, editSearchTerm: {})
-        )
+        .onRealServices(bffClient: mockClientService, category: category, searchText: searchText, mode: mode)
     }
 }

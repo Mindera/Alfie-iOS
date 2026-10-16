@@ -1,4 +1,3 @@
-import Core
 import Mocks
 import Model
 import TestUtils
@@ -71,24 +70,6 @@ final class ProductListingTransientErrorTests: XCTestCase {
     }
 
     private func makeSUT() -> ProductListingViewModel {
-        .init(
-            dependencies: ProductListingDependencyContainer(
-                productListingService: ProductListingService(
-                    productService: ProductService(bffClient: mockClientService),
-                    searchService: SearchService(bffClient: mockClientService),
-                    configuration: .init(type: .plp)
-                ),
-                plpStyleListProvider: ProductListingStyleProvider(userDefaults: MockUserDefaults()),
-                wishlistService: MockWishlistService(),
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                configurationService: MockConfigurationService(),
-                log: MockLogger()
-            ),
-            category: "clothing",
-            searchText: nil,
-            mode: .listing,
-            navigate: { _ in },
-            searchNavigation: .listing(openSearch: {})
-        )
+        .onRealServices(bffClient: mockClientService, category: "clothing", mode: .listing)
     }
 }

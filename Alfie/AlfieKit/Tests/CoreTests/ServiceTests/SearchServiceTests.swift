@@ -20,27 +20,10 @@ final class SearchServiceTests: XCTestCase {
     }
 
     func test_searchProducts_passes_bff_errors_through_untouched() async {
-        let underlying = URLError(.badServerResponse)
-        let thrown = BFFRequestError(
-            type: .serverError(status: 503),
-            error: underlying,
-            retryCount: 2,
-            graphqlErrorCode: "INTERNAL_SERVER_ERROR",
-            graphqlErrorStatus: 503
-        )
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw thrown }
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected a throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .serverError(status: 503))
-            XCTAssertEqual(error.retryCount, 2)
-            XCTAssertEqual(error.graphqlErrorCode, "INTERNAL_SERVER_ERROR")
-            XCTAssertEqual(error.graphqlErrorStatus, 503)
-            XCTAssertEqual((error.error as? URLError)?.code, .badServerResponse)
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 
