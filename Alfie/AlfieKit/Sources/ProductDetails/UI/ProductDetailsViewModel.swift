@@ -169,6 +169,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         }
     }
 
+    public func didTapRetry() {
+        state = .loading
+        relatedProductsState = .loading
+        hasRequestedRelatedProducts = false
+        viewDidAppear()
+    }
+
     public func shouldShowLoading(for section: ProductDetailsSection) -> Bool {
         switch section {
         case .titleHeader:

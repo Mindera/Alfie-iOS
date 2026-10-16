@@ -2038,6 +2038,55 @@ final class ProductDetailsViewModelTests: XCTestCase {
         wait(for: [relatedRefetch], timeout: .inverted)
     }
 
+    // MARK: - Retry
+
+    func test_retry_shows_the_loading_skeleton_while_the_product_reloads() {
+        arrangeAppearedScreen(
+            productResponse: { _ in throw BFFRequestError(type: .generic) },
+            relatedProductsResponse: { _, _ in [] }
+        )
+
+        sut.didTapRetry()
+
+        XCTAssertTrue(sut.state.isLoading)
+        XCTAssertTrue(sut.relatedProductsState.isLoading)
+    }
+
+    func test_retry_after_a_failure_reloads_the_product_and_related_products_to_success() {
+        arrangeAppearedScreen(
+            productResponse: { _ in throw BFFRequestError(type: .generic) },
+            relatedProductsResponse: { _, _ in throw BFFRequestError(type: .generic) }
+        )
+        mockProductService.onGetProductCalled = { _ in .fixture(name: "Reloaded") }
+        mockProductService.onRelatedProductsCalled = { _, _ in [.fixture(id: "related", slug: "other")] }
+
+        XCTAssertEmitsValue(
+            from: sut.$state.combineLatest(sut.$relatedProductsState),
+            where: { !$0.isLoading && !$1.isLoading },
+            afterTrigger: { self.sut.didTapRetry() }
+        )
+
+        XCTAssertTrue(sut.state.isSuccess)
+        XCTAssertEqual(sut.productName, "Reloaded")
+        XCTAssertEqual(sut.relatedProducts.map(\.id), ["related"])
+    }
+
+    func test_retry_that_fails_again_ends_in_the_error_state() {
+        arrangeAppearedScreen(
+            productResponse: { _ in throw BFFRequestError(type: .generic) },
+            relatedProductsResponse: { _, _ in [] }
+        )
+        mockProductService.onGetProductCalled = { _ in throw BFFRequestError(type: .emptyResponse) }
+
+        XCTAssertEmitsValue(
+            from: sut.$state.combineLatest(sut.$relatedProductsState),
+            where: { !$0.isLoading && !$1.isLoading },
+            afterTrigger: { self.sut.didTapRetry() }
+        )
+
+        XCTAssertEqual(sut.state.failure, .notFound)
+    }
+
     func test_did_select_related_product_opens_that_product() {
         var openedProducts: [Product] = []
         initViewModel(openProductAction: { openedProducts.append($0) })

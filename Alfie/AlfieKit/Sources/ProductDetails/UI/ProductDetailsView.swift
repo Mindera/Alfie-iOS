@@ -688,6 +688,11 @@ extension ProductDetailsView {
             // other 16 consumers of this value, including WebView's error message.
             messageColor: Primitives.Colours.neutrals600,
             buttons: [
+                .init(
+                    cta: L10n.Pdp.ErrorView.Retry.Button.cta,
+                    accessibilityId: AccessibilityID.ProductDetails.errorRetryButton,
+                    action: viewModel.didTapRetry
+                ),
                 .init(cta: L10n.Pdp.ErrorView.GoBack.Button.cta) {
                     viewModel.didTapBackButton()
                 },

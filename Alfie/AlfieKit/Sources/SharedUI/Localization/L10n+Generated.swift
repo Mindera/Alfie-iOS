@@ -265,6 +265,12 @@ public enum L10n {
         /// Too many requests
         public static let title = L10n.tr("L10n", "pdp.error_view.rate_limited.title")
       }
+      public enum Retry {
+        public enum Button {
+          /// Retry
+          public static let cta = L10n.tr("L10n", "pdp.error_view.retry.button.cta")
+        }
+      }
       public enum ServerError {
         /// We're having trouble reaching our servers. Please try again.
         public static let message = L10n.tr("L10n", "pdp.error_view.server_error.message")
@@ -865,6 +871,7 @@ public extension L10n {
       case pdpErrorViewNotFoundMessage = "pdp.error_view.not_found.message"
       case pdpErrorViewRateLimitedMessage = "pdp.error_view.rate_limited.message"
       case pdpErrorViewRateLimitedTitle = "pdp.error_view.rate_limited.title"
+      case pdpErrorViewRetryButtonCta = "pdp.error_view.retry.button.cta"
       case pdpErrorViewServerErrorMessage = "pdp.error_view.server_error.message"
       case pdpErrorViewServerErrorTitle = "pdp.error_view.server_error.title"
       case pdpGalleryAccessibilityHint = "pdp.gallery.accessibility_hint"
