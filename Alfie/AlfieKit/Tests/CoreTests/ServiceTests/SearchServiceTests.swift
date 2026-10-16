@@ -19,53 +19,11 @@ final class SearchServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_searchProducts_maps_emptyResponse_to_noProducts() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .emptyResponse)
-        }
+    func test_searchProducts_passes_bff_errors_through_untouched() async {
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected searchProducts to throw")
-        } catch let error as BFFRequestError {
-            guard case .product(.noProducts) = error.type else {
-                XCTFail("Expected .product(.noProducts), got \(error.type)")
-                return
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_searchProducts_maps_other_bff_errors_to_generic_product_error() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
-
-        do {
-            _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected searchProducts to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_searchProducts_rethrows_cancellation_unmapped() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw CancellationError()
-        }
-
-        do {
-            _ = try await sut.searchProducts(searchTerm: "polo", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected searchProducts to throw")
-        } catch is CancellationError {
-            // The PLP attaches `.refreshable` in both modes, so a search-results refresh reaches
-            // here rather than `ProductService`. Without this the cancellation guard in
-            // `ProductListingViewModel.refresh()` is just as unreachable as it was for `.listing`.
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 

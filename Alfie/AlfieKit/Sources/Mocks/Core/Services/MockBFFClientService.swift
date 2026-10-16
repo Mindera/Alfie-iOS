@@ -8,9 +8,9 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         try onGetHeaderNavCalled?(handle) ?? []
     }
 
-    public var onGetProductCalled: ((String) throws -> Product)?
+    public var onGetProductCalled: ((String) async throws -> Product)?
     public func getProduct(handle: String) async throws -> Product {
-        guard let product = try onGetProductCalled?(handle) else {
+        guard let product = try await onGetProductCalled?(handle) else {
             throw BFFRequestError(type: .emptyResponse)
         }
         return product

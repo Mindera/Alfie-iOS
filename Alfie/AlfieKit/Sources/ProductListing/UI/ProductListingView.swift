@@ -173,29 +173,16 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     private var errorView: some View {
-        let (title, message) = errorCopy(for: viewModel.state.failure)
+        let failure = viewModel.state.failure ?? .generic
         return ErrorView(
-            title: title,
-            message: message,
+            title: failure.title,
+            message: failure.message,
             buttons: [
                 .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityID.ProductListing.retryButton) {
                     Task { await viewModel.retry() }
                 },
             ]
         )
-    }
-
-    private func errorCopy(for error: ProductListingViewErrorType?) -> (String, String) {
-        switch error {
-        case .rateLimited:
-            return (L10n.Plp.ErrorView.RateLimited.title, L10n.Plp.ErrorView.RateLimited.message)
-
-        case .serverError:
-            return (L10n.Plp.ErrorView.ServerError.title, L10n.Plp.ErrorView.ServerError.message)
-
-        case .generic, .noInternet, .noResults, .none:
-            return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
-        }
     }
 }
 
@@ -207,17 +194,9 @@ extension SnackbarViewConfiguration {
         onRetry: @escaping () -> Void,
         onDismiss: @escaping () -> Void
     ) -> Self {
-        let text: String
-        switch transientError.request {
-        case .nextPage:
-            text = L10n.Plp.NextPage.errorMessage
-
-        case .refresh:
-            text = L10n.Plp.Refresh.errorMessage
-        }
-        return .init(
+        .init(
             type: .error,
-            text: text,
+            text: transientError.message,
             showCloseButton: true,
             icon: Icon.warning.image,
             actionButtonLabel: L10n.Plp.ErrorView.Button.cta,

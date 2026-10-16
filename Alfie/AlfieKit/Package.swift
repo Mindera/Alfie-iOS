@@ -352,6 +352,7 @@ let package = Package(
         .target(
             name: "TestUtils",
             dependencies: [
+                "Model",
                 .product(name: "CombineSchedulers", package: "combine-schedulers"),
                 .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
             ]
@@ -469,6 +470,7 @@ let package = Package(
             dependencies: [
                 "Model",
                 "Mocks",
+                "TestUtils",
             ]
         ),
 
@@ -484,6 +486,7 @@ let package = Package(
         .testTarget(
             name: "ProductListingTests",
             dependencies: [
+                "Core",
                 "ProductListing",
                 "Mocks",
                 "TestUtils",

@@ -199,22 +199,22 @@ final class ProductListingPagerTests: XCTestCase {
     }
 
     func test_cancelled_refresh_over_a_blocking_error_keeps_it() throws {
-        var sut = ProductListingPager(state: .error(.noInternet))
+        var sut = ProductListingPager(state: .error(.noConnection))
         let ticket = try XCTUnwrap(sut.begin(.refresh))
 
         let commit = sut.commit(.failure(CancellationError()), for: ticket)
 
-        XCTAssertEqual(sut.state, .error(.noInternet))
+        XCTAssertEqual(sut.state, .error(.noConnection))
         XCTAssertNil(commit?.transientError)
     }
 
     func test_cancelled_first_page_over_a_blocking_error_keeps_it() throws {
-        var sut = ProductListingPager(state: .error(.noInternet))
+        var sut = ProductListingPager(state: .error(.noConnection))
         let ticket = try XCTUnwrap(sut.begin(.firstPage))
 
         let commit = sut.commit(.failure(CancellationError()), for: ticket)
 
-        XCTAssertEqual(sut.state, .error(.noInternet))
+        XCTAssertEqual(sut.state, .error(.noConnection))
         XCTAssertNil(commit?.transientError)
     }
 
@@ -321,7 +321,7 @@ final class ProductListingPagerTests: XCTestCase {
     }
 
     func test_failed_refresh_over_a_blocking_error_stays_blocking() throws {
-        var sut = ProductListingPager(state: .error(.noInternet))
+        var sut = ProductListingPager(state: .error(.noConnection))
         let ticket = try XCTUnwrap(sut.begin(.refresh))
 
         let commit = sut.commit(.failure(BFFRequestError(type: .serverError(status: 503))), for: ticket)

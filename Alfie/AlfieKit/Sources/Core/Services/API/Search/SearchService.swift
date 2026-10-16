@@ -17,31 +17,12 @@ public final class SearchService: SearchServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
-        do {
-            return try await bffClient.searchProducts(
-                searchTerm: searchTerm,
-                after: after,
-                limit: limit,
-                sort: sort,
-                filters: filters
-            )
-        } catch let error as CancellationError {
-            // The PLP attaches `.refreshable` in search-results mode too, so a cancelled refresh
-            // lands here rather than in `ProductService`. Same rule: rethrow unmapped.
-            throw error
-        } catch let error as BFFRequestError {
-            // Only "no data" responses should surface as a noProducts state; genuine
-            // failures (network, decoding, server errors) get the generic product error so
-            // the UI can render an error state rather than a misleading empty list.
-            switch error.type {
-            case .emptyResponse, .product(.noProducts):
-                throw BFFRequestError(type: .product(.noProducts(category: nil, query: searchTerm, sort: sort)))
-
-            default:
-                throw BFFRequestError(type: .product(.generic))
-            }
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
+        try await bffClient.searchProducts(
+            searchTerm: searchTerm,
+            after: after,
+            limit: limit,
+            sort: sort,
+            filters: filters
+        )
     }
 }

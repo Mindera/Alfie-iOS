@@ -278,8 +278,8 @@ final class ProductListingViewModelTests: XCTestCase {
 
     func test_fetch_first_page_failure_returns_error() {
         sut = makeSUT(category: "clothing")
-        mockProductListing.onProductListPageCalled = { collectionHandle, _, sort, _ in
-            throw BFFRequestError(type: .product(.noProducts(category: collectionHandle, query: nil, sort: sort)))
+        mockProductListing.onProductListPageCalled = { _, _, _, _ in
+            throw BFFRequestError(type: .emptyResponse)
         }
 
         XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
@@ -527,10 +527,6 @@ final class ProductListingViewModelTests: XCTestCase {
         }
         await sut.refresh()
 
-        // Guards the ViewModel half of the contract: given a service that rethrows `CancellationError`
-        // unmapped, `refresh()` must swallow it — loaded products intact, no Snackbar. It stubs
-        // `MockProductListingService`, a layer above the fix, so it cannot fail for the service half;
-        // `ProductServiceTests.test_productList_rethrows_cancellation_unmapped` covers that.
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), seeded)
         XCTAssertNil(sut.transientError)
@@ -580,7 +576,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
-        XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noInternet))
+        XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noConnection))
     }
 
     func test_cancelled_next_page_keeps_loaded_products_and_emits_no_error() {
@@ -1098,7 +1094,7 @@ final class ProductListingViewModelTests: XCTestCase {
         // Bounds are auxiliary: losing them hides the Price row, it does not error the screen.
         sut = makeSUT(category: "clothing")
         mockProductListing.onCategoryPriceRangeCalled = { _ in
-            throw BFFRequestError(type: .product(.generic))
+            throw BFFRequestError(type: .generic)
         }
         mockProductListing.onProductListPageCalled = { _, _, _, _ in
             ProductListing.fixture(products: Array(Product.fixtures.prefix(3)))
@@ -1172,7 +1168,7 @@ final class ProductListingViewModelTests: XCTestCase {
         mockProductListing.onCategoryPriceRangeCalled = { _ in
             boundsFetches += 1
             guard boundsFetches > 1 else {
-                throw BFFRequestError(type: .product(.generic))
+                throw BFFRequestError(type: .generic)
             }
             return PriceRange(low: self.money(1_023), high: self.money(48_000))
         }

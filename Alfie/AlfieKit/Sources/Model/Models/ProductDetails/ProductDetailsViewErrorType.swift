@@ -1,29 +1,13 @@
 import Foundation
 
-public enum ProductDetailsViewErrorType: Error, CaseIterable {
+public enum ProductDetailsViewErrorType: Error, CaseIterable, FailureKindRepresentable {
     case generic
-    case noInternet
+    case noConnection
     case notFound
     case rateLimited
     case serverError
 
     public static func from(error: Error) -> ProductDetailsViewErrorType {
-        guard let bff = error as? BFFRequestError else { return .generic }
-        switch bff.type {
-        case .rateLimited:
-            return .rateLimited
-
-        case .serverError:
-            return .serverError
-
-        case .noInternet:
-            return .noInternet
-
-        case .product(.noProduct), .product(.noProducts), .emptyResponse:
-            return .notFound
-
-        case .timeout, .product(.generic), .cart, .generic:
-            return .generic
-        }
+        from(error: error, notFound: .notFound)
     }
 }

@@ -34,6 +34,7 @@ public protocol ProductDetailsViewModelProtocol: ObservableObject {
     var isWishlistEnabled: Bool { get }
 
     func viewDidAppear()
+    func didTapRetry()
     func shouldShow(section: ProductDetailsSection) -> Bool
     func shouldShowLoading(for section: ProductDetailsSection) -> Bool
     func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature?

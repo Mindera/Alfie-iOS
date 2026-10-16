@@ -72,19 +72,11 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertTrue(listing.pagination.hasNextPage)
     }
 
-    func test_productListPage_propagates_bff_errors() async {
-        mockClientService.onProductListCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
+    func test_productListPage_passes_bff_errors_through_untouched() async {
+        mockClientService.onProductListCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.productListPage(collectionHandle: "c", after: nil, sort: nil, filters: nil)
-            XCTFail("Expected productListPage() to throw")
-        } catch let error as BFFRequestError {
-            // ProductService maps non-emptyResponse BFF errors to .product(.generic)
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 
@@ -108,19 +100,11 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertEqual(call.filters, filters)
     }
 
-    func test_searchPage_propagates_bff_errors() async {
-        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
+    func test_searchPage_passes_bff_errors_through_untouched() async {
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.searchPage(searchTerm: "polo", after: nil, sort: nil, filters: nil)
-            XCTFail("Expected searchPage() to throw")
-        } catch let error as BFFRequestError {
-            // SearchService maps non-emptyResponse BFF errors to .product(.generic)
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 }

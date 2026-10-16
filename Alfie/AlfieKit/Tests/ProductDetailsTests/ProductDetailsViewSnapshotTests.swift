@@ -256,6 +256,35 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        as: .defaultImage(),
                        record: isRecording)
     }
+
+    func test_productDetailsView_errorState_serverError() {
+        assertErrorStateSnapshot(for: .serverError)
+    }
+
+    func test_productDetailsView_errorState_rateLimited() {
+        assertErrorStateSnapshot(for: .rateLimited)
+    }
+
+    func test_productDetailsView_errorState_noConnection() {
+        assertErrorStateSnapshot(for: .noConnection)
+    }
+
+    private func assertErrorStateSnapshot(
+        for error: ProductDetailsViewErrorType,
+        file: StaticString = #filePath,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let viewModel = makeViewModel()
+        viewModel.state = .error(error)
+        let sut = ProductDetailsView(viewModel: viewModel, showFailureState: true)
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording,
+                       file: file,
+                       testName: testName,
+                       line: line)
+    }
 }
 
 private enum Constants {
