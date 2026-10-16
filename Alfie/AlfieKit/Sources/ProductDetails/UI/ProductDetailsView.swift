@@ -203,7 +203,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
         // swiftlint:disable vertical_whitespace_between_cases
         switch failure {
         case .generic,
-             .noInternet: // swiftlint:disable:this indentation_width
+             .noConnection: // swiftlint:disable:this indentation_width
             return L10n.Pdp.ErrorView.Generic.message
         case .notFound:
             return L10n.Pdp.ErrorView.NotFound.message

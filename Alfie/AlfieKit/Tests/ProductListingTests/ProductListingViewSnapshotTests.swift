@@ -101,7 +101,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// `serverError` is one of only two cases with copy of its own — `generic`, `noInternet` and
+    /// `serverError` is one of only two cases with copy of its own — `generic`, `noConnection` and
     /// `noResults` all fall through to the same strings, so this is the branch worth pinning.
     func test_productListingView_serverErrorState() {
         let viewModel = makeViewModel(products: [], state: .error(.serverError))
@@ -131,7 +131,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
 
     func test_transient_error_snackbar_shows_a_retry_action_beside_close() {
         let sut = SnackbarView(
-            configuration: .transientError(.init(request: .nextPage, error: .noInternet), onRetry: {}, onDismiss: {})
+            configuration: .transientError(.init(request: .nextPage, error: .noConnection), onRetry: {}, onDismiss: {})
         )
         .padding(Primitives.Spacing.spacing8)
         assertSnapshot(of: sut.embededInContainer(height: 80),
