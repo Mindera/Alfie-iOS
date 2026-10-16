@@ -15,7 +15,6 @@ final class BFFErrorReporterTests: XCTestCase {
             (.serverError(status: 503), "server_error"),
             (.noInternet, "network"),
             (.product(.noProduct), "graphql"),
-            (.product(.generic), "graphql"),
             (.emptyResponse, "graphql"),
             (.cart(.cartNotFound), "graphql"),
             (.generic, "generic"),
@@ -36,7 +35,6 @@ final class BFFErrorReporterTests: XCTestCase {
             (.serverError(status: 503), true),
             (.serverError(status: 500), true),
             (.generic, true),
-            (.product(.generic), false),
             (.product(.noProduct), false),
             (.emptyResponse, false),
             // An expired cart is recovered from without the shopper ever seeing it, so it is an

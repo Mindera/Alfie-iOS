@@ -12,7 +12,7 @@ public final class MockProductListingService: ProductListingServiceProtocol {
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
         guard let productListing = try await onProductListPageCalled?(collectionHandle, after, sort, filters) else {
-            throw BFFRequestError(type: .product(.noProducts(category: collectionHandle, query: nil, sort: sort)))
+            throw BFFRequestError(type: .emptyResponse)
         }
         return productListing
     }
@@ -25,7 +25,7 @@ public final class MockProductListingService: ProductListingServiceProtocol {
         filters: ProductFilterInput?
     ) async throws -> ProductListing {
         guard let productListing = try await onSearchPageCalled?(searchTerm, after, sort, filters) else {
-            throw BFFRequestError(type: .product(.noProducts(category: nil, query: searchTerm, sort: sort)))
+            throw BFFRequestError(type: .emptyResponse)
         }
         return productListing
     }

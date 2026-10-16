@@ -202,9 +202,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
         // swiftlint:disable vertical_whitespace_between_cases
         switch failure {
-        case .generic,
-             .noConnection: // swiftlint:disable:this indentation_width
+        case .generic:
             return L10n.Pdp.ErrorView.Generic.message
+        case .noConnection:
+            return L10n.Pdp.ErrorView.NoConnection.message
         case .notFound:
             return L10n.Pdp.ErrorView.NotFound.message
         case .rateLimited:
@@ -222,6 +223,9 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
         case .serverError:
             return L10n.Pdp.ErrorView.ServerError.title
+
+        case .noConnection:
+            return L10n.Pdp.ErrorView.NoConnection.title
 
         default:
             return L10n.Pdp.ErrorView.title
@@ -806,6 +810,10 @@ private enum Constants {
 
 #Preview("Error - Generic") {
     ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.generic)))
+}
+
+#Preview("Error - No connection") {
+    ProductDetailsView(viewModel: MockProductDetailsViewModel(state: .error(.noConnection)))
 }
 #endif
 

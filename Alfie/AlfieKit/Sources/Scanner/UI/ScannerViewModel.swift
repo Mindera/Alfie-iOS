@@ -303,7 +303,23 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
         case .failure(let error):
             log.error("Looking up the scanned Barcode failed: \(error)")
-            failLookUp(of: barcode, notice: L10n.Scanner.LookupFailed.message)
+            failLookUp(of: barcode, notice: Self.lookupFailedNotice(for: error))
+        }
+    }
+
+    private static func lookupFailedNotice(for error: Error) -> String {
+        switch FailureKind(error: error) {
+        case .noConnection:
+            return L10n.Scanner.LookupFailed.NoConnection.message
+
+        case .rateLimited:
+            return L10n.Scanner.LookupFailed.RateLimited.message
+
+        case .serverError:
+            return L10n.Scanner.LookupFailed.ServerError.message
+
+        case .generic:
+            return L10n.Scanner.LookupFailed.message
         }
     }
 

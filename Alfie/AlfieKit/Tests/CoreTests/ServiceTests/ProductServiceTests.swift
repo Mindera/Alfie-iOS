@@ -42,19 +42,6 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertNil(match)
     }
 
-    func test_product_by_barcode_throws_generic_error_when_bff_service_fails() async {
-        mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .generic) }
-
-        do {
-            _ = try await sut.productByBarcode("5901234123457")
-            XCTFail("Expected productByBarcode to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
     func test_product_by_barcode_rethrows_cancellation_unmapped() async {
         mockClientService.onProductByBarcodeCalled = { _ in throw CancellationError() }
 
@@ -80,36 +67,6 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(capturedHandle, "the-handle")
     }
 
-    func test_get_product_throws_no_product_error_when_not_found() async {
-        mockClientService.onGetProductCalled = { _ in
-            throw BFFRequestError(type: .emptyResponse)
-        }
-
-        do {
-            _ = try await sut.getProduct(handle: "the-handle")
-            XCTFail("Expected getProduct to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.noProduct))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_get_product_throws_generic_error_when_bff_service_fails() async {
-        mockClientService.onGetProductCalled = { _ in
-            throw BFFRequestError(type: .generic)
-        }
-
-        do {
-            _ = try await sut.getProduct(handle: "the-handle")
-            XCTFail("Expected getProduct to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
     func test_get_product_rethrows_cancellation_unmapped() async {
         mockClientService.onGetProductCalled = { _ in
             throw CancellationError()
@@ -119,8 +76,6 @@ final class ProductServiceTests: XCTestCase {
             _ = try await sut.getProduct(handle: "the-handle")
             XCTFail("Expected getProduct to throw")
         } catch is CancellationError {
-            // Expected. No caller of this method guards on cancellation today; the rule is
-            // service-wide so the next one can. See `ProductService.getProduct`.
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

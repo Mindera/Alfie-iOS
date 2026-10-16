@@ -753,6 +753,28 @@
         }
       }
     },
+    "pdp.error_view.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your connection."
+          }
+        }
+      }
+    },
+    "pdp.error_view.no_connection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No connection"
+          }
+        }
+      }
+    },
     "pdp.error_view.not_found.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1620,6 +1642,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something went wrong. Try scanning again."
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your connection and try scanning again."
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We're having trouble. Please try scanning again."
           }
         }
       }

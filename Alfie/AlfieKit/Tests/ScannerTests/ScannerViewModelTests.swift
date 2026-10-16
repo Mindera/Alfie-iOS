@@ -47,6 +47,9 @@ final class ScannerViewModelTests: XCTestCase {
     private static let unrecognisedMessage = "We don't recognize this barcode."
     private static let notFoundMessage = "We couldn't find this product."
     private static let lookupFailedMessage = "Something went wrong. Try scanning again."
+    private static let noConnectionMessage = "Check your connection and try scanning again."
+    private static let rateLimitedMessage = "Please wait a moment and try again."
+    private static let serverErrorMessage = "We're having trouble. Please try scanning again."
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -505,7 +508,7 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     func test_scanning_barcode_when_lookup_fails_shows_lookup_failed_notice() {
-        productService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .product(.generic)) }
+        productService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .generic) }
         sut.viewDidAppear()
 
         let state = recogniseAndAwaitLookup([Self.barcode])
@@ -513,6 +516,30 @@ final class ScannerViewModelTests: XCTestCase {
         XCTAssertEqual(state?.value?.notice?.message, Self.lookupFailedMessage)
         XCTAssertEqual(state?.value?.isLookingUp, false)
         XCTAssertTrue(openedLinks.isEmpty)
+    }
+
+    func test_barcode_lookup_with_no_connection_shows_no_connection_notice() {
+        XCTAssertEqual(noticeAfterLookUpFailing(with: .noInternet), Self.noConnectionMessage)
+    }
+
+    func test_barcode_lookup_while_rate_limited_shows_rate_limited_notice() {
+        XCTAssertEqual(noticeAfterLookUpFailing(with: .rateLimited(retryAfter: 30)), Self.rateLimitedMessage)
+    }
+
+    func test_barcode_lookup_during_server_error_shows_server_error_notice() {
+        XCTAssertEqual(noticeAfterLookUpFailing(with: .serverError(status: 503)), Self.serverErrorMessage)
+    }
+
+    func test_barcode_lookup_timing_out_shows_lookup_failed_notice() {
+        XCTAssertEqual(noticeAfterLookUpFailing(with: .timeout), Self.lookupFailedMessage)
+    }
+
+    func test_barcode_lookup_failing_generically_shows_lookup_failed_notice() {
+        XCTAssertEqual(noticeAfterLookUpFailing(with: .generic), Self.lookupFailedMessage)
+    }
+
+    func test_barcode_lookup_with_empty_response_shows_lookup_failed_notice() {
+        XCTAssertEqual(noticeAfterLookUpFailing(with: .emptyResponse), Self.lookupFailedMessage)
     }
 
     func test_scanning_barcode_again_after_not_found_looks_it_up_again() {
@@ -814,7 +841,7 @@ final class ScannerViewModelTests: XCTestCase {
     }
 
     func test_scanning_barcode_when_lookup_fails_reports_barcode_failure() {
-        productService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .product(.generic)) }
+        productService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .generic) }
         sut.viewDidAppear()
 
         recogniseAndAwaitLookup([Self.barcode])
@@ -952,11 +979,13 @@ final class ScannerViewModelTests: XCTestCase {
 
     private func makeSUT(
         canAskForCameraAccess: Bool = false,
+        productService: ProductServiceProtocol? = nil,
         openScannedLink: ((URL) -> Void)? = nil,
         close: (() -> Void)? = nil
     ) -> ScannerViewModel {
         scanService.canAskForCameraAccess = canAskForCameraAccess
         let scanService = self.scanService!
+        let productService: ProductServiceProtocol = productService ?? self.productService
         return ScannerViewModel(
             dependencies: .init(
                 deepLinkService: deepLinkService,
@@ -972,6 +1001,15 @@ final class ScannerViewModelTests: XCTestCase {
             openAppSettings: { [weak self] in self?.openSettingsCount += 1 },
             close: close ?? { [weak self] in self?.closeCount += 1 }
         )
+    }
+
+    private func noticeAfterLookUpFailing(with type: BFFRequestError.BFFRequestErrorType) -> String? {
+        let bffClient = MockBFFClientService()
+        bffClient.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: type) }
+        sut = makeSUT(productService: ProductService(bffClient: bffClient))
+        sut.viewDidAppear()
+
+        return recogniseAndAwaitLookup([Self.barcode])?.value?.notice?.message
     }
 
     private var isScanning: Bool { startScanCount > stopScanCount }

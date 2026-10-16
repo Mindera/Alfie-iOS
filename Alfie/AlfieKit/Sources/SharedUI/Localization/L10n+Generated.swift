@@ -255,6 +255,12 @@ public enum L10n {
           public static let cta = L10n.tr("L10n", "pdp.error_view.go_back.button.cta")
         }
       }
+      public enum NoConnection {
+        /// Check your connection.
+        public static let message = L10n.tr("L10n", "pdp.error_view.no_connection.message")
+        /// No connection
+        public static let title = L10n.tr("L10n", "pdp.error_view.no_connection.title")
+      }
       public enum NotFound {
         /// The page you are looking for doesn’t exist.
         public static let message = L10n.tr("L10n", "pdp.error_view.not_found.message")
@@ -585,6 +591,18 @@ public enum L10n {
     public enum LookupFailed {
       /// Something went wrong. Try scanning again.
       public static let message = L10n.tr("L10n", "scanner.lookup_failed.message")
+      public enum NoConnection {
+        /// Check your connection and try scanning again.
+        public static let message = L10n.tr("L10n", "scanner.lookup_failed.no_connection.message")
+      }
+      public enum RateLimited {
+        /// Please wait a moment and try again.
+        public static let message = L10n.tr("L10n", "scanner.lookup_failed.rate_limited.message")
+      }
+      public enum ServerError {
+        /// We're having trouble. Please try scanning again.
+        public static let message = L10n.tr("L10n", "scanner.lookup_failed.server_error.message")
+      }
     }
     public enum NotFound {
       /// We couldn't find this product.
@@ -882,6 +900,8 @@ public extension L10n {
       case pdpErrorViewTitle = "pdp.error_view.title"
       case pdpErrorViewGenericMessage = "pdp.error_view.generic.message"
       case pdpErrorViewGoBackButtonCta = "pdp.error_view.go_back.button.cta"
+      case pdpErrorViewNoConnectionMessage = "pdp.error_view.no_connection.message"
+      case pdpErrorViewNoConnectionTitle = "pdp.error_view.no_connection.title"
       case pdpErrorViewNotFoundMessage = "pdp.error_view.not_found.message"
       case pdpErrorViewRateLimitedMessage = "pdp.error_view.rate_limited.message"
       case pdpErrorViewRateLimitedTitle = "pdp.error_view.rate_limited.title"
@@ -960,6 +980,9 @@ public extension L10n {
       case scannerIntroTitle = "scanner.intro.title"
       case scannerLookupMessage = "scanner.lookup.message"
       case scannerLookupFailedMessage = "scanner.lookup_failed.message"
+      case scannerLookupFailedNoConnectionMessage = "scanner.lookup_failed.no_connection.message"
+      case scannerLookupFailedRateLimitedMessage = "scanner.lookup_failed.rate_limited.message"
+      case scannerLookupFailedServerErrorMessage = "scanner.lookup_failed.server_error.message"
       case scannerNotFoundMessage = "scanner.not_found.message"
       case scannerUnrecognisedMessage = "scanner.unrecognised.message"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"
