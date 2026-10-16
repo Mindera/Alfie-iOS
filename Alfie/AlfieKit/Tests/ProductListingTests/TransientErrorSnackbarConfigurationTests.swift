@@ -16,6 +16,19 @@ final class TransientErrorSnackbarConfigurationTests: XCTestCase {
         XCTAssertEqual(sut.text, L10n.Plp.Refresh.errorMessage)
     }
 
+    func test_a_typed_failure_shows_one_message_per_kind_on_refresh_and_next_page() {
+        let cases: [(error: ProductListingViewErrorType, expected: String)] = [
+            (.serverError, L10n.Plp.TransientError.ServerError.message),
+            (.rateLimited, L10n.Plp.TransientError.RateLimited.message),
+            (.noConnection, L10n.Plp.TransientError.NoConnection.message),
+        ]
+        for (error, expected) in cases {
+            for request in [ProductListingTransientError.Request.refresh, .nextPage] {
+                XCTAssertEqual(makeSUT(request: request, error: error).text, expected, "\(error) on \(request)")
+            }
+        }
+    }
+
     func test_transient_error_offers_retry_and_stays_until_dismissed() {
         let sut = makeSUT(request: .nextPage)
 
@@ -35,8 +48,9 @@ final class TransientErrorSnackbarConfigurationTests: XCTestCase {
 
     private func makeSUT(
         request: ProductListingTransientError.Request,
+        error: ProductListingViewErrorType = .generic,
         onRetry: @escaping () -> Void = {}
     ) -> SnackbarViewConfiguration {
-        .transientError(.init(request: request, error: .generic), onRetry: onRetry, onDismiss: {})
+        .transientError(.init(request: request, error: error), onRetry: onRetry, onDismiss: {})
     }
 }

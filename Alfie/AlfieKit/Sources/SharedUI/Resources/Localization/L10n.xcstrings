@@ -1315,6 +1315,39 @@
         }
       }
     },
+    "plp.transient_error.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check your connection."
+          }
+        }
+      }
+    },
+    "plp.transient_error.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment."
+          }
+        }
+      }
+    },
+    "plp.transient_error.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble."
+          }
+        }
+      }
+    },
     "product.add_to_bag.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {

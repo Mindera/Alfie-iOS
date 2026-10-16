@@ -210,17 +210,9 @@ extension SnackbarViewConfiguration {
         onRetry: @escaping () -> Void,
         onDismiss: @escaping () -> Void
     ) -> Self {
-        let text: String
-        switch transientError.request {
-        case .nextPage:
-            text = L10n.Plp.NextPage.errorMessage
-
-        case .refresh:
-            text = L10n.Plp.Refresh.errorMessage
-        }
-        return .init(
+        .init(
             type: .error,
-            text: text,
+            text: transientErrorText(for: transientError),
             showCloseButton: true,
             icon: Icon.warning.image,
             actionButtonLabel: L10n.Plp.ErrorView.Button.cta,
@@ -228,6 +220,25 @@ extension SnackbarViewConfiguration {
             onActionTap: onRetry,
             onDismiss: onDismiss
         )
+    }
+
+    private static func transientErrorText(for transientError: ProductListingTransientError) -> String {
+        switch (transientError.error, transientError.request) {
+        case (.serverError, _):
+            L10n.Plp.TransientError.ServerError.message
+
+        case (.rateLimited, _):
+            L10n.Plp.TransientError.RateLimited.message
+
+        case (.noConnection, _):
+            L10n.Plp.TransientError.NoConnection.message
+
+        case (.generic, .nextPage), (.noResults, .nextPage):
+            L10n.Plp.NextPage.errorMessage
+
+        case (.generic, .refresh), (.noResults, .refresh):
+            L10n.Plp.Refresh.errorMessage
+        }
     }
 }
 

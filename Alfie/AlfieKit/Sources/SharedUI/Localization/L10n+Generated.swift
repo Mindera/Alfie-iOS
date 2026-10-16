@@ -464,6 +464,20 @@ public enum L10n {
         public static let title = L10n.tr("L10n", "plp.sort_by.option.title")
       }
     }
+    public enum TransientError {
+      public enum NoConnection {
+        /// Check your connection.
+        public static let message = L10n.tr("L10n", "plp.transient_error.no_connection.message")
+      }
+      public enum RateLimited {
+        /// Please wait a moment.
+        public static let message = L10n.tr("L10n", "plp.transient_error.rate_limited.message")
+      }
+      public enum ServerError {
+        /// We're having trouble.
+        public static let message = L10n.tr("L10n", "plp.transient_error.server_error.message")
+      }
+    }
   }
   public enum Product {
     public enum AddToBag {
@@ -917,6 +931,9 @@ public extension L10n {
       case plpRefreshErrorMessage = "plp.refresh.error_message"
       case plpShowResultsButtonCta = "plp.show_results.button.cta"
       case plpSortByOptionTitle = "plp.sort_by.option.title"
+      case plpTransientErrorNoConnectionMessage = "plp.transient_error.no_connection.message"
+      case plpTransientErrorRateLimitedMessage = "plp.transient_error.rate_limited.message"
+      case plpTransientErrorServerErrorMessage = "plp.transient_error.server_error.message"
       case productAddToBagButtonCta = "product.add_to_bag.button.cta"
       case productAddToBagErrorMessage = "product.add_to_bag.error.message"
       case productAddToBagSuccessMessage = "product.add_to_bag.success.message"
