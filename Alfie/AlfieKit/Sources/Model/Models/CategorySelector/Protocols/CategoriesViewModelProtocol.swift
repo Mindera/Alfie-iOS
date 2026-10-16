@@ -11,7 +11,7 @@ public struct CategoriesViewStateModel {
     }
 }
 
-public enum CategoriesViewErrorType: Error, CaseIterable {
+public enum CategoriesViewErrorType: Error, CaseIterable, FailureKindRepresentable {
     case generic
     case noConnection
     case noResults
@@ -19,19 +19,7 @@ public enum CategoriesViewErrorType: Error, CaseIterable {
     case serverError
 
     public static func from(error: Error) -> CategoriesViewErrorType {
-        switch FailureKind(error: error) {
-        case .serverError:
-            return .serverError
-
-        case .rateLimited:
-            return .rateLimited
-
-        case .noConnection:
-            return .noConnection
-
-        case .generic:
-            return .generic
-        }
+        .init(FailureKind(error: error))
     }
 }
 
