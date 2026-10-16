@@ -196,40 +196,11 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     }
 
     private var errorMessage: String {
-        guard let failure = viewModel.state.failure else {
-            return ""
-        }
-
-        // swiftlint:disable vertical_whitespace_between_cases
-        switch failure {
-        case .generic:
-            return L10n.Pdp.ErrorView.Generic.message
-        case .noConnection:
-            return L10n.Pdp.ErrorView.NoConnection.message
-        case .notFound:
-            return L10n.Pdp.ErrorView.NotFound.message
-        case .rateLimited:
-            return L10n.Pdp.ErrorView.RateLimited.message
-        case .serverError:
-            return L10n.Pdp.ErrorView.ServerError.message
-        }
-        // swiftlint:enable vertical_whitespace_between_cases
+        viewModel.state.failure?.message ?? ""
     }
 
     private var errorTitle: String {
-        switch viewModel.state.failure {
-        case .rateLimited:
-            return L10n.Pdp.ErrorView.RateLimited.title
-
-        case .serverError:
-            return L10n.Pdp.ErrorView.ServerError.title
-
-        case .noConnection:
-            return L10n.Pdp.ErrorView.NoConnection.title
-
-        default:
-            return L10n.Pdp.ErrorView.title
-        }
+        viewModel.state.failure?.title ?? L10n.Pdp.ErrorView.title
     }
 }
 
