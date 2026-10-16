@@ -42,14 +42,11 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertNil(match)
     }
 
-    func test_product_by_barcode_rethrows_cancellation_unmapped() async {
-        mockClientService.onProductByBarcodeCalled = { _ in throw CancellationError() }
+    func test_productByBarcode_passes_bff_errors_through_untouched() async {
+        mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.productByBarcode("5901234123457")
-            XCTFail("Expected productByBarcode to throw")
-        } catch {
-            XCTAssertTrue(error is CancellationError)
         }
     }
 
@@ -67,17 +64,11 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(capturedHandle, "the-handle")
     }
 
-    func test_get_product_rethrows_cancellation_unmapped() async {
-        mockClientService.onGetProductCalled = { _ in
-            throw CancellationError()
-        }
+    func test_getProduct_passes_bff_errors_through_untouched() async {
+        mockClientService.onGetProductCalled = { _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.getProduct(handle: "the-handle")
-            XCTFail("Expected getProduct to throw")
-        } catch is CancellationError {
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 
@@ -122,6 +113,16 @@ final class ProductServiceTests: XCTestCase {
 
         await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.categoryPriceRange(collectionHandle: "c")
+        }
+    }
+
+    // MARK: - Related Products
+
+    func test_relatedProducts_passes_bff_errors_through_untouched() async {
+        mockClientService.onRelatedProductsCalled = { _, _ in throw BFFRequestError.passThroughFixture }
+
+        await assertPassesBFFErrorThroughUntouched {
+            _ = try await sut.relatedProducts(handle: "the-handle", limit: 4)
         }
     }
 }
