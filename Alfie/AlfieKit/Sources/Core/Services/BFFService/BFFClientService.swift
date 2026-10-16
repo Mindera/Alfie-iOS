@@ -48,7 +48,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         )
         self.executor = BFFOperationExecutor(
             apolloClient: ApolloClient(networkTransport: transport, store: store),
-            dependencies: dependencies
+            errorReporter: dependencies.errorReporter
         )
     }
 
@@ -84,9 +84,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("productDetails → handle=\(handle)")
 
         do {
-            let product = try await executor.fetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.ProductDetailsQuery(handle: handle)
-            ).productDetails
+            )
+            let product = response.productDetails
 
             guard let product else {
                 log.error("productDetails ← null for handle=\(handle)")
@@ -104,9 +105,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("productByBarcode → barcode=\(barcode)")
 
         do {
-            let match = try await executor.fetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.ProductByBarcodeQuery(barcode: barcode)
-            ).productByBarcode
+            )
+            let match = response.productByBarcode
 
             log.info(
                 "productByBarcode ← productId=\(match?.id ?? "nil") handle=\(match?.slug ?? "nil") "
@@ -140,11 +142,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
                     filters: resolvedFilters,
                     sort: .some(.case(resolvedSort))
                 )
-            ).productList
+            )
+            let listing = response.productList
 
-            log.info("productList ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+            log.info("productList ← totalCount=\(listing.totalCount ?? -1) products=\(listing.products.count) hasNextPage=\(listing.pageInfo?.hasNextPage == true) endCursor=\(listing.pageInfo?.endCursor ?? "nil")")
 
-            return response.convertToProductListing()
+            return listing.convertToProductListing()
         } catch {
             log.error("productList failed: \(error)")
             throw error
@@ -171,11 +174,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
                     filters: resolvedFilters,
                     sort: .some(.case(resolvedSort))
                 )
-            ).searchProducts
+            )
+            let listing = response.searchProducts
 
-            log.info("searchProducts ← totalCount=\(response.totalCount ?? -1) products=\(response.products.count) hasNextPage=\(response.pageInfo?.hasNextPage == true) endCursor=\(response.pageInfo?.endCursor ?? "nil")")
+            log.info("searchProducts ← totalCount=\(listing.totalCount ?? -1) products=\(listing.products.count) hasNextPage=\(listing.pageInfo?.hasNextPage == true) endCursor=\(listing.pageInfo?.endCursor ?? "nil")")
 
-            return response.convertToProductListing()
+            return listing.convertToProductListing()
         } catch {
             log.error("searchProducts failed: \(error)")
             throw error
@@ -188,11 +192,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
         do {
             let response = try await executor.fetch(
                 BFFGraphAPI.CategoryPriceRangeQuery(collectionHandle: collectionHandle)
-            ).categoryPriceRange
+            )
+            let priceRange = response.categoryPriceRange
 
-            log.info("categoryPriceRange ← \(response == nil ? "nil" : "range")")
+            log.info("categoryPriceRange ← \(priceRange == nil ? "nil" : "range")")
 
-            return response?.convertToPriceRange()
+            return priceRange?.convertToPriceRange()
         } catch {
             log.error("categoryPriceRange failed: \(error)")
             throw error
@@ -203,9 +208,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("relatedProducts → handle=\(handle) limit=\(limit)")
 
         do {
-            let products = try await executor.fetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.RelatedProductsQuery(handle: handle, limit: limit)
-            ).relatedProducts
+            )
+            let products = response.relatedProducts
 
             log.info("relatedProducts ← products=\(products.count)")
 
@@ -240,11 +246,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                     input: BFFGraphAPI.CreateCartInput(lines: .some(lines.map(BFFGraphAPI.CartLineInput.init(domain:))))
                 )
             )
-            let cart = response.createCart.fragments.cartFragment.convertToCart()
-
-            log.info("createCart ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
-            logUnrepresentableAmounts(in: cart, operation: "createCart")
-            return cart
+            return received(response.createCart.fragments.cartFragment, from: "createCart")
         } catch {
             log.error("createCart failed: \(error)")
             throw error
@@ -264,11 +266,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 ),
                 mapError: { $0.mappingCartNotFound() }
             )
-            let cart = response.addToCart.fragments.cartFragment.convertToCart()
-
-            log.info("addToCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
-            logUnrepresentableAmounts(in: cart, operation: "addToCart")
-            return cart
+            return received(response.addToCart.fragments.cartFragment, from: "addToCart")
         } catch {
             log.error("addToCart failed: \(error)")
             throw error
@@ -283,11 +281,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 BFFGraphAPI.RemoveFromCartMutation(cartId: cartId, lineId: lineId),
                 mapError: { $0.mappingCartNotFound() }
             )
-            let cart = response.removeFromCart.fragments.cartFragment.convertToCart()
-
-            log.info("removeFromCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
-            logUnrepresentableAmounts(in: cart, operation: "removeFromCart")
-            return cart
+            return received(response.removeFromCart.fragments.cartFragment, from: "removeFromCart")
         } catch {
             log.error("removeFromCart failed: \(error)")
             throw error
@@ -307,11 +301,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 ),
                 mapError: { $0.mappingCartNotFound() }
             )
-            let cart = response.updateCart.fragments.cartFragment.convertToCart()
-
-            log.info("updateCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
-            logUnrepresentableAmounts(in: cart, operation: "updateCart")
-            return cart
+            return received(response.updateCart.fragments.cartFragment, from: "updateCart")
         } catch {
             log.error("updateCart failed: \(error)")
             throw error
@@ -331,11 +321,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
                 cachePolicy: .fetchIgnoringCacheCompletely,
                 mapError: { $0.mappingCartNotFound() }
             )
-            let cart = response.cart.fragments.cartFragment.convertToCart()
-
-            log.info("getCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
-            logUnrepresentableAmounts(in: cart, operation: "getCart")
-            return cart
+            return received(response.cart.fragments.cartFragment, from: "getCart")
         } catch {
             log.error("getCart failed: \(error)")
             throw error
@@ -344,13 +330,17 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     // MARK: - Private
 
-    /// Reports any amount the BFF sent in a form this app cannot represent. Logged at `error`
-    /// because it means the BFF has a defect: the shopper only sees a `—` in place of the price,
-    /// which nobody reports, so this log is the only way we find out.
-    private func logUnrepresentableAmounts(in cart: Cart, operation: String) {
+    /// Any amount the BFF sent in a form this app cannot represent is logged at `error`, because
+    /// it means the BFF has a defect: the shopper only sees a `—` in place of the price, which
+    /// nobody reports, so this log is the only way we find out.
+    private func received(_ fragment: BFFGraphAPI.CartFragment, from operation: String) -> Cart {
+        let cart = fragment.convertToCart()
+        log.info("\(operation) ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
         let fields = cart.unrepresentableAmountFields
-        guard !fields.isEmpty else { return }
-        log.error("\(operation) ← unrepresentable amount(s) cartId=\(cart.id) fields=\(fields.joined(separator: ","))")
+        if !fields.isEmpty {
+            log.error("\(operation) ← unrepresentable amount(s) cartId=\(cart.id) fields=\(fields.joined(separator: ","))")
+        }
+        return cart
     }
 }
 

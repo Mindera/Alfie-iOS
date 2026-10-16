@@ -3,20 +3,20 @@ import BFFGraph
 import Foundation
 import Model
 
-/// `mapError` re-labels a failure in terms only the calling operation knows — what a GraphQL
-/// status means depends on what was asked for. It defaults to identity, so an operation with
-/// nothing to add passes failures through untouched.
 final class BFFOperationExecutor {
     private static let graphqlRateLimitedCodes: Set<String> = ["RATE_LIMITED", "THROTTLED"]
 
     private let apolloClient: ApolloClient
-    private let dependencies: BFFClientDependencyContainer
+    private let errorReporter: BFFErrorReporterProtocol?
 
-    init(apolloClient: ApolloClient, dependencies: BFFClientDependencyContainer) {
+    init(apolloClient: ApolloClient, errorReporter: BFFErrorReporterProtocol?) {
         self.apolloClient = apolloClient
-        self.dependencies = dependencies
+        self.errorReporter = errorReporter
     }
 
+    /// `mapError` re-labels a failure in terms only the calling operation knows — what a GraphQL
+    /// status means depends on what was asked for. It defaults to identity, so an operation with
+    /// nothing to add passes failures through untouched.
     func fetch<Query: GraphQLQuery>(
         _ query: Query,
         cachePolicy: CachePolicy = .default,
@@ -27,6 +27,7 @@ final class BFFOperationExecutor {
         }
     }
 
+    /// `mapError` as in `fetch(_:cachePolicy:mapError:)`.
     func perform<Mutation: GraphQLMutation>(
         _ mutation: Mutation,
         mapError: (BFFRequestError) -> BFFRequestError = { $0 }
@@ -60,7 +61,7 @@ final class BFFOperationExecutor {
                                 continuation.resume(throwing: failure)
                                 return
                             }
-                            guard let data = Self.resultAsSuccess(result)?.data else {
+                            guard let data = try? result.get().data else {
                                 continuation.resume(throwing: BFFRequestError(type: .generic))
                                 return
                             }
@@ -81,13 +82,11 @@ final class BFFOperationExecutor {
             let error = mapError(error)
             reportError(error, operationName: operationName)
             throw error
-        } catch {
-            throw error
         }
     }
 
     private func reportError(_ error: BFFRequestError, operationName: String) {
-        guard let reporter = dependencies.errorReporter else { return }
+        guard let reporter = errorReporter else { return }
         let httpStatus: Int? = {
             switch error.type {
             case .serverError(let status):
@@ -135,16 +134,5 @@ final class BFFOperationExecutor {
             }
             return BFFRequestError(type: .generic, error: error)
         }
-    }
-
-    private static func resultAsSuccess<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> GraphQLResult<Data>? {
-        guard
-            case .success(let success) = result,
-            success.errors == nil || success.errors?.isEmpty == true
-        else {
-            return nil
-        }
-
-        return success
     }
 }
