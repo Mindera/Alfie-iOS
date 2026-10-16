@@ -13,27 +13,23 @@ public struct CategoriesViewStateModel {
 
 public enum CategoriesViewErrorType: Error, CaseIterable {
     case generic
-    case noInternet
+    case noConnection
     case noResults
     case rateLimited
     case serverError
 
     public static func from(error: Error) -> CategoriesViewErrorType {
-        guard let bff = error as? BFFRequestError else { return .generic }
-        switch bff.type {
-        case .rateLimited:
-            return .rateLimited
-
+        switch FailureKind(error: error) {
         case .serverError:
             return .serverError
 
-        case .noInternet:
-            return .noInternet
+        case .rateLimited:
+            return .rateLimited
 
-        case .product(.noProduct), .product(.noProducts), .emptyResponse:
-            return .noResults
+        case .noConnection:
+            return .noConnection
 
-        case .timeout, .product(.generic), .cart, .generic:
+        case .generic:
             return .generic
         }
     }

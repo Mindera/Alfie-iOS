@@ -580,7 +580,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.products.map(\.id), page1.map(\.id))
-        XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noInternet))
+        XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: .noConnection))
     }
 
     func test_cancelled_next_page_keeps_loaded_products_and_emits_no_error() {
