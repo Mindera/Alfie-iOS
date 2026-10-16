@@ -170,9 +170,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public func didTapRetry() {
+        guard !state.isLoading else { return }
+
         state = .loading
-        relatedProductsState = .loading
-        hasRequestedRelatedProducts = false
+        if !relatedProductsState.isLoading {
+            relatedProductsState = .loading
+            hasRequestedRelatedProducts = false
+        }
         viewDidAppear()
     }
 

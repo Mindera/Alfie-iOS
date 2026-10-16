@@ -2087,6 +2087,64 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.failure, .notFound)
     }
 
+    func test_tapping_retry_again_while_the_retry_loads_does_not_load_twice() {
+        arrangeAppearedScreen(
+            productResponse: { _ in throw BFFRequestError(type: .generic) },
+            relatedProductsResponse: { _, _ in [] }
+        )
+        let secondProductLoad = expectation(description: "Product is not loaded twice")
+        secondProductLoad.isInverted = true
+        let secondRelatedLoad = expectation(description: "Related products are not loaded twice")
+        secondRelatedLoad.isInverted = true
+        var productLoads = 0
+        var relatedLoads = 0
+        mockProductService.onGetProductCalled = { _ in
+            productLoads += 1
+            if productLoads > 1 { secondProductLoad.fulfill() }
+            return .fixture()
+        }
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            relatedLoads += 1
+            if relatedLoads > 1 { secondRelatedLoad.fulfill() }
+            return []
+        }
+
+        XCTAssertEmitsValue(
+            from: sut.$state.combineLatest(sut.$relatedProductsState),
+            where: { !$0.isLoading && !$1.isLoading },
+            afterTrigger: {
+                self.sut.didTapRetry()
+                self.sut.didTapRetry()
+            }
+        )
+
+        wait(for: [secondProductLoad, secondRelatedLoad], timeout: .inverted)
+        XCTAssertTrue(sut.state.isSuccess)
+    }
+
+    func test_retry_while_related_products_are_still_loading_does_not_request_them_again() async {
+        initViewModel()
+        mockProductService.onGetProductCalled = { _ in throw BFFRequestError(type: .generic) }
+        let gate = RelatedProductsGate()
+        let relatedRequested = expectation(description: "Related products are requested")
+        let secondRelatedRequest = expectation(description: "Related products are not requested again")
+        secondRelatedRequest.isInverted = true
+        var relatedRequests = 0
+        mockProductService.onRelatedProductsCalled = { _, _ in
+            relatedRequests += 1
+            if relatedRequests > 1 { secondRelatedRequest.fulfill() }
+            await gate.hold(signal: relatedRequested)
+            return []
+        }
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
+        await fulfillment(of: [relatedRequested], timeout: .default)
+
+        sut.didTapRetry()
+
+        await fulfillment(of: [secondRelatedRequest], timeout: .inverted)
+        await gate.open()
+    }
+
     func test_did_select_related_product_opens_that_product() {
         var openedProducts: [Product] = []
         initViewModel(openProductAction: { openedProducts.append($0) })
