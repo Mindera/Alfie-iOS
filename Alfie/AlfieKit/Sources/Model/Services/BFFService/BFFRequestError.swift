@@ -14,8 +14,6 @@ public struct BFFRequestError: Error {
 
     public enum BFFProductRequestErrorType: Equatable {
         case noProduct
-        case noProducts(category: String?, query: String?, sort: String?)
-        case generic
     }
 
     public enum BFFCartRequestErrorType: Equatable {
@@ -59,18 +57,7 @@ public struct BFFRequestError: Error {
 
     public var isNotFound: Bool {
         switch type {
-        case .product(let subType):
-            // swiftlint:disable vertical_whitespace_between_cases
-            switch subType {
-            case .noProduct,
-                .noProducts:
-                return true
-            default:
-                return false
-            }
-            // swiftlint:enable vertical_whitespace_between_cases
-
-        case .emptyResponse:
+        case .product(.noProduct), .emptyResponse:
             return true
 
         default:
