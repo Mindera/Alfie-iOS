@@ -1,5 +1,3 @@
-import AlicerceLogging
-import Core
 import Mocks
 import Model
 import TestUtils
@@ -59,22 +57,7 @@ final class ProductDetailsViewModelFailureKindTests: XCTestCase {
 
     private func makeSUT() {
         mockBFFClient = MockBFFClientService()
-        sut = ProductDetailsViewModel(
-            configuration: .id("the-handle"),
-            dependencies: ProductDetailsDependencyContainer(
-                scheduler: .immediate,
-                productService: ProductService(bffClient: mockBFFClient),
-                webUrlProvider: MockWebUrlProvider(),
-                cartService: MockCartService(),
-                wishlistService: MockWishlistService(),
-                configurationService: MockConfigurationService(),
-                analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
-                log: Log.DummyLogger()
-            ),
-            goBackAction: {},
-            openWebfeatureAction: { _ in },
-            openProductAction: { _ in }
-        )
+        sut = .onRealServices(bffClient: mockBFFClient)
     }
 
     private func appearAndWaitForBothRequests() {

@@ -1943,7 +1943,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_related_products_skeleton_is_shown_when_product_loads_before_related_products() async {
         initViewModel()
         mockProductService.onGetProductCalled = { _ in .fixture() }
-        let gate = RelatedProductsGate()
+        let gate = ResponseGate()
         let relatedRequested = expectation(description: "Related products are requested")
         mockProductService.onRelatedProductsCalled = { _, _ in
             await gate.hold(signal: relatedRequested)
@@ -2036,113 +2036,6 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         wait(for: [productRefetch], timeout: .default)
         wait(for: [relatedRefetch], timeout: .inverted)
-    }
-
-    // MARK: - Retry
-
-    func test_retry_shows_the_loading_skeleton_while_the_product_reloads() {
-        arrangeAppearedScreen(
-            productResponse: { _ in throw BFFRequestError(type: .generic) },
-            relatedProductsResponse: { _, _ in [] }
-        )
-
-        sut.didTapRetry()
-
-        XCTAssertTrue(sut.state.isLoading)
-        XCTAssertTrue(sut.relatedProductsState.isLoading)
-    }
-
-    func test_retry_after_a_failure_reloads_the_product_and_related_products_to_success() {
-        arrangeAppearedScreen(
-            productResponse: { _ in throw BFFRequestError(type: .generic) },
-            relatedProductsResponse: { _, _ in throw BFFRequestError(type: .generic) }
-        )
-        mockProductService.onGetProductCalled = { _ in .fixture(name: "Reloaded") }
-        mockProductService.onRelatedProductsCalled = { _, _ in [.fixture(id: "related", slug: "other")] }
-
-        XCTAssertEmitsValue(
-            from: sut.$state.combineLatest(sut.$relatedProductsState),
-            where: { !$0.isLoading && !$1.isLoading },
-            afterTrigger: { self.sut.didTapRetry() }
-        )
-
-        XCTAssertTrue(sut.state.isSuccess)
-        XCTAssertEqual(sut.productName, "Reloaded")
-        XCTAssertEqual(sut.relatedProducts.map(\.id), ["related"])
-    }
-
-    func test_retry_that_fails_again_ends_in_the_error_state() {
-        arrangeAppearedScreen(
-            productResponse: { _ in throw BFFRequestError(type: .generic) },
-            relatedProductsResponse: { _, _ in [] }
-        )
-        mockProductService.onGetProductCalled = { _ in throw BFFRequestError(type: .emptyResponse) }
-
-        XCTAssertEmitsValue(
-            from: sut.$state.combineLatest(sut.$relatedProductsState),
-            where: { !$0.isLoading && !$1.isLoading },
-            afterTrigger: { self.sut.didTapRetry() }
-        )
-
-        XCTAssertEqual(sut.state.failure, .notFound)
-    }
-
-    func test_tapping_retry_again_while_the_retry_loads_does_not_load_twice() {
-        arrangeAppearedScreen(
-            productResponse: { _ in throw BFFRequestError(type: .generic) },
-            relatedProductsResponse: { _, _ in [] }
-        )
-        let secondProductLoad = expectation(description: "Product is not loaded twice")
-        secondProductLoad.isInverted = true
-        let secondRelatedLoad = expectation(description: "Related products are not loaded twice")
-        secondRelatedLoad.isInverted = true
-        var productLoads = 0
-        var relatedLoads = 0
-        mockProductService.onGetProductCalled = { _ in
-            productLoads += 1
-            if productLoads > 1 { secondProductLoad.fulfill() }
-            return .fixture()
-        }
-        mockProductService.onRelatedProductsCalled = { _, _ in
-            relatedLoads += 1
-            if relatedLoads > 1 { secondRelatedLoad.fulfill() }
-            return []
-        }
-
-        XCTAssertEmitsValue(
-            from: sut.$state.combineLatest(sut.$relatedProductsState),
-            where: { !$0.isLoading && !$1.isLoading },
-            afterTrigger: {
-                self.sut.didTapRetry()
-                self.sut.didTapRetry()
-            }
-        )
-
-        wait(for: [secondProductLoad, secondRelatedLoad], timeout: .inverted)
-        XCTAssertTrue(sut.state.isSuccess)
-    }
-
-    func test_retry_while_related_products_are_still_loading_does_not_request_them_again() async {
-        initViewModel()
-        mockProductService.onGetProductCalled = { _ in throw BFFRequestError(type: .generic) }
-        let gate = RelatedProductsGate()
-        let relatedRequested = expectation(description: "Related products are requested")
-        let secondRelatedRequest = expectation(description: "Related products are not requested again")
-        secondRelatedRequest.isInverted = true
-        var relatedRequests = 0
-        mockProductService.onRelatedProductsCalled = { _, _ in
-            relatedRequests += 1
-            if relatedRequests > 1 { secondRelatedRequest.fulfill() }
-            await gate.hold(signal: relatedRequested)
-            return []
-        }
-        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
-        await fulfillment(of: [relatedRequested], timeout: .default)
-
-        sut.didTapRetry()
-
-        await fulfillment(of: [secondRelatedRequest], timeout: .inverted)
-        await gate.open()
     }
 
     func test_did_select_related_product_opens_that_product() {
@@ -2357,22 +2250,5 @@ final class ProductDetailsViewModelTests: XCTestCase {
             return []
         }
         return relatedRequested
-    }
-}
-
-private actor RelatedProductsGate {
-    private var continuation: CheckedContinuation<Void, Never>?
-    private var opened = false
-
-    func hold(signal: XCTestExpectation) async {
-        signal.fulfill()
-        guard !opened else { return }
-        await withCheckedContinuation { continuation = $0 }
-    }
-
-    func open() {
-        opened = true
-        continuation?.resume()
-        continuation = nil
     }
 }
