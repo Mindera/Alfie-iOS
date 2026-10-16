@@ -10,9 +10,7 @@ private enum BFFEndpoint: String {
 }
 
 public final class BFFClientService: BFFClientServiceProtocol {
-    private static let graphqlRateLimitedCodes: Set<String> = ["RATE_LIMITED", "THROTTLED"]
-
-    private let apolloClient: ApolloClient
+    private let executor: BFFOperationExecutor
     private let dependencies: BFFClientDependencyContainer
     private let baseUrl: Foundation.URL
     private let log: Logger
@@ -48,7 +46,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
             interceptorProvider: provider,
             endpointURL: url.appending(path: BFFEndpoint.graphQL.rawValue)
         )
-        self.apolloClient = ApolloClient(networkTransport: transport, store: store)
+        self.executor = BFFOperationExecutor(
+            apolloClient: ApolloClient(networkTransport: transport, store: store),
+            dependencies: dependencies
+        )
     }
 
     // MARK: - BFFClientServiceProtocol
@@ -60,10 +61,11 @@ public final class BFFClientService: BFFClientServiceProtocol {
         do {
             // The menu is never served from cache: the normalized cache has no TTL, so a cached menu
             // would hide merchandising changes until an app relaunch. Always fetch fresh.
-            let items = try await executeFetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.MainMenuQuery(handle: menuHandle),
                 cachePolicy: .fetchIgnoringCacheData
-            ).menu.convertToNavigationItems()
+            )
+            let items = response.menu.convertToNavigationItems()
             if items.isEmpty {
                 // Menu returned but nothing was actionable — no recognizable collection links.
                 // Surfaces an otherwise-silent empty Shop screen.
@@ -82,7 +84,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("productDetails → handle=\(handle)")
 
         do {
-            let product = try await executeFetch(
+            let product = try await executor.fetch(
                 BFFGraphAPI.ProductDetailsQuery(handle: handle)
             ).productDetails
 
@@ -102,7 +104,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("productByBarcode → barcode=\(barcode)")
 
         do {
-            let match = try await executeFetch(
+            let match = try await executor.fetch(
                 BFFGraphAPI.ProductByBarcodeQuery(barcode: barcode)
             ).productByBarcode
 
@@ -130,7 +132,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("productList → collectionHandle=\(collectionHandle) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
-            let response = try await executeFetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.ProductListQuery(
                     collectionHandle: collectionHandle,
                     after: after.map { .some($0) } ?? .none,
@@ -161,7 +163,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("searchProducts → searchTerm=\(searchTerm) after=\(after ?? "nil") limit=\(limit) sort=\(resolvedSort.rawValue) filters=\(filters.map(String.init(describing:)) ?? "nil")")
 
         do {
-            let response = try await executeFetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.SearchProductsQuery(
                     searchTerm: searchTerm,
                     after: after.map { .some($0) } ?? .none,
@@ -184,7 +186,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("categoryPriceRange → collectionHandle=\(collectionHandle)")
 
         do {
-            let response = try await executeFetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.CategoryPriceRangeQuery(collectionHandle: collectionHandle)
             ).categoryPriceRange
 
@@ -201,7 +203,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("relatedProducts → handle=\(handle) limit=\(limit)")
 
         do {
-            let products = try await executeFetch(
+            let products = try await executor.fetch(
                 BFFGraphAPI.RelatedProductsQuery(handle: handle, limit: limit)
             ).relatedProducts
 
@@ -233,11 +235,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("createCart → lines=\(lines.count)")
 
         do {
-            let cart = try await executeMutation(
+            let response = try await executor.perform(
                 BFFGraphAPI.CreateCartMutation(
                     input: BFFGraphAPI.CreateCartInput(lines: .some(lines.map(BFFGraphAPI.CartLineInput.init(domain:))))
                 )
-            ).createCart.fragments.cartFragment.convertToCart()
+            )
+            let cart = response.createCart.fragments.cartFragment.convertToCart()
 
             log.info("createCart ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
             logUnrepresentableAmounts(in: cart, operation: "createCart")
@@ -252,12 +255,16 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("addToCart → cartId=\(cartId) lines=\(lines.count)")
 
         do {
-            let cart = try await executeMutation(
+            let response = try await executor.perform(
                 BFFGraphAPI.AddToCartMutation(
-                    input: BFFGraphAPI.AddToCartInput(cartId: cartId, lines: lines.map(BFFGraphAPI.CartLineInput.init(domain:)))
+                    input: BFFGraphAPI.AddToCartInput(
+                        cartId: cartId,
+                        lines: lines.map(BFFGraphAPI.CartLineInput.init(domain:))
+                    )
                 ),
                 mapError: { $0.mappingCartNotFound() }
-            ).addToCart.fragments.cartFragment.convertToCart()
+            )
+            let cart = response.addToCart.fragments.cartFragment.convertToCart()
 
             log.info("addToCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
             logUnrepresentableAmounts(in: cart, operation: "addToCart")
@@ -272,10 +279,11 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("removeFromCart → cartId=\(cartId) lineId=\(lineId)")
 
         do {
-            let cart = try await executeMutation(
+            let response = try await executor.perform(
                 BFFGraphAPI.RemoveFromCartMutation(cartId: cartId, lineId: lineId),
                 mapError: { $0.mappingCartNotFound() }
-            ).removeFromCart.fragments.cartFragment.convertToCart()
+            )
+            let cart = response.removeFromCart.fragments.cartFragment.convertToCart()
 
             log.info("removeFromCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
             logUnrepresentableAmounts(in: cart, operation: "removeFromCart")
@@ -290,7 +298,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
         log.info("updateCart → cartId=\(cartId) lines=\(lines.count)")
 
         do {
-            let cart = try await executeMutation(
+            let response = try await executor.perform(
                 BFFGraphAPI.UpdateCartMutation(
                     input: BFFGraphAPI.UpdateCartInput(
                         cartId: cartId,
@@ -298,7 +306,8 @@ public final class BFFClientService: BFFClientServiceProtocol {
                     )
                 ),
                 mapError: { $0.mappingCartNotFound() }
-            ).updateCart.fragments.cartFragment.convertToCart()
+            )
+            let cart = response.updateCart.fragments.cartFragment.convertToCart()
 
             log.info("updateCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
             logUnrepresentableAmounts(in: cart, operation: "updateCart")
@@ -317,11 +326,12 @@ public final class BFFClientService: BFFClientServiceProtocol {
             // bag, and every mutation already returns the authoritative cart. `Completely` rather
             // than `.fetchIgnoringCacheData`, which skips the read but still writes — that write
             // is one nobody reads, and it leaves a stale cart for the next caller to trip over.
-            let cart = try await executeFetch(
+            let response = try await executor.fetch(
                 BFFGraphAPI.CartQuery(cartId: cartId),
                 cachePolicy: .fetchIgnoringCacheCompletely,
                 mapError: { $0.mappingCartNotFound() }
-            ).cart.fragments.cartFragment.convertToCart()
+            )
+            let cart = response.cart.fragments.cartFragment.convertToCart()
 
             log.info("getCart ← lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
             logUnrepresentableAmounts(in: cart, operation: "getCart")
@@ -342,135 +352,6 @@ public final class BFFClientService: BFFClientServiceProtocol {
         guard !fields.isEmpty else { return }
         log.error("\(operation) ← unrepresentable amount(s) cartId=\(cart.id) fields=\(fields.joined(separator: ","))")
     }
-
-    private func executeFetch<Query: GraphQLQuery>(
-        _ query: Query,
-        cachePolicy: CachePolicy = .default,
-        mapError: (BFFRequestError) -> BFFRequestError = { $0 }
-    ) async throws -> Query.Data {
-        try await execute(operationName: Query.operationName, mapError: mapError) { [apolloClient] resultHandler in
-            apolloClient.fetch(query: query, cachePolicy: cachePolicy, resultHandler: resultHandler)
-        }
-    }
-
-    private func executeMutation<Mutation: GraphQLMutation>(
-        _ mutation: Mutation,
-        mapError: (BFFRequestError) -> BFFRequestError = { $0 }
-    ) async throws -> Mutation.Data {
-        try await execute(operationName: Mutation.operationName, mapError: mapError) { [apolloClient] resultHandler in
-            apolloClient.perform(mutation: mutation, resultHandler: resultHandler)
-        }
-    }
-
-    /// `mapError` re-labels a failure in terms only the calling operation knows — what a GraphQL
-    /// status means depends on what was asked for. It defaults to identity, so an operation with
-    /// nothing to add passes failures through untouched.
-    private func execute<Data: RootSelectionSet>(
-        operationName: String,
-        mapError: (BFFRequestError) -> BFFRequestError = { $0 },
-        perform: @escaping (@escaping (Result<GraphQLResult<Data>, Error>) -> Void) -> Cancellable
-    ) async throws -> Data {
-        try Task.checkCancellation()
-
-        // Capture Apollo's `Cancellable` in a thread-safe box so the cancellation
-        // handler can abort the in-flight request if the caller's task is cancelled
-        // (e.g. user backs out of PLP mid-fetch). Without this we'd leak a network
-        // round-trip and silently drop the response.
-        let box = CancellableBox()
-        do {
-            return try await withTaskCancellationHandler {
-                try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data, Error>) in
-                    box.setResumeOnCancel { continuation.resume(throwing: CancellationError()) }
-                    let cancellable = perform { result in
-                        box.resumeOnce {
-                            if let failure = Self.resultAsFailure(result) {
-                                continuation.resume(throwing: failure)
-                                return
-                            }
-                            guard let data = Self.resultAsSuccess(result)?.data else {
-                                continuation.resume(throwing: BFFRequestError(type: .generic))
-                                return
-                            }
-                            continuation.resume(returning: data)
-                        }
-                    }
-                    box.set(cancellable)
-                }
-            } onCancel: {
-                box.cancel()
-            }
-        } catch let error as BFFRequestError {
-            // Mapped before reporting rather than by the caller afterwards: the reporter decides
-            // what reaches Crashlytics from the error's type, so an operation that re-labels its own
-            // failures has to do it first or the reporter judges a type nobody ends up seeing. An
-            // expired cart is a routine empty state, and reporting it as `.generic` filed a
-            // non-fatal for it every time.
-            let error = mapError(error)
-            reportError(error, operationName: operationName)
-            throw error
-        } catch {
-            throw error
-        }
-    }
-
-    private func reportError(_ error: BFFRequestError, operationName: String) {
-        guard let reporter = dependencies.errorReporter else { return }
-        let httpStatus: Int? = {
-            switch error.type {
-            case .serverError(let status): return status
-            default: return nil
-            }
-        }()
-        reporter.report(
-            error: error,
-            operationName: operationName,
-            httpStatus: httpStatus,
-            graphqlErrorCode: error.graphqlErrorCode
-        )
-    }
-
-    private static func resultAsFailure<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> BFFRequestError? {
-        switch result {
-        case .success(let result):
-            guard
-                let errors = result.errors,
-                !errors.isEmpty
-            else {
-                return nil
-            }
-
-            let code = errors.first?.extensions?["code"] as? String
-            // Carried on every failure but interpreted by nobody here: what a status means depends
-            // on the operation, so the cart operations map their own 404 (see `mappingCartNotFound`).
-            let status = errors.first?.extensions?["status"] as? Int
-            let message = errors.first?.message
-            let type: BFFRequestError.BFFRequestErrorType = {
-                if let code, graphqlRateLimitedCodes.contains(code) {
-                    return .rateLimited(retryAfter: nil)
-                }
-                return .generic
-            }()
-            return BFFRequestError(type: type, message: message, graphqlErrorCode: code, graphqlErrorStatus: status)
-
-        case .failure(let error):
-            if let bffError = error as? BFFRequestError { return bffError }
-            if let urlError = error as? URLError, urlError.code == .timedOut {
-                return BFFRequestError(type: .timeout, error: error)
-            }
-            return BFFRequestError(type: .generic, error: error)
-        }
-    }
-
-    private static func resultAsSuccess<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> GraphQLResult<Data>? {
-        guard
-            case .success(let success) = result,
-            success.errors == nil || success.errors?.isEmpty == true
-        else {
-            return nil
-        }
-
-        return success
-    }
 }
 
 extension NavigationHandle {
@@ -485,4 +366,3 @@ extension NavigationHandle {
         }
     }
 }
-
