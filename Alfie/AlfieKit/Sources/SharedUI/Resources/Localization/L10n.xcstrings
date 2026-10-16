@@ -786,6 +786,17 @@
         }
       }
     },
+    "pdp.error_view.retry.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
     "pdp.error_view.server_error.message" : {
       "extractionState" : "manual",
       "localizations" : {
