@@ -18,41 +18,36 @@ final class ProductListingTransientErrorTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    private let cases: [(name: String, error: BFFRequestError, expected: ProductListingViewErrorType)] = [
-        ("server error", BFFRequestError(type: .serverError(status: 503)), .serverError),
-        ("rate limited", BFFRequestError(type: .rateLimited(retryAfter: 5)), .rateLimited),
-        ("no connection", BFFRequestError(type: .noInternet), .noConnection),
-        ("timeout", BFFRequestError(type: .timeout), .generic),
-        ("generic", BFFRequestError(type: .generic), .generic),
-    ]
+    private let rows = BFFFailureRow.all.filter { $0.plp != .noResults }
 
     func test_a_failed_refresh_over_loaded_products_names_the_failure_kind() async {
-        for (name, error, expected) in cases {
+        for row in rows {
             let sut = makeLoadedSUT(hasNextPage: false)
-            mockClientService.onProductListCalled = { _, _, _, _, _ in throw error }
+            mockClientService.onProductListCalled = { _, _, _, _, _ in throw row.error }
 
             await sut.refresh()
 
-            XCTAssertEqual(sut.transientError, .init(request: .refresh, error: expected), name)
-            XCTAssertTrue(sut.state.isSuccess, name)
-            XCTAssertEqual(sut.products.map(\.id), loadedProducts.map(\.id), name)
+            XCTAssertEqual(sut.transientError, .init(request: .refresh, error: row.plp), row.name)
+            XCTAssertTrue(sut.state.isSuccess, row.name)
+            XCTAssertEqual(sut.products.map(\.id), loadedProducts.map(\.id), row.name)
         }
     }
 
-    func test_a_failed_next_page_names_the_failure_kind() {
-        for (name, error, expected) in cases {
+    func test_a_failed_next_page_names_the_failure_kind() throws {
+        let lastLoadedProduct = try XCTUnwrap(loadedProducts.last)
+        for row in rows {
             let sut = makeLoadedSUT(hasNextPage: true)
-            mockClientService.onProductListCalled = { _, _, _, _, _ in throw error }
+            mockClientService.onProductListCalled = { _, _, _, _, _ in throw row.error }
 
             XCTAssertEmitsValue(
                 from: sut.$transientError,
                 where: { $0 != nil },
-                afterTrigger: { sut.didDisplay(sut.products.last!) }
+                afterTrigger: { sut.didDisplay(lastLoadedProduct) }
             )
 
-            XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: expected), name)
-            XCTAssertTrue(sut.state.isSuccess, name)
-            XCTAssertEqual(sut.products.map(\.id), loadedProducts.map(\.id), name)
+            XCTAssertEqual(sut.transientError, .init(request: .nextPage, error: row.plp), row.name)
+            XCTAssertTrue(sut.state.isSuccess, row.name)
+            XCTAssertEqual(sut.products.map(\.id), loadedProducts.map(\.id), row.name)
         }
     }
 

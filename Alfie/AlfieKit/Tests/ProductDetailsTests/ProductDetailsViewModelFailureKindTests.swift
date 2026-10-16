@@ -15,43 +15,27 @@ final class ProductDetailsViewModelFailureKindTests: XCTestCase {
     }
 
     func test_product_failure_from_the_bff_client_reaches_the_screen_as_its_failure_kind() {
-        let cases: [(BFFRequestError.BFFRequestErrorType, ProductDetailsViewErrorType)] = [
-            (.serverError(status: 503), .serverError),
-            (.rateLimited(retryAfter: 30), .rateLimited),
-            (.noInternet, .noConnection),
-            (.timeout, .generic),
-            (.generic, .generic),
-            (.emptyResponse, .notFound),
-            (.product(.noProduct), .notFound),
-        ]
-
-        for (bffError, expected) in cases {
+        for row in BFFFailureRow.all {
             makeSUT()
-            mockBFFClient.onGetProductCalled = { _ in throw BFFRequestError(type: bffError) }
+            mockBFFClient.onGetProductCalled = { _ in throw row.error }
             mockBFFClient.onRelatedProductsCalled = { _, _ in [] }
 
             appearAndWaitForBothRequests()
 
-            XCTAssertEqual(sut.state.failure, expected, "for \(bffError)")
+            XCTAssertEqual(sut.state.failure, row.pdp, row.name)
         }
     }
 
     func test_related_products_failure_from_the_bff_client_stays_silent() {
-        let failures: [BFFRequestError.BFFRequestErrorType] = [
-            .serverError(status: 503),
-            .rateLimited(retryAfter: 30),
-            .noInternet,
-        ]
-
-        for bffError in failures {
+        for row in BFFFailureRow.all {
             makeSUT()
             mockBFFClient.onGetProductCalled = { _ in .fixture() }
-            mockBFFClient.onRelatedProductsCalled = { _, _ in throw BFFRequestError(type: bffError) }
+            mockBFFClient.onRelatedProductsCalled = { _, _ in throw row.error }
 
             appearAndWaitForBothRequests()
 
-            XCTAssertTrue(sut.state.isSuccess, "for \(bffError)")
-            XCTAssertFalse(sut.shouldShow(section: .relatedProducts), "for \(bffError)")
+            XCTAssertTrue(sut.state.isSuccess, row.name)
+            XCTAssertFalse(sut.shouldShow(section: .relatedProducts), row.name)
         }
     }
 
