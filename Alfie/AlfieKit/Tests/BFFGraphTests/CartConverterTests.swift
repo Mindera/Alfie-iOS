@@ -101,7 +101,7 @@ final class CartConverterTests: XCTestCase {
 
     func test_non_finite_totals_map_to_no_total_rather_than_zero() {
         // The grand total is the number a shopper checks before checking out, so a fabricated
-        // £0.00 is the worst place of all to state a price they are not being charged (Q36).
+        // £0.00 is the worst place of all to state a price they are not being charged.
         let cart = makeFragment(lines: [], subtotal: .nan, grandTotal: .infinity).convertToCart()
 
         XCTAssertNil(cart.subtotal)

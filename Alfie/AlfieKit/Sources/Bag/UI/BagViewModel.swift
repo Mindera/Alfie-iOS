@@ -39,7 +39,7 @@ public final class BagViewModel: BagViewModelProtocol {
             } catch {
                 dependencies.log.error("Error removing line \(line.id) from the cart: \(error)")
                 // The bag is left exactly as it was, so without this the row just snaps back and
-                // the shopper is told nothing (Q25).
+                // the shopper is told nothing.
                 removalFailure = (error as? BFFRequestError)?.type ?? .generic
             }
         }

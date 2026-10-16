@@ -117,7 +117,7 @@ extension BFFGraphAPI.MoneyFragment {
     func toDomainMoney() -> Money {
         // BFF amount is a major-unit Double; parse once to a clean Decimal, then derive both the
         // minor-unit amount and the formatted string. An unrepresentable amount falls back to zero,
-        // which Q36 keeps for listings — the bag uses `toDomainMoneyIfRenderable()` instead.
+        // which listings keep — the bag uses `toDomainMoneyIfRenderable()` instead.
         makeMoney(representableAmount ?? .zero)
     }
 
