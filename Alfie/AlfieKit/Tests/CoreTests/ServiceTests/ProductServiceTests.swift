@@ -42,19 +42,6 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertNil(match)
     }
 
-    func test_product_by_barcode_throws_generic_error_when_bff_service_fails() async {
-        mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .generic) }
-
-        do {
-            _ = try await sut.productByBarcode("5901234123457")
-            XCTFail("Expected productByBarcode to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
     func test_product_by_barcode_rethrows_cancellation_unmapped() async {
         mockClientService.onProductByBarcodeCalled = { _ in throw CancellationError() }
 

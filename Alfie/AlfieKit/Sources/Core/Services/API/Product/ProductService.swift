@@ -26,13 +26,7 @@ public final class ProductService: ProductServiceProtocol {
     }
 
     public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
-        do {
-            return try await bffClient.productByBarcode(barcode)
-        } catch let error as CancellationError {
-            throw error
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
+        try await bffClient.productByBarcode(barcode)
     }
 
     public func productList(
