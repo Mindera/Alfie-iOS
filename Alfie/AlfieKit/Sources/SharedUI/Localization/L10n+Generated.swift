@@ -333,6 +333,12 @@ public enum L10n {
         /// Retry
         public static let cta = L10n.tr("L10n", "plp.error_view.button.cta")
       }
+      public enum NoConnection {
+        /// Check your connection and try again.
+        public static let message = L10n.tr("L10n", "plp.error_view.no_connection.message")
+        /// No connection
+        public static let title = L10n.tr("L10n", "plp.error_view.no_connection.title")
+      }
       public enum RateLimited {
         /// Please wait a moment and try again.
         public static let message = L10n.tr("L10n", "plp.error_view.rate_limited.message")
@@ -571,6 +577,18 @@ public enum L10n {
     public enum LookupFailed {
       /// Something went wrong. Try scanning again.
       public static let message = L10n.tr("L10n", "scanner.lookup_failed.message")
+      public enum NoConnection {
+        /// Check your connection and try scanning again.
+        public static let message = L10n.tr("L10n", "scanner.lookup_failed.no_connection.message")
+      }
+      public enum RateLimited {
+        /// Please wait a moment and try again.
+        public static let message = L10n.tr("L10n", "scanner.lookup_failed.rate_limited.message")
+      }
+      public enum ServerError {
+        /// We're having trouble. Please try scanning again.
+        public static let message = L10n.tr("L10n", "scanner.lookup_failed.server_error.message")
+      }
     }
     public enum NotFound {
       /// We couldn't find this product.
@@ -888,6 +906,8 @@ public extension L10n {
       case plpErrorViewMessage = "plp.error_view.message"
       case plpErrorViewTitle = "plp.error_view.title"
       case plpErrorViewButtonCta = "plp.error_view.button.cta"
+      case plpErrorViewNoConnectionMessage = "plp.error_view.no_connection.message"
+      case plpErrorViewNoConnectionTitle = "plp.error_view.no_connection.title"
       case plpErrorViewRateLimitedMessage = "plp.error_view.rate_limited.message"
       case plpErrorViewRateLimitedTitle = "plp.error_view.rate_limited.title"
       case plpErrorViewServerErrorMessage = "plp.error_view.server_error.message"
@@ -943,6 +963,9 @@ public extension L10n {
       case scannerIntroTitle = "scanner.intro.title"
       case scannerLookupMessage = "scanner.lookup.message"
       case scannerLookupFailedMessage = "scanner.lookup_failed.message"
+      case scannerLookupFailedNoConnectionMessage = "scanner.lookup_failed.no_connection.message"
+      case scannerLookupFailedRateLimitedMessage = "scanner.lookup_failed.rate_limited.message"
+      case scannerLookupFailedServerErrorMessage = "scanner.lookup_failed.server_error.message"
       case scannerNotFoundMessage = "scanner.not_found.message"
       case scannerUnrecognisedMessage = "scanner.unrecognised.message"
       case searchScreenNoResultsViewLink = "search.screen.no_results_view.link"

@@ -484,6 +484,7 @@ let package = Package(
         .testTarget(
             name: "ProductListingTests",
             dependencies: [
+                "Core",
                 "ProductListing",
                 "Mocks",
                 "TestUtils",

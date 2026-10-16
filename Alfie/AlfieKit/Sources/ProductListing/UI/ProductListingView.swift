@@ -193,7 +193,10 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
         case .serverError:
             return (L10n.Plp.ErrorView.ServerError.title, L10n.Plp.ErrorView.ServerError.message)
 
-        case .generic, .noConnection, .noResults, .none:
+        case .noConnection:
+            return (L10n.Plp.ErrorView.NoConnection.title, L10n.Plp.ErrorView.NoConnection.message)
+
+        case .generic, .noResults, .none:
             return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
         }
     }
