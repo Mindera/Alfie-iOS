@@ -176,16 +176,10 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         case .titleHeader:
             return state.isLoading && productName.isEmpty
 
-        case .colorSelector,
-             .sizeSelector, // swiftlint:disable:this indentation_width
-             .mediaCarousel,
-             .complementaryInfo:
+        case .colorSelector, .sizeSelector, .mediaCarousel, .complementaryInfo:
             return state.isLoading
 
-        case .productDescription,
-             .addToBag, // swiftlint:disable:this indentation_width
-             .addToWishlist,
-             .availabilityNote:
+        case .productDescription, .addToBag, .addToWishlist, .availabilityNote:
             return false
 
         case .relatedProducts:
@@ -194,43 +188,44 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public func shouldShow(section: ProductDetailsSection) -> Bool {
-        // swiftlint:disable vertical_whitespace_between_cases
         switch section {
-        case .titleHeader,
-             .colorSelector, // swiftlint:disable:this indentation_width
-             .sizeSelector:
+        case .titleHeader, .colorSelector, .sizeSelector:
             return true
+
         case .complementaryInfo:
             return !complementaryInfoToShow.isEmpty
+
         case .mediaCarousel:
             return state.isLoading || !productImageUrls.isEmpty
+
         case .productDescription:
             return !productDescription.isEmpty
+
         // The note qualifies what the selectors' availability means, so it only belongs on screen
         // once there is real availability to qualify: while loading the swatches are shimmer
         // placeholders, and a failure draws no selectors at all. Same gate as the CTA.
-        case .addToBag,
-             .availabilityNote: // swiftlint:disable:this indentation_width
+        case .addToBag, .availabilityNote:
             return state.isSuccess
+
         case .addToWishlist:
             return state.isSuccess && isWishlistEnabled
+
         case .relatedProducts:
             return state.isSuccess && (relatedProductsState.isLoading || relatedProductsState.value?.isEmpty == false)
         }
-        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     public func complementaryInfoWebFeature(for type: ProductDetailsComplementaryInfoType) -> WebFeature? {
-        // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .delivery:
             return nil
+
         case .paymentOptions:
             return .paymentOptions
+
         case .returns:
             return .returnOptions
         }
-        // swiftlint:enable vertical_whitespace_between_cases
     }
 
     public func didTapAddToWishlist() {
