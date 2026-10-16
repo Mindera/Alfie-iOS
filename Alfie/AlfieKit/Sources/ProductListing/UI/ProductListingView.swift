@@ -173,32 +173,16 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     private var errorView: some View {
-        let (title, message) = errorCopy(for: viewModel.state.failure)
+        let failure = viewModel.state.failure ?? .generic
         return ErrorView(
-            title: title,
-            message: message,
+            title: failure.title,
+            message: failure.message,
             buttons: [
                 .init(cta: L10n.Plp.ErrorView.Button.cta, accessibilityId: AccessibilityID.ProductListing.retryButton) {
                     Task { await viewModel.retry() }
                 },
             ]
         )
-    }
-
-    private func errorCopy(for error: ProductListingViewErrorType?) -> (String, String) {
-        switch error {
-        case .rateLimited:
-            return (L10n.Plp.ErrorView.RateLimited.title, L10n.Plp.ErrorView.RateLimited.message)
-
-        case .serverError:
-            return (L10n.Plp.ErrorView.ServerError.title, L10n.Plp.ErrorView.ServerError.message)
-
-        case .noConnection:
-            return (L10n.Plp.ErrorView.NoConnection.title, L10n.Plp.ErrorView.NoConnection.message)
-
-        case .generic, .noResults, .none:
-            return (L10n.Plp.ErrorView.title, L10n.Plp.ErrorView.message)
-        }
     }
 }
 
@@ -212,7 +196,7 @@ extension SnackbarViewConfiguration {
     ) -> Self {
         .init(
             type: .error,
-            text: transientErrorText(for: transientError),
+            text: transientError.message,
             showCloseButton: true,
             icon: Icon.warning.image,
             actionButtonLabel: L10n.Plp.ErrorView.Button.cta,
@@ -220,25 +204,6 @@ extension SnackbarViewConfiguration {
             onActionTap: onRetry,
             onDismiss: onDismiss
         )
-    }
-
-    private static func transientErrorText(for transientError: ProductListingTransientError) -> String {
-        switch (transientError.error, transientError.request) {
-        case (.serverError, _):
-            L10n.Plp.TransientError.ServerError.message
-
-        case (.rateLimited, _):
-            L10n.Plp.TransientError.RateLimited.message
-
-        case (.noConnection, _):
-            L10n.Plp.TransientError.NoConnection.message
-
-        case (.generic, .nextPage), (.noResults, .nextPage):
-            L10n.Plp.NextPage.errorMessage
-
-        case (.generic, .refresh), (.noResults, .refresh):
-            L10n.Plp.Refresh.errorMessage
-        }
     }
 }
 
