@@ -255,6 +255,12 @@ public enum L10n {
           public static let cta = L10n.tr("L10n", "pdp.error_view.go_back.button.cta")
         }
       }
+      public enum NoConnection {
+        /// Check your connection.
+        public static let message = L10n.tr("L10n", "pdp.error_view.no_connection.message")
+        /// No connection
+        public static let title = L10n.tr("L10n", "pdp.error_view.no_connection.title")
+      }
       public enum NotFound {
         /// The page you are looking for doesn’t exist.
         public static let message = L10n.tr("L10n", "pdp.error_view.not_found.message")
@@ -862,6 +868,8 @@ public extension L10n {
       case pdpErrorViewTitle = "pdp.error_view.title"
       case pdpErrorViewGenericMessage = "pdp.error_view.generic.message"
       case pdpErrorViewGoBackButtonCta = "pdp.error_view.go_back.button.cta"
+      case pdpErrorViewNoConnectionMessage = "pdp.error_view.no_connection.message"
+      case pdpErrorViewNoConnectionTitle = "pdp.error_view.no_connection.title"
       case pdpErrorViewNotFoundMessage = "pdp.error_view.not_found.message"
       case pdpErrorViewRateLimitedMessage = "pdp.error_view.rate_limited.message"
       case pdpErrorViewRateLimitedTitle = "pdp.error_view.rate_limited.title"

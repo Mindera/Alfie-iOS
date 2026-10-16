@@ -753,6 +753,28 @@
         }
       }
     },
+    "pdp.error_view.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your connection."
+          }
+        }
+      }
+    },
+    "pdp.error_view.no_connection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No connection"
+          }
+        }
+      }
+    },
     "pdp.error_view.not_found.message" : {
       "extractionState" : "manual",
       "localizations" : {

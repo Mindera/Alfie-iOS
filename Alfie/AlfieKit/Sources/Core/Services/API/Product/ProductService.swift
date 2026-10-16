@@ -11,18 +11,7 @@ public final class ProductService: ProductServiceProtocol {
     }
 
     public func getProduct(handle: String) async throws -> Product {
-        do {
-            return try await bffClient.getProduct(handle: handle)
-        } catch let error as CancellationError {
-            // Cancellation is a control-flow signal, not a domain failure: flattening it into a
-            // product error shows an error state for a request that never failed. Every method
-            // here rethrows it unmapped so a caller that guards on it can stay silent.
-            throw error
-        } catch let error as BFFRequestError where error.isNotFound {
-            throw BFFRequestError(type: .product(.noProduct))
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
+        try await bffClient.getProduct(handle: handle)
     }
 
     public func productByBarcode(_ barcode: String) async throws -> BarcodeMatch? {
@@ -82,12 +71,6 @@ public final class ProductService: ProductServiceProtocol {
     }
 
     public func relatedProducts(handle: String, limit: Int) async throws -> [Product] {
-        do {
-            return try await bffClient.relatedProducts(handle: handle, limit: limit)
-        } catch let error as CancellationError {
-            throw error
-        } catch {
-            throw BFFRequestError(type: .product(.generic))
-        }
+        try await bffClient.relatedProducts(handle: handle, limit: limit)
     }
 }
