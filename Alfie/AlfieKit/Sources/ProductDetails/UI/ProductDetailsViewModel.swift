@@ -5,8 +5,9 @@ import Model
 import SharedUI
 
 public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
-    let dependencies: ProductDetailsDependencyContainer
-    // In case we already have a full or partial product to show while fetching
+    private let dependencies: ProductDetailsDependencyContainer
+    private let bag: BagLineEditor
+    private var bagSubscription: AnyCancellable?
     private let baseProduct: Product?
     private let goBackAction: () -> Void
     private let openWebfeatureAction: (WebFeature) -> Void
@@ -20,32 +21,28 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         [Product], ProductDetailsViewErrorType
     > = .loading
     @Published private(set) var wishlistContent: [SelectedProduct] = []
-    @Published public internal(set) var isAddingToBag = false
-    @Published public internal(set) var addToBagFeedback: AddToBagFeedback?
-    @Published public internal(set) var isUpdatingBagQuantity = false
-    @Published var cart: Cart?
-    @Published var pendingBagQuantity: PendingBagQuantity?
-    private var cartSubscription: AnyCancellable?
-    let bagQuantityDebounce: Debounce
+    @Published public private(set) var isAddingToBag = false
+    @Published public private(set) var addToBagFeedback: AddToBagFeedback?
+    @Published public private(set) var isUpdatingBagQuantity = false
     @Published public private(set) var isInWishlist = false
     /// The only selection state on the PDP. Everything the shopper sees about colour, size, the
     /// chosen variant and whether the product can be bought is derived from it.
-    var selection = VariantSelection(variants: [])
+    private var selection = VariantSelection(variants: [])
     /// Rebuilt when `selection` changes, not on every read: the view touches this several times per
     /// body pass and each rebuild rescans every variant. `displayVariant` and `addToBagState` are
     /// cached alongside it for the same reason.
-    @Published public internal(set) var variantSelection = VariantSelectionState()
-    @Published public internal(set) var addToBagState: AddToBagState = .outOfStock
-    var displayVariant: Product.Variant?
+    @Published public private(set) var variantSelection = VariantSelectionState()
+    @Published public private(set) var addToBagState: AddToBagState = .outOfStock
+    private var displayVariant: Product.Variant?
     public let productId: String
     /// The BFF `productDetails(handle:)` argument. Sourced from the product `slug` where we have a
     /// product; for `.id` entry we only have the numeric id, which the BFF resolves for Shopify.
     private let productHandle: String
     private let initialSelectedProduct: SelectedProduct?
-    let requestedSku: String?
-    let requestedVariantId: String?
+    private let requestedSku: String?
+    private let requestedVariantId: String?
 
-    var product: Product? {
+    private var product: Product? {
         guard case .success(let model) = state else {
             return baseProduct
         }
@@ -53,7 +50,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         return model.product
     }
 
-    var selectedVariant: Product.Variant? {
+    private var selectedVariant: Product.Variant? {
         displayVariant ?? initialSelectedProduct?.selectedVariant ?? baseProduct?.defaultVariant
     }
 
@@ -105,10 +102,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         self.goBackAction = goBackAction
         self.openWebfeatureAction = openWebfeatureAction
         self.openProductAction = openProductAction
-        self.bagQuantityDebounce = Debounce(
-            scheduler: dependencies.scheduler,
-            delay: Constants.bagQuantityDebounce
-        )
+        self.bag = BagLineEditor(dependencies: dependencies)
 
         switch configuration {
         case .id(let productId):
@@ -151,11 +145,13 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             ))
         }
 
-        cartSubscription = dependencies.cartService.cartPublisher
-            .receive(on: dependencies.scheduler)
-            .sink { [weak self] cart in
-                self?.cart = cart
-            }
+        bag.$isAdding.assign(to: &$isAddingToBag)
+        bag.$feedback.assign(to: &$addToBagFeedback)
+        bag.$isUpdating.assign(to: &$isUpdatingBagQuantity)
+        // The bag quantity is read from the editor, so its changes have to reach this ViewModel's observers.
+        bagSubscription = bag.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     public func viewDidAppear() {
@@ -226,6 +222,35 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         case .returns:
             return .returnOptions
         }
+    }
+
+    public var bagQuantity: Int { bagLineProduct.map(bag.quantity(of:)) ?? 0 }
+    public var maxBagQuantity: Int { bag.maxQuantity(of: selectedVariant) }
+
+    public func didTapAddToBag() {
+        guard let variant = selection.purchaseState.readyVariant, let product else { return }
+
+        bag.add(SelectedProduct(product: product, selectedVariant: variant))
+    }
+
+    public func didTapIncreaseBagQuantity() {
+        bagLineProduct.map(bag.increase)
+    }
+
+    public func didTapDecreaseBagQuantity() {
+        bagLineProduct.map(bag.decrease)
+    }
+
+    public func didDismissAddToBagFeedback() {
+        bag.dismissFeedback()
+    }
+
+    public func didSelectColour(_ swatch: ColorSwatch) {
+        updateSelection(selection.selecting(colourID: swatch.id))
+    }
+
+    public func didSelectSize(_ swatch: SizingSwatch) {
+        updateSelection(selection.selecting(sizeID: swatch.id))
     }
 
     public func didTapAddToWishlist() {
@@ -329,19 +354,36 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
             return
         }
 
-        updateSelection(selection(for: product))
+        updateSelection(VariantSelection(product: product, restoringSku: requestedSku, orVariantId: requestedVariantId))
         state = .success(.init(product: product))
     }
 
-    var selectedProduct: SelectedProduct? {
-        guard
-            let product,
-            let selectedVariant
-        else {
-            return initialSelectedProduct
-        }
+    /// The one way to move the selection, so the drawn state can never lag behind it.
+    private func updateSelection(_ selection: VariantSelection) {
+        // `@Published` publishes on every set, equal or not, and re-picking the current swatch
+        // lands an identical selection. The guard sits on the source so that anything moving the
+        // variants — a refetch carrying fresh stock — still reaches the swatches.
+        guard selection != self.selection else { return }
+
+        self.selection = selection
+        variantSelection = VariantSelectionState(selection)
+        displayVariant = selection.displayVariant
+        addToBagState = AddToBagState(selection.purchaseState)
+    }
+
+    private var selectedProduct: SelectedProduct? {
+        guard let product, let selectedVariant else { return initialSelectedProduct }
 
         return SelectedProduct(product: product, selectedVariant: selectedVariant)
+    }
+
+    /// The selected variant's bag line only counts once the shopper has a size to count it for.
+    private var bagLineProduct: SelectedProduct? {
+        guard variantSelection.sizeDisplay != .selector || variantSelection.selectedSize != nil else {
+            return nil
+        }
+
+        return selectedProduct
     }
 }
 
@@ -350,7 +392,6 @@ private extension String {
 }
 
 private enum Constants {
-    static let bagQuantityDebounce: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(500)
     static let relatedProductsMaxCount = 6
     static let relatedProductsRequestLimit = relatedProductsMaxCount + 1
 }
