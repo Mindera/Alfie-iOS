@@ -6,7 +6,7 @@ extension Optional where Wrapped == Money {
     ///
     /// Printing the £0.00 that `toDomainMoney()`'s zero fallback would give states a price the
     /// shopper is not being charged: on a line it reads as "this item is free", and on the grand
-    /// total it misstates what they are about to pay (Q36).
+    /// total it misstates what they are about to pay.
     var amountFormattedOrUnavailable: String {
         self?.amountFormatted ?? L10n.Bag.Amount.unavailable
     }

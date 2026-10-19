@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 extension View {
-    // Fixed logical container sizes (pt), not a device pin — the OS is what's pinned (see Docs/SnapshotTesting.md).
+    // Fixed logical container sizes (pt), not a device pin — the OS is what's pinned (see docs/SnapshotTesting.md).
     var defaultSnapshotSize: CGSize { .init(width: 393, height: 852) }
     var fullHeightSnapshotSize: CGSize { .init(width: 393, height: 1500) } // taller, for long screens
 

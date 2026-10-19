@@ -130,3 +130,7 @@ Alfie/Alfie/Configuration/Release/GoogleService-Info.plist
 
 # Local working notes — not part of the repo
 .scratch/
+
+# Claude Code: shared config is tracked; local overrides and worktrees are not
+.claude/settings.local.json
+.claude/worktrees/

@@ -6,8 +6,8 @@ public protocol BagViewModelProtocol: ObservableObject {
     var state: ViewState<Cart?, BFFRequestError> { get }
     var isWishlistEnabled: Bool { get }
     /// Why the last removal failed, surfaced as a Snackbar and cleared when it is dismissed. A
-    /// blocked write tells the shopper so rather than leaving the row to snap back in silence
-    /// (Q25). The type rather than the error because the view only picks copy from it — and
+    /// blocked write tells the shopper so rather than leaving the row to snap back in silence.
+    /// The type rather than the error because the view only picks copy from it — and
     /// `BFFRequestError` is not `Equatable`, so `onChange` could not observe it.
     var removalFailure: BFFRequestError.BFFRequestErrorType? { get }
 
