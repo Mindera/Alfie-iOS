@@ -9,12 +9,16 @@ struct ProductListingPager {
     struct Ticket {
         let request: ProductListingPageRequest
         let cursor: String?
-        fileprivate let generation: Int
-        fileprivate let previousState: State
+        let generation: Int
     }
 
     struct Commit {
         let transientError: ProductListingTransientError?
+    }
+
+    private struct InFlight {
+        let generation: Int
+        let previousState: State
     }
 
     private static let noProducts = ProductListingViewStateModel(title: "", products: [])
@@ -22,10 +26,10 @@ struct ProductListingPager {
     private(set) var state: State
     private(set) var pagination: ProductListing.Pagination?
     private var generation = 0
-    private var inFlightGeneration: Int?
+    private var inFlight: InFlight?
 
     var isFetching: Bool {
-        inFlightGeneration == generation
+        inFlight?.generation == generation
     }
 
     init(state: State, pagination: ProductListing.Pagination? = nil) {
@@ -60,18 +64,18 @@ struct ProductListingPager {
             return nil
         }
 
-        inFlightGeneration = generation
-        return Ticket(request: request, cursor: cursor, generation: generation, previousState: previousState)
+        inFlight = InFlight(generation: generation, previousState: previousState)
+        return Ticket(request: request, cursor: cursor, generation: generation)
     }
 
     mutating func commit(_ result: Result<ProductListing?, Error>, for ticket: Ticket) -> Commit? {
-        guard ticket.generation == generation else { return nil }
-        inFlightGeneration = nil
+        guard ticket.generation == generation, let previousState = inFlight?.previousState else { return nil }
+        inFlight = nil
 
         switch (result, ticket.request) {
         case (.success(let page?), _):
             pagination = page.pagination
-            if ticket.request == .nextPage, case .success(let loaded) = ticket.previousState {
+            if ticket.request == .nextPage, case .success(let loaded) = previousState {
                 state = .success(.init(title: loaded.title, products: loaded.products + page.products))
             } else {
                 state = .success(.init(title: page.title, products: page.products))
@@ -79,17 +83,17 @@ struct ProductListingPager {
             return Commit(transientError: nil)
 
         case (.success(nil), .nextPage), (.failure(is CancellationError), _):
-            if case .loadingFirstPage = ticket.previousState {
-                return fail(with: .generic, for: ticket)
+            if case .loadingFirstPage = previousState {
+                return fail(with: .generic, for: ticket.request, from: previousState)
             }
-            state = ticket.previousState
+            state = previousState
             return Commit(transientError: nil)
 
         case (.success(nil), _):
-            return fail(with: .noResults, for: ticket)
+            return fail(with: .noResults, for: ticket.request, from: previousState)
 
         case (.failure(let error), _):
-            return fail(with: .from(error: error), for: ticket)
+            return fail(with: .from(error: error), for: ticket.request, from: previousState)
         }
     }
 
@@ -100,10 +104,14 @@ struct ProductListingPager {
         state = .loadingFirstPage(Self.noProducts)
     }
 
-    private mutating func fail(with error: ProductListingViewErrorType, for ticket: Ticket) -> Commit {
+    private mutating func fail(
+        with error: ProductListingViewErrorType,
+        for pageRequest: ProductListingPageRequest,
+        from previousState: State
+    ) -> Commit {
         guard
-            let request = ProductListingTransientError.Request(ticket.request),
-            case .success(let loaded) = ticket.previousState,
+            let request = ProductListingTransientError.Request(pageRequest),
+            case .success(let loaded) = previousState,
             !loaded.products.isEmpty
         else {
             state = .error(error)
