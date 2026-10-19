@@ -74,6 +74,10 @@ final class CurrencyFormatterTests: XCTestCase {
         )
     }
 
+    func test_minor_units_falls_back_to_zero_when_it_overflows_int() {
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "1e17")!, currencyCode: "GBP"), 0)
+    }
+
     // MARK: - symbol (glyph only, for use as a field affix)
 
     func test_symbol_returns_the_glyph_not_the_code() {
