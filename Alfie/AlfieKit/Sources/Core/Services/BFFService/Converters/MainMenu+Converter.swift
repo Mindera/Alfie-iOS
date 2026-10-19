@@ -10,8 +10,8 @@ extension BFFGraphAPI.MainMenuQuery.Data.Menu {
 
 // Apollo generates a distinct type per nesting level, so each level gets a thin adapter over the
 // shared `makeNavigationItem` builder.
-extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item {
-    fileprivate func convertToNavigationItem() -> NavigationItem? {
+private extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item {
+    func convertToNavigationItem() -> NavigationItem? {
         makeNavigationItem(
             id: id,
             title: title,
@@ -21,8 +21,8 @@ extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item {
     }
 }
 
-extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item {
-    fileprivate func convertToNavigationItem() -> NavigationItem? {
+private extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item {
+    func convertToNavigationItem() -> NavigationItem? {
         makeNavigationItem(
             id: id,
             title: title,
@@ -32,10 +32,10 @@ extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item {
     }
 }
 
-extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item.Item {
+private extension BFFGraphAPI.MainMenuQuery.Data.Menu.Item.Item.Item {
     // The query intentionally caps nesting at 3 levels (Shopify's menu depth limit), so the
     // deepest level has no children to convert.
-    fileprivate func convertToNavigationItem() -> NavigationItem? {
+    func convertToNavigationItem() -> NavigationItem? {
         makeNavigationItem(id: id, title: title, url: url, children: [])
     }
 }
