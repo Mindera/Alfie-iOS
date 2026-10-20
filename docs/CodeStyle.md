@@ -32,8 +32,9 @@ if that binary is missing or not executable.
 
 The pre-commit hook lints the staged content of staged Swift files inside the config's scope. It
 only reports: it never modifies files. When it blocks a commit, run `--fix`, fix the rest by hand
-from the printed `file:line: rule` list, restage and commit again. `git commit --no-verify` skips
-the hook, but CI lints the whole repo with the same script and has no override.
+from the printed `file:line:col: error: … (rule_id)` list, restage and commit again.
+`git commit --no-verify` skips the hook; CI is the real gate: its `lint` job (#193) runs this script
+on the whole repo, with no override.
 
 ## Naming Conventions
 
@@ -66,7 +67,8 @@ See [Architecture.md](Architecture.md#feature-module-structure).
 #endif
 ```
 
-**Important**: Previews should be wrapped with `#if DEBUG` (SwiftLint custom rule enforces this).
+**Important**: Previews should be wrapped with `#if DEBUG`. The `debug_Mocks` custom rule only
+catches a bare `#Preview` line straight after a closing `}`, so check this in review.
 
 ## Async/Await Pattern
 

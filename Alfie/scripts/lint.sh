@@ -1,23 +1,23 @@
 #!/bin/bash
 
-# The only entry point to SwiftLint: strict, committed binary, Alfie/.swiftlint.yml.
-#
-# Usage:
-#   lint.sh            Lint the whole repo
-#   lint.sh --staged   Lint the staged content of staged Swift files
-#   lint.sh --fix      Autocorrect, then lint the whole repo
+# The only entry point to SwiftLint. See Docs/CodeStyle.md §Running SwiftLint.
 
 set -euo pipefail
 
-ALFIE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ALFIE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SWIFTLINT="$ALFIE_DIR/Tools/swiftlint"
 CONFIG=".swiftlint.yml"
-FIX_HINT="Auto-fix with: Alfie/scripts/lint.sh --fix"
+FIX_HINT="Auto-fix with: ./Alfie/scripts/lint.sh --fix"
+
+fail() {
+    echo "" >&2
+    echo "❌ $1" >&2
+    exit "${2:-1}"
+}
 
 if [ ! -f "$SWIFTLINT" ] || [ ! -x "$SWIFTLINT" ]; then
-    echo "❌ SwiftLint binary missing or not executable: $SWIFTLINT" >&2
-    echo "   Restore it with: git checkout -- Alfie/Tools/swiftlint && chmod +x Alfie/Tools/swiftlint" >&2
-    exit 2
+    fail "SwiftLint binary missing or not executable: $SWIFTLINT
+   Restore it with: git checkout -- Alfie/Tools/swiftlint && chmod +x Alfie/Tools/swiftlint" 2
 fi
 
 lint() {
@@ -25,10 +25,13 @@ lint() {
 }
 
 config_paths() {
-    awk -v key="$1:" '
-        $0 == key { in_list = 1; next }
-        in_list && /^[[:space:]]*-/ { sub(/^[[:space:]]*-[[:space:]]*/, ""); print; next }
-        in_list { exit }
+    awk -v key="$1" '
+        { sub(/^#.*$/, ""); sub(/[[:space:]]+#.*$/, ""); sub(/[[:space:]]+$/, "") }
+        $0 == key ":" { in_list = 1; next }
+        in_list && /^[[:space:]]*-/ {
+            sub(/^[[:space:]]*-[[:space:]]*/, ""); gsub(/["'\'']/, ""); print; next
+        }
+        in_list && NF { exit }
     ' "$ALFIE_DIR/$CONFIG"
 }
 
@@ -45,18 +48,16 @@ is_in_scope() {
 }
 
 lint_staged() {
-    local repo_root alfie_prefix staged=() files=() path relative
+    local repo_root alfie_prefix files=() path relative
     repo_root="$(git -C "$ALFIE_DIR" rev-parse --show-toplevel)"
     alfie_prefix="${ALFIE_DIR#"$repo_root"/}"
 
     while IFS= read -r -d '' path; do
-        staged+=("$path")
-    done < <(git -C "$repo_root" diff --cached --name-only --diff-filter=ACMR -z -- '*.swift')
-
-    for path in ${staged[@]+"${staged[@]}"}; do
         relative="${path#"$alfie_prefix"/}"
-        [ "$relative" != "$path" ] && is_in_scope "$relative" && files+=("$relative")
-    done
+        if [ "$relative" != "$path" ] && is_in_scope "$relative"; then
+            files+=("$relative")
+        fi
+    done < <(git -C "$repo_root" diff --cached --name-only --diff-filter=ACMR -z -- '*.swift')
 
     if [ ${#files[@]} -eq 0 ]; then
         exit 0
@@ -64,7 +65,7 @@ lint_staged() {
 
     local snapshot
     snapshot="$(mktemp -d)"
-    trap 'rm -rf "$snapshot"' EXIT
+    trap "rm -rf '$snapshot'" EXIT
 
     (
         cd "$repo_root"
@@ -75,27 +76,22 @@ lint_staged() {
     )
 
     cd "$snapshot/$alfie_prefix"
-    local status=0
-    lint --force-exclude "${files[@]}" | sed "s|^\(/private\)\{0,1\}$snapshot/||" || status=$?
-    if [ "$status" -ne 0 ]; then
-        echo "" >&2
-        echo "❌ SwiftLint failed on staged files. $FIX_HINT" >&2
-    fi
-    exit "$status"
+    lint --force-exclude "${files[@]}" | sed "s|^\(/private\)\{0,1\}$snapshot/||" \
+        || fail "SwiftLint failed on staged files. $FIX_HINT"
 }
 
 cd "$ALFIE_DIR"
 
 case "${1:-}" in
     "")
-        lint || { echo "" >&2; echo "❌ SwiftLint failed. $FIX_HINT" >&2; exit 1; }
+        lint || fail "SwiftLint failed. $FIX_HINT"
         ;;
     --staged)
         lint_staged
         ;;
     --fix)
         "$SWIFTLINT" lint --fix --quiet --config "$CONFIG"
-        lint || { echo "" >&2; echo "❌ Violations remain that auto-fix can't correct." >&2; exit 1; }
+        lint || fail "Violations remain that auto-fix can't correct."
         ;;
     *)
         echo "Usage: $(basename "$0") [--staged | --fix]" >&2
