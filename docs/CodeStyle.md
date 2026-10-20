@@ -12,9 +12,9 @@
 
 ### Running SwiftLint
 
-`Alfie/scripts/lint.sh` is the only entry point. It always runs strict (a warning fails) with the
-committed binary `Alfie/Tools/swiftlint` (pinned at 0.54.0, never one on `PATH`), and exits non-zero
-if that binary is missing or not executable.
+`Alfie/scripts/lint.sh` is the lint command the pre-commit hook and CI share. It always runs strict
+(a warning fails) with the committed binary `Alfie/Tools/swiftlint` (pinned at 0.54.0, never one on
+`PATH`), and exits non-zero if that binary is missing or not executable.
 
 ```bash
 # Once per clone: point git at the versioned hooks in .githooks/ (safe to rerun)
@@ -33,8 +33,9 @@ if that binary is missing or not executable.
 The pre-commit hook lints the staged content of staged Swift files inside the config's scope. It
 only reports: it never modifies files. When it blocks a commit, run `--fix`, fix the rest by hand
 from the printed `file:line:col: error: … (rule_id)` list, restage and commit again.
-`git commit --no-verify` skips the hook; CI is the real gate: its `lint` job (#193) runs this script
-on the whole repo, with no override.
+`git commit --no-verify` skips the hook, because CI is the real gate: once its `lint` job (#193)
+lands, it runs this script on the whole repo with no override. Until #194 removes it, the Xcode
+build phase also runs SwiftLint, non-strict and outside this script.
 
 ## Naming Conventions
 
