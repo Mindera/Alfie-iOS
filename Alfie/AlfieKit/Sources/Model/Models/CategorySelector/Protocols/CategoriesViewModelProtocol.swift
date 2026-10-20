@@ -19,7 +19,7 @@ public enum CategoriesViewErrorType: Error, CaseIterable, FailureKindRepresentab
     case serverError
 
     public static func from(error: Error) -> CategoriesViewErrorType {
-        .init(FailureKind(error: error))
+        from(error: error, notFound: .noResults)
     }
 }
 

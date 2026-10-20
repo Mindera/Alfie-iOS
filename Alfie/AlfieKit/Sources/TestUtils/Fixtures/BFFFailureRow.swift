@@ -74,7 +74,7 @@ extension BFFFailureRow {
             kind: .generic,
             plp: .noResults,
             pdp: .notFound,
-            categories: .generic
+            categories: .noResults
         ),
         .init(
             name: "product not found",
@@ -82,7 +82,7 @@ extension BFFFailureRow {
             kind: .generic,
             plp: .noResults,
             pdp: .notFound,
-            categories: .generic
+            categories: .noResults
         ),
         .init(
             name: "non-BFF error",
