@@ -42,7 +42,7 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertNil(match)
     }
 
-    func test_productByBarcode_passes_bff_errors_through_untouched() async {
+    func test_product_by_barcode_passes_bff_errors_through_untouched() async {
         mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {
@@ -64,7 +64,7 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(capturedHandle, "the-handle")
     }
 
-    func test_getProduct_passes_bff_errors_through_untouched() async {
+    func test_get_product_passes_bff_errors_through_untouched() async {
         mockClientService.onGetProductCalled = { _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {
@@ -74,7 +74,7 @@ final class ProductServiceTests: XCTestCase {
 
     // MARK: - Product List
 
-    func test_productList_passes_bff_errors_through_untouched() async {
+    func test_product_list_passes_bff_errors_through_untouched() async {
         mockClientService.onProductListCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {
@@ -108,7 +108,7 @@ final class ProductServiceTests: XCTestCase {
 
     // MARK: - Category Price Range
 
-    func test_categoryPriceRange_passes_bff_errors_through_untouched() async {
+    func test_category_price_range_passes_bff_errors_through_untouched() async {
         mockClientService.onCategoryPriceRangeCalled = { _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {
@@ -118,7 +118,7 @@ final class ProductServiceTests: XCTestCase {
 
     // MARK: - Related Products
 
-    func test_relatedProducts_passes_bff_errors_through_untouched() async {
+    func test_related_products_passes_bff_errors_through_untouched() async {
         mockClientService.onRelatedProductsCalled = { _, _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {

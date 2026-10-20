@@ -19,7 +19,7 @@ final class SearchServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    func test_searchProducts_passes_bff_errors_through_untouched() async {
+    func test_search_products_passes_bff_errors_through_untouched() async {
         mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {

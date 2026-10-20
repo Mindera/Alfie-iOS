@@ -72,7 +72,7 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertTrue(listing.pagination.hasNextPage)
     }
 
-    func test_productListPage_passes_bff_errors_through_untouched() async {
+    func test_product_list_page_passes_bff_errors_through_untouched() async {
         mockClientService.onProductListCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {
@@ -100,7 +100,7 @@ final class ProductListingServiceTests: XCTestCase {
         XCTAssertEqual(call.filters, filters)
     }
 
-    func test_searchPage_passes_bff_errors_through_untouched() async {
+    func test_search_page_passes_bff_errors_through_untouched() async {
         mockClientService.onSearchProductsCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
         await assertPassesBFFErrorThroughUntouched {

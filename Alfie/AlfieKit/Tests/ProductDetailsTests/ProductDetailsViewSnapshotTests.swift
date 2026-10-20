@@ -248,7 +248,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    func test_productDetailsView_errorState() {
+    func test_product_details_view_with_generic_error() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)
         let sut = ProductDetailsView(viewModel: viewModel, showFailureState: true)
@@ -257,15 +257,15 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    func test_productDetailsView_errorState_serverError() {
+    func test_product_details_view_with_server_error() {
         assertErrorStateSnapshot(for: .serverError)
     }
 
-    func test_productDetailsView_errorState_rateLimited() {
+    func test_product_details_view_with_rate_limited_error() {
         assertErrorStateSnapshot(for: .rateLimited)
     }
 
-    func test_productDetailsView_errorState_noConnection() {
+    func test_product_details_view_with_no_connection_error() {
         assertErrorStateSnapshot(for: .noConnection)
     }
 
