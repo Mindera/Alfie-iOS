@@ -93,7 +93,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
 
     /// The error overlay sits on top of an intentionally empty scroll view, so pull-to-refresh and
     /// the Retry button both survive the failure.
-    func test_productListingView_errorState() {
+    func test_product_listing_view_with_generic_error() {
         let viewModel = makeViewModel(products: [], state: .error(.generic))
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
@@ -101,10 +101,24 @@ final class ProductListingViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// `serverError` is one of only two cases with copy of its own — `generic`, `noInternet` and
-    /// `noResults` all fall through to the same strings, so this is the branch worth pinning.
-    func test_productListingView_serverErrorState() {
+    func test_product_listing_view_with_server_error() {
         let viewModel = makeViewModel(products: [], state: .error(.serverError))
+        let sut = ProductListingView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_product_listing_view_with_rate_limited_error() {
+        let viewModel = makeViewModel(products: [], state: .error(.rateLimited))
+        let sut = ProductListingView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_product_listing_view_with_no_connection_error() {
+        let viewModel = makeViewModel(products: [], state: .error(.noConnection))
         let sut = ProductListingView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
@@ -131,7 +145,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
 
     func test_transient_error_snackbar_shows_a_retry_action_beside_close() {
         let sut = SnackbarView(
-            configuration: .transientError(.init(request: .nextPage, error: .noInternet), onRetry: {}, onDismiss: {})
+            configuration: .transientError(.init(request: .nextPage, error: .noConnection), onRetry: {}, onDismiss: {})
         )
         .padding(Primitives.Spacing.spacing8)
         assertSnapshot(of: sut.embededInContainer(height: 80),

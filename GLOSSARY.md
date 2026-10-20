@@ -77,6 +77,21 @@ _Avoid_: Error screen, full-screen error
 A page request failure shown as a dismissible Snackbar over loaded products, which stay on screen.
 _Avoid_: Refresh error
 
+### Failures
+
+**Server error**:
+The BFF failed to answer after the app retried. The shopper is told the problem is ours and can try again.
+
+**Rate limited**:
+The BFF asked the app to slow down. The shopper is told to wait a moment and try again.
+
+**No connection**:
+The device cannot reach the network. The shopper is told to check their connection.
+_Avoid_: offline, no internet
+
+**Timeout**:
+The BFF did not answer in time. Not a kind of its own for the shopper: it shows the generic failure.
+
 ### Bag
 
 **Bag**:

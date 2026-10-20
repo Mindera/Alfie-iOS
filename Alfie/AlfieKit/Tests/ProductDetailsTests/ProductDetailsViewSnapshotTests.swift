@@ -248,13 +248,42 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    func test_productDetailsView_errorState() {
+    func test_product_details_view_with_generic_error() {
         let viewModel = makeViewModel()
         viewModel.state = .error(.generic)
         let sut = ProductDetailsView(viewModel: viewModel, showFailureState: true)
         assertSnapshot(of: sut.embededInContainer(),
                        as: .defaultImage(),
                        record: isRecording)
+    }
+
+    func test_product_details_view_with_server_error() {
+        assertErrorStateSnapshot(for: .serverError)
+    }
+
+    func test_product_details_view_with_rate_limited_error() {
+        assertErrorStateSnapshot(for: .rateLimited)
+    }
+
+    func test_product_details_view_with_no_connection_error() {
+        assertErrorStateSnapshot(for: .noConnection)
+    }
+
+    private func assertErrorStateSnapshot(
+        for error: ProductDetailsViewErrorType,
+        file: StaticString = #filePath,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
+        let viewModel = makeViewModel()
+        viewModel.state = .error(error)
+        let sut = ProductDetailsView(viewModel: viewModel, showFailureState: true)
+        assertSnapshot(of: sut.embededInContainer(),
+                       as: .defaultImage(),
+                       record: isRecording,
+                       file: file,
+                       testName: testName,
+                       line: line)
     }
 }
 

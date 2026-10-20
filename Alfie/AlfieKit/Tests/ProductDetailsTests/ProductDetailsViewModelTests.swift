@@ -1943,7 +1943,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
     func test_related_products_skeleton_is_shown_when_product_loads_before_related_products() async {
         initViewModel()
         mockProductService.onGetProductCalled = { _ in .fixture() }
-        let gate = RelatedProductsGate()
+        let gate = ResponseGate()
         let relatedRequested = expectation(description: "Related products are requested")
         mockProductService.onRelatedProductsCalled = { _, _ in
             await gate.hold(signal: relatedRequested)
@@ -2250,22 +2250,5 @@ final class ProductDetailsViewModelTests: XCTestCase {
             return []
         }
         return relatedRequested
-    }
-}
-
-private actor RelatedProductsGate {
-    private var continuation: CheckedContinuation<Void, Never>?
-    private var opened = false
-
-    func hold(signal: XCTestExpectation) async {
-        signal.fulfill()
-        guard !opened else { return }
-        await withCheckedContinuation { continuation = $0 }
-    }
-
-    func open() {
-        opened = true
-        continuation?.resume()
-        continuation = nil
     }
 }

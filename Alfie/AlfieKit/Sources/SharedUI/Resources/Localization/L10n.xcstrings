@@ -753,6 +753,28 @@
         }
       }
     },
+    "pdp.error_view.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check your connection."
+          }
+        }
+      }
+    },
+    "pdp.error_view.no_connection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No connection"
+          }
+        }
+      }
+    },
     "pdp.error_view.not_found.message" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -782,6 +804,17 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Too many requests"
+          }
+        }
+      }
+    },
+    "pdp.error_view.retry.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Retry"
           }
         }
       }
@@ -936,6 +969,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please try again later"
+          }
+        }
+      }
+    },
+    "plp.error_view.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check your connection and try again."
+          }
+        }
+      }
+    },
+    "plp.error_view.no_connection.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No connection"
           }
         }
       }
@@ -1282,6 +1337,39 @@
         }
       }
     },
+    "plp.transient_error.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check your connection."
+          }
+        }
+      }
+    },
+    "plp.transient_error.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment."
+          }
+        }
+      }
+    },
+    "plp.transient_error.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble."
+          }
+        }
+      }
+    },
     "product.add_to_bag.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1554,6 +1642,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something went wrong. Try scanning again."
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.no_connection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Check your connection and try scanning again."
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.rate_limited.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "scanner.lookup_failed.server_error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We're having trouble. Please try scanning again."
           }
         }
       }

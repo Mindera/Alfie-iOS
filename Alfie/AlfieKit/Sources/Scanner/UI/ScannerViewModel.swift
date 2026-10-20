@@ -303,7 +303,7 @@ public final class ScannerViewModel: ScannerViewModelProtocol {
 
         case .failure(let error):
             log.error("Looking up the scanned Barcode failed: \(error)")
-            failLookUp(of: barcode, notice: L10n.Scanner.LookupFailed.message)
+            failLookUp(of: barcode, notice: FailureKind(error: error).lookupFailedNotice)
         }
     }
 

@@ -42,27 +42,11 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertNil(match)
     }
 
-    func test_product_by_barcode_throws_generic_error_when_bff_service_fails() async {
-        mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError(type: .generic) }
+    func test_product_by_barcode_passes_bff_errors_through_untouched() async {
+        mockClientService.onProductByBarcodeCalled = { _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.productByBarcode("5901234123457")
-            XCTFail("Expected productByBarcode to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_product_by_barcode_rethrows_cancellation_unmapped() async {
-        mockClientService.onProductByBarcodeCalled = { _ in throw CancellationError() }
-
-        do {
-            _ = try await sut.productByBarcode("5901234123457")
-            XCTFail("Expected productByBarcode to throw")
-        } catch {
-            XCTAssertTrue(error is CancellationError)
         }
     }
 
@@ -80,101 +64,21 @@ final class ProductServiceTests: XCTestCase {
         XCTAssertEqual(capturedHandle, "the-handle")
     }
 
-    func test_get_product_throws_no_product_error_when_not_found() async {
-        mockClientService.onGetProductCalled = { _ in
-            throw BFFRequestError(type: .emptyResponse)
-        }
+    func test_get_product_passes_bff_errors_through_untouched() async {
+        mockClientService.onGetProductCalled = { _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.getProduct(handle: "the-handle")
-            XCTFail("Expected getProduct to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.noProduct))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_get_product_throws_generic_error_when_bff_service_fails() async {
-        mockClientService.onGetProductCalled = { _ in
-            throw BFFRequestError(type: .generic)
-        }
-
-        do {
-            _ = try await sut.getProduct(handle: "the-handle")
-            XCTFail("Expected getProduct to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_get_product_rethrows_cancellation_unmapped() async {
-        mockClientService.onGetProductCalled = { _ in
-            throw CancellationError()
-        }
-
-        do {
-            _ = try await sut.getProduct(handle: "the-handle")
-            XCTFail("Expected getProduct to throw")
-        } catch is CancellationError {
-            // Expected. No caller of this method guards on cancellation today; the rule is
-            // service-wide so the next one can. See `ProductService.getProduct`.
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 
     // MARK: - Product List
 
-    func test_productList_maps_emptyResponse_to_noProducts() async {
-        mockClientService.onProductListCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .emptyResponse)
-        }
+    func test_product_list_passes_bff_errors_through_untouched() async {
+        mockClientService.onProductListCalled = { _, _, _, _, _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.productList(collectionHandle: "c", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected productList to throw")
-        } catch let error as BFFRequestError {
-            guard case .product(.noProducts) = error.type else {
-                XCTFail("Expected .product(.noProducts), got \(error.type)")
-                return
-            }
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_productList_maps_other_bff_errors_to_generic_product_error() async {
-        mockClientService.onProductListCalled = { _, _, _, _, _ in
-            throw BFFRequestError(type: .generic)
-        }
-
-        do {
-            _ = try await sut.productList(collectionHandle: "c", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected productList to throw")
-        } catch let error as BFFRequestError {
-            XCTAssertEqual(error.type, .product(.generic))
-        } catch {
-            XCTFail("Unexpected error: \(error)")
-        }
-    }
-
-    func test_productList_rethrows_cancellation_unmapped() async {
-        mockClientService.onProductListCalled = { _, _, _, _, _ in
-            throw CancellationError()
-        }
-
-        do {
-            _ = try await sut.productList(collectionHandle: "c", after: nil, limit: 1, sort: nil, filters: nil)
-            XCTFail("Expected productList to throw")
-        } catch is CancellationError {
-            // Expected: `ProductListingViewModel.refresh()` catches `CancellationError` to stay
-            // silent. Mapping it to a product error here made that guard unreachable, so every
-            // cancelled pull-to-refresh raised an error Snackbar over a perfectly good grid.
-        } catch {
-            XCTFail("Unexpected error: \(error)")
         }
     }
 
@@ -204,19 +108,21 @@ final class ProductServiceTests: XCTestCase {
 
     // MARK: - Category Price Range
 
-    func test_categoryPriceRange_rethrows_cancellation_unmapped() async {
-        mockClientService.onCategoryPriceRangeCalled = { _ in
-            throw CancellationError()
-        }
+    func test_category_price_range_passes_bff_errors_through_untouched() async {
+        mockClientService.onCategoryPriceRangeCalled = { _ in throw BFFRequestError.passThroughFixture }
 
-        do {
+        await assertPassesBFFErrorThroughUntouched {
             _ = try await sut.categoryPriceRange(collectionHandle: "c")
-            XCTFail("Expected categoryPriceRange to throw")
-        } catch is CancellationError {
-            // Expected. No caller of this method guards on cancellation today; the rule is
-            // service-wide so the next one can. See `ProductService.getProduct`.
-        } catch {
-            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    // MARK: - Related Products
+
+    func test_related_products_passes_bff_errors_through_untouched() async {
+        mockClientService.onRelatedProductsCalled = { _, _ in throw BFFRequestError.passThroughFixture }
+
+        await assertPassesBFFErrorThroughUntouched {
+            _ = try await sut.relatedProducts(handle: "the-handle", limit: 4)
         }
     }
 }

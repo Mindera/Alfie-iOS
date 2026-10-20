@@ -59,6 +59,11 @@ public class MockProductDetailsViewModel: ProductDetailsViewModelProtocol {
         onViewDidAppearCalled?()
     }
 
+    public var onDidTapRetryCalled: (() -> Void)?
+    public func didTapRetry() {
+        onDidTapRetryCalled?()
+    }
+
     public var onShouldShowLoadingForSectionCalled: ((ProductDetailsSection) -> Bool)?
     public func shouldShowLoading(for section: ProductDetailsSection) -> Bool {
         onShouldShowLoadingForSectionCalled?(section) ?? false
