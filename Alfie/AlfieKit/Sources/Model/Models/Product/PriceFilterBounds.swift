@@ -40,7 +40,8 @@ public struct PriceFilterBounds: Hashable {
 
     private static func majorUnits(of money: Money, rounding: Decimal.RoundingMode) -> Double {
         let digits = CurrencyFormatter.minorUnitDigits(for: money.currencyCode)
-        let major = Decimal(money.amount).wholeUnits(shiftedByPowerOf10: -digits, rounding: rounding)
-        return Double(major.description) ?? 0
+        return Decimal(money.amount)
+            .wholeUnits(shiftedByPowerOf10: -digits, rounding: rounding)
+            .flatMap { Double($0.description) } ?? 0
     }
 }

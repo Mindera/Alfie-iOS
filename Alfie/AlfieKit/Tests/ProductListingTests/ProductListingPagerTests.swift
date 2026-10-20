@@ -24,6 +24,17 @@ final class ProductListingPagerTests: XCTestCase {
         XCTAssertEqual(sut.pagination?.endCursor, "cursor-2")
     }
 
+    func test_committing_the_same_ticket_twice_is_ignored() throws {
+        var sut = makeSUT()
+        let ticket = try XCTUnwrap(sut.begin(.nextPage))
+        _ = sut.commit(.success(.fixture(products: page2)), for: ticket)
+
+        let secondCommit = sut.commit(.success(.fixture(products: page2)), for: ticket)
+
+        XCTAssertNil(secondCommit)
+        XCTAssertEqual(sut.state.value?.products.map(\.id), (page1 + page2).map(\.id))
+    }
+
     func test_beginning_a_next_page_shows_loaded_products_as_loading_next_page() throws {
         var sut = makeSUT()
 

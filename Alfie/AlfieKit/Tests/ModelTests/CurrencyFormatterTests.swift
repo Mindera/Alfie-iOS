@@ -78,6 +78,15 @@ final class CurrencyFormatterTests: XCTestCase {
         XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "1e17")!, currencyCode: "GBP"), 0)
     }
 
+    func test_minor_units_fits_up_to_int_max_and_falls_back_to_zero_one_past_it() {
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "92233720368547758.07")!, currencyCode: "GBP"), .max)
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "92233720368547758.08")!, currencyCode: "GBP"), 0)
+    }
+
+    func test_minor_units_falls_back_to_zero_when_the_decimal_shift_overflows() {
+        XCTAssertEqual(CurrencyFormatter.minorUnits(of: Decimal(string: "1e126")!, currencyCode: "KWD"), 0)
+    }
+
     // MARK: - symbol (glyph only, for use as a field affix)
 
     func test_symbol_returns_the_glyph_not_the_code() {
