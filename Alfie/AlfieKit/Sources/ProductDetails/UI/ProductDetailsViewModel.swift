@@ -149,9 +149,7 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
         bag.$feedback.assign(to: &$addToBagFeedback)
         bag.$isUpdating.assign(to: &$isUpdatingBagQuantity)
         // The bag quantity is read from the editor, so its changes have to reach this ViewModel's observers.
-        bagSubscription = bag.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
-        }
+        bagSubscription = bag.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
 
     public func viewDidAppear() {
@@ -234,11 +232,15 @@ public final class ProductDetailsViewModel: ProductDetailsViewModelProtocol {
     }
 
     public func didTapIncreaseBagQuantity() {
-        bagLineProduct.map(bag.increase)
+        guard let item = bagLineProduct else { return }
+
+        bag.increase(item)
     }
 
     public func didTapDecreaseBagQuantity() {
-        bagLineProduct.map(bag.decrease)
+        guard let item = bagLineProduct else { return }
+
+        bag.decrease(item)
     }
 
     public func didDismissAddToBagFeedback() {
