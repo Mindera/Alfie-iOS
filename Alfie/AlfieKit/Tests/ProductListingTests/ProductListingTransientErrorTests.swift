@@ -51,20 +51,44 @@ final class ProductListingTransientErrorTests: XCTestCase {
         }
     }
 
-    private func makeLoadedSUT(hasNextPage: Bool) -> ProductListingViewModel {
+    func test_a_cancelled_refresh_over_loaded_products_stays_silent() async {
+        for mode in [ProductListingViewMode.listing, .searchResults] {
+            let sut = makeLoadedSUT(hasNextPage: false, mode: mode)
+            stubBFF { throw CancellationError() }
+
+            await sut.refresh()
+
+            XCTAssertNil(sut.transientError, "\(mode)")
+            XCTAssertTrue(sut.state.isSuccess, "\(mode)")
+            XCTAssertEqual(sut.products.map(\.id), loadedProducts.map(\.id), "\(mode)")
+        }
+    }
+
+    private func makeLoadedSUT(hasNextPage: Bool, mode: ProductListingViewMode = .listing) -> ProductListingViewModel {
         let products = loadedProducts
-        mockClientService.onProductListCalled = { _, _, _, _, _ in
+        stubBFF {
             ProductListing.fixture(
                 pagination: .fixture(endCursor: "cursor-1", hasNextPage: hasNextPage),
                 products: products
             )
         }
-        let sut = makeSUT()
+        let sut = makeSUT(mode: mode)
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { sut.viewDidAppear() })
         return sut
     }
 
-    private func makeSUT() -> ProductListingViewModel {
-        .onRealServices(bffClient: mockClientService, category: "clothing", mode: .listing)
+    private func stubBFF(_ response: @escaping () throws -> ProductListing) {
+        mockClientService.onProductListCalled = { _, _, _, _, _ in try response() }
+        mockClientService.onSearchProductsCalled = { _, _, _, _, _ in try response() }
+    }
+
+    private func makeSUT(mode: ProductListingViewMode) -> ProductListingViewModel {
+        switch mode {
+        case .listing:
+            return .onRealServices(bffClient: mockClientService, category: "clothing", mode: mode)
+
+        case .searchResults:
+            return .onRealServices(bffClient: mockClientService, searchText: "shirt", mode: mode)
+        }
     }
 }
