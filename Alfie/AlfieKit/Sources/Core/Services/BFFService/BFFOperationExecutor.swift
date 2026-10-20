@@ -109,11 +109,18 @@ final class BFFOperationExecutor {
 
         case .failure(let error):
             if let bffError = error as? BFFRequestError { return .failure(bffError) }
-            if let urlError = error as? URLError, urlError.code == .timedOut {
+            if isTimeout(error) {
                 return .failure(BFFRequestError(type: .timeout, error: error))
             }
             return .failure(BFFRequestError(type: .generic, error: error))
         }
+    }
+
+    private static func isTimeout(_ error: Error) -> Bool {
+        if case .networkError(_, _, let underlying) = error as? URLSessionClient.URLSessionClientError {
+            return isTimeout(underlying)
+        }
+        return (error as? URLError)?.code == .timedOut
     }
 
     private static func requestError(from errors: [GraphQLError]) -> BFFRequestError {
