@@ -14,7 +14,7 @@ import Model
 /// Apollo v1.19 routes transport `URLError`s through `chain.handleErrorAsync` from
 /// `NetworkFetchInterceptor`, which bypasses subsequent interceptors — so this class
 /// only retries HTTP-status-based failures. Transport timeouts are typed as `.timeout`
-/// in `BFFClientService.resultAsFailure` and rely on user-tap retry.
+/// in `BFFOperationExecutor` and rely on user-tap retry.
 final class RetryInterceptor: ApolloInterceptor {
     struct Configuration {
         let baseDelay: TimeInterval
