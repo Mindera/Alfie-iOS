@@ -38,17 +38,10 @@ public struct PriceFilterBounds: Hashable {
         minimum...maximum
     }
 
-    private static func majorUnits(of money: Money, rounding: NSDecimalNumber.RoundingMode) -> Double {
+    private static func majorUnits(of money: Money, rounding: Decimal.RoundingMode) -> Double {
         let digits = CurrencyFormatter.minorUnitDigits(for: money.currencyCode)
-        let major = Decimal(money.amount) / pow(Decimal(10), digits)
-        let handler = NSDecimalNumberHandler(
-            roundingMode: rounding,
-            scale: 0,
-            raiseOnExactness: false,
-            raiseOnOverflow: false,
-            raiseOnUnderflow: false,
-            raiseOnDivideByZero: false
-        )
-        return NSDecimalNumber(decimal: major).rounding(accordingToBehavior: handler).doubleValue
+        return Decimal(money.amount)
+            .wholeUnits(shiftedByPowerOf10: -digits, rounding: rounding)
+            .flatMap { Double($0.description) } ?? 0
     }
 }

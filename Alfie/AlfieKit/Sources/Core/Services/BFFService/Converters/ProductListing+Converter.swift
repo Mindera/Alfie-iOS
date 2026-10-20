@@ -94,11 +94,10 @@ extension BFFGraphAPI.MoneyFragment {
     /// - `1e300` is finite, so `isFinite` passes it, but it is outside `Decimal`'s range (the limit
     ///   sits between `1e120` and `1e140`) and `Decimal(string:)` returns `nil`.
     /// - `1e17` is finite *and* a clean `Decimal`, so it clears both tests above — but scaling it to
-    ///   minor units overflows `Int64`. `CurrencyFormatter.minorUnits` scales through
-    ///   `NSDecimalNumber.int64Value` with `raiseOnOverflow: false`, so it wraps silently and
-    ///   returns a **negative** amount for a positive price. That flips the "was price" test in
-    ///   `ProductDetails+Converter` and corrupts `PriceFilterBounds`, both of which read
-    ///   `Money.amount`, and it leaves `amount` disagreeing with `amountFormatted`.
+    ///   minor units overflows `Int`. `CurrencyFormatter.minorUnits` falls back to **0** when the
+    ///   scaled value does not fit, which corrupts the "was price" test in
+    ///   `ProductDetails+Converter` and `PriceFilterBounds`, both of which read `Money.amount`, and
+    ///   it leaves `amount` disagreeing with `amountFormatted`.
     ///
     /// The bound is checked rather than the round trip, because rounding makes the round trip
     /// inexact by design: GBP `0.005` scales to `0.5` and correctly lands on `1`.

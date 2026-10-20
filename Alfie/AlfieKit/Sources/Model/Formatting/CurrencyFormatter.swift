@@ -66,20 +66,12 @@ public enum CurrencyFormatter {
 
     /// Scales a major-unit amount to its integer minor-unit value using the currency's
     /// exponent (GBP £10.23 → 1023, JPY ¥5000 → 5000, KWD 19.999 → 19999).
+    ///
+    /// Returns 0 when the minor-unit value does not fit in `Int`; bound the input first (see
+    /// `MoneyFragment.representableAmount`).
     public static func minorUnits(of amount: Decimal, currencyCode: String) -> Int {
-        let digits = minorUnitDigits(for: currencyCode)
-        let scaled = NSDecimalNumber(decimal: amount)
-            .multiplying(byPowerOf10: Int16(digits))
-            .rounding(accordingToBehavior: minorUnitRoundingHandler)
-        return Int(scaled.int64Value)
+        amount
+            .wholeUnits(shiftedByPowerOf10: minorUnitDigits(for: currencyCode), rounding: .plain)
+            .flatMap { Int($0.description) } ?? 0
     }
-
-    private static let minorUnitRoundingHandler = NSDecimalNumberHandler(
-        roundingMode: .plain,
-        scale: 0,
-        raiseOnExactness: false,
-        raiseOnOverflow: false,
-        raiseOnUnderflow: false,
-        raiseOnDivideByZero: false
-    )
 }

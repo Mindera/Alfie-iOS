@@ -153,12 +153,8 @@ final class CartConverterTests: XCTestCase {
         XCTAssertEqual(cart.grandTotal?.currencyCode, "GBP")
     }
 
-    func test_an_amount_that_overflows_minor_units_maps_to_no_total_rather_than_a_negative_one() throws {
-        // `1e17` is finite *and* a clean `Decimal`, so it clears both other guards — but scaling it
-        // to minor units wraps `Int64` (`raiseOnOverflow: false`) and yields a **negative** amount
-        // for a positive price. That is worse than £0.00: `Money.amount` feeds the "was price"
-        // comparison in `ProductDetails+Converter` and `PriceFilterBounds`, and it would disagree
-        // with this same Money's `amountFormatted`.
+    func test_an_amount_that_overflows_minor_units_maps_to_no_total_rather_than_zero() throws {
+        // `1e17` clears the finiteness and `Decimal` guards; see `representableAmount` for why the bound matters.
         let cart = makeFragment(
             lines: [makeLine(id: "line-1", unitAmount: 1e17, lineTotalAmount: 1e17)],
             subtotal: 1e17,
