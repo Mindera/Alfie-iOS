@@ -33,9 +33,10 @@ checked against the diff.
   `Mock<Service>` types — construct the container rather than bypassing it. An `AppFeature` ViewModel
   wires the app graph, so its seam is a `MockServiceProvider`. A `Core` service test has
   no container: inject the protocol collaborators straight into the initialiser, as
-  `ProductListingServiceTests` does. One exception: a ViewModel test of failure mapping may build
-  the real services over a `MockBFFClientService`, so a BFF error is traced end to end to what the
-  screen shows, as `ProductListingBlockingErrorTests` does (#173).
+  `ProductListingServiceTests` does. One exception: a ViewModel test of failure mapping, or of PDP
+  Retry, may build the real services over a `MockBFFClientService`, so a BFF error is traced end to
+  end to what the screen shows, as `ProductListingBlockingErrorTests` and `ProductDetailsRetryTests`
+  do (#173).
 - Stub a mock by assigning its `on<Method>Called` closure, and **spy** by capturing the arguments
   inside that same closure (navigation into a `capturedRoutes` array).
 - Leave the unset closure of a value-returning mock throwing — `guard let x = try onFooCalled?(…) else
