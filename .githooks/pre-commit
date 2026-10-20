@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec "$(git rev-parse --show-toplevel)/Alfie/scripts/lint.sh" --staged
