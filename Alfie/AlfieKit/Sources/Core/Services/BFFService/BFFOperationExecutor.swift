@@ -56,17 +56,7 @@ final class BFFOperationExecutor {
                 try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data, Error>) in
                     box.setResumeOnCancel { continuation.resume(throwing: CancellationError()) }
                     let cancellable = start { result in
-                        box.resumeOnce {
-                            if let failure = Self.resultAsFailure(result) {
-                                continuation.resume(throwing: failure)
-                                return
-                            }
-                            guard let data = try? result.get().data else {
-                                continuation.resume(throwing: BFFRequestError(type: .generic))
-                                return
-                            }
-                            continuation.resume(returning: data)
-                        }
+                        box.resumeOnce { continuation.resume(with: Self.outcome(of: result)) }
                     }
                     box.set(cancellable)
                 }
@@ -104,35 +94,40 @@ final class BFFOperationExecutor {
         )
     }
 
-    private static func resultAsFailure<Data: RootSelectionSet>(_ result: Result<GraphQLResult<Data>, Error>) -> BFFRequestError? {
+    private static func outcome<Data: RootSelectionSet>(
+        of result: Result<GraphQLResult<Data>, Error>
+    ) -> Result<Data, BFFRequestError> {
         switch result {
-        case .success(let result):
-            guard
-                let errors = result.errors,
-                !errors.isEmpty
-            else {
-                return nil
+        case .success(let response):
+            if let errors = response.errors, !errors.isEmpty {
+                return .failure(requestError(from: errors))
             }
-
-            let code = errors.first?.extensions?["code"] as? String
-            // Carried on every failure but interpreted by nobody here: what a status means depends
-            // on the operation, so the cart operations map their own 404 (see `mappingCartNotFound`).
-            let status = errors.first?.extensions?["status"] as? Int
-            let message = errors.first?.message
-            let type: BFFRequestError.BFFRequestErrorType = {
-                if let code, graphqlRateLimitedCodes.contains(code) {
-                    return .rateLimited(retryAfter: nil)
-                }
-                return .generic
-            }()
-            return BFFRequestError(type: type, message: message, graphqlErrorCode: code, graphqlErrorStatus: status)
+            guard let data = response.data else {
+                return .failure(BFFRequestError(type: .generic))
+            }
+            return .success(data)
 
         case .failure(let error):
-            if let bffError = error as? BFFRequestError { return bffError }
+            if let bffError = error as? BFFRequestError { return .failure(bffError) }
             if let urlError = error as? URLError, urlError.code == .timedOut {
-                return BFFRequestError(type: .timeout, error: error)
+                return .failure(BFFRequestError(type: .timeout, error: error))
             }
-            return BFFRequestError(type: .generic, error: error)
+            return .failure(BFFRequestError(type: .generic, error: error))
         }
+    }
+
+    private static func requestError(from errors: [GraphQLError]) -> BFFRequestError {
+        let code = errors.first?.extensions?["code"] as? String
+        // Carried on every failure but interpreted by nobody here: what a status means depends
+        // on the operation, so the cart operations map their own 404 (see `mappingCartNotFound`).
+        let status = errors.first?.extensions?["status"] as? Int
+        let message = errors.first?.message
+        let type: BFFRequestError.BFFRequestErrorType = {
+            if let code, graphqlRateLimitedCodes.contains(code) {
+                return .rateLimited(retryAfter: nil)
+            }
+            return .generic
+        }()
+        return BFFRequestError(type: type, message: message, graphqlErrorCode: code, graphqlErrorStatus: status)
     }
 }

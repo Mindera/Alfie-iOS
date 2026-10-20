@@ -330,9 +330,10 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
     // MARK: - Private
 
-    /// Any amount the BFF sent in a form this app cannot represent is logged at `error`, because
-    /// it means the BFF has a defect: the shopper only sees a `—` in place of the price, which
-    /// nobody reports, so this log is the only way we find out.
+    /// Converts the fragment to a `Cart` and logs the success summary. Any amount the BFF sent in a
+    /// form this app cannot represent is logged at `error`, because it means the BFF has a defect:
+    /// the shopper only sees a `—` in place of the price, which nobody reports, so this log is the
+    /// only way we find out.
     private func received(_ fragment: BFFGraphAPI.CartFragment, from operation: String) -> Cart {
         let cart = fragment.convertToCart()
         log.info("\(operation) ← id=\(cart.id) lines=\(cart.lines.count) quantity=\(cart.totalQuantity)")
