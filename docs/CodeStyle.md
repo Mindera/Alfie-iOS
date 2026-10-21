@@ -33,9 +33,9 @@
 The pre-commit hook lints the staged content of staged Swift files inside the config's scope. It
 only reports: it never modifies files. When it blocks a commit, run `--fix`, fix the rest by hand
 from the printed `file:line:col: error: … (rule_id)` list, restage and commit again.
-`git commit --no-verify` skips the hook, because CI is the real gate: once its `lint` job (#193)
-lands, it runs this script on the whole repo with no override. Until #194 removes it, the Xcode
-build phase also runs SwiftLint, non-strict and outside this script.
+`git commit --no-verify` skips the hook, because CI is the real gate: its `lint` job runs this
+script on the whole repo, on every PR and push to `main`, with no override. Until #194 removes it,
+the Xcode build phase also runs SwiftLint, non-strict and outside this script.
 
 ## Naming Conventions
 
