@@ -217,6 +217,6 @@ public enum AccessibilityID {
 
     public enum DebugMenu {
         public static let searchBarDemoPlaceholderButton = "debugMenu.searchBarDemo.placeholder.button"
-        public static let searchBarDemoSearchTermButton = "debugMenu.searchBarDemo.searchTerm.button";
+        public static let searchBarDemoSearchTermButton = "debugMenu.searchBarDemo.searchTerm.button"
     }
 }
