@@ -35,9 +35,9 @@ only reports: it never modifies files. When it blocks a commit, run `--fix`, fix
 from the printed `file:line:col: error: … (rule_id)` list, restage and commit again. `--fix`
 rewrites working-tree files across the whole repo, so restage with `git add -p` to keep unstaged
 hunks out of the commit.
-`git commit --no-verify` skips the hook, because CI is the real gate: once its `lint` job (#193)
-lands, it runs this script on the whole repo with no override. Until #194 removes it, the Xcode
-build phase also runs SwiftLint, non-strict and outside this script.
+`git commit --no-verify` skips the hook, because CI is the real gate: the `lint` job
+(`.github/workflows/lint.yml`) runs this script on the whole repo with no override. Until #194
+removes it, the Xcode build phase also runs SwiftLint, non-strict and outside this script.
 
 ## Naming Conventions
 
