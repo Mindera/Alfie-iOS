@@ -12,6 +12,9 @@ brew bundle install
 # Decrypt sensitive files (requires GPG keys)
 git secret reveal
 
+# Pre-commit SwiftLint hook (CodeStyle.md §Running SwiftLint)
+./Alfie/scripts/install-git-hooks.sh
+
 # Agent skills: trust the folder in Claude Code, then install the plugin pinned in
 # .claude/settings.json (a version bump is a change to its "ref")
 claude plugin install mattpocock-skills@mattpocock --scope project
