@@ -4,6 +4,9 @@
 
 set -euo pipefail
 
+# Hooks in a linked worktree export GIT_DIR, which makes `git -C` report ALFIE_DIR as the top level.
+unset GIT_DIR GIT_WORK_TREE
+
 ALFIE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 REPO_ROOT="$(git -C "$ALFIE_DIR" rev-parse --show-toplevel)"
 ALFIE_PREFIX="${ALFIE_DIR#"$REPO_ROOT"/}"
