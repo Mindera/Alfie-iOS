@@ -36,8 +36,8 @@ from the printed `file:line:col: error: … (rule_id)` list, restage and commit 
 rewrites working-tree files across the whole repo, so restage with `git add -p` to keep unstaged
 hunks out of the commit.
 `git commit --no-verify` skips the hook, because CI is the real gate: the `lint` job
-(`.github/workflows/lint.yml`) runs this script on the whole repo with no override. Until #194
-removes it, the Xcode build phase also runs SwiftLint, non-strict and outside this script.
+(`.github/workflows/lint.yml`) runs this script on the whole repo with no override. Xcode builds
+don't run SwiftLint.
 
 ## Naming Conventions
 
