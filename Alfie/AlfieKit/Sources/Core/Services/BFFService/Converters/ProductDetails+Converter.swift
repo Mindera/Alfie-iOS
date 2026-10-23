@@ -6,11 +6,11 @@ import Utils
 extension BFFGraphAPI.ProductDetailsFragment {
     func convertToProduct() -> Product {
         let fragmentVariants = (variants ?? []).compactMap { $0 }
-        // Product-level image used as a media fallback for variants that carry none of their own.
-        let fallbackMedia: [Media] = primaryImage
-            .flatMap { image in URL(string: image.url).map { ($0, image.altText) } }
-            .map { [.image(MediaImage(alt: $0.1, mediaContentType: .image, url: $0.0))] } ?? []
-        let domainVariants = fragmentVariants.map { $0.convertToVariant(fallbackMedia: fallbackMedia) }
+        let gallery = images.compactMap { Media.image(url: $0.url, altText: $0.altText) }
+        let primaryImageMedia = primaryImage.flatMap { Media.image(url: $0.url, altText: $0.altText) }
+        let domainVariants = fragmentVariants.map {
+            $0.convertToVariant(gallery: gallery, primaryImage: primaryImageMedia)
+        }
 
         // Resolved by index on the fragment variants, which carry the `inventory` the in-stock
         // fallback needs, then mapped to the converted domain variant.
@@ -65,15 +65,9 @@ extension BFFGraphAPI.ProductDetailsFragment {
     /// Fallback when the BFF returns no variants: synthesise one from product-level fields so
     /// `Product.defaultVariant` (non-optional) is always satisfiable.
     private func syntheticDefaultVariant() -> Product.Variant {
-        let colour: Product.Colour? = primaryImage.flatMap { image in
-            URL(string: image.url).map { url in
-                Product.Colour(
-                    swatch: nil,
-                    name: "",
-                    media: [.image(MediaImage(alt: image.altText, mediaContentType: .image, url: url))]
-                )
-            }
-        }
+        let colour: Product.Colour? = primaryImage
+            .flatMap { Media.image(url: $0.url, altText: $0.altText) }
+            .map { Product.Colour(swatch: nil, name: "", media: [$0]) }
 
         return Product.Variant(
             sku: "",
@@ -104,11 +98,11 @@ extension BFFGraphAPI.ProductDetailsFragment {
 }
 
 extension BFFGraphAPI.ProductDetailsFragment.Variant {
-    func convertToVariant(fallbackMedia: [Media]) -> Product.Variant {
-        let variantMedia: [Media] = (media ?? []).compactMap { $0?.toDomainMedia() }
-        // The PDP carousel reads `Product.Variant.media`, which is derived from the variant's
-        // colour. Use the variant's own media, falling back to the product image when it has none.
-        let resolvedMedia = variantMedia.isEmpty ? fallbackMedia : variantMedia
+    func convertToVariant(gallery: [Media], primaryImage: Media?) -> Product.Variant {
+        let variantImage = (media ?? []).lazy
+            .compactMap { $0.flatMap { Media.image(url: $0.url, altText: $0.altText) } }
+            .first
+        let resolvedMedia = Media.colourMedia(gallery: gallery, variantImage: variantImage, primaryImage: primaryImage)
 
         // Reconstruct typed colour/size from the generic `optionValues[]` by matching the option
         // name case-insensitively. When there is no colour dimension (e.g. Shopify single-option
@@ -159,10 +153,20 @@ extension BFFGraphAPI.ProductDetailsFragment.Variant {
     }
 }
 
-extension BFFGraphAPI.ProductDetailsFragment.Variant.Medium {
-    func toDomainMedia() -> Media? {
-        guard let url = URL(string: url) else { return nil }
-        return .image(MediaImage(alt: altText, mediaContentType: .image, url: url))
+private extension Media {
+    static func image(url: String, altText: String?) -> Media? {
+        URL(string: url).map { .image(MediaImage(alt: altText, mediaContentType: .image, url: $0)) }
+    }
+
+    /// The Gallery, starting on the Variant image; without a Gallery, the Variant image, else `primaryImage`.
+    static func colourMedia(gallery: [Media], variantImage: Media?, primaryImage: Media?) -> [Media] {
+        guard !gallery.isEmpty else {
+            return [variantImage ?? primaryImage].compactMap { $0 }
+        }
+        guard let variantImage else { return gallery }
+        let variantImageURL = variantImage.asImage?.url
+        let matchingPhoto = gallery.first { $0.asImage?.url == variantImageURL }
+        return [matchingPhoto ?? variantImage] + gallery.filter { $0.asImage?.url != variantImageURL }
     }
 }
 

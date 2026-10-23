@@ -18,6 +18,10 @@ fragment ProductDetailsFragment on OmniProduct {
         url
         altText
     }
+    images {
+        url
+        altText
+    }
     variants {
         id
         sku

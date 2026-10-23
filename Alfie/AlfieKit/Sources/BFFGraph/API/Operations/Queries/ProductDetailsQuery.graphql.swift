@@ -53,6 +53,7 @@ public extension BFFGraphAPI {
         public var inventoryTotal: Int? { __data["inventoryTotal"] }
         public var priceRange: PriceRange { __data["priceRange"] }
         public var primaryImage: PrimaryImage? { __data["primaryImage"] }
+        public var images: [Image] { __data["images"] }
         public var variants: [Variant?]? { __data["variants"] }
 
         public struct Fragments: FragmentContainer {
@@ -65,6 +66,8 @@ public extension BFFGraphAPI {
         public typealias PriceRange = ProductDetailsFragment.PriceRange
 
         public typealias PrimaryImage = ProductDetailsFragment.PrimaryImage
+
+        public typealias Image = ProductDetailsFragment.Image
 
         public typealias Variant = ProductDetailsFragment.Variant
       }
