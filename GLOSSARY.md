@@ -8,9 +8,25 @@ Bag and Wishlist, and the physical-retail features that reach into them.
 
 ### Catalogue
 
+**Master**:
+SCAYLE's grouping of the Products that are one style in different colours (siblings sharing a
+`masterKey`). Shopify and BigCommerce have no Master: there a Product already spans every colour.
+_Avoid_: parent product, style group
+
 **Product**:
-A style offered for sale, independent of colour and size. What a PDP is about.
+A style offered for sale, independent of size. What a PDP is about. On SCAYLE a Product is also one
+colour of a Master; on Shopify and BigCommerce it spans every colour.
 _Avoid_: item, article, SKU
+
+**Gallery**:
+The ordered photos of a Product (`OmniProduct.images`). What the PDP carousel shows, starting on the
+selected Variant's Variant image when it has one.
+_Avoid_: variant media, media, images (in prose)
+
+**Variant image**:
+The one photo a platform ties to a Variant (`ProductVariant.media`, at most one, usually none).
+SCAYLE has none; Shopify falls back to the Product's featured image.
+_Avoid_: variant media, variant gallery
 
 **Handle**:
 The identifier that addresses a Product in the BFF and in a link. On Shopify it is the platform's

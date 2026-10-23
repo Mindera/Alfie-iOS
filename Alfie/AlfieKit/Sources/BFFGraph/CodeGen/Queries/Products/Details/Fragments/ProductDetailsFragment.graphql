@@ -15,8 +15,10 @@ fragment ProductDetailsFragment on OmniProduct {
         }
     }
     primaryImage {
-        url
-        altText
+        ...ImageFragment
+    }
+    images {
+        ...ImageFragment
     }
     variants {
         id
@@ -35,8 +37,7 @@ fragment ProductDetailsFragment on OmniProduct {
             value
         }
         media {
-            url
-            altText
+            ...ImageFragment
         }
     }
 }

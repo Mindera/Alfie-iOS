@@ -14,6 +14,7 @@ class OmniProduct: MockObject {
     @Field<String>("defaultVariantId") public var defaultVariantId
     @Field<String>("descriptionHtml") public var descriptionHtml
     @Field<BFFGraphAPI.ID>("id") public var id
+    @Field<[Image]>("images") public var images
     @Field<Int>("inventoryTotal") public var inventoryTotal
     @Field<String>("name") public var name
     @Field<MoneyRange>("priceRange") public var priceRange
@@ -30,6 +31,7 @@ extension Mock where O == OmniProduct {
     defaultVariantId: String? = nil,
     descriptionHtml: String? = nil,
     id: BFFGraphAPI.ID? = nil,
+    images: [Mock<Image>]? = nil,
     inventoryTotal: Int? = nil,
     name: String? = nil,
     priceRange: Mock<MoneyRange>? = nil,
@@ -43,6 +45,7 @@ extension Mock where O == OmniProduct {
     _setScalar(defaultVariantId, for: \.defaultVariantId)
     _setScalar(descriptionHtml, for: \.descriptionHtml)
     _setScalar(id, for: \.id)
+    _setList(images, for: \.images)
     _setScalar(inventoryTotal, for: \.inventoryTotal)
     _setScalar(name, for: \.name)
     _setEntity(priceRange, for: \.priceRange)

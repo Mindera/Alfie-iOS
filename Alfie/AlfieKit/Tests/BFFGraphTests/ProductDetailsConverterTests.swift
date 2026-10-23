@@ -2,6 +2,7 @@ import XCTest
 import ApolloTestSupport
 @testable import BFFGraph
 @testable import Core
+import enum Model.Media
 
 final class ProductDetailsConverterTests: XCTestCase {
     // MARK: - Colour / size mapping
@@ -40,46 +41,98 @@ final class ProductDetailsConverterTests: XCTestCase {
         XCTAssertNil(variant.size)
     }
 
-    func test_colour_swatch_sources_from_variant_media() throws {
+    // MARK: - Gallery
+
+    func test_gallery_without_variant_image_is_colour_media_in_bff_order() throws {
         let product = makeFragment(
-            variants: [
-                makeVariant(
-                    id: "v1",
-                    options: [("color", "Red")],
-                    media: [Mock<Image>(altText: "Red shot", url: "https://cdn.alfie.test/red.jpg")]
-                )
-            ]
+            gallery: [galleryPhoto(0), galleryPhoto(1), galleryPhoto(2)],
+            variants: [makeVariant(id: "v1", options: [("color", "Red")])]
         ).convertToProduct()
 
-        let swatch = try XCTUnwrap(product.variants.first?.colour?.swatch)
-        XCTAssertEqual(swatch.url.absoluteString, "https://cdn.alfie.test/red.jpg")
+        let colour = try XCTUnwrap(product.colours?.first)
+        XCTAssertEqual(urls(colour.media), [galleryURL(0), galleryURL(1), galleryURL(2)])
     }
 
-    func test_variant_without_colour_option_still_surfaces_its_media() throws {
-        // Shopify single-option ("Title") products have no colour dimension; their media must still
-        // reach the PDP carousel (which reads variant.media via colour?.media).
+    func test_variant_image_matching_a_gallery_photo_moves_it_to_the_front_without_duplicating_it() throws {
         let product = makeFragment(
-            variants: [
-                makeVariant(
-                    id: "v1",
-                    options: [("Title", "Default Title")],
-                    media: [Mock<Image>(altText: "shot", url: "https://cdn.alfie.test/x.jpg")]
-                )
-            ]
+            gallery: [galleryPhoto(0), galleryPhoto(1), galleryPhoto(2)],
+            variants: [makeVariant(id: "v1", options: [("color", "Red")], media: [galleryPhoto(2)])]
         ).convertToProduct()
 
-        let variant = try XCTUnwrap(product.variants.first)
-        XCTAssertEqual(variant.media.compactMap { $0.asImage?.url.absoluteString }, ["https://cdn.alfie.test/x.jpg"])
+        let colour = try XCTUnwrap(product.colours?.first)
+        XCTAssertEqual(urls(colour.media), [galleryURL(2), galleryURL(0), galleryURL(1)])
     }
 
-    func test_variant_without_media_falls_back_to_product_primary_image() throws {
+    func test_variant_image_matching_no_gallery_photo_goes_in_front_of_the_full_gallery() throws {
+        let variantImage = Mock<Image>(altText: "Red", url: "https://cdn.alfie.test/red.jpg")
+        let product = makeFragment(
+            gallery: [galleryPhoto(0), galleryPhoto(1)],
+            variants: [makeVariant(id: "v1", options: [("color", "Red")], media: [variantImage])]
+        ).convertToProduct()
+
+        let colour = try XCTUnwrap(product.colours?.first)
+        XCTAssertEqual(urls(colour.media), ["https://cdn.alfie.test/red.jpg", galleryURL(0), galleryURL(1)])
+    }
+
+    func test_empty_gallery_uses_only_the_variant_image() throws {
+        let variantImage = Mock<Image>(altText: "Red", url: "https://cdn.alfie.test/red.jpg")
+        let product = makeFragment(
+            primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
+            variants: [makeVariant(id: "v1", options: [("color", "Red")], media: [variantImage])]
+        ).convertToProduct()
+
+        let colour = try XCTUnwrap(product.colours?.first)
+        XCTAssertEqual(urls(colour.media), ["https://cdn.alfie.test/red.jpg"])
+    }
+
+    func test_empty_gallery_without_variant_image_falls_back_to_primary_image() throws {
         let product = makeFragment(
             primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
             variants: [makeVariant(id: "v1", options: [("Title", "Default Title")])]
         ).convertToProduct()
 
         let variant = try XCTUnwrap(product.variants.first)
-        XCTAssertEqual(variant.media.first?.asImage?.url.absoluteString, "https://cdn.alfie.test/hero.jpg")
+        XCTAssertEqual(urls(variant.media), ["https://cdn.alfie.test/hero.jpg"])
+    }
+
+    func test_each_colour_media_starts_on_its_own_variant_image() throws {
+        let product = makeFragment(
+            gallery: [galleryPhoto(0), galleryPhoto(1), galleryPhoto(2)],
+            variants: [
+                makeVariant(id: "v1", options: [("color", "Red")], media: [galleryPhoto(1)]),
+                makeVariant(id: "v2", options: [("color", "Blue")], media: [galleryPhoto(2)])
+            ]
+        ).convertToProduct()
+
+        let colours = try XCTUnwrap(product.colours)
+        XCTAssertEqual(colours.map(\.name), ["Red", "Blue"])
+        XCTAssertEqual(urls(colours[0].media), [galleryURL(1), galleryURL(0), galleryURL(2)])
+        XCTAssertEqual(urls(colours[1].media), [galleryURL(2), galleryURL(0), galleryURL(1)])
+    }
+
+    func test_swatch_is_the_first_item_of_colour_media() throws {
+        let product = makeFragment(
+            gallery: [galleryPhoto(0), galleryPhoto(1)],
+            variants: [
+                makeVariant(id: "v1", options: [("color", "Red")], media: [galleryPhoto(1)]),
+                makeVariant(id: "v2", options: [("color", "Blue")])
+            ]
+        ).convertToProduct()
+
+        let colours = try XCTUnwrap(product.colours)
+        XCTAssertEqual(colours[0].swatch?.url.absoluteString, galleryURL(1))
+        XCTAssertEqual(colours[1].swatch?.url.absoluteString, galleryURL(0))
+    }
+
+    func test_variant_without_colour_option_still_carries_the_gallery() throws {
+        let product = makeFragment(
+            gallery: [galleryPhoto(0), galleryPhoto(1)],
+            variants: [makeVariant(id: "v1", options: [("Title", "Default Title")])]
+        ).convertToProduct()
+
+        let variant = try XCTUnwrap(product.variants.first)
+        XCTAssertEqual(variant.colour?.name, "")
+        XCTAssertEqual(urls(variant.media), [galleryURL(0), galleryURL(1)])
     }
 
     // MARK: - Default variant
@@ -253,6 +306,25 @@ final class ProductDetailsConverterTests: XCTestCase {
 
     // MARK: - No-variant fallback
 
+    func test_empty_variants_synthesised_default_variant_carries_the_gallery() {
+        let product = makeFragment(
+            primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
+            gallery: [galleryPhoto(0), galleryPhoto(1)],
+            variants: []
+        ).convertToProduct()
+
+        XCTAssertEqual(urls(product.defaultVariant.media), [galleryURL(0), galleryURL(1)])
+    }
+
+    func test_empty_variants_and_empty_gallery_synthesised_default_variant_falls_back_to_primary_image() {
+        let product = makeFragment(
+            primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
+            variants: []
+        ).convertToProduct()
+
+        XCTAssertEqual(urls(product.defaultVariant.media), ["https://cdn.alfie.test/hero.jpg"])
+    }
+
     func test_empty_variants_synthesises_default_variant() {
         let product = makeFragment(inventoryTotal: 9, variants: []).convertToProduct()
 
@@ -289,6 +361,7 @@ private extension ProductDetailsConverterTests {
         highAmount: Double? = nil,
         currencyCode: String = "GBP",
         primaryImage: Mock<Image>? = nil,
+        gallery: [Mock<Image>] = [],
         variants: [Mock<ProductVariant>] = []
     ) -> BFFGraphAPI.ProductDetailsFragment {
         let low = Mock<Money>(amount: amount, currencyCode: currencyCode)
@@ -304,6 +377,7 @@ private extension ProductDetailsConverterTests {
         product.name = "Product"
         product.priceRange = priceRange
         product.primaryImage = primaryImage
+        product.images = gallery
         product.slug = "product"
         product.variants = variants
 
@@ -332,5 +406,17 @@ private extension ProductDetailsConverterTests {
         }
         variant.media = media
         return variant
+    }
+
+    func galleryURL(_ index: Int) -> String {
+        "https://cdn.alfie.test/gallery-\(index).jpg"
+    }
+
+    func galleryPhoto(_ index: Int) -> Mock<Image> {
+        Mock<Image>(altText: "Gallery \(index)", url: galleryURL(index))
+    }
+
+    func urls(_ media: [Media]?) -> [String] {
+        (media ?? []).compactMap { $0.asImage?.url.absoluteString }
     }
 }

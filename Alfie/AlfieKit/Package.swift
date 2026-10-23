@@ -480,6 +480,7 @@ let package = Package(
                 "ProductDetails",
                 "Mocks",
                 "TestUtils",
+                .product(name: "Nuke", package: "nuke"),
             ]
         ),
 
