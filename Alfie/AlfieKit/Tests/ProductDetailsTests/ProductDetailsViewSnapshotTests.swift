@@ -1,5 +1,6 @@
 import Mocks
 import Model
+import Nuke
 import SnapshotTesting
 import SwiftUI
 import TestUtils
@@ -45,7 +46,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         // `defaultImage()` compares at full precision. With none, the gallery renders its reserved
         // placeholder slot: a solid square, no network, no animation, so the full-bleed band and
         // everything positioned below it are covered deterministically.
-        // Still NOT covered: the pagination indicators, which need one image per dot.
+        // The pagination indicators are covered by `test_productDetailsView_withSeveralGalleryPhotos`.
         //
         // This is also the reference that pins the availability note below the size chips: at
         // `precision: 1.0` the case cannot pass with that line missing.
@@ -183,6 +184,35 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
                        record: isRecording)
+    }
+
+    /// Each photo is pre-seeded in the image cache, so `RemoteImage` resolves to success on first
+    /// render instead of racing its placeholder and failure branches.
+    func test_productDetailsView_withSeveralGalleryPhotos() {
+        let photos: [(URL, UIColor)] = [
+            (URL(string: "https://cdn.alfie.test/gallery-0.jpg")!, .systemTeal),
+            (URL(string: "https://cdn.alfie.test/gallery-1.jpg")!, .systemOrange),
+            (URL(string: "https://cdn.alfie.test/gallery-2.jpg")!, .systemPurple),
+            (URL(string: "https://cdn.alfie.test/gallery-3.jpg")!, .systemGreen),
+        ]
+        photos.forEach { url, colour in
+            ImagePipeline.shared.cache[ImageRequest(url: url)] = ImageContainer(image: solidImage(colour))
+        }
+        addTeardownBlock { ImagePipeline.shared.cache.removeAll() }
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.productImageUrls = photos.map(\.0)
+        let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    private func solidImage(_ colour: UIColor) -> UIImage {
+        UIGraphicsImageRenderer(size: CGSize(width: 3, height: 4)).image { context in
+            colour.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 3, height: 4))
+        }
     }
 
     func test_product_details_view_with_six_related_products() {
