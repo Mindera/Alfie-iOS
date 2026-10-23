@@ -306,6 +306,25 @@ final class ProductDetailsConverterTests: XCTestCase {
 
     // MARK: - No-variant fallback
 
+    func test_empty_variants_synthesised_default_variant_carries_the_gallery() {
+        let product = makeFragment(
+            primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
+            gallery: [galleryPhoto(0), galleryPhoto(1)],
+            variants: []
+        ).convertToProduct()
+
+        XCTAssertEqual(urls(product.defaultVariant.media), [galleryURL(0), galleryURL(1)])
+    }
+
+    func test_empty_variants_and_empty_gallery_synthesised_default_variant_falls_back_to_primary_image() {
+        let product = makeFragment(
+            primaryImage: Mock<Image>(altText: "hero", url: "https://cdn.alfie.test/hero.jpg"),
+            variants: []
+        ).convertToProduct()
+
+        XCTAssertEqual(urls(product.defaultVariant.media), ["https://cdn.alfie.test/hero.jpg"])
+    }
+
     func test_empty_variants_synthesises_default_variant() {
         let product = makeFragment(inventoryTotal: 9, variants: []).convertToProduct()
 

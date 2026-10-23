@@ -9,7 +9,7 @@ public extension BFFGraphAPI {
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
         #"query ProductDetailsQuery($handle: String!) { productDetails(handle: $handle) { __typename ...ProductDetailsFragment } }"#,
-        fragments: [MoneyFragment.self, ProductDetailsFragment.self]
+        fragments: [ImageFragment.self, MoneyFragment.self, ProductDetailsFragment.self]
       ))
 
     public var handle: String

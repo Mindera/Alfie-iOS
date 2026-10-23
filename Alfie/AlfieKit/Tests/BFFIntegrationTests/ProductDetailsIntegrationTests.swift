@@ -28,7 +28,7 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
                        "The default variant should surface media for the PDP carousel")
     }
 
-    func test_getProduct_seededProductWithSeveralPhotos_surfacesTheFullGalleryAsColourMedia() async throws {
+    func test_get_product_with_several_photos_surfaces_the_full_gallery_as_colour_media() async throws {
         let product = try await sut.getProduct(handle: IntegrationSeed.handleWithSeveralPhotos)
 
         XCTAssertGreaterThan(
