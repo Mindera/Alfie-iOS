@@ -147,6 +147,10 @@ final class UIKitZoomableCarousel<Content: View>: UIScrollView, UIScrollViewDele
         layoutSubviews()
     }
 
+    func updatePages(_ update: (inout Content) -> Void) {
+        childViews.forEach { $0.updateRootView(update) }
+    }
+
     func autoSlide(to index: Int) {
         let newActualIndex = index < 0 ? 0 : index + 1
         guard !isAnimating, actualCurrentIndex != newActualIndex else {

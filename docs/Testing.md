@@ -149,8 +149,9 @@ Treat them as correct, in review and when writing.
 ## Mocks and fixtures
 
 Under `Alfie/AlfieKit/Sources/Mocks/`: `Core/Features/` for mock ViewModels, `Core/Services/` for
-mock services and test seams over them (`remoteImageFixtures`), `Fixtures/` for the `.fixture(...)` builders. BFF mocks are Apollo-generated under
-`Sources/BFFGraph/Mocks/` — regenerate them rather than editing.
+mock services and test seams over them (`remoteImageFixtures`), `Fixtures/` for the `.fixture(...)`
+builders. BFF mocks are Apollo-generated under `Sources/BFFGraph/Mocks/` — regenerate them rather
+than editing.
 
 `Mocks` is a production `.target`, not a test target: `SharedUI` depends on it for `#Preview`s, which
 puts it in nearly every module, so anything added there ships in the app binary.

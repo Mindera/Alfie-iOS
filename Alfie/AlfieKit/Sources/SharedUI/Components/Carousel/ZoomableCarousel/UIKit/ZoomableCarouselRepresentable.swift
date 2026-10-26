@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 struct ZoomableCarouselRepresentable<Content: View> {
-    typealias ViewControllerType = UIKitZoomableCarouselViewController<Content>
+    typealias ViewControllerType = UIKitZoomableCarouselViewController<EnvironmentForwarding<Content>>
 
     @Binding private var currentIndex: Int
     private let childViews: [Content]
@@ -29,9 +29,20 @@ extension ZoomableCarouselRepresentable: UIViewControllerRepresentable {
             currentIndex: $currentIndex,
             slidePublisher: slidePublisher,
             configuration: configuration,
-            items: childViews
+            items: childViews.map { EnvironmentForwarding(content: $0, environment: context.environment) }
         )
     }
 
-    func updateUIViewController(_ uiViewController: UIKitZoomableCarouselViewController<Content>, context: Context) {}
+    func updateUIViewController(_ uiViewController: ViewControllerType, context: Context) {
+        uiViewController.updatePages { $0.environment = context.environment }
+    }
+}
+
+struct EnvironmentForwarding<Content: View>: View {
+    let content: Content
+    var environment: EnvironmentValues
+
+    var body: some View {
+        content.environment(\.self, environment)
+    }
 }
