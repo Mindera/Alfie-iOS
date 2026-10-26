@@ -521,7 +521,9 @@ let package = Package(
         .testTarget(
             name: "SharedUITests",
             dependencies: [
+                "Mocks",
                 "SharedUI",
+                "TestUtils",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])

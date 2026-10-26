@@ -53,6 +53,11 @@ checked against the diff.
   parameter defaulting to the real thing, so a test passes a fixed value. `CurrencyFormatter` is the
   reference: it takes `locale:`, so its tests pin `en_GB` and `de_DE` rather than inheriting whatever
   the simulator is set to.
+- In a SwiftUI view the ambient seam is an environment value defaulting to the real thing. `RemoteImage`
+  loads through `\.imagePipeline` (default `ImagePipeline.shared`); a snapshot test serves its images
+  with `.remoteImageFixtures([URL: UIImage])` from `Mocks`, applied to the SUT, never by seeding the
+  shared cache. An unfixtured URL fails at once, so a missing fixture shows as the failure state. The
+  PDP several-photos and `ZoomableCarouselSnapshotTests` snapshots are the reference.
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`, at the tightest tolerance the
   maths genuinely needs — see §Tolerances.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
