@@ -57,7 +57,7 @@ checked against the diff.
   loads through `\.imagePipeline` (default `ImagePipeline.shared`); a snapshot test serves its images
   with `.remoteImageFixtures([URL: UIImage])` from `Mocks`, applied to the SUT, never by seeding the
   shared cache. An unfixtured URL fails at once, so a missing fixture shows as the failure state. The
-  PDP several-photos and `ZoomableCarouselSnapshotTests` snapshots are the reference.
+  PDP several-photos and `ZoomableCarouselSnapshotTests` snapshots are the reference (#225).
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`, at the tightest tolerance the
   maths genuinely needs — see §Tolerances.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
@@ -149,7 +149,7 @@ Treat them as correct, in review and when writing.
 ## Mocks and fixtures
 
 Under `Alfie/AlfieKit/Sources/Mocks/`: `Core/Features/` for mock ViewModels, `Core/Services/` for
-mock services, `Fixtures/` for the `.fixture(...)` builders. BFF mocks are Apollo-generated under
+mock services and test seams over them (`remoteImageFixtures`), `Fixtures/` for the `.fixture(...)` builders. BFF mocks are Apollo-generated under
 `Sources/BFFGraph/Mocks/` — regenerate them rather than editing.
 
 `Mocks` is a production `.target`, not a test target: `SharedUI` depends on it for `#Preview`s, which

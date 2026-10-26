@@ -186,8 +186,6 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// Each photo is served from fixtures, so `RemoteImage` resolves to success on first render
-    /// instead of racing its placeholder and failure branches.
     func test_product_details_view_with_several_gallery_photos_shows_page_indicators() {
         let photos: [(url: URL, colour: UIColor)] = [
             (URL(string: "https://cdn.alfie.test/gallery-0.jpg")!, .systemTeal),
@@ -195,21 +193,15 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
             (URL(string: "https://cdn.alfie.test/gallery-2.jpg")!, .systemPurple),
             (URL(string: "https://cdn.alfie.test/gallery-3.jpg")!, .systemGreen),
         ]
-        let fixtures = Dictionary(uniqueKeysWithValues: photos.map { ($0.url, solidImage($0.colour)) })
+        let fixtures = Dictionary(uniqueKeysWithValues: photos.map { ($0.url, UIImage.solid($0.colour)) })
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.productImageUrls = photos.map(\.url)
         let sut = ProductDetailsView(viewModel: viewModel).remoteImageFixtures(fixtures)
+
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
                        record: isRecording)
-    }
-
-    private func solidImage(_ colour: UIColor) -> UIImage {
-        UIGraphicsImageRenderer(size: CGSize(width: 3, height: 4)).image { context in
-            colour.setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 3, height: 4))
-        }
     }
 
     func test_product_details_view_with_six_related_products() {
