@@ -1,6 +1,5 @@
 import Mocks
 import Model
-import Nuke
 import SnapshotTesting
 import SwiftUI
 import TestUtils
@@ -187,8 +186,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
                        record: isRecording)
     }
 
-    /// Each photo is pre-seeded in the image cache, so `RemoteImage` resolves to success on first
-    /// render instead of racing its placeholder and failure branches.
+    /// Each photo is served from fixtures, so `RemoteImage` resolves to success on first render
+    /// instead of racing its placeholder and failure branches.
     func test_product_details_view_with_several_gallery_photos_shows_page_indicators() {
         let photos: [(url: URL, colour: UIColor)] = [
             (URL(string: "https://cdn.alfie.test/gallery-0.jpg")!, .systemTeal),
@@ -196,14 +195,11 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
             (URL(string: "https://cdn.alfie.test/gallery-2.jpg")!, .systemPurple),
             (URL(string: "https://cdn.alfie.test/gallery-3.jpg")!, .systemGreen),
         ]
-        photos.forEach { url, colour in
-            ImagePipeline.shared.cache[ImageRequest(url: url)] = ImageContainer(image: solidImage(colour))
-        }
-        addTeardownBlock { ImagePipeline.shared.cache.removeAll() }
+        let fixtures = Dictionary(uniqueKeysWithValues: photos.map { ($0.url, solidImage($0.colour)) })
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
         viewModel.productImageUrls = photos.map(\.url)
-        let sut = ProductDetailsView(viewModel: viewModel)
+        let sut = ProductDetailsView(viewModel: viewModel).remoteImageFixtures(fixtures)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
                        record: isRecording)
