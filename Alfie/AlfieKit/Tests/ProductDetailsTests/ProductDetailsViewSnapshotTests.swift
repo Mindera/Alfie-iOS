@@ -46,7 +46,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         // `defaultImage()` compares at full precision. With none, the gallery renders its reserved
         // placeholder slot: a solid square, no network, no animation, so the full-bleed band and
         // everything positioned below it are covered deterministically.
-        // The pagination indicators are covered by `test_productDetailsView_withSeveralGalleryPhotos`.
+        // The pagination indicators are covered by
+        // `test_product_details_view_with_several_gallery_photos_shows_page_indicators`.
         //
         // This is also the reference that pins the availability note below the size chips: at
         // `precision: 1.0` the case cannot pass with that line missing.
@@ -188,8 +189,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
 
     /// Each photo is pre-seeded in the image cache, so `RemoteImage` resolves to success on first
     /// render instead of racing its placeholder and failure branches.
-    func test_productDetailsView_withSeveralGalleryPhotos() {
-        let photos: [(URL, UIColor)] = [
+    func test_product_details_view_with_several_gallery_photos_shows_page_indicators() {
+        let photos: [(url: URL, colour: UIColor)] = [
             (URL(string: "https://cdn.alfie.test/gallery-0.jpg")!, .systemTeal),
             (URL(string: "https://cdn.alfie.test/gallery-1.jpg")!, .systemOrange),
             (URL(string: "https://cdn.alfie.test/gallery-2.jpg")!, .systemPurple),
@@ -201,7 +202,7 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         addTeardownBlock { ImagePipeline.shared.cache.removeAll() }
         let viewModel = makeViewModel()
         viewModel.priceType = .default(price: "£450.00")
-        viewModel.productImageUrls = photos.map(\.0)
+        viewModel.productImageUrls = photos.map(\.url)
         let sut = ProductDetailsView(viewModel: viewModel)
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
