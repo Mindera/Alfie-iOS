@@ -28,8 +28,4 @@ final class UIKitZoomableCarouselViewController<Content: View>: UIViewController
     override func loadView() {
         view = carousel
     }
-
-    func updatePages(_ update: (inout Content) -> Void) {
-        carousel.updatePages(update)
-    }
 }

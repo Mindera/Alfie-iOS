@@ -224,10 +224,6 @@ final class ZoomableUIView<Content: View>: UIScrollView, UIScrollViewDelegate, U
         leadingConstraint?.isActive = true
     }
 
-    func updateRootView(_ update: (inout Content) -> Void) {
-        update(&hostingController.rootView)
-    }
-
     // MARK: Delegate Methods:
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         !isZoomed

@@ -56,8 +56,9 @@ checked against the diff.
 - In a SwiftUI view the ambient seam is an environment value defaulting to the real thing. `RemoteImage`
   loads through `\.imagePipeline` (default `ImagePipeline.shared`); a snapshot test serves its images
   with `.remoteImageFixtures([URL: UIImage])` from `Mocks`, applied to the SUT, never by seeding the
-  shared cache. An unfixtured URL fails at once, so a missing fixture shows as the failure state. The
-  PDP several-photos and `ZoomableCarouselSnapshotTests` snapshots are the reference (#225).
+  shared cache. An unfixtured URL never touches the network; its failure lands asynchronously, so the
+  snapshot shows the placeholder. The PDP several-photos and `ZoomableCarouselSnapshotTests`
+  snapshots are the reference (#225).
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`, at the tightest tolerance the
   maths genuinely needs — see §Tolerances.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
