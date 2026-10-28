@@ -13,12 +13,12 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             recentSearchesHeader
             recentSearchesList
             Spacer()
         }
-        .padding(.top, Primitives.Spacing.spacing16)
+        .padding(.top, theme.sizing.spacingSpacingMd)
         .onDisappear {
             viewModel.viewDidDisappear()
         }
@@ -28,14 +28,14 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
         Text.build(theme.font.heading.small(L10n.Search.Screen.RecentSearches.Header.title))
             .accessibilityIdentifier(AccessibilityId.recentSearchHeaderTitle)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.bottom, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
+            .padding(.bottom, theme.sizing.spacingSpacingMd)
     }
 
     private var recentSearchesList: some View {
         ForEach(viewModel.recentSearches, id: \.self) { recentSearch in
             recentSearchView(for: recentSearch)
-                .padding(.vertical, Primitives.Spacing.spacing4)
+                .padding(.vertical, theme.sizing.spacingSpacing2xs)
         }
     }
 
@@ -43,14 +43,14 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
         VStack {
             HStack {
                 Text.build(theme.font.body.medium(recentSearch.value))
-                    .foregroundStyle(Primitives.Colours.neutrals800)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                     .lineLimit(1)
                 Spacer()
                 recentSearchRemoveButton(for: recentSearch)
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
-        .padding(.vertical, Primitives.Spacing.spacing8)
+        .padding(.vertical, theme.sizing.spacingSpacingXs)
         .modifier(TapHighlightableModifier { viewModel.didTapRecentSearch(recentSearch) })
         .accessibilityIdentifier(AccessibilityId.recentSearchItem)
     }
@@ -65,8 +65,8 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(width: Primitives.Spacing.spacing16, height: Primitives.Spacing.spacing16)
-                .foregroundStyle(Primitives.Colours.neutrals800)
+                .frame(width: theme.sizing.iconsIconSmall, height: theme.sizing.iconsIconSmall)
+                .foregroundStyle(theme.color.contentContentPrimary)
         })
         .accessibilityIdentifier(AccessibilityId.removeRecentSearchButton)
         .accessibilityLabel(Text(L10n.Accessibility.removeRecentSearch))

@@ -10,7 +10,7 @@ struct AccountSectionView: View {
     }
 
     var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing8) {
+        HStack(spacing: theme.sizing.spacingSpacingXs) {
             section.icon.image
                 .resizable()
                 .scaledToFit()
@@ -18,16 +18,16 @@ struct AccountSectionView: View {
                 .accessibilityIdentifier(AccessibilityID.Account.sectionIcon)
 
             Text.build(theme.font.body.medium(section.title))
-                .foregroundStyle(Theme.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentPrimary)
 
             Spacer()
         }
-        .padding(.vertical, Primitives.Spacing.spacing12)
+        .padding(.vertical, theme.sizing.spacingSpacingSm)
         .frame(minHeight: AccountConstants.sectionHeight)
     }
 
     private enum AccountConstants {
-        static let iconSize: CGFloat = Sizing.iconsIconMedium
+        static let iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconMedium
         static let sectionHeight: CGFloat = 48
     }
 }

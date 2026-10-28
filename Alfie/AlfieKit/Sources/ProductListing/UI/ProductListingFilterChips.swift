@@ -26,7 +26,7 @@ struct ProductListingFilterChips: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: theme.spacing.space100) {
+            HStack(spacing: theme.sizing.spacingSpacingXs) {
                 ForEach(Array(filters.enumerated()), id: \.offset) { index, label in
                     let isSelected = selectedIndices.contains(index)
                     Chip(configuration: .init(type: .small, label: label, isSelected: .constant(isSelected)))
@@ -37,7 +37,7 @@ struct ProductListingFilterChips: View {
                         .accessibilityIdentifier(AccessibilityID.ProductListing.filterChip(index: index))
                 }
             }
-            .padding(.horizontal, theme.spacing.space200)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
         .accessibilityIdentifier(AccessibilityID.ProductListing.filterChips)
     }

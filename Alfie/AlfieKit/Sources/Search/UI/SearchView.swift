@@ -17,7 +17,7 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
     }
 
     public var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             ThemedDivider.horizontalThin
             searchContentView
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -35,14 +35,14 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
             pullToSearchConfig: .disabled,
             theme: .softLarge,
             dismissConfiguration: .init(type: .back),
-            contentOverlayColorWhenFocused: Primitives.Colours.neutrals0,
+            contentOverlayColorWhenFocused: theme.color.surfaceBackgroundPrimary,
             showDivider: true,
             autoFocus: autoFocus,
             transition: transition,
             onCancel: { onCancel() },
             onSubmit: { _ in onSubmit() }
         )
-        .background(Primitives.Colours.neutrals0)
+        .background(theme.color.surfaceBackgroundPrimary)
     }
 }
 

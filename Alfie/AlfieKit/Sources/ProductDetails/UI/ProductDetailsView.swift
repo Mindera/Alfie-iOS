@@ -77,7 +77,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 
     private var pdpView: some View {
         ScrollView {
-            VStack(spacing: theme.spacing.space0) {
+            VStack(spacing: theme.sizing.spacingSpacingNone) {
                 // The gallery is full-bleed, so the gutter belongs to the content below it.
                 mediaCarousel
                 complementaryViews
@@ -87,7 +87,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     .frame(maxWidth: .infinity)
                     // Opaque, so nothing from the gallery can render through the product info.
                     // No rule between the two — the design runs the panel straight off the image.
-                    .background(Theme.surfaceBackgroundPrimary)
+                    .background(theme.color.surfaceBackgroundPrimary)
             }
         }
         .scrollIndicators(.hidden)
@@ -101,12 +101,12 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @ViewBuilder private var paginatedControl: some View {
         if viewModel.shouldShowMediaPaginatedControl {
             let configuration = ThemedPageControlConfiguration(
-                color: Constants.unselectedIndicatorColor,
+                color: theme.color.borderMedium,
                 // White, not primary: the indicators overlay the image rather than sit below it.
-                selectedColor: Theme.contentContentInvertedPrimary,
+                selectedColor: theme.color.contentContentInvertedPrimary,
                 size: Constants.indicatorSize,
-                spacing: theme.spacing.space100,
-                padding: theme.spacing.space0
+                spacing: theme.sizing.spacingSpacingXs,
+                padding: theme.sizing.spacingSpacingNone
             )
             ThemedPageControl(
                 data: viewModel.productImageUrls,
@@ -140,7 +140,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     }
 
     private var horizontalPadding: CGFloat {
-        isIpad ? theme.spacing.space500 : theme.spacing.space200
+        isIpad ? theme.sizing.spacingSpacing2xl : theme.sizing.spacingSpacingMd
     }
 
     /// The gallery when there is imagery, otherwise one empty slot while the product loads. An empty
@@ -151,7 +151,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
     @ViewBuilder private var galleryPages: some View {
         let urls = viewModel.productImageUrls
         if urls.isEmpty {
-            Theme.surfaceForegroundPrimary
+            theme.color.surfaceForegroundPrimary
                 .aspectRatio(1, contentMode: .fit)
                 .tag(0)
         } else {
@@ -171,10 +171,10 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                     // Neither has an intrinsic size, so both hold a square while the image resolves.
                     // A loading reservation, not a design ratio.
                     placeholder: {
-                        Theme.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit)
+                        theme.color.surfaceForegroundPrimary.aspectRatio(1, contentMode: .fit)
                     },
                     failure: { _ in
-                        Theme.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
+                        theme.color.surfaceBackgroundInvertedPrimary.aspectRatio(1, contentMode: .fit)
                     }
                 )
                 .tag(index)
@@ -208,15 +208,15 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
 extension ProductDetailsView {
     /// contains every view except the media carousel
     private var complementaryViews: some View {
-        VStack(alignment: .leading, spacing: theme.spacing.space100) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
             productInfo
 
             // Figma: one row — Add to Bag fills, the wishlist is a 40pt square beside it.
-            HStack(spacing: theme.spacing.space100) {
+            HStack(spacing: theme.sizing.spacingSpacingXs) {
                 addToBag
                 addToWishlist
             }
-            .padding(.vertical, theme.spacing.space100)
+            .padding(.vertical, theme.sizing.spacingSpacingXs)
 
             colorSelector
 
@@ -225,7 +225,7 @@ extension ProductDetailsView {
             availabilityNote
 
             descriptionSection
-                .padding(.vertical, theme.spacing.space200)
+                .padding(.vertical, theme.sizing.spacingSpacingMd)
 
             complementaryInfo
 
@@ -255,9 +255,9 @@ extension ProductDetailsView {
         .disabled(isMediaFullScreen)
         .overlay(alignment: .bottom) {
             paginatedControl
-                .padding(.bottom, theme.spacing.space150)
+                .padding(.bottom, theme.sizing.spacingSpacingSm)
         }
-        .padding(.bottom, theme.spacing.space200)
+        .padding(.bottom, theme.sizing.spacingSpacingMd)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(L10n.Pdp.Gallery.accessibilityLabel)
         .accessibilityValue(
@@ -299,8 +299,8 @@ extension ProductDetailsView {
                             .resizable()
                             .scaledToFit()
                     },
-                    placeholder: { Theme.surfaceForegroundPrimary },
-                    failure: { _ in Theme.surfaceBackgroundInvertedPrimary }
+                    placeholder: { theme.color.surfaceForegroundPrimary },
+                    failure: { _ in theme.color.surfaceBackgroundInvertedPrimary }
                 )
             }
         }
@@ -308,8 +308,8 @@ extension ProductDetailsView {
 
     /// Brand, product name and price, with the colour summary pinned to the trailing edge.
     private var productInfo: some View {
-        HStack(alignment: .top, spacing: theme.spacing.space100) {
-            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+        HStack(alignment: .top, spacing: theme.sizing.spacingSpacingXs) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                 brandName
 
                 titleHeader
@@ -327,9 +327,7 @@ extension ProductDetailsView {
         // leaving blank space above the product name.
         if viewModel.shouldShow(section: .titleHeader), !viewModel.productTitle.isEmpty {
             Text.build(theme.font.label.small(viewModel.productTitle))
-                // TOKEN GAP (G2): the design's #2B2B2B has no `content/secondary` alias upstream, so
-                // the brand line renders at primary weight — flatter than designed — until it lands.
-                .foregroundStyle(Theme.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentSecondary)
                 .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.brandName)
         }
@@ -337,9 +335,9 @@ extension ProductDetailsView {
 
     @ViewBuilder private var titleHeader: some View {
         if viewModel.shouldShow(section: .titleHeader) {
-            HStack(spacing: theme.spacing.space0) {
+            HStack(spacing: theme.sizing.spacingSpacingNone) {
                 Text.build(theme.font.body.medium(viewModel.productName))
-                    .foregroundStyle(Theme.contentContentPrimary)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                     .frame(maxWidth: .infinity, minHeight: Constants.minTitleHeight, alignment: .leading)
                     .shimmering(while: shimmeringBinding(for: .titleHeader), animateOnStateTransition: false)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.productName)
@@ -382,7 +380,7 @@ extension ProductDetailsView {
             } else {
                 switch colourLayout {
                 case .inlineGrid:
-                    VStack(alignment: .leading, spacing: theme.spacing.space150) {
+                    VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingSm) {
                         colourSelectorTitle
 
                         ColorCardGridView(
@@ -405,12 +403,12 @@ extension ProductDetailsView {
 
     private var colourSelectorTitle: some View {
         Text.build(theme.font.heading.xSmall(L10n.Pdp.ColourSelector.title))
-            .foregroundStyle(Theme.contentContentPrimary)
+            .foregroundStyle(theme.color.contentContentPrimary)
     }
 
     @ViewBuilder private var sizeSelector: some View {
         if viewModel.shouldShow(section: .sizeSelector) {
-            VStack(alignment: .leading, spacing: theme.spacing.space150) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingSm) {
                 switch viewModel.variantSelection.sizeDisplay {
                 case .selector:
                     sizeSelectorHeader
@@ -437,16 +435,16 @@ extension ProductDetailsView {
     }
 
     private var sizeSelectorHeader: some View {
-        HStack(alignment: .firstTextBaseline, spacing: theme.spacing.space100) {
+        HStack(alignment: .firstTextBaseline, spacing: theme.sizing.spacingSpacingXs) {
             Text.build(theme.font.heading.xSmall(L10n.Pdp.SizeSelector.title))
-                .foregroundStyle(Theme.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentPrimary)
 
             Spacer()
 
             // The design draws the link with no destination behind it; slice 5 makes it live. Until
             // then it renders as designed but offers no tap target and no accessibility action.
             Text.build(theme.font.link.medium(L10n.Pdp.SizeGuide.link, underline: true))
-                .foregroundStyle(Theme.linkLinkPrimaryDefault)
+                .foregroundStyle(theme.color.linkLinkPrimaryDefault)
                 .allowsHitTesting(false)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.sizeGuideLink)
         }
@@ -465,19 +463,19 @@ extension ProductDetailsView {
     @ViewBuilder private var availabilityNote: some View {
         if viewModel.shouldShow(section: .availabilityNote) {
             Text.build(theme.font.label.small(L10n.Pdp.Availability.onlineNote))
-                .foregroundStyle(Theme.contentContentTerciary)
+                .foregroundStyle(theme.color.contentContentTerciary)
                 .accessibilityIdentifier(AccessibilityID.ProductDetails.availabilityNote)
         }
     }
 
     private func selectedSizeLabel(_ size: String) -> some View {
         Text.build(theme.font.body.medium(L10n.Product.Size.selected(size)))
-            .foregroundStyle(Theme.contentContentPrimary)
+            .foregroundStyle(theme.color.contentContentPrimary)
     }
 
     @ViewBuilder private var complementaryInfo: some View {
         if viewModel.shouldShow(section: .complementaryInfo) {
-            VStack(spacing: theme.spacing.space0) {
+            VStack(spacing: theme.sizing.spacingSpacingNone) {
                 ForEach(Array(viewModel.complementaryInfoToShow.enumerated()), id: \.0) { index, type in
                     complementaryInfoCell(type: type, showTopDivider: index == 0)
                 }
@@ -487,13 +485,17 @@ extension ProductDetailsView {
 
     @ViewBuilder private var relatedProducts: some View {
         if viewModel.shouldShow(section: .relatedProducts) {
-            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                 Text.build(theme.font.body.mediumBold(L10n.Pdp.RelatedProducts.title))
-                    .foregroundStyle(Theme.contentContentPrimary)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsTitleLabel)
 
-                LazyVGrid(columns: relatedProductsColumns, alignment: .leading, spacing: theme.spacing.space200) {
+                LazyVGrid(
+                    columns: relatedProductsColumns,
+                    alignment: .leading,
+                    spacing: theme.sizing.spacingSpacingMd
+                ) {
                     if viewModel.shouldShowLoading(for: .relatedProducts) {
                         ForEach(Product.skeletons(count: Constants.relatedProductsSkeletonCount)) { product in
                             relatedProductCard(product, isSkeleton: true)
@@ -508,7 +510,9 @@ extension ProductDetailsView {
             }
             .padding(
                 .top,
-                viewModel.shouldShow(section: .complementaryInfo) ? theme.spacing.space200 : theme.spacing.space0
+                viewModel.shouldShow(section: .complementaryInfo)
+                    ? theme.sizing.spacingSpacingMd
+                    : theme.sizing.spacingSpacingNone
             )
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.relatedProductsSection)
@@ -517,7 +521,7 @@ extension ProductDetailsView {
 
     private var relatedProductsColumns: [GridItem] {
         Array(
-            repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+            repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingXs, alignment: .top),
             count: Constants.relatedProductsColumns
         )
     }
@@ -553,16 +557,16 @@ extension ProductDetailsView {
         )
 
         if showDescription || metadata != nil {
-            VStack(alignment: .leading, spacing: theme.spacing.space100) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                 if showDescription {
                     Text.build(theme.font.body.medium(viewModel.productDescription))
-                        .foregroundStyle(Theme.contentContentPrimary)
+                        .foregroundStyle(theme.color.contentContentPrimary)
                         .accessibilityIdentifier(AccessibilityID.ProductDetails.productDescription)
                 }
 
                 if let metadata {
                     Text.build(theme.font.label.small(metadata.display))
-                        .foregroundStyle(Theme.contentContentTerciary)
+                        .foregroundStyle(theme.color.contentContentTerciary)
                         .accessibilityLabel(metadata.accessibilityLabel)
                         .accessibilityIdentifier(AccessibilityID.ProductDetails.descriptionMetadata)
                 }
@@ -605,7 +609,7 @@ extension ProductDetailsView {
     }
 
     @ViewBuilder private var addToBagButton: some View {
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             let addToBagText = L10n.Product.AddToBag.Button.cta
             let outOfStockText = L10n.Product.OutOfStock.Button.cta
 
@@ -641,11 +645,11 @@ extension ProductDetailsView {
                 leadingAsset: viewModel.isInWishlist ? .heartFill : .heart,
                 cornerRadius: Constants.ctaCornerRadius,
                 // Figma: a 24pt glyph in the 40pt square, not the 16pt a label-with-icon uses.
-                iconSize: Sizing.iconsIconMedium
+                iconSize: theme.sizing.iconsIconMedium
             ) {
                 viewModel.didTapAddToWishlist()
             }
-            .frame(width: Sizing.iconsIconXlarge, height: Sizing.iconsIconXlarge)
+            .frame(width: theme.sizing.iconsIconXlarge, height: theme.sizing.iconsIconXlarge)
             .accessibilityLabel(
                 viewModel.isInWishlist ? L10n.Accessibility.removeFromWishlist : L10n.Product.AddToWishlist.Button.cta
             )
@@ -655,7 +659,7 @@ extension ProductDetailsView {
 
     @ViewBuilder private var errorView: some View {
         ErrorView(
-            spacing: theme.spacing.space500,
+            spacing: theme.sizing.spacingSpacing2xl,
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(errorTitle),
             message: theme.font.body.medium(errorMessage),
@@ -676,24 +680,24 @@ extension ProductDetailsView {
     }
 
     private func complementaryInfoCell(type: ProductDetailsComplementaryInfoType, showTopDivider: Bool) -> some View {
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             if showTopDivider {
                 ThemedDivider.horizontalThin
             }
 
-            HStack(spacing: theme.spacing.space0) {
-                HStack(spacing: theme.spacing.space0) {
+            HStack(spacing: theme.sizing.spacingSpacingNone) {
+                HStack(spacing: theme.sizing.spacingSpacingNone) {
                     // No inset of its own: the panel's gutter already positions the row, and the
                     // extra 8pt pushed these titles out of line with the description above them.
                     Text.build(theme.font.body.medium(complementaryInfoTitle(for: type)))
-                        .foregroundStyle(Theme.contentContentPrimary)
+                        .foregroundStyle(theme.color.contentContentPrimary)
                     Spacer()
                     Icon.chevronRight.image
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
                         .frame(width: Constants.chevronSize, height: Constants.chevronSize)
-                        .foregroundStyle(Theme.contentContentPrimary)
+                        .foregroundStyle(theme.color.contentContentPrimary)
                 }
                 .shimmering(while: shimmeringBinding(for: .complementaryInfo), animateOnStateTransition: false)
             }
@@ -727,10 +731,6 @@ private enum Constants {
     /// width it would be taller than the screen and push the information block below the fold.
     /// Applied to the gallery and the content block alike so they stay in one aligned column.
     static let maxContentWidth: CGFloat = 500
-    /// TOKEN GAP (G1): the design's unselected indicator is #CDCDCD. The theme has no *border*
-    /// alias at that value — only `surfaceBackgroundTerciary`, a surface token — so a semantic
-    /// `border/border-strong` alias is requested upstream. Held on the primitive meanwhile.
-    static let unselectedIndicatorColor = Primitives.Colours.neutrals300
     static let minTitleHeight = 20.0
     /// Figma: the gallery Image component's default variant is `Ratio=3:4` (375x500).
     static let galleryAspectRatio: CGFloat = 0.75

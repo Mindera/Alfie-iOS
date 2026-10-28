@@ -114,7 +114,7 @@ private struct BagLineList: View {
                     BagLineRow(line: line) { onSelect(line) }
                     if line.id != lines.last?.id {
                         BagDivider()
-                            .padding(.horizontal, Sizing.spacingSpacingMd)
+                            .padding(.horizontal, theme.sizing.spacingSpacingMd)
                     }
                 }
                 .listRowSeparator(.hidden)
@@ -132,14 +132,14 @@ private struct BagLineList: View {
                             Icon.close.image
                         }
                     }
-                    .tint(Theme.surfaceBackgroundDestructive)
+                    .tint(theme.color.surfaceBackgroundDestructive)
                     .accessibilityIdentifier(AccessibilityID.Bag.lineItemRemoveButton(id: line.id))
                 }
             }
         }
         .listStyle(.plain)
         .listRowSpacing(Constants.lineSpacing)
-        .padding(.top, Sizing.spacingSpacingMd)
+        .padding(.top, theme.sizing.spacingSpacingMd)
         .accessibilityIdentifier(AccessibilityID.Bag.bagView)
     }
 }
@@ -153,11 +153,11 @@ private struct BagLoadingView: View {
             ForEach(0 ..< Constants.skeletonRowCount, id: \.self) { _ in
                 Color.clear
                     .frame(height: BagLineRow.minHeight)
-                    .shimmering(while: .constant(true), cornerRadius: Sizing.radiusSoft)
+                    .shimmering(while: .constant(true), cornerRadius: theme.sizing.radiusSoft)
             }
             Spacer()
         }
-        .padding(Sizing.spacingSpacingMd)
+        .padding(theme.sizing.spacingSpacingMd)
         // The skeleton is decorative. VoiceOver gets one element announcing the fetch rather than
         // four unlabelled shapes it would otherwise read as blank.
         .accessibilityElement(children: .ignore)
@@ -167,8 +167,8 @@ private struct BagLoadingView: View {
 
 private enum Constants {
     static let skeletonRowCount = 4
-    static let lineSpacing = Sizing.spacingSpacingXs
-    static let skeletonRowSpacing = lineSpacing * 2 + Sizing.borderBorderWeightDefault
+    static let lineSpacing = DesignSystem.shared.sizing.spacingSpacingXs
+    static let skeletonRowSpacing = lineSpacing * 2 + DesignSystem.shared.sizing.borderBorderWeightDefault
 }
 
 #if DEBUG

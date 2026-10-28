@@ -24,7 +24,7 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
                 }
             } else {
                 errorView
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
             }
         }
         .onAppear {
@@ -44,7 +44,7 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
 
     private var errorView: some View {
         ErrorView(
-            spacing: Primitives.Spacing.spacing40,
+            spacing: theme.sizing.spacingSpacing2xl,
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(L10n.WebView.ErrorView.title),
             message: theme.font.body.medium(L10n.WebView.ErrorView.Generic.message),
@@ -81,7 +81,7 @@ private struct WebViewRepresentable<ViewModel: WebViewModelProtocol>: UIViewRepr
         config.allowsInlineMediaPlayback = true
 
         let webView = CustomWebViewNoAccessory(frame: .zero, configuration: config)
-        webView.backgroundColor = Primitives.Colours.neutrals0.ui
+        webView.backgroundColor = theme.color.surfaceBackgroundPrimary.ui
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
 

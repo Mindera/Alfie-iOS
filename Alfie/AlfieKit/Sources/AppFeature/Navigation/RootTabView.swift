@@ -46,7 +46,7 @@ public struct RootTabView<ViewModel: RootTabViewModelProtocol>: View {
                 }
                 .toolbar(.hidden, for: .tabBar)
             }
-            .accentColor(Primitives.Colours.neutrals900)
+            .accentColor(theme.color.contentContentPrimary)
             // The bar is a ZStack layer and the system tab bar is hidden, so nothing reserves its
             // height. Shrink the pages by the measured height instead: a `safeAreaInset` here does
             // not survive each flow's NavigationStack, so scroll views would still run underneath.

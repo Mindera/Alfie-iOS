@@ -20,7 +20,7 @@ private extension VariantSelection.ColourOption {
             .url(url)
         } else {
             // A filled stand-in for a missing swatch image, so it reads as a surface token.
-            .color(Theme.surfaceBackgroundInvertedPrimary)
+            .color(DesignSystem.shared.color.surfaceBackgroundInvertedPrimary)
         }
 
         return ColorSwatch(

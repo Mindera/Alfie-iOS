@@ -40,9 +40,9 @@ extension View {
     ) -> some View {
         self
             .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: Primitives.Spacing.spacing0) {
-                VStack(spacing: Primitives.Spacing.spacing0) {
-                    HStack(spacing: Primitives.Spacing.spacing8) {
+            .safeAreaInset(edge: .top, spacing: theme.sizing.spacingSpacingNone) {
+                VStack(spacing: theme.sizing.spacingSpacingNone) {
+                    HStack(spacing: theme.sizing.spacingSpacingXs) {
                         ThemedBackButton(
                             accessibilityIdentifier: AccessibilityID.ProductListing.searchBackButton,
                             action: backAction
@@ -56,12 +56,12 @@ extension View {
                             action: searchBarAction
                         )
                     }
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
                     .frame(height: Constants.searchResultsHeaderHeight)
 
                     ThemedDivider.horizontalThin
                 }
-                .background(Primitives.Colours.neutrals0)
+                .background(theme.color.surfaceBackgroundPrimary)
             }
     }
 }
