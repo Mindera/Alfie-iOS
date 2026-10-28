@@ -48,7 +48,6 @@ public struct WebView<ViewModel: WebViewModelProtocol>: View {
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(L10n.WebView.ErrorView.title),
             message: theme.font.body.medium(L10n.WebView.ErrorView.Generic.message),
-            messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(cta: L10n.WebView.ErrorView.Button.cta) {
                     viewModel.tryAgain()

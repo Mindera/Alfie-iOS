@@ -29,58 +29,43 @@ public struct ErrorView: View {
 
     private let spacing: CGFloat
     private let icon: Image?
-    private let iconColor: Color
     private let iconSize: CGFloat
     private let title: AttributedString?
-    private let titleColor: Color
     private let message: AttributedString?
-    private let messageColor: Color
     private let buttons: [ButtonConfiguration]
 
     // MARK: Lifecycle
 
     public init(
-        spacing: CGFloat = Primitives.Spacing.spacing16,
+        spacing: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd,
         icon: Image? = Icon.warning.image,
-        iconColor: Color = Primitives.Colours.neutrals900,
         iconSize: CGFloat = Constants.iconSize,
         title: AttributedString? = nil,
-        titleColor: Color = Primitives.Colours.neutrals900,
         message: AttributedString? = nil,
-        messageColor: Color = Primitives.Colours.neutrals900,
         buttons: [ButtonConfiguration] = []
     ) {
         self.spacing = spacing
         self.icon = icon
-        self.iconColor = iconColor
         self.iconSize = iconSize
         self.title = title
-        self.titleColor = titleColor
         self.message = message
-        self.messageColor = messageColor
         self.buttons = buttons
     }
 
     public init(
-        spacing: CGFloat = Primitives.Spacing.spacing16,
+        spacing: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd,
         icon: Image? = Icon.warning.image,
-        iconColor: Color = Primitives.Colours.neutrals900,
         iconSize: CGFloat = Constants.iconSize,
         title: String? = nil,
-        titleColor: Color = Primitives.Colours.neutrals900,
         message: String? = nil,
-        messageColor: Color = Primitives.Colours.neutrals900,
         buttons: [ButtonConfiguration] = []
     ) {
         self.init(
             spacing: spacing,
             icon: icon,
-            iconColor: iconColor,
             iconSize: iconSize,
             title: title.map { DesignSystem.shared.font.body.medium($0) },
-            titleColor: titleColor,
             message: message.map { DesignSystem.shared.font.body.small($0) },
-            messageColor: messageColor,
             buttons: buttons
         )
     }
@@ -93,22 +78,22 @@ public struct ErrorView: View {
                 icon
                     .renderingMode(.template)
                     .resizable()
-                    .foregroundStyle(iconColor)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
             }
 
             if let title {
                 Text.build(title)
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(theme.color.contentContentPrimary)
             }
 
             if let message {
                 Text.build(message)
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(theme.color.contentContentSecondary)
             }
 
-            VStack(spacing: Primitives.Spacing.spacing8) {
+            VStack(spacing: theme.sizing.spacingSpacingXs) {
                 ForEach(buttons) { button in
                     let themedButton = ThemedButton(text: button.cta, isFullWidth: true, action: button.action)
                     if let accessibilityId = button.accessibilityId {
@@ -118,7 +103,7 @@ public struct ErrorView: View {
                     }
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
 
             Spacer()
         }

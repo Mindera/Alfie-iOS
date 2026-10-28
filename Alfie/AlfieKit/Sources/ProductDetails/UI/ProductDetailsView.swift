@@ -659,9 +659,6 @@ extension ProductDetailsView {
             iconSize: Constants.errorViewIconSize,
             title: theme.font.heading.medium(errorTitle),
             message: theme.font.body.medium(errorMessage),
-            // No Theme alias maps to neutrals600 (#4A4A4A) — see token-requests.md G3. Matches the
-            // other 16 consumers of this value, including WebView's error message.
-            messageColor: Primitives.Colours.neutrals600,
             buttons: [
                 .init(
                     cta: L10n.Pdp.ErrorView.Retry.Button.cta,
