@@ -120,7 +120,7 @@ public struct PriceComponentView: View {
 
     private func defaultPrice(_ price: String, textSize: CGFloat) -> some View {
         priceText(price, textSize: textSize)
-            .foregroundStyle(Primitives.Colours.neutrals800)
+            .foregroundStyle(theme.color.contentContentPrimary)
     }
 
     // MARK: - Sale
@@ -140,14 +140,14 @@ public struct PriceComponentView: View {
     }
 
     private func verticalSalePrice(fullPrice: String, finalPrice: String) -> some View {
-        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: Primitives.Spacing.spacing4) {
+        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: theme.sizing.spacingSpacing2xs) {
             saleFullPrice(fullPrice)
             saleFinalPrice(finalPrice)
         }
     }
 
     private func horizontalSalePrice(fullPrice: String, finalPrice: String) -> some View {
-        HStack(spacing: Primitives.Spacing.spacing4) {
+        HStack(spacing: theme.sizing.spacingSpacing2xs) {
             saleFinalPrice(finalPrice)
             saleFullPrice(fullPrice)
         }
@@ -158,13 +158,14 @@ public struct PriceComponentView: View {
             .font(
                 Font(theme.font.body.medium.uiFont.withSize(Constants.saleFullPriceTextSize(for: configuration.size)))
             )
-            .foregroundStyle(Primitives.Colours.neutrals600)
+            .foregroundStyle(theme.color.contentContentSecondary)
             .strikethrough()
             .accessibilityIdentifier(AccessibilityId.priceHigher)
     }
 
     private func saleFinalPrice(_ price: String) -> some View {
         priceText(price, textSize: Constants.saleFinalPriceTextSize(for: configuration.size))
+            // swiftlint:disable:next no_primitive_tokens - design review #186: no sale price token
             .foregroundStyle(Primitives.Colours.semanticError700)
             .accessibilityIdentifier(AccessibilityId.priceLower)
     }
@@ -186,7 +187,7 @@ public struct PriceComponentView: View {
     }
 
     private func verticalRangePrice(lowerBound: String, upperBound: String, separator: String) -> some View {
-        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: Primitives.Spacing.spacing0) {
+        VStack(alignment: configuration.textAlignment.horizontalAlignment, spacing: theme.sizing.spacingSpacingNone) {
             defaultPrice(lowerBound, textSize: Constants.verticalRangeTextSize(for: configuration.size))
                 .accessibilityIdentifier(AccessibilityId.priceLower)
             defaultPrice(separator, textSize: Constants.verticalRangeTextSize(for: configuration.size))
@@ -197,7 +198,7 @@ public struct PriceComponentView: View {
     }
 
     private func horizontalRangePrice(lowerBound: String, upperBound: String, separator: String) -> some View {
-        HStack(spacing: Primitives.Spacing.spacing4) {
+        HStack(spacing: theme.sizing.spacingSpacing2xs) {
             defaultPrice(lowerBound, textSize: Constants.horizontalRangeTextSize(for: configuration.size))
                 .accessibilityIdentifier(AccessibilityId.priceLower)
             defaultPrice(separator, textSize: Constants.horizontalRangeTextSize(for: configuration.size))

@@ -11,12 +11,13 @@ public struct ThemedPageControlConfiguration {
     public let padding: CGFloat
 
     public init(
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no inactive indicator token
         color: Color = Primitives.Colours.neutrals200,
-        selectedColor: Color = Primitives.Colours.neutrals600,
+        selectedColor: Color = DesignSystem.shared.color.contentContentSecondary,
         animationDuration: CGFloat = 0.3,
         size: CGFloat = 10,
         spacing: CGFloat = 0,
-        padding: CGFloat = Primitives.Spacing.spacing16
+        padding: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd
     ) {
         self.color = color
         self.selectedColor = selectedColor
@@ -28,5 +29,8 @@ public struct ThemedPageControlConfiguration {
 }
 
 extension ThemedPageControlConfiguration {
-    static let `default` = ThemedPageControlConfiguration(size: 8, spacing: Primitives.Spacing.spacing4)
+    static let `default` = ThemedPageControlConfiguration(
+        size: 8,
+        spacing: DesignSystem.shared.sizing.spacingSpacing2xs
+    )
 }

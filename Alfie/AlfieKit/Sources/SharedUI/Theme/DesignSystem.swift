@@ -31,7 +31,7 @@ public class DesignSystem: DesignSystemProtocol {
     public func setupAppearance() {
         let attributesNormal: [NSAttributedString.Key: Any] = [
             .font: font.heading.small.uiFont,
-            .foregroundColor: Primitives.Colours.neutrals900.ui,
+            .foregroundColor: color.contentContentPrimary.ui,
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesNormal, for: .normal)
 
@@ -41,21 +41,21 @@ public class DesignSystem: DesignSystemProtocol {
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesSelected, for: .highlighted)
 
-        UIBarButtonItem.appearance().tintColor = Primitives.Colours.neutrals900.ui
+        UIBarButtonItem.appearance().tintColor = color.contentContentPrimary.ui
 
         setNavigationBarAppearance()
         setTabBarAppearance()
     }
 
     private func setNavigationBarAppearance() {
-        let backgroundColor = Primitives.Colours.neutrals0.ui
+        let backgroundColor = color.surfaceBackgroundPrimary.ui
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = backgroundColor
 
         let backButtonAppearance = UIBarButtonItemAppearance(style: .plain)
         let hiddenTitleAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: Primitives.Colours.transparentTransparent.ui
+            .foregroundColor: UIColor.clear
         ]
         backButtonAppearance.focused.titleTextAttributes = hiddenTitleAttributes
         backButtonAppearance.disabled.titleTextAttributes = hiddenTitleAttributes
@@ -79,7 +79,7 @@ public class DesignSystem: DesignSystemProtocol {
     }
 
     private func setTabBarAppearance() {
-        let backgroundColor = Primitives.Colours.neutrals0.ui
+        let backgroundColor = color.surfaceBackgroundPrimary.ui
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithTransparentBackground()
         tabBarAppearance.backgroundColor = backgroundColor

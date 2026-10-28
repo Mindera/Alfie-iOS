@@ -40,8 +40,8 @@ public struct VerticalProductCard: View {
                 .shimmering(while: $isSkeleton)
                 .accessibilityIdentifier(AccessibilityId.productImage)
 
-            HStack(alignment: .lastTextBaseline, spacing: Primitives.Spacing.spacing0) {
-                VStack(alignment: .leading, spacing: Primitives.Spacing.spacing4) {
+            HStack(alignment: .lastTextBaseline, spacing: theme.sizing.spacingSpacingNone) {
+                VStack(alignment: .leading, spacing: theme.sizing.spacingSpacing2xs) {
                     productDesignerView
                     productNameView
                 }
@@ -76,8 +76,8 @@ public struct VerticalProductCard: View {
                     .resizable()
                     .aspectRatio(Constants.imageAspectRatio, contentMode: .fit)
             },
-            placeholder: { Primitives.Colours.neutrals100 },
-            failure: { _ in Primitives.Colours.neutrals100 }
+            placeholder: { theme.color.surfaceForegroundPrimary },
+            failure: { _ in theme.color.surfaceForegroundPrimary }
         )
         .aspectRatio(Constants.imageAspectRatio, contentMode: .fill)
     }
@@ -85,7 +85,7 @@ public struct VerticalProductCard: View {
     private var productDesignerView: some View {
         Text(viewModel.designer)
             .font(Font(viewModel.configuration.designerFont))
-            .foregroundStyle(Primitives.Colours.neutrals800)
+            .foregroundStyle(theme.color.contentContentPrimary)
             .lineLimit(Constants.productDesignerLineLimit)
             .shimmeringMultiline(
                 while: $isSkeleton,
@@ -146,8 +146,8 @@ public struct VerticalProductCard: View {
 
         case .medium, .large:
             let topTrailingEdgePadding = viewModel.configuration.size == .medium
-                ? Primitives.Spacing.spacing4
-                : Primitives.Spacing.spacing8
+                ? theme.sizing.spacingSpacing2xs
+                : theme.sizing.spacingSpacingXs
             let iconSize = viewModel.configuration.size == .medium ? Constants.iconSmallSize : Constants.iconLargeSize
 
             Button(action: {
@@ -157,7 +157,7 @@ public struct VerticalProductCard: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(Primitives.Colours.neutrals900, Primitives.Colours.neutrals0)
+                    .foregroundStyle(theme.color.contentContentPrimary, theme.color.surfaceBackgroundPrimary)
                     .padding([.top, .trailing], topTrailingEdgePadding)
                     .frame(
                         minWidth: Constants.actionMinTapSize,
@@ -186,7 +186,7 @@ private enum Constants {
     static let productNameLineLimit: Int = 2
     static let iconSmallSize: CGFloat = 24
     static let iconLargeSize: CGFloat = 32
-    static let actionMinTapSize: CGFloat = Primitives.Spacing.spacing44
+    static let actionMinTapSize: CGFloat = 44
     static let imageAspectRatio: CGFloat = 0.75
 }
 

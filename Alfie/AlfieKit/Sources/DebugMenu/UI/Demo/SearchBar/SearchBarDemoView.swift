@@ -5,7 +5,7 @@ import SwiftUI
 struct SearchBarDemoView: View {
     @State private var searchText: String = ""
     @State private var scrollOffset: CGPoint = .zero
-    @State private var searchBarTheme = ThemedSearchBarView.Theme.light
+    @State private var searchBarTheme = ThemedSearchBarView.Style.light
     private let placeholder = "Search Alfie"
     private let placeholderOnFocus = "What are you looking for?"
 
@@ -83,7 +83,7 @@ struct SearchBarDemoView: View {
             VStack(alignment: .leading) {
                 Text.build(theme.font.body.small("Search Bar Theme:"))
                 Picker(selection: $searchBarTheme) {
-                    ForEach(ThemedSearchBarView.Theme.allCases, id: \.self) { searchBarTheme in
+                    ForEach(ThemedSearchBarView.Style.allCases, id: \.self) { searchBarTheme in
                         Text.build(theme.font.body.small(searchBarTheme.name))
                             .tag(searchBarTheme)
                     }
@@ -96,7 +96,7 @@ struct SearchBarDemoView: View {
     }
 }
 
-private extension ThemedSearchBarView.Theme {
+private extension ThemedSearchBarView.Style {
     var name: String {
         switch self {
         case .softMedium:

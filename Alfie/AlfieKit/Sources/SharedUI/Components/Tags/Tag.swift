@@ -12,6 +12,7 @@ public struct TagConfiguration {
         label: String,
         showCloseButton: Bool = false,
         icon: Image? = nil,
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no tag accent token
         color: Color = Primitives.Colours.neutrals700,
         onCloseTap: (() -> Void)? = nil
     ) {
@@ -41,11 +42,11 @@ public struct Tag: View {
     }
 
     public var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing0) {
+        HStack(spacing: theme.sizing.spacingSpacingNone) {
             Rectangle()
                 .fill(configuration.color)
                 .frame(width: Constants.strokeWidth)
-            HStack(spacing: Primitives.Spacing.spacing8) {
+            HStack(spacing: theme.sizing.spacingSpacingXs) {
                 if let icon = configuration.icon {
                     icon
                         .resizable()
@@ -61,16 +62,17 @@ public struct Tag: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: Constants.closeWidth, height: Constants.closeHeight)
-                            .foregroundStyle(Primitives.Colours.neutrals900)
+                            .foregroundStyle(theme.color.contentContentPrimary)
                     })
                     .accessibilityLabel(Text(L10n.Accessibility.close))
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing12)
+            .padding(.horizontal, theme.sizing.spacingSpacingSm)
         }
-        .background(Primitives.Colours.neutrals100)
+        .background(theme.color.surfaceForegroundPrimary)
         .cornerRadius(Constants.cornerRadius)
         .frame(height: Constants.height)
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no shadow token
         .shadow(color: Primitives.Colours.neutrals900.opacity(0.1), radius: 4, x: 2, y: 2)
     }
 }

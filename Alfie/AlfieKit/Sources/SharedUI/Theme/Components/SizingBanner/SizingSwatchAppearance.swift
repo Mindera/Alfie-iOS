@@ -13,17 +13,19 @@ public struct SizingSwatchAppearance: Equatable {
     public static func resolve(for state: SizingSwatch.ItemState, isSelected: Bool) -> Self {
         guard state == .available else {
             return .init(
-                borderColor: Theme.borderSoft,
+                borderColor: DesignSystem.shared.color.borderSoft,
                 borderWidth: Constants.borderWidthDefault,
-                textColor: Theme.contentContentTerciary,
+                textColor: DesignSystem.shared.color.contentContentTerciary,
                 backgroundColor: .clear
             )
         }
 
         return .init(
-            borderColor: isSelected ? Theme.contentContentPrimary : Theme.borderSoft,
+            borderColor: isSelected
+                ? DesignSystem.shared.color.contentContentPrimary
+                : DesignSystem.shared.color.borderSoft,
             borderWidth: isSelected ? Constants.borderWidthSelected : Constants.borderWidthDefault,
-            textColor: Theme.contentContentPrimary,
+            textColor: DesignSystem.shared.color.contentContentPrimary,
             backgroundColor: .clear
         )
     }

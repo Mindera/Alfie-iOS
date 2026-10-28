@@ -26,7 +26,7 @@ public struct QuantityStepper: View {
     }
 
     private enum Constants {
-        static let iconSize: CGFloat = Sizing.iconsIconSmall
+        static let iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconSmall
         static let minTapTarget: CGFloat = 44
     }
 
@@ -43,8 +43,8 @@ public struct QuantityStepper: View {
         quantity: Int,
         bounds: ClosedRange<Int>,
         isDisabled: Bool = false,
-        height: CGFloat = Primitives.Spacing.spacing40,
-        cornerRadius: CGFloat = Sizing.radiusSoft,
+        height: CGFloat = 40,
+        cornerRadius: CGFloat = DesignSystem.shared.sizing.radiusSoft,
         accessibility: Accessibility,
         onDecrease: @escaping () -> Void,
         onIncrease: @escaping () -> Void
@@ -60,7 +60,7 @@ public struct QuantityStepper: View {
     }
 
     public var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing0) {
+        HStack(spacing: theme.sizing.spacingSpacingNone) {
             stepButton(
                 icon: .minus,
                 control: accessibility.decrease,
@@ -83,7 +83,7 @@ public struct QuantityStepper: View {
             )
         }
         .frame(height: height)
-        .background(Theme.buttonPrimaryBackgroundPrimaryDefault)
+        .background(theme.color.buttonPrimaryBackgroundPrimaryDefault)
         .cornerRadius(cornerRadius)
         .accessibilityElement(children: .contain)
     }
@@ -111,8 +111,8 @@ public struct QuantityStepper: View {
 
     private func contentColor(isEnabled: Bool) -> Color {
         isDisabled || !isEnabled
-            ? Theme.buttonPrimaryContentPrimaryDisabled
-            : Theme.buttonPrimaryContentPrimaryDefault
+            ? theme.color.buttonPrimaryContentPrimaryDisabled
+            : theme.color.buttonPrimaryContentPrimaryDefault
     }
 }
 
@@ -130,7 +130,7 @@ private extension QuantityStepper.Accessibility {
 }
 
 #Preview("Quantity stepper") {
-    VStack(spacing: Primitives.Spacing.spacing16) {
+    VStack(spacing: DesignSystem.shared.sizing.spacingSpacingMd) {
         QuantityStepper(
             quantity: 1,
             bounds: 0...100,

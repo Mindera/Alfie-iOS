@@ -87,7 +87,7 @@ public struct RangeSlider: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: theme.spacing.space100) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
             slider
             if let inputs = configuration.inputs {
                 fields(inputs)
@@ -160,7 +160,7 @@ public struct RangeSlider: View {
     // MARK: - Fields
 
     private func fields(_ inputs: RangeSliderConfiguration.Inputs) -> some View {
-        HStack(spacing: theme.spacing.space200) {
+        HStack(spacing: theme.sizing.spacingSpacingMd) {
             field(for: .lower, inputs: inputs)
             field(for: .upper, inputs: inputs)
         }

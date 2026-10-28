@@ -24,10 +24,10 @@ public struct ThemedButton: View {
         isDisabled: Binding<Bool> = .constant(false),
         isLoading: Binding<Bool> = .constant(false),
         isFullWidth: Bool = false,
-        cornerRadius: CGFloat = Sizing.radiusSoft,
+        cornerRadius: CGFloat = DesignSystem.shared.sizing.radiusSoft,
         // Defaults to the small icon every existing caller renders; an icon-only button sized from
         // the design needs a larger glyph than a label-with-icon does.
-        iconSize: CGFloat = Sizing.iconsIconSmall,
+        iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconSmall,
         action: @escaping () -> Void
     ) {
         self.text = text
@@ -145,10 +145,10 @@ public enum ButtonType {
 
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
-    static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
-    static let smallHeight: CGFloat = Primitives.Spacing.spacing32
-    static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
-    static let bigHeight: CGFloat = Primitives.Spacing.spacing48
+    static let verticalPadding: CGFloat = -DesignSystem.shared.sizing.spacingSpacingXs
+    static let smallHeight: CGFloat = 32
+    static let mediumHeight: CGFloat = 40
+    static let bigHeight: CGFloat = 48
 }
 
 // MARK: - ThemedButtonStyle
@@ -166,8 +166,10 @@ private struct ThemedButtonStyle: ButtonStyle {
     /// button wider than it is tall. Dropping it lets the button size to icon + padding.
     let isIconOnly: Bool
 
+    private var theme: DesignSystemProtocol { DesignSystem.shared }
+
     func makeBody(configuration: Self.Configuration) -> some View {
-        HStack(spacing: isIconOnly ? Primitives.Spacing.spacing0 : nil) {
+        HStack(spacing: isIconOnly ? theme.sizing.spacingSpacingNone : nil) {
             if let leadingAsset {
                 leadingAsset.image
                     .renderingMode(.template)
@@ -178,7 +180,7 @@ private struct ThemedButtonStyle: ButtonStyle {
             }
             if !isIconOnly {
                 configuration.label
-                    .padding(.vertical, Primitives.Spacing.spacing16)
+                    .padding(.vertical, theme.sizing.spacingSpacingMd)
             }
             if let trailingAsset {
                 trailingAsset.image
@@ -190,14 +192,14 @@ private struct ThemedButtonStyle: ButtonStyle {
             }
         }
         .frame(height: type.height)
-        .padding(.horizontal, Primitives.Spacing.spacing8)
+        .padding(.horizontal, theme.sizing.spacingSpacingXs)
         .foregroundStyle(textColor(configuration))
         .background(background(configuration))
         .cornerRadius(cornerRadius)
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(borderColor(configuration), lineWidth: Primitives.Border.borderWeightDefault)
+                    .stroke(borderColor(configuration), lineWidth: theme.sizing.borderBorderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
@@ -312,6 +314,7 @@ extension ThemedButton: CustomShimmerable {
     public var customLighterShimmerColor: Color? {
         switch style {
         case .primary:
+            // swiftlint:disable:next no_primitive_tokens - design review #186: no skeleton token
             return Primitives.Colours.neutrals600
         case .secondary,
              .tertiary, // swiftlint:disable:this indentation_width
@@ -323,6 +326,7 @@ extension ThemedButton: CustomShimmerable {
     public var customDarkerShimmerColor: Color? {
         switch style {
         case .primary:
+            // swiftlint:disable:next no_primitive_tokens - design review #186: no skeleton token
             return Primitives.Colours.neutrals800
         case .secondary,
              .tertiary, // swiftlint:disable:this indentation_width

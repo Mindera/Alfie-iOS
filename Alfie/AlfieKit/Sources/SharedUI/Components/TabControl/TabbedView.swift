@@ -9,7 +9,7 @@ private enum Constants {
 public struct TabbedView<Content>: View where Content: View {
     @Binding private var currentIndex: Int
     private let tabs: OrderedDictionary<TabControl.TabOption, Content>
-    private let theme: TabControl.Theme
+    private let style: TabControl.Style
     private let lazyLoading: Bool
     private let swipeToSwitchTabEnabled: Bool
     private let configuration: TabControl.Configuration
@@ -21,14 +21,14 @@ public struct TabbedView<Content>: View where Content: View {
     ///   - lazyLoading: always true on iOS 16!
     public init(
         currentIndex: Binding<Int>,
-        theme: TabControl.Theme,
+        theme style: TabControl.Style,
         configuration: TabControl.Configuration,
         lazyLoading: Bool = true,
         swipeToSwitchTabEnabled: Bool = true,
         tabs: OrderedDictionary<TabControl.TabOption, Content>
     ) {
         self._currentIndex = currentIndex
-        self.theme = theme
+        self.style = style
         self.configuration = configuration
         self.lazyLoading = lazyLoading
         self.swipeToSwitchTabEnabled = swipeToSwitchTabEnabled
@@ -37,7 +37,7 @@ public struct TabbedView<Content>: View where Content: View {
 
     public var body: some View {
         VStack {
-            TabControl(theme: theme, configuration: configuration, options: options, currentIndex: $currentIndex)
+            TabControl(theme: style, configuration: configuration, options: options, currentIndex: $currentIndex)
             tabbedCarousel
         }
     }
@@ -46,10 +46,10 @@ public struct TabbedView<Content>: View where Content: View {
         if #available(iOS 17.0, *) {
             ScrollView(.horizontal, showsIndicators: false) {
                 if lazyLoading {
-                    LazyHStack(spacing: Primitives.Spacing.spacing0) { stackContent }
+                    LazyHStack(spacing: theme.sizing.spacingSpacingNone) { stackContent }
                         .scrollTargetLayout()
                 } else {
-                    HStack(spacing: Primitives.Spacing.spacing0) { stackContent }
+                    HStack(spacing: theme.sizing.spacingSpacingNone) { stackContent }
                         .scrollTargetLayout()
                 }
             }

@@ -28,7 +28,7 @@ public struct SearchBarEntryButton: View {
     private let searchTerm: String?
     private let accessibilityIdentifier: String
     private let scan: ScanConfiguration?
-    private let theme: ThemedSearchBarView.Theme
+    private let style: ThemedSearchBarView.Style
     private let action: () -> Void
 
     public init(
@@ -36,14 +36,14 @@ public struct SearchBarEntryButton: View {
         searchTerm: String? = nil,
         accessibilityIdentifier: String,
         scan: ScanConfiguration? = nil,
-        theme: ThemedSearchBarView.Theme = .soft,
+        theme style: ThemedSearchBarView.Style = .soft,
         action: @escaping () -> Void
     ) {
         self.placeholder = placeholder
         self.searchTerm = searchTerm
         self.accessibilityIdentifier = accessibilityIdentifier
         self.scan = scan
-        self.theme = theme
+        self.style = style
         self.action = action
     }
 
@@ -61,7 +61,7 @@ public struct SearchBarEntryButton: View {
             ThemedSearchBarView(
                 searchText: .constant(searchTerm ?? ""),
                 placeholder: placeholder,
-                theme: theme,
+                theme: style,
                 dismissConfiguration: .init(type: .hidden),
                 iconLayout: iconLayout
             )
@@ -88,7 +88,7 @@ public struct SearchBarEntryButton: View {
     private func scanTapTarget(_ scan: ScanConfiguration) -> some View {
         Button(action: scan.action) {
             Color.clear
-                .frame(size: theme.searchBarHeight)
+                .frame(size: style.searchBarHeight)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

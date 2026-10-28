@@ -10,6 +10,7 @@ public struct LoadingSpinner: View {
 
     private enum Constants {
         static let rotationDuration: Double = 1
+        static let largeDimension: CGFloat = 48
     }
 
     @Environment(\.theme) private var theme
@@ -22,13 +23,13 @@ public struct LoadingSpinner: View {
     private var dimension: CGFloat {
         switch size {
         case .small:
-            theme.spacing.space300
+            theme.sizing.iconsIconMedium
 
         case .medium:
-            theme.spacing.space400
+            theme.sizing.iconsIconLarge
 
         case .large:
-            theme.spacing.space600
+            Constants.largeDimension
         }
     }
 

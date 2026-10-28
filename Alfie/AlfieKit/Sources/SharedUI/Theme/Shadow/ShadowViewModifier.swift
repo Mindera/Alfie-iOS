@@ -21,6 +21,11 @@ public struct ShadowViewModifier: ViewModifier {
         case softFloat4
         case softFloat5
 
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no shadow token
+        private static let elevationShadow = Primitives.Colours.neutrals900
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no shadow token
+        private static let floatShadow = Primitives.Colours.neutrals800
+
         // swiftlint:disable vertical_whitespace_between_cases
         internal var color: Color {
             switch self {
@@ -29,27 +34,27 @@ public struct ShadowViewModifier: ViewModifier {
                 .elevation3,
                 .elevation4,
                 .elevation5:
-                return Primitives.Colours.neutrals900.opacity(0.15)
+                return Self.elevationShadow.opacity(0.15)
             case .mediumFloat1:
-                return Primitives.Colours.neutrals800.opacity(0.1)
+                return Self.floatShadow.opacity(0.1)
             case .mediumFloat2:
-                return Primitives.Colours.neutrals800.opacity(0.15)
+                return Self.floatShadow.opacity(0.15)
             case .mediumFloat3:
-                return Primitives.Colours.neutrals800.opacity(0.2)
+                return Self.floatShadow.opacity(0.2)
             case .mediumFloat4:
-                return Primitives.Colours.neutrals800.opacity(0.25)
+                return Self.floatShadow.opacity(0.25)
             case .mediumFloat5:
-                return Primitives.Colours.neutrals800.opacity(0.3)
+                return Self.floatShadow.opacity(0.3)
             case .softFloat1:
-                return Primitives.Colours.neutrals800.opacity(0.04)
+                return Self.floatShadow.opacity(0.04)
             case .softFloat2:
-                return Primitives.Colours.neutrals800.opacity(0.06)
+                return Self.floatShadow.opacity(0.06)
             case .softFloat3:
-                return Primitives.Colours.neutrals800.opacity(0.08)
+                return Self.floatShadow.opacity(0.08)
             case .softFloat4:
-                return Primitives.Colours.neutrals800.opacity(0.10)
+                return Self.floatShadow.opacity(0.10)
             case .softFloat5:
-                return Primitives.Colours.neutrals800.opacity(0.12)
+                return Self.floatShadow.opacity(0.12)
             }
         }
 

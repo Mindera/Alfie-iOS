@@ -2,13 +2,13 @@ import SharedUI
 import SwiftUI
 
 struct TabControlFixedWidthDemoView: View {
-    @State private var theme = TabControl.Theme.light
+    @State private var theme = TabControl.Style.light
     @State private var currentIndex: Int = 0
     @State private var numberOfOptions = 3
     @State private var padding: CGFloat = Primitives.Spacing.spacing8
     @State private var showIcons = false
     private let options = ["Reviews", "Offers", "Delivery", "Promos"]
-    private var themeOptions = TabControl.Theme.allCases
+    private var themeOptions = TabControl.Style.allCases
     private var currentOptions: [String] {
         Array(options.prefix(numberOfOptions))
     }

@@ -22,14 +22,14 @@ public struct SortByView: View {
             if let title {
                 HStack {
                     Text.build(theme.font.body.medium(title))
-                        .foregroundStyle(Theme.contentContentPrimary)
+                        .foregroundStyle(theme.color.contentContentPrimary)
                     Spacer()
                 }
-                .padding(.horizontal, theme.spacing.space200)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
             }
             ScrollViewReader { reader in
                 ScrollView(.horizontal) {
-                    HStack(spacing: theme.spacing.space100) {
+                    HStack(spacing: theme.sizing.spacingSpacingXs) {
                         ForEach(options, id: \.value) { option in
                             Button {
                                 sortBy = option.value
@@ -37,25 +37,25 @@ public struct SortByView: View {
                                     reader.scrollTo(option.value, anchor: .center)
                                 }
                             } label: {
-                                HStack(spacing: theme.spacing.space100) {
+                                HStack(spacing: theme.sizing.spacingSpacingXs) {
                                     if let icon = option.icon {
                                         icon.image
                                             .renderingMode(.template)
                                             .resizable()
                                             .scaledToFit()
                                             .frame(size: Constants.iconSize)
-                                            .foregroundStyle(Theme.contentContentPrimary)
-                                            .padding(.vertical, theme.spacing.space150)
-                                            .padding(.leading, theme.spacing.space150)
+                                            .foregroundStyle(theme.color.contentContentPrimary)
+                                            .padding(.vertical, theme.sizing.spacingSpacingSm)
+                                            .padding(.leading, theme.sizing.spacingSpacingSm)
                                     }
                                     Text.build(theme.font.body.small(option.title))
-                                        .foregroundStyle(Theme.contentContentPrimary)
-                                        .padding(.trailing, theme.spacing.space150)
-                                        .padding(.vertical, theme.spacing.space150)
-                                        .padding(.leading, option.icon == nil ? theme.spacing.space150 : 0)
+                                        .foregroundStyle(theme.color.contentContentPrimary)
+                                        .padding(.trailing, theme.sizing.spacingSpacingSm)
+                                        .padding(.vertical, theme.sizing.spacingSpacingSm)
+                                        .padding(.leading, option.icon == nil ? theme.sizing.spacingSpacingSm : 0)
                                 }
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: Sizing.radiusSoft)
+                                    RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
                                         .stroke(
                                             colorForOptionBorder(option.value),
                                             lineWidth: Constants.borderLineWidth
@@ -66,7 +66,7 @@ public struct SortByView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, theme.spacing.space200)
+                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -74,7 +74,7 @@ public struct SortByView: View {
     }
 
     private func colorForOptionBorder(_ option: SortByType) -> Color {
-        option == sortBy ? Theme.contentContentPrimary : Theme.borderSoft
+        option == sortBy ? theme.color.contentContentPrimary : theme.color.borderSoft
     }
 
     private enum Constants {

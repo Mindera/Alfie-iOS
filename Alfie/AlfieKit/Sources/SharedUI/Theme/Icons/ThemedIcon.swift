@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Renders an ``Icon`` at a token-driven size with a template tint, replacing the
 /// hand-rolled `renderingMode(.template).resizable().scaledToFit().frame(...).foregroundStyle(...)`
-/// chain repeated across components. Size comes from the generated `Sizing.iconsIcon*` tokens.
+/// chain repeated across components. Size comes from the generated `theme.sizing.iconsIcon*` tokens.
 public struct ThemedIcon: View {
     public enum Size {
         case small
@@ -10,19 +10,21 @@ public struct ThemedIcon: View {
         case large
         case xlarge
 
+        private var theme: DesignSystemProtocol { DesignSystem.shared }
+
         var dimension: CGFloat {
             switch self {
             case .small:
-                return Sizing.iconsIconSmall
+                return theme.sizing.iconsIconSmall
 
             case .medium:
-                return Sizing.iconsIconMedium
+                return theme.sizing.iconsIconMedium
 
             case .large:
-                return Sizing.iconsIconLarge
+                return theme.sizing.iconsIconLarge
 
             case .xlarge:
-                return Sizing.iconsIconXlarge
+                return theme.sizing.iconsIconXlarge
             }
         }
     }

@@ -82,13 +82,14 @@ struct ThemedModalSheet<Modal: View>: View {
     let modal: () -> Modal
 
     private var horizontalInset: CGFloat {
-        horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
+        horizontalSizeClass == .regular ? theme.sizing.spacingSpacing2xl : theme.sizing.spacingSpacingNone
     }
 
     var body: some View {
         GeometryReader { gp in
             ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
                 Rectangle()
+                    // swiftlint:disable:next no_primitive_tokens - design review #186: no modal overlay token
                     .fill(Primitives.Colours.neutrals900.opacity(Constants.opacityBackground))
                     .onTapGesture {
                         onDismiss()
@@ -110,7 +111,7 @@ struct ThemedModalSheet<Modal: View>: View {
                     VStack {
                         HStack {
                             Text.build(theme.font.heading.small(title))
-                                .foregroundStyle(Primitives.Colours.neutrals900)
+                                .foregroundStyle(theme.color.contentContentPrimary)
                             Spacer()
                             Button {
                                 onDismiss()
@@ -123,12 +124,12 @@ struct ThemedModalSheet<Modal: View>: View {
                                         width: Constants.iconCloseSize,
                                         height: Constants.iconCloseSize
                                     )
-                                    .tint(Primitives.Colours.neutrals900)
+                                    .tint(theme.color.contentContentPrimary)
                             }
                             .accessibilityLabel(Text(L10n.Accessibility.close))
                         }
-                        .padding(.vertical, Primitives.Spacing.spacing8)
-                        .padding(.horizontal, Primitives.Spacing.spacing16)
+                        .padding(.vertical, theme.sizing.spacingSpacingXs)
+                        .padding(.horizontal, theme.sizing.spacingSpacingMd)
                         if self.modalFitsScreen {
                             modal()
                                 .simultaneousGesture(
@@ -146,8 +147,8 @@ struct ThemedModalSheet<Modal: View>: View {
                                             )
                                     }
                                 )
-                                .padding(.bottom, Primitives.Spacing.spacing32)
-                                .padding(.horizontal, Primitives.Spacing.spacing16)
+                                .padding(.bottom, theme.sizing.spacingSpacingXl)
+                                .padding(.horizontal, theme.sizing.spacingSpacingMd)
                                 .onPreferenceChange(ViewHeightKey.self) {
                                     self.modalFitsScreen = $0 < (gp.size.height - topMargin * 2)
                                 }
@@ -160,16 +161,16 @@ struct ThemedModalSheet<Modal: View>: View {
                                                 offset = .zero
                                             }
                                     )
-                                    .padding(.bottom, Primitives.Spacing.spacing32)
-                                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                                    .padding(.bottom, theme.sizing.spacingSpacingXl)
+                                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
                             }
                         }
                     }
                     .padding(.horizontal, horizontalInset)
                     .edgesIgnoringSafeArea(.bottom)
                     .background {
-                        RoundedRectangle(cornerRadius: Sizing.radiusStrong)
-                            .fill(Primitives.Colours.neutrals0)
+                        RoundedRectangle(cornerRadius: theme.sizing.radiusStrong)
+                            .fill(theme.color.surfaceBackgroundPrimary)
                             .edgesIgnoringSafeArea(.bottom)
                             .padding(.horizontal, horizontalInset)
                     }

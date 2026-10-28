@@ -8,12 +8,12 @@ import SwiftUI
 /// If the value is set to higher than `maxValue`, the badge will show `maxValue+`
 public struct BadgeViewModifier: ViewModifier {
     private enum Constants {
-        static let badgeHeight = Primitives.Spacing.spacing16
-        static let textPadding = Primitives.Spacing.spacing4
-        static let indicatorHeight = Primitives.Spacing.spacing12
-        static let indicatorWidth = Primitives.Spacing.spacing12
+        static let badgeHeight: CGFloat = 16
+        static let textPadding = DesignSystem.shared.sizing.spacingSpacing2xs
+        static let indicatorHeight: CGFloat = 12
+        static let indicatorWidth: CGFloat = 12
         static let capsuleOffsetXFactor = 3 // layout multiplier, no design token
-        static let borderLineWidth = CGFloat(Primitives.Border.borderWeightDefault)
+        static let borderLineWidth = CGFloat(DesignSystem.shared.sizing.borderBorderWeightDefault)
     }
 
     private var helper: BadgeHelper
@@ -32,14 +32,14 @@ public struct BadgeViewModifier: ViewModifier {
                     if !helper.isIndicator {
                         let badgeLabelsOffsetX = CGFloat(helper.badgeLabel.count * Constants.capsuleOffsetXFactor)
                         ZStack(alignment: .center) {
-                            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
-                                .fill(Theme.surfaceBackgroundDestructive)
+                            RoundedRectangle(cornerRadius: theme.sizing.radiusRounded)
+                                .fill(theme.color.surfaceBackgroundDestructive)
                                 .frame(height: Constants.badgeHeight)
-                            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
-                                .stroke(Theme.surfaceBackgroundPrimary, lineWidth: Constants.borderLineWidth)
+                            RoundedRectangle(cornerRadius: theme.sizing.radiusRounded)
+                                .stroke(theme.color.surfaceBackgroundPrimary, lineWidth: Constants.borderLineWidth)
                                 .frame(height: Constants.badgeHeight)
                             Text.build(theme.font.body.small(helper.badgeLabel))
-                                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                                 .padding(.all, Constants.textPadding)
                         }
                         .frame(height: Constants.badgeHeight)
@@ -49,10 +49,10 @@ public struct BadgeViewModifier: ViewModifier {
                     } else {
                         ZStack(alignment: .center) {
                             Circle()
-                                .fill(Theme.surfaceBackgroundDestructive)
+                                .fill(theme.color.surfaceBackgroundDestructive)
                                 .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
-                            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
-                                .stroke(Theme.surfaceBackgroundPrimary, lineWidth: Constants.borderLineWidth)
+                            RoundedRectangle(cornerRadius: theme.sizing.radiusRounded)
+                                .stroke(theme.color.surfaceBackgroundPrimary, lineWidth: Constants.borderLineWidth)
                                 .frame(width: Constants.indicatorWidth, height: Constants.indicatorHeight)
                         }
                         .offset(x: (Constants.indicatorWidth / 2), y: -((Constants.indicatorHeight / 2)))

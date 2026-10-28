@@ -22,9 +22,9 @@ public struct ScrollViewWithOffsetReader<Content: View>: View {
 
     public var body: some View {
         ScrollView(scrollViewAxis) {
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.sizing.spacingSpacingNone) {
                 GeometryReader { proxy in
-                    Primitives.Colours.transparentTransparent.preference(
+                    Color.clear.preference(
                         key: ScrollViewOffsetPreferenceKey.self,
                         value: proxy.frame(in: .named(coordinateSpace)).origin
                     )

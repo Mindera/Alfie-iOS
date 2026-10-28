@@ -26,7 +26,7 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
     }
 
     private func searchBar(
-        theme: ThemedSearchBarView.Theme,
+        theme: ThemedSearchBarView.Style,
         autoFocus: ThemedSearchBarView.AutoFocusSetting = .off
     ) -> some View {
         ThemedSearchBarView(

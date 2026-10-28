@@ -13,10 +13,10 @@ public struct ColorSummaryView: View {
     }
 
     public var body: some View {
-        HStack(spacing: theme.spacing.space100) {
+        HStack(spacing: theme.sizing.spacingSpacingXs) {
             ColorSwatchView(item: selectedItem, swatchSize: .small, isSelected: false)
             Text.build(theme.font.body.medium(L10n.Pdp.ColourSummary.count(remainingCount)))
-                .foregroundStyle(Theme.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentPrimary)
         }
         // The swatch and count read as one thing; without this the count reads alone as "+1".
         .accessibilityElement(children: .ignore)

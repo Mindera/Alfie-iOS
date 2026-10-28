@@ -26,63 +26,70 @@ public enum ButtonTheme: String, CaseIterable {
     case tertiary
     case underline
 
+    private var theme: DesignSystemProtocol { DesignSystem.shared }
+
     var spec: ButtonThemeSpec {
         switch self {
-        // Default/disabled colors come from the semantic `Theme.button*` tokens; the pressed state
-        // has no semantic token, so it stays on `Primitives.Colours.*`.
         case .primary:
             return .init(
-                backgroundColor: Theme.buttonPrimaryBackgroundPrimaryDefault,
-                backgroundDisabledColor: Theme.buttonPrimaryBackgroundPrimaryDisabled,
+                backgroundColor: theme.color.buttonPrimaryBackgroundPrimaryDefault,
+                backgroundDisabledColor: theme.color.buttonPrimaryBackgroundPrimaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 backgroundPressedColor: Primitives.Colours.neutrals500,
-                textColor: Theme.buttonPrimaryContentPrimaryDefault,
-                textDisabledColor: Theme.buttonPrimaryContentPrimaryDisabled,
+                textColor: theme.color.buttonPrimaryContentPrimaryDefault,
+                textDisabledColor: theme.color.buttonPrimaryContentPrimaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 textPressedColor: Primitives.Colours.neutrals0,
-                borderColor: Theme.buttonPrimaryStrokePrimaryDefault,
-                borderDisabledColor: Theme.buttonPrimaryStrokePrimaryDisabled,
+                borderColor: theme.color.buttonPrimaryStrokePrimaryDefault,
+                borderDisabledColor: theme.color.buttonPrimaryStrokePrimaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 borderPressedColor: Primitives.Colours.neutrals500
             )
 
         case .secondary:
             return .init(
-                backgroundColor: Theme.buttonSecondaryBackgroundSecondaryDefault,
-                backgroundDisabledColor: Theme.buttonSecondaryBackgroundSecondaryDisabled,
+                backgroundColor: theme.color.buttonSecondaryBackgroundSecondaryDefault,
+                backgroundDisabledColor: theme.color.buttonSecondaryBackgroundSecondaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 backgroundPressedColor: Primitives.Colours.neutrals100,
-                textColor: Theme.buttonSecondaryContentSecondaryDefault,
-                textDisabledColor: Theme.buttonSecondaryContentSecondaryDisabled,
+                textColor: theme.color.buttonSecondaryContentSecondaryDefault,
+                textDisabledColor: theme.color.buttonSecondaryContentSecondaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 textPressedColor: Primitives.Colours.neutrals500,
-                borderColor: Theme.buttonSecondaryStrokeSecondaryDefault,
-                borderDisabledColor: Theme.buttonSecondaryStrokeSecondaryDisabled,
+                borderColor: theme.color.buttonSecondaryStrokeSecondaryDefault,
+                borderDisabledColor: theme.color.buttonSecondaryStrokeSecondaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 borderPressedColor: Primitives.Colours.neutrals500
             )
 
         case .tertiary:
             return .init(
-                backgroundColor: Theme.buttonTerciaryBackgroundTerciaryDefault,
-                backgroundDisabledColor: Theme.buttonTerciaryBackgroundTerciaryDisabled,
+                backgroundColor: theme.color.buttonTerciaryBackgroundTerciaryDefault,
+                backgroundDisabledColor: theme.color.buttonTerciaryBackgroundTerciaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 backgroundPressedColor: Primitives.Colours.neutrals100,
-                textColor: Theme.buttonTerciaryContentTerciaryDefault,
-                textDisabledColor: Theme.buttonTerciaryContentTerciaryDisabled,
+                textColor: theme.color.buttonTerciaryContentTerciaryDefault,
+                textDisabledColor: theme.color.buttonTerciaryContentTerciaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 textPressedColor: Primitives.Colours.neutrals500,
-                borderColor: Theme.buttonTerciaryStrokeTerciaryDefault,
-                borderDisabledColor: Theme.buttonTerciaryStrokeTerciaryDisabled,
+                borderColor: theme.color.buttonTerciaryStrokeTerciaryDefault,
+                borderDisabledColor: theme.color.buttonTerciaryStrokeTerciaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 borderPressedColor: Primitives.Colours.neutrals100
             )
 
-        // Underline has no semantic button group → its text tracks the semantic `Theme.linkLink*`
-        // tokens (an underline button is a link); pressed text and the invisible background/border
-        // have no matching token and stay on `Primitives.Colours.*`.
         case .underline:
             return .init(
-                backgroundColor: Primitives.Colours.neutrals0,
-                backgroundDisabledColor: Primitives.Colours.neutrals0,
-                backgroundPressedColor: Primitives.Colours.neutrals0,
-                textColor: Theme.linkLinkPrimaryDefault,
-                textDisabledColor: Theme.linkLinkPrimaryDisabled,
+                backgroundColor: theme.color.buttonTerciaryBackgroundTerciaryDefault,
+                backgroundDisabledColor: theme.color.buttonTerciaryBackgroundTerciaryDisabled,
+                backgroundPressedColor: theme.color.buttonTerciaryBackgroundTerciaryDefault,
+                textColor: theme.color.linkLinkPrimaryDefault,
+                textDisabledColor: theme.color.linkLinkPrimaryDisabled,
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no button pressed token
                 textPressedColor: Primitives.Colours.neutrals500,
-                borderColor: Primitives.Colours.neutrals0,
-                borderDisabledColor: Primitives.Colours.neutrals0,
-                borderPressedColor: Primitives.Colours.neutrals0
+                borderColor: theme.color.buttonTerciaryStrokeTerciaryDefault,
+                borderDisabledColor: theme.color.buttonTerciaryStrokeTerciaryDisabled,
+                borderPressedColor: theme.color.buttonTerciaryStrokeTerciaryDefault
             )
         }
     }

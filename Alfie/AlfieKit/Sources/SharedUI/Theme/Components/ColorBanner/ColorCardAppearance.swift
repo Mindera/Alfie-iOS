@@ -15,17 +15,19 @@ public struct ColorCardAppearance: Equatable {
     public static func resolve(isSelected: Bool, isDisabled: Bool) -> Self {
         guard !isDisabled else {
             return .init(
-                borderColor: Theme.borderSoft,
+                borderColor: DesignSystem.shared.color.borderSoft,
                 borderWidth: Constants.borderWidth,
-                textColor: Theme.contentContentTerciary,
+                textColor: DesignSystem.shared.color.contentContentTerciary,
                 isSelected: false
             )
         }
 
         return .init(
-            borderColor: isSelected ? Theme.contentContentPrimary : Theme.borderSoft,
+            borderColor: isSelected
+                ? DesignSystem.shared.color.contentContentPrimary
+                : DesignSystem.shared.color.borderSoft,
             borderWidth: Constants.borderWidth,
-            textColor: Theme.contentContentPrimary,
+            textColor: DesignSystem.shared.color.contentContentPrimary,
             isSelected: isSelected
         )
     }
