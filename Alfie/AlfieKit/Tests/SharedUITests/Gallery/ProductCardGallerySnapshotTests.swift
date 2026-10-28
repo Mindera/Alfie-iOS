@@ -8,19 +8,19 @@ import XCTest
 final class ProductCardGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_verticalSmall() {
+    func test_small_vertical_card_renders_sale_product() {
         assertSnapshot(of: verticalCard(size: .small, width: 180).embededInContainer(height: 480),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_verticalMedium() {
+    func test_medium_vertical_card_renders_sale_product() {
         assertSnapshot(of: verticalCard(size: .medium, width: 180).embededInContainer(height: 560),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_horizontal() {
+    func test_horizontal_card_renders_product_details() {
         let sut = HorizontalProductCard(
             viewModel: .init(
                 image: nil,

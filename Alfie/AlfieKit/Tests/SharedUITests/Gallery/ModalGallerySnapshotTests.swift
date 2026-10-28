@@ -7,7 +7,7 @@ import XCTest
 final class ModalGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_sheet() {
+    func test_modal_sheet_renders_title_and_content() {
         let sut = ThemedModalSheet(
             title: "Modal title",
             modalFitsScreen: .constant(true),

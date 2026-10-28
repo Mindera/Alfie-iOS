@@ -86,7 +86,7 @@ struct ThemedModalSheet<Modal: View>: View {
     }
 
     var body: some View {
-        GeometryReader { gp in
+        GeometryReader { proxy in
             ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
                 Rectangle()
                     // swiftlint:disable:next no_primitive_tokens - design review #186: no modal overlay token
@@ -150,7 +150,7 @@ struct ThemedModalSheet<Modal: View>: View {
                                 .padding(.bottom, theme.sizing.spacingSpacingXl)
                                 .padding(.horizontal, theme.sizing.spacingSpacingMd)
                                 .onPreferenceChange(ViewHeightKey.self) {
-                                    self.modalFitsScreen = $0 < (gp.size.height - topMargin * 2)
+                                    self.modalFitsScreen = $0 < (proxy.size.height - topMargin * 2)
                                 }
                         } else {
                             ScrollView {

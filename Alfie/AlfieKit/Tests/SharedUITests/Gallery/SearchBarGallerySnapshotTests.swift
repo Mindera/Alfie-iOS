@@ -7,20 +7,20 @@ import XCTest
 final class SearchBarGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_light() {
+    func test_light_search_bar_renders_placeholder() {
         assertSnapshot(of: searchBar(theme: .light).embededInContainer(height: 100),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
-    func test_dark() {
+    func test_dark_search_bar_renders_placeholder() {
         assertSnapshot(of: searchBar(theme: .dark).embededInContainer(height: 100),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
     // The text cursor blinks off wall-clock time; the precision allowance covers its few pixels only.
-    func test_focused() {
+    func test_focused_search_bar_shows_focus_placeholder_and_cancel() {
         let window = hostedInKeyWindow(searchBar(theme: .light, autoFocus: .on(delay: 0)))
         assertSnapshot(of: window, as: .defaultImage(precision: 0.999), record: isRecording)
     }

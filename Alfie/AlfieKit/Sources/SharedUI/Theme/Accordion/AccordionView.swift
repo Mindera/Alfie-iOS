@@ -78,10 +78,8 @@ public struct AccordionView<Content: View>: View {
 
 // MARK: - MyDisclosureStyle
 
-public struct MyDisclosureStyle: DisclosureGroupStyle {
+public struct MyDisclosureStyle: DisclosureGroupStyle, ThemeReading {
     var isDisabled: Bool
-
-    private var theme: DesignSystemProtocol { DesignSystem.shared }
 
     public func makeBody(configuration: Configuration) -> some View {
         VStack {

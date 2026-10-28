@@ -82,9 +82,7 @@ struct ThemedToggleStyle: ToggleStyle {
 
 // MARK: - ColorToggle
 
-private enum ColorToggle {
-    private static let theme: DesignSystemProtocol = DesignSystem.shared
-
+private enum ColorToggle: ThemeReading {
     static let toggleCircle = theme.color.contentContentSecondary
     static let toggleCircleDisabled = theme.color.contentContentPrimaryDisabled
     // swiftlint:disable:next no_primitive_tokens - design review #186: no toggle on token

@@ -7,7 +7,7 @@ import XCTest
 final class ProgressBarGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_progress() {
+    func test_progress_bar_renders_empty_half_and_full() {
         let sut = VStack(spacing: 24) {
             ProgressBar(progress: .constant(0), total: 10)
             ProgressBar(progress: .constant(5), total: 10)

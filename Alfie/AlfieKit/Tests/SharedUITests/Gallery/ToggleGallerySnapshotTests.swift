@@ -7,7 +7,7 @@ import XCTest
 final class ToggleGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_states() {
+    func test_toggle_renders_every_state() {
         let sut = VStack(spacing: 16) {
             ThemedToggleView(isOn: .constant(true)) { Text("On") }
             ThemedToggleView(isOn: .constant(false)) { Text("Off") }

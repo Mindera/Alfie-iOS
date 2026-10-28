@@ -10,7 +10,8 @@ public struct LoadingSpinner: View {
 
     private enum Constants {
         static let rotationDuration: Double = 1
-        static let largeDimension: CGFloat = 48
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no large spinner size token
+        static let largeDimension: CGFloat = Primitives.Spacing.spacing48
     }
 
     @Environment(\.theme) private var theme

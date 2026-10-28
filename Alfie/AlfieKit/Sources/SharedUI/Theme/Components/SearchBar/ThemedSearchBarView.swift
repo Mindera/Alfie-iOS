@@ -3,14 +3,12 @@ import SwiftUI
 // MARK: - ThemedSearchBarView
 
 public struct ThemedSearchBarView: View {
-    public enum Style: CaseIterable {
+    public enum Style: CaseIterable, ThemeReading {
         case light
         case dark
         case soft
         case softMedium
         case softLarge
-
-        private var theme: DesignSystemProtocol { DesignSystem.shared }
 
         // swiftlint:disable vertical_whitespace_between_cases
         var focusedBackgroundColor: Color {

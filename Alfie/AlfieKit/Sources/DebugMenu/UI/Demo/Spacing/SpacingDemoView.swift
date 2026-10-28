@@ -42,8 +42,8 @@ struct SpacingDemoView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: 16)
-                .background(.black)
-                .foregroundStyle(.white)
+                .background(theme.color.surfaceBackgroundInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .padding(.top, theme.sizing.spacingSpacingMd)
 
             Spacer(minLength: spacing)
@@ -52,8 +52,8 @@ struct SpacingDemoView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: 16)
-                .background(.black)
-                .foregroundStyle(.white)
+                .background(theme.color.surfaceBackgroundInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .padding(.bottom, theme.sizing.spacingSpacingMd)
         }
     }

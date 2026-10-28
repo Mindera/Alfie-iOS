@@ -41,7 +41,6 @@ public struct TextInputConfiguration {
 // MARK: - TextInput
 
 /// Bordered single-line field with an optional label and an optional leading affix.
-/// Disable it with `.disabled(_:)`.
 public struct TextInput: View {
     private let configuration: TextInputConfiguration
     @FocusState private var isFocused: Bool
@@ -130,7 +129,7 @@ private struct OptionalAccessibilityLabel: ViewModifier {
 
 /// Resolves a `TextInput`'s visual styling from its state, sourced from design tokens.
 /// Extracted from `TextInput` so the state→token mapping is unit-testable without snapshots.
-struct TextInputStyle {
+struct TextInputStyle: ThemeReading {
     static let height: CGFloat = 44
 
     private enum Constants {
@@ -140,8 +139,6 @@ struct TextInputStyle {
     let isError: Bool
     let isFocused: Bool
     let isDisabled: Bool
-
-    private var theme: DesignSystemProtocol { DesignSystem.shared }
 
     init(isError: Bool, isFocused: Bool, isDisabled: Bool = false) {
         self.isError = isError

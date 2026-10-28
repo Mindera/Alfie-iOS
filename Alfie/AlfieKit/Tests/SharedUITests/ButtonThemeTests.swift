@@ -3,7 +3,7 @@ import XCTest
 @testable import SharedUI
 
 final class ButtonThemeTests: XCTestCase {
-    func test_primary_sourcesSemanticButtonTokens() {
+    func test_primary_spec_uses_primary_button_tokens() {
         let spec = ButtonTheme.primary.spec
         XCTAssertEqual(spec.backgroundColor, Theme.buttonPrimaryBackgroundPrimaryDefault)
         XCTAssertEqual(spec.backgroundDisabledColor, Theme.buttonPrimaryBackgroundPrimaryDisabled)
@@ -16,7 +16,7 @@ final class ButtonThemeTests: XCTestCase {
         XCTAssertEqual(spec.borderPressedColor, Primitives.Colours.neutrals500)
     }
 
-    func test_secondary_sourcesSemanticButtonTokens() {
+    func test_secondary_spec_uses_secondary_button_tokens() {
         let spec = ButtonTheme.secondary.spec
         XCTAssertEqual(spec.backgroundColor, Theme.buttonSecondaryBackgroundSecondaryDefault)
         XCTAssertEqual(spec.backgroundDisabledColor, Theme.buttonSecondaryBackgroundSecondaryDisabled)
@@ -29,7 +29,7 @@ final class ButtonThemeTests: XCTestCase {
         XCTAssertEqual(spec.borderPressedColor, Primitives.Colours.neutrals500)
     }
 
-    func test_tertiary_sourcesSemanticButtonTokens() {
+    func test_tertiary_spec_uses_tertiary_button_tokens() {
         let spec = ButtonTheme.tertiary.spec
         XCTAssertEqual(spec.backgroundColor, Theme.buttonTerciaryBackgroundTerciaryDefault)
         XCTAssertEqual(spec.backgroundDisabledColor, Theme.buttonTerciaryBackgroundTerciaryDisabled)
@@ -42,14 +42,14 @@ final class ButtonThemeTests: XCTestCase {
         XCTAssertEqual(spec.borderPressedColor, Primitives.Colours.neutrals100)
     }
 
-    func test_underline_sourcesSemanticLinkTokensForText() {
+    func test_underline_text_uses_link_tokens() {
         let spec = ButtonTheme.underline.spec
         XCTAssertEqual(spec.textColor, Theme.linkLinkPrimaryDefault)
         XCTAssertEqual(spec.textDisabledColor, Theme.linkLinkPrimaryDisabled)
         XCTAssertEqual(spec.textPressedColor, Primitives.Colours.neutrals500)
     }
 
-    func test_underline_hasTransparentBackgroundAndBorderInEveryState() {
+    func test_underline_background_and_border_reuse_tertiary_tokens_in_every_state() {
         let spec = ButtonTheme.underline.spec
         XCTAssertEqual(spec.backgroundColor, Theme.buttonTerciaryBackgroundTerciaryDefault)
         XCTAssertEqual(spec.backgroundDisabledColor, Theme.buttonTerciaryBackgroundTerciaryDisabled)

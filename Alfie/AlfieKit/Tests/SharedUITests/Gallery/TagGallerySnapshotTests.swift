@@ -7,7 +7,7 @@ import XCTest
 final class TagGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_variants() {
+    func test_tag_renders_every_variant() {
         let sut = VStack(spacing: 16) {
             Tag(configuration: .init(label: "Label"))
             Tag(configuration: .init(label: "Closable", showCloseButton: true))

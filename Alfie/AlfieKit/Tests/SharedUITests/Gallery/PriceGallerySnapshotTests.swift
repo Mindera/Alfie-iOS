@@ -7,11 +7,11 @@ import XCTest
 final class PriceGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_small() {
+    func test_small_price_renders_every_type() {
         assertGallery(of: .small)
     }
 
-    func test_large() {
+    func test_large_price_renders_every_type() {
         assertGallery(of: .large)
     }
 

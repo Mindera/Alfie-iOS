@@ -97,9 +97,7 @@ public struct Chip: View {
 
 /// Resolves a `Chip`'s visual styling from its state, sourced from design tokens.
 /// Extracted from `Chip` so the state→token mapping is unit-testable without snapshots.
-struct ChipStyle {
-    private var theme: DesignSystemProtocol { DesignSystem.shared }
-
+struct ChipStyle: ThemeReading {
     private enum Constants {
         static let heightSmall = 36.0
         static let heightLarge = 44.0
@@ -107,8 +105,10 @@ struct ChipStyle {
         static let maxCounter: Int = 99
     }
 
-    static let closeWidth: CGFloat = 12
-    static let closeHeight: CGFloat = 12
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no close-icon size token
+    static let closeWidth: CGFloat = Primitives.Spacing.spacing12
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no close-icon size token
+    static let closeHeight: CGFloat = Primitives.Spacing.spacing12
 
     let type: ChipConfiguration.ChipType
     let isSelected: Bool

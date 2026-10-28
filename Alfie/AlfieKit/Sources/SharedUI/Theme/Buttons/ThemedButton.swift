@@ -146,14 +146,17 @@ public enum ButtonType {
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
     static let verticalPadding: CGFloat = -DesignSystem.shared.sizing.spacingSpacingXs
-    static let smallHeight: CGFloat = 32
-    static let mediumHeight: CGFloat = 40
-    static let bigHeight: CGFloat = 48
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
+    static let smallHeight: CGFloat = Primitives.Spacing.spacing32
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
+    static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
+    static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
 // MARK: - ThemedButtonStyle
 
-private struct ThemedButtonStyle: ButtonStyle {
+private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
     let style: ButtonTheme
     let type: ButtonType
     let isDisabled: Bool
@@ -165,8 +168,6 @@ private struct ThemedButtonStyle: ButtonStyle {
     /// An empty label still occupies the stack and its default spacing, which makes an icon-only
     /// button wider than it is tall. Dropping it lets the button size to icon + padding.
     let isIconOnly: Bool
-
-    private var theme: DesignSystemProtocol { DesignSystem.shared }
 
     func makeBody(configuration: Self.Configuration) -> some View {
         HStack(spacing: isIconOnly ? theme.sizing.spacingSpacingNone : nil) {

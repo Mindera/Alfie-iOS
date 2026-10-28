@@ -13,11 +13,11 @@ final class SegmentedControlGallerySnapshotTests: XCTestCase {
         Segment(id: "services", title: "Services", icon: Icon.info.image, "services"),
     ]
 
-    func test_compact() {
+    func test_compact_segmented_control_renders_first_segment_selected() {
         assertGallery(of: .compact)
     }
 
-    func test_extended() {
+    func test_extended_segmented_control_renders_first_segment_selected() {
         assertGallery(of: .extended)
     }
 

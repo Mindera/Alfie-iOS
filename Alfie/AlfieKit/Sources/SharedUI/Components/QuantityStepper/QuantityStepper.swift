@@ -43,7 +43,8 @@ public struct QuantityStepper: View {
         quantity: Int,
         bounds: ClosedRange<Int>,
         isDisabled: Bool = false,
-        height: CGFloat = 40,
+        // swiftlint:disable:next no_primitive_tokens - design review #186: no stepper height token
+        height: CGFloat = Primitives.Spacing.spacing40,
         cornerRadius: CGFloat = DesignSystem.shared.sizing.radiusSoft,
         accessibility: Accessibility,
         onDecrease: @escaping () -> Void,

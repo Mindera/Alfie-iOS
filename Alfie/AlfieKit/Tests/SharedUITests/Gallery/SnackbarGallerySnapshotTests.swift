@@ -7,7 +7,7 @@ import XCTest
 final class SnackbarGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_types() {
+    func test_snackbar_renders_every_type() {
         let sut = VStack(spacing: 16) {
             SnackbarView(configuration: .init(type: .info, text: "Info message", showCloseButton: true))
             SnackbarView(configuration: .init(type: .success, text: "Success message", actionButtonLabel: "Undo"))

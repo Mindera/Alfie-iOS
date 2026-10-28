@@ -86,6 +86,16 @@ public class DesignSystem: DesignSystemProtocol {
     }
 }
 
+// MARK: - ThemeReading
+
+/// `theme` for SharedUI types that are neither `View` nor `ViewModifier` (styles, resolvers, enums).
+protocol ThemeReading {}
+
+extension ThemeReading {
+    var theme: DesignSystemProtocol { DesignSystem.shared }
+    static var theme: DesignSystemProtocol { DesignSystem.shared }
+}
+
 // MARK: - Environment injection seam
 
 // Injectable theme: the default is `DesignSystem.shared`; `.environment(\.theme, custom)` overrides

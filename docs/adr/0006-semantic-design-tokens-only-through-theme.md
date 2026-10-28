@@ -6,7 +6,8 @@ status: accepted
 
 Every view reads colour, spacing and radius from **Semantic tokens** vended by `DesignSystem`
 (`theme.color` is `Theme.Type`, `theme.sizing` is `Sizing.Type`, `theme.font` as before). No
-**Primitive token** is read outside `SharedUI/Theme/`, DebugMenu included, and a lint rule
+**Primitive token** is read outside the theme layer (`SharedUI/Theme/DesignSystem.swift`,
+`SharedUI/Theme/Typography/`) and `SharedUI/GeneratedTokens/`, DebugMenu included, and a lint rule
 enforces it. Three spacing APIs and a raw palette forwarder let the same screen be styled three
 ways, depending on which file was copied (#186).
 

@@ -17,11 +17,9 @@ public struct TabControl: View {
         }
     }
 
-    public enum Style: CaseIterable {
+    public enum Style: CaseIterable, ThemeReading {
         case light
         case dark
-
-        private var theme: DesignSystemProtocol { DesignSystem.shared }
 
         // swiftlint:disable vertical_whitespace_between_cases
         var outerLineColor: Color {

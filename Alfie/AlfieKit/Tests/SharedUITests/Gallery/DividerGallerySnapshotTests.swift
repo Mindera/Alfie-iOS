@@ -7,7 +7,7 @@ import XCTest
 final class DividerGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_variants() {
+    func test_divider_renders_every_variant() {
         let sut = VStack(spacing: 32) {
             ThemedDivider.horizontalThin
             ThemedDivider.horizontalThick

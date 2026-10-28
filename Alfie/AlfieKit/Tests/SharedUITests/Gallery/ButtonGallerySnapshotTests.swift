@@ -7,19 +7,19 @@ import XCTest
 final class ButtonGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_primary() {
+    func test_primary_button_renders_every_state() {
         assertGallery(of: .primary)
     }
 
-    func test_secondary() {
+    func test_secondary_button_renders_every_state() {
         assertGallery(of: .secondary)
     }
 
-    func test_tertiary() {
+    func test_tertiary_button_renders_every_state() {
         assertGallery(of: .tertiary)
     }
 
-    func test_underline() {
+    func test_underline_button_renders_every_state() {
         assertGallery(of: .underline)
     }
 

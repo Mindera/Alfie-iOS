@@ -7,7 +7,7 @@ import XCTest
 final class CheckboxGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
-    func test_states() {
+    func test_checkbox_renders_every_state() {
         let sut = VStack(alignment: .leading, spacing: 16) {
             Checkbox(state: .constant(.selected), text: "Selected")
             Checkbox(state: .constant(.unselected), text: "Unselected")

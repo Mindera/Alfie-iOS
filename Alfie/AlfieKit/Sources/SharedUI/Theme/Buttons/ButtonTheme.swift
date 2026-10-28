@@ -20,13 +20,11 @@ struct ButtonThemeSpec {
 
 // MARK: - ButtonTheme
 
-public enum ButtonTheme: String, CaseIterable {
+public enum ButtonTheme: String, CaseIterable, ThemeReading {
     case primary
     case secondary
     case tertiary
     case underline
-
-    private var theme: DesignSystemProtocol { DesignSystem.shared }
 
     var spec: ButtonThemeSpec {
         switch self {
