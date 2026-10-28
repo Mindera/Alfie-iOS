@@ -84,20 +84,26 @@ same-name collision between the `sizing` and `.primitives` collections.
 - A new typography token is not reachable from the theme until its group struct in
   `SharedUI/Theme/Typography/Specifications/TypographyGroups.swift` (`TypographyBody`,
   `TypographyLabel`, …) gains a matching property by hand, as `mediumBold` did.
-- Colour and sizing: read Semantic tokens through `theme.color.<token>` (the generated `Theme`)
-  and `theme.sizing.<token>` (the generated `Sizing`), per ADR 0006. Much of `SharedUI` and the
-  Debug Menu still reads `Primitives.*` (#186), so copy the rule, not the neighbouring file.
+- Colour, spacing, radius and sizes: see §Semantic tokens only.
 - Type: `Text.build(theme.font.<group>.<size>(text))`. `Typography.*` is read only by the theme's
   own group structs.
-- Spacing: `theme.spacing.*` stays until #186 lands its contract; new code prefers
-  `theme.sizing.spacing*`.
+
+## Semantic tokens only
+
+Views read design values only through `theme` (ADR 0006):
+
+- **Colour**: `theme.color.<token>` (the generated `Theme`), picked by role, never by value.
+- **Spacing**: `theme.sizing.spacingSpacing*`. A value between steps rounds to the nearest step,
+  a tie rounds down.
+- **Radius**: `theme.sizing.radius*`.
+- **Sizes** (tap targets, heights, icons): `theme.sizing.icons*` when one matches, never rounded;
+  otherwise an allowlisted primitive (below).
 
 ## Primitive tokens
 
 The `no_primitive_tokens` SwiftLint rule (`Alfie/.swiftlint.yml`) flags any `Primitives.` read
 outside the theme layer (`SharedUI/Theme/DesignSystem.swift`, `SharedUI/Theme/Typography/`) and
-`SharedUI/GeneratedTokens/`. It is a **warning** for now (#186):
-`lint.sh` prints it without failing, while every other warning still fails the run.
+`SharedUI/GeneratedTokens/`. It is an **error**: `lint.sh` and the pre-commit hook fail on it.
 
 A role with no Semantic token keeps its primitive until design adds the token upstream in
 `Alfie-Mobile-Design-Tokens`; never invent one here. Allowlist that line, naming the design review

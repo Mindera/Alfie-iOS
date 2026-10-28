@@ -95,7 +95,7 @@ custom_rules:
     regex: \bPrimitives\.
     match_kinds:
       - identifier
-    severity: warning
+    severity: error
 unused_import:
   always_keep_imports:
     - SwiftSyntaxBuilder

@@ -13,8 +13,7 @@
 ### Running SwiftLint
 
 `Alfie/scripts/lint.sh` is the lint command the pre-commit hook and CI share. It always runs strict
-(a warning fails, except the advisory `no_primitive_tokens`: `docs/DesignTokens.md` §Primitive
-tokens) with the committed binary `Alfie/Tools/swiftlint` (pinned at 0.54.0, never one on
+(a warning fails) with the committed binary `Alfie/Tools/swiftlint` (pinned at 0.54.0, never one on
 `PATH`), and exits non-zero if that binary is missing or not executable.
 
 ```bash
