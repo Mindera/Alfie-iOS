@@ -88,6 +88,14 @@ custom_rules:
     message: Preview should only work on Debug
     regex: '^\}\n*\#Preview$'
     severity: error
+  no_primitive_tokens:
+    name: No Primitive Tokens
+    excluded: "SharedUI/(Theme|GeneratedTokens)/"
+    message: "Style through `theme.color` / `theme.sizing` (ADR 0006). A role with no Semantic token keeps its primitive with `// swiftlint:disable:this no_primitive_tokens` and a design-review reference (docs/DesignTokens.md)."
+    regex: \bPrimitives\.
+    match_kinds:
+      - identifier
+    severity: warning
 unused_import:
   always_keep_imports:
     - SwiftSyntaxBuilder

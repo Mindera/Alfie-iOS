@@ -14,7 +14,7 @@ struct SplashView: View {
                     .alignmentGuide(.bottom) { $0[.top] - theme.spacing.space200 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background { theme.color.neutrals0.ignoresSafeArea() }
+            .background { theme.color.surfaceBackgroundPrimary.ignoresSafeArea() }
             .accessibilityIdentifier(AccessibilityID.Splash.screen)
     }
 }

@@ -113,7 +113,7 @@ public struct ProductDetailsView<ViewModel: ProductDetailsViewModelProtocol>: Vi
                 selectedIndex: $currentMediaIndex,
                 configuration: configuration
             ) { _, isSelected in
-                RoundedRectangle(cornerRadius: theme.radius.rounded)
+                RoundedRectangle(cornerRadius: theme.sizing.radiusRounded)
                     .fill(isSelected ? configuration.selectedColor : configuration.color)
                     .frame(
                         width: isSelected ? Constants.selectedIndicatorWidth : Constants.indicatorSize,

@@ -37,8 +37,18 @@ swiftlint() {
     "$SWIFTLINT" lint --quiet --config "$CONFIG" "$@"
 }
 
+# Rules whose warnings are reported without failing the run (a strict run fails on any other warning).
+ADVISORY_RULES=(no_primitive_tokens)
+
 lint() {
-    swiftlint --strict "$@"
+    local output status=0 advisory
+    advisory="$(printf '|%s' "${ADVISORY_RULES[@]}")"
+    output="$(swiftlint "$@")" || status=$?
+    [ -z "$output" ] || printf '%s\n' "$output"
+    [ "$status" -eq 0 ] || return "$status"
+    if grep ': warning: ' <<< "$output" | grep -vE "\((${advisory#|})\)$" > /dev/null; then
+        return 2
+    fi
 }
 
 config_paths() {

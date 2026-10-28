@@ -2,13 +2,12 @@ import SwiftUI
 
 // MARK: - DesignSystemProtocol
 
-/// Single entry point for every design-token category (colour, spacing, radius, typography).
-/// Each category forwards to the generated tokens, vended as one unit so the whole theme can be
-/// injected via `EnvironmentValues.theme`.
+/// Single entry point for the semantic design tokens (ADR 0006): `color` and `sizing` vend the
+/// generated `Theme` and `Sizing` enums, `font` the typography provider.
 public protocol DesignSystemProtocol {
-    var color: ColorProvider { get }
+    var color: Theme.Type { get }
+    var sizing: Sizing.Type { get }
     var spacing: SpacingProvider { get }
-    var radius: RadiusProvider { get }
     var font: TypographyProviderProtocol { get }
 
     func setupAppearance()
@@ -19,11 +18,9 @@ public protocol DesignSystemProtocol {
 public class DesignSystem: DesignSystemProtocol {
     public static var shared = DesignSystem()
 
-    // Token-backed categories are fixed forwarders to the generated tokens (no variation, so
-    // concrete). Only `font` is a swappable provider.
-    public let color = ColorProvider()
+    public let color = Theme.self
+    public let sizing = Sizing.self
     public let spacing = SpacingProvider()
-    public let radius = RadiusProvider()
     public let font: TypographyProviderProtocol
 
     public init(font: TypographyProviderProtocol = TypographyProvider()) {
