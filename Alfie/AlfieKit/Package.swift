@@ -519,6 +519,7 @@ let package = Package(
             name: "SharedUITests",
             dependencies: [
                 "SharedUI",
+                "TestUtils",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])
