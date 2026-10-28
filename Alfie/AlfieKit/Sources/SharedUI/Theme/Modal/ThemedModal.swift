@@ -19,123 +19,20 @@ struct ThemedModal<Modal: View>: ViewModifier {
         self.modal = modal
     }
 
-    private var horizontalInset: CGFloat {
-        horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
-    }
-
     func body(content: Content) -> some View {
         content
             .fullScreenCover(isPresented: $isPresented) {
                 Group {
                     if showModal {
-                        GeometryReader { gp in
-                            ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
-                                Rectangle()
-                                    .fill(Primitives.Colours.neutrals900.opacity(Constants.opacityBackground))
-                                    .onTapGesture {
-                                        onDismiss()
-                                    }
-                                    .onAppear {
-                                        withAnimation {
-                                            backOpacityLayer = 1
-                                        }
-                                    }
-                                    .animation(.standardAccelerate, value: backOpacityLayer)
-                                    .opacity(backOpacityLayer)
-                                    .ignoresSafeArea(.all)
-                                VStack {
-                                    if !self.modalFitsScreen {
-                                        Spacer()
-                                            .frame(height: topMargin)
-                                    }
-
-                                    VStack {
-                                        HStack {
-                                            Text.build(theme.font.heading.small(title))
-                                                .foregroundStyle(Primitives.Colours.neutrals900)
-                                            Spacer()
-                                            Button {
-                                                onDismiss()
-                                            } label: {
-                                                Icon.close.image
-                                                    .renderingMode(.template)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(
-                                                        width: Constants.iconCloseSize,
-                                                        height: Constants.iconCloseSize
-                                                    )
-                                                    .tint(Primitives.Colours.neutrals900)
-                                            }
-                                            .accessibilityLabel(Text(L10n.Accessibility.close))
-                                        }
-                                        .padding(.vertical, Primitives.Spacing.spacing8)
-                                        .padding(.horizontal, Primitives.Spacing.spacing16)
-                                        if self.modalFitsScreen {
-                                            modal()
-                                                .simultaneousGesture(
-                                                    DragGesture()
-                                                        .onChanged { _ in
-                                                            offset = .zero
-                                                        }
-                                                )
-                                                .background(
-                                                    GeometryReader {
-                                                        ZStack {}
-                                                            .preference(
-                                                                key: ViewHeightKey.self,
-                                                                value: $0.frame(in: .local).size.height
-                                                            )
-                                                    }
-                                                )
-                                                .padding(.bottom, Primitives.Spacing.spacing32)
-                                                .padding(.horizontal, Primitives.Spacing.spacing16)
-                                                .onPreferenceChange(ViewHeightKey.self) {
-                                                    self.modalFitsScreen = $0 < (gp.size.height - topMargin * 2)
-                                                }
-                                        } else {
-                                            ScrollView {
-                                                modal()
-                                                    .simultaneousGesture(
-                                                        DragGesture()
-                                                            .onChanged { _ in
-                                                                offset = .zero
-                                                            }
-                                                    )
-                                                    .padding(.bottom, Primitives.Spacing.spacing32)
-                                                    .padding(.horizontal, Primitives.Spacing.spacing16)
-                                            }
-                                        }
-                                    }
-                                    .padding(.horizontal, horizontalInset)
-                                    .edgesIgnoringSafeArea(.bottom)
-                                    .background {
-                                        RoundedRectangle(cornerRadius: Sizing.radiusStrong)
-                                            .fill(Primitives.Colours.neutrals0)
-                                            .edgesIgnoringSafeArea(.bottom)
-                                            .padding(.horizontal, horizontalInset)
-                                    }
-                                    .offset(y: offset.height)
-                                    .transition(.move(edge: .bottom))
-                                    .animation(.interactiveSpring(), value: offset)
-                                    .simultaneousGesture(
-                                        DragGesture()
-                                            .onChanged { gesture in
-                                                if gesture.translation.height > 0 {
-                                                    offset = gesture.translation
-                                                }
-                                            }
-                                            .onEnded { _ in
-                                                if offset.height > Constants.modalScrollThreshold {
-                                                    onDismiss()
-                                                } else {
-                                                    offset = .zero
-                                                }
-                                            }
-                                    )
-                                }
-                            }
-                        }
+                        ThemedModalSheet(
+                            title: title,
+                            modalFitsScreen: $modalFitsScreen,
+                            offset: $offset,
+                            backOpacityLayer: $backOpacityLayer,
+                            topMargin: topMargin,
+                            onDismiss: onDismiss,
+                            modal: modal
+                        )
                         .onDisappear {
                             isPresented = false
                             modalFitsScreen = true
@@ -168,6 +65,134 @@ struct ThemedModal<Modal: View>: ViewModifier {
             UIDevice.current.topMargin + 25.0
         } else {
             UIDevice.current.hasNotch ? UIDevice.current.topMargin : UIDevice.current.topMargin + 25.0
+        }
+    }
+}
+
+// MARK: - ThemedModalSheet
+
+struct ThemedModalSheet<Modal: View>: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    let title: String
+    @Binding var modalFitsScreen: Bool
+    @Binding var offset: CGSize
+    @Binding var backOpacityLayer: CGFloat
+    let topMargin: CGFloat
+    let onDismiss: () -> Void
+    let modal: () -> Modal
+
+    private var horizontalInset: CGFloat {
+        horizontalSizeClass == .regular ? Primitives.Spacing.spacing80 : Primitives.Spacing.spacing0
+    }
+
+    var body: some View {
+        GeometryReader { gp in
+            ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
+                Rectangle()
+                    .fill(Primitives.Colours.neutrals900.opacity(Constants.opacityBackground))
+                    .onTapGesture {
+                        onDismiss()
+                    }
+                    .onAppear {
+                        withAnimation {
+                            backOpacityLayer = 1
+                        }
+                    }
+                    .animation(.standardAccelerate, value: backOpacityLayer)
+                    .opacity(backOpacityLayer)
+                    .ignoresSafeArea(.all)
+                VStack {
+                    if !self.modalFitsScreen {
+                        Spacer()
+                            .frame(height: topMargin)
+                    }
+
+                    VStack {
+                        HStack {
+                            Text.build(theme.font.heading.small(title))
+                                .foregroundStyle(Primitives.Colours.neutrals900)
+                            Spacer()
+                            Button {
+                                onDismiss()
+                            } label: {
+                                Icon.close.image
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(
+                                        width: Constants.iconCloseSize,
+                                        height: Constants.iconCloseSize
+                                    )
+                                    .tint(Primitives.Colours.neutrals900)
+                            }
+                            .accessibilityLabel(Text(L10n.Accessibility.close))
+                        }
+                        .padding(.vertical, Primitives.Spacing.spacing8)
+                        .padding(.horizontal, Primitives.Spacing.spacing16)
+                        if self.modalFitsScreen {
+                            modal()
+                                .simultaneousGesture(
+                                    DragGesture()
+                                        .onChanged { _ in
+                                            offset = .zero
+                                        }
+                                )
+                                .background(
+                                    GeometryReader {
+                                        ZStack {}
+                                            .preference(
+                                                key: ViewHeightKey.self,
+                                                value: $0.frame(in: .local).size.height
+                                            )
+                                    }
+                                )
+                                .padding(.bottom, Primitives.Spacing.spacing32)
+                                .padding(.horizontal, Primitives.Spacing.spacing16)
+                                .onPreferenceChange(ViewHeightKey.self) {
+                                    self.modalFitsScreen = $0 < (gp.size.height - topMargin * 2)
+                                }
+                        } else {
+                            ScrollView {
+                                modal()
+                                    .simultaneousGesture(
+                                        DragGesture()
+                                            .onChanged { _ in
+                                                offset = .zero
+                                            }
+                                    )
+                                    .padding(.bottom, Primitives.Spacing.spacing32)
+                                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, horizontalInset)
+                    .edgesIgnoringSafeArea(.bottom)
+                    .background {
+                        RoundedRectangle(cornerRadius: Sizing.radiusStrong)
+                            .fill(Primitives.Colours.neutrals0)
+                            .edgesIgnoringSafeArea(.bottom)
+                            .padding(.horizontal, horizontalInset)
+                    }
+                    .offset(y: offset.height)
+                    .transition(.move(edge: .bottom))
+                    .animation(.interactiveSpring(), value: offset)
+                    .simultaneousGesture(
+                        DragGesture()
+                            .onChanged { gesture in
+                                if gesture.translation.height > 0 {
+                                    offset = gesture.translation
+                                }
+                            }
+                            .onEnded { _ in
+                                if offset.height > Constants.modalScrollThreshold {
+                                    onDismiss()
+                                } else {
+                                    offset = .zero
+                                }
+                            }
+                    )
+                }
+            }
         }
     }
 }
