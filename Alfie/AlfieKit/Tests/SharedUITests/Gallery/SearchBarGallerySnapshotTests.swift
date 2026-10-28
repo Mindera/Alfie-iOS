@@ -44,12 +44,21 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
         let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
         let window = scene.map(UIWindow.init(windowScene:)) ?? UIWindow()
         window.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
-        window.rootViewController = UIHostingController(rootView: view)
+        window.rootViewController = UIHostingController(
+            rootView: view
+                .ignoresSafeArea(.keyboard)
+                .transaction { $0.disablesAnimations = true }
+        )
         window.makeKeyAndVisible()
         addTeardownBlock { window.isHidden = true }
-        let settled = expectation(description: "focus settled")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { settled.fulfill() }
-        wait(for: [settled], timeout: 2)
+        let focused = expectation(for: NSPredicate { _, _ in Self.hasFirstResponder(in: window) },
+                                  evaluatedWith: nil)
+        wait(for: [focused], timeout: .default)
+        window.layoutIfNeeded()
         return window
+    }
+
+    private static func hasFirstResponder(in view: UIView) -> Bool {
+        view.isFirstResponder || view.subviews.contains { hasFirstResponder(in: $0) }
     }
 }
