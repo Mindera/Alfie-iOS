@@ -191,6 +191,7 @@ private struct ThemedButtonStyle: ButtonStyle {
                     .frame(width: iconSize, height: iconSize)
             }
         }
+        .opacity(isLoading ? 0 : 1)
         .frame(height: type.height)
         .padding(.horizontal, theme.sizing.spacingSpacingXs)
         .foregroundStyle(textColor(configuration))

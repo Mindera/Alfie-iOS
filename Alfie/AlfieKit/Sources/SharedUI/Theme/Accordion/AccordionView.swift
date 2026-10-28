@@ -72,7 +72,7 @@ public struct AccordionView<Content: View>: View {
     }
 
     private var accordianColor: Color {
-        isDisabled ? theme.color.contentContentPrimaryDisabled : theme.color.contentContentTerciary
+        isDisabled ? theme.color.borderSoft : theme.color.contentContentTerciary
     }
 }
 
