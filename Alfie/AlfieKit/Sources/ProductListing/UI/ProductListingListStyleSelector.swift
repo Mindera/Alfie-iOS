@@ -11,7 +11,7 @@ struct ProductListingListStyleSelector: View {
     }
 
     var body: some View {
-        HStack(spacing: theme.spacing.space0) {
+        HStack(spacing: theme.sizing.spacingSpacingNone) {
             styleButton(
                 for: .list,
                 accessibilityLabel: L10n.Accessibility.listView,
@@ -37,11 +37,11 @@ struct ProductListingListStyleSelector: View {
             ThemedIcon(
                 Style.icon(for: style, isSelected: isSelected),
                 size: .medium,
-                tint: Theme.contentContentPrimary,
+                tint: theme.color.contentContentPrimary,
                 accessibilityLabel: accessibilityLabel
             )
             // Figma: 24pt icon centred in a 32×32 button (two sit flush → 8pt visible gap).
-            .frame(width: theme.spacing.space400, height: theme.spacing.space400)
+            .frame(width: Constants.buttonSize, height: Constants.buttonSize)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -62,4 +62,9 @@ struct ProductListingListStyleSelector: View {
             }
         }
     }
+}
+
+private enum Constants {
+    // swiftlint:disable:next no_primitive_tokens - design review #186: tap-target size, no size token
+    static let buttonSize: CGFloat = Primitives.Spacing.spacing32
 }

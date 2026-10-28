@@ -11,7 +11,7 @@ struct SplashView: View {
             // Spinner hangs below the wordmark without affecting its centring (aligns with launch screen).
             .overlay(alignment: .bottom) {
                 LoadingSpinner()
-                    .alignmentGuide(.bottom) { $0[.top] - theme.spacing.space200 }
+                    .alignmentGuide(.bottom) { $0[.top] - theme.sizing.spacingSpacingMd }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background { theme.color.surfaceBackgroundPrimary.ignoresSafeArea() }

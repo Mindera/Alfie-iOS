@@ -35,8 +35,8 @@ struct ProductListingFilterBar: View {
             Spacer()
             refineButton
         }
-        .padding(.horizontal, theme.spacing.space200)
-        .padding(.vertical, theme.spacing.space050)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
+        .padding(.vertical, theme.sizing.spacingSpacing2xs)
     }
 
     private var refineButton: some View {
@@ -44,7 +44,7 @@ struct ProductListingFilterBar: View {
             filterAction()
         } label: {
             Text.build(theme.font.link.medium(L10n.Plp.Refine.Button.cta, underline: true))
-                .foregroundStyle(Theme.linkLinkPrimaryDefault)
+                .foregroundStyle(theme.color.linkLinkPrimaryDefault)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(AccessibilityID.ProductListing.filterButton)
@@ -52,7 +52,7 @@ struct ProductListingFilterBar: View {
 
     private var resultInfoView: some View {
         Text.build(theme.font.body.small(L10n.Plp.NumberOfResults.message(total)))
-            .foregroundStyle(Theme.contentContentTerciary)
+            .foregroundStyle(theme.color.contentContentTerciary)
             .accessibilityIdentifier(AccessibilityID.ProductListing.resultsLabel)
     }
 

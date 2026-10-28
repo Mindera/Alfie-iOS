@@ -51,7 +51,7 @@ public struct LoadingSpinner: View {
 }
 
 #Preview {
-    VStack(spacing: DesignSystem.shared.spacing.space400) {
+    VStack(spacing: DesignSystem.shared.sizing.spacingSpacingXl) {
         LoadingSpinner(size: .small)
         LoadingSpinner(size: .medium)
         LoadingSpinner(size: .large)

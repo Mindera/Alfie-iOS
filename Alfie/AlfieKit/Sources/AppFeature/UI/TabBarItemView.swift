@@ -22,7 +22,7 @@ struct TabBarItemView: View {
 
     var body: some View {
         let isSelected = tab == currentTab
-        return VStack(spacing: Primitives.Spacing.spacing8) {
+        return VStack(spacing: theme.sizing.spacingSpacingXs) {
             tab.icon(isSelected: isSelected).image
                 .renderingMode(.template)
                 .resizable()
@@ -34,7 +34,7 @@ struct TabBarItemView: View {
                 .foregroundStyle(Style.labelColour(isSelected: isSelected))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, Primitives.Spacing.spacing8)
+        .padding(.vertical, theme.sizing.spacingSpacingXs)
         .contentShape(Rectangle())
         .accessibilityElement()
         .accessibilityIdentifier(tab.accessibilityId)
@@ -58,12 +58,14 @@ struct TabBarItemView: View {
     }
 
     enum Style {
+        private static var color: Theme.Type { DesignSystem.shared.color }
+
         static func iconColour(isSelected: Bool) -> Color {
-            isSelected ? Theme.contentContentPrimary : Theme.contentContentPrimaryDisabled
+            isSelected ? color.contentContentPrimary : color.contentContentPrimaryDisabled
         }
 
         static func labelColour(isSelected: Bool) -> Color {
-            isSelected ? Theme.contentContentPrimary : Theme.contentContentTerciary
+            isSelected ? color.contentContentPrimary : color.contentContentTerciary
         }
 
         static func labelStyle(isSelected: Bool) -> ThemedTypographyStyle {
@@ -72,6 +74,9 @@ struct TabBarItemView: View {
     }
 
     private enum Constants {
-        static let iconSize: CGSize = .init(width: Sizing.iconsIconMedium, height: Sizing.iconsIconMedium)
+        static let iconSize: CGSize = .init(
+            width: DesignSystem.shared.sizing.iconsIconMedium,
+            height: DesignSystem.shared.sizing.iconsIconMedium
+        )
     }
 }

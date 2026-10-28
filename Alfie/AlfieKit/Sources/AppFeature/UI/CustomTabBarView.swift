@@ -21,10 +21,10 @@ struct CustomTabBarView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingNone) {
             Divider()
-                .overlay(Theme.borderSoft)
-            HStack(spacing: Primitives.Spacing.spacing0) {
+                .overlay(theme.color.borderSoft)
+            HStack(spacing: theme.sizing.spacingSpacingNone) {
                 ForEach(tabs, id: \.self) { tab in
                     TabBarItemView(
                         tab: tab,
@@ -35,7 +35,7 @@ struct CustomTabBarView: View {
                 }
             }
         }
-        .background(Theme.surfaceBackgroundPrimary)
+        .background(theme.color.surfaceBackgroundPrimary)
         .frame(maxWidth: .infinity)
     }
 

@@ -10,10 +10,10 @@ public struct PagedImageGalleryDemoView: View {
     @State private var index: Int = 0
 
     public var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing16) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "PDP Image Gallery")
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.bottom, Primitives.Spacing.spacing0)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                .padding(.bottom, theme.sizing.spacingSpacingNone)
             // A paged TabView does not take its height from its pages, so the ratio is imposed here.
             GeometryReader { proxy in
                 TabView(selection: $index) {
@@ -21,7 +21,7 @@ public struct PagedImageGalleryDemoView: View {
                         Image(name, bundle: .module)
                             .resizable()
                             .scaledToFit()
-                            .cornerRadius(Sizing.radiusSoft)
+                            .cornerRadius(theme.sizing.radiusSoft)
                             .tag(offset)
                     }
                 }
@@ -31,7 +31,7 @@ public struct PagedImageGalleryDemoView: View {
             .aspectRatio(Constants.itemAspectRatio, contentMode: .fit)
 
             PaginatedControl(configuration: .init(), itemsCount: 4, selectedIndex: $index)
-                .frame(maxHeight: Primitives.Spacing.spacing16)
+                .frame(maxHeight: theme.sizing.spacingSpacingMd)
         }
         Spacer()
     }

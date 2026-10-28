@@ -11,6 +11,7 @@ public struct TextInputConfiguration {
     public let prefix: String?
     public let keyboardType: UIKeyboardType
     public let isError: Bool
+    public let isSecure: Bool
     public let accessibilityIdentifier: String?
     public let accessibilityLabel: String?
 
@@ -21,6 +22,7 @@ public struct TextInputConfiguration {
         prefix: String? = nil,
         keyboardType: UIKeyboardType = .default,
         isError: Bool = false,
+        isSecure: Bool = false,
         accessibilityIdentifier: String? = nil,
         accessibilityLabel: String? = nil
     ) {
@@ -30,6 +32,7 @@ public struct TextInputConfiguration {
         self.prefix = prefix
         self.keyboardType = keyboardType
         self.isError = isError
+        self.isSecure = isSecure
         self.accessibilityIdentifier = accessibilityIdentifier
         self.accessibilityLabel = accessibilityLabel
     }
@@ -38,50 +41,44 @@ public struct TextInputConfiguration {
 // MARK: - TextInput
 
 /// Bordered single-line field with an optional label and an optional leading affix.
-///
-/// Distinct from `ThemedInput`, which is the legacy-design input (legacy `Primitives` palette,
-/// focus bar, status-label row) still used by the DebugMenu. This one is the modern-design
-/// component: semantic `Theme` tokens, and an affix the design places beside the value.
+/// Disable it with `.disabled(_:)`.
 public struct TextInput: View {
     private let configuration: TextInputConfiguration
     @FocusState private var isFocused: Bool
+    @Environment(\.isEnabled) private var isEnabled
 
     public init(configuration: TextInputConfiguration) {
         self.configuration = configuration
     }
 
     private var style: TextInputStyle {
-        TextInputStyle(isError: configuration.isError, isFocused: isFocused)
+        TextInputStyle(isError: configuration.isError, isFocused: isFocused, isDisabled: !isEnabled)
     }
 
     public var body: some View {
         let style = self.style
 
-        return VStack(alignment: .leading, spacing: theme.spacing.space100) {
+        return VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
             if let label = configuration.label {
                 Text.build(theme.font.body.small(label))
                     .foregroundStyle(style.labelColor)
             }
 
-            HStack(spacing: theme.spacing.space050) {
+            HStack(spacing: theme.sizing.spacingSpacing2xs) {
                 if let prefix = configuration.prefix {
                     Text.build(theme.font.body.medium(prefix))
                         .foregroundStyle(style.prefixColor)
                         .accessibilityHidden(true)
                 }
 
-                TextField(
-                    "",
-                    text: configuration.$text,
-                    prompt: configuration.placeholder.map { placeholder in
-                        Text(placeholder)
-                            .font(Font(theme.font.body.medium.uiFont))
-                            .foregroundColor(style.placeholderColor)
-                    }
-                )
+                field(prompt: configuration.placeholder.map { placeholder in
+                    Text(placeholder)
+                        .font(Font(theme.font.body.medium.uiFont))
+                        .foregroundColor(style.placeholderColor)
+                })
                 .font(Font(theme.font.body.medium.uiFont))
                 .foregroundStyle(style.textColor)
-                .tint(Theme.contentContentPrimary)
+                .tint(theme.color.contentContentPrimary)
                 .keyboardType(configuration.keyboardType)
                 .focused($isFocused)
                 .accessibilityIdentifier(configuration.accessibilityIdentifier ?? "")
@@ -93,15 +90,24 @@ public struct TextInput: View {
                     )
                 )
             }
-            .padding(.horizontal, theme.spacing.space150)
+            .padding(.horizontal, theme.sizing.spacingSpacingSm)
             .frame(height: TextInputStyle.height)
             .background(
-                RoundedRectangle(cornerRadius: Sizing.radiusSoft)
+                RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
                     .strokeBorder(style.borderColor, lineWidth: style.borderWidth)
-                    .background(RoundedRectangle(cornerRadius: Sizing.radiusSoft).fill(style.backgroundColor))
+                    .background(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft).fill(style.backgroundColor))
             )
             .contentShape(Rectangle())
             .onTapGesture { isFocused = true }
+        }
+    }
+
+    @ViewBuilder
+    private func field(prompt: Text?) -> some View {
+        if configuration.isSecure {
+            SecureField("", text: configuration.$text, prompt: prompt)
+        } else {
+            TextField("", text: configuration.$text, prompt: prompt)
         }
     }
 }
@@ -133,40 +139,54 @@ struct TextInputStyle {
 
     let isError: Bool
     let isFocused: Bool
+    let isDisabled: Bool
+
+    private var theme: DesignSystemProtocol { DesignSystem.shared }
+
+    init(isError: Bool, isFocused: Bool, isDisabled: Bool = false) {
+        self.isError = isError
+        self.isFocused = isFocused
+        self.isDisabled = isDisabled
+    }
 
     var borderColor: Color {
-        if isError {
-            return Theme.contentContentNegative
+        if isDisabled {
+            return theme.color.borderSoft
+        } else if isError {
+            return theme.color.contentContentNegative
         } else if isFocused {
-            return Theme.contentContentPrimary
+            return theme.color.contentContentPrimary
         } else {
-            return Theme.borderSoft
+            return theme.color.borderSoft
         }
     }
 
     var borderWidth: CGFloat {
-        isFocused || isError ? Constants.borderFocused : Primitives.Border.borderWeightDefault
+        !isDisabled && (isFocused || isError) ? Constants.borderFocused : theme.sizing.borderBorderWeightDefault
     }
 
     var backgroundColor: Color {
-        Theme.surfaceBackgroundPrimary
+        theme.color.surfaceBackgroundPrimary
     }
 
     var textColor: Color {
-        Theme.contentContentPrimary
+        isDisabled ? theme.color.contentContentPrimaryDisabled : theme.color.contentContentPrimary
     }
 
     /// The affix is chrome, not content — it stays muted so the typed value reads as the value.
     var prefixColor: Color {
-        Theme.contentContentTerciary
+        isDisabled ? theme.color.contentContentPrimaryDisabled : theme.color.contentContentTerciary
     }
 
     var placeholderColor: Color {
-        Theme.contentContentTerciary
+        theme.color.contentContentTerciary
     }
 
     var labelColor: Color {
-        isError ? Theme.contentContentNegative : Theme.contentContentTerciary
+        if isDisabled {
+            return theme.color.contentContentPrimaryDisabled
+        }
+        return isError ? theme.color.contentContentNegative : theme.color.contentContentTerciary
     }
 }
 
