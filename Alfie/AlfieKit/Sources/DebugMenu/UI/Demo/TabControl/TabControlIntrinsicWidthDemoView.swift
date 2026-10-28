@@ -20,7 +20,7 @@ struct TabControlIntrinsicWidthDemoView: View {
     var body: some View {
         VStack {
             TabControl(
-                theme: tabTheme,
+                style: tabTheme,
                 configuration: .intrisicSize(itemSpacing: spacing),
                 options: currentOptions.map {
                     TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil)

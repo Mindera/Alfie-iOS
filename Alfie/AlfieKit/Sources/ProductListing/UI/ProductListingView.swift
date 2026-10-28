@@ -57,7 +57,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
                     .padding(theme.sizing.spacingSpacingMd)
                     .background(theme.color.surfaceBackgroundPrimary)
-                    .cornerRadius(theme.sizing.radiusSoft)
+                    .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                     .padding(.top, theme.sizing.spacingSpacingXs)
             }
         }

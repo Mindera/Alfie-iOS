@@ -21,7 +21,7 @@ public struct PagedImageGalleryDemoView: View {
                         Image(name, bundle: .module)
                             .resizable()
                             .scaledToFit()
-                            .cornerRadius(theme.sizing.radiusSoft)
+                            .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                             .tag(offset)
                     }
                 }

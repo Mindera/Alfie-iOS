@@ -151,7 +151,7 @@ private enum AccessibilityId {
 }
 
 private enum Constants {
-    static let chevronSize: CGFloat = DesignSystem.shared.sizing.iconsIconMedium
+    static var chevronSize: CGFloat { DesignSystem.shared.sizing.iconsIconMedium }
     static let categoryViewHeight: CGFloat = 48
 }
 

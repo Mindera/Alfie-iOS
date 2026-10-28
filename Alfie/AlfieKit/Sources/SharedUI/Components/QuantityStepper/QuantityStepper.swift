@@ -26,7 +26,7 @@ public struct QuantityStepper: View {
     }
 
     private enum Constants {
-        static let iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconSmall
+        static var iconSize: CGFloat { DesignSystem.shared.sizing.iconsIconSmall }
         static let minTapTarget: CGFloat = 44
     }
 

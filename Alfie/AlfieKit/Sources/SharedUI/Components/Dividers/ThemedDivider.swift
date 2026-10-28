@@ -27,34 +27,42 @@ public struct ThemedDivider: View {
         static let thickThickness = 2.0
     }
 
-    public static var horizontalThin = ThemedDivider(
-        configuration: .init(
-            orientation: .horizontal,
-            thickness: Constants.thinThickness,
-            color: DesignSystem.shared.color.borderSoft
+    public static var horizontalThin: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(
+                orientation: .horizontal,
+                thickness: Constants.thinThickness,
+                color: DesignSystem.shared.color.borderSoft
+            )
         )
-    )
-    public static var verticalThin = ThemedDivider(
-        configuration: .init(
-            orientation: .vertical,
-            thickness: Constants.thinThickness,
-            color: DesignSystem.shared.color.borderSoft
+    }
+    public static var verticalThin: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(
+                orientation: .vertical,
+                thickness: Constants.thinThickness,
+                color: DesignSystem.shared.color.borderSoft
+            )
         )
-    )
-    public static var horizontalThick = ThemedDivider(
-        configuration: .init(
-            orientation: .horizontal,
-            thickness: Constants.thickThickness,
-            color: DesignSystem.shared.color.borderSoft
+    }
+    public static var horizontalThick: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(
+                orientation: .horizontal,
+                thickness: Constants.thickThickness,
+                color: DesignSystem.shared.color.borderSoft
+            )
         )
-    )
-    public static var verticalThick = ThemedDivider(
-        configuration: .init(
-            orientation: .vertical,
-            thickness: Constants.thickThickness,
-            color: DesignSystem.shared.color.borderSoft
+    }
+    public static var verticalThick: ThemedDivider {
+        ThemedDivider(
+            configuration: .init(
+                orientation: .vertical,
+                thickness: Constants.thickThickness,
+                color: DesignSystem.shared.color.borderSoft
+            )
         )
-    )
+    }
     private let configuration: ThemedDividerConfiguration
 
     public init(configuration: ThemedDividerConfiguration) {

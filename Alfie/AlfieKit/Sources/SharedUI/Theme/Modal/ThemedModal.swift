@@ -5,10 +5,6 @@ import SwiftUI
 struct ThemedModal<Modal: View>: ViewModifier {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var isPresented: Bool
-    @State private var offset: CGSize = .zero
-
-    @State private var backOpacityLayer: CGFloat = 0
-    @State private var modalFitsScreen = true
     @State private var showModal = false
     private var title: String
     private var modal: () -> Modal
@@ -26,20 +22,12 @@ struct ThemedModal<Modal: View>: ViewModifier {
                     if showModal {
                         ThemedModalSheet(
                             title: title,
-                            modalFitsScreen: $modalFitsScreen,
-                            offset: $offset,
-                            backOpacityLayer: $backOpacityLayer,
                             topMargin: topMargin,
                             onDismiss: onDismiss,
                             modal: modal
                         )
                         .onDisappear {
                             isPresented = false
-                            modalFitsScreen = true
-                            offset = .zero
-                            withAnimation {
-                                backOpacityLayer = 0
-                            }
                         }
                     }
                 }
@@ -73,13 +61,28 @@ struct ThemedModal<Modal: View>: ViewModifier {
 
 struct ThemedModalSheet<Modal: View>: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var modalFitsScreen = true
+    @State private var modalHeight: CGFloat = 0
+    @State private var offset: CGSize = .zero
+    @State private var backOpacityLayer: CGFloat
     let title: String
-    @Binding var modalFitsScreen: Bool
-    @Binding var offset: CGSize
-    @Binding var backOpacityLayer: CGFloat
     let topMargin: CGFloat
     let onDismiss: () -> Void
     let modal: () -> Modal
+
+    init(
+        title: String,
+        topMargin: CGFloat,
+        backOpacityLayer: CGFloat = 0,
+        onDismiss: @escaping () -> Void,
+        modal: @escaping () -> Modal
+    ) {
+        _backOpacityLayer = State(initialValue: backOpacityLayer)
+        self.title = title
+        self.topMargin = topMargin
+        self.onDismiss = onDismiss
+        self.modal = modal
+    }
 
     private var horizontalInset: CGFloat {
         horizontalSizeClass == .regular ? theme.sizing.spacingSpacing2xl : theme.sizing.spacingSpacingNone
@@ -130,7 +133,7 @@ struct ThemedModalSheet<Modal: View>: View {
                         }
                         .padding(.vertical, theme.sizing.spacingSpacingXs)
                         .padding(.horizontal, theme.sizing.spacingSpacingMd)
-                        if self.modalFitsScreen {
+                        ScrollView {
                             modal()
                                 .simultaneousGesture(
                                     DragGesture()
@@ -149,29 +152,20 @@ struct ThemedModalSheet<Modal: View>: View {
                                 )
                                 .padding(.bottom, theme.sizing.spacingSpacingXl)
                                 .padding(.horizontal, theme.sizing.spacingSpacingMd)
-                                .onPreferenceChange(ViewHeightKey.self) {
-                                    self.modalFitsScreen = $0 < (proxy.size.height - topMargin * 2)
-                                }
-                        } else {
-                            ScrollView {
-                                modal()
-                                    .simultaneousGesture(
-                                        DragGesture()
-                                            .onChanged { _ in
-                                                offset = .zero
-                                            }
-                                    )
-                                    .padding(.bottom, theme.sizing.spacingSpacingXl)
-                                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
-                            }
+                        }
+                        .scrollDisabled(modalFitsScreen)
+                        .frame(height: modalFitsScreen ? modalHeight + theme.sizing.spacingSpacingXl : nil)
+                        .onPreferenceChange(ViewHeightKey.self) {
+                            modalHeight = $0
+                            modalFitsScreen = $0 < (proxy.size.height - topMargin * 2)
                         }
                     }
                     .padding(.horizontal, horizontalInset)
-                    .edgesIgnoringSafeArea(.bottom)
+                    .ignoresSafeArea(edges: .bottom)
                     .background {
                         RoundedRectangle(cornerRadius: theme.sizing.radiusStrong)
                             .fill(theme.color.surfaceBackgroundPrimary)
-                            .edgesIgnoringSafeArea(.bottom)
+                            .ignoresSafeArea(edges: .bottom)
                             .padding(.horizontal, horizontalInset)
                     }
                     .offset(y: offset.height)

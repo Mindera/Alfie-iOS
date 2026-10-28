@@ -27,7 +27,7 @@ struct TabBarItemView: View {
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(size: Constants.iconSize)
+                .frame(width: theme.sizing.iconsIconMedium, height: theme.sizing.iconsIconMedium)
                 .foregroundStyle(Style.iconColour(isSelected: isSelected))
                 .badgeView(badgeValue: .constant(badgeValue))
             Text.build(Style.labelStyle(isSelected: isSelected)(tab.title))
@@ -71,12 +71,5 @@ struct TabBarItemView: View {
         static func labelStyle(isSelected: Bool) -> ThemedTypographyStyle {
             isSelected ? DesignSystem.shared.font.label.smallBold : DesignSystem.shared.font.label.small
         }
-    }
-
-    private enum Constants {
-        static let iconSize: CGSize = .init(
-            width: DesignSystem.shared.sizing.iconsIconMedium,
-            height: DesignSystem.shared.sizing.iconsIconMedium
-        )
     }
 }

@@ -226,7 +226,7 @@ public struct ThemedSearchBarView: View {
         searchText: Binding<String>,
         placeholder: String,
         placeholderOnFocus: String? = nil,
-        theme style: Style,
+        style: Style,
         dismissConfiguration: DismissConfiguration,
         keyboardType: UIKeyboardType = .default,
         submitLabel: SubmitLabel = .done,
@@ -455,7 +455,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .soft,
+            style: .soft,
             dismissConfiguration: .init(type: .back)
         )
         .padding()
@@ -467,7 +467,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .softLarge,
+            style: .softLarge,
             dismissConfiguration: .init(type: .cancel(title: "Cancel"))
         )
         .padding()
@@ -479,7 +479,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .light,
+            style: .light,
             dismissConfiguration: .init(type: .back)
         )
         .padding()
@@ -491,7 +491,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .dark,
+            style: .dark,
             dismissConfiguration: .init(type: .back)
         )
         .padding()

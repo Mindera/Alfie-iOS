@@ -104,7 +104,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
                 ForEach(1...3, id: \.self) { index in
                     Rectangle()
                         .foregroundStyle(DesignSystem.shared.color.borderStrong)
-                        .cornerRadius(DesignSystem.shared.sizing.radiusStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignSystem.shared.sizing.radiusStrong))
                         .frame(width: 110, height: 300)
                         .overlay {
                             Text("\(index)")
@@ -126,7 +126,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
                 ForEach(1...10, id: \.self) { index in
                     Rectangle()
                         .foregroundStyle(DesignSystem.shared.color.borderStrong)
-                        .cornerRadius(DesignSystem.shared.sizing.radiusStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignSystem.shared.sizing.radiusStrong))
                         .frame(width: 200, height: 300)
                         .overlay {
                             Text("\(index)")

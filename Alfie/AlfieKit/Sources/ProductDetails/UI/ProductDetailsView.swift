@@ -645,14 +645,14 @@ extension ProductDetailsView {
                 leadingAsset: viewModel.isInWishlist ? .heartFill : .heart,
                 cornerRadius: Constants.ctaCornerRadius,
                 // Figma: a 24pt glyph in the 40pt square, not the 16pt a label-with-icon uses.
-                iconSize: theme.sizing.iconsIconMedium
+                iconSize: theme.sizing.iconsIconMedium,
+                accessibilityLabel: viewModel.isInWishlist
+                    ? L10n.Accessibility.removeFromWishlist
+                    : L10n.Product.AddToWishlist.Button.cta
             ) {
                 viewModel.didTapAddToWishlist()
             }
             .frame(width: theme.sizing.iconsIconXlarge, height: theme.sizing.iconsIconXlarge)
-            .accessibilityLabel(
-                viewModel.isInWishlist ? L10n.Accessibility.removeFromWishlist : L10n.Product.AddToWishlist.Button.cta
-            )
             .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
         }
     }

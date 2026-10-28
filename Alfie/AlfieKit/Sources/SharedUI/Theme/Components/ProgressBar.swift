@@ -25,11 +25,11 @@ public struct ProgressBar: View {
                 Rectangle()
                     // swiftlint:disable:next no_primitive_tokens - design review #186: no inactive track token
                     .fill(Primitives.Colours.neutrals200)
-                    .cornerRadius(theme.sizing.radiusStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusStrong))
                     .frame(height: Constants.height)
                 Rectangle()
                     .fill(theme.color.contentContentSecondary)
-                    .cornerRadius(theme.sizing.radiusStrong)
+                    .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusStrong))
                     .frame(width: Constants.indicatorWidth, height: Constants.height)
                     .offset(x: xOffset(for: progress), y: 0)
                     .animation(.easeOut, value: progress)

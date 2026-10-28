@@ -74,16 +74,16 @@ public struct TabControl: View {
     @Binding private var currentIndex: Int
     @Namespace private var namespace
 
-    public init(theme style: Style, configuration: Configuration, options: [TabOption], currentIndex: Binding<Int>) {
+    public init(style: Style, configuration: Configuration, options: [TabOption], currentIndex: Binding<Int>) {
         self.style = style
         self.configuration = configuration
         self.options = options
         self._currentIndex = currentIndex
     }
 
-    public init(theme style: Style, configuration: Configuration, options: [String], currentIndex: Binding<Int>) {
+    public init(style: Style, configuration: Configuration, options: [String], currentIndex: Binding<Int>) {
         self.init(
-            theme: style,
+            style: style,
             configuration: configuration,
             options: options.map { TabOption(title: $0) },
             currentIndex: currentIndex
@@ -149,7 +149,7 @@ public struct TabControl: View {
                                         color: style.outerLineColor
                                     )
                                 )
-                                .cornerRadius(theme.sizing.radiusSoft)
+                                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                                 ThemedDivider(
                                     configuration: .init(
                                         orientation: .horizontal,
@@ -219,7 +219,7 @@ private enum AccessibilityId {
 
 #Preview("Intrinsic Size") {
     TabControl(
-        theme: .light,
+        style: .light,
         configuration: .intrisicSize(itemSpacing: DesignSystem.shared.sizing.spacingSpacingMd),
         options: ["Option1", "Option2", "Option3"],
         currentIndex: .constant(0)
@@ -228,7 +228,7 @@ private enum AccessibilityId {
 
 #Preview("Fixed Size") {
     TabControl(
-        theme: .dark,
+        style: .dark,
         configuration: .fixedSize(horizontalMargins: DesignSystem.shared.sizing.spacingSpacingXs),
         options: ["Option1", "Option2", "Option3"],
         currentIndex: .constant(0)

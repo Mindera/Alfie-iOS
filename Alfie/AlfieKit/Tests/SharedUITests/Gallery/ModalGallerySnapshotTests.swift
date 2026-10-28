@@ -10,10 +10,8 @@ final class ModalGallerySnapshotTests: XCTestCase {
     func test_modal_sheet_renders_title_and_content() {
         let sut = ThemedModalSheet(
             title: "Modal title",
-            modalFitsScreen: .constant(true),
-            offset: .constant(.zero),
-            backOpacityLayer: .constant(1),
             topMargin: 0,
+            backOpacityLayer: 1,
             onDismiss: {}
         ) {
             Text("Modal content")

@@ -8,32 +8,32 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
     private let isRecording = false
 
     func test_light_search_bar_renders_placeholder() {
-        assertSnapshot(of: searchBar(theme: .light).embededInContainer(height: 100),
+        assertSnapshot(of: searchBar(style: .light).embededInContainer(height: 100),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
     func test_dark_search_bar_renders_placeholder() {
-        assertSnapshot(of: searchBar(theme: .dark).embededInContainer(height: 100),
+        assertSnapshot(of: searchBar(style: .dark).embededInContainer(height: 100),
                        as: .defaultImage(),
                        record: isRecording)
     }
 
     // The text cursor blinks off wall-clock time; the precision allowance covers its few pixels only.
     func test_focused_search_bar_shows_focus_placeholder_and_cancel() {
-        let window = hostedInKeyWindow(searchBar(theme: .light, autoFocus: .on(delay: 0)))
+        let window = hostedInKeyWindow(searchBar(style: .light, autoFocus: .on(delay: 0)))
         assertSnapshot(of: window, as: .defaultImage(precision: 0.999), record: isRecording)
     }
 
     private func searchBar(
-        theme: ThemedSearchBarView.Style,
+        style: ThemedSearchBarView.Style,
         autoFocus: ThemedSearchBarView.AutoFocusSetting = .off
     ) -> some View {
         ThemedSearchBarView(
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: theme,
+            style: style,
             dismissConfiguration: .init(type: .cancel(title: "Cancel")),
             autoFocusWhenAppearing: autoFocus
         )

@@ -24,8 +24,8 @@ public struct LoaderView: View {
 
     private enum Constants {
         static let smallCircleDiameter: CGFloat = 8
-		static let circleSpacing: CGFloat = DesignSystem.shared.sizing.spacingSpacingXs
-		static let circlesToLabelSpacing: CGFloat = DesignSystem.shared.sizing.spacingSpacingSm
+        static var circleSpacing: CGFloat { DesignSystem.shared.sizing.spacingSpacingXs }
+        static var circlesToLabelSpacing: CGFloat { DesignSystem.shared.sizing.spacingSpacingSm }
         static let numberOfCircles = 3
         static let animationTime: Double = 0.5
     }

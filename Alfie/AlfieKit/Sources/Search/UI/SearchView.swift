@@ -33,7 +33,7 @@ public struct SearchView<ViewModel: SearchViewModelProtocol>: View {
             placeholderOnFocus: L10n.SearchBar.Focused.placeholder,
             searchText: $viewModel.searchText,
             pullToSearchConfig: .disabled,
-            theme: .softLarge,
+            style: .softLarge,
             dismissConfiguration: .init(type: .back),
             contentOverlayColorWhenFocused: theme.color.surfaceBackgroundPrimary,
             showDivider: true,

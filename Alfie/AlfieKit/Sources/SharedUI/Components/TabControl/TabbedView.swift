@@ -21,7 +21,7 @@ public struct TabbedView<Content>: View where Content: View {
     ///   - lazyLoading: always true on iOS 16!
     public init(
         currentIndex: Binding<Int>,
-        theme style: TabControl.Style,
+        style: TabControl.Style,
         configuration: TabControl.Configuration,
         lazyLoading: Bool = true,
         swipeToSwitchTabEnabled: Bool = true,
@@ -37,7 +37,7 @@ public struct TabbedView<Content>: View where Content: View {
 
     public var body: some View {
         VStack {
-            TabControl(theme: style, configuration: configuration, options: options, currentIndex: $currentIndex)
+            TabControl(style: style, configuration: configuration, options: options, currentIndex: $currentIndex)
             tabbedCarousel
         }
     }

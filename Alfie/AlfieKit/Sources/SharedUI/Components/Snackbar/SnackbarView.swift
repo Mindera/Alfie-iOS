@@ -94,7 +94,7 @@ public struct SnackbarView: View {
         ZStack {
             Rectangle()
                 .fill(backgroundColor)
-                .cornerRadius(theme.sizing.radiusSoft)
+                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
             HStack(spacing: theme.sizing.spacingSpacingXs) {
                 if let icon = configuration.icon {
                     icon

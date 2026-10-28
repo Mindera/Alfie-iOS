@@ -27,7 +27,7 @@ public struct PickerMenu<Content: View>: View {
                     .padding(.horizontal, theme.sizing.spacingSpacingMd)
                 }
                 .background(theme.color.surfaceBackgroundPrimary)
-                .cornerRadius(theme.sizing.radiusSoft)
+                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
         }
     }
 }

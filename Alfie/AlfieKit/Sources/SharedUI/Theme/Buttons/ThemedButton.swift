@@ -4,6 +4,7 @@ import SwiftUI
 
 public struct ThemedButton: View {
     private let text: String
+    private let accessibilityLabel: String?
     private let type: ButtonType
     private let style: ButtonTheme
     @Binding private var isDisabled: Bool
@@ -28,9 +29,11 @@ public struct ThemedButton: View {
         // Defaults to the small icon every existing caller renders; an icon-only button sized from
         // the design needs a larger glyph than a label-with-icon does.
         iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconSmall,
+        accessibilityLabel: String? = nil,
         action: @escaping () -> Void
     ) {
         self.text = text
+        self.accessibilityLabel = accessibilityLabel
         self.type = type
         self.style = style
         self.leadingAsset = leadingAsset
@@ -64,6 +67,8 @@ public struct ThemedButton: View {
             }
         }
         .disabled(isDisabled)
+        .accessibilityLabel(accessibilityLabel ?? text)
+        .accessibilityValue(isLoading ? L10n.Loading.title : "")
         .buttonStyle(
             ThemedButtonStyle(
                 style: style,
@@ -145,7 +150,7 @@ public enum ButtonType {
 
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
-    static let verticalPadding: CGFloat = -DesignSystem.shared.sizing.spacingSpacingXs
+    static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
     // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
     static let smallHeight: CGFloat = Primitives.Spacing.spacing32
     // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token

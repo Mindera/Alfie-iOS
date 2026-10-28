@@ -16,7 +16,7 @@ struct ProgressBarDemoView: View {
                     ForEach(0..<40) { _ in
                         Rectangle()
                             .foregroundStyle(theme.color.borderStrong)
-                            .cornerRadius(theme.sizing.radiusStrong)
+                            .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusStrong))
                             .frame(width: 120, height: 120)
                     }
                 }

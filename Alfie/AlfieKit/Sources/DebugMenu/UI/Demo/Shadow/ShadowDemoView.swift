@@ -58,7 +58,7 @@ struct ShadowDemoView: View {
             Rectangle()
                 .fill(theme.color.surfaceBackgroundPrimary)
                 .frame(width: 50, height: 50)
-                .cornerRadius(theme.sizing.radiusSoft)
+                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                 .shadow(type)
             Text.build(theme.font.body.small(label))
                 .foregroundStyle(theme.color.contentContentTerciary)

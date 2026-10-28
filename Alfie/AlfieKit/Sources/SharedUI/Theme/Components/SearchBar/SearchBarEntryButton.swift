@@ -36,7 +36,7 @@ public struct SearchBarEntryButton: View {
         searchTerm: String? = nil,
         accessibilityIdentifier: String,
         scan: ScanConfiguration? = nil,
-        theme style: ThemedSearchBarView.Style = .soft,
+        style: ThemedSearchBarView.Style = .soft,
         action: @escaping () -> Void
     ) {
         self.placeholder = placeholder
@@ -61,7 +61,7 @@ public struct SearchBarEntryButton: View {
             ThemedSearchBarView(
                 searchText: .constant(searchTerm ?? ""),
                 placeholder: placeholder,
-                theme: style,
+                style: style,
                 dismissConfiguration: .init(type: .hidden),
                 iconLayout: iconLayout
             )

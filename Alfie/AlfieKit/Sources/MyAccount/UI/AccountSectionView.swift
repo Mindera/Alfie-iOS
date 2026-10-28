@@ -27,7 +27,7 @@ struct AccountSectionView: View {
     }
 
     private enum AccountConstants {
-        static let iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconMedium
+        static var iconSize: CGFloat { DesignSystem.shared.sizing.iconsIconMedium }
         static let sectionHeight: CGFloat = 48
     }
 }

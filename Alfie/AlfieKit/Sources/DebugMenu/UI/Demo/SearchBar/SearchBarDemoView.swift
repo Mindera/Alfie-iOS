@@ -46,7 +46,7 @@ struct SearchBarDemoView: View {
                 placeholderOnFocus: placeholderOnFocus,
                 searchText: $searchText,
                 pullToSearchConfig: .enabled(scrollOffset: $scrollOffset),
-                theme: searchBarTheme,
+                style: searchBarTheme,
                 dismissConfiguration: .init(type: .back),
                 resultsView: {
                     VStack(spacing: theme.sizing.spacingSpacingMd) {
