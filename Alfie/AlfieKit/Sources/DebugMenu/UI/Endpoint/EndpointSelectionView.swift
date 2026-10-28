@@ -13,24 +13,27 @@ struct EndpointSelectionView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Choose Environment")
 
             RadioButtonList(
                 values: viewModel.availableEndpointOptions,
                 disabledValues: .constant(viewModel.disabledEndpointOptions),
                 selectedValue: $viewModel.selectedEndpointOption,
-                verticalSpacing: Primitives.Spacing.spacing24
+                verticalSpacing: theme.sizing.spacingSpacingLg
             )
 
-            ThemedInput($viewModel.customEndpointUrl, isDisabled: .constant(viewModel.isInputDisabled))
+            TextInput(configuration: .init(text: $viewModel.customEndpointUrl))
+                .disabled(viewModel.isInputDisabled)
 
-            ThemedInput(
-                $viewModel.bffApiKey,
-                placeholder: L10n.DebugMenu.Endpoint.ApiKey.placeholder,
-                isDisabled: .constant(viewModel.isInputDisabled),
-                isSecure: true
+            TextInput(
+                configuration: .init(
+                    text: $viewModel.bffApiKey,
+                    placeholder: L10n.DebugMenu.Endpoint.ApiKey.placeholder,
+                    isSecure: true
+                )
             )
+            .disabled(viewModel.isInputDisabled)
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
 
@@ -45,7 +48,7 @@ struct EndpointSelectionView: View {
 
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
         .snackbarView(configuration: $snackbarConfig)
         .onChange(of: viewModel.urlError) { urlError in
             if let urlError {

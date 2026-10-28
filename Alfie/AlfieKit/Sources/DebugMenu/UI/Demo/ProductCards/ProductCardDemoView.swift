@@ -10,24 +10,24 @@ struct ProductCardDemoView: View {
         ScrollView {
             VStack {
                 DemoHelper.demoSectionHeader(title: "Product Card - XS")
-                    .padding(.bottom, Primitives.Spacing.spacing32)
+                    .padding(.bottom, theme.sizing.spacingSpacingXl)
                 productCardListXS
-                    .padding(.trailing, -Primitives.Spacing.spacing16)
+                    .padding(.trailing, -theme.sizing.spacingSpacingMd)
 
                 DemoHelper.demoSectionHeader(title: "Product Card - Small")
-                    .padding(.bottom, Primitives.Spacing.spacing20)
-                    .padding(.top, Primitives.Spacing.spacing8)
+                    .padding(.bottom, theme.sizing.spacingSpacingMd)
+                    .padding(.top, theme.sizing.spacingSpacingXs)
                 productCardListS
 
                 DemoHelper.demoSectionHeader(title: "Product Card - Medium")
-                    .padding(.vertical, Primitives.Spacing.spacing20)
+                    .padding(.vertical, theme.sizing.spacingSpacingMd)
                 productCardListMedium
 
                 DemoHelper.demoSectionHeader(title: "Product Card - Large")
-                    .padding(.vertical, Primitives.Spacing.spacing20)
+                    .padding(.vertical, theme.sizing.spacingSpacingMd)
                 productCardListLarge
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
         .onRotate { newOrientation in
             orientation = newOrientation
@@ -37,7 +37,7 @@ struct ProductCardDemoView: View {
 
 extension ProductCardDemoView {
     private var productCardListXS: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing16) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
             ForEach(Product.fixtures) { product in
                 HorizontalProductCard(viewModel: .init(product: product, colorTitle: "Color:", sizeTitle: "Size:"))
             }
@@ -46,10 +46,10 @@ extension ProductCardDemoView {
 
     @ViewBuilder private var productCardListS: some View {
         ProgressableHorizontalScrollView(
-            scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing0),
-            progressBarConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing64)
+            scrollViewConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacingNone),
+            progressBarConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacing2xl)
         ) {
-            HStack(alignment: .top, spacing: Primitives.Spacing.spacing12) {
+            HStack(alignment: .top, spacing: theme.sizing.spacingSpacingSm) {
                 ForEach(Product.fixtures) { product in
                     VerticalProductCard(
                         viewModel: .init(configuration: .init(size: .small), product: product)
@@ -70,10 +70,10 @@ extension ProductCardDemoView {
         // swiftlint:enable vertical_whitespace_between_cases
         LazyVGrid(
             columns: Array(
-                repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
+                repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingMd, alignment: .top),
                 count: columns
             ),
-            spacing: Primitives.Spacing.spacing16
+            spacing: theme.sizing.spacingSpacingMd
         ) {
             ForEach(Product.fixtures) { product in
                 VerticalProductCard(viewModel: .init(configuration: .init(size: .medium), product: product)) { _, _ in }
@@ -92,10 +92,10 @@ extension ProductCardDemoView {
         // swiftlint:enable vertical_whitespace_between_cases
         LazyVGrid(
             columns: Array(
-                repeating: GridItem(.flexible(), spacing: Primitives.Spacing.spacing16, alignment: .top),
+                repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingMd, alignment: .top),
                 count: columns
             ),
-            spacing: Primitives.Spacing.spacing16
+            spacing: theme.sizing.spacingSpacingMd
         ) {
             ForEach(Product.fixtures) { product in
                 VerticalProductCard(viewModel: .init(configuration: .init(size: .large), product: product)) { _, _ in }

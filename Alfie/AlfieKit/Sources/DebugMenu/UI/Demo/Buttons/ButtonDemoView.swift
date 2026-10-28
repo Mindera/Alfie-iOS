@@ -13,7 +13,7 @@ struct ButtonDemoView: View {
     @State private var isFullWidth = false
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Button")
 
             ThemedButton(
@@ -26,7 +26,7 @@ struct ButtonDemoView: View {
                 isLoading: $isLoading,
                 isFullWidth: isFullWidth
             ) {}
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.vertical, theme.sizing.spacingSpacingXs)
 
             ThemedButton(
                 text: text,
@@ -38,7 +38,7 @@ struct ButtonDemoView: View {
                 isLoading: $isLoading,
                 isFullWidth: isFullWidth
             ) {}
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.vertical, theme.sizing.spacingSpacingXs)
 
             ThemedButton(
                 text: text,
@@ -50,15 +50,15 @@ struct ButtonDemoView: View {
                 isLoading: $isLoading,
                 isFullWidth: isFullWidth
             ) {}
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.vertical, theme.sizing.spacingSpacingXs)
 
             DemoHelper.demoSectionHeader(title: "Options")
 
             HStack {
                 Text.build(theme.font.body.small("Caption"))
                 Spacer()
-                ThemedInput($text)
-                    .padding(.leading, Primitives.Spacing.spacing64)
+                TextInput(configuration: .init(text: $text))
+                    .padding(.leading, theme.sizing.spacingSpacing2xl)
             }
 
             HStack {
@@ -74,7 +74,7 @@ struct ButtonDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(style.rawValue))
-                        .tint(Primitives.Colours.neutrals400)
+                        .tint(theme.color.borderStrong)
                 }
             }
 
@@ -95,7 +95,7 @@ struct ButtonDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(iconLeft.rawValue))
-                        .tint(Primitives.Colours.neutrals400)
+                        .tint(theme.color.borderStrong)
                 }
             }
             .disabled(!showIconLeft)
@@ -117,7 +117,7 @@ struct ButtonDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(iconRight.rawValue))
-                        .tint(Primitives.Colours.neutrals400)
+                        .tint(theme.color.borderStrong)
                 }
             }
             .disabled(!showIconRight)
@@ -136,7 +136,7 @@ struct ButtonDemoView: View {
 
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 }
 

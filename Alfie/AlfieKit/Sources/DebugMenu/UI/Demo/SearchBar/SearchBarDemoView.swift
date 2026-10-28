@@ -14,13 +14,13 @@ struct SearchBarDemoView: View {
     var body: some View {
         VStack {
             DemoHelper.demoSectionHeader(title: "Search Bar")
-                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
 
             ScrollViewWithOffsetReader(offset: $scrollOffset) {
                 LazyVGrid(columns: [
                     GridItem(.flexible(minimum: 200)),
                     GridItem(.flexible(minimum: 200)),
-                ], spacing: Primitives.Spacing.spacing16) {
+                ], spacing: theme.sizing.spacingSpacingMd) {
                     ForEach(0..<10) { index in
                         VStack {
                             Image("DemoProductImage", bundle: .module)
@@ -36,7 +36,7 @@ struct SearchBarDemoView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 10)
                         }
-                        .background(Primitives.Colours.neutrals0)
+                        .background(theme.color.surfaceBackgroundPrimary)
                         .cornerRadius(10)
                     }
                 }
@@ -49,22 +49,22 @@ struct SearchBarDemoView: View {
                 theme: searchBarTheme,
                 dismissConfiguration: .init(type: .back),
                 resultsView: {
-                    VStack(spacing: Primitives.Spacing.spacing16) {
+                    VStack(spacing: theme.sizing.spacingSpacingMd) {
                         if searchText.isEmpty {
                             Text.build(theme.font.body.medium("Type something to start searching"))
                         } else {
                             Text.build(theme.font.body.medium("Searching for:"))
                             Text.build(theme.font.body.small(searchText))
-                                .padding(.horizontal, Primitives.Spacing.spacing20)
+                                .padding(.horizontal, theme.sizing.spacingSpacingMd)
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Primitives.Colours.neutrals0)
+                    .background(theme.color.surfaceBackgroundPrimary)
                 }
             )
             .animation(.standard, value: searchBarTheme)
 
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                 Text.build(theme.font.body.small("Read-only Search Bar:"))
                 SearchBarEntryButton(
                     placeholder: placeholder,
@@ -78,7 +78,7 @@ struct SearchBarDemoView: View {
                     action: {}
                 )
             }
-            .padding(.horizontal, Primitives.Spacing.spacing12)
+            .padding(.horizontal, theme.sizing.spacingSpacingSm)
 
             VStack(alignment: .leading) {
                 Text.build(theme.font.body.small("Search Bar Theme:"))
@@ -91,7 +91,7 @@ struct SearchBarDemoView: View {
                 }
                 .pickerStyle(.segmented)
             }
-            .padding(Primitives.Spacing.spacing12)
+            .padding(theme.sizing.spacingSpacingSm)
         }
     }
 }

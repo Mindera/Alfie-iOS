@@ -4,54 +4,54 @@ import SwiftUI
 struct DividerDemoView: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
                 DemoHelper.demoSectionHeader(title: "Divider")
-                    .padding(.bottom, Primitives.Spacing.spacing32)
+                    .padding(.bottom, theme.sizing.spacingSpacingXl)
                 Text.build(theme.font.body.medium("Horizontal Thin"))
-                VStack(spacing: Primitives.Spacing.spacing0) {
+                VStack(spacing: theme.sizing.spacingSpacingNone) {
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(height: 20)
                     ThemedDivider.horizontalThin
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(height: 20)
                 }
-                .padding(.horizontal, -Primitives.Spacing.spacing16)
+                .padding(.horizontal, -theme.sizing.spacingSpacingMd)
                 Text.build(theme.font.body.medium("Horizontal Thick"))
-                VStack(spacing: Primitives.Spacing.spacing0) {
+                VStack(spacing: theme.sizing.spacingSpacingNone) {
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(height: 20)
                     ThemedDivider.horizontalThick
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(height: 20)
                 }
-                .padding(.horizontal, -Primitives.Spacing.spacing16)
+                .padding(.horizontal, -theme.sizing.spacingSpacingMd)
                 Text.build(theme.font.body.medium("Vertical Thin"))
-                HStack(spacing: Primitives.Spacing.spacing0) {
+                HStack(spacing: theme.sizing.spacingSpacingNone) {
                     Spacer()
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(width: 20, height: 80)
                     ThemedDivider.verticalThin
                         .frame(height: 80)
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(width: 20, height: 80)
                     Spacer()
                 }
                 Text.build(theme.font.body.medium("Vertical Thick"))
-                HStack(spacing: Primitives.Spacing.spacing0) {
+                HStack(spacing: theme.sizing.spacingSpacingNone) {
                     Spacer()
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(width: 20, height: 80)
                     ThemedDivider.verticalThick
                         .frame(height: 80)
                     Rectangle()
-                        .fill(Primitives.Colours.neutrals500)
+                        .fill(theme.color.contentContentTerciary)
                         .frame(width: 20, height: 80)
                     Spacer()
                 }
@@ -90,7 +90,7 @@ struct DividerDemoView: View {
                 }
                 Spacer()
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
     }
 }

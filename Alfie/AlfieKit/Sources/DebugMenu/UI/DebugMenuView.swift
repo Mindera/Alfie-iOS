@@ -19,7 +19,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         NavigationStack {
             VStack {
                 DemoHelper.demoHeader(title: "Debug Menu")
-                    .padding(.vertical, Primitives.Spacing.spacing4)
+                    .padding(.vertical, theme.sizing.spacingSpacing2xs)
                 Spacer()
                 List {
                     link(for: .catalogue, text: "Catalogue App")

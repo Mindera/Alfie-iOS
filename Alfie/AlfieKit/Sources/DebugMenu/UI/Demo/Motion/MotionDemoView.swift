@@ -35,7 +35,7 @@ struct MotionDemoView: View {
     @State private var showRectangle = false
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Motion")
 
             HStack {
@@ -50,7 +50,7 @@ struct MotionDemoView: View {
                     }
                 } label: {
                     Text.build(theme.font.body.small(motionType.rawValue))
-                        .tint(Primitives.Colours.neutrals400)
+                        .tint(theme.color.borderStrong)
                 }
             }
 
@@ -69,24 +69,24 @@ struct MotionDemoView: View {
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .leading))
-                        .foregroundStyle(Primitives.Colours.neutrals300)
+                        .foregroundStyle(theme.color.borderMedium)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .bottom))
-                        .foregroundStyle(Primitives.Colours.neutrals400)
+                        .foregroundStyle(theme.color.borderStrong)
 
                     Circle()
                         .cornerRadius(10)
                         .transition(circleTransition(from: .trailing))
-                        .foregroundStyle(Primitives.Colours.neutrals500)
+                        .foregroundStyle(theme.color.contentContentTerciary)
                 }
             }
-            .padding(Primitives.Spacing.spacing16)
+            .padding(theme.sizing.spacingSpacingMd)
             .frame(maxWidth: showRectangle ? .infinity : 0, maxHeight: showRectangle ? 300 : 0)
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
         .edgesIgnoringSafeArea(.bottom)
     }
 

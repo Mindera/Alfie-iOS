@@ -8,98 +8,41 @@ struct InputDemoView: View {
     @State private var textD: String = ""
     @State private var textE: String = ""
     @State private var isDisabled = false
-    @State private var isRequired = false
-    @State private var hasLimit = false
-    @State private var hasIcon = false
-    @State private var icon: Icon = .search
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
                 DemoHelper.demoSectionHeader(title: "Input Fields")
 
-                ThemedInput($textA, isDisabled: $isDisabled)
-                ThemedInput(
-                    $textB,
-                    title: "Title",
-                    placeholder: "E.g. John",
-                    isDisabled: $isDisabled,
-                    isRequired: $isRequired,
-                    icon: iconSelected
-                )
-                ThemedInput(
-                    $textC,
-                    title: "Title",
-                    status: .info("Must be at least 8 characters long and include 1 number."),
-                    limit: textLimit,
-                    isDisabled: $isDisabled,
-                    isRequired: $isRequired,
-                    icon: iconSelected
-                )
-                ThemedInput(
-                    $textD,
-                    title: "Title",
-                    status: .success("Must be at least 8 characters long and include 1 number."),
-                    limit: textLimit,
-                    isDisabled: $isDisabled,
-                    isRequired: $isRequired,
-                    icon: iconSelected
-                )
-                ThemedInput(
-                    $textE,
-                    title: "Title",
-                    status: .error("Must be at least 8 characters long and include 1 number."),
-                    limit: textLimit,
-                    isDisabled: $isDisabled,
-                    isRequired: $isRequired,
-                    icon: iconSelected
-                )
+                Group {
+                    TextInput(configuration: .init(text: $textA))
+                    TextInput(configuration: .init(text: $textB, label: "Title", placeholder: "E.g. John"))
+                    TextInput(
+                        configuration: .init(
+                            text: $textC,
+                            label: "Price",
+                            placeholder: "0",
+                            prefix: "£",
+                            keyboardType: .numberPad
+                        )
+                    )
+                    TextInput(
+                        configuration: .init(text: $textD, label: "Title", placeholder: "E.g. John", isError: true)
+                    )
+                    TextInput(
+                        configuration: .init(text: $textE, label: "Password", placeholder: "Password", isSecure: true)
+                    )
+                }
+                .disabled(isDisabled)
 
                 DemoHelper.demoSectionHeader(title: "Options")
-                    .padding(.top, Primitives.Spacing.spacing32)
+                    .padding(.top, theme.sizing.spacingSpacingXl)
 
                 ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.body.small("Disabled")) }
-                ThemedToggleView(isOn: $isRequired) { Text.build(theme.font.body.small("Required")) }
-                ThemedToggleView(isOn: $hasLimit) { Text.build(theme.font.body.small("Counter")) }
-                ThemedToggleView(isOn: $hasIcon) { Text.build(theme.font.body.small("Show Icon")) }
-                HStack {
-                    Text.build(theme.font.body.small("Icon"))
-                    Spacer()
-                    Menu {
-                        Picker(selection: $icon) {
-                            ForEach(Icon.allCases, id: \.self) { icon in
-                                Text(icon.rawValue)
-                                    .tag(icon)
-                            }
-                        } label: {
-                        }
-                    } label: {
-                        Text.build(theme.font.body.small(icon.rawValue))
-                            .tint(Primitives.Colours.neutrals400)
-                    }
-                }
-                .disabled(!hasIcon)
-                .padding(.bottom, Primitives.Spacing.spacing56)
+                    .padding(.bottom, theme.sizing.spacingSpacing2xl)
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
-        .onChange(of: hasLimit) { newValue in
-            guard newValue, let textLimit else {
-                return
-            }
-
-            textC = "\(textC.prefix(textLimit))"
-            textD = "\(textD.prefix(textLimit))"
-            textE = "\(textE.prefix(textLimit))"
-        }
-    }
-
-    private var textLimit: Int? {
-        hasLimit ? 30 : nil
-    }
-
-    private var iconSelected: Icon? {
-        hasIcon ? icon : nil
     }
 }
 
