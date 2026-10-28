@@ -90,8 +90,8 @@ custom_rules:
     severity: error
   no_primitive_tokens:
     name: No Primitive Tokens
-    excluded: "SharedUI/(Theme|GeneratedTokens)/"
-    message: "Style through `theme.color` / `theme.sizing` (ADR 0006). A role with no Semantic token keeps its primitive with `// swiftlint:disable:this no_primitive_tokens` and a design-review reference (docs/DesignTokens.md)."
+    excluded: 'SharedUI/(GeneratedTokens/|Theme/DesignSystem\.swift|Theme/Typography/)'
+    message: "Read Semantic tokens through `theme.color` / `theme.sizing` (ADR 0006). For a role with no Semantic token, see docs/DesignTokens.md §Primitive tokens."
     regex: \bPrimitives\.
     match_kinds:
       - identifier

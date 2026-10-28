@@ -84,10 +84,27 @@ same-name collision between the `sizing` and `.primitives` collections.
 - A new typography token is not reachable from the theme until its group struct in
   `SharedUI/Theme/Typography/Specifications/TypographyGroups.swift` (`TypographyBody`,
   `TypographyLabel`, …) gains a matching property by hand, as `mediumBold` did.
-- Colour: use the semantic `Theme.*` symbols, and reach for `Primitives.Colours.*` only when no
-  semantic token covers the value. Much of `SharedUI` and the Debug Menu still reads the raw
-  palette (#186), so copy the rule, not the neighbouring file.
+- Colour and sizing: read Semantic tokens through `theme.color.<token>` (the generated `Theme`)
+  and `theme.sizing.<token>` (the generated `Sizing`), per ADR 0006. Much of `SharedUI` and the
+  Debug Menu still reads `Primitives.*` (#186), so copy the rule, not the neighbouring file.
 - Type: `Text.build(theme.font.<group>.<size>(text))`. `Typography.*` is read only by the theme's
   own group structs.
-- Spacing and radius: no rule yet (#186) between `Sizing.*`, `theme.spacing.*` and
-  `Primitives.Spacing.*`; match the module you're in.
+- Spacing: `theme.spacing.*` stays until #186 lands its contract; new code prefers
+  `theme.sizing.spacing*`.
+
+## Primitive tokens
+
+The `no_primitive_tokens` SwiftLint rule (`Alfie/.swiftlint.yml`) flags any `Primitives.` read
+outside the theme layer (`SharedUI/Theme/DesignSystem.swift`, `SharedUI/Theme/Typography/`) and
+`SharedUI/GeneratedTokens/`. It is a **warning** for now (#186):
+`lint.sh` prints it without failing, while every other warning still fails the run.
+
+A role with no Semantic token keeps its primitive until design adds the token upstream in
+`Alfie-Mobile-Design-Tokens`; never invent one here. Allowlist that line, naming the design review
+item that tracks the gap:
+
+```swift
+.fill(Primitives.Colours.brand200) // swiftlint:disable:this no_primitive_tokens - design review #186: no highlight-surface token
+```
+
+Allowlist one line at a time (`disable:this` / `disable:next`), never a file or a block.
