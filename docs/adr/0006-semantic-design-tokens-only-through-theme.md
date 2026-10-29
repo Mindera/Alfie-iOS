@@ -24,7 +24,8 @@ generator pins one brand at compile time, so there is nothing to inject at runti
 - **Colour** maps by role, never by value. A small shift that results (n900 to n800 for primary
   text) is accepted as the design's intent.
 - **A role with no semantic token** keeps its primitive, on the lint allowlist, until design adds
-  the token upstream in `Alfie-Mobile-Design-Tokens`. Tokens are never invented here.
+  the token upstream in `Alfie-Mobile-Design-Tokens`. Tokens are never invented here. Open gaps
+  are tracked in [#235](https://github.com/Mindera/Alfie-iOS/issues/235).
 
 ## Considered options
 
