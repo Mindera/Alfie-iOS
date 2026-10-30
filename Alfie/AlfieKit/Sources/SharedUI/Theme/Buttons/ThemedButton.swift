@@ -52,25 +52,7 @@ public struct ThemedButton: View {
                 action()
             }
         } label: {
-            HStack(alignment: .center) {
-                if isFullWidth {
-                    Spacer()
-                }
-                Text.build(textFor(text))
-                    .padding(.horizontal, Constants.horizontalPadding)
-                    .padding(.vertical, Constants.verticalPadding)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                if isFullWidth {
-                    Spacer()
-                }
-            }
-        }
-        .disabled(isDisabled)
-        .accessibilityLabel(accessibilityLabel ?? text)
-        .accessibilityValue(isLoading ? L10n.Loading.title : "")
-        .buttonStyle(
-            ThemedButtonStyle(
+            ThemedButtonLabel(
                 style: style,
                 type: type,
                 isDisabled: isDisabled,
@@ -80,8 +62,26 @@ public struct ThemedButton: View {
                 cornerRadius: buttonCornerRadius,
                 iconSize: iconSize,
                 isIconOnly: text.isEmpty
-            )
-        )
+            ) {
+                HStack(alignment: .center) {
+                    if isFullWidth {
+                        Spacer()
+                    }
+                    Text.build(textFor(text))
+                        .padding(.horizontal, Constants.horizontalPadding)
+                        .padding(.vertical, Constants.verticalPadding)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                    if isFullWidth {
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .disabled(isDisabled)
+        .accessibilityLabel(accessibilityLabel ?? text)
+        .accessibilityValue(isLoading ? L10n.Loading.title : "")
+        .buttonStyle(.plain)
     }
 
     func textFor(_ text: String) -> AttributedString {
@@ -159,9 +159,9 @@ private enum Constants {
     static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
-// MARK: - ThemedButtonStyle
+// MARK: - ThemedButtonLabel
 
-private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
+private struct ThemedButtonLabel<Label: View>: View {
     let style: ButtonTheme
     let type: ButtonType
     let isDisabled: Bool
@@ -173,8 +173,9 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
     /// An empty label still occupies the stack and its default spacing, which makes an icon-only
     /// button wider than it is tall. Dropping it lets the button size to icon + padding.
     let isIconOnly: Bool
+    @ViewBuilder let label: Label
 
-    func makeBody(configuration: Self.Configuration) -> some View {
+    var body: some View {
         HStack(spacing: isIconOnly ? theme.sizing.spacingSpacingNone : nil) {
             if let leadingAsset {
                 leadingAsset.image
@@ -182,17 +183,17 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(textColor(configuration))
+                    .foregroundStyle(textColor)
             }
             if !isIconOnly {
-                configuration.label
+                label
                     .padding(.vertical, theme.sizing.spacingSpacingMd)
             }
             if let trailingAsset {
                 trailingAsset.image
                     .renderingMode(.template)
                     .resizable()
-                    .tint(textColor(configuration))
+                    .tint(textColor)
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
             }
@@ -200,44 +201,34 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
         .opacity(isLoading ? 0 : 1)
         .frame(height: type.height)
         .padding(.horizontal, theme.sizing.spacingSpacingXs)
-        .foregroundStyle(textColor(configuration))
-        .background(background(configuration))
+        .foregroundStyle(textColor)
+        .background(backgroundColor)
         .cornerRadius(cornerRadius)
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(borderColor(configuration), lineWidth: theme.sizing.borderBorderWeightDefault)
+                    .stroke(borderColor, lineWidth: theme.sizing.borderBorderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(background(configuration))
+                        .background(backgroundColor)
                         .cornerRadius(cornerRadius)
                 }
             }
         )
     }
 
-    private func background(_ configuration: Self.Configuration) -> Color {
-        let backgroundDisabledColor = style.spec.backgroundDisabledColor
-        let backgroundPressedColor = style.spec.backgroundPressedColor
-        let backgroundColor = style.spec.backgroundColor
-
-        return isDisabled ? backgroundDisabledColor : configuration.isPressed ? backgroundPressedColor : backgroundColor
+    private var backgroundColor: Color {
+        isDisabled ? style.spec.backgroundDisabledColor : style.spec.backgroundColor
     }
 
-    private func textColor(_ configuration: Self.Configuration) -> Color {
-        let textDisabledColor = style.spec.textDisabledColor
-        let textPressedColor = style.spec.textPressedColor
-
-        return isDisabled ? textDisabledColor : configuration.isPressed ? textPressedColor : style.spec.textColor
+    private var textColor: Color {
+        isDisabled ? style.spec.textDisabledColor : style.spec.textColor
     }
 
-    private func borderColor(_ configuration: Self.Configuration) -> Color {
-        let borderDisabledColor = style.spec.borderDisabledColor
-        let borderPressedColor = style.spec.borderPressedColor
-
-        return isDisabled ? borderDisabledColor : configuration.isPressed ? borderPressedColor : style.spec.borderColor
+    private var borderColor: Color {
+        isDisabled ? style.spec.borderDisabledColor : style.spec.borderColor
     }
 
     private var styleLoading: LoaderView.CircleStyle {
