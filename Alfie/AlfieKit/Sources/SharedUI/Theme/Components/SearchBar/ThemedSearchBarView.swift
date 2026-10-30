@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - ThemedSearchBarView
 
 public struct ThemedSearchBarView: View {
-    public enum Theme: CaseIterable {
+    public enum Style: CaseIterable, ThemeReading {
         case light
         case dark
         case soft
@@ -17,9 +17,9 @@ public struct ThemedSearchBarView: View {
                 .softMedium,
                 .softLarge,
                 .light:
-                Primitives.Colours.neutrals100
+                theme.color.surfaceForegroundPrimary
             case .dark:
-                Primitives.Colours.neutrals700
+                theme.color.surfaceForegroundInvertedPrimary
             }
         }
 
@@ -31,7 +31,7 @@ public struct ThemedSearchBarView: View {
                 .dark:
                 focusedBackgroundColor
             case .light:
-                Primitives.Colours.neutrals0
+                theme.color.surfaceBackgroundPrimary
             }
         }
 
@@ -39,11 +39,11 @@ public struct ThemedSearchBarView: View {
             switch self {
             case .soft,
                 .softMedium,
-                .softLarge:
-                Primitives.Colours.neutrals200
-            case .light:
-                Primitives.Colours.neutrals800
+                .softLarge,
+                .light:
+                theme.color.contentContentPrimary
             case .dark:
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no inverted focused border token
                 Primitives.Colours.neutrals400
             }
         }
@@ -56,7 +56,7 @@ public struct ThemedSearchBarView: View {
                     .dark:
                     .clear
             case .light:
-                Primitives.Colours.neutrals800
+                theme.color.contentContentPrimary
             }
         }
 
@@ -66,9 +66,9 @@ public struct ThemedSearchBarView: View {
                 .softMedium,
                 .softLarge,
                 .light:
-                Primitives.Colours.neutrals800
+                theme.color.contentContentPrimary
             case .dark:
-                Primitives.Colours.neutrals100
+                theme.color.contentContentInvertedPrimary
             }
         }
 
@@ -78,8 +78,9 @@ public struct ThemedSearchBarView: View {
                 .softMedium,
                 .softLarge,
                 .light:
-                Primitives.Colours.neutrals500
+                theme.color.contentContentTerciary
             case .dark:
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no dark placeholder token
                 Primitives.Colours.neutrals200
             }
         }
@@ -94,8 +95,9 @@ public struct ThemedSearchBarView: View {
                 .softMedium,
                 .softLarge,
                 .light:
-                Primitives.Colours.neutrals800
+                theme.color.contentContentPrimary
             case .dark:
+                // swiftlint:disable:next no_primitive_tokens - design review #186: no dark placeholder token
                 Primitives.Colours.neutrals200
             }
         }
@@ -118,11 +120,11 @@ public struct ThemedSearchBarView: View {
             switch self {
             case .soft,
                 .softMedium:
-                Sizing.radiusSoft
+                theme.sizing.radiusSoft
             case .light,
                 .dark,
                 .softLarge:
-                Sizing.radiusRounded
+                theme.sizing.radiusRounded
             }
         }
 
@@ -130,11 +132,11 @@ public struct ThemedSearchBarView: View {
             switch self {
             case .soft,
                 .softMedium:
-                Primitives.Spacing.spacing8
+                theme.sizing.spacingSpacingXs
             case .light,
                 .dark,
                 .softLarge:
-                Primitives.Spacing.spacing16
+                theme.sizing.spacingSpacingMd
             }
         }
         // swiftlint:enable vertical_whitespace_between_cases
@@ -176,7 +178,7 @@ public struct ThemedSearchBarView: View {
     private let defaultPlaceholder: String
     private let focusedPlaceholder: String
     private let dismissConfiguration: DismissConfiguration
-    private let theme: Theme
+    private let style: Style
     private let keyboardType: UIKeyboardType
     private let submitLabel: SubmitLabel
     private let autocorrectionDisabled: Bool
@@ -224,7 +226,7 @@ public struct ThemedSearchBarView: View {
         searchText: Binding<String>,
         placeholder: String,
         placeholderOnFocus: String? = nil,
-        theme: Theme,
+        style: Style,
         dismissConfiguration: DismissConfiguration,
         keyboardType: UIKeyboardType = .default,
         submitLabel: SubmitLabel = .done,
@@ -242,7 +244,7 @@ public struct ThemedSearchBarView: View {
         _text = State(initialValue: searchText.wrappedValue)
         defaultPlaceholder = placeholder
         focusedPlaceholder = placeholderOnFocus ?? defaultPlaceholder
-        self.theme = theme
+        self.style = style
         self.dismissConfiguration = dismissConfiguration
         self.keyboardType = keyboardType
         self.submitLabel = submitLabel
@@ -268,7 +270,7 @@ public struct ThemedSearchBarView: View {
                 cancelButton
             }
 
-            HStack(spacing: iconLayout.hasTrailingAccessory ? theme.horizontalContentPadding : 0) {
+            HStack(spacing: iconLayout.hasTrailingAccessory ? style.horizontalContentPadding : 0) {
                 if iconLayout.hasTrailingAccessory {
                     magnifyingGlassIcon
                 }
@@ -278,11 +280,11 @@ public struct ThemedSearchBarView: View {
                     text: $text,
                     prompt: Text(currentPlaceholder)
                         .font(Font(theme.font.body.medium.uiFont))
-                        .foregroundColor(theme.placeholderColor)
+                        .foregroundColor(style.placeholderColor)
                 )
                 .focused($isFocused)
-                .tint(theme.cursorColor)
-                .foregroundStyle(theme.searchTermColor)
+                .tint(style.cursorColor)
+                .foregroundStyle(style.searchTermColor)
                 .keyboardType(keyboardType)
                 .submitLabel(submitLabel)
                 .font(Font(theme.font.body.medium.uiFont))
@@ -325,18 +327,18 @@ public struct ThemedSearchBarView: View {
 
                 trailingAccessory
             }
-            .padding(.horizontal, theme.horizontalContentPadding)
-            .padding(.vertical, Primitives.Spacing.spacing16)
-            .frame(height: theme.searchBarHeight)
+            .padding(.horizontal, style.horizontalContentPadding)
+            .padding(.vertical, theme.sizing.spacingSpacingMd)
+            .frame(height: style.searchBarHeight)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: theme.cornerRadius)
-                        .fill(isFocused ? theme.focusedBackgroundColor : theme.unfocusedBackgroundColor)
+                    RoundedRectangle(cornerRadius: style.cornerRadius)
+                        .fill(isFocused ? style.focusedBackgroundColor : style.unfocusedBackgroundColor)
 
-                    RoundedRectangle(cornerRadius: theme.cornerRadius)
+                    RoundedRectangle(cornerRadius: style.cornerRadius)
                         .inset(by: Constants.borderLineWidth)
                         .stroke(
-                            isFocused ? theme.focusedBorderColor : theme.unfocusedBorderColor,
+                            isFocused ? style.focusedBorderColor : style.unfocusedBorderColor,
                             lineWidth: Constants.borderLineWidth
                         )
                         .padding(-Constants.borderLineWidth)
@@ -348,7 +350,7 @@ public struct ThemedSearchBarView: View {
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
-        .frame(height: theme.searchBarHeight)
+        .frame(height: style.searchBarHeight)
         .animation(.standardDecelerate, value: isCancelButtonVisible)
         .animation(.emphasizedAccelerate, value: isClearButtonVisible)
     }
@@ -373,12 +375,9 @@ public struct ThemedSearchBarView: View {
     /// The clear button always overlays the text. The magnifying glass only joins it here under
     /// ``IconLayout/magnifierOnly`` — otherwise it has already been placed at the leading edge.
     /// Matches the bar's own magnifying glass, so the pair bracketing the text reads as one set.
-    ///
-    /// `SharedUI.Theme` spelled out because ``ThemedSearchBarView/Theme`` — the bar's own set of
-    /// looks — shadows the design-token namespace inside this type.
     @ViewBuilder private var trailingAccessory: some View {
         if iconLayout.hasTrailingAccessory {
-            ThemedIcon(.scanBarcode, size: .small, tint: SharedUI.Theme.contentContentPrimary)
+            ThemedIcon(.scanBarcode, size: .small, tint: theme.color.contentContentPrimary)
         }
     }
 
@@ -396,7 +395,7 @@ public struct ThemedSearchBarView: View {
             .resizable()
             .scaledToFit()
             .frame(width: Constants.trailingIconSize, height: Constants.trailingIconSize)
-            .foregroundStyle(theme.iconColor)
+            .foregroundStyle(style.iconColor)
             .transition(.scale(scale: 0, anchor: .trailing))
     }
 
@@ -417,7 +416,7 @@ public struct ThemedSearchBarView: View {
                 dismissBlock()
             } label: {
                 Text.build(theme.font.body.small(title))
-                    .foregroundStyle(Primitives.Colours.neutrals800)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                     .accessibilityIdentifier(dismissConfiguration.accessibilityId)
             }
 
@@ -456,7 +455,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .soft,
+            style: .soft,
             dismissConfiguration: .init(type: .back)
         )
         .padding()
@@ -468,7 +467,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .softLarge,
+            style: .softLarge,
             dismissConfiguration: .init(type: .cancel(title: "Cancel"))
         )
         .padding()
@@ -480,7 +479,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .light,
+            style: .light,
             dismissConfiguration: .init(type: .back)
         )
         .padding()
@@ -492,7 +491,7 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             searchText: .constant(""),
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
-            theme: .dark,
+            style: .dark,
             dismissConfiguration: .init(type: .back)
         )
         .padding()

@@ -43,32 +43,32 @@ private struct BagLineContent: View {
     let line: CartLine
 
     var body: some View {
-        HStack(alignment: .top, spacing: Sizing.spacingSpacingXs) {
+        HStack(alignment: .top, spacing: theme.sizing.spacingSpacingXs) {
             BagLineImage(url: line.imageURL, altText: line.imageAltText)
-            VStack(alignment: .leading, spacing: Sizing.spacingSpacingXs) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                 if let name = line.name {
                     Text.build(theme.font.body.medium(name))
                         .lineLimit(Constants.nameLineLimit)
                 }
                 Spacer(minLength: 0)
                 ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .firstTextBaseline, spacing: Sizing.spacingSpacingXs) {
+                    HStack(alignment: .firstTextBaseline, spacing: theme.sizing.spacingSpacingXs) {
                         quantity
                         Spacer(minLength: 0)
                         lineTotal
                     }
-                    VStack(alignment: .leading, spacing: Sizing.spacingSpacingXs) {
+                    VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                         quantity
                         lineTotal
                     }
                 }
-                .padding(.vertical, Sizing.spacingSpacing2xs)
+                .padding(.vertical, theme.sizing.spacingSpacing2xs)
             }
-            .foregroundStyle(Theme.contentContentPrimary)
+            .foregroundStyle(theme.color.contentContentPrimary)
             .frame(minHeight: BagLineRow.minHeight)
         }
         .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal, Sizing.spacingSpacingMd)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private var quantity: some View {
@@ -85,7 +85,7 @@ private struct BagLineImage: View {
     let altText: String?
 
     var body: some View {
-        Theme.surfaceForegroundPrimary
+        theme.color.surfaceForegroundPrimary
             .frame(width: Constants.imageSize.width, height: Constants.imageSize.height)
             .overlay {
                 if let url {

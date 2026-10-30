@@ -6,9 +6,9 @@ struct BagPurchaseSummary: View {
     let total: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Sizing.spacingSpacingXs) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .firstTextBaseline, spacing: Sizing.spacingSpacingXs) {
+                HStack(alignment: .firstTextBaseline, spacing: theme.sizing.spacingSpacingXs) {
                     Text.build(theme.font.body.mediumBold(L10n.Bag.Total.title))
                     Spacer(minLength: 0)
                     Text.build(theme.font.body.mediumBold(total))
@@ -23,10 +23,10 @@ struct BagPurchaseSummary: View {
             ThemedButton(text: L10n.Bag.Continue.cta, isFullWidth: true) {}
                 .accessibilityIdentifier(AccessibilityID.Bag.continueButton)
         }
-        .foregroundStyle(Theme.contentContentPrimary)
-        .padding(.vertical, Sizing.spacingSpacingXs)
-        .padding(.horizontal, Sizing.spacingSpacingMd)
-        .background(Theme.surfaceBackgroundPrimary)
+        .foregroundStyle(theme.color.contentContentPrimary)
+        .padding(.vertical, theme.sizing.spacingSpacingXs)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
+        .background(theme.color.surfaceBackgroundPrimary)
         .overlay(alignment: .top) {
             BagDivider()
         }

@@ -17,7 +17,7 @@ public struct TabControl: View {
         }
     }
 
-    public enum Theme: CaseIterable {
+    public enum Style: CaseIterable, ThemeReading {
         case light
         case dark
 
@@ -25,9 +25,9 @@ public struct TabControl: View {
         var outerLineColor: Color {
             switch self {
             case .light:
-                return Primitives.Colours.neutrals200
+                return theme.color.borderSoft
             case .dark:
-                return Primitives.Colours.neutrals800
+                return theme.color.contentContentPrimary
             }
         }
         // swiftlint:enable vertical_whitespace_between_cases
@@ -35,9 +35,9 @@ public struct TabControl: View {
 
     public enum Configuration {
         /// Left aligned, scrollable
-        case intrisicSize(itemSpacing: CGFloat = Primitives.Spacing.spacing16)
+        case intrisicSize(itemSpacing: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd)
         /// Center aligned, non-scrollable
-        case fixedSize(horizontalMargins: CGFloat = Primitives.Spacing.spacing0)
+        case fixedSize(horizontalMargins: CGFloat = DesignSystem.shared.sizing.spacingSpacingNone)
 
         // swiftlint:disable vertical_whitespace_between_cases
         var itemSpacing: CGFloat {
@@ -45,7 +45,7 @@ public struct TabControl: View {
             case .intrisicSize(let itemSpacing):
                 itemSpacing
             case .fixedSize:
-                Primitives.Spacing.spacing0
+                DesignSystem.shared.sizing.spacingSpacingNone
             }
         }
 
@@ -65,28 +65,25 @@ public struct TabControl: View {
         static let innerLineHeight: CGFloat = 2
         static let itemHeight: CGFloat = 44
         static let imageSize: CGFloat = 16
-        static let innerLineColor = Primitives.Colours.neutrals100
-        static let selectedItemFontColor = Primitives.Colours.neutrals800
-        static let unselectedItemFontColor = Primitives.Colours.neutrals500
         static let matchedGeometryEffectID = "tabControl_underline"
     }
 
     private let options: [TabOption]
-    private let theme: Theme
+    private let style: Style
     private let configuration: Configuration
     @Binding private var currentIndex: Int
     @Namespace private var namespace
 
-    public init(theme: Theme, configuration: Configuration, options: [TabOption], currentIndex: Binding<Int>) {
-        self.theme = theme
+    public init(style: Style, configuration: Configuration, options: [TabOption], currentIndex: Binding<Int>) {
+        self.style = style
         self.configuration = configuration
         self.options = options
         self._currentIndex = currentIndex
     }
 
-    public init(theme: Theme, configuration: Configuration, options: [String], currentIndex: Binding<Int>) {
+    public init(style: Style, configuration: Configuration, options: [String], currentIndex: Binding<Int>) {
         self.init(
-            theme: theme,
+            style: style,
             configuration: configuration,
             options: options.map { TabOption(title: $0) },
             currentIndex: currentIndex
@@ -120,7 +117,7 @@ public struct TabControl: View {
     private var tabControlItemsView: some View {
         HStack(alignment: .center, spacing: configuration.itemSpacing) {
             if !configuration.isIntrisicSize {
-                Spacer(minLength: Primitives.Spacing.spacing0)
+                Spacer(minLength: theme.sizing.spacingSpacingNone)
             }
             ForEach(Array(options.enumerated()), id: \.0) { index, value in
                 Button {
@@ -139,25 +136,25 @@ public struct TabControl: View {
                             .lineLimit(1)
                     }
                     .foregroundStyle(
-                        currentIndex == index ? Constants.selectedItemFontColor : Constants.unselectedItemFontColor
+                        currentIndex == index ? theme.color.contentContentPrimary : theme.color.contentContentTerciary
                     )
                     .overlay {
                         if currentIndex == index {
-                            VStack(spacing: Primitives.Spacing.spacing0) {
+                            VStack(spacing: theme.sizing.spacingSpacingNone) {
                                 Spacer()
                                 ThemedDivider(
                                     configuration: .init(
                                         orientation: .horizontal,
                                         thickness: Constants.outerLineHeight,
-                                        color: theme.outerLineColor
+                                        color: style.outerLineColor
                                     )
                                 )
-                                .cornerRadius(Sizing.radiusSoft)
+                                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                                 ThemedDivider(
                                     configuration: .init(
                                         orientation: .horizontal,
                                         thickness: Constants.outerLineHeight / 2,
-                                        color: theme.outerLineColor
+                                        color: style.outerLineColor
                                     )
                                 )
                                 .padding(.top, -Constants.outerLineHeight / 2)
@@ -179,9 +176,9 @@ public struct TabControl: View {
                 )
             }
 
-            Spacer(minLength: Primitives.Spacing.spacing0)
+            Spacer(minLength: theme.sizing.spacingSpacingNone)
         }
-        .padding(.vertical, Primitives.Spacing.spacing16)
+        .padding(.vertical, theme.sizing.spacingSpacingMd)
         .padding(.horizontal, configuration.itemSpacing)
         .background {
             VStack {
@@ -190,7 +187,7 @@ public struct TabControl: View {
                     configuration: .init(
                         orientation: .horizontal,
                         thickness: Constants.innerLineHeight,
-                        color: Constants.innerLineColor
+                        color: theme.color.borderSoft
                     )
                 )
             }
@@ -222,8 +219,8 @@ private enum AccessibilityId {
 
 #Preview("Intrinsic Size") {
     TabControl(
-        theme: .light,
-        configuration: .intrisicSize(itemSpacing: Primitives.Spacing.spacing16),
+        style: .light,
+        configuration: .intrisicSize(itemSpacing: DesignSystem.shared.sizing.spacingSpacingMd),
         options: ["Option1", "Option2", "Option3"],
         currentIndex: .constant(0)
     )
@@ -231,8 +228,8 @@ private enum AccessibilityId {
 
 #Preview("Fixed Size") {
     TabControl(
-        theme: .dark,
-        configuration: .fixedSize(horizontalMargins: Primitives.Spacing.spacing8),
+        style: .dark,
+        configuration: .fixedSize(horizontalMargins: DesignSystem.shared.sizing.spacingSpacingXs),
         options: ["Option1", "Option2", "Option3"],
         currentIndex: .constant(0)
     )

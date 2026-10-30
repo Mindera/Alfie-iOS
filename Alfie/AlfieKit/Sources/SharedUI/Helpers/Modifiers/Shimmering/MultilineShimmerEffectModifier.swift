@@ -32,8 +32,8 @@ struct MultilineShimmerEffectModifier: ViewModifier {
         self._shouldShowShimmer = State(initialValue: isLoading.wrappedValue)
         self.cornerRadius = cornerRadius
         self.blurRadius = blurRadius
-        self.lighterShimmerColor = customLighterShimmerColor ?? Primitives.Colours.neutrals200
-        self.darkerShimmerColor = customDarkerShimmerColor ?? Primitives.Colours.neutrals400
+        self.lighterShimmerColor = customLighterShimmerColor ?? DesignSystem.shared.color.borderSoft
+        self.darkerShimmerColor = customDarkerShimmerColor ?? DesignSystem.shared.color.borderStrong
         self.lines = lines > 0 ? Array(0..<lines) : []
         self.font = font
         self.lineSpacing = lineSpacing
@@ -79,5 +79,5 @@ struct MultilineShimmerEffectModifier: ViewModifier {
         DesignSystem.shared.font.body.small(Array(repeating: "Hello, world!", count: 24).joined(separator: " "))
     )
     .shimmeringMultiline(while: .constant(true), lines: 8, font: DesignSystem.shared.font.body.small.uiFont)
-    .padding(.horizontal, Primitives.Spacing.spacing24)
+    .padding(.horizontal, DesignSystem.shared.sizing.spacingSpacingLg)
 })

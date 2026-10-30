@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ShadowDemoView: View {
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Elevation")
             HStack {
                 Spacer()
@@ -18,7 +18,7 @@ struct ShadowDemoView: View {
                 shadowView(label: "5", type: .elevation5)
                 Spacer()
             }
-            .padding(.bottom, Primitives.Spacing.spacing32)
+            .padding(.bottom, theme.sizing.spacingSpacingXl)
             DemoHelper.demoSectionHeader(title: "Shadow Medium Float")
             HStack {
                 Spacer()
@@ -33,7 +33,7 @@ struct ShadowDemoView: View {
                 shadowView(label: "5", type: .mediumFloat5)
                 Spacer()
             }
-            .padding(.bottom, Primitives.Spacing.spacing32)
+            .padding(.bottom, theme.sizing.spacingSpacingXl)
             DemoHelper.demoSectionHeader(title: "Shadow Soft Float")
             HStack {
                 Spacer()
@@ -50,18 +50,18 @@ struct ShadowDemoView: View {
             }
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private func shadowView(label: String, type: ShadowViewModifier.ShadowType) -> some View {
         VStack {
             Rectangle()
-                .fill(Primitives.Colours.neutrals0)
+                .fill(theme.color.surfaceBackgroundPrimary)
                 .frame(width: 50, height: 50)
-                .cornerRadius(Sizing.radiusSoft)
+                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                 .shadow(type)
             Text.build(theme.font.body.small(label))
-                .foregroundStyle(Primitives.Colours.neutrals500)
+                .foregroundStyle(theme.color.contentContentTerciary)
         }
     }
 }

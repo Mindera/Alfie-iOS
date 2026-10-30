@@ -13,7 +13,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         let horizontalPadding: CGFloat
         let verticalPadding: CGFloat
 
-        public init(horizontalPadding: CGFloat, verticalPadding: CGFloat = Primitives.Spacing.spacing20) {
+        public init(horizontalPadding: CGFloat, verticalPadding: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd) {
             self.horizontalPadding = horizontalPadding
             self.verticalPadding = verticalPadding
         }
@@ -39,13 +39,13 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             ScrollView(.horizontal, showsIndicators: false) {
                 content()
                     .padding(.horizontal, scrollViewConfiguration.horizontalPadding)
                     .background(GeometryReader { proxy in
                         GeometryReader { proxy in
-                            Primitives.Colours.transparentTransparent.preference(
+                            Color.clear.preference(
                                 key: ScrollViewOffsetPreferenceKey.self,
                                 value: proxy.frame(in: .named(coordinateSpace)).origin
                             )
@@ -94,17 +94,17 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         Text("No scrollable area - hidden ProgressBar")
 
         ProgressableHorizontalScrollView(
-            scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
+            scrollViewConfiguration: .init(horizontalPadding: DesignSystem.shared.sizing.spacingSpacingMd),
             progressBarConfiguration: .init(
-                horizontalPadding: Primitives.Spacing.spacing80,
-                verticalPadding: Primitives.Spacing.spacing32
+                horizontalPadding: DesignSystem.shared.sizing.spacingSpacing2xl,
+                verticalPadding: DesignSystem.shared.sizing.spacingSpacingXl
             )
         ) {
             HStack {
                 ForEach(1...3, id: \.self) { index in
                     Rectangle()
-                        .foregroundStyle(Primitives.Colours.neutrals400)
-                        .cornerRadius(Sizing.radiusStrong)
+                        .foregroundStyle(DesignSystem.shared.color.borderStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignSystem.shared.sizing.radiusStrong))
                         .frame(width: 110, height: 300)
                         .overlay {
                             Text("\(index)")
@@ -116,17 +116,17 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         Text("Scrollable area - visible ProgressBar")
 
         ProgressableHorizontalScrollView(
-            scrollViewConfiguration: .init(horizontalPadding: Primitives.Spacing.spacing16),
+            scrollViewConfiguration: .init(horizontalPadding: DesignSystem.shared.sizing.spacingSpacingMd),
             progressBarConfiguration: .init(
-                horizontalPadding: Primitives.Spacing.spacing80,
-                verticalPadding: Primitives.Spacing.spacing32
+                horizontalPadding: DesignSystem.shared.sizing.spacingSpacing2xl,
+                verticalPadding: DesignSystem.shared.sizing.spacingSpacingXl
             )
         ) {
             HStack {
                 ForEach(1...10, id: \.self) { index in
                     Rectangle()
-                        .foregroundStyle(Primitives.Colours.neutrals400)
-                        .cornerRadius(Sizing.radiusStrong)
+                        .foregroundStyle(DesignSystem.shared.color.borderStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignSystem.shared.sizing.radiusStrong))
                         .frame(width: 200, height: 300)
                         .overlay {
                             Text("\(index)")

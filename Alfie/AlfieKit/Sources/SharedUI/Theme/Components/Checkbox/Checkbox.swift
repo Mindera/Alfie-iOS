@@ -74,7 +74,7 @@ public struct Checkbox: View {
     }
 
     public var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing12) {
+        HStack(spacing: theme.sizing.spacingSpacingSm) {
             state.correspondingIcon.image
                 .resizable()
                 .scaledToFit()
@@ -82,7 +82,11 @@ public struct Checkbox: View {
 
             Text.build(theme.font.body.medium(text))
         }
-        .foregroundStyle(state.isDisabled ? Primitives.Colours.neutrals500 : Primitives.Colours.neutrals800)
+        .foregroundStyle(
+            state.isDisabled
+                ? theme.color.contentContentPrimaryDisabled
+                : theme.color.contentContentPrimary
+        )
         .onTapGesture {
             playAppropriateHaptics()
             state.toggleIfEnabled()

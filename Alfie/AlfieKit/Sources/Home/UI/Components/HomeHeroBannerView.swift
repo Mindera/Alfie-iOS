@@ -41,7 +41,7 @@ struct HomeHeroBannerView: View {
             .overlay {
                 LinearGradient(
                     stops: [
-                        .init(color: Theme.contentContentPrimary.opacity(Constants.scrimOpacity), location: 0),
+                        .init(color: theme.color.contentContentPrimary.opacity(Constants.scrimOpacity), location: 0),
                         .init(color: .clear, location: Constants.scrimEndLocation),
                     ],
                     startPoint: .bottom,
@@ -53,13 +53,13 @@ struct HomeHeroBannerView: View {
     }
 
     private var overlayContent: some View {
-        VStack(alignment: .leading, spacing: theme.spacing.space300) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingLg) {
             Text.build(theme.font.display.medium(banner.title))
-                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .multilineTextAlignment(.leading)
 
             if pageCount > 1 {
-                HStack(spacing: theme.spacing.space100) {
+                HStack(spacing: theme.sizing.spacingSpacingXs) {
                     ForEach(0..<pageCount, id: \.self) { index in
                         pageDot(isSelected: index == currentIndex)
                     }
@@ -67,7 +67,7 @@ struct HomeHeroBannerView: View {
                 .accessibilityHidden(true) // Decorative page indicator; paging is exposed via the TabView.
             }
         }
-        .padding(theme.spacing.space200)
+        .padding(theme.sizing.spacingSpacingMd)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -75,11 +75,11 @@ struct HomeHeroBannerView: View {
     private func pageDot(isSelected: Bool) -> some View {
         if isSelected {
             Capsule()
-                .fill(Theme.contentContentInvertedPrimary)
+                .fill(theme.color.contentContentInvertedPrimary)
                 .frame(width: Constants.activeDotSize.width, height: Constants.activeDotSize.height)
         } else {
             Circle()
-                .fill(Theme.contentContentInvertedPrimary.opacity(Constants.inactiveDotOpacity))
+                .fill(theme.color.contentContentInvertedPrimary.opacity(Constants.inactiveDotOpacity))
                 .frame(width: Constants.inactiveDotDiameter, height: Constants.inactiveDotDiameter)
         }
     }

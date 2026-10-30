@@ -33,7 +33,7 @@ public struct ThemedToolbarButton: View {
     public init(
         icon: Icon?,
         text: String? = nil,
-        tint: Color = Primitives.Colours.neutrals800,
+        tint: Color = DesignSystem.shared.color.contentContentPrimary,
         isDisabled: Binding<Bool> = .constant(false),
         isLoading: Binding<Bool> = .constant(false),
         badgeValue: Binding<Int?> = .constant(nil),

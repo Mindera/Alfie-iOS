@@ -16,7 +16,7 @@ public struct ThemedLoaderView: View {
 	}
 
 	public var body: some View {
-		VStack(spacing: Primitives.Spacing.spacing12) {
+		VStack(spacing: theme.sizing.spacingSpacingSm) {
 			if let url = Bundle.module.url(forResource: Constants.logoFileName, withExtension: "gif") {
                 AnimatedGifImage(
                     url: url,
@@ -28,7 +28,7 @@ public struct ThemedLoaderView: View {
 
 			if !labelHidden {
 				Text.build(theme.font.body.medium(labelTitle))
-					.foregroundStyle(Primitives.Colours.neutrals900)
+					.foregroundStyle(theme.color.contentContentPrimary)
 			}
 		}
 	}

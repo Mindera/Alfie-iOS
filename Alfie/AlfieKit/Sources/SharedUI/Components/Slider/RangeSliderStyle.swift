@@ -145,10 +145,10 @@ struct RangeSliderStyle {
 
     // MARK: - Colours
 
-    var trackColor: Color { Theme.borderSoft }
-    var activeTrackColor: Color { Theme.contentContentPrimary }
-    var thumbFillColor: Color { Theme.surfaceBackgroundPrimary }
-    var thumbBorderColor: Color { Theme.contentContentPrimary }
+    var trackColor: Color { DesignSystem.shared.color.borderSoft }
+    var activeTrackColor: Color { DesignSystem.shared.color.contentContentPrimary }
+    var thumbFillColor: Color { DesignSystem.shared.color.surfaceBackgroundPrimary }
+    var thumbBorderColor: Color { DesignSystem.shared.color.contentContentPrimary }
 
     // MARK: - Dimensions
 

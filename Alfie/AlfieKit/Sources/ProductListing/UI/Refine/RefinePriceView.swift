@@ -13,7 +13,7 @@ struct RefinePriceView<ViewModel: RefineViewModelProtocol>: View {
     let bounds: PriceFilterBounds
 
     var body: some View {
-        VStack(alignment: .leading, spacing: theme.spacing.space300) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingLg) {
             RangeSlider(
                 configuration: .init(
                     bounds: bounds.range,
@@ -39,14 +39,14 @@ struct RefinePriceView<ViewModel: RefineViewModelProtocol>: View {
 
             if viewModel.isPriceRangeInvalid {
                 Text.build(theme.font.body.small(L10n.Plp.Refine.Price.InvalidRange.message))
-                    .foregroundStyle(Theme.contentContentNegative)
+                    .foregroundStyle(theme.color.contentContentNegative)
                     .accessibilityIdentifier(AccessibilityID.ProductListing.refinePriceError)
             }
 
             Spacer()
         }
-        .padding(.horizontal, theme.spacing.space200)
-        .padding(.top, theme.spacing.space300)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
+        .padding(.top, theme.sizing.spacingSpacingLg)
         // `.numberPad` has no return key, so without these the keyboard covers the slider the user
         // is trying to set with no way to dismiss it.
         .contentShape(Rectangle())

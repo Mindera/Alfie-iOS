@@ -1,127 +1,90 @@
-import Foundation
 import SharedUI
 import SwiftUI
 
 struct ColorsDemoView: View {
+    private typealias Token = (name: String, color: Color)
+
+    private var groups: [(title: String, tokens: [Token])] {
+        [
+            ("Content", [
+                ("contentContentPrimary", theme.color.contentContentPrimary),
+                ("contentContentSecondary", theme.color.contentContentSecondary),
+                ("contentContentTerciary", theme.color.contentContentTerciary),
+                ("contentContentPrimaryDisabled", theme.color.contentContentPrimaryDisabled),
+                ("contentContentPrimaryActive", theme.color.contentContentPrimaryActive),
+                ("contentContentInvertedPrimary", theme.color.contentContentInvertedPrimary),
+                ("contentContentInvertedPrimarydisabled", theme.color.contentContentInvertedPrimarydisabled),
+                ("contentContentPositive", theme.color.contentContentPositive),
+                ("contentContentNegative", theme.color.contentContentNegative),
+            ]),
+            ("Surface", [
+                ("surfaceBackgroundPrimary", theme.color.surfaceBackgroundPrimary),
+                ("surfaceBackgroundPrimaryActive", theme.color.surfaceBackgroundPrimaryActive),
+                ("surfaceBackgroundTerciary", theme.color.surfaceBackgroundTerciary),
+                ("surfaceBackgroundInvertedPrimary", theme.color.surfaceBackgroundInvertedPrimary),
+                ("surfaceForegroundPrimary", theme.color.surfaceForegroundPrimary),
+                ("surfaceForegroundInvertedPrimary", theme.color.surfaceForegroundInvertedPrimary),
+                ("surfaceBackgroundPositive", theme.color.surfaceBackgroundPositive),
+                ("surfaceBackgroundNegative", theme.color.surfaceBackgroundNegative),
+                ("surfaceBackgroundDestructive", theme.color.surfaceBackgroundDestructive),
+            ]),
+            ("Border", [
+                ("borderSoft", theme.color.borderSoft),
+                ("borderMedium", theme.color.borderMedium),
+                ("borderStrong", theme.color.borderStrong),
+            ]),
+            ("Link", [
+                ("linkLinkPrimaryDefault", theme.color.linkLinkPrimaryDefault),
+                ("linkLinkPrimaryDisabled", theme.color.linkLinkPrimaryDisabled),
+                ("linkLinkPrimaryInvertedDefault", theme.color.linkLinkPrimaryInvertedDefault),
+                ("linkLinkPrimaryInvertedDisabled", theme.color.linkLinkPrimaryInvertedDisabled),
+            ]),
+            ("Button", [
+                ("buttonPrimaryBackgroundPrimaryDefault", theme.color.buttonPrimaryBackgroundPrimaryDefault),
+                ("buttonPrimaryContentPrimaryDefault", theme.color.buttonPrimaryContentPrimaryDefault),
+                ("buttonSecondaryStrokeSecondaryDefault", theme.color.buttonSecondaryStrokeSecondaryDefault),
+                ("buttonSecondaryContentSecondaryDefault", theme.color.buttonSecondaryContentSecondaryDefault),
+                ("buttonTerciaryContentTerciaryDefault", theme.color.buttonTerciaryContentTerciaryDefault),
+                (
+                    "buttonDestructiveBackgroundDestructiveDefault",
+                    theme.color.buttonDestructiveBackgroundDestructiveDefault
+                ),
+                ("buttonDestructiveContentDestructiveDefault", theme.color.buttonDestructiveContentDestructiveDefault),
+                ("buttonPrimaryBackgroundPrimaryDisabled", theme.color.buttonPrimaryBackgroundPrimaryDisabled),
+                ("buttonPrimaryContentPrimaryDisabled", theme.color.buttonPrimaryContentPrimaryDisabled),
+            ]),
+        ]
+    }
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
-                DemoHelper.demoSectionHeader(title: "Color Palette - Primary")
-
-                primaryColorView
-
-                Spacer()
-                    .padding(.vertical, 10)
-
-                DemoHelper.demoSectionHeader(title: "Color Palette - Secondary")
-
-                secondaryColorView
-            }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-        }
-    }
-
-    var primaryColorView: some View {
-        VStack {
-            paletteView(with: "B&W", colors: [
-                Primitives.Colours.neutrals900,
-                Primitives.Colours.neutrals0,
-            ])
-
-            paletteView(with: "Mono", colors: [
-                Primitives.Colours.neutrals800,
-                Primitives.Colours.neutrals700,
-                Primitives.Colours.neutrals600,
-                Primitives.Colours.neutrals500,
-                Primitives.Colours.neutrals400,
-                Primitives.Colours.neutrals300,
-                Primitives.Colours.neutrals200,
-                Primitives.Colours.neutrals100,
-            ])
-        }
-    }
-
-    var secondaryColorView: some View {
-        VStack {
-            paletteView(with: "Green", colors: [
-                Primitives.Colours.semanticSuccess800,
-                Primitives.Colours.semanticSuccess700,
-                Primitives.Colours.semanticSuccess600,
-                Primitives.Colours.semanticSuccess500,
-                Primitives.Colours.semanticSuccess400,
-                Primitives.Colours.semanticSuccess300,
-                Primitives.Colours.semanticSuccess200,
-                Primitives.Colours.semanticSuccess100,
-            ])
-
-            paletteView(with: "Red", colors: [
-                Primitives.Colours.semanticError800,
-                Primitives.Colours.semanticError700,
-                Primitives.Colours.semanticError600,
-                Primitives.Colours.semanticError500,
-                Primitives.Colours.semanticError400,
-                Primitives.Colours.semanticError300,
-                Primitives.Colours.semanticError200,
-                Primitives.Colours.semanticError100,
-            ])
-        }
-    }
-
-    func paletteView(with name: String, colors: [Color]) -> some View {
-        VStack(alignment: .leading) {
-            Text.build(theme.font.body.small(name))
-                .foregroundStyle(colors.first ?? Primitives.Colours.neutrals900)
-            ScrollView(.horizontal) {
-                HStack(spacing: Primitives.Spacing.spacing0) {
-                    ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
-                        colorView(with: color)
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
+                ForEach(groups, id: \.title) { group in
+                    DemoHelper.demoSectionHeader(title: group.title)
+                    ForEach(group.tokens, id: \.name) { token in
+                        colorRow(token)
                     }
                 }
-                .padding(.bottom, 16)
             }
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
     }
 
-    func colorView(with color: Color) -> some View {
-        VStack {
-            Rectangle()
-                .fill(color)
-                .frame(width: 64, height: 64)
-            Text.build(theme.font.body.small(color.name ?? "-"))
-                .foregroundStyle(Primitives.Colours.neutrals500)
+    private func colorRow(_ token: Token) -> some View {
+        HStack(spacing: theme.sizing.spacingSpacingSm) {
+            RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
+                .fill(token.color)
+                .overlay {
+                    RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
+                        .stroke(theme.color.borderSoft, lineWidth: theme.sizing.borderBorderWeightDefault)
+                }
+                .frame(width: theme.sizing.iconsIconXlarge, height: theme.sizing.iconsIconXlarge)
+            Text.build(theme.font.body.small("theme.color.\(token.name)"))
+                .foregroundStyle(theme.color.contentContentPrimary)
         }
     }
 }
 
 #Preview {
     ColorsDemoView()
-}
-
-private extension Color {
-    var name: String? {
-        let regexPattern: String = "\"(.*?)\""
-
-        guard let regex = try? NSRegularExpression(pattern: regexPattern) else {
-            return nil
-        }
-
-        let descriptionString = "\(self)"
-        let results = regex.matches(
-            in: descriptionString,
-            range: NSRange(descriptionString.startIndex..., in: descriptionString)
-        )
-
-        let matches = results.map {
-            guard let range = Range($0.range, in: descriptionString) else {
-                return ""
-            }
-            return String(descriptionString[range])
-        }
-
-        guard let match = matches.first else {
-            return nil
-        }
-
-        return match.replacingOccurrences(of: "\"", with: "")
-    }
 }

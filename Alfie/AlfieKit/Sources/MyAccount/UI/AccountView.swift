@@ -14,10 +14,10 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
 
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing24) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingLg) {
                 welcome
 
-                VStack(spacing: Primitives.Spacing.spacing0) {
+                VStack(spacing: theme.sizing.spacingSpacingNone) {
                     ForEach(viewModel.sectionList, id: \.self) { section in
                         row(for: section)
                     }
@@ -25,8 +25,8 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
 
                 row(for: viewModel.sessionSection)
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
-            .padding(.vertical, Primitives.Spacing.spacing8)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
+            .padding(.vertical, theme.sizing.spacingSpacingXs)
         }
         .toolbar(.hidden, for: .navigationBar)
         .fullScreenCover(
@@ -40,13 +40,13 @@ public struct AccountView<ViewModel: AccountViewModelProtocol>: View {
     }
 
     private var welcome: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingNone) {
             Text.build(theme.font.display.small(L10n.Account.greeting))
-                .foregroundStyle(Theme.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentPrimary)
                 .accessibilityIdentifier(AccessibilityID.Account.greetingLabel)
 
             Text.build(theme.font.label.small(L10n.Account.memberSince))
-                .foregroundStyle(Theme.contentContentTerciary)
+                .foregroundStyle(theme.color.contentContentTerciary)
                 .accessibilityIdentifier(AccessibilityID.Account.memberSinceLabel)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

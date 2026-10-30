@@ -22,19 +22,19 @@ struct TabBarItemView: View {
 
     var body: some View {
         let isSelected = tab == currentTab
-        return VStack(spacing: Primitives.Spacing.spacing8) {
+        return VStack(spacing: theme.sizing.spacingSpacingXs) {
             tab.icon(isSelected: isSelected).image
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(size: Constants.iconSize)
+                .frame(width: theme.sizing.iconsIconMedium, height: theme.sizing.iconsIconMedium)
                 .foregroundStyle(Style.iconColour(isSelected: isSelected))
                 .badgeView(badgeValue: .constant(badgeValue))
             Text.build(Style.labelStyle(isSelected: isSelected)(tab.title))
                 .foregroundStyle(Style.labelColour(isSelected: isSelected))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, Primitives.Spacing.spacing8)
+        .padding(.vertical, theme.sizing.spacingSpacingXs)
         .contentShape(Rectangle())
         .accessibilityElement()
         .accessibilityIdentifier(tab.accessibilityId)
@@ -58,20 +58,18 @@ struct TabBarItemView: View {
     }
 
     enum Style {
+        private static var color: Theme.Type { DesignSystem.shared.color }
+
         static func iconColour(isSelected: Bool) -> Color {
-            isSelected ? Theme.contentContentPrimary : Theme.contentContentPrimaryDisabled
+            isSelected ? color.contentContentPrimary : color.contentContentPrimaryDisabled
         }
 
         static func labelColour(isSelected: Bool) -> Color {
-            isSelected ? Theme.contentContentPrimary : Theme.contentContentTerciary
+            isSelected ? color.contentContentPrimary : color.contentContentTerciary
         }
 
         static func labelStyle(isSelected: Bool) -> ThemedTypographyStyle {
             isSelected ? DesignSystem.shared.font.label.smallBold : DesignSystem.shared.font.label.small
         }
-    }
-
-    private enum Constants {
-        static let iconSize: CGSize = .init(width: Sizing.iconsIconMedium, height: Sizing.iconsIconMedium)
     }
 }

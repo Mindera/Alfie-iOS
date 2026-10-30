@@ -2,58 +2,59 @@ import SharedUI
 import SwiftUI
 
 struct SpacingDemoView: View {
+    private var tokens: [(name: String, value: CGFloat)] {
+        [
+            ("spacingSpacingNone", theme.sizing.spacingSpacingNone),
+            ("spacingSpacing3xs", theme.sizing.spacingSpacing3xs),
+            ("spacingSpacing2xs", theme.sizing.spacingSpacing2xs),
+            ("spacingSpacingXs", theme.sizing.spacingSpacingXs),
+            ("spacingSpacingSm", theme.sizing.spacingSpacingSm),
+            ("spacingSpacingMd", theme.sizing.spacingSpacingMd),
+            ("spacingSpacingLg", theme.sizing.spacingSpacingLg),
+            ("spacingSpacingXl", theme.sizing.spacingSpacingXl),
+            ("spacingSpacing2xl", theme.sizing.spacingSpacing2xl),
+        ]
+    }
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
                 DemoHelper.demoSectionHeader(title: "Spacing")
-                spacingView(token: "space.0", multiplier: "0.00", Primitives.Spacing.spacing0)
-                spacingView(token: "space.025", multiplier: "0.25", Primitives.Spacing.spacing2)
-                spacingView(token: "space.050", multiplier: "0.50", Primitives.Spacing.spacing4)
-                spacingView(token: "space.100", multiplier: "1", Primitives.Spacing.spacing8)
-                spacingView(token: "space.150", multiplier: "1.5", Primitives.Spacing.spacing12)
-                spacingView(token: "space.200", multiplier: "2", Primitives.Spacing.spacing16)
-                spacingView(token: "space.250", multiplier: "2.5", Primitives.Spacing.spacing20)
-                spacingView(token: "space.300", multiplier: "3", Primitives.Spacing.spacing24)
-                spacingView(token: "space.400", multiplier: "4", Primitives.Spacing.spacing32)
-                spacingView(token: "space.500", multiplier: "5", Primitives.Spacing.spacing40)
-                spacingView(token: "space.600", multiplier: "6", Primitives.Spacing.spacing48)
-                spacingView(token: "space.700", multiplier: "7", Primitives.Spacing.spacing56)
-                spacingView(token: "space.800", multiplier: "8", Primitives.Spacing.spacing64)
-                spacingView(token: "space.1000", multiplier: "10", Primitives.Spacing.spacing80)
+                ForEach(tokens, id: \.name) { token in
+                    spacingView(token: token.name, token.value)
+                }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
     }
 
-    private func spacingView(token: String, multiplier: String, _ spacing: CGFloat) -> some View {
-        Group {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
-                HStack {
-                    Text.build(theme.font.body.medium(token))
-                    Text.build(theme.font.body.small("\(Int(spacing))pt (Base Unit Multiplier: \(multiplier))"))
-                    Spacer()
-                }
-                ThemedDivider.horizontalThick
-                    .padding(.top, Primitives.Spacing.spacing2)
-
-                Image(systemName: "arrow.down.to.line")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 16)
-                    .background(.black)
-                    .foregroundStyle(.white)
-                    .padding(.top, Primitives.Spacing.spacing20)
-
-                Spacer(minLength: spacing)
-
-                Image(systemName: "arrow.up.to.line")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 16)
-                    .background(.black)
-                    .foregroundStyle(.white)
-                    .padding(.bottom, Primitives.Spacing.spacing20)
+    private func spacingView(token: String, _ spacing: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingNone) {
+            HStack {
+                Text.build(theme.font.body.medium("theme.sizing.\(token)"))
+                Text.build(theme.font.body.small("\(Int(spacing))pt"))
+                Spacer()
             }
+            ThemedDivider.horizontalThick
+                .padding(.top, theme.sizing.spacingSpacing3xs)
+
+            Image(systemName: "arrow.down.to.line")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: 16)
+                .background(theme.color.surfaceBackgroundInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
+                .padding(.top, theme.sizing.spacingSpacingMd)
+
+            Spacer(minLength: spacing)
+
+            Image(systemName: "arrow.up.to.line")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: 16)
+                .background(theme.color.surfaceBackgroundInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
+                .padding(.bottom, theme.sizing.spacingSpacingMd)
         }
     }
 }

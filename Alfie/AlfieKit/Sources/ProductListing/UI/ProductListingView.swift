@@ -55,10 +55,10 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
         .overlay(alignment: .top) {
             if viewModel.isRetryingRefresh {
                 LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
-                    .padding(theme.spacing.space200)
-                    .background(Primitives.Colours.neutrals0)
-                    .cornerRadius(Sizing.radiusSoft)
-                    .padding(.top, theme.spacing.space100)
+                    .padding(theme.sizing.spacingSpacingMd)
+                    .background(theme.color.surfaceBackgroundPrimary)
+                    .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
+                    .padding(.top, theme.sizing.spacingSpacingXs)
             }
         }
         .snackbarView(configuration: $transientErrorSnackbarConfig)
@@ -80,7 +80,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     }
 
     @ViewBuilder private var productCardList: some View {
-        LazyVGrid(columns: gridStruct, spacing: theme.spacing.space200) {
+        LazyVGrid(columns: gridStruct, spacing: theme.sizing.spacingSpacingMd) {
             ForEach(viewModel.products) { product in
                 VerticalProductCard(
                     viewModel: .init(
@@ -107,16 +107,16 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 }
             }
         }
-        .padding(theme.spacing.space200)
+        .padding(theme.sizing.spacingSpacingMd)
 
         if viewModel.state.isLoadingNextPage {
             LoaderView(circleDiameter: .defaultSmall, style: .dark, labelHidden: false)
-                .padding(.bottom, theme.spacing.space400)
+                .padding(.bottom, theme.sizing.spacingSpacingXl)
         }
     }
 
     @ViewBuilder private var infoFilterBarView: some View {
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             ProductListingFilterBar(
                 style: $viewModel.style,
                 total: viewModel.totalNumberOfProducts,
@@ -125,7 +125,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 viewModel.showRefine.toggle()
             }
         }
-        .padding(.bottom, theme.spacing.space100)
+        .padding(.bottom, theme.sizing.spacingSpacingXs)
         .onChange(of: viewModel.style, perform: viewModel.setListStyle)
         .sheet(isPresented: $viewModel.showRefine) {
             ProductListingFilter(
@@ -143,7 +143,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
     private var gridStruct: [GridItem] {
         // Figma product grid gap is `16px 8px` (row 16, column 8); GridItem spacing is the column gap.
         Array(
-            repeating: GridItem(.flexible(), spacing: theme.spacing.space100, alignment: .top),
+            repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingXs, alignment: .top),
             count: numberOfCardsPerRow
         )
     }

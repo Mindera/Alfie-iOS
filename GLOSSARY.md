@@ -121,3 +121,13 @@ _Avoid_: favourites, saved items, likes
 **BFF API key**:
 The opaque token the app presents to the BFF to be let in. It identifies the calling app, not a shopper, and is the same whichever commerce platform the BFF fronts.
 _Avoid_: Bearer credential, auth token, platform token
+
+### Design tokens
+
+**Primitive token**:
+A raw design value with no intent attached: a palette colour or a step on the spacing scale. Semantic tokens are built from it.
+_Avoid_: raw palette, palette colour, base token
+
+**Semantic token**:
+A design value named for the role it plays, such as a primary button's background or extra-small spacing. What a screen or component styles itself with.
+_Avoid_: theme colour, alias token

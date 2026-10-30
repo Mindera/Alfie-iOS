@@ -60,10 +60,10 @@ public struct Chip: View {
     public var body: some View {
         let style = self.style
         return ZStack {
-            RoundedRectangle(cornerRadius: Sizing.radiusRounded)
+            RoundedRectangle(cornerRadius: theme.sizing.radiusRounded)
                 .strokeBorder(style.borderColor, lineWidth: style.borderWidth)
-                .background(RoundedRectangle(cornerRadius: Sizing.radiusRounded).fill(style.backgroundColor))
-            HStack(spacing: Primitives.Spacing.spacing8) {
+                .background(RoundedRectangle(cornerRadius: theme.sizing.radiusRounded).fill(style.backgroundColor))
+            HStack(spacing: theme.sizing.spacingSpacingXs) {
                 Text.build(theme.font.body.small(configuration.label))
                     .foregroundStyle(style.textColor)
                 if let counterLabel = style.counterLabel {
@@ -74,7 +74,7 @@ public struct Chip: View {
                     Button(action: {
                         configuration.onCloseTap?()
                     }, label: {
-                        HStack(spacing: Primitives.Spacing.spacing0) {
+                        HStack(spacing: theme.sizing.spacingSpacingNone) {
                             Icon.close.image
                                 .renderingMode(.template)
                                 .resizable()
@@ -88,7 +88,7 @@ public struct Chip: View {
                     .accessibilityLabel(Text(L10n.Accessibility.close))
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
         .fixedSize(horizontal: true, vertical: false)
         .frame(height: style.height)
@@ -97,7 +97,7 @@ public struct Chip: View {
 
 /// Resolves a `Chip`'s visual styling from its state, sourced from design tokens.
 /// Extracted from `Chip` so the state→token mapping is unit-testable without snapshots.
-struct ChipStyle {
+struct ChipStyle: ThemeReading {
     private enum Constants {
         static let heightSmall = 36.0
         static let heightLarge = 44.0
@@ -105,10 +105,10 @@ struct ChipStyle {
         static let maxCounter: Int = 99
     }
 
-    // Close-icon dimensions are fixed 12pt layout constants (state-independent), sourced from the
-    // spacing12 token and exposed statically rather than as instance properties of this resolver.
-    static let closeWidth = Primitives.Spacing.spacing12
-    static let closeHeight = Primitives.Spacing.spacing12
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no close-icon size token
+    static let closeWidth: CGFloat = Primitives.Spacing.spacing12
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no close-icon size token
+    static let closeHeight: CGFloat = Primitives.Spacing.spacing12
 
     let type: ChipConfiguration.ChipType
     let isSelected: Bool
@@ -118,28 +118,27 @@ struct ChipStyle {
     var borderColor: Color {
         if isDisabled {
             // surfaceForegroundPrimary is the only semantic Theme alias resolving to the disabled neutrals100 value.
-            return Theme.surfaceForegroundPrimary
+            return theme.color.surfaceForegroundPrimary
         } else if isSelected {
-            return Theme.contentContentPrimary
+            return theme.color.contentContentPrimary
         } else {
-            return Theme.borderSoft
+            return theme.color.borderSoft
         }
     }
 
     var textColor: Color {
         if isDisabled {
-            return Theme.contentContentPrimaryDisabled
+            return theme.color.contentContentPrimaryDisabled
         } else {
-            // No Theme alias maps to neutrals600, so this remains a raw primitive.
-            return Primitives.Colours.neutrals600
+            return theme.color.contentContentSecondary
         }
     }
 
     var backgroundColor: Color {
         if isDisabled {
-            return Theme.surfaceForegroundPrimary
+            return theme.color.surfaceForegroundPrimary
         } else {
-            return Theme.surfaceBackgroundPrimary
+            return theme.color.surfaceBackgroundPrimary
         }
     }
 
@@ -147,7 +146,7 @@ struct ChipStyle {
         if isSelected {
             return Constants.borderSelected
         } else {
-            return Primitives.Border.borderWeightDefault
+            return theme.sizing.borderBorderWeightDefault
         }
     }
 

@@ -40,17 +40,17 @@ public struct ZoomableCarousel<Content: View>: View {
                     ThemedIcon(
                         .close,
                         size: .medium,
-                        tint: Primitives.Colours.neutrals800,
+                        tint: theme.color.contentContentPrimary,
                         accessibilityLabel: L10n.Accessibility.close
                     )
-                        .padding(Primitives.Spacing.spacing4)
-                        .background(Primitives.Colours.neutrals0.opacity(Constants.closeIconBackgroundOpacity))
+                        .padding(theme.sizing.spacingSpacing2xs)
+                        .background(theme.color.surfaceBackgroundPrimary.opacity(Constants.closeIconBackgroundOpacity))
                         .clipShape(Circle())
                 })
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .edgesIgnoringSafeArea(.bottom)
-                .padding(.bottom, Primitives.Spacing.spacing16)
-                .padding(.leading, Primitives.Spacing.spacing16)
+                .padding(.bottom, theme.sizing.spacingSpacingMd)
+                .padding(.leading, theme.sizing.spacingSpacingMd)
 
                 Spacer()
 
@@ -61,9 +61,9 @@ public struct ZoomableCarousel<Content: View>: View {
                         selectedIndex: $currentIndex,
                         slideSubject: slideSubject
                     )
-                    .padding(Primitives.Spacing.spacing16)
-                    .background(Primitives.Colours.neutrals0.opacity(Constants.backgroundOpacity))
-                    .cornerRadius(Sizing.radiusSoft)
+                    .padding(theme.sizing.spacingSpacingMd)
+                    .background(theme.color.surfaceBackgroundPrimary.opacity(Constants.backgroundOpacity))
+                    .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                 }
             }
         }

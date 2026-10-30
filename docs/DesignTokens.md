@@ -84,10 +84,33 @@ same-name collision between the `sizing` and `.primitives` collections.
 - A new typography token is not reachable from the theme until its group struct in
   `SharedUI/Theme/Typography/Specifications/TypographyGroups.swift` (`TypographyBody`,
   `TypographyLabel`, …) gains a matching property by hand, as `mediumBold` did.
-- Colour: use the semantic `Theme.*` symbols, and reach for `Primitives.Colours.*` only when no
-  semantic token covers the value. Much of `SharedUI` and the Debug Menu still reads the raw
-  palette (#186), so copy the rule, not the neighbouring file.
+- Colour, spacing, radius and sizes: see §Semantic tokens only.
 - Type: `Text.build(theme.font.<group>.<size>(text))`. `Typography.*` is read only by the theme's
   own group structs.
-- Spacing and radius: no rule yet (#186) between `Sizing.*`, `theme.spacing.*` and
-  `Primitives.Spacing.*`; match the module you're in.
+
+## Semantic tokens only
+
+Views read design values only through `theme` (ADR 0006):
+
+- **Colour**: `theme.color.<token>` (the generated `Theme`), picked by role, never by value.
+- **Spacing**: `theme.sizing.spacingSpacing*`. A value between steps rounds to the nearest step,
+  a tie rounds down.
+- **Radius**: `theme.sizing.radius*`.
+- **Sizes** (tap targets, heights, icons): `theme.sizing.icons*` when one matches, never rounded;
+  otherwise an allowlisted primitive (below).
+
+## Primitive tokens
+
+The `no_primitive_tokens` SwiftLint rule (`Alfie/.swiftlint.yml`) flags any `Primitives.` read
+outside the theme layer (`SharedUI/Theme/DesignSystem.swift`, `SharedUI/Theme/Typography/`) and
+`SharedUI/GeneratedTokens/`. It is an **error**: `lint.sh` and the pre-commit hook fail on it.
+
+A role with no Semantic token keeps its primitive until design adds the token upstream in
+`Alfie-Mobile-Design-Tokens`; never invent one here. Allowlist that line, naming the design review
+item that tracks the gap:
+
+```swift
+.fill(Primitives.Colours.brand200) // swiftlint:disable:this no_primitive_tokens - design review #186: no highlight-surface token
+```
+
+Allowlist one line at a time (`disable:this` / `disable:next`), never a file or a block.

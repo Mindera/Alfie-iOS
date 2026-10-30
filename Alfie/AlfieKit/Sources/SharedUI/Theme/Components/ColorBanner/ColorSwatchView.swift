@@ -27,10 +27,13 @@ public struct ColorSwatchView: View {
     public var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: size / 2)
-                .stroke(isSelected ? Primitives.Colours.neutrals900 : .clear, lineWidth: Constants.borderLineWidth)
+                .stroke(isSelected ? theme.color.contentContentPrimary : .clear, lineWidth: Constants.borderLineWidth)
             RoundedRectangle(cornerRadius: size - (Constants.borderLineWidth * 2) / 2)
                 .inset(by: Constants.borderLineWidth)
-                .stroke(isSelected ? Primitives.Colours.neutrals0 : .clear, lineWidth: Constants.borderLineWidth)
+                .stroke(
+                    isSelected ? theme.color.surfaceBackgroundPrimary : .clear,
+                    lineWidth: Constants.borderLineWidth
+                )
         }
         .background {
             ZStack {
@@ -58,17 +61,17 @@ public struct ColorSwatchView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: size, height: size)
                         },
-                        placeholder: { Primitives.Colours.neutrals100 },
-                        failure: { _ in Primitives.Colours.neutrals900 }
+                        placeholder: { theme.color.surfaceForegroundPrimary },
+                        failure: { _ in theme.color.surfaceBackgroundInvertedPrimary }
                     )
                 }
 
                 if item.isDisabled {
                     RoundedRectangle(cornerRadius: size / 2)
-                        .fill(Primitives.Colours.neutrals0)
+                        .fill(theme.color.surfaceBackgroundPrimary)
                         .opacity(Constants.disabledOpacity)
                     UnavailableCrossedOutShape()
-                        .stroke(Primitives.Colours.neutrals0, lineWidth: 1)
+                        .stroke(theme.color.surfaceBackgroundPrimary, lineWidth: 1)
                         .frame(width: size, height: size)
                 }
             }

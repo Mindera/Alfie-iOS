@@ -18,7 +18,7 @@ extension VerticalProductCardConfiguration {
         // Figma: 8pt between image, details and price for the PLP grid/list cards.
         switch size {
         case .small, .medium, .large:
-            Primitives.Spacing.spacing8
+            DesignSystem.shared.sizing.spacingSpacingXs
         }
     }
 
@@ -53,10 +53,10 @@ extension VerticalProductCardConfiguration {
     var nameColor: Color {
         switch size {
         case .small:
-            Primitives.Colours.neutrals500
+            DesignSystem.shared.color.contentContentTerciary
         case .medium,
              .large: // swiftlint:disable:this indentation_width
-            Primitives.Colours.neutrals800
+            DesignSystem.shared.color.contentContentPrimary
         }
     }
 
@@ -67,7 +67,7 @@ extension VerticalProductCardConfiguration {
             DesignSystem.shared.font.body.small.uiFont.lineHeight
         case .medium,
              .large: // swiftlint:disable:this indentation_width
-            Primitives.Spacing.spacing24
+            24
         }
     }
     // swiftlint:enable vertical_whitespace_between_cases

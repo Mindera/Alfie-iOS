@@ -12,20 +12,20 @@ public struct EmptyStateView: View {
     }
 
     public var body: some View {
-        VStack(spacing: Sizing.spacingSpacingMd) {
-            ThemedIcon(icon, tint: Theme.contentContentPrimary)
-            VStack(spacing: Sizing.spacingSpacing2xs) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
+            ThemedIcon(icon, tint: theme.color.contentContentPrimary)
+            VStack(spacing: theme.sizing.spacingSpacing2xs) {
                 Text.build(theme.font.body.medium(title))
-                    .foregroundStyle(Theme.contentContentPrimary)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                 if let message {
                     Text.build(theme.font.body.medium(message))
-                        .foregroundStyle(Theme.contentContentTerciary)
+                        .foregroundStyle(theme.color.contentContentTerciary)
                 }
             }
             .multilineTextAlignment(.center)
         }
-        .padding(.horizontal, Sizing.spacingSpacingXl)
-        .padding(.vertical, Sizing.spacingSpacingXs)
+        .padding(.horizontal, theme.sizing.spacingSpacingXl)
+        .padding(.vertical, theme.sizing.spacingSpacingXs)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .combine)
     }

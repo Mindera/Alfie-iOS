@@ -82,17 +82,20 @@ struct ThemedToggleStyle: ToggleStyle {
 
 // MARK: - ColorToggle
 
-private enum ColorToggle {
-    static let toggleCircle = Primitives.Colours.neutrals600
-    static let toggleCircleDisabled = Primitives.Colours.neutrals300
+private enum ColorToggle: ThemeReading {
+    static var toggleCircle: Color { theme.color.contentContentSecondary }
+    static var toggleCircleDisabled: Color { theme.color.contentContentPrimaryDisabled }
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no toggle on token
     static let toggleBorderOn = Primitives.Colours.semanticSuccess700
-    static let toggleBorderOff = Primitives.Colours.neutrals300
+    static var toggleBorderOff: Color { theme.color.borderMedium }
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no toggle on token
     static let toggleBorderOnDisabled = Primitives.Colours.semanticSuccess200
-    static let toggleBorderOffDisabled = Primitives.Colours.neutrals100
+    static var toggleBorderOffDisabled: Color { theme.color.surfaceForegroundPrimary }
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no toggle on token
     static let toggleBackgroundOn = Primitives.Colours.semanticSuccess100
-    static let toggleBackgroundOff = Primitives.Colours.neutrals300
-    static let toggleBackgroundOnDisabled = Primitives.Colours.neutrals0
-    static let toggleBackgroundOffDisabled = Primitives.Colours.neutrals100
+    static var toggleBackgroundOff: Color { theme.color.surfaceBackgroundTerciary }
+    static var toggleBackgroundOnDisabled: Color { theme.color.surfaceBackgroundPrimary }
+    static var toggleBackgroundOffDisabled: Color { theme.color.surfaceForegroundPrimary }
 }
 
 #Preview {

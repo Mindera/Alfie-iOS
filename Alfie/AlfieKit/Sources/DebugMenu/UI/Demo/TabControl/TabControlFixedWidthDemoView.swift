@@ -2,20 +2,20 @@ import SharedUI
 import SwiftUI
 
 struct TabControlFixedWidthDemoView: View {
-    @State private var theme = TabControl.Theme.light
+    @State private var tabTheme = TabControl.Style.light
     @State private var currentIndex: Int = 0
     @State private var numberOfOptions = 3
-    @State private var padding: CGFloat = Primitives.Spacing.spacing8
+    @State private var padding: CGFloat = DesignSystem.shared.sizing.spacingSpacingXs
     @State private var showIcons = false
     private let options = ["Reviews", "Offers", "Delivery", "Promos"]
-    private var themeOptions = TabControl.Theme.allCases
+    private var themeOptions = TabControl.Style.allCases
     private var currentOptions: [String] {
         Array(options.prefix(numberOfOptions))
     }
     var body: some View {
         VStack {
             TabControl(
-                theme: theme,
+                style: tabTheme,
                 configuration: .fixedSize(horizontalMargins: padding),
                 options: currentOptions.map {
                     TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil)
@@ -26,7 +26,7 @@ struct TabControlFixedWidthDemoView: View {
             TabView(selection: $currentIndex) {
                 ForEach(Array(currentOptions.enumerated()), id: \.0) { _, value in
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(Primitives.Colours.neutrals400)
+                        .fill(theme.color.borderStrong)
                         .overlay {
                             Text.build(theme.font.body.medium(value))
                                 .foregroundStyle(.white)
@@ -43,7 +43,7 @@ struct TabControlFixedWidthDemoView: View {
                 }
 
                 Text.build(theme.font.body.medium("Theme:"))
-                Picker(selection: $theme) {
+                Picker(selection: $tabTheme) {
                     ForEach(themeOptions, id: \.self) { tabTheme in
                         Text.build(theme.font.body.small("\(tabTheme)".capitalized))
                     }
@@ -62,7 +62,7 @@ struct TabControlFixedWidthDemoView: View {
                 Slider(value: $padding, in: 0...32)
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal, Primitives.Spacing.spacing24)
+            .padding(.horizontal, theme.sizing.spacingSpacingLg)
         }
     }
 }

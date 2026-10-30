@@ -2,14 +2,17 @@ import SharedUI
 import SwiftUI
 
 struct TabControlIntrinsicWidthDemoView: View {
-    @State private var theme = TabControl.Theme.light
+    @State private var tabTheme = TabControl.Style.light
     @State private var numberOfOptions = 3
-    @State private var spacing = Primitives.Spacing.spacing16
+    @State private var spacing = DesignSystem.shared.sizing.spacingSpacingMd
     @State private var currentIndex: Int = 0
     @State private var showIcons = false
     private let options = ["Product Description", "Reviews", "Online Promotion", "Offers", "Delivery"]
-    private var spacingOptions = [Primitives.Spacing.spacing8, Primitives.Spacing.spacing16]
-    private var themeOptions = TabControl.Theme.allCases
+    private var spacingOptions = [
+        DesignSystem.shared.sizing.spacingSpacingXs,
+        DesignSystem.shared.sizing.spacingSpacingMd,
+    ]
+    private var themeOptions = TabControl.Style.allCases
     private var currentOptions: [String] {
         Array(options.prefix(numberOfOptions))
     }
@@ -17,7 +20,7 @@ struct TabControlIntrinsicWidthDemoView: View {
     var body: some View {
         VStack {
             TabControl(
-                theme: theme,
+                style: tabTheme,
                 configuration: .intrisicSize(itemSpacing: spacing),
                 options: currentOptions.map {
                     TabControl.TabOption(title: $0, image: showIcons ? Icon.checkmark.image : nil)
@@ -29,7 +32,7 @@ struct TabControlIntrinsicWidthDemoView: View {
             TabView(selection: $currentIndex) {
                 ForEach(Array(currentOptions.enumerated()), id: \.0) { _, value in
                     RoundedRectangle(cornerRadius: 25)
-                        .fill(Primitives.Colours.neutrals400)
+                        .fill(theme.color.borderStrong)
                         .overlay {
                             Text.build(theme.font.body.medium(value))
                                 .foregroundStyle(.white)
@@ -54,7 +57,7 @@ struct TabControlIntrinsicWidthDemoView: View {
                 }
 
                 Text.build(theme.font.body.medium("Theme:"))
-                Picker(selection: $theme) {
+                Picker(selection: $tabTheme) {
                     ForEach(themeOptions, id: \.self) { tabTheme in
                         Text.build(theme.font.body.small("\(tabTheme)".capitalized))
                     }
@@ -70,7 +73,7 @@ struct TabControlIntrinsicWidthDemoView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal, Primitives.Spacing.spacing24)
+            .padding(.horizontal, theme.sizing.spacingSpacingLg)
         }
     }
 }

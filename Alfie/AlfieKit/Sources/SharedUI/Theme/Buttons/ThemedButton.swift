@@ -4,6 +4,7 @@ import SwiftUI
 
 public struct ThemedButton: View {
     private let text: String
+    private let accessibilityLabel: String?
     private let type: ButtonType
     private let style: ButtonTheme
     @Binding private var isDisabled: Bool
@@ -24,13 +25,15 @@ public struct ThemedButton: View {
         isDisabled: Binding<Bool> = .constant(false),
         isLoading: Binding<Bool> = .constant(false),
         isFullWidth: Bool = false,
-        cornerRadius: CGFloat = Sizing.radiusSoft,
+        cornerRadius: CGFloat = DesignSystem.shared.sizing.radiusSoft,
         // Defaults to the small icon every existing caller renders; an icon-only button sized from
         // the design needs a larger glyph than a label-with-icon does.
-        iconSize: CGFloat = Sizing.iconsIconSmall,
+        iconSize: CGFloat = DesignSystem.shared.sizing.iconsIconSmall,
+        accessibilityLabel: String? = nil,
         action: @escaping () -> Void
     ) {
         self.text = text
+        self.accessibilityLabel = accessibilityLabel
         self.type = type
         self.style = style
         self.leadingAsset = leadingAsset
@@ -49,23 +52,7 @@ public struct ThemedButton: View {
                 action()
             }
         } label: {
-            HStack(alignment: .center) {
-                if isFullWidth {
-                    Spacer()
-                }
-                Text.build(textFor(text))
-                    .padding(.horizontal, Constants.horizontalPadding)
-                    .padding(.vertical, Constants.verticalPadding)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                if isFullWidth {
-                    Spacer()
-                }
-            }
-        }
-        .disabled(isDisabled)
-        .buttonStyle(
-            ThemedButtonStyle(
+            ThemedButtonLabel(
                 style: style,
                 type: type,
                 isDisabled: isDisabled,
@@ -75,8 +62,26 @@ public struct ThemedButton: View {
                 cornerRadius: buttonCornerRadius,
                 iconSize: iconSize,
                 isIconOnly: text.isEmpty
-            )
-        )
+            ) {
+                HStack(alignment: .center) {
+                    if isFullWidth {
+                        Spacer()
+                    }
+                    Text.build(textFor(text))
+                        .padding(.horizontal, Constants.horizontalPadding)
+                        .padding(.vertical, Constants.verticalPadding)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                    if isFullWidth {
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .disabled(isDisabled)
+        .accessibilityLabel(accessibilityLabel ?? text)
+        .accessibilityValue(isLoading ? L10n.Loading.title : "")
+        .buttonStyle(.plain)
     }
 
     func textFor(_ text: String) -> AttributedString {
@@ -145,15 +150,18 @@ public enum ButtonType {
 
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
-    static let verticalPadding: CGFloat = -Primitives.Spacing.spacing8
+    static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
     static let smallHeight: CGFloat = Primitives.Spacing.spacing32
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
     static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
     static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
-// MARK: - ThemedButtonStyle
+// MARK: - ThemedButtonLabel
 
-private struct ThemedButtonStyle: ButtonStyle {
+private struct ThemedButtonLabel<Label: View>: View {
     let style: ButtonTheme
     let type: ButtonType
     let isDisabled: Bool
@@ -165,70 +173,62 @@ private struct ThemedButtonStyle: ButtonStyle {
     /// An empty label still occupies the stack and its default spacing, which makes an icon-only
     /// button wider than it is tall. Dropping it lets the button size to icon + padding.
     let isIconOnly: Bool
+    @ViewBuilder let label: Label
 
-    func makeBody(configuration: Self.Configuration) -> some View {
-        HStack(spacing: isIconOnly ? Primitives.Spacing.spacing0 : nil) {
+    var body: some View {
+        HStack(spacing: isIconOnly ? theme.sizing.spacingSpacingNone : nil) {
             if let leadingAsset {
                 leadingAsset.image
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(textColor(configuration))
+                    .foregroundStyle(textColor)
             }
             if !isIconOnly {
-                configuration.label
-                    .padding(.vertical, Primitives.Spacing.spacing16)
+                label
+                    .padding(.vertical, theme.sizing.spacingSpacingMd)
             }
             if let trailingAsset {
                 trailingAsset.image
                     .renderingMode(.template)
                     .resizable()
-                    .tint(textColor(configuration))
+                    .tint(textColor)
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
             }
         }
+        .opacity(isLoading ? 0 : 1)
         .frame(height: type.height)
-        .padding(.horizontal, Primitives.Spacing.spacing8)
-        .foregroundStyle(textColor(configuration))
-        .background(background(configuration))
+        .padding(.horizontal, theme.sizing.spacingSpacingXs)
+        .foregroundStyle(textColor)
+        .background(backgroundColor)
         .cornerRadius(cornerRadius)
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(borderColor(configuration), lineWidth: Primitives.Border.borderWeightDefault)
+                    .stroke(borderColor, lineWidth: theme.sizing.borderBorderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(background(configuration))
+                        .background(backgroundColor)
                         .cornerRadius(cornerRadius)
                 }
             }
         )
     }
 
-    private func background(_ configuration: Self.Configuration) -> Color {
-        let backgroundDisabledColor = style.spec.backgroundDisabledColor
-        let backgroundPressedColor = style.spec.backgroundPressedColor
-        let backgroundColor = style.spec.backgroundColor
-
-        return isDisabled ? backgroundDisabledColor : configuration.isPressed ? backgroundPressedColor : backgroundColor
+    private var backgroundColor: Color {
+        isDisabled ? style.spec.backgroundDisabledColor : style.spec.backgroundColor
     }
 
-    private func textColor(_ configuration: Self.Configuration) -> Color {
-        let textDisabledColor = style.spec.textDisabledColor
-        let textPressedColor = style.spec.textPressedColor
-
-        return isDisabled ? textDisabledColor : configuration.isPressed ? textPressedColor : style.spec.textColor
+    private var textColor: Color {
+        isDisabled ? style.spec.textDisabledColor : style.spec.textColor
     }
 
-    private func borderColor(_ configuration: Self.Configuration) -> Color {
-        let borderDisabledColor = style.spec.borderDisabledColor
-        let borderPressedColor = style.spec.borderPressedColor
-
-        return isDisabled ? borderDisabledColor : configuration.isPressed ? borderPressedColor : style.spec.borderColor
+    private var borderColor: Color {
+        isDisabled ? style.spec.borderDisabledColor : style.spec.borderColor
     }
 
     private var styleLoading: LoaderView.CircleStyle {
@@ -306,28 +306,6 @@ extension ThemedButton: CustomShimmerable {
         case .tertiary,
              .underline: // swiftlint:disable:this indentation_width
             return 0
-        }
-    }
-
-    public var customLighterShimmerColor: Color? {
-        switch style {
-        case .primary:
-            return Primitives.Colours.neutrals600
-        case .secondary,
-             .tertiary, // swiftlint:disable:this indentation_width
-             .underline:
-            return nil
-        }
-    }
-
-    public var customDarkerShimmerColor: Color? {
-        switch style {
-        case .primary:
-            return Primitives.Colours.neutrals800
-        case .secondary,
-             .tertiary, // swiftlint:disable:this indentation_width
-             .underline:
-            return nil
         }
     }
 }

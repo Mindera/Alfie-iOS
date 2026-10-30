@@ -25,8 +25,8 @@ struct ShimmerEffectModifier: ViewModifier {
         self._shouldShowShimmer = State(initialValue: isLoading.wrappedValue)
         self.cornerRadius = cornerRadius
         self.blurRadius = blurRadius
-        self.lighterShimmerColor = customLighterShimmerColor ?? Primitives.Colours.neutrals200
-        self.darkerShimmerColor = customDarkerShimmerColor ?? Primitives.Colours.neutrals400
+        self.lighterShimmerColor = customLighterShimmerColor ?? DesignSystem.shared.color.borderSoft
+        self.darkerShimmerColor = customDarkerShimmerColor ?? DesignSystem.shared.color.borderStrong
         self.disabledWhileShimmering = disabledWhileShimmering
         self.animateOnStateTransition = animateOnStateTransition
     }

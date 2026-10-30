@@ -29,9 +29,9 @@ final class ChipStyleTests: XCTestCase {
 
     // MARK: - Text color
 
-    func test_text_color_is_neutrals600_when_enabled() {
+    func test_text_color_is_content_secondary_when_enabled() {
         let sut = ChipStyle(type: .small, isSelected: false, isDisabled: false, counter: nil)
-        XCTAssertEqual(sut.textColor, Primitives.Colours.neutrals600)
+        XCTAssertEqual(sut.textColor, Theme.contentContentSecondary)
     }
 
     func test_text_color_is_content_primary_disabled_when_disabled() {
@@ -41,7 +41,7 @@ final class ChipStyleTests: XCTestCase {
 
     func test_text_color_is_unaffected_by_selection() {
         let sut = ChipStyle(type: .small, isSelected: true, isDisabled: false, counter: nil)
-        XCTAssertEqual(sut.textColor, Primitives.Colours.neutrals600)
+        XCTAssertEqual(sut.textColor, Theme.contentContentSecondary)
     }
 
     func test_text_color_disabled_takes_precedence_over_selected() {

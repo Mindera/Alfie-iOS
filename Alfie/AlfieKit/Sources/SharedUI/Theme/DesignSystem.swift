@@ -2,13 +2,11 @@ import SwiftUI
 
 // MARK: - DesignSystemProtocol
 
-/// Single entry point for every design-token category (colour, spacing, radius, typography).
-/// Each category forwards to the generated tokens, vended as one unit so the whole theme can be
-/// injected via `EnvironmentValues.theme`.
+/// Single entry point for the semantic design tokens (ADR 0006): `color` and `sizing` vend the
+/// generated `Theme` and `Sizing` enums, `font` the typography provider.
 public protocol DesignSystemProtocol {
-    var color: ColorProvider { get }
-    var spacing: SpacingProvider { get }
-    var radius: RadiusProvider { get }
+    var color: Theme.Type { get }
+    var sizing: Sizing.Type { get }
     var font: TypographyProviderProtocol { get }
 
     func setupAppearance()
@@ -19,11 +17,8 @@ public protocol DesignSystemProtocol {
 public class DesignSystem: DesignSystemProtocol {
     public static var shared = DesignSystem()
 
-    // Token-backed categories are fixed forwarders to the generated tokens (no variation, so
-    // concrete). Only `font` is a swappable provider.
-    public let color = ColorProvider()
-    public let spacing = SpacingProvider()
-    public let radius = RadiusProvider()
+    public let color = Theme.self
+    public let sizing = Sizing.self
     public let font: TypographyProviderProtocol
 
     public init(font: TypographyProviderProtocol = TypographyProvider()) {
@@ -34,7 +29,7 @@ public class DesignSystem: DesignSystemProtocol {
     public func setupAppearance() {
         let attributesNormal: [NSAttributedString.Key: Any] = [
             .font: font.heading.small.uiFont,
-            .foregroundColor: Primitives.Colours.neutrals900.ui,
+            .foregroundColor: color.contentContentPrimary.ui,
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesNormal, for: .normal)
 
@@ -44,21 +39,21 @@ public class DesignSystem: DesignSystemProtocol {
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesSelected, for: .highlighted)
 
-        UIBarButtonItem.appearance().tintColor = Primitives.Colours.neutrals900.ui
+        UIBarButtonItem.appearance().tintColor = color.contentContentPrimary.ui
 
         setNavigationBarAppearance()
         setTabBarAppearance()
     }
 
     private func setNavigationBarAppearance() {
-        let backgroundColor = Primitives.Colours.neutrals0.ui
+        let backgroundColor = color.surfaceBackgroundPrimary.ui
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = backgroundColor
 
         let backButtonAppearance = UIBarButtonItemAppearance(style: .plain)
         let hiddenTitleAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: Primitives.Colours.transparentTransparent.ui
+            .foregroundColor: UIColor.clear
         ]
         backButtonAppearance.focused.titleTextAttributes = hiddenTitleAttributes
         backButtonAppearance.disabled.titleTextAttributes = hiddenTitleAttributes
@@ -82,13 +77,23 @@ public class DesignSystem: DesignSystemProtocol {
     }
 
     private func setTabBarAppearance() {
-        let backgroundColor = Primitives.Colours.neutrals0.ui
+        let backgroundColor = color.surfaceBackgroundPrimary.ui
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithTransparentBackground()
         tabBarAppearance.backgroundColor = backgroundColor
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
     }
+}
+
+// MARK: - ThemeReading
+
+/// `theme` for SharedUI types that are neither `View` nor `ViewModifier` (styles, resolvers, enums).
+protocol ThemeReading {}
+
+extension ThemeReading {
+    var theme: DesignSystemProtocol { DesignSystem.shared }
+    static var theme: DesignSystemProtocol { DesignSystem.shared }
 }
 
 // MARK: - Environment injection seam

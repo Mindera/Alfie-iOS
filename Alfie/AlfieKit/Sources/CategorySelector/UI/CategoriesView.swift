@@ -38,7 +38,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
     private var scrollContent: some View {
         ScrollView {
             if !viewModel.state.didFail {
-                LazyVStack(spacing: theme.spacing.space0) {
+                LazyVStack(spacing: theme.sizing.spacingSpacingNone) {
                     ForEach(viewModel.categories, id: \.id) { category in
                         if viewModel.state.isLoading {
                             placeholderView(category)
@@ -67,7 +67,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             for: category.title,
             font: rowFont,
             isShimmering: false,
-            foregroundColor: Theme.contentContentPrimary,
+            foregroundColor: theme.color.contentContentPrimary,
             showChevron: category.hasSubCategories
         )
             .modifier(
@@ -84,7 +84,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             for: category.title,
             font: rowFont,
             isShimmering: true,
-            foregroundColor: Theme.contentContentPrimaryDisabled,
+            foregroundColor: theme.color.contentContentPrimaryDisabled,
             showChevron: true
         )
     }
@@ -142,7 +142,7 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             }
         }
         .frame(height: Constants.categoryViewHeight)
-        .padding(.horizontal, theme.spacing.space200)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 }
 
@@ -151,7 +151,7 @@ private enum AccessibilityId {
 }
 
 private enum Constants {
-    static let chevronSize: CGFloat = Sizing.iconsIconMedium
+    static var chevronSize: CGFloat { DesignSystem.shared.sizing.iconsIconMedium }
     static let categoryViewHeight: CGFloat = 48
 }
 
