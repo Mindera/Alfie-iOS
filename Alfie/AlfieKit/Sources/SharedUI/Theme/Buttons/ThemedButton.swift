@@ -308,28 +308,4 @@ extension ThemedButton: CustomShimmerable {
             return 0
         }
     }
-
-    public var customLighterShimmerColor: Color? {
-        switch style {
-        case .primary:
-            // swiftlint:disable:next no_primitive_tokens - design review #186: no skeleton token
-            return Primitives.Colours.neutrals600
-        case .secondary,
-             .tertiary, // swiftlint:disable:this indentation_width
-             .underline:
-            return nil
-        }
-    }
-
-    public var customDarkerShimmerColor: Color? {
-        switch style {
-        case .primary:
-            // swiftlint:disable:next no_primitive_tokens - design review #186: no skeleton token
-            return Primitives.Colours.neutrals800
-        case .secondary,
-             .tertiary, // swiftlint:disable:this indentation_width
-             .underline:
-            return nil
-        }
-    }
 }
