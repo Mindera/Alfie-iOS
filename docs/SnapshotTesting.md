@@ -93,6 +93,7 @@ of the build.
 | `SearchViewSnapshotTests` | `SearchTests` | Search screen blank and with recent searches |
 | `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one, unpriced totals |
 | `WishlistViewSnapshotTests` | `WishlistTests` | Populated Wishlist grid, including an out-of-stock Variant; empty Wishlist; grid with the Removed Snackbar |
+| `ZoomableCarouselSnapshotTests` | `SharedUITests` | Full-screen carousel pages loading images through the pipeline injected above it |
 | `ScannerViewSnapshotTests` | `ScannerTests` | Scanner chrome over the camera, wrapping guidance, the unrecognised-code notice, the recognised (green) viewfinder, the camera-access explainer, permission denied, device unsupported, camera unavailable |
 
 Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every
