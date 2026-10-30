@@ -1,7 +1,9 @@
-import Model
+import Nuke
+import NukeUI
 import SwiftUI
 
 public struct RemoteImage<Success: View, Failure: View, Placeholder: View>: View {
+    @Environment(\.imagePipeline) private var pipeline
     private let urlRequest: URLRequest?
     private let transaction: Transaction
     private let success: (Image) -> Success
@@ -40,18 +42,16 @@ public struct RemoteImage<Success: View, Failure: View, Placeholder: View>: View
     }
 
     public var body: some View {
-        RemoteImageWrapper<LazyImageView>(urlRequest: urlRequest, transaction: transaction) { state in
-            // swiftlint:disable vertical_whitespace_between_cases
-            switch state {
-            case .empty:
-                placeholder()
-            case .success(let image):
+        LazyImage(url: urlRequest?.url, transaction: transaction) { state in
+            if let image = state.image {
                 success(image)
-            case .failure(let error):
+            } else if let error = state.error {
                 failure(error)
+            } else {
+                placeholder()
             }
-            // swiftlint:enable vertical_whitespace_between_cases
         }
+        .pipeline(pipeline)
     }
 }
 

@@ -88,11 +88,12 @@ of the build.
 | `SplashViewSnapshotTests` | `AppFeatureTests` | Startup splash wordmark, placement, background |
 | `CustomTabBarViewSnapshotTests` | `AppFeatureTests` | Bag tab badge: absent, single digit, summed multi-line, overflow |
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
-| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, loading, out-of-stock, error screen with Retry (generic, server error, rate limited, no connection), related products (6, 3, skeleton) |
+| `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, a several-photo Gallery with page indicators, loading, out-of-stock, error screen with Retry (generic, server error, rate limited, no connection), related products (6, 3, skeleton) |
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, Blocking error (generic, server error, rate limited, no connection), search results header, transient-error Snackbar with Retry |
 | `SearchViewSnapshotTests` | `SearchTests` | Search screen blank and with recent searches |
 | `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one, unpriced totals |
 | `WishlistViewSnapshotTests` | `WishlistTests` | Populated Wishlist grid, including an out-of-stock Variant; empty Wishlist; grid with the Removed Snackbar |
+| `ZoomableCarouselSnapshotTests` | `SharedUITests` | Full-screen carousel pages loading images through the pipeline injected above it |
 | `ScannerViewSnapshotTests` | `ScannerTests` | Scanner chrome over the camera, wrapping guidance, the unrecognised-code notice, the recognised (green) viewfinder, the camera-access explainer, permission denied, device unsupported, camera unavailable |
 
 Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every

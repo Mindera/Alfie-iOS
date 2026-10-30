@@ -1,9 +1,10 @@
 import Combine
+import Core
 import SwiftUI
 import UIKit
 
 struct ZoomableCarouselRepresentable<Content: View> {
-    typealias ViewControllerType = UIKitZoomableCarouselViewController<Content>
+    typealias ViewControllerType = UIKitZoomableCarouselViewController<ImagePipelineForwarding<Content>>
 
     @Binding private var currentIndex: Int
     private let childViews: [Content]
@@ -29,9 +30,18 @@ extension ZoomableCarouselRepresentable: UIViewControllerRepresentable {
             currentIndex: $currentIndex,
             slidePublisher: slidePublisher,
             configuration: configuration,
-            items: childViews
+            items: childViews.map { ImagePipelineForwarding(content: $0, source: context.environment) }
         )
     }
 
-    func updateUIViewController(_ uiViewController: UIKitZoomableCarouselViewController<Content>, context: Context) {}
+    func updateUIViewController(_ uiViewController: ViewControllerType, context: Context) {}
+}
+
+struct ImagePipelineForwarding<Content: View>: View {
+    let content: Content
+    let source: EnvironmentValues
+
+    var body: some View {
+        content.environment(\.imagePipeline, source.imagePipeline)
+    }
 }
