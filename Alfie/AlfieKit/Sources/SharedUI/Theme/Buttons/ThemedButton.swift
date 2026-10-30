@@ -52,25 +52,7 @@ public struct ThemedButton: View {
                 action()
             }
         } label: {
-            HStack(alignment: .center) {
-                if isFullWidth {
-                    Spacer()
-                }
-                Text.build(textFor(text))
-                    .padding(.horizontal, Constants.horizontalPadding)
-                    .padding(.vertical, Constants.verticalPadding)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                if isFullWidth {
-                    Spacer()
-                }
-            }
-        }
-        .disabled(isDisabled)
-        .accessibilityLabel(accessibilityLabel ?? text)
-        .accessibilityValue(isLoading ? L10n.Loading.title : "")
-        .buttonStyle(
-            ThemedButtonStyle(
+            ThemedButtonLabel(
                 style: style,
                 type: type,
                 isDisabled: isDisabled,
@@ -80,8 +62,26 @@ public struct ThemedButton: View {
                 cornerRadius: buttonCornerRadius,
                 iconSize: iconSize,
                 isIconOnly: text.isEmpty
-            )
-        )
+            ) {
+                HStack(alignment: .center) {
+                    if isFullWidth {
+                        Spacer()
+                    }
+                    Text.build(textFor(text))
+                        .padding(.horizontal, Constants.horizontalPadding)
+                        .padding(.vertical, Constants.verticalPadding)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                    if isFullWidth {
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .disabled(isDisabled)
+        .accessibilityLabel(accessibilityLabel ?? text)
+        .accessibilityValue(isLoading ? L10n.Loading.title : "")
+        .buttonStyle(.plain)
     }
 
     func textFor(_ text: String) -> AttributedString {
@@ -149,7 +149,6 @@ public enum ButtonType {
 // MARK: - Constants
 
 private enum Constants {
-    static let pressedOpacity: Double = 0.75
     static let horizontalPadding: CGFloat = 0
     static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
     // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
@@ -160,9 +159,9 @@ private enum Constants {
     static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
-// MARK: - ThemedButtonStyle
+// MARK: - ThemedButtonLabel
 
-private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
+private struct ThemedButtonLabel<Label: View>: View {
     let style: ButtonTheme
     let type: ButtonType
     let isDisabled: Bool
@@ -174,8 +173,9 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
     /// An empty label still occupies the stack and its default spacing, which makes an icon-only
     /// button wider than it is tall. Dropping it lets the button size to icon + padding.
     let isIconOnly: Bool
+    @ViewBuilder let label: Label
 
-    func makeBody(configuration: Self.Configuration) -> some View {
+    var body: some View {
         HStack(spacing: isIconOnly ? theme.sizing.spacingSpacingNone : nil) {
             if let leadingAsset {
                 leadingAsset.image
@@ -186,7 +186,7 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
                     .foregroundStyle(textColor)
             }
             if !isIconOnly {
-                configuration.label
+                label
                     .padding(.vertical, theme.sizing.spacingSpacingMd)
             }
             if let trailingAsset {
@@ -217,7 +217,6 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
                 }
             }
         )
-        .opacity(configuration.isPressed ? Constants.pressedOpacity : 1)
     }
 
     private var backgroundColor: Color {
