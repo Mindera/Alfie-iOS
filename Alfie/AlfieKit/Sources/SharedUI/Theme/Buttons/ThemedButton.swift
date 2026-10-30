@@ -149,6 +149,7 @@ public enum ButtonType {
 // MARK: - Constants
 
 private enum Constants {
+    static let pressedOpacity: Double = 0.75
     static let horizontalPadding: CGFloat = 0
     static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
     // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
@@ -182,7 +183,7 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
                     .resizable()
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
-                    .foregroundStyle(textColor(configuration))
+                    .foregroundStyle(textColor)
             }
             if !isIconOnly {
                 configuration.label
@@ -192,7 +193,7 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
                 trailingAsset.image
                     .renderingMode(.template)
                     .resizable()
-                    .tint(textColor(configuration))
+                    .tint(textColor)
                     .scaledToFit()
                     .frame(width: iconSize, height: iconSize)
             }
@@ -200,44 +201,35 @@ private struct ThemedButtonStyle: ButtonStyle, ThemeReading {
         .opacity(isLoading ? 0 : 1)
         .frame(height: type.height)
         .padding(.horizontal, theme.sizing.spacingSpacingXs)
-        .foregroundStyle(textColor(configuration))
-        .background(background(configuration))
+        .foregroundStyle(textColor)
+        .background(backgroundColor)
         .cornerRadius(cornerRadius)
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(borderColor(configuration), lineWidth: theme.sizing.borderBorderWeightDefault)
+                    .stroke(borderColor, lineWidth: theme.sizing.borderBorderWeightDefault)
 
                 if isLoading {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(background(configuration))
+                        .background(backgroundColor)
                         .cornerRadius(cornerRadius)
                 }
             }
         )
+        .opacity(configuration.isPressed ? Constants.pressedOpacity : 1)
     }
 
-    private func background(_ configuration: Self.Configuration) -> Color {
-        let backgroundDisabledColor = style.spec.backgroundDisabledColor
-        let backgroundPressedColor = style.spec.backgroundPressedColor
-        let backgroundColor = style.spec.backgroundColor
-
-        return isDisabled ? backgroundDisabledColor : configuration.isPressed ? backgroundPressedColor : backgroundColor
+    private var backgroundColor: Color {
+        isDisabled ? style.spec.backgroundDisabledColor : style.spec.backgroundColor
     }
 
-    private func textColor(_ configuration: Self.Configuration) -> Color {
-        let textDisabledColor = style.spec.textDisabledColor
-        let textPressedColor = style.spec.textPressedColor
-
-        return isDisabled ? textDisabledColor : configuration.isPressed ? textPressedColor : style.spec.textColor
+    private var textColor: Color {
+        isDisabled ? style.spec.textDisabledColor : style.spec.textColor
     }
 
-    private func borderColor(_ configuration: Self.Configuration) -> Color {
-        let borderDisabledColor = style.spec.borderDisabledColor
-        let borderPressedColor = style.spec.borderPressedColor
-
-        return isDisabled ? borderDisabledColor : configuration.isPressed ? borderPressedColor : style.spec.borderColor
+    private var borderColor: Color {
+        isDisabled ? style.spec.borderDisabledColor : style.spec.borderColor
     }
 
     private var styleLoading: LoaderView.CircleStyle {
