@@ -23,8 +23,7 @@ public struct ProgressBar: View {
         HStack {
             ZStack(alignment: .leading) {
                 Rectangle()
-                    // swiftlint:disable:next no_primitive_tokens - design review #186: no inactive track token
-                    .fill(Primitives.Colours.neutrals200)
+                    .fill(theme.color.borderSoft)
                     .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusStrong))
                     .frame(height: Constants.height)
                 Rectangle()
