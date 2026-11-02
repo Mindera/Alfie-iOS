@@ -72,8 +72,7 @@ public struct Tag: View {
         .background(theme.color.surfaceForegroundPrimary)
         .cornerRadius(Constants.cornerRadius)
         .frame(height: Constants.height)
-        // swiftlint:disable:next no_primitive_tokens - design review #186: no shadow token
-        .shadow(color: Primitives.Colours.neutrals900.opacity(0.1), radius: 4, x: 2, y: 2)
+        .shadow(color: .black.opacity(0.1), radius: 4, x: 2, y: 2)
     }
 }
 
