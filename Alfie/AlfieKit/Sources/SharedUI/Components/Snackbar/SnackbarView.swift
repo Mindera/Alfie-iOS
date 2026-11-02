@@ -148,26 +148,15 @@ public struct SnackbarView: View {
             return theme.color.surfaceBackgroundInvertedPrimary
 
         case .success:
-            // swiftlint:disable:next no_primitive_tokens - design review #186: no subtle success background token
-            return Primitives.Colours.semanticSuccess100
+            return theme.color.surfaceBackgroundPositive
 
         case .error:
-            // swiftlint:disable:next no_primitive_tokens - design review #186: no subtle error background token
-            return Primitives.Colours.semanticError100
+            return theme.color.surfaceBackgroundNegative
         }
     }
 
     private var foregroundColor: Color {
-        switch configuration.type {
-        case .info:
-            return theme.color.contentContentInvertedPrimary
-
-        case .success:
-            return theme.color.contentContentPositive
-
-        case .error:
-            return theme.color.contentContentNegative
-        }
+        theme.color.contentContentInvertedPrimary
     }
 }
 
