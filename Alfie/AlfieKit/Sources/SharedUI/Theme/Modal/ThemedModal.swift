@@ -92,8 +92,7 @@ struct ThemedModalSheet<Modal: View>: View {
         GeometryReader { proxy in
             ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
                 Rectangle()
-                    // swiftlint:disable:next no_primitive_tokens - design review #186: no modal overlay token
-                    .fill(Primitives.Colours.neutrals900.opacity(Constants.opacityBackground))
+                    .fill(Color.black.opacity(Constants.opacityBackground))
                     .onTapGesture {
                         onDismiss()
                     }
