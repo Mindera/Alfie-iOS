@@ -11,8 +11,7 @@ public struct ThemedPageControlConfiguration {
     public let padding: CGFloat
 
     public init(
-        // swiftlint:disable:next no_primitive_tokens - design review #186: no inactive indicator token
-        color: Color = Primitives.Colours.neutrals200,
+        color: Color = DesignSystem.shared.color.borderSoft,
         selectedColor: Color = DesignSystem.shared.color.contentContentSecondary,
         animationDuration: CGFloat = 0.3,
         size: CGFloat = 10,
