@@ -53,6 +53,12 @@ checked against the diff.
   parameter defaulting to the real thing, so a test passes a fixed value. `CurrencyFormatter` is the
   reference: it takes `locale:`, so its tests pin `en_GB` and `de_DE` rather than inheriting whatever
   the simulator is set to.
+- In a SwiftUI view the ambient seam is an environment value defaulting to the real thing. `RemoteImage`
+  loads through `\.imagePipeline` (default `ImagePipeline.shared`); a snapshot test serves its images
+  with `.remoteImageFixtures([URL: UIImage])` from `Mocks`, applied to the SUT, never by seeding the
+  shared cache. An unfixtured URL never touches the network; its failure lands asynchronously, so the
+  snapshot shows the placeholder. The PDP several-photos and `ZoomableCarouselSnapshotTests`
+  snapshots are the reference (#225).
 - Compare `Double` and `Float` with `XCTAssertEqual(_:_:accuracy:)`, at the tightest tolerance the
   maths genuinely needs — see §Tolerances.
 - Forward `file: StaticString = #filePath, line: UInt = #line` through a new assertion helper, so a
@@ -144,8 +150,9 @@ Treat them as correct, in review and when writing.
 ## Mocks and fixtures
 
 Under `Alfie/AlfieKit/Sources/Mocks/`: `Core/Features/` for mock ViewModels, `Core/Services/` for
-mock services, `Fixtures/` for the `.fixture(...)` builders. BFF mocks are Apollo-generated under
-`Sources/BFFGraph/Mocks/` — regenerate them rather than editing.
+mock services and test seams over them (`remoteImageFixtures`), `Fixtures/` for the `.fixture(...)`
+builders. BFF mocks are Apollo-generated under `Sources/BFFGraph/Mocks/` — regenerate them rather
+than editing.
 
 `Mocks` is a production `.target`, not a test target: `SharedUI` depends on it for `#Preview`s, which
 puts it in nearly every module, so anything added there ships in the app binary.

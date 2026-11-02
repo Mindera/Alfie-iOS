@@ -187,6 +187,7 @@ let package = Package(
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseRemoteConfig",package: "firebase-ios-sdk"),
+                .product(name: "Nuke", package: "nuke"),
                 .product(name: "NukeUI", package: "nuke"),
             ]
         ),
@@ -240,9 +241,11 @@ let package = Package(
         .target(
             name: "Mocks",
             dependencies: [
+                "Core",
                 "Model",
                 "Utils",
                 .product(name: "AlicerceLogging", package: "Alicerce"),
+                .product(name: "Nuke", package: "nuke"),
             ]
         ),
         
@@ -518,7 +521,9 @@ let package = Package(
         .testTarget(
             name: "SharedUITests",
             dependencies: [
+                "Mocks",
                 "SharedUI",
+                "TestUtils",
             ],
             swiftSettings: [
                 .unsafeFlags(["-enable-bare-slash-regex"])

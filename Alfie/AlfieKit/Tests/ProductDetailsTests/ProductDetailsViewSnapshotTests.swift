@@ -45,7 +45,8 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         // `defaultImage()` compares at full precision. With none, the gallery renders its reserved
         // placeholder slot: a solid square, no network, no animation, so the full-bleed band and
         // everything positioned below it are covered deterministically.
-        // Still NOT covered: the pagination indicators, which need one image per dot.
+        // The pagination indicators are covered by
+        // `test_product_details_view_with_several_gallery_photos_shows_page_indicators`.
         //
         // This is also the reference that pins the availability note below the size chips: at
         // `precision: 1.0` the case cannot pass with that line missing.
@@ -180,6 +181,24 @@ final class ProductDetailsViewSnapshotTests: XCTestCase {
         viewModel.priceType = .default(price: "£450.00")
         viewModel.isAddingToBag = true
         let sut = ProductDetailsView(viewModel: viewModel)
+        assertSnapshot(of: sut.embededInFullHeightContainer(),
+                       as: .defaultImage(),
+                       record: isRecording)
+    }
+
+    func test_product_details_view_with_several_gallery_photos_shows_page_indicators() {
+        let photos: [(url: URL, colour: UIColor)] = [
+            (URL(string: "https://cdn.alfie.test/gallery-0.jpg")!, .systemTeal),
+            (URL(string: "https://cdn.alfie.test/gallery-1.jpg")!, .systemOrange),
+            (URL(string: "https://cdn.alfie.test/gallery-2.jpg")!, .systemPurple),
+            (URL(string: "https://cdn.alfie.test/gallery-3.jpg")!, .systemGreen),
+        ]
+        let fixtures = Dictionary(uniqueKeysWithValues: photos.map { ($0.url, UIImage.solid($0.colour)) })
+        let viewModel = makeViewModel()
+        viewModel.priceType = .default(price: "£450.00")
+        viewModel.productImageUrls = photos.map(\.url)
+        let sut = ProductDetailsView(viewModel: viewModel).remoteImageFixtures(fixtures)
+
         assertSnapshot(of: sut.embededInFullHeightContainer(),
                        as: .defaultImage(),
                        record: isRecording)
