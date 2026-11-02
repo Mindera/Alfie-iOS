@@ -5,30 +5,20 @@ import SwiftUI
 public struct ThemedSearchBarView: View {
     public enum Style: CaseIterable, ThemeReading {
         case light
-        case dark
         case soft
         case softMedium
         case softLarge
 
         // swiftlint:disable vertical_whitespace_between_cases
         var focusedBackgroundColor: Color {
-            switch self {
-            case .soft,
-                .softMedium,
-                .softLarge,
-                .light:
-                theme.color.surfaceForegroundPrimary
-            case .dark:
-                theme.color.surfaceForegroundInvertedPrimary
-            }
+            theme.color.surfaceForegroundPrimary
         }
 
         var unfocusedBackgroundColor: Color {
             switch self {
             case .soft,
                 .softMedium,
-                .softLarge,
-                .dark:
+                .softLarge:
                 focusedBackgroundColor
             case .light:
                 theme.color.surfaceBackgroundPrimary
@@ -36,53 +26,26 @@ public struct ThemedSearchBarView: View {
         }
 
         var focusedBorderColor: Color {
-            switch self {
-            case .soft,
-                .softMedium,
-                .softLarge,
-                .light:
-                theme.color.contentContentPrimary
-            case .dark:
-                // swiftlint:disable:next no_primitive_tokens - design review #186: no inverted focused border token
-                Primitives.Colours.neutrals400
-            }
+            theme.color.contentContentPrimary
         }
 
         var unfocusedBorderColor: Color {
             switch self {
             case .soft,
                 .softMedium,
-                .softLarge,
-                    .dark:
-                    .clear
+                .softLarge:
+                .clear
             case .light:
                 theme.color.contentContentPrimary
             }
         }
 
         var searchTermColor: Color {
-            switch self {
-            case .soft,
-                .softMedium,
-                .softLarge,
-                .light:
-                theme.color.contentContentPrimary
-            case .dark:
-                theme.color.contentContentInvertedPrimary
-            }
+            theme.color.contentContentPrimary
         }
 
         var placeholderColor: Color {
-            switch self {
-            case .soft,
-                .softMedium,
-                .softLarge,
-                .light:
-                theme.color.contentContentTerciary
-            case .dark:
-                // swiftlint:disable:next no_primitive_tokens - design review #186: no dark placeholder token
-                Primitives.Colours.neutrals200
-            }
+            theme.color.contentContentTerciary
         }
 
         var cursorColor: Color {
@@ -90,16 +53,7 @@ public struct ThemedSearchBarView: View {
         }
 
         var iconColor: Color {
-            switch self {
-            case .soft,
-                .softMedium,
-                .softLarge,
-                .light:
-                theme.color.contentContentPrimary
-            case .dark:
-                // swiftlint:disable:next no_primitive_tokens - design review #186: no dark placeholder token
-                Primitives.Colours.neutrals200
-            }
+            theme.color.contentContentPrimary
         }
 
         var searchBarHeight: CGFloat {
@@ -107,8 +61,6 @@ public struct ThemedSearchBarView: View {
             case .soft,
                 .light:
                 32
-            case .dark:
-                38
             case .softMedium:
                 40
             case .softLarge:
@@ -122,7 +74,6 @@ public struct ThemedSearchBarView: View {
                 .softMedium:
                 theme.sizing.radiusSoft
             case .light,
-                .dark,
                 .softLarge:
                 theme.sizing.radiusRounded
             }
@@ -134,7 +85,6 @@ public struct ThemedSearchBarView: View {
                 .softMedium:
                 theme.sizing.spacingSpacingXs
             case .light,
-                .dark,
                 .softLarge:
                 theme.sizing.spacingSpacingMd
             }
@@ -480,18 +430,6 @@ struct ThemedSearchBarRightIconModifier: ViewModifier {
             placeholder: "Search Alfie",
             placeholderOnFocus: "What are you looking for?",
             style: .light,
-            dismissConfiguration: .init(type: .back)
-        )
-        .padding()
-
-        Spacer()
-
-        Text("Dark")
-        ThemedSearchBarView(
-            searchText: .constant(""),
-            placeholder: "Search Alfie",
-            placeholderOnFocus: "What are you looking for?",
-            style: .dark,
             dismissConfiguration: .init(type: .back)
         )
         .padding()
