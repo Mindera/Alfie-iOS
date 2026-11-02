@@ -165,8 +165,7 @@ public struct PriceComponentView: View {
 
     private func saleFinalPrice(_ price: String) -> some View {
         priceText(price, textSize: Constants.saleFinalPriceTextSize(for: configuration.size))
-            // swiftlint:disable:next no_primitive_tokens - design review #186: no sale price token
-            .foregroundStyle(Primitives.Colours.semanticError700)
+            .foregroundStyle(theme.color.contentContentNegative)
             .accessibilityIdentifier(AccessibilityId.priceLower)
     }
 
