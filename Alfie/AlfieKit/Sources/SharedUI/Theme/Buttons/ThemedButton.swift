@@ -69,7 +69,7 @@ public struct ThemedButton: View {
                     }
                     Text.build(textFor(text))
                         .padding(.horizontal, Constants.horizontalPadding)
-                        .padding(.vertical, -theme.sizing.spacingSpacingXs)
+                        .padding(.vertical, Constants.verticalPadding)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                     if isFullWidth {
@@ -127,7 +127,7 @@ public struct ThemedButton: View {
 
 // MARK: - ButtonType
 
-public enum ButtonType: ThemeReading {
+public enum ButtonType {
     case small
     case medium
     case big
@@ -136,11 +136,11 @@ public enum ButtonType: ThemeReading {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .small:
-            return theme.sizing.spacingSpacingXl
+            return Constants.smallHeight
         case .medium:
-            return theme.sizing.spacingSpacing2xl
+            return Constants.mediumHeight
         case .big:
-            return theme.sizing.spacingSpacing3xl
+            return Constants.bigHeight
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -150,6 +150,13 @@ public enum ButtonType: ThemeReading {
 
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
+    static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
+    static let smallHeight: CGFloat = Primitives.Spacing.spacing32
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
+    static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
+    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
+    static let bigHeight: CGFloat = Primitives.Spacing.spacing48
 }
 
 // MARK: - ThemedButtonLabel

@@ -54,25 +54,9 @@
     "$type": "dimension",
     "$value": "{spacing-spacing-4}"
   },
-  "spacing-spacing-3xl": {
-    "$type": "dimension",
-    "$value": "{spacing-spacing-48}"
-  },
   "spacing-spacing-3xs": {
     "$type": "dimension",
     "$value": "{spacing-spacing-2}"
-  },
-  "spacing-spacing-4xl": {
-    "$type": "dimension",
-    "$value": "{spacing-spacing-56}"
-  },
-  "spacing-spacing-5xl": {
-    "$type": "dimension",
-    "$value": "{spacing-spacing-64}"
-  },
-  "spacing-spacing-6xl": {
-    "$type": "dimension",
-    "$value": "{spacing-spacing-80}"
   },
   "spacing-spacing-lg": {
     "$type": "dimension",
