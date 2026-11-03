@@ -33,12 +33,6 @@ public class DesignSystem: DesignSystemProtocol {
         ]
         UIBarButtonItem.appearance().setTitleTextAttributes(attributesNormal, for: .normal)
 
-        let attributesSelected: [NSAttributedString.Key: Any] = [
-            .font: font.heading.small.uiFont,
-            .foregroundColor: Primitives.Colours.neutrals600.ui,
-        ]
-        UIBarButtonItem.appearance().setTitleTextAttributes(attributesSelected, for: .highlighted)
-
         UIBarButtonItem.appearance().tintColor = color.contentContentPrimary.ui
 
         setNavigationBarAppearance()
