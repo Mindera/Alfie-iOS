@@ -88,6 +88,10 @@ struct ThemedModalSheet<Modal: View>: View {
         horizontalSizeClass == .regular ? theme.sizing.spacingSpacing2xl : theme.sizing.spacingSpacingNone
     }
 
+    private var bottomInset: CGFloat {
+        theme.sizing.spacingSpacingXl
+    }
+
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: horizontalSizeClass == .compact ? .bottom : .center) {
@@ -149,11 +153,11 @@ struct ThemedModalSheet<Modal: View>: View {
                                             )
                                     }
                                 )
-                                .padding(.bottom, theme.sizing.spacingSpacingXl)
+                                .padding(.bottom, bottomInset)
                                 .padding(.horizontal, theme.sizing.spacingSpacingMd)
                         }
                         .scrollDisabled(modalFitsScreen)
-                        .frame(height: modalFitsScreen ? modalHeight + theme.sizing.spacingSpacingXl : nil)
+                        .frame(height: modalFitsScreen ? modalHeight + bottomInset : nil)
                         .onPreferenceChange(ViewHeightKey.self) {
                             modalHeight = $0
                             modalFitsScreen = $0 < (proxy.size.height - topMargin * 2)

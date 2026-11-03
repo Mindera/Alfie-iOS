@@ -10,23 +10,15 @@ public struct ThemedSearchBarView: View {
         case softLarge
 
         // swiftlint:disable vertical_whitespace_between_cases
-        var focusedBackgroundColor: Color {
-            theme.color.surfaceForegroundPrimary
-        }
-
         var unfocusedBackgroundColor: Color {
             switch self {
             case .soft,
                 .softMedium,
                 .softLarge:
-                focusedBackgroundColor
+                theme.color.surfaceForegroundPrimary
             case .light:
                 theme.color.surfaceBackgroundPrimary
             }
-        }
-
-        var focusedBorderColor: Color {
-            theme.color.contentContentPrimary
         }
 
         var unfocusedBorderColor: Color {
@@ -38,22 +30,6 @@ public struct ThemedSearchBarView: View {
             case .light:
                 theme.color.contentContentPrimary
             }
-        }
-
-        var searchTermColor: Color {
-            theme.color.contentContentPrimary
-        }
-
-        var placeholderColor: Color {
-            theme.color.contentContentTerciary
-        }
-
-        var cursorColor: Color {
-            searchTermColor
-        }
-
-        var iconColor: Color {
-            theme.color.contentContentPrimary
         }
 
         var searchBarHeight: CGFloat {
@@ -230,11 +206,11 @@ public struct ThemedSearchBarView: View {
                     text: $text,
                     prompt: Text(currentPlaceholder)
                         .font(Font(theme.font.body.medium.uiFont))
-                        .foregroundColor(style.placeholderColor)
+                        .foregroundColor(theme.color.contentContentTerciary)
                 )
                 .focused($isFocused)
-                .tint(style.cursorColor)
-                .foregroundStyle(style.searchTermColor)
+                .tint(theme.color.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentPrimary)
                 .keyboardType(keyboardType)
                 .submitLabel(submitLabel)
                 .font(Font(theme.font.body.medium.uiFont))
@@ -283,12 +259,12 @@ public struct ThemedSearchBarView: View {
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: style.cornerRadius)
-                        .fill(isFocused ? style.focusedBackgroundColor : style.unfocusedBackgroundColor)
+                        .fill(isFocused ? theme.color.surfaceForegroundPrimary : style.unfocusedBackgroundColor)
 
                     RoundedRectangle(cornerRadius: style.cornerRadius)
                         .inset(by: Constants.borderLineWidth)
                         .stroke(
-                            isFocused ? style.focusedBorderColor : style.unfocusedBorderColor,
+                            isFocused ? theme.color.contentContentPrimary : style.unfocusedBorderColor,
                             lineWidth: Constants.borderLineWidth
                         )
                         .padding(-Constants.borderLineWidth)
@@ -345,7 +321,7 @@ public struct ThemedSearchBarView: View {
             .resizable()
             .scaledToFit()
             .frame(width: Constants.trailingIconSize, height: Constants.trailingIconSize)
-            .foregroundStyle(style.iconColor)
+            .foregroundStyle(theme.color.contentContentPrimary)
             .transition(.scale(scale: 0, anchor: .trailing))
     }
 

@@ -13,22 +13,12 @@ public struct ColorCardAppearance: Equatable {
     /// Selection darkens the border and bolds the label — the stroke stays 1pt, unlike the size
     /// chip, and the swatch inside keeps its own unselected appearance so the marks never stack.
     public static func resolve(isSelected: Bool, isDisabled: Bool) -> Self {
-        guard !isDisabled else {
-            return .init(
-                borderColor: DesignSystem.shared.color.borderSoft,
-                borderWidth: Constants.borderWidth,
-                textColor: DesignSystem.shared.color.contentContentTerciary,
-                isSelected: false
-            )
-        }
-
+        let colors = SwatchColors(isSelected: isSelected, isEnabled: !isDisabled)
         return .init(
-            borderColor: isSelected
-                ? DesignSystem.shared.color.contentContentPrimary
-                : DesignSystem.shared.color.borderSoft,
+            borderColor: colors.border,
             borderWidth: Constants.borderWidth,
-            textColor: DesignSystem.shared.color.contentContentPrimary,
-            isSelected: isSelected
+            textColor: colors.text,
+            isSelected: isSelected && !isDisabled
         )
     }
 }
