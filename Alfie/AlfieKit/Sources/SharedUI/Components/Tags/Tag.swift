@@ -12,8 +12,7 @@ public struct TagConfiguration {
         label: String,
         showCloseButton: Bool = false,
         icon: Image? = nil,
-        // swiftlint:disable:next no_primitive_tokens - design review #186: no tag accent token
-        color: Color = Primitives.Colours.neutrals700,
+        color: Color = DesignSystem.shared.color.contentContentSecondary,
         onCloseTap: (() -> Void)? = nil
     ) {
         self.label = label
