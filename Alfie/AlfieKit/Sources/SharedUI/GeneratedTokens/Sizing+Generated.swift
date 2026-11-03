@@ -24,4 +24,27 @@ public enum Sizing {
     public static let spacingSpacingSm: CGFloat = Primitives.Spacing.spacing12
     public static let spacingSpacingXl: CGFloat = Primitives.Spacing.spacing32
     public static let spacingSpacingXs: CGFloat = Primitives.Spacing.spacing8
+
+    public static let allTokens: [(name: String, value: CGFloat)] = [
+        ("borderBorderWeightDefault", borderBorderWeightDefault),
+        ("borderBorderWeightHeavy", borderBorderWeightHeavy),
+        ("iconsIconLarge", iconsIconLarge),
+        ("iconsIconMedium", iconsIconMedium),
+        ("iconsIconSmall", iconsIconSmall),
+        ("iconsIconXlarge", iconsIconXlarge),
+        ("interactiveSmallPaddingLeftRight", interactiveSmallPaddingLeftRight),
+        ("interactiveSmallPaddingTopBottom", interactiveSmallPaddingTopBottom),
+        ("radiusRounded", radiusRounded),
+        ("radiusSoft", radiusSoft),
+        ("radiusStrong", radiusStrong),
+        ("spacingSpacing2xl", spacingSpacing2xl),
+        ("spacingSpacing2xs", spacingSpacing2xs),
+        ("spacingSpacing3xs", spacingSpacing3xs),
+        ("spacingSpacingLg", spacingSpacingLg),
+        ("spacingSpacingMd", spacingSpacingMd),
+        ("spacingSpacingNone", spacingSpacingNone),
+        ("spacingSpacingSm", spacingSpacingSm),
+        ("spacingSpacingXl", spacingSpacingXl),
+        ("spacingSpacingXs", spacingSpacingXs),
+    ]
 }

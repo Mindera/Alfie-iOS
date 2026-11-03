@@ -215,6 +215,18 @@ struct EmitterTests {
         #expect(s.contains("public static let radiusRounded: CGFloat = CGFloat(1000.0)"))
     }
 
+    @Test("theme and sizing list every token by name for showcases")
+    func allTokensListing() throws {
+        let files = try emit()
+        let t = files["Theme+Generated.swift"]!
+        let s = files["Sizing+Generated.swift"]!
+
+        #expect(t.contains("public static let allTokens: [(name: String, value: Color)] = ["))
+        #expect(t.contains("        (\"surfaceBackgroundPrimary\", surfaceBackgroundPrimary),"))
+        #expect(s.contains("public static let allTokens: [(name: String, value: CGFloat)] = ["))
+        #expect(s.contains("        (\"radiusSoft\", radiusSoft),"))
+    }
+
     @Test("typography emits nested styles referencing primitives; cycle field resolves; doc skipped")
     func typographyComposite() throws {
         let t = try emit()["Typography+Generated.swift"]!
