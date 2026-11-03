@@ -151,12 +151,9 @@ public enum ButtonType {
 private enum Constants: ThemeReading {
     static let horizontalPadding: CGFloat = 0
     static var verticalPadding: CGFloat { -theme.sizing.spacingSpacingXs }
-    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
-    static let smallHeight: CGFloat = Primitives.Spacing.spacing32
-    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
-    static let mediumHeight: CGFloat = Primitives.Spacing.spacing40
-    // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
-    static let bigHeight: CGFloat = Primitives.Spacing.spacing48
+    static var smallHeight: CGFloat { theme.componentSize.buttonHeightSmall }
+    static var mediumHeight: CGFloat { theme.componentSize.buttonHeightMedium }
+    static var bigHeight: CGFloat { theme.componentSize.buttonHeightLarge }
 }
 
 // MARK: - ThemedButtonLabel

@@ -64,7 +64,6 @@ struct ProductListingListStyleSelector: View {
     }
 }
 
-private enum Constants {
-    // swiftlint:disable:next no_primitive_tokens - design review #186: tap-target size, no size token
-    static let buttonSize: CGFloat = Primitives.Spacing.spacing32
+private enum Constants: ThemeReading {
+    static var buttonSize: CGFloat { theme.componentSize.tapTargetCompact }
 }

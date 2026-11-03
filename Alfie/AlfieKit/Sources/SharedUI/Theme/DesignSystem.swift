@@ -7,6 +7,7 @@ import SwiftUI
 public protocol DesignSystemProtocol {
     var color: Theme.Type { get }
     var sizing: Sizing.Type { get }
+    var componentSize: ComponentSize.Type { get }
     var font: TypographyProviderProtocol { get }
 
     func setupAppearance()
@@ -19,6 +20,7 @@ public class DesignSystem: DesignSystemProtocol {
 
     public let color = Theme.self
     public let sizing = Sizing.self
+    public let componentSize = ComponentSize.self
     public let font: TypographyProviderProtocol
 
     public init(font: TypographyProviderProtocol = TypographyProvider()) {

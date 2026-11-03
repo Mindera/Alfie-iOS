@@ -181,13 +181,12 @@ private enum AccessibilityId {
     static let productWishlistButton = "product-add-wishlist-btn"
 }
 
-private enum Constants {
+private enum Constants: ThemeReading {
     static let productDesignerLineLimit: Int = 1
     static let productNameLineLimit: Int = 2
     static let iconSmallSize: CGFloat = 24
     static let iconLargeSize: CGFloat = 32
-    // swiftlint:disable:next no_primitive_tokens - design review #186: tap-target size, no size token
-    static let actionMinTapSize: CGFloat = Primitives.Spacing.spacing44
+    static var actionMinTapSize: CGFloat { theme.componentSize.tapTargetMinimum }
     static let imageAspectRatio: CGFloat = 0.75
 }
 

@@ -20,7 +20,8 @@ generator pins one brand at compile time, so there is nothing to inject at runti
 - **Spacing** (padding, stack spacing, gaps) rounds to the nearest semantic step; a tie rounds
   down (20 becomes 16).
 - **Sizes** (tap targets, heights, icon and spinner sizes) are never rounded. They use a
-  `Sizing.icons*` token when one matches, otherwise a named constant holding the primitive.
+  `Sizing.icons*` token when one matches, otherwise a role-named `ComponentSize` entry in the
+  theme layer holding the primitive (`theme.componentSize.*`).
 - **Colour** maps by role, never by value. A small shift that results (n900 to n800 for primary
   text) is accepted as the design's intent.
 - **A role with no semantic token** keeps its primitive, on the lint allowlist, until design adds

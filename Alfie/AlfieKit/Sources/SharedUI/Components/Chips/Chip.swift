@@ -105,10 +105,8 @@ struct ChipStyle: ThemeReading {
         static let maxCounter: Int = 99
     }
 
-    // swiftlint:disable:next no_primitive_tokens - design review #186: no close-icon size token
-    static let closeWidth: CGFloat = Primitives.Spacing.spacing12
-    // swiftlint:disable:next no_primitive_tokens - design review #186: no close-icon size token
-    static let closeHeight: CGFloat = Primitives.Spacing.spacing12
+    static var closeWidth: CGFloat { theme.componentSize.chipCloseIcon }
+    static var closeHeight: CGFloat { theme.componentSize.chipCloseIcon }
 
     let type: ChipConfiguration.ChipType
     let isSelected: Bool
