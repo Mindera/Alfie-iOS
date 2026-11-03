@@ -105,8 +105,8 @@ struct ChipStyle: ThemeReading {
         static let maxCounter: Int = 99
     }
 
-    static var closeWidth: CGFloat { theme.componentSize.chipCloseIcon }
-    static var closeHeight: CGFloat { theme.componentSize.chipCloseIcon }
+    static var closeWidth: CGFloat { theme.sizing.spacingSpacingSm }
+    static var closeHeight: CGFloat { theme.sizing.spacingSpacingSm }
 
     let type: ChipConfiguration.ChipType
     let isSelected: Bool

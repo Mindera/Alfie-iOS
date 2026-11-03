@@ -8,10 +8,10 @@ import SwiftUI
 /// If the value is set to higher than `maxValue`, the badge will show `maxValue+`
 public struct BadgeViewModifier: ViewModifier {
     private enum Constants: ThemeReading {
-        static var badgeHeight: CGFloat { theme.componentSize.badgeHeight }
+        static var badgeHeight: CGFloat { theme.sizing.iconsIconSmall }
         static var textPadding: CGFloat { theme.sizing.spacingSpacing2xs }
-        static var indicatorHeight: CGFloat { theme.componentSize.badgeIndicator }
-        static var indicatorWidth: CGFloat { theme.componentSize.badgeIndicator }
+        static var indicatorHeight: CGFloat { theme.sizing.spacingSpacingSm }
+        static var indicatorWidth: CGFloat { theme.sizing.spacingSpacingSm }
         static let capsuleOffsetXFactor = 3 // layout multiplier, no design token
         static var borderLineWidth: CGFloat { CGFloat(theme.sizing.borderBorderWeightDefault) }
     }

@@ -96,8 +96,8 @@ Views read design values only through `theme` (ADR 0006):
 - **Spacing**: `theme.sizing.spacingSpacing*`. A value between steps rounds to the nearest step,
   a tie rounds down.
 - **Radius**: `theme.sizing.radius*`.
-- **Sizes** (tap targets, heights, icons): `theme.sizing.icons*` when one matches, never rounded;
-  otherwise `theme.componentSize.*` (below).
+- **Sizes** (tap targets, heights, icons): the generated `theme.sizing.*` token of the exact
+  value (`icons*`, else `spacingSpacing*`), never rounded.
 
 Where `theme` comes from:
 
@@ -108,16 +108,12 @@ Where `theme` comes from:
 ## Primitive tokens
 
 The `no_primitive_tokens` SwiftLint rule (`Alfie/.swiftlint.yml`) flags any `Primitives.` read
-outside the theme layer (`SharedUI/Theme/DesignSystem.swift`, `SharedUI/Theme/ComponentSize.swift`,
+outside the theme layer (`SharedUI/Theme/DesignSystem.swift`,
 `SharedUI/Theme/Typography/`) and `SharedUI/GeneratedTokens/`. It is an **error**: `lint.sh` and the pre-commit hook fail on it.
 
 A role with no Semantic token keeps its primitive until design adds the token upstream in
-`Alfie-Mobile-Design-Tokens`; never invent a value here.
-
-- **A size** goes in `ComponentSize` (`SharedUI/Theme/ComponentSize.swift`), named by role and holding
-  its primitive, and is read as `theme.componentSize.<role>`. When the token ships, swap the primitive
-  there for the generated `Sizing` token. Open gaps are tracked in #235.
-- **Any other role** allowlists that line, naming the design review item that tracks the gap:
+`Alfie-Mobile-Design-Tokens`; never invent a value here. Allowlist that line, naming the design
+review item that tracks the gap:
 
 ```swift
 .fill(Primitives.Colours.brand200) // swiftlint:disable:this no_primitive_tokens - design review #186: no highlight-surface token

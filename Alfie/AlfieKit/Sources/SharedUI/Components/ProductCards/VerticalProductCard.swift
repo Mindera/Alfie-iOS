@@ -186,7 +186,7 @@ private enum Constants: ThemeReading {
     static let productNameLineLimit: Int = 2
     static let iconSmallSize: CGFloat = 24
     static let iconLargeSize: CGFloat = 32
-    static var actionMinTapSize: CGFloat { theme.componentSize.tapTargetMinimum }
+    static var actionMinTapSize: CGFloat { theme.sizing.spacingSpacing3xl }
     static let imageAspectRatio: CGFloat = 0.75
 }
 

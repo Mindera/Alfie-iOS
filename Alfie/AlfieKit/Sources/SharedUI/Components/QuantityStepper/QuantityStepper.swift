@@ -43,7 +43,7 @@ public struct QuantityStepper: View {
         quantity: Int,
         bounds: ClosedRange<Int>,
         isDisabled: Bool = false,
-        height: CGFloat = DesignSystem.shared.componentSize.stepperHeight,
+        height: CGFloat = DesignSystem.shared.sizing.spacingSpacing2xl,
         cornerRadius: CGFloat = DesignSystem.shared.sizing.radiusSoft,
         accessibility: Accessibility,
         onDecrease: @escaping () -> Void,

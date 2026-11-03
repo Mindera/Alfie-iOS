@@ -17,7 +17,11 @@ public enum Sizing {
     public static let radiusStrong: CGFloat = Primitives.Spacing.spacing16
     public static let spacingSpacing2xl: CGFloat = Primitives.Spacing.spacing40
     public static let spacingSpacing2xs: CGFloat = Primitives.Spacing.spacing4
+    public static let spacingSpacing3xl: CGFloat = Primitives.Spacing.spacing48
     public static let spacingSpacing3xs: CGFloat = Primitives.Spacing.spacing2
+    public static let spacingSpacing4xl: CGFloat = Primitives.Spacing.spacing56
+    public static let spacingSpacing5xl: CGFloat = Primitives.Spacing.spacing64
+    public static let spacingSpacing6xl: CGFloat = Primitives.Spacing.spacing80
     public static let spacingSpacingLg: CGFloat = Primitives.Spacing.spacing24
     public static let spacingSpacingMd: CGFloat = Primitives.Spacing.spacing16
     public static let spacingSpacingNone: CGFloat = Primitives.Spacing.spacing0
@@ -39,7 +43,11 @@ public enum Sizing {
         ("radiusStrong", radiusStrong),
         ("spacingSpacing2xl", spacingSpacing2xl),
         ("spacingSpacing2xs", spacingSpacing2xs),
+        ("spacingSpacing3xl", spacingSpacing3xl),
         ("spacingSpacing3xs", spacingSpacing3xs),
+        ("spacingSpacing4xl", spacingSpacing4xl),
+        ("spacingSpacing5xl", spacingSpacing5xl),
+        ("spacingSpacing6xl", spacingSpacing6xl),
         ("spacingSpacingLg", spacingSpacingLg),
         ("spacingSpacingMd", spacingSpacingMd),
         ("spacingSpacingNone", spacingSpacingNone),

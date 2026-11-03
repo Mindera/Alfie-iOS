@@ -151,9 +151,9 @@ public enum ButtonType {
 private enum Constants: ThemeReading {
     static let horizontalPadding: CGFloat = 0
     static var verticalPadding: CGFloat { -theme.sizing.spacingSpacingXs }
-    static var smallHeight: CGFloat { theme.componentSize.buttonHeightSmall }
-    static var mediumHeight: CGFloat { theme.componentSize.buttonHeightMedium }
-    static var bigHeight: CGFloat { theme.componentSize.buttonHeightLarge }
+    static var smallHeight: CGFloat { theme.sizing.spacingSpacingXl }
+    static var mediumHeight: CGFloat { theme.sizing.spacingSpacing2xl }
+    static var bigHeight: CGFloat { theme.sizing.spacingSpacing3xl }
 }
 
 // MARK: - ThemedButtonLabel

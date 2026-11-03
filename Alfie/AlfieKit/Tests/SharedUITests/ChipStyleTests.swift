@@ -88,7 +88,7 @@ final class ChipStyleTests: XCTestCase {
     func test_border_width_normal_uses_border_weight_default_token() {
         let sut = ChipStyle(type: .small, isSelected: false, isDisabled: false, counter: nil)
 
-        XCTAssertEqual(sut.borderWidth, Primitives.Border.borderWeightDefault)
+        XCTAssertEqual(sut.borderWidth, Sizing.borderBorderWeightDefault)
     }
 
     func test_border_width_is_thicker_when_selected() {
@@ -106,7 +106,7 @@ final class ChipStyleTests: XCTestCase {
     func test_border_width_is_normal_when_unselected_and_disabled() {
         let sut = ChipStyle(type: .small, isSelected: false, isDisabled: true, counter: nil)
 
-        XCTAssertEqual(sut.borderWidth, Primitives.Border.borderWeightDefault)
+        XCTAssertEqual(sut.borderWidth, Sizing.borderBorderWeightDefault)
     }
 
     // MARK: - Height
@@ -126,8 +126,8 @@ final class ChipStyleTests: XCTestCase {
     // MARK: - Close-icon size
 
     func test_close_icon_size_uses_spacing12_token() {
-        XCTAssertEqual(ChipStyle.closeWidth, Primitives.Spacing.spacing12)
-        XCTAssertEqual(ChipStyle.closeHeight, Primitives.Spacing.spacing12)
+        XCTAssertEqual(ChipStyle.closeWidth, Sizing.spacingSpacingSm)
+        XCTAssertEqual(ChipStyle.closeHeight, Sizing.spacingSpacingSm)
     }
 
     // MARK: - Counter label

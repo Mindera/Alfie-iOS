@@ -10,7 +10,7 @@ public struct LoadingSpinner: View {
 
     private enum Constants: ThemeReading {
         static let rotationDuration: Double = 1
-        static var largeDimension: CGFloat { theme.componentSize.spinnerLarge }
+        static var largeDimension: CGFloat { theme.sizing.spacingSpacing3xl }
     }
 
     @Environment(\.theme) private var theme

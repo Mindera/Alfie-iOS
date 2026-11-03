@@ -65,5 +65,5 @@ struct ProductListingListStyleSelector: View {
 }
 
 private enum Constants: ThemeReading {
-    static var buttonSize: CGFloat { theme.componentSize.tapTargetCompact }
+    static var buttonSize: CGFloat { theme.sizing.spacingSpacingXl }
 }
