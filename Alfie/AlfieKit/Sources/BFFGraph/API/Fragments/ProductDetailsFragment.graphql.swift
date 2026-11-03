@@ -6,7 +6,7 @@
 public extension BFFGraphAPI {
   struct ProductDetailsFragment: BFFGraphAPI.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      #"fragment ProductDetailsFragment on OmniProduct { __typename id name slug brandName descriptionHtml defaultVariantId inventoryTotal priceRange { __typename minVariantPrice { __typename ...MoneyFragment } maxVariantPrice { __typename ...MoneyFragment } } primaryImage { __typename url altText } variants { __typename id sku price { __typename ...MoneyFragment } compareAtPrice { __typename ...MoneyFragment } inventory { __typename available } optionValues { __typename name value } media { __typename url altText } } }"#
+      #"fragment ProductDetailsFragment on OmniProduct { __typename id name slug brandName descriptionHtml defaultVariantId inventoryTotal priceRange { __typename minVariantPrice { __typename ...MoneyFragment } maxVariantPrice { __typename ...MoneyFragment } } primaryImage { __typename ...ImageFragment } images { __typename ...ImageFragment } variants { __typename id sku price { __typename ...MoneyFragment } compareAtPrice { __typename ...MoneyFragment } inventory { __typename available } optionValues { __typename name value } media { __typename ...ImageFragment } } }"#
     }
 
     public let __data: DataDict
@@ -24,6 +24,7 @@ public extension BFFGraphAPI {
       .field("inventoryTotal", Int?.self),
       .field("priceRange", PriceRange.self),
       .field("primaryImage", PrimaryImage?.self),
+      .field("images", [Image].self),
       .field("variants", [Variant?]?.self),
     ] }
 
@@ -36,6 +37,7 @@ public extension BFFGraphAPI {
     public var inventoryTotal: Int? { __data["inventoryTotal"] }
     public var priceRange: PriceRange { __data["priceRange"] }
     public var primaryImage: PrimaryImage? { __data["primaryImage"] }
+    public var images: [Image] { __data["images"] }
     public var variants: [Variant?]? { __data["variants"] }
 
     /// PriceRange
@@ -114,12 +116,42 @@ public extension BFFGraphAPI {
       public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Image }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
-        .field("url", String.self),
-        .field("altText", String?.self),
+        .fragment(ImageFragment.self),
       ] }
 
       public var url: String { __data["url"] }
       public var altText: String? { __data["altText"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var imageFragment: ImageFragment { _toFragment() }
+      }
+    }
+
+    /// Image
+    ///
+    /// Parent Type: `Image`
+    public struct Image: BFFGraphAPI.SelectionSet {
+      public let __data: DataDict
+      public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Image }
+      public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .fragment(ImageFragment.self),
+      ] }
+
+      public var url: String { __data["url"] }
+      public var altText: String? { __data["altText"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var imageFragment: ImageFragment { _toFragment() }
+      }
     }
 
     /// Variant
@@ -241,12 +273,18 @@ public extension BFFGraphAPI {
         public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Image }
         public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("url", String.self),
-          .field("altText", String?.self),
+          .fragment(ImageFragment.self),
         ] }
 
         public var url: String { __data["url"] }
         public var altText: String? { __data["altText"] }
+
+        public struct Fragments: FragmentContainer {
+          public let __data: DataDict
+          public init(_dataDict: DataDict) { __data = _dataDict }
+
+          public var imageFragment: ImageFragment { _toFragment() }
+        }
       }
     }
   }

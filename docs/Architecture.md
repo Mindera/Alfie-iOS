@@ -303,6 +303,7 @@ make those changes in Xcode.
 - **Model** is the most foundational (depends only on Utils)
 - **Core** depends on Model, Utils, BFFGraph
 - **SharedUI** depends on Core, Model, Mocks
+- **Mocks** depends on Core, Model, Utils and Nuke (for `remoteImageFixtures`)
 - **Feature modules** depend on Model, SharedUI, Core, and other feature modules as needed
 
 ## Services & Dependency Injection

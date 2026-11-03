@@ -28,6 +28,15 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
                        "The default variant should surface media for the PDP carousel")
     }
 
+    func test_get_product_with_several_photos_surfaces_the_full_gallery_as_colour_media() async throws {
+        let product = try await sut.getProduct(handle: IntegrationSeed.handleWithSeveralPhotos)
+
+        XCTAssertGreaterThan(
+            product.defaultVariant.media.count, 1,
+            "'\(IntegrationSeed.handleWithSeveralPhotos)' should carry its full Gallery as Colour media"
+        )
+    }
+
     func test_getProduct_unknownHandle_throwsBFFRequestError() async throws {
         do {
             _ = try await sut.getProduct(handle: "alfie-integration-nonexistent-slug-000")

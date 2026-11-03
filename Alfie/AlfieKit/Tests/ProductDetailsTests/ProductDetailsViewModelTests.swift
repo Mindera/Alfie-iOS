@@ -196,6 +196,28 @@ final class ProductDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(sut.productImageUrls[1].absoluteString, variant.media[1].asImage?.url.absoluteString)
     }
 
+    func test_product_with_a_gallery_of_several_photos_shows_every_photo_starting_on_the_variant_image() {
+        let variantImage = URL(string: "https://cdn.alfie.test/gallery-2.jpg")!
+        let gallery = [
+            variantImage,
+            URL(string: "https://cdn.alfie.test/gallery-0.jpg")!,
+            URL(string: "https://cdn.alfie.test/gallery-1.jpg")!,
+            URL(string: "https://cdn.alfie.test/gallery-3.jpg")!,
+        ]
+        let variant = Product.Variant.fixture(
+            colour: .fixture(media: gallery.map { .image(.fixture(url: $0)) })
+        )
+        mockProductService.onGetProductCalled = { _ in
+            .fixture(defaultVariant: variant, variants: [variant])
+        }
+        initViewModel(configuration: .id("t-shirt"))
+
+        XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.productImageUrls, gallery)
+        XCTAssertTrue(sut.shouldShowMediaPaginatedControl)
+    }
+
     // MARK: - Add to Bag gating
 
     func test_add_to_bag_needs_a_size_on_init_for_a_multi_size_product_even_with_stock() {

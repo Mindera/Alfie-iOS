@@ -6,11 +6,11 @@ import Utils
 extension BFFGraphAPI.ProductDetailsFragment {
     func convertToProduct() -> Product {
         let fragmentVariants = (variants ?? []).compactMap { $0 }
-        // Product-level image used as a media fallback for variants that carry none of their own.
-        let fallbackMedia: [Media] = primaryImage
-            .flatMap { image in URL(string: image.url).map { ($0, image.altText) } }
-            .map { [.image(MediaImage(alt: $0.1, mediaContentType: .image, url: $0.0))] } ?? []
-        let domainVariants = fragmentVariants.map { $0.convertToVariant(fallbackMedia: fallbackMedia) }
+        let gallery = images.compactMap { $0.fragments.imageFragment.toDomainMedia() }
+        let primaryImageMedia = primaryImage?.fragments.imageFragment.toDomainMedia()
+        let domainVariants = fragmentVariants.map {
+            $0.convertToVariant(gallery: gallery, primaryImage: primaryImageMedia)
+        }
 
         // Resolved by index on the fragment variants, which carry the `inventory` the in-stock
         // fallback needs, then mapped to the converted domain variant.
@@ -18,7 +18,7 @@ extension BFFGraphAPI.ProductDetailsFragment {
         if let index = defaultVariantIndex(in: fragmentVariants) {
             defaultVariant = domainVariants[index]
         } else {
-            defaultVariant = syntheticDefaultVariant()
+            defaultVariant = syntheticDefaultVariant(gallery: gallery, primaryImage: primaryImageMedia)
         }
 
         let lowMoney = priceRange.minVariantPrice.fragments.moneyFragment.toDomainMoney()
@@ -64,16 +64,9 @@ extension BFFGraphAPI.ProductDetailsFragment {
 
     /// Fallback when the BFF returns no variants: synthesise one from product-level fields so
     /// `Product.defaultVariant` (non-optional) is always satisfiable.
-    private func syntheticDefaultVariant() -> Product.Variant {
-        let colour: Product.Colour? = primaryImage.flatMap { image in
-            URL(string: image.url).map { url in
-                Product.Colour(
-                    swatch: nil,
-                    name: "",
-                    media: [.image(MediaImage(alt: image.altText, mediaContentType: .image, url: url))]
-                )
-            }
-        }
+    private func syntheticDefaultVariant(gallery: [Media], primaryImage: Media?) -> Product.Variant {
+        let media = Media.colourMedia(gallery: gallery, startingOn: nil, fallback: primaryImage)
+        let colour = media.isEmpty ? nil : Product.Colour(swatch: nil, name: "", media: media)
 
         return Product.Variant(
             sku: "",
@@ -104,11 +97,9 @@ extension BFFGraphAPI.ProductDetailsFragment {
 }
 
 extension BFFGraphAPI.ProductDetailsFragment.Variant {
-    func convertToVariant(fallbackMedia: [Media]) -> Product.Variant {
-        let variantMedia: [Media] = (media ?? []).compactMap { $0?.toDomainMedia() }
-        // The PDP carousel reads `Product.Variant.media`, which is derived from the variant's
-        // colour. Use the variant's own media, falling back to the product image when it has none.
-        let resolvedMedia = variantMedia.isEmpty ? fallbackMedia : variantMedia
+    func convertToVariant(gallery: [Media], primaryImage: Media?) -> Product.Variant {
+        let variantImage = (media ?? []).lazy.compactMap { $0?.fragments.imageFragment.toDomainMedia() }.first
+        let resolvedMedia = Media.colourMedia(gallery: gallery, startingOn: variantImage, fallback: primaryImage)
 
         // Reconstruct typed colour/size from the generic `optionValues[]` by matching the option
         // name case-insensitively. When there is no colour dimension (e.g. Shopify single-option
@@ -159,10 +150,26 @@ extension BFFGraphAPI.ProductDetailsFragment.Variant {
     }
 }
 
-extension BFFGraphAPI.ProductDetailsFragment.Variant.Medium {
+extension BFFGraphAPI.ImageFragment {
     func toDomainMedia() -> Media? {
-        guard let url = URL(string: url) else { return nil }
-        return .image(MediaImage(alt: altText, mediaContentType: .image, url: url))
+        URL(string: url).map { .image(MediaImage(alt: altText, mediaContentType: .image, url: $0)) }
+    }
+}
+
+private extension Media {
+    static func colourMedia(
+        gallery: [Media],
+        startingOn variantImage: Media?,
+        fallback primaryImage: Media?
+    ) -> [Media] {
+        guard !gallery.isEmpty else {
+            return [variantImage ?? primaryImage].compactMap { $0 }
+        }
+        guard let variantImage else { return gallery }
+
+        let isVariantImage: (Media) -> Bool = { $0.asImage?.url == variantImage.asImage?.url }
+        let galleryPhotoOfVariantImage = gallery.first(where: isVariantImage)
+        return [galleryPhotoOfVariantImage ?? variantImage] + gallery.filter { !isVariantImage($0) }
     }
 }
 
