@@ -69,7 +69,7 @@ public struct ThemedButton: View {
                     }
                     Text.build(textFor(text))
                         .padding(.horizontal, Constants.horizontalPadding)
-                        .padding(.vertical, Constants.verticalPadding)
+                        .padding(.vertical, -theme.sizing.spacingSpacingXs)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                     if isFullWidth {
@@ -127,7 +127,7 @@ public struct ThemedButton: View {
 
 // MARK: - ButtonType
 
-public enum ButtonType {
+public enum ButtonType: ThemeReading {
     case small
     case medium
     case big
@@ -136,11 +136,11 @@ public enum ButtonType {
         // swiftlint:disable vertical_whitespace_between_cases
         switch self {
         case .small:
-            return Constants.smallHeight
+            return theme.sizing.spacingSpacingXl
         case .medium:
-            return Constants.mediumHeight
+            return theme.sizing.spacingSpacing2xl
         case .big:
-            return Constants.bigHeight
+            return theme.sizing.spacingSpacing3xl
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
@@ -150,10 +150,6 @@ public enum ButtonType {
 
 private enum Constants {
     static let horizontalPadding: CGFloat = 0
-    static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
-    static var smallHeight: CGFloat { DesignSystem.shared.sizing.spacingSpacingXl }
-    static var mediumHeight: CGFloat { DesignSystem.shared.sizing.spacingSpacing2xl }
-    static var bigHeight: CGFloat { DesignSystem.shared.sizing.spacingSpacing3xl }
 }
 
 // MARK: - ThemedButtonLabel
