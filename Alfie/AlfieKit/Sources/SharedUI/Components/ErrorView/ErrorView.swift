@@ -64,8 +64,8 @@ public struct ErrorView: View {
             spacing: spacing,
             icon: icon,
             iconSize: iconSize,
-            title: title.map { DesignSystem.shared.font.body.medium($0) },
-            message: message.map { DesignSystem.shared.font.body.small($0) },
+            title: title.map { Self.theme.font.body.medium($0) },
+            message: message.map { Self.theme.font.body.small($0) },
             buttons: buttons
         )
     }

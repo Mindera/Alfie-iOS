@@ -99,6 +99,12 @@ Views read design values only through `theme` (ADR 0006):
 - **Sizes** (tap targets, heights, icons): `theme.sizing.icons*` when one matches, never rounded;
   otherwise an allowlisted primitive (below).
 
+Where `theme` comes from:
+
+- `View` / `ViewModifier`: `theme`, or `Self.theme` in a static context or an `init` body.
+- Styles, resolvers, enums and `Constants`: conform to `ThemeReading`.
+- Init default arguments and `#Preview`: `DesignSystem.shared`, since neither has `self`.
+
 ## Primitive tokens
 
 The `no_primitive_tokens` SwiftLint rule (`Alfie/.swiftlint.yml`) flags any `Primitives.` read

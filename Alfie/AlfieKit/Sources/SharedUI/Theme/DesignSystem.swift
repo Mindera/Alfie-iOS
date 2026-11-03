@@ -82,10 +82,10 @@ public class DesignSystem: DesignSystemProtocol {
 
 // MARK: - ThemeReading
 
-/// `theme` for SharedUI types that are neither `View` nor `ViewModifier` (styles, resolvers, enums).
-protocol ThemeReading {}
+/// `theme` for types that are neither `View` nor `ViewModifier` (styles, resolvers, enums, `Constants`).
+public protocol ThemeReading {}
 
-extension ThemeReading {
+public extension ThemeReading {
     var theme: DesignSystemProtocol { DesignSystem.shared }
     static var theme: DesignSystemProtocol { DesignSystem.shared }
 }

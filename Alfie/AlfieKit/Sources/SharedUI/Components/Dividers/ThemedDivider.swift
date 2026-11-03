@@ -32,7 +32,7 @@ public struct ThemedDivider: View {
             configuration: .init(
                 orientation: .horizontal,
                 thickness: Constants.thinThickness,
-                color: DesignSystem.shared.color.borderSoft
+                color: theme.color.borderSoft
             )
         )
     }
@@ -41,7 +41,7 @@ public struct ThemedDivider: View {
             configuration: .init(
                 orientation: .vertical,
                 thickness: Constants.thinThickness,
-                color: DesignSystem.shared.color.borderSoft
+                color: theme.color.borderSoft
             )
         )
     }
@@ -50,7 +50,7 @@ public struct ThemedDivider: View {
             configuration: .init(
                 orientation: .horizontal,
                 thickness: Constants.thickThickness,
-                color: DesignSystem.shared.color.borderSoft
+                color: theme.color.borderSoft
             )
         )
     }
@@ -59,7 +59,7 @@ public struct ThemedDivider: View {
             configuration: .init(
                 orientation: .vertical,
                 thickness: Constants.thickThickness,
-                color: DesignSystem.shared.color.borderSoft
+                color: theme.color.borderSoft
             )
         )
     }

@@ -165,10 +165,10 @@ private struct BagLoadingView: View {
     }
 }
 
-private enum Constants {
+private enum Constants: ThemeReading {
     static let skeletonRowCount = 4
-    static var lineSpacing: CGFloat { DesignSystem.shared.sizing.spacingSpacingXs }
-    static var skeletonRowSpacing: CGFloat { lineSpacing * 2 + DesignSystem.shared.sizing.borderBorderWeightDefault }
+    static var lineSpacing: CGFloat { theme.sizing.spacingSpacingXs }
+    static var skeletonRowSpacing: CGFloat { lineSpacing * 2 + theme.sizing.borderBorderWeightDefault }
 }
 
 #if DEBUG

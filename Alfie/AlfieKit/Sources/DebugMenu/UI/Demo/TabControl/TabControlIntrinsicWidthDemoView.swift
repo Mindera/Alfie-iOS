@@ -4,13 +4,13 @@ import SwiftUI
 struct TabControlIntrinsicWidthDemoView: View {
     @State private var tabTheme = TabControl.Style.light
     @State private var numberOfOptions = 3
-    @State private var spacing = DesignSystem.shared.sizing.spacingSpacingMd
+    @State private var spacing = Self.theme.sizing.spacingSpacingMd
     @State private var currentIndex: Int = 0
     @State private var showIcons = false
     private let options = ["Product Description", "Reviews", "Online Promotion", "Offers", "Delivery"]
     private var spacingOptions = [
-        DesignSystem.shared.sizing.spacingSpacingXs,
-        DesignSystem.shared.sizing.spacingSpacingMd,
+        Self.theme.sizing.spacingSpacingXs,
+        Self.theme.sizing.spacingSpacingMd,
     ]
     private var themeOptions = TabControl.Style.allCases
     private var currentOptions: [String] {

@@ -148,9 +148,9 @@ public enum ButtonType {
 
 // MARK: - Constants
 
-private enum Constants {
+private enum Constants: ThemeReading {
     static let horizontalPadding: CGFloat = 0
-    static var verticalPadding: CGFloat { -DesignSystem.shared.sizing.spacingSpacingXs }
+    static var verticalPadding: CGFloat { -theme.sizing.spacingSpacingXs }
     // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token
     static let smallHeight: CGFloat = Primitives.Spacing.spacing32
     // swiftlint:disable:next no_primitive_tokens - design review #186: no button height token

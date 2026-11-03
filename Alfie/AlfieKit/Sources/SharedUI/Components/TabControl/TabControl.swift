@@ -45,7 +45,7 @@ public struct TabControl: View {
             case .intrisicSize(let itemSpacing):
                 itemSpacing
             case .fixedSize:
-                DesignSystem.shared.sizing.spacingSpacingNone
+                theme.sizing.spacingSpacingNone
             }
         }
 

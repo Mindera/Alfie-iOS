@@ -27,9 +27,9 @@ public struct ThemedPageControlConfiguration {
     }
 }
 
-extension ThemedPageControlConfiguration {
+extension ThemedPageControlConfiguration: ThemeReading {
     static let `default` = ThemedPageControlConfiguration(
         size: 8,
-        spacing: DesignSystem.shared.sizing.spacingSpacing2xs
+        spacing: theme.sizing.spacingSpacing2xs
     )
 }

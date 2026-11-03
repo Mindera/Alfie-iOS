@@ -4,7 +4,7 @@ import Utils
 /// Resolves a `RangeSlider`'s geometry, value arithmetic and colours. Extracted from the view so
 /// the parts that can actually be wrong — stepping, clamping, the collapsed-range tie-break — are
 /// unit-testable without a rendered slider or a snapshot.
-struct RangeSliderStyle {
+struct RangeSliderStyle: ThemeReading {
     enum Thumb: Equatable {
         case lower
         case upper
@@ -145,10 +145,10 @@ struct RangeSliderStyle {
 
     // MARK: - Colours
 
-    var trackColor: Color { DesignSystem.shared.color.borderSoft }
-    var activeTrackColor: Color { DesignSystem.shared.color.contentContentPrimary }
-    var thumbFillColor: Color { DesignSystem.shared.color.surfaceBackgroundPrimary }
-    var thumbBorderColor: Color { DesignSystem.shared.color.contentContentPrimary }
+    var trackColor: Color { theme.color.borderSoft }
+    var activeTrackColor: Color { theme.color.contentContentPrimary }
+    var thumbFillColor: Color { theme.color.surfaceBackgroundPrimary }
+    var thumbBorderColor: Color { theme.color.contentContentPrimary }
 
     // MARK: - Dimensions
 

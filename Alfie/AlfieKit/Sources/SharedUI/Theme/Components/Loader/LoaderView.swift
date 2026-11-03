@@ -6,7 +6,7 @@ public struct LoaderView: View {
         case custom(CGFloat)
     }
 
-    public enum CircleStyle {
+    public enum CircleStyle: ThemeReading {
         case dark
         case light
 
@@ -14,18 +14,18 @@ public struct LoaderView: View {
             // swiftlint:disable vertical_whitespace_between_cases
             switch self {
             case .dark:
-                return DesignSystem.shared.color.contentContentPrimary
+                return theme.color.contentContentPrimary
             case .light:
-                return DesignSystem.shared.color.contentContentInvertedPrimary
+                return theme.color.contentContentInvertedPrimary
             }
             // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
-    private enum Constants {
+    private enum Constants: ThemeReading {
         static let smallCircleDiameter: CGFloat = 8
-        static var circleSpacing: CGFloat { DesignSystem.shared.sizing.spacingSpacingXs }
-        static var circlesToLabelSpacing: CGFloat { DesignSystem.shared.sizing.spacingSpacingSm }
+        static var circleSpacing: CGFloat { theme.sizing.spacingSpacingXs }
+        static var circlesToLabelSpacing: CGFloat { theme.sizing.spacingSpacingSm }
         static let numberOfCircles = 3
         static let animationTime: Double = 0.5
     }

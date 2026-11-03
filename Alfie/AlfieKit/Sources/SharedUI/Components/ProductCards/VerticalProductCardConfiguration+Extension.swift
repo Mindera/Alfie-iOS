@@ -2,7 +2,7 @@ import Foundation
 import Model
 import SwiftUI
 
-extension VerticalProductCardConfiguration {
+extension VerticalProductCardConfiguration: ThemeReading {
     // swiftlint:disable vertical_whitespace_between_cases
     var cardSize: CardIntrinsicSize {
         switch size {
@@ -18,7 +18,7 @@ extension VerticalProductCardConfiguration {
         // Figma: 8pt between image, details and price for the PLP grid/list cards.
         switch size {
         case .small, .medium, .large:
-            DesignSystem.shared.sizing.spacingSpacingXs
+            theme.sizing.spacingSpacingXs
         }
     }
 
@@ -35,17 +35,17 @@ extension VerticalProductCardConfiguration {
 
     /// Brand / designer label — Figma `label/small` (12pt) across all card sizes.
     var designerFont: UIFont {
-        DesignSystem.shared.font.body.small.uiFont
+        theme.font.body.small.uiFont
     }
 
     /// Product name — Figma `body/medium` (16pt) on PLP grid/list; small carousel keeps 12pt.
     var nameFont: UIFont {
         switch size {
         case .small:
-            DesignSystem.shared.font.body.small.uiFont
+            theme.font.body.small.uiFont
         case .medium,
              .large: // swiftlint:disable:this indentation_width
-            DesignSystem.shared.font.body.medium.uiFont
+            theme.font.body.medium.uiFont
         }
     }
 
@@ -53,10 +53,10 @@ extension VerticalProductCardConfiguration {
     var nameColor: Color {
         switch size {
         case .small:
-            DesignSystem.shared.color.contentContentTerciary
+            theme.color.contentContentTerciary
         case .medium,
              .large: // swiftlint:disable:this indentation_width
-            DesignSystem.shared.color.contentContentPrimary
+            theme.color.contentContentPrimary
         }
     }
 
@@ -64,7 +64,7 @@ extension VerticalProductCardConfiguration {
     var nameLineHeight: CGFloat {
         switch size {
         case .small:
-            DesignSystem.shared.font.body.small.uiFont.lineHeight
+            theme.font.body.small.uiFont.lineHeight
         case .medium,
              .large: // swiftlint:disable:this indentation_width
             24

@@ -3,7 +3,7 @@ import SwiftUI
 
 public struct StyleGuideDemoView: View {
     public init() {
-        DesignSystem.shared.setupAppearance()
+        Self.theme.setupAppearance()
     }
 
     public var body: some View {

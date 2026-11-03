@@ -3,17 +3,9 @@ import SwiftUI
 
 struct SpacingDemoView: View {
     private var tokens: [(name: String, value: CGFloat)] {
-        [
-            ("spacingSpacingNone", theme.sizing.spacingSpacingNone),
-            ("spacingSpacing3xs", theme.sizing.spacingSpacing3xs),
-            ("spacingSpacing2xs", theme.sizing.spacingSpacing2xs),
-            ("spacingSpacingXs", theme.sizing.spacingSpacingXs),
-            ("spacingSpacingSm", theme.sizing.spacingSpacingSm),
-            ("spacingSpacingMd", theme.sizing.spacingSpacingMd),
-            ("spacingSpacingLg", theme.sizing.spacingSpacingLg),
-            ("spacingSpacingXl", theme.sizing.spacingSpacingXl),
-            ("spacingSpacing2xl", theme.sizing.spacingSpacing2xl),
-        ]
+        theme.sizing.allTokens
+            .filter { $0.name.hasPrefix("spacingSpacing") }
+            .sorted { $0.value < $1.value }
     }
 
     var body: some View {
@@ -41,7 +33,7 @@ struct SpacingDemoView: View {
             Image(systemName: "arrow.down.to.line")
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: .infinity, maxHeight: 16)
+                .frame(maxWidth: .infinity, maxHeight: theme.sizing.iconsIconSmall)
                 .background(theme.color.surfaceBackgroundInvertedPrimary)
                 .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .padding(.top, theme.sizing.spacingSpacingMd)
@@ -51,7 +43,7 @@ struct SpacingDemoView: View {
             Image(systemName: "arrow.up.to.line")
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: .infinity, maxHeight: 16)
+                .frame(maxWidth: .infinity, maxHeight: theme.sizing.iconsIconSmall)
                 .background(theme.color.surfaceBackgroundInvertedPrimary)
                 .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .padding(.bottom, theme.sizing.spacingSpacingMd)

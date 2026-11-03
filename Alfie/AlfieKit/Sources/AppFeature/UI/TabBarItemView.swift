@@ -57,19 +57,17 @@ struct TabBarItemView: View {
         badgeValue.map(L10n.Accessibility.bagBadge) ?? ""
     }
 
-    enum Style {
-        private static var color: Theme.Type { DesignSystem.shared.color }
-
+    enum Style: ThemeReading {
         static func iconColour(isSelected: Bool) -> Color {
-            isSelected ? color.contentContentPrimary : color.contentContentPrimaryDisabled
+            isSelected ? theme.color.contentContentPrimary : theme.color.contentContentPrimaryDisabled
         }
 
         static func labelColour(isSelected: Bool) -> Color {
-            isSelected ? color.contentContentPrimary : color.contentContentTerciary
+            isSelected ? theme.color.contentContentPrimary : theme.color.contentContentTerciary
         }
 
         static func labelStyle(isSelected: Bool) -> ThemedTypographyStyle {
-            isSelected ? DesignSystem.shared.font.label.smallBold : DesignSystem.shared.font.label.small
+            isSelected ? theme.font.label.smallBold : theme.font.label.small
         }
     }
 }

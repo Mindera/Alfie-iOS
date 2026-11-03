@@ -26,8 +26,8 @@ struct AccountSectionView: View {
         .frame(minHeight: AccountConstants.sectionHeight)
     }
 
-    private enum AccountConstants {
-        static var iconSize: CGFloat { DesignSystem.shared.sizing.iconsIconMedium }
+    private enum AccountConstants: ThemeReading {
+        static var iconSize: CGFloat { theme.sizing.iconsIconMedium }
         static let sectionHeight: CGFloat = 48
     }
 }
