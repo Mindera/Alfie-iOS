@@ -34,6 +34,7 @@ final class ProductCardGallerySnapshotTests: XCTestCase {
             )
         )
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 240), as: .defaultImage(), record: isRecording)
     }
 

@@ -27,6 +27,7 @@ final class SegmentedControlGallerySnapshotTests: XCTestCase {
             ThemedSegmentView(segment, type: type, currectSelected: selection, animation: animation)
         }
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 120),
                        as: .defaultImage(),
                        record: isRecording,

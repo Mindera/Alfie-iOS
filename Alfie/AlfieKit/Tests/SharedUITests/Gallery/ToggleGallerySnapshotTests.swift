@@ -15,6 +15,7 @@ final class ToggleGallerySnapshotTests: XCTestCase {
             ThemedToggleView(isOn: .constant(false), isDisabled: .constant(true)) { Text("Off, disabled") }
         }
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 260), as: .defaultImage(), record: isRecording)
     }
 }

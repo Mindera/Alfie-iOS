@@ -17,6 +17,7 @@ final class ModalGallerySnapshotTests: XCTestCase {
             Text("Modal content")
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
+
         assertSnapshot(of: sut.embededInContainer(height: 400), as: .defaultImage(), record: isRecording)
     }
 }

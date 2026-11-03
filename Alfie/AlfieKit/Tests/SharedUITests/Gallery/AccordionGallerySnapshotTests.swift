@@ -15,6 +15,7 @@ final class AccordionGallerySnapshotTests: XCTestCase {
             AccordionView(text: "Disabled", isDisabled: .constant(true), notFirst: true) { Text("Content") }
         }
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 360), as: .defaultImage(), record: isRecording)
     }
 }

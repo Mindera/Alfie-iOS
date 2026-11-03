@@ -16,6 +16,7 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
     // The text cursor blinks off wall-clock time; the precision allowance covers its few pixels only.
     func test_focused_search_bar_shows_focus_placeholder_and_cancel() {
         let window = hostedInKeyWindow(searchBar(style: .light, autoFocus: .on(delay: 0)))
+
         assertSnapshot(of: window, as: .defaultImage(precision: 0.999), record: isRecording)
     }
 

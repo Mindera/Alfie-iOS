@@ -13,6 +13,7 @@ final class ErrorViewGallerySnapshotTests: XCTestCase {
             message: "Please try again in a few moments.",
             buttons: [.init(cta: "Retry") {}]
         )
+
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
     }
 }

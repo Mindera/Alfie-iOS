@@ -14,6 +14,7 @@ final class TagGallerySnapshotTests: XCTestCase {
             Tag(configuration: .init(label: "With icon", icon: Icon.info.image))
             Tag(configuration: .init(label: "Icon and close", showCloseButton: true, icon: Icon.info.image))
         }
+
         assertSnapshot(of: sut.embededInContainer(height: 240), as: .defaultImage(), record: isRecording)
     }
 }

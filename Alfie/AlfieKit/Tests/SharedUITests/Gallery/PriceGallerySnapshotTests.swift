@@ -24,6 +24,7 @@ final class PriceGallerySnapshotTests: XCTestCase {
             PriceComponentView(type: .sale(fullPrice: "$100.00", finalPrice: "$50.00"),
                                configuration: .init(preferredDistribution: .vertical, size: size))
         }
+
         assertSnapshot(of: sut.embededInContainer(height: 200),
                        as: .defaultImage(),
                        record: isRecording,

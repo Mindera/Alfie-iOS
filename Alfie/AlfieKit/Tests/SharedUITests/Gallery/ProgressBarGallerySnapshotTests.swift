@@ -14,6 +14,7 @@ final class ProgressBarGallerySnapshotTests: XCTestCase {
             ProgressBar(progress: .constant(10), total: 10)
         }
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 120), as: .defaultImage(), record: isRecording)
     }
 }

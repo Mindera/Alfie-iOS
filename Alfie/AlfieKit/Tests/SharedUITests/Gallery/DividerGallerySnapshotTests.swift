@@ -18,6 +18,7 @@ final class DividerGallerySnapshotTests: XCTestCase {
             .frame(height: 48)
         }
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 200), as: .defaultImage(), record: isRecording)
     }
 }

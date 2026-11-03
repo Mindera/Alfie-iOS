@@ -13,6 +13,7 @@ final class RadioButtonGallerySnapshotTests: XCTestCase {
             RadioButton(state: .constant(.unselected), text: "Unselected")
             RadioButton(state: .constant(.disabled), text: "Disabled")
         }
+
         assertSnapshot(of: sut.embededInContainer(height: 160), as: .defaultImage(), record: isRecording)
     }
 }

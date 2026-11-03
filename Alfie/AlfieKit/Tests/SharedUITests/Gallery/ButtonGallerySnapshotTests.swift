@@ -30,6 +30,7 @@ final class ButtonGallerySnapshotTests: XCTestCase {
             ThemedButton(text: "Loading", style: style, isLoading: .constant(true)) {}
             ThemedButton(text: "With icons", style: style, leadingAsset: .heart, trailingAsset: .chevronRight) {}
         }
+
         assertSnapshot(of: sut.embededInContainer(height: 300),
                        as: .defaultImage(),
                        record: isRecording,

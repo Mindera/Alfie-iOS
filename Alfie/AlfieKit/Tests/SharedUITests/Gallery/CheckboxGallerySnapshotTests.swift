@@ -13,6 +13,7 @@ final class CheckboxGallerySnapshotTests: XCTestCase {
             Checkbox(state: .constant(.unselected), text: "Unselected")
             Checkbox(state: .constant(.disabled), text: "Disabled")
         }
+
         assertSnapshot(of: sut.embededInContainer(height: 160), as: .defaultImage(), record: isRecording)
     }
 }

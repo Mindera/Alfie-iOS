@@ -14,6 +14,7 @@ final class SnackbarGallerySnapshotTests: XCTestCase {
             SnackbarView(configuration: .init(type: .error, text: "Error message", icon: Icon.warning.image))
         }
         .padding(16)
+
         assertSnapshot(of: sut.embededInContainer(height: 300), as: .defaultImage(), record: isRecording)
     }
 }
