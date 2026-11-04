@@ -38,7 +38,7 @@ public struct ColorSwatchView: View {
         .background {
             ZStack {
                 switch item.type {
-                case .image(let image):
+                case .image(let image)?:
                     image
                         .resizable()
                         .clipShape(Circle())
@@ -46,11 +46,11 @@ public struct ColorSwatchView: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: size, height: size)
 
-                case .color(let color):
+                case .color(let color)?:
                     RoundedRectangle(cornerRadius: size / 2)
                         .fill(color)
 
-                case .url(let url):
+                case .url(let url)?:
                     RemoteImage(
                         url: url,
                         success: { image in
@@ -64,6 +64,10 @@ public struct ColorSwatchView: View {
                         placeholder: { theme.color.surfaceForegroundPrimary },
                         failure: { _ in theme.color.surfaceBackgroundInvertedPrimary }
                     )
+
+                case nil:
+                    RoundedRectangle(cornerRadius: size / 2)
+                        .fill(theme.color.surfaceBackgroundInvertedPrimary)
                 }
 
                 if item.isDisabled {
