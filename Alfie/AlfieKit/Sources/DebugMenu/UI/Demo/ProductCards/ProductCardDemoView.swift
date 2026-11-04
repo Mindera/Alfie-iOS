@@ -47,7 +47,7 @@ extension ProductCardDemoView {
     @ViewBuilder private var productCardListS: some View {
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacingNone),
-            progressBarConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacing2xl)
+            progressBarConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacing5xl)
         ) {
             HStack(alignment: .top, spacing: theme.sizing.spacingSpacingSm) {
                 ForEach(Product.fixtures) { product in

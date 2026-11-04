@@ -39,7 +39,7 @@ struct InputDemoView: View {
                     .padding(.top, theme.sizing.spacingSpacingXl)
 
                 ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.body.small("Disabled")) }
-                    .padding(.bottom, theme.sizing.spacingSpacing2xl)
+                    .padding(.bottom, theme.sizing.spacingSpacing4xl)
             }
             .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }

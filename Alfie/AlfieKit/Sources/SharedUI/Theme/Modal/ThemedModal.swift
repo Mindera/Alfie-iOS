@@ -85,7 +85,7 @@ struct ThemedModalSheet<Modal: View>: View {
     }
 
     private var horizontalInset: CGFloat {
-        horizontalSizeClass == .regular ? theme.sizing.spacingSpacing2xl : theme.sizing.spacingSpacingNone
+        horizontalSizeClass == .regular ? theme.sizing.spacingSpacing6xl : theme.sizing.spacingSpacingNone
     }
 
     private var bottomInset: CGFloat {

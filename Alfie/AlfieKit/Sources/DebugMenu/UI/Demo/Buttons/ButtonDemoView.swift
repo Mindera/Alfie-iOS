@@ -58,7 +58,7 @@ struct ButtonDemoView: View {
                 Text.build(theme.font.body.small("Caption"))
                 Spacer()
                 TextInput(configuration: .init(text: $text))
-                    .padding(.leading, theme.sizing.spacingSpacing2xl)
+                    .padding(.leading, theme.sizing.spacingSpacing5xl)
             }
 
             HStack {

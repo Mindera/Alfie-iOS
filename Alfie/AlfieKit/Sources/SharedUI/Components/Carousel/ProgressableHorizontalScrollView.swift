@@ -96,7 +96,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: DesignSystem.shared.sizing.spacingSpacingMd),
             progressBarConfiguration: .init(
-                horizontalPadding: DesignSystem.shared.sizing.spacingSpacing2xl,
+                horizontalPadding: DesignSystem.shared.sizing.spacingSpacing6xl,
                 verticalPadding: DesignSystem.shared.sizing.spacingSpacingXl
             )
         ) {
@@ -118,7 +118,7 @@ public struct ProgressableHorizontalScrollView<Content: View>: View {
         ProgressableHorizontalScrollView(
             scrollViewConfiguration: .init(horizontalPadding: DesignSystem.shared.sizing.spacingSpacingMd),
             progressBarConfiguration: .init(
-                horizontalPadding: DesignSystem.shared.sizing.spacingSpacing2xl,
+                horizontalPadding: DesignSystem.shared.sizing.spacingSpacing6xl,
                 verticalPadding: DesignSystem.shared.sizing.spacingSpacingXl
             )
         ) {

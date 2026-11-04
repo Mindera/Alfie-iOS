@@ -10,7 +10,7 @@ struct ProgressBarDemoView: View {
 
             ProgressableHorizontalScrollView(
                 scrollViewConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacingMd),
-                progressBarConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacing2xl)
+                progressBarConfiguration: .init(horizontalPadding: theme.sizing.spacingSpacing5xl)
             ) {
                 HStack {
                     ForEach(0..<40) { _ in
