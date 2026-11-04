@@ -652,7 +652,7 @@ extension ProductDetailsView {
             ) {
                 viewModel.didTapAddToWishlist()
             }
-            .frame(width: theme.sizing.iconsIconXlarge, height: theme.sizing.iconsIconXlarge)
+            .frame(width: theme.sizing.spacingSpacing2xl, height: theme.sizing.spacingSpacing2xl)
             .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
         }
     }

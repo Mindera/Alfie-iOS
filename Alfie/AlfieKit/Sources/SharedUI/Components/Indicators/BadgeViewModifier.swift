@@ -8,7 +8,7 @@ import SwiftUI
 /// If the value is set to higher than `maxValue`, the badge will show `maxValue+`
 public struct BadgeViewModifier: ViewModifier {
     private enum Constants: ThemeReading {
-        static var badgeHeight: CGFloat { theme.sizing.iconsIconSmall }
+        static var badgeHeight: CGFloat { theme.sizing.spacingSpacingMd }
         static var textPadding: CGFloat { theme.sizing.spacingSpacing2xs }
         static var indicatorHeight: CGFloat { theme.sizing.spacingSpacingSm }
         static var indicatorWidth: CGFloat { theme.sizing.spacingSpacingSm }

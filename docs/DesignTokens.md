@@ -96,8 +96,8 @@ Views read design values only through `theme` (ADR 0006):
 - **Spacing**: `theme.sizing.spacingSpacing*`. A value between steps rounds to the nearest step,
   a tie rounds down.
 - **Radius**: `theme.sizing.radius*`.
-- **Sizes** (tap targets, heights, icons): the generated `theme.sizing.*` token of the exact
-  value (`icons*`, else `spacingSpacing*`), never rounded.
+- **Sizes**: `theme.sizing.icons*` for icon and glyph dimensions; `theme.sizing.spacingSpacing*`
+  for control heights and tap targets. Exact value, never rounded.
 
 Where `theme` comes from:
 

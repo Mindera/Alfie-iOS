@@ -33,7 +33,7 @@ struct ColorsDemoView: View {
                     RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
                         .stroke(theme.color.borderSoft, lineWidth: theme.sizing.borderBorderWeightDefault)
                 }
-                .frame(width: theme.sizing.iconsIconXlarge, height: theme.sizing.iconsIconXlarge)
+                .frame(width: theme.sizing.spacingSpacing2xl, height: theme.sizing.spacingSpacing2xl)
             Text.build(theme.font.body.small("theme.color.\(token.name)"))
                 .foregroundStyle(theme.color.contentContentPrimary)
         }
