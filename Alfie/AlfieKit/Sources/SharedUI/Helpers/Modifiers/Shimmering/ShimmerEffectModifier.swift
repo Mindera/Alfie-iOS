@@ -49,7 +49,7 @@ struct ShimmerEffectModifier: ViewModifier {
                                 endPoint: endPoint
                             )
                         )
-                        .cornerRadius(cornerRadius)
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                         .blur(radius: blurRadius)
                 }
                 .task {

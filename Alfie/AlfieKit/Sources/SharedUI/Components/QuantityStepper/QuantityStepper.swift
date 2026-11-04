@@ -84,7 +84,7 @@ public struct QuantityStepper: View {
         }
         .frame(height: height)
         .background(theme.color.buttonPrimaryBackgroundPrimaryDefault)
-        .cornerRadius(cornerRadius)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .accessibilityElement(children: .contain)
     }
 

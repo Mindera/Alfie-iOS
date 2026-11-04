@@ -26,7 +26,7 @@ struct SearchBarDemoView: View {
                             Image("DemoProductImage", bundle: .module)
                                 .resizable()
                                 .scaledToFit()
-                                .cornerRadius(8)
+                                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                             Text("Product \(index)")
                                 .font(.headline)
                                 .padding(.top, 5)
@@ -37,7 +37,7 @@ struct SearchBarDemoView: View {
                                 .padding(.horizontal, 10)
                         }
                         .background(theme.color.surfaceBackgroundPrimary)
-                        .cornerRadius(10)
+                        .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
                     }
                 }
             }

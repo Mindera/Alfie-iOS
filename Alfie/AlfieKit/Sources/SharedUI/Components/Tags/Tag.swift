@@ -69,7 +69,7 @@ public struct Tag: View {
             .padding(.horizontal, theme.sizing.spacingSpacingSm)
         }
         .background(theme.color.surfaceForegroundPrimary)
-        .cornerRadius(Constants.cornerRadius)
+        .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
         .frame(height: Constants.height)
         .shadow(color: .black.opacity(0.1), radius: 4, x: 2, y: 2)
     }

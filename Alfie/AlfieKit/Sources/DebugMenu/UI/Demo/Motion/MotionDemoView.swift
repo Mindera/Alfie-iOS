@@ -67,17 +67,14 @@ struct MotionDemoView: View {
             HStack {
                 if showRectangle {
                     Circle()
-                        .cornerRadius(10)
                         .transition(circleTransition(from: .leading))
                         .foregroundStyle(theme.color.borderMedium)
 
                     Circle()
-                        .cornerRadius(10)
                         .transition(circleTransition(from: .bottom))
                         .foregroundStyle(theme.color.borderStrong)
 
                     Circle()
-                        .cornerRadius(10)
                         .transition(circleTransition(from: .trailing))
                         .foregroundStyle(theme.color.contentContentTerciary)
                 }

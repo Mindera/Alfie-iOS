@@ -200,7 +200,7 @@ private struct ThemedButtonLabel<Label: View>: View {
         .padding(.horizontal, theme.sizing.spacingSpacingXs)
         .foregroundStyle(textColor)
         .background(backgroundColor)
-        .cornerRadius(cornerRadius)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .overlay(
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
@@ -210,7 +210,7 @@ private struct ThemedButtonLabel<Label: View>: View {
                     LoaderView(circleDiameter: .defaultSmall, style: styleLoading)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(backgroundColor)
-                        .cornerRadius(cornerRadius)
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 }
             }
         )
