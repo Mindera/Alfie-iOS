@@ -66,7 +66,7 @@ struct PriceComponentDemoView: View {
                 )
             }
             .frame(height: 60)
-            .padding(.vertical, Primitives.Spacing.spacing32)
+            .padding(.vertical, theme.sizing.spacingSpacingXl)
 
             DemoHelper.demoSectionHeader(title: "Options")
             priceTypeOption
@@ -77,7 +77,7 @@ struct PriceComponentDemoView: View {
                 .disabled(!isTextAlignmentAvailable)
             currencyOption
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private var priceSizeOption: some View {
@@ -93,10 +93,10 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.body.small(priceSize.title))
-                    .tint(Primitives.Colours.neutrals400)
+                    .tint(theme.color.borderStrong)
             }
         }
-        .padding(.top, Primitives.Spacing.spacing16)
+        .padding(.top, theme.sizing.spacingSpacingMd)
     }
 
     private var priceTypeOption: some View {
@@ -112,10 +112,10 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.body.small(priceType.rawValue))
-                    .tint(Primitives.Colours.neutrals400)
+                    .tint(theme.color.borderStrong)
             }
         }
-        .padding(.top, Primitives.Spacing.spacing16)
+        .padding(.top, theme.sizing.spacingSpacingMd)
     }
 
     private var priceLayoutOption: some View {
@@ -131,10 +131,10 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.body.small(priceDistribution.title))
-                    .tint(Primitives.Colours.neutrals400)
+                    .tint(theme.color.borderStrong)
             }
         }
-        .padding(.top, Primitives.Spacing.spacing16)
+        .padding(.top, theme.sizing.spacingSpacingMd)
     }
 
     private var priceAlignmentOption: some View {
@@ -150,10 +150,10 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.body.small(textAlignment.title))
-                    .tint(Primitives.Colours.neutrals400)
+                    .tint(theme.color.borderStrong)
             }
         }
-        .padding(.top, Primitives.Spacing.spacing16)
+        .padding(.top, theme.sizing.spacingSpacingMd)
     }
 
     private var currencyOption: some View {
@@ -169,10 +169,10 @@ struct PriceComponentDemoView: View {
                 }
             } label: {
                 Text.build(theme.font.body.small(currencyCode))
-                    .tint(Primitives.Colours.neutrals400)
+                    .tint(theme.color.borderStrong)
             }
         }
-        .padding(.top, Primitives.Spacing.spacing16)
+        .padding(.top, theme.sizing.spacingSpacingMd)
     }
 }
 

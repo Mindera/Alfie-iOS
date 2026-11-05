@@ -24,9 +24,9 @@ public struct TapHighlightableModifier: ViewModifier {
     }
 }
 
-private struct HighlightButtonStyle: ButtonStyle {
+private struct HighlightButtonStyle: ButtonStyle, ThemeReading {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .background(configuration.isPressed ? Primitives.Colours.neutrals100 : .clear)
+            .background(configuration.isPressed ? theme.color.surfaceForegroundPrimary : .clear)
     }
 }

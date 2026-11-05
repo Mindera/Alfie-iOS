@@ -5,9 +5,9 @@ struct CheckboxesDemoView: View {
     @State private var enabledCheckboxState = CheckboxState.selected
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Checkbox")
-                .padding(.bottom, Primitives.Spacing.spacing32)
+                .padding(.bottom, theme.sizing.spacingSpacingXl)
             Checkbox(
                 state: $enabledCheckboxState,
                 text: .constant(enabledCheckboxState == .selected ? "Selected" : "Unselected")
@@ -16,7 +16,7 @@ struct CheckboxesDemoView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 }
 

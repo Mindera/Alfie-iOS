@@ -4,7 +4,7 @@ import SwiftUI
 struct TypographyDemoView: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
                 DemoHelper.demoSectionHeader(title: "Typography")
                 Spacer()
                 display
@@ -13,7 +13,7 @@ struct TypographyDemoView: View {
                 label
                 link
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
     }
 

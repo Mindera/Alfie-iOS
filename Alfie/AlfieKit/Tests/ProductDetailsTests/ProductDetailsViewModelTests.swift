@@ -855,7 +855,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
         }
     }
 
-    func test_color_selection_swatch_is_black_by_default_for_invalid_swatch_urls() {
+    func test_color_selection_swatch_has_no_type_for_invalid_swatch_urls() {
         initViewModel()
 
         let color = Product.Colour.fixture(id: "1", name: "Color 1")
@@ -868,7 +868,7 @@ final class ProductDetailsViewModelTests: XCTestCase {
 
         XCTAssertEmitsValue(from: sut.$state.drop(while: \.isLoading), afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(sut.variantSelection.colours.first?.type, .color(Theme.surfaceBackgroundInvertedPrimary))
+        XCTAssertNil(sut.variantSelection.colours.first?.type)
     }
 
     /// `isDisabled` is the flag both colour surfaces key off — the card grid and the sheet row each

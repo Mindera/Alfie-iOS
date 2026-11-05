@@ -15,7 +15,7 @@ struct DatePickerDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Primitives.Spacing.spacing20) {
+            VStack(spacing: theme.sizing.spacingSpacingMd) {
                 DemoHelper.demoSectionHeader(title: "Date Picker")
 
                 Picker("Date Picker Style", selection: $datePickerType) {
@@ -24,7 +24,7 @@ struct DatePickerDemoView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(.bottom, Primitives.Spacing.spacing16)
+                .padding(.bottom, theme.sizing.spacingSpacingMd)
 
                 if datePickerType == .wheel {
                     if datePickerType == .wheel {
@@ -36,7 +36,7 @@ struct DatePickerDemoView: View {
                     DatePicker("", selection: $dateSelection, displayedComponents: .date)
                         .labelsHidden()
                         .modifier(DatePickerModifier(type: datePickerType))
-                        .tint(Primitives.Colours.neutrals900)
+                        .tint(theme.color.contentContentPrimary)
 
                     if datePickerType == .wheel {
                         VStack(alignment: .leading) {
@@ -47,7 +47,7 @@ struct DatePickerDemoView: View {
                     DatePicker("", selection: $dateSelection, displayedComponents: .hourAndMinute)
                         .labelsHidden()
                         .modifier(DatePickerModifier(type: datePickerType))
-                        .tint(Primitives.Colours.neutrals900)
+                        .tint(theme.color.contentContentPrimary)
                 }
 
                 if datePickerType == .wheel {
@@ -59,10 +59,10 @@ struct DatePickerDemoView: View {
                 DatePicker("", selection: $dateAndHourSelection, displayedComponents: [.date, .hourAndMinute])
                     .labelsHidden()
                     .modifier(DatePickerModifier(type: datePickerType))
-                    .tint(Primitives.Colours.neutrals900)
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
+                    .tint(theme.color.contentContentPrimary)
+                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
         .environment(\.locale, Locale(identifier: "en_AU"))
     }

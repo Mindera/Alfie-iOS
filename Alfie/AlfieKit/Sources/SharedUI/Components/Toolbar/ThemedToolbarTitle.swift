@@ -19,7 +19,7 @@ public struct ThemedToolbarTitle: View {
     private let tint: Color
     private let accessibilityId: String
 
-    public init(style: TitleStyle, tint: Color = Primitives.Colours.neutrals800, accessibilityId: String = "") {
+    public init(style: TitleStyle, tint: Color = DesignSystem.shared.color.contentContentPrimary, accessibilityId: String = "") {
         self.style = style
         self.tint = tint
         self.accessibilityId = accessibilityId
@@ -45,17 +45,17 @@ public struct ThemedToolbarTitle: View {
 
                 if let subtitle {
                     Text.build(theme.font.body.small(subtitle))
-                        .foregroundStyle(Primitives.Colours.neutrals500)
+                        .foregroundStyle(theme.color.contentContentTerciary)
                 }
             }
-            .padding(.vertical, Primitives.Spacing.spacing16)
+            .padding(.vertical, theme.sizing.spacingSpacingMd)
 
         case .text(let text):
             Text(text)
                 .font(Font(theme.font.body.medium.uiFont.withSize(18)))
                 .foregroundStyle(tint)
                 .accessibilityIdentifier(accessibilityId)
-                .padding(.vertical, Primitives.Spacing.spacing16)
+                .padding(.vertical, theme.sizing.spacingSpacingMd)
         }
     }
 }

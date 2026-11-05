@@ -5,7 +5,7 @@ struct PageControlDemoView: View {
     @State private var selectedIndex: Int = 0
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Progress Indicators")
 
             VStack {
@@ -59,15 +59,15 @@ struct PageControlDemoView: View {
                 }
             }
             DemoHelper.demoSectionHeader(title: "Options")
-                .padding(.top, Primitives.Spacing.spacing32)
-            HStack(spacing: Primitives.Spacing.spacing20) {
+                .padding(.top, theme.sizing.spacingSpacingXl)
+            HStack(spacing: theme.sizing.spacingSpacingMd) {
                 selectionButton(title: "First", selectedIndex: 0)
                 selectionButton(title: "Second", selectedIndex: 1)
                 selectionButton(title: "Third", selectedIndex: 2)
             }
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private func selectionButton(title: String, selectedIndex: Int) -> some View {

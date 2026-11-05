@@ -11,12 +11,12 @@ public struct ThemedPageControlConfiguration {
     public let padding: CGFloat
 
     public init(
-        color: Color = Primitives.Colours.neutrals200,
-        selectedColor: Color = Primitives.Colours.neutrals600,
+        color: Color = DesignSystem.shared.color.borderSoft,
+        selectedColor: Color = DesignSystem.shared.color.contentContentSecondary,
         animationDuration: CGFloat = 0.3,
         size: CGFloat = 10,
         spacing: CGFloat = 0,
-        padding: CGFloat = Primitives.Spacing.spacing16
+        padding: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd
     ) {
         self.color = color
         self.selectedColor = selectedColor
@@ -27,6 +27,9 @@ public struct ThemedPageControlConfiguration {
     }
 }
 
-extension ThemedPageControlConfiguration {
-    static let `default` = ThemedPageControlConfiguration(size: 8, spacing: Primitives.Spacing.spacing4)
+extension ThemedPageControlConfiguration: ThemeReading {
+    static let `default` = ThemedPageControlConfiguration(
+        size: 8,
+        spacing: theme.sizing.spacingSpacing2xs
+    )
 }

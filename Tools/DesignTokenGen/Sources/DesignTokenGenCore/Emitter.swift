@@ -61,8 +61,10 @@ public struct Emitter {
         let theme = loaded.map.values.filter { $0.file.hasPrefix("theme.") }.sorted { $0.name < $1.name }
         try SwiftIdentifier.assertNoCollisions(theme.map(\.name))
         var body = ""
+        var listing = ""
         for token in theme {
             let id = SwiftIdentifier.make(token.name)
+            listing += "        (\"\(id)\", \(id)),\n"
             body += "    public static let \(id) = \(try valueOrPrimitiveRef(token))\n"
         }
         return """
@@ -70,7 +72,10 @@ public struct Emitter {
         import SwiftUI
 
         public enum Theme {
-        \(body)}
+        \(body)
+            public static let allTokens: [(name: String, value: Color)] = [
+        \(listing)    ]
+        }
         """
     }
 
@@ -80,8 +85,10 @@ public struct Emitter {
         let sizing = loaded.map.values.filter { $0.file.hasPrefix("sizing.") }.sorted { $0.name < $1.name }
         try SwiftIdentifier.assertNoCollisions(sizing.map(\.name))
         var body = ""
+        var listing = ""
         for token in sizing {
             let id = SwiftIdentifier.make(token.name)
+            listing += "        (\"\(id)\", \(id)),\n"
             body += "    public static let \(id): CGFloat = \(try valueOrPrimitiveRef(token))\n"
         }
         return """
@@ -89,7 +96,10 @@ public struct Emitter {
         import CoreGraphics
 
         public enum Sizing {
-        \(body)}
+        \(body)
+            public static let allTokens: [(name: String, value: CGFloat)] = [
+        \(listing)    ]
+        }
         """
     }
 

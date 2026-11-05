@@ -11,9 +11,6 @@
       "modes": {
         "alfie-theme": [
           ".primitives.alfie-theme.tokens.json"
-        ],
-        "new-theme": [
-          ".primitives.new-theme.tokens.json"
         ]
       }
     },
@@ -57,9 +54,6 @@
       "modes": {
         "alfie-theme": [
           "theme.alfie-theme.tokens.json"
-        ],
-        "new-brand-theme": [
-          "theme.new-brand-theme.tokens.json"
         ]
       }
     },

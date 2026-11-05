@@ -6,7 +6,7 @@ public struct LoaderView: View {
         case custom(CGFloat)
     }
 
-    public enum CircleStyle {
+    public enum CircleStyle: ThemeReading {
         case dark
         case light
 
@@ -14,18 +14,18 @@ public struct LoaderView: View {
             // swiftlint:disable vertical_whitespace_between_cases
             switch self {
             case .dark:
-                return Primitives.Colours.neutrals900
+                return theme.color.contentContentPrimary
             case .light:
-                return Primitives.Colours.neutrals0
+                return theme.color.contentContentInvertedPrimary
             }
             // swiftlint:enable vertical_whitespace_between_cases
         }
     }
 
-    private enum Constants {
+    private enum Constants: ThemeReading {
         static let smallCircleDiameter: CGFloat = 8
-		static let circleSpacing: CGFloat = Primitives.Spacing.spacing8
-		static let circlesToLabelSpacing: CGFloat = Primitives.Spacing.spacing12
+        static var circleSpacing: CGFloat { theme.sizing.spacingSpacingXs }
+        static var circlesToLabelSpacing: CGFloat { theme.sizing.spacingSpacingSm }
         static let numberOfCircles = 3
         static let animationTime: Double = 0.5
     }
@@ -72,7 +72,7 @@ public struct LoaderView: View {
 
             if !labelHidden {
                 Text.build(theme.font.body.medium(labelTitle))
-                    .foregroundStyle(Primitives.Colours.neutrals900)
+                    .foregroundStyle(theme.color.contentContentPrimary)
             }
         }
     }

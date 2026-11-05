@@ -5,7 +5,7 @@ struct BadgeDemoView: View {
     @State private var badgeValue: Int? = 1
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Badge")
 
             HStack {
@@ -114,7 +114,7 @@ struct BadgeDemoView: View {
 
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Icon.bell.image
@@ -129,11 +129,11 @@ struct BadgeDemoView: View {
 
     private func button(label: String) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: Sizing.radiusStrong)
+            RoundedRectangle(cornerRadius: theme.sizing.radiusStrong)
                 .fill(.black)
             Text.build(theme.font.body.small(label))
                 .padding()
-                .foregroundStyle(Primitives.Colours.neutrals0)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
         }
         .frame(width: 110, height: 44)
     }

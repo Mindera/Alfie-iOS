@@ -94,8 +94,8 @@ public struct SnackbarView: View {
         ZStack {
             Rectangle()
                 .fill(backgroundColor)
-                .cornerRadius(Sizing.radiusSoft)
-            HStack(spacing: Primitives.Spacing.spacing8) {
+                .clipShape(RoundedRectangle(cornerRadius: theme.sizing.radiusSoft))
+            HStack(spacing: theme.sizing.spacingSpacingXs) {
                 if let icon = configuration.icon {
                     icon
                         .renderingMode(.template)
@@ -106,7 +106,7 @@ public struct SnackbarView: View {
                 }
                 Text.build(theme.font.body.medium(configuration.text))
                     .foregroundStyle(foregroundColor)
-                    .padding(Primitives.Spacing.spacing16)
+                    .padding(theme.sizing.spacingSpacingMd)
                     .lineLimit(configuration.lineLimit)
                     .accessibilityIdentifier(AccessibilityID.Snackbar.text)
                 Spacer()
@@ -116,7 +116,7 @@ public struct SnackbarView: View {
                     }, label: {
                         Text.build(theme.font.body.medium(actionButtonLabel))
                             .foregroundStyle(foregroundColor)
-                            .padding(Primitives.Spacing.spacing16)
+                            .padding(theme.sizing.spacingSpacingMd)
                     })
                     .accessibilityIdentifier(AccessibilityID.Snackbar.actionButton)
                 }
@@ -134,7 +134,7 @@ public struct SnackbarView: View {
                     .accessibilityLabel(Text(L10n.Accessibility.close))
                 }
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
             .frame(minHeight: Constants.minHeight)
         }
         .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
@@ -145,27 +145,18 @@ public struct SnackbarView: View {
     private var backgroundColor: Color {
         switch configuration.type {
         case .info:
-            return Primitives.Colours.neutrals900
+            return theme.color.surfaceBackgroundInvertedPrimary
 
         case .success:
-            return Primitives.Colours.semanticSuccess100
+            return theme.color.surfaceBackgroundPositive
 
         case .error:
-            return Primitives.Colours.semanticError100
+            return theme.color.surfaceBackgroundNegative
         }
     }
 
     private var foregroundColor: Color {
-        switch configuration.type {
-        case .info:
-            return Primitives.Colours.neutrals0
-
-        case .success:
-            return Primitives.Colours.semanticSuccess800
-
-        case .error:
-            return Primitives.Colours.semanticError700
-        }
+        theme.color.contentContentInvertedPrimary
     }
 }
 
@@ -219,5 +210,5 @@ public struct SnackbarView: View {
             )
         )
     }
-    .padding(.horizontal, Primitives.Spacing.spacing8)
+    .padding(.horizontal, DesignSystem.shared.sizing.spacingSpacingXs)
 }

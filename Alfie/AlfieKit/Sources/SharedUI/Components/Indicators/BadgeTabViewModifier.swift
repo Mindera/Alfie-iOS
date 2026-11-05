@@ -17,12 +17,12 @@ public struct BadgeTabViewModifier: ViewModifier {
     }
 
     private func setAppearance() {
-        UITabBarItem.appearance().badgeColor = Theme.surfaceBackgroundDestructive.ui
+        UITabBarItem.appearance().badgeColor = theme.color.surfaceBackgroundDestructive.ui
 
         let font = theme.font.body.small.uiFont
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: Theme.contentContentInvertedPrimary.ui,
+            .foregroundColor: theme.color.contentContentInvertedPrimary.ui,
         ]
         UITabBarItem.appearance().setBadgeTextAttributes(attributes, for: .normal)
         UITabBarItem.appearance().setBadgeTextAttributes(attributes, for: .selected)

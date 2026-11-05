@@ -5,8 +5,8 @@ struct BagDivider: View {
     var body: some View {
         ThemedDivider(configuration: .init(
             orientation: .horizontal,
-            thickness: Sizing.borderBorderWeightDefault,
-            color: Theme.borderSoft
+            thickness: theme.sizing.borderBorderWeightDefault,
+            color: theme.color.borderSoft
         ))
         .accessibilityHidden(true)
     }

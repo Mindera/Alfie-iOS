@@ -34,7 +34,7 @@ public struct AccordionView<Content: View>: View {
     }
 
     public var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             if !notFirst {
                 Rectangle()
                     .fill(accordianColor)
@@ -60,25 +60,25 @@ public struct AccordionView<Content: View>: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch type {
         case .small:
-            return Primitives.Spacing.spacing12
+            return theme.sizing.spacingSpacingSm
         case .large:
-            return Primitives.Spacing.spacing16
+            return theme.sizing.spacingSpacingMd
         }
         // swiftlint:enable vertical_whitespace_between_cases
     }
 
     private var textColor: Color {
-        isDisabled ? Primitives.Colours.neutrals600 : Primitives.Colours.neutrals800
+        isDisabled ? theme.color.contentContentPrimaryDisabled : theme.color.contentContentPrimary
     }
 
     private var accordianColor: Color {
-        isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500
+        isDisabled ? theme.color.borderSoft : theme.color.contentContentTerciary
     }
 }
 
 // MARK: - MyDisclosureStyle
 
-public struct MyDisclosureStyle: DisclosureGroupStyle {
+public struct MyDisclosureStyle: DisclosureGroupStyle, ThemeReading {
     var isDisabled: Bool
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -94,7 +94,9 @@ public struct MyDisclosureStyle: DisclosureGroupStyle {
                     ThemedIcon(
                         .chevronDown,
                         size: .small,
-                        tint: isDisabled ? Primitives.Colours.neutrals200 : Primitives.Colours.neutrals500
+                        tint: isDisabled
+                            ? theme.color.contentContentPrimaryDisabled
+                            : theme.color.contentContentTerciary
                     )
                         .rotationEffect(.degrees(configuration.isExpanded ? 0 : -90))
                         .animation(.easeInOut(duration: 0.3), value: configuration.isExpanded)
@@ -116,22 +118,22 @@ public struct MyDisclosureStyle: DisclosureGroupStyle {
             AccordionView(text: "Accordian component") {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Primitives.Spacing.spacing16)
+            .padding(DesignSystem.shared.sizing.spacingSpacingMd)
 
             AccordionView(text: "Accordian component", isDisabled: .constant(true)) {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Primitives.Spacing.spacing16)
+            .padding(DesignSystem.shared.sizing.spacingSpacingMd)
 
             AccordionView(text: "Accordian component", type: .large) {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Primitives.Spacing.spacing16)
+            .padding(DesignSystem.shared.sizing.spacingSpacingMd)
 
             AccordionView(text: "Accordian component", type: .large, isDisabled: .constant(true)) {
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Rhoncus, accumsan, vel interdum diam tortor cursus nam quisque ut. Blandit ut netus consequat ridiculus mi. Lacus a fermentum nec nisl consectetur molestie. Mauris mi cursus quis risus aliquam vivamus blandit. Maecenas dui odio odio aliquet.")
             }
-            .padding(Primitives.Spacing.spacing16)
+            .padding(DesignSystem.shared.sizing.spacingSpacingMd)
         }
     }
 }

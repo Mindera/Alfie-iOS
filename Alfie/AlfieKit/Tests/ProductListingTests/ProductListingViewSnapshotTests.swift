@@ -147,7 +147,7 @@ final class ProductListingViewSnapshotTests: XCTestCase {
         let sut = SnackbarView(
             configuration: .transientError(.init(request: .nextPage, error: .noConnection), onRetry: {}, onDismiss: {})
         )
-        .padding(Primitives.Spacing.spacing8)
+        .padding(Sizing.spacingSpacingXs)
         assertSnapshot(of: sut.embededInContainer(height: 80),
                        as: .defaultImage(),
                        record: isRecording)

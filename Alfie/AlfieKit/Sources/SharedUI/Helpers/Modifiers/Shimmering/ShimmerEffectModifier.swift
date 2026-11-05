@@ -25,8 +25,8 @@ struct ShimmerEffectModifier: ViewModifier {
         self._shouldShowShimmer = State(initialValue: isLoading.wrappedValue)
         self.cornerRadius = cornerRadius
         self.blurRadius = blurRadius
-        self.lighterShimmerColor = customLighterShimmerColor ?? Primitives.Colours.neutrals200
-        self.darkerShimmerColor = customDarkerShimmerColor ?? Primitives.Colours.neutrals400
+        self.lighterShimmerColor = customLighterShimmerColor ?? Self.theme.color.borderSoft
+        self.darkerShimmerColor = customDarkerShimmerColor ?? Self.theme.color.borderStrong
         self.disabledWhileShimmering = disabledWhileShimmering
         self.animateOnStateTransition = animateOnStateTransition
     }
@@ -49,7 +49,7 @@ struct ShimmerEffectModifier: ViewModifier {
                                 endPoint: endPoint
                             )
                         )
-                        .cornerRadius(cornerRadius)
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                         .blur(radius: blurRadius)
                 }
                 .task {

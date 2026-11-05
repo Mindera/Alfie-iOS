@@ -1,5 +1,4 @@
 import Model
-import SharedUI
 
 extension VariantSelectionState {
     init(_ selection: VariantSelection) {
@@ -16,17 +15,10 @@ extension VariantSelectionState {
 
 private extension VariantSelection.ColourOption {
     var colorSwatch: ColorSwatch {
-        let type: SwatchType = if let url = colour.swatch?.url {
-            .url(url)
-        } else {
-            // A filled stand-in for a missing swatch image, so it reads as a surface token.
-            .color(Theme.surfaceBackgroundInvertedPrimary)
-        }
-
-        return ColorSwatch(
+        ColorSwatch(
             id: colour.id,
             name: colour.name,
-            type: type,
+            type: colour.swatch.map { .url($0.url) },
             isDisabled: !isAvailable
         )
     }

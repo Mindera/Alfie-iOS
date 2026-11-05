@@ -10,18 +10,18 @@ public struct HorizontalProductCard: View {
     }
 
     public var body: some View {
-        HStack(alignment: .top, spacing: Primitives.Spacing.spacing16) {
+        HStack(alignment: .top, spacing: theme.sizing.spacingSpacingMd) {
             productImageView
                 .accessibilityIdentifier(AccessibilityId.productImage)
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing0) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingNone) {
                 productDesignerView
-                    .padding(.bottom, Primitives.Spacing.spacing8)
+                    .padding(.bottom, theme.sizing.spacingSpacingXs)
                 productNameView
-                    .padding(.bottom, Primitives.Spacing.spacing8)
+                    .padding(.bottom, theme.sizing.spacingSpacingXs)
                 productColorView
-                    .padding(.bottom, Primitives.Spacing.spacing8)
+                    .padding(.bottom, theme.sizing.spacingSpacingXs)
                 productSizeView
-                    .padding(.bottom, Primitives.Spacing.spacing8)
+                    .padding(.bottom, theme.sizing.spacingSpacingXs)
                 productPriceView
             }
 
@@ -40,8 +40,8 @@ public struct HorizontalProductCard: View {
                         .resizable()
                         .scaledToFit()
                 },
-                placeholder: { Primitives.Colours.neutrals100 },
-                failure: { _ in Primitives.Colours.neutrals100 }
+                placeholder: { theme.color.surfaceForegroundPrimary },
+                failure: { _ in theme.color.surfaceForegroundPrimary }
             )
         }
         .frame(width: Constants.productImageWidth, height: Constants.productImageHeight)
@@ -56,19 +56,19 @@ public struct HorizontalProductCard: View {
     private var productNameView: some View {
         Text.build(theme.font.body.small(viewModel.name))
             .lineLimit(Constants.productNameLineLimit)
-            .foregroundStyle(Primitives.Colours.neutrals500)
+            .foregroundStyle(theme.color.contentContentTerciary)
             .accessibilityIdentifier(AccessibilityId.productName)
     }
 
     private var productColorView: some View {
-        HStack(spacing: Primitives.Spacing.spacing8) {
+        HStack(spacing: theme.sizing.spacingSpacingXs) {
             if let colorTitle = viewModel.colorTitle {
                 Text.build(theme.font.body.small(colorTitle))
-                    .foregroundStyle(Primitives.Colours.neutrals500)
+                    .foregroundStyle(theme.color.contentContentTerciary)
             }
             if let color = viewModel.color {
                 Text.build(theme.font.body.small(color))
-                    .foregroundStyle(Primitives.Colours.neutrals600)
+                    .foregroundStyle(theme.color.contentContentSecondary)
             }
         }
         .lineLimit(Constants.productColorLineLimit)
@@ -77,14 +77,14 @@ public struct HorizontalProductCard: View {
     }
 
     private var productSizeView: some View {
-        HStack(spacing: Primitives.Spacing.spacing8) {
+        HStack(spacing: theme.sizing.spacingSpacingXs) {
             if let sizeTitle = viewModel.sizeTitle {
                 Text.build(theme.font.body.small(sizeTitle))
-                    .foregroundStyle(Primitives.Colours.neutrals500)
+                    .foregroundStyle(theme.color.contentContentTerciary)
             }
             if let size = viewModel.size {
                 Text.build(theme.font.body.small(size))
-                    .foregroundStyle(Primitives.Colours.neutrals600)
+                    .foregroundStyle(theme.color.contentContentSecondary)
             }
         }
         .lineLimit(Constants.productSizeLineLimit)

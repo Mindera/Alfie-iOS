@@ -28,7 +28,7 @@ struct ColorBannerDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Primitives.Spacing.spacing20) {
+            VStack(spacing: theme.sizing.spacingSpacingMd) {
                 Spacer()
 
                 section(title: "Colour Cards - 3 columns") {
@@ -68,12 +68,12 @@ struct ColorBannerDemoView: View {
 
                 Spacer()
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
     }
 
     private func section(title: String, @ViewBuilder content: () -> any View) -> some View {
-        VStack(alignment: .leading, spacing: Primitives.Spacing.spacing32) {
+        VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXl) {
             DemoHelper.demoSectionHeader(title: title)
             AnyView(content())
         }

@@ -138,7 +138,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
     private let clearAccessibilityId: String?
     private let hapticsService: HapticsServiceProtocol
     private let transition: SearchBarTransition?
-    private let theme: ThemedSearchBarView.Theme
+    private let style: ThemedSearchBarView.Style
     private let verticalSpacing: CGFloat
     private var resultsView: () -> ResultsView
     private var onCancel: (() -> Void)?
@@ -153,7 +153,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
         placeholderOnFocus: String,
         searchText: Binding<String>,
         pullToSearchConfig: PullToSearchConfig,
-        theme: ThemedSearchBarView.Theme,
+        style: ThemedSearchBarView.Style,
         dismissConfiguration: ThemedSearchBarView.DismissConfiguration,
         verticalSpacing: CGFloat,
         showCancelButton: Bool = true,
@@ -184,7 +184,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
         self.inputAccessibilityId = inputAccessibilityId
         self.clearAccessibilityId = clearAccessibilityId
         self.hapticsService = hapticsService
-        self.theme = theme
+        self.style = style
         self.transition = transition
         self.verticalSpacing = verticalSpacing
         self._animatingTransition = State(initialValue: transition != nil)
@@ -209,14 +209,14 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             if showSearchBar {
                 let isGrowFromTrailingIconAnimation = animatingTransition && transition?.isGrowFromTrailingIcon == true
                 ThemedSearchBarView(
                     searchText: $searchText,
                     placeholder: placeholder,
                     placeholderOnFocus: placeholderOnFocus,
-                    theme: theme,
+                    style: style,
                     dismissConfiguration: dismissConfiguration,
                     autoFocusWhenAppearing: autoFocus ? .on(delay: transition?.autofocusDelay ?? 0.0) : .off,
                     inputAccessibilityId: inputAccessibilityId,
@@ -227,7 +227,7 @@ public struct SearchableModifier<ResultsView: View>: ViewModifier {
                 )
                 .optionalMatchedGeometryEffect(id: transition?.geometryEffectID, in: transition?.namespace)
                 .focused($searchBarFocused)
-                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
                 // verticalSpacing is not applied to the VStack because if you have many items on content, it will affect all of them
                 .padding(.bottom, verticalSpacing)
                 .scaleEffect(

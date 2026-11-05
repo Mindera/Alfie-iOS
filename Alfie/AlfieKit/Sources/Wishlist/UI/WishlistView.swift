@@ -74,10 +74,10 @@ private extension WishlistView {
         ScrollView {
             LazyVGrid(
                 columns: Array(
-                    repeating: GridItem(.flexible(), spacing: Sizing.spacingSpacingXs, alignment: .top),
+                    repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingXs, alignment: .top),
                     count: Constants.columns
                 ),
-                spacing: Sizing.spacingSpacingMd
+                spacing: theme.sizing.spacingSpacingMd
             ) {
                 ForEach(products) { product in
                     productCard(for: product)
@@ -87,7 +87,7 @@ private extension WishlistView {
                         .accessibilityIdentifier(AccessibilityID.Wishlist.item(id: product.id))
                 }
             }
-            .padding(Sizing.spacingSpacingMd)
+            .padding(theme.sizing.spacingSpacingMd)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier(AccessibilityID.Wishlist.grid)
         }

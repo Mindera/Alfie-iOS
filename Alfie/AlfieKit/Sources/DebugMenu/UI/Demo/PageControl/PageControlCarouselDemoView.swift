@@ -3,30 +3,33 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 struct PageControlCarouselDemoView: View {
-    private let smallColors: [Color] = [
-        Primitives.Colours.neutrals200,
-        Primitives.Colours.neutrals300,
-        Primitives.Colours.neutrals400,
-        Primitives.Colours.neutrals500,
-    ]
-    private let mediumColors: [Color] = [
-        Primitives.Colours.semanticError200,
-        Primitives.Colours.semanticError300,
-        Primitives.Colours.semanticError400,
-        Primitives.Colours.semanticError500,
-    ]
-    private let largeColors: [Color] = [
-        Primitives.Colours.neutrals600,
-        Primitives.Colours.neutrals700,
-        Primitives.Colours.neutrals800,
-        Primitives.Colours.neutrals900,
-    ]
-    private let customColors: [Color] = [
-        Primitives.Colours.semanticSuccess200,
-        Primitives.Colours.semanticSuccess400,
-        Primitives.Colours.semanticSuccess500,
-        Primitives.Colours.semanticSuccess600,
-    ]
+    private var smallColors: [Color] {
+        [theme.color.borderSoft, theme.color.borderMedium, theme.color.borderStrong, theme.color.contentContentTerciary]
+    }
+    private var mediumColors: [Color] {
+        [
+            theme.color.borderStrong,
+            theme.color.contentContentNegative,
+            theme.color.surfaceBackgroundDestructive,
+            theme.color.contentContentPrimary,
+        ]
+    }
+    private var largeColors: [Color] {
+        [
+            theme.color.surfaceForegroundPrimary,
+            theme.color.contentContentTerciary,
+            theme.color.contentContentSecondary,
+            theme.color.contentContentPrimary,
+        ]
+    }
+    private var customColors: [Color] {
+        [
+            theme.color.borderSoft,
+            theme.color.contentContentPositive,
+            theme.color.surfaceBackgroundPositive,
+            theme.color.contentContentPrimary,
+        ]
+    }
 
     @State private var smallSelectedIndex: Int? = 0
     @State private var mediumSelectedIndex: Int? = 0
@@ -34,7 +37,7 @@ struct PageControlCarouselDemoView: View {
     @State private var customSelectedIndex: Int? = 0
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             colorCarouselComponent(
                 title: "Progress Indicators - Small Dots",
                 colorIndex: $smallSelectedIndex,
@@ -53,9 +56,9 @@ struct PageControlCarouselDemoView: View {
                 size: 16,
                 colors: largeColors
             )
-            VStack(spacing: Primitives.Spacing.spacing0) {
+            VStack(spacing: theme.sizing.spacingSpacingNone) {
                 DemoHelper.demoSectionHeader(title: "Progress Indicators - Custom Dots")
-                    .padding(.bottom, Primitives.Spacing.spacing32)
+                    .padding(.bottom, theme.sizing.spacingSpacingXl)
                 carousel(colorIndex: $customSelectedIndex, colors: customColors)
                 ThemedPageControl(
                     data: customColors,
@@ -74,12 +77,12 @@ struct PageControlCarouselDemoView: View {
             }
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private func carousel(colorIndex: Binding<Int?>, colors: [Color]) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: Primitives.Spacing.spacing0) {
+            LazyHStack(spacing: theme.sizing.spacingSpacingNone) {
                 ForEach(Array(colors.enumerated()), id: \.offset) { _, color in
                     color
                         .frame(height: 50)
@@ -100,9 +103,9 @@ struct PageControlCarouselDemoView: View {
     }
 
     private func colorCarouselComponent(title: String, colorIndex: Binding<Int?>, size: CGFloat, colors: [Color]) -> some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             DemoHelper.demoSectionHeader(title: title)
-                .padding(.bottom, Primitives.Spacing.spacing32)
+                .padding(.bottom, theme.sizing.spacingSpacingXl)
             carousel(colorIndex: colorIndex, colors: colors)
             ThemedPageControl(
                 data: colors,

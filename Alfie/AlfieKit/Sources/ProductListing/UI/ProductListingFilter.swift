@@ -46,7 +46,7 @@ struct ProductListingFilter: View {
     var body: some View {
         // The CTA lives outside the stack so it is pinned across every screen as one instance —
         // duplicating it per screen would put two identical accessibility ids in the hierarchy.
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             NavigationStack(path: $path) {
                 root
                     .navigationDestination(for: RefineRoute.self) { route in
@@ -64,14 +64,14 @@ struct ProductListingFilter: View {
     // MARK: - Root
 
     private var root: some View {
-        VStack(spacing: theme.spacing.space100) {
+        VStack(spacing: theme.sizing.spacingSpacingXs) {
             header
             ThemedDivider.horizontalThin
-            VStack(spacing: theme.spacing.space300) {
+            VStack(spacing: theme.sizing.spacingSpacingLg) {
                 listStyleView
                 rows
             }
-            .padding(.vertical, theme.spacing.space200)
+            .padding(.vertical, theme.sizing.spacingSpacingMd)
             Spacer()
         }
         .navigationBarHidden(true)
@@ -85,7 +85,7 @@ struct ProductListingFilter: View {
                 ThemedIcon(
                     .close,
                     size: .medium,
-                    tint: Theme.contentContentPrimary,
+                    tint: theme.color.contentContentPrimary,
                     accessibilityLabel: L10n.Accessibility.close
                 )
             }
@@ -96,7 +96,7 @@ struct ProductListingFilter: View {
             Spacer()
             removeAllButton(accessibilityIdentifier: AccessibilityID.ProductListing.refineRemoveAllButton)
         }
-        .padding(.horizontal, theme.spacing.space300)
+        .padding(.horizontal, theme.sizing.spacingSpacingLg)
     }
 
     /// Figma places Remove All on both the panel and the sub-screen headers. With one filterable
@@ -111,7 +111,7 @@ struct ProductListingFilter: View {
                 viewModel.removeAllFilters()
             } label: {
                 Text.build(theme.font.body.small(L10n.Plp.Refine.RemoveAll.Button.cta))
-                    .foregroundStyle(Theme.linkLinkPrimaryDefault)
+                    .foregroundStyle(theme.color.linkLinkPrimaryDefault)
             }
             .accessibilityIdentifier(accessibilityIdentifier)
         }
@@ -120,7 +120,7 @@ struct ProductListingFilter: View {
     /// v1 exposes Price and Sort only. Every row here does something — a dimension that cannot be
     /// filtered gets no row at all, not a disabled one or an empty screen (ALFMOB-477 / 483).
     @ViewBuilder private var rows: some View {
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             // No bounds means no scale to filter within — which is also the search-driven PLP,
             // where `categoryPriceRange` has no collection handle to key on.
             if viewModel.priceBounds != nil {
@@ -150,17 +150,17 @@ struct ProductListingFilter: View {
         Button {
             path.append(route)
         } label: {
-            HStack(spacing: theme.spacing.space100) {
+            HStack(spacing: theme.sizing.spacingSpacingXs) {
                 Text.build(theme.font.body.medium(title))
-                    .foregroundStyle(Theme.contentContentPrimary)
+                    .foregroundStyle(theme.color.contentContentPrimary)
                 Spacer()
                 if let value {
                     Text.build(theme.font.body.small(value))
-                        .foregroundStyle(Theme.contentContentTerciary)
+                        .foregroundStyle(theme.color.contentContentTerciary)
                 }
-                ThemedIcon(.chevronRight, size: .small, tint: Theme.contentContentPrimary)
+                ThemedIcon(.chevronRight, size: .small, tint: theme.color.contentContentPrimary)
             }
-            .padding(.horizontal, theme.spacing.space200)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
             .frame(height: Constants.rowHeight)
             .contentShape(Rectangle())
         }
@@ -184,11 +184,11 @@ struct ProductListingFilter: View {
     private var listStyleView: some View {
         HStack {
             Text.build(theme.font.body.medium(L10n.Plp.ListStyle.Option.title))
-                .foregroundStyle(Theme.contentContentPrimary)
+                .foregroundStyle(theme.color.contentContentPrimary)
             Spacer()
             ProductListingListStyleSelector(selectedStyle: $listStyle)
         }
-        .padding(.horizontal, theme.spacing.space200)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     // MARK: - Sub-screens
@@ -209,7 +209,7 @@ struct ProductListingFilter: View {
                     title: nil,
                     options: SortByHelper.options
                 )
-                .padding(.top, theme.spacing.space300)
+                .padding(.top, theme.sizing.spacingSpacingLg)
                 .frame(maxHeight: .infinity, alignment: .top)
             }
         }
@@ -231,7 +231,7 @@ struct ProductListingFilter: View {
                     ThemedIcon(
                         .chevronLeft,
                         size: .medium,
-                        tint: Theme.contentContentPrimary,
+                        tint: theme.color.contentContentPrimary,
                         accessibilityLabel: L10n.Accessibility.back
                     )
                 }

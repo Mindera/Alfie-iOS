@@ -10,15 +10,15 @@ struct SkeletonDemoView: View {
         VStack {
             ScrollView {
                 DemoHelper.demoSectionHeader(title: "Skeleton Animation")
-                    .padding(.horizontal, Primitives.Spacing.spacing16)
-                    .padding(.bottom, Primitives.Spacing.spacing0)
+                    .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                    .padding(.bottom, theme.sizing.spacingSpacingNone)
                 bodyType {
                     Image("DemoProductImage", bundle: .module)
                         .resizable()
                         .scaledToFit()
                         .shimmering(while: $isImageLoading)
                 } second: {
-                    VStack(alignment: .leading, spacing: Primitives.Spacing.spacing8) {
+                    VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingXs) {
                         Text.build(theme.font.heading.medium("TOMMY HILFIGER"))
                             .shimmering(while: $isContentLoading)
 
@@ -52,22 +52,22 @@ struct SkeletonDemoView: View {
                             )
                         )
                         .shimmeringMultiline(while: $isContentLoading, lines: 14, font: theme.font.body.small.uiFont)
-                        .padding(.top, Primitives.Spacing.spacing8)
+                        .padding(.top, theme.sizing.spacingSpacingXs)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal, Primitives.Spacing.spacing16)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
             }
 
             ThemedDivider.horizontalThick
-            HStack(spacing: Primitives.Spacing.spacing16) {
+            HStack(spacing: theme.sizing.spacingSpacingMd) {
                 ThemedButton(text: "Add To Bag", type: .big, style: .primary, trailingAsset: Icon.bag) {}
                     .shimmering(while: $isContentLoading)
 
                 ThemedButton(text: "Find in Store", type: .big, style: .secondary, trailingAsset: Icon.store) {}
                     .shimmering(while: $isContentLoading)
             }
-            .padding(Primitives.Spacing.spacing8)
+            .padding(theme.sizing.spacingSpacingXs)
         }
         .edgesIgnoringSafeArea(.horizontal)
         .task {

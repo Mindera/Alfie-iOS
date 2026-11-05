@@ -13,16 +13,16 @@ struct RadioListDemoView: View {
     @State private var selectedValue: RadioListTestValue?
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Radio Buttons")
             RadioButtonList(
                 values: RadioListTestValue.allCases,
                 disabledValues: .constant([.selectionDisabled]),
                 selectedValue: $selectedValue,
-                verticalSpacing: Primitives.Spacing.spacing24
+                verticalSpacing: theme.sizing.spacingSpacingLg
             )
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, Primitives.Spacing.spacing32)
+            .padding(.vertical, theme.sizing.spacingSpacingXl)
 
             DemoHelper.demoSectionHeader(title: "Demo")
             HStack {
@@ -32,7 +32,7 @@ struct RadioListDemoView: View {
             }
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 }
 

@@ -11,19 +11,12 @@ public struct SizingSwatchAppearance: Equatable {
 
     /// Selection is a heavier *border* — never a fill, which is what the pre-redesign chip did.
     public static func resolve(for state: SizingSwatch.ItemState, isSelected: Bool) -> Self {
-        guard state == .available else {
-            return .init(
-                borderColor: Theme.borderSoft,
-                borderWidth: Constants.borderWidthDefault,
-                textColor: Theme.contentContentTerciary,
-                backgroundColor: .clear
-            )
-        }
-
+        let isAvailable = state == .available
+        let colors = SwatchColors(isSelected: isSelected, isEnabled: isAvailable)
         return .init(
-            borderColor: isSelected ? Theme.contentContentPrimary : Theme.borderSoft,
-            borderWidth: isSelected ? Constants.borderWidthSelected : Constants.borderWidthDefault,
-            textColor: Theme.contentContentPrimary,
+            borderColor: colors.border,
+            borderWidth: isAvailable && isSelected ? Constants.borderWidthSelected : Constants.borderWidthDefault,
+            textColor: colors.text,
             backgroundColor: .clear
         )
     }

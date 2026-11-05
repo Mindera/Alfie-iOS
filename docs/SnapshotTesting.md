@@ -95,6 +95,7 @@ of the build.
 | `WishlistViewSnapshotTests` | `WishlistTests` | Populated Wishlist grid, including an out-of-stock Variant; empty Wishlist; grid with the Removed Snackbar |
 | `ZoomableCarouselSnapshotTests` | `SharedUITests` | Full-screen carousel pages loading images through the pipeline injected above it |
 | `ScannerViewSnapshotTests` | `ScannerTests` | Scanner chrome over the camera, wrapping guidance, the unrecognised-code notice, the recognised (green) viewfinder, the camera-access explainer, permission denied, device unsupported, camera unavailable |
+| `Gallery/*GallerySnapshotTests` | `SharedUITests` | Component baseline for the semantic-token migration (#186): button (4 styles × default/disabled/loading/icons), snackbar (info/success/error), toggle (on/off × enabled/disabled), error view, tag, accordion, segmented control, divider, search bar (light/focused), progress bar, page control, product cards (vertical small/medium, horizontal), price (regular/sale × small/large), checkbox, radio, modal sheet |
 
 Screens mid Modern Design Rollout are deliberately uncovered — their references would churn on every
 rollout PR. Add them per screen once the design settles, covering the full state matrix

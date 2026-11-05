@@ -17,7 +17,7 @@ where SelectionValue: Hashable & RawRepresentable, SelectionValue.RawValue == St
         values: [SelectionValue],
         disabledValues: Binding<[SelectionValue]> = .constant([]),
         selectedValue: Binding<SelectionValue?>,
-        verticalSpacing: CGFloat = Primitives.Spacing.spacing16
+        verticalSpacing: CGFloat = DesignSystem.shared.sizing.spacingSpacingMd
     ) {
         self.values = values
         self._disabledValues = disabledValues

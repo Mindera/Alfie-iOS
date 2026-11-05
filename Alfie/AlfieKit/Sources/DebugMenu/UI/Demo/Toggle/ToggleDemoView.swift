@@ -2,12 +2,11 @@ import SharedUI
 import SwiftUI
 
 struct ToggleDemoView: View {
-    private var theme: DesignSystemProtocol = DesignSystem()
     @State private var isOn = false
     @State private var isDisabled = false
 
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing20) {
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
             DemoHelper.demoSectionHeader(title: "Toggle")
 
             ThemedToggleView(isOn: $isOn, isDisabled: $isDisabled) {
@@ -15,13 +14,13 @@ struct ToggleDemoView: View {
             }
 
             DemoHelper.demoSectionHeader(title: "Options")
-                .padding(.top, Primitives.Spacing.spacing32)
+                .padding(.top, theme.sizing.spacingSpacingXl)
 
             ThemedToggleView(isOn: $isDisabled) { Text.build(theme.font.body.small("Disable")) }
 
             Spacer()
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 }
 

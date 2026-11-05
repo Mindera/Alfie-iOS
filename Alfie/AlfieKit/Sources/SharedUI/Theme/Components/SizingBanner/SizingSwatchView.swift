@@ -25,7 +25,7 @@ public struct SizingSwatchView: View {
             // renders 6pt shorter than the design and the bell reads oversized against it.
             .frame(maxWidth: .infinity, minHeight: theme.font.body.medium.style.lineHeight)
             .lineLimit(1)
-            .padding(theme.spacing.space100)
+            .padding(theme.sizing.spacingSpacingXs)
             .foregroundStyle(appearance.textColor)
             .background(
                 ZStack {
@@ -64,9 +64,9 @@ public struct SizingSwatchView: View {
     @ViewBuilder
     private func outOfStockBellView() -> some View {
         if isOutOfStock {
-            ThemedIcon(.bell, tint: Theme.contentContentTerciary)
-                .padding(.top, theme.spacing.space050)
-                .padding(.trailing, theme.spacing.space025)
+            ThemedIcon(.bell, tint: theme.color.contentContentTerciary)
+                .padding(.top, theme.sizing.spacingSpacing2xs)
+                .padding(.trailing, theme.sizing.spacingSpacing3xs)
         }
     }
 }

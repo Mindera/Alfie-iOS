@@ -25,8 +25,8 @@ public struct SizingSelectorComponentView: View {
 
     private func gridSwatches(columns: Int) -> some View {
         LazyVGrid(
-            columns: Array(repeating: GridItem(.flexible(), spacing: theme.spacing.space100), count: columns),
-            spacing: theme.spacing.space100
+            columns: Array(repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingXs), count: columns),
+            spacing: theme.sizing.spacingSpacingXs
         ) {
             swatches()
         }
@@ -44,7 +44,7 @@ public struct SizingSelectorComponentView: View {
             HStack(spacing: itemSpacing) {
                 swatches()
             }
-            .padding(.bottom, Primitives.Spacing.spacing12)
+            .padding(.bottom, theme.sizing.spacingSpacingSm)
         }
         .scrollDisabled(!scrollable)
     }
@@ -60,7 +60,7 @@ public struct SizingSelectorComponentView: View {
                 SizingSwatchView(item: item, isSelected: configuration.isSelected(item))
                     // The design draws a 40pt chip, 4pt under the minimum target. Outset the hit
                     // region rather than the frame, so the drawn box and the row gaps stay put.
-                    .contentShape(Rectangle().inset(by: -theme.spacing.space025))
+                    .contentShape(Rectangle().inset(by: -theme.sizing.spacingSpacing3xs))
             }
             .buttonStyle(SizingSwatchButtonStyle())
             .disabled(item.state != .available)
@@ -107,8 +107,8 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
             onSelect: { _ in }
         ),
         arrangement: .chips(
-            itemHorizontalSpacing: Primitives.Spacing.spacing16,
-            itemVerticalSpacing: Primitives.Spacing.spacing16
+            itemHorizontalSpacing: DesignSystem.shared.sizing.spacingSpacingMd,
+            itemVerticalSpacing: DesignSystem.shared.sizing.spacingSpacingMd
         )
     )
 }
@@ -126,6 +126,6 @@ private struct SizingSwatchButtonStyle: ButtonStyle {
             ],
             onSelect: { _ in }
         ),
-        arrangement: .horizontal(itemSpacing: Primitives.Spacing.spacing16)
+        arrangement: .horizontal(itemSpacing: DesignSystem.shared.sizing.spacingSpacingMd)
     )
 }

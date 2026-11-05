@@ -4,10 +4,10 @@ import SwiftUI
 
 struct ProductCarouselDemoView: View {
     var body: some View {
-        VStack(spacing: Primitives.Spacing.spacing0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             DemoHelper.demoSectionHeader(title: "Product Carousel")
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.bottom, Primitives.Spacing.spacing32)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                .padding(.bottom, theme.sizing.spacingSpacingXl)
 
             ProductCarouselView(
                 data: Product.fixtures,
@@ -23,8 +23,8 @@ struct ProductCarouselDemoView: View {
             )
 
             DemoHelper.demoSectionHeader(title: "Product Carousel - Left alignment / No action / No Progress Bar")
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.vertical, Primitives.Spacing.spacing32)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                .padding(.vertical, theme.sizing.spacingSpacingXl)
 
             ProductCarouselView(
                 data: Array(Product.fixtures.prefix(2)),
@@ -38,8 +38,8 @@ struct ProductCarouselDemoView: View {
             )
 
             DemoHelper.demoSectionHeader(title: "Product Carousel - No description")
-                .padding(.horizontal, Primitives.Spacing.spacing16)
-                .padding(.vertical, Primitives.Spacing.spacing32)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                .padding(.vertical, theme.sizing.spacingSpacingXl)
 
             ProductCarouselView(
                 data: Product.fixtures,

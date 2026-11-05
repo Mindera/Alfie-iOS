@@ -32,7 +32,7 @@ struct SegmentsDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Primitives.Spacing.spacing20) {
+            VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingMd) {
                 // Section 1
                 DemoHelper.demoSectionHeader(title: "3 segments with standard padding")
 
@@ -140,7 +140,7 @@ struct SegmentsDemoView: View {
                 Segment(title: "Services", icon: Icon.heart.image, CategoryPages.services),
             ]
         }
-        .padding(.horizontal, Primitives.Spacing.spacing16)
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     @ViewBuilder
@@ -148,9 +148,9 @@ struct SegmentsDemoView: View {
         // swiftlint:disable vertical_whitespace_between_cases
         switch segment.object as? CategoryPages {
         case .categories:
-            segmentContentView(title: "Categories", color: Primitives.Colours.semanticSuccess400)
+            segmentContentView(title: "Categories", color: theme.color.surfaceBackgroundPositive)
         case .services:
-            segmentContentView(title: "Services", color: Primitives.Colours.semanticError300)
+            segmentContentView(title: "Services", color: theme.color.surfaceBackgroundNegative)
         case .none:
             EmptyView()
         }

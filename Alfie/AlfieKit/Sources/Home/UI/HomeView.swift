@@ -16,7 +16,7 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             SearchBarEntryButton(
                 placeholder: L10n.Home.SearchBar.placeholder,
                 accessibilityIdentifier: AccessibilityID.Home.searchInput,
@@ -27,12 +27,12 @@ struct HomeView<ViewModel: HomeViewModelProtocol>: View {
                 action: viewModel.didTapSearch
             )
             .matchedGeometryEffect(id: Constants.searchBarGeometryID, in: animation)
-            .padding(.horizontal, theme.spacing.space200)
-            .padding(.top, theme.spacing.space100)
-            .padding(.bottom, theme.spacing.space200)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
+            .padding(.top, theme.sizing.spacingSpacingXs)
+            .padding(.bottom, theme.sizing.spacingSpacingMd)
 
             ScrollView {
-                VStack(spacing: theme.spacing.space0) {
+                VStack(spacing: theme.sizing.spacingSpacingNone) {
                     HomeHeroCarouselView(banners: viewModel.heroBanners)
                 }
             }

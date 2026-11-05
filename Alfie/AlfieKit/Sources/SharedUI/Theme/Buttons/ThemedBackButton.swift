@@ -14,7 +14,7 @@ public struct ThemedBackButton: View {
             ThemedIcon(
                 .chevronLeft,
                 size: .medium,
-                tint: Primitives.Colours.neutrals800,
+                tint: theme.color.contentContentPrimary,
                 accessibilityLabel: L10n.Accessibility.back
             )
             .frame(width: Constants.minimumTapTarget, height: Constants.minimumTapTarget)

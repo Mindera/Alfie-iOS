@@ -23,7 +23,7 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol>: View {
     }
 
     var body: some View {
-        VStack(spacing: theme.spacing.space0) {
+        VStack(spacing: theme.sizing.spacingSpacingNone) {
             SearchBarEntryButton(
                 placeholder: L10n.Home.SearchBar.placeholder,
                 accessibilityIdentifier: AccessibilityID.Shop.searchInput,
@@ -33,9 +33,9 @@ struct ShopView<CategoriesViewModel: CategoriesViewModelProtocol>: View {
                 ),
                 action: didTapSearch
             )
-            .padding(.horizontal, theme.spacing.space200)
-            .padding(.top, theme.spacing.space100)
-            .padding(.bottom, theme.spacing.space200)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
+            .padding(.top, theme.sizing.spacingSpacingXs)
+            .padding(.bottom, theme.sizing.spacingSpacingMd)
 
             categoriesView
         }

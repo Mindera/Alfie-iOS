@@ -15,7 +15,7 @@ public struct SnackbarViewModifier: ViewModifier {
             .overlay(
                 ZStack {
                     snackbarView
-                        .padding(Primitives.Spacing.spacing8)
+                        .padding(theme.sizing.spacingSpacingXs)
                 }
                 .animation(.spring(), value: configuration),
                 alignment: alignment

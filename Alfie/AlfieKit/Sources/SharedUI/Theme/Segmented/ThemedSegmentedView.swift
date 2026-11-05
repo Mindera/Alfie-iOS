@@ -23,15 +23,15 @@ public struct ThemedSegmentedView<Content: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: Primitives.Spacing.spacing0) {
+        HStack(spacing: theme.sizing.spacingSpacingNone) {
             ForEach(list, id: \.id) { segment in
                 itemBuilder(segment, animation, type)
             }
         }
-        .padding(type == .compact ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8)
+        .padding(type == .compact ? theme.sizing.spacingSpacing2xs : theme.sizing.spacingSpacingXs)
         .background {
-            RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                .fill(Primitives.Colours.neutrals100)
+            RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
+                .fill(theme.color.surfaceForegroundPrimary)
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AccessibilityId.segmentedControl)
@@ -56,14 +56,14 @@ public struct ThemedSegmentView: View {
     public var body: some View {
         ZStack {
             if currectSelected == segment {
-                RoundedRectangle(cornerRadius: Sizing.radiusSoft)
-                    .fill(Primitives.Colours.neutrals0)
+                RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
+                    .fill(theme.color.surfaceBackgroundPrimary)
                     .matchedGeometryEffect(id: "segmentBackground", in: animation, properties: .frame)
             } else {
-                RoundedRectangle(cornerRadius: Sizing.radiusSoft)
+                RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
                     .fill(.clear)
             }
-            HStack(spacing: Primitives.Spacing.spacing0) {
+            HStack(spacing: theme.sizing.spacingSpacingNone) {
                 Spacer()
                 if let icon = segment.icon {
                     icon
@@ -73,17 +73,26 @@ public struct ThemedSegmentView: View {
                         .frame(width: Constants.iconWidth, height: Constants.iconHeight)
                         .padding(
                             .trailing,
-                            type == .compact ? Primitives.Spacing.spacing4 : Primitives.Spacing.spacing8
+                            type == .compact ? theme.sizing.spacingSpacing2xs : theme.sizing.spacingSpacingXs
                         )
                         .foregroundStyle(
-                            currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500
+                            currectSelected == segment
+                                ? theme.color.contentContentPrimary
+                                : theme.color.contentContentTerciary
                         )
                 }
                 Text.build(theme.font.body.medium(segment.title))
                     .foregroundStyle(
-                        currectSelected == segment ? Primitives.Colours.neutrals900 : Primitives.Colours.neutrals500
+                        currectSelected == segment
+                            ? theme.color.contentContentPrimary
+                            : theme.color.contentContentTerciary
                     )
-                    .padding(.vertical, type == .compact ? Primitives.Spacing.spacing8 : Primitives.Spacing.spacing16)
+                    .padding(
+                        .vertical,
+                        type == .compact
+                            ? theme.sizing.spacingSpacingXs
+                            : theme.sizing.spacingSpacingMd
+                    )
                     .lineLimit(1)
                 Spacer()
             }

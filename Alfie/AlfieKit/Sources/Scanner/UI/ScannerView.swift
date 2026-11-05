@@ -57,19 +57,21 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     private var screen: some View {
         VStack(spacing: 0) {
             header
-                .padding(.horizontal, theme.spacing.space200)
-                .padding(.vertical, theme.spacing.space150)
-                .background(Theme.surfaceBackgroundInvertedPrimary.ignoresSafeArea(edges: .top))
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                .padding(.vertical, theme.sizing.spacingSpacingSm)
+                .background(theme.color.surfaceBackgroundInvertedPrimary.ignoresSafeArea(edges: .top))
 
             if let error = viewModel.failure {
                 ScannerFailureView(error: error, openSettings: viewModel.didTapOpenSettings)
                     .frame(maxHeight: .infinity)
-                    .background(Theme.surfaceBackgroundPrimary)
+                    .background(theme.color.surfaceBackgroundPrimary)
             } else {
                 camera
             }
         }
-        .background(isShowingCamera ? Theme.surfaceBackgroundInvertedPrimary : Theme.surfaceBackgroundPrimary)
+        .background(
+            isShowingCamera ? theme.color.surfaceBackgroundInvertedPrimary : theme.color.surfaceBackgroundPrimary
+        )
         .accessibilityIdentifier(AccessibilityID.Scanner.screen)
         .onAppear {
             viewModel.viewDidAppear()
@@ -116,7 +118,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                 .ignoresSafeArea(edges: .bottom)
                 .accessibilityHidden(true)
 
-            VStack(spacing: theme.spacing.space300) {
+            VStack(spacing: theme.sizing.spacingSpacingLg) {
                 viewfinder
                 if viewModel.isLookingUp {
                     lookup
@@ -124,12 +126,12 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
                     guidance
                 }
             }
-            .padding(.horizontal, theme.spacing.space400)
+            .padding(.horizontal, theme.sizing.spacingSpacingXl)
 
             notice
                 .frame(maxHeight: .infinity, alignment: .bottom)
-                .padding(.horizontal, theme.spacing.space200)
-                .padding(.bottom, theme.spacing.space400)
+                .padding(.horizontal, theme.sizing.spacingSpacingMd)
+                .padding(.bottom, theme.sizing.spacingSpacingXl)
         }
     }
 
@@ -138,7 +140,7 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     private var header: some View {
         ZStack {
             Text.build(theme.font.heading.medium(viewModel.title))
-                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .accessibilityIdentifier(AccessibilityID.Scanner.title)
                 .accessibilityAddTraits(.isHeader)
 
@@ -151,16 +153,16 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
         Button {
             viewModel.didTapClose()
         } label: {
-            ThemedIcon(.chevronLeft, size: .medium, tint: Theme.contentContentInvertedPrimary)
+            ThemedIcon(.chevronLeft, size: .medium, tint: theme.color.contentContentInvertedPrimary)
         }
         .accessibilityIdentifier(AccessibilityID.Scanner.back)
         .accessibilityLabel(Text(L10n.Accessibility.back))
     }
 
     private var viewfinder: some View {
-        RoundedRectangle(cornerRadius: Sizing.radiusSoft)
+        RoundedRectangle(cornerRadius: theme.sizing.radiusSoft)
             .stroke(
-                viewModel.isRecognised ? Theme.contentContentPositive : Theme.borderSoft,
+                viewModel.isRecognised ? theme.color.contentContentPositive : theme.color.borderSoft,
                 lineWidth: Constants.viewfinderLineWidth
             )
             .frame(width: Constants.viewfinderSide, height: Constants.viewfinderSide)
@@ -174,17 +176,17 @@ public struct ScannerView<ViewModel: ScannerViewModelProtocol>: View {
     @ViewBuilder private var guidance: some View {
         if let guidance = viewModel.guidance {
             Text.build(theme.font.body.small(guidance))
-                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .multilineTextAlignment(.center)
                 .accessibilityIdentifier(AccessibilityID.Scanner.guidance)
         }
     }
 
     private var lookup: some View {
-        VStack(spacing: theme.spacing.space150) {
+        VStack(spacing: theme.sizing.spacingSpacingSm) {
             LoaderView(circleDiameter: .defaultSmall, style: .light)
             Text.build(theme.font.body.small(L10n.Scanner.Lookup.message))
-                .foregroundStyle(Theme.contentContentInvertedPrimary)
+                .foregroundStyle(theme.color.contentContentInvertedPrimary)
                 .multilineTextAlignment(.center)
         }
         .accessibilityElement(children: .combine)

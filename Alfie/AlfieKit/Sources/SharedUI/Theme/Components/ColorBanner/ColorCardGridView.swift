@@ -13,8 +13,8 @@ public struct ColorCardGridView: View {
 
     public var body: some View {
         LazyVGrid(
-            columns: Array(repeating: GridItem(.flexible(), spacing: theme.spacing.space100), count: columns),
-            spacing: theme.spacing.space100
+            columns: Array(repeating: GridItem(.flexible(), spacing: theme.sizing.spacingSpacingXs), count: columns),
+            spacing: theme.sizing.spacingSpacingXs
         ) {
             ForEach(configuration.items) { item in
                 ColorCardView(item: item, isSelected: configuration.isSelected(item)) {
@@ -40,7 +40,7 @@ private struct ColorCardView: View {
         // A `Button`, not a tap gesture: the card is a control, so it belongs in the Buttons rotor,
         // and only a control announces "dimmed" when an out-of-stock colour disables it.
         return Button(action: onTap) {
-            VStack(spacing: theme.spacing.space100) {
+            VStack(spacing: theme.sizing.spacingSpacingXs) {
                 ColorSwatchView(item: item, swatchSize: .normal, isSelected: false)
 
                 // The design bolds the selected colour's name, so selection survives even where the
@@ -61,7 +61,7 @@ private struct ColorCardView: View {
             // Cards in one row share that row's height; `LazyVGrid` sizes each row on its own, so
             // rows can still differ.
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(theme.spacing.space100)
+            .padding(theme.sizing.spacingSpacingXs)
             .background(
                 // The design draws the card square, so no corner radius token applies.
                 Rectangle()

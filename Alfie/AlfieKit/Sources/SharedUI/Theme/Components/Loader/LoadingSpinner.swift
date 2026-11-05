@@ -8,8 +8,9 @@ public struct LoadingSpinner: View {
         case large
     }
 
-    private enum Constants {
+    private enum Constants: ThemeReading {
         static let rotationDuration: Double = 1
+        static var largeDimension: CGFloat { theme.sizing.spacingSpacing3xl }
     }
 
     @Environment(\.theme) private var theme
@@ -22,13 +23,13 @@ public struct LoadingSpinner: View {
     private var dimension: CGFloat {
         switch size {
         case .small:
-            theme.spacing.space300
+            theme.sizing.iconsIconMedium
 
         case .medium:
-            theme.spacing.space400
+            theme.sizing.iconsIconLarge
 
         case .large:
-            theme.spacing.space600
+            Constants.largeDimension
         }
     }
 
@@ -50,7 +51,7 @@ public struct LoadingSpinner: View {
 }
 
 #Preview {
-    VStack(spacing: DesignSystem.shared.spacing.space400) {
+    VStack(spacing: DesignSystem.shared.sizing.spacingSpacingXl) {
         LoadingSpinner(size: .small)
         LoadingSpinner(size: .medium)
         LoadingSpinner(size: .large)

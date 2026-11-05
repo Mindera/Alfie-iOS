@@ -46,12 +46,12 @@ struct ToolbarDemoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: Primitives.Spacing.spacing20) {
+            VStack(spacing: theme.sizing.spacingSpacingMd) {
                 DemoHelper.demoHeader(title: "Catalogue App")
-                    .padding(.vertical, Primitives.Spacing.spacing4)
+                    .padding(.vertical, theme.sizing.spacingSpacing2xs)
 
                 DemoHelper.demoSectionHeader(title: "Title Header")
-                    .padding(.bottom, Primitives.Spacing.spacing20)
+                    .padding(.bottom, theme.sizing.spacingSpacingMd)
 
                 DemoHelper.demoSectionHeader(title: "Title")
 
@@ -66,14 +66,14 @@ struct ToolbarDemoView: View {
                 ThemedToggleView(isOn: $darkMode) { Text.build(theme.font.body.small("Dark mode")) }
 
                 DemoHelper.demoSectionHeader(title: "Controls (Left / Right)")
-                    .padding(.top, Primitives.Spacing.spacing20)
+                    .padding(.top, theme.sizing.spacingSpacingMd)
 
-                HStack(alignment: .top, spacing: Primitives.Spacing.spacing0) {
+                HStack(alignment: .top, spacing: theme.sizing.spacingSpacingNone) {
                     RadioButtonList(
                         values: ToolbarLeftButtonMode.allCases,
                         disabledValues: .constant([]),
                         selectedValue: $leftMode,
-                        verticalSpacing: Primitives.Spacing.spacing24
+                        verticalSpacing: theme.sizing.spacingSpacingLg
                     )
 
                     Spacer()
@@ -82,13 +82,13 @@ struct ToolbarDemoView: View {
                         values: ToolbarRightButtonMode.allCases,
                         disabledValues: .constant([]),
                         selectedValue: $rightMode,
-                        verticalSpacing: Primitives.Spacing.spacing24
+                        verticalSpacing: theme.sizing.spacingSpacingLg
                     )
                 }
 
                 Spacer()
             }
-            .padding(.horizontal, Primitives.Spacing.spacing16)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
         }
         .toolbar {
             leadingToolbarContent
@@ -118,14 +118,14 @@ struct ToolbarDemoView: View {
             if leftAlign {
                 ThemedToolbarTitle(
                     style: .leftText("Alfie"),
-                    tint: !darkMode ? Primitives.Colours.neutrals800 : Primitives.Colours.neutrals0
+                    tint: !darkMode ? theme.color.contentContentPrimary : theme.color.contentContentInvertedPrimary
                 )
             } else {
                 if let mode = leftMode, mode.isMulti {
                     ThemedToolbarButton(
                         icon: mode.isIcon && mode != .multiMixed ? .store : nil,
                         text: mode == .multiMixed ? "Shop" : nil,
-                        tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
+                        tint: darkMode ? theme.color.contentContentInvertedPrimary : theme.color.contentContentPrimary
                     ) {}
                 }
             }
@@ -139,7 +139,7 @@ struct ToolbarDemoView: View {
             } else {
                 ThemedToolbarTitle(
                     style: showLogo ? .logo : .text("Alfie"),
-                    tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
+                    tint: darkMode ? theme.color.contentContentInvertedPrimary : theme.color.contentContentPrimary
                 )
             }
         }
@@ -151,14 +151,14 @@ struct ToolbarDemoView: View {
                 ThemedToolbarButton(
                     icon: mode.isIcon ? .bag : nil,
                     text: mode.isText ? "Bag" : nil,
-                    tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
+                    tint: darkMode ? theme.color.contentContentInvertedPrimary : theme.color.contentContentPrimary
                 ) {}
 
                 if mode.isMulti {
                     ThemedToolbarButton(
                         icon: mode.isIcon && mode != .multiMixed ? .help : nil,
                         text: mode.isText || mode == .multiMixed ? "Help" : nil,
-                        tint: darkMode ? Primitives.Colours.neutrals0 : Primitives.Colours.neutrals800
+                        tint: darkMode ? theme.color.contentContentInvertedPrimary : theme.color.contentContentPrimary
                     ) {}
                 }
             }
