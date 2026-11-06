@@ -2,7 +2,6 @@ import AlicerceLogging
 import Core
 import Mocks
 import Model
-import TestSeed
 import XCTest
 
 /// Base case for integration tests that exercise the **real** `BFFClientService` over HTTP against
@@ -86,11 +85,9 @@ class IntegrationTestCase: XCTestCase {
         }
     }
 
-    /// Only the Mock BFF's seed carries `barcode.value` (a GS1 restricted-circulation code), so a
-    /// match identifies the Mock BFF without the platform being forwarded into the test bundle.
-    func skipOnMockBFF(_ reason: String) async throws {
-        let match = try? await sut.productByBarcode(SeedAnchors.barcode.value)
-        if match != nil {
+    /// `run-integration-tests.sh` exports `TEST_RUNNER_ALFIE_BFF_PLATFORM`; xcodebuild strips the prefix.
+    func skipOnMockBFF(_ reason: String) throws {
+        if ProcessInfo.processInfo.environment["ALFIE_BFF_PLATFORM"] == "mock" {
             throw XCTSkip(reason)
         }
     }
