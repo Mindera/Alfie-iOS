@@ -81,6 +81,10 @@ let package = Package(
             targets: ["TabFlow"]
         ),
         .library(
+            name: "TestSeed",
+            targets: ["TestSeed"]
+        ),
+        .library(
             name: "TestUtils",
             targets: ["TestUtils"]
         ),
@@ -353,6 +357,10 @@ let package = Package(
         ),
 
         .target(
+            name: "TestSeed"
+        ),
+
+        .target(
             name: "TestUtils",
             dependencies: [
                 "Model",
@@ -464,6 +472,7 @@ let package = Package(
                 "Core",
                 "Model",
                 "Mocks",
+                "TestSeed",
                 "TestUtils",
             ]
         ),

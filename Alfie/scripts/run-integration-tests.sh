@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Boots a local BFF, runs the BFFIntegrationTests target against it, and tears the BFF down on exit.
-# ALFMOB-335.
+# Builds and boots the Mock BFF, runs the BFFIntegrationTests target against it, and tears the BFF
+# down on exit. ALFIE_BFF_START_CMD overrides the start command (e.g. a Live BFF platform).
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree
@@ -12,10 +12,7 @@ SCHEME="Alfie"
 TEST_PLAN="AlfieIntegration"
 TEST_LOG="/tmp/alfie_integration_test.log"
 
-# BFF location + boot command. Override ALFIE_BFF_START_CMD once the BFF team confirms the canonical
-# local-run command (TBD per ALFMOB-335 Open Q #1; `npm run start:dev` is the current assumption).
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
-BFF_START_CMD="${ALFIE_BFF_START_CMD:-npm run start:dev}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
 ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL%/}"  # drop any trailing slash so we never build `//graphql`
 # Port for the stale-server preflight: explicit :port if present, else the scheme default.
@@ -28,17 +25,30 @@ esac
 GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
 
+if [ -n "$ALFIE_BFF_START_CMD" ]; then
+    BFF_START_CMD="$ALFIE_BFF_START_CMD"
+    BFF_PLATFORM_LABEL="custom start command"
+else
+    # Auth disabled and a throwaway JWT secret: no customer can log in on the mock, so nothing is
+    # signed that outlives the run. Explicit env wins over the BFF's own .env.
+    BFF_JWT_SECRET="$(openssl rand -hex 32)"
+    export BFF_JWT_SECRET
+    BFF_START_CMD="PLATFORM=mock AUTH_DISABLED=true PORT=$BFF_PORT MOCK_ASSETS_BASE_URL=$ALFIE_BFF_BASE_URL node dist/main"
+    BFF_PLATFORM_LABEL="mock"
+fi
+
 fail() { echo "❌ $1"; exit 1; }
 
 # --- Prerequisites -----------------------------------------------------------
 command -v node >/dev/null 2>&1 || fail "node not found — install Node to run the BFF."
-command -v npm  >/dev/null 2>&1 || fail "npm not found — install Node/npm to run the BFF."
+command -v yarn >/dev/null 2>&1 || fail "yarn not found — install it (corepack enable, or brew install yarn) to build the BFF."
 [ -d "$BFF_PATH" ] || fail "BFF repo not found at '$BFF_PATH'. Clone Alfie-BFF as a sibling or set ALFIE_BFF_PATH."
 
-if [ ! -d "$BFF_PATH/node_modules" ]; then
-    echo "📦 Installing BFF dependencies (npm ci) in $BFF_PATH..."
-    ( cd "$BFF_PATH" && npm ci ) || fail "npm ci failed in $BFF_PATH"
-fi
+echo "🔖 BFF: $(git -C "$BFF_PATH" rev-parse HEAD 2>/dev/null || echo unknown) ($BFF_PATH)"
+echo "🧩 BFF platform: $BFF_PLATFORM_LABEL"
+
+echo "📦 Installing and building the BFF (yarn)..."
+( cd "$BFF_PATH" && yarn install --frozen-lockfile && yarn build ) || fail "yarn install/build failed in $BFF_PATH"
 
 # --- Pre-flight: refuse to reuse a stale server ------------------------------
 if lsof -i ":$BFF_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
