@@ -109,7 +109,7 @@ let package = Package(
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", exact: "11.11.0"),
         .package(url: "https://github.com/kean/Nuke.git", exact: "12.8.0"),
         .package(url: "https://github.com/Mindera/Alicerce.git", exact: "0.18.0"),
-        .package(url: "https://github.com/Mindera/SwiftGenPlugin", exact: "6.6.4-mindera"),
+        .package(url: "https://github.com/Mindera/SwiftGenPlugin", exact: "6.6.5-mindera"),
         .package(url: "https://github.com/onmyway133/EasyStash.git", exact: "1.1.9"),
         .package(url: "https://github.com/pointfreeco/combine-schedulers", exact: "1.0.3"),
     ],
