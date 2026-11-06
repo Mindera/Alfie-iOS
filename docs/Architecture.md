@@ -229,6 +229,7 @@ The project uses Swift Package Manager with a modular, feature-based architectur
 - **SharedUI**: Localization (L10n.xcstrings), theme, reusable UI components
 - **Utils**: Shared utilities and extensions
 - **TestUtils**: Testing utilities (snapshot testing helpers, test schedulers)
+- **TestSeed**: `SeedAnchors`, the Mock BFF seed anchors integration and UI tests pin to
 - **DeepLink**: Deep linking handling
 
 ### Feature Modules

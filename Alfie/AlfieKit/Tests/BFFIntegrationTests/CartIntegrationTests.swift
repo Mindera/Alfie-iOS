@@ -265,8 +265,8 @@ final class CartIntegrationTests: IntegrationTestCase {
             return CartLineInput(productId: productId, variantId: variantId, quantity: 1)
         }
 
-        XCTAssertGreaterThanOrEqual(inStock.count, 2, "'\(SeedAnchors.products.default)' has fewer than two in-stock variants")
-        return (try XCTUnwrap(inStock.first), try XCTUnwrap(inStock.dropFirst().first))
+        let shortfall = "'\(SeedAnchors.products.default)' has fewer than two in-stock variants"
+        return (try XCTUnwrap(inStock.first, shortfall), try XCTUnwrap(inStock.dropFirst().first, shortfall))
     }
 
     /// Posts a query straight at the endpoint and returns the decoded JSON body. Used for seed
