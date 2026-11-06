@@ -2,6 +2,7 @@ import AlicerceLogging
 import Core
 import Mocks
 import Model
+import TestSeed
 import XCTest
 
 /// Base case for integration tests that exercise the **real** `BFFClientService` over HTTP against
@@ -82,6 +83,15 @@ class IntegrationTestCase: XCTestCase {
             throw skip
         } catch {
             throw XCTSkip("BFF not reachable at \(endpoint): \(error.localizedDescription)")
+        }
+    }
+
+    /// Only the Mock BFF's seed carries `barcode.value` (a GS1 restricted-circulation code), so a
+    /// match identifies the Mock BFF without the platform being forwarded into the test bundle.
+    func skipOnMockBFF(_ reason: String) async throws {
+        let match = try? await sut.productByBarcode(SeedAnchors.barcode.value)
+        if match != nil {
+            throw XCTSkip(reason)
         }
     }
 

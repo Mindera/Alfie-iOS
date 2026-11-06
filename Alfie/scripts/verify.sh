@@ -4,8 +4,8 @@
 # Runs both build and test verification after code changes
 # This ensures code compiles AND business logic is preserved
 #
-# Scope (default): build + UNIT tests (mocked BFF) + INTEGRATION tests against a real local BFF
-# (delegates to run-integration-tests.sh; needs Node + the Alfie-BFF repo).
+# Scope (default): build + UNIT tests (mocked BFF) + INTEGRATION tests against the Mock BFF
+# (delegates to run-integration-tests.sh; needs Node, yarn + the Alfie-BFF repo).
 # Pass --skip-integration to run only build + unit tests (fast, server-free) — use this when the
 # local BFF / Node toolchain isn't available.
 #
@@ -14,6 +14,24 @@
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Read-only: ls-remote instead of fetch, so the BFF checkout and its refs are never touched.
+warn_if_bff_checkout_differs_from_main() {
+    local bff_path="${ALFIE_BFF_PATH:-$SCRIPT_DIR/../../../Alfie-BFF}"
+    git -C "$bff_path" rev-parse --git-dir >/dev/null 2>&1 || return 0
+
+    local branch
+    branch="$(git -C "$bff_path" symbolic-ref --short -q HEAD || echo "detached HEAD")"
+    if [ "$branch" != "main" ]; then
+        echo "⚠️  BFF checkout at $bff_path is on '$branch', not main; CI tests against main."
+    fi
+
+    local remote_main
+    remote_main="$(git -C "$bff_path" ls-remote origin refs/heads/main 2>/dev/null | cut -f1)"
+    if [ -n "$remote_main" ] && ! git -C "$bff_path" merge-base --is-ancestor "$remote_main" HEAD 2>/dev/null; then
+        echo "⚠️  BFF checkout at $bff_path is behind origin/main ($remote_main); CI tests against main."
+    fi
+}
 
 # Parse our own flags; pass everything else through to the unit-test runner.
 RUN_INTEGRATION=true
@@ -66,8 +84,9 @@ fi
 if [ "$RUN_INTEGRATION" = true ]; then
     echo ""
     echo ""
-    echo "🌐 STEP 3: Integration Test Verification (real local BFF)"
+    echo "🌐 STEP 3: Integration Test Verification (Mock BFF)"
     echo "-------------------------------"
+    warn_if_bff_checkout_differs_from_main
     "$SCRIPT_DIR/run-integration-tests.sh"
     INTEGRATION_RESULT=$?
 

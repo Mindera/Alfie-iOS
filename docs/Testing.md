@@ -144,8 +144,9 @@ Treat them as correct, in review and when writing.
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
   `BFFIntegrationTests` is the odd one out:
-  it runs against a real local BFF, not mocks, and only when `verify.sh` runs without
-  `--skip-integration`.
+  it runs against the Mock BFF, not mocks, and only when `verify.sh` runs without
+  `--skip-integration`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
+  seed anchors; "the first item" only where the assertion holds for any item.
 
 ## Mocks and fixtures
 
