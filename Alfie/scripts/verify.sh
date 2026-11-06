@@ -4,8 +4,8 @@
 # Runs both build and test verification after code changes
 # This ensures code compiles AND business logic is preserved
 #
-# Scope (default): build + UNIT tests (mocked BFF) + INTEGRATION tests against a real local BFF
-# (delegates to run-integration-tests.sh; needs Node + the Alfie-BFF repo).
+# Scope (default): build + UNIT tests (mocked BFF) + INTEGRATION tests against the Mock BFF
+# (delegates to run-integration-tests.sh; needs Node, yarn + the Alfie-BFF repo).
 # Pass --skip-integration to run only build + unit tests (fast, server-free) — use this when the
 # local BFF / Node toolchain isn't available.
 #
@@ -66,7 +66,7 @@ fi
 if [ "$RUN_INTEGRATION" = true ]; then
     echo ""
     echo ""
-    echo "🌐 STEP 3: Integration Test Verification (real local BFF)"
+    echo "🌐 STEP 3: Integration Test Verification (Mock BFF)"
     echo "-------------------------------"
     "$SCRIPT_DIR/run-integration-tests.sh"
     INTEGRATION_RESULT=$?

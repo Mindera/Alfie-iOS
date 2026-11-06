@@ -19,7 +19,7 @@ git secret reveal
 # .claude/settings.json (a version bump is a change to its "ref")
 claude plugin install mattpocock-skills@mattpocock --scope project
 
-# Integration tests only (boots a local BFF, runs them, tears it down)
+# Integration tests only (builds and boots the Mock BFF, runs them, tears it down)
 ./Alfie/scripts/run-integration-tests.sh
 ```
 

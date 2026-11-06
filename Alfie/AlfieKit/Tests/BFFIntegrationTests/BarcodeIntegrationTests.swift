@@ -1,4 +1,5 @@
 import Model
+import TestSeed
 import XCTest
 
 final class BarcodeIntegrationTests: IntegrationTestCase {
@@ -15,7 +16,7 @@ final class BarcodeIntegrationTests: IntegrationTestCase {
     func test_product_by_barcode_with_unknown_barcode_returns_nil() async throws {
         let match: BarcodeMatch?
         do {
-            match = try await sut.productByBarcode("0000000000000")
+            match = try await sut.productByBarcode(SeedAnchors.unknownBarcode)
         } catch let error as BFFRequestError where Self.isUnimplemented(error) {
             throw XCTSkip(
                 "productByBarcode is SCAYLE only and this BFF answered 501. "

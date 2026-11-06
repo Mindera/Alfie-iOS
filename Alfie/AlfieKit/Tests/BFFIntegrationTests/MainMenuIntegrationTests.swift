@@ -6,6 +6,11 @@ import XCTest
 /// seed-specific values.
 final class MainMenuIntegrationTests: IntegrationTestCase {
     func test_getHeaderNav_returnsActionableItemsWithHandleUrls() async throws {
+        try skipOnMockBFF(
+            "The Mock BFF has no product-category menu alias nor Live-shaped menu URLs: "
+                + "https://github.com/Mindera/Alfie-BFF/issues/155"
+        )
+
         let items = try await sut.getHeaderNav(handle: .header)
 
         XCTAssertFalse(items.isEmpty, "Seed BFF returned an empty Shop menu for handle .header")

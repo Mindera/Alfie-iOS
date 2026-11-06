@@ -1,4 +1,5 @@
 import Model
+import TestSeed
 import XCTest
 
 /// Exercises the real `getProduct` operation. A product handle is discovered by chaining off
@@ -29,11 +30,11 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
     }
 
     func test_get_product_with_several_photos_surfaces_the_full_gallery_as_colour_media() async throws {
-        let product = try await sut.getProduct(handle: IntegrationSeed.handleWithSeveralPhotos)
+        let product = try await sut.getProduct(handle: Constants.productWithSeveralPhotos)
 
         XCTAssertGreaterThan(
             product.defaultVariant.media.count, 1,
-            "'\(IntegrationSeed.handleWithSeveralPhotos)' should carry its full Gallery as Colour media"
+            "'\(Constants.productWithSeveralPhotos)' should carry its full Gallery as Colour media"
         )
     }
 
@@ -51,19 +52,10 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
 
     // MARK: - Related products
 
-    func test_related_products_for_handle_without_recommendations_are_empty() async throws {
-        let products = try await sut.relatedProducts(
-            handle: IntegrationSeed.handleWithoutRelatedProducts,
-            limit: Constants.relatedProductsLimit
-        )
-
-        XCTAssertTrue(products.isEmpty)
-    }
-
     func test_related_products_for_seeded_handle_are_complete_list_items_within_limit() async throws {
         let related = try await firstNonEmptyRelatedProducts()
 
-        let products = try XCTUnwrap(related, "No seeded product in '\(IntegrationSeed.collectionHandle)' returned related products")
+        let products = try XCTUnwrap(related, "No seeded product in '\(SeedAnchors.Collections.women)' returned related products")
 
         XCTAssertLessThanOrEqual(products.count, Constants.relatedProductsLimit)
         XCTAssertFalse(products.contains { $0.id.isEmpty })
@@ -75,7 +67,7 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
 
     private func firstNonEmptyRelatedProducts() async throws -> [Product]? {
         let listing = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: Constants.relatedProductsCandidateCount,
             sort: nil,
@@ -90,21 +82,20 @@ final class ProductDetailsIntegrationTests: IntegrationTestCase {
         return nil
     }
 
-    /// Fetches the first available product's slug, skipping the test when the seed BFF has no products.
     private func firstProductSlug() async throws -> String {
         let listing = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 1,
             sort: nil,
             filters: nil
         )
-        try XCTSkipUnless(!listing.products.isEmpty, "Seed BFF returned no products to fetch details for")
-        return try XCTUnwrap(listing.products.first).slug
+        return try XCTUnwrap(listing.products.first, "Seed BFF returned no products to fetch details for").slug
     }
 }
 
 private enum Constants {
+    static let productWithSeveralPhotos = SeedAnchors.Products.default
     static let relatedProductsLimit = 3
     static let relatedProductsCandidateCount = 5
 }

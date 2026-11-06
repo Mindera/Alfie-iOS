@@ -1,4 +1,5 @@
 import Model
+import TestSeed
 import XCTest
 
 /// Drives the whole cart lifecycle against a running BFF: create, re-add, add, remove, read.
@@ -11,6 +12,9 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// Shopify reports an unknown cart in `userErrors`, which the BFF maps to 400, so the 404 that
     /// `mappingCartNotFound()` keys on never reaches the add and update paths. Flip once #155 lands.
     private let addAndUpdateReportAnUnknownCartAs404 = false
+
+    private static let mockBFFNeverAnswersCartNotFound =
+        "The Mock BFF answers an unknown cart with an empty one: https://github.com/Mindera/Alfie-iOS/issues/247"
 
     func test_cart_round_trip_creates_merges_adds_removes_and_reads_back() async throws {
         let (first, second) = try await twoAddableVariants()
@@ -81,6 +85,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     }
 
     func test_update_cart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         try XCTSkipUnless(
             addAndUpdateReportAnUnknownCartAs404,
             "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"
@@ -131,6 +136,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// syntactically invalid id is a different failure: the platform rejects it before the lookup
     /// and the BFF reports `status` 500, so it would not exercise the recovery path at all.
     func test_an_unknown_cart_id_comes_back_with_a_404_status_extension() async throws {
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         let body = try await rawGraphQL(
             query: "query($cartId: String!) { cart(cartId: $cartId) { id } }",
             variables: ["cartId": try await unknownButWellFormedCartId()]
@@ -151,6 +157,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// and `getCart` has to apply the mapping. Neither is visible from the raw shape, and a unit
     /// test cannot see them either — it stubs the error it wants at the client boundary.
     func test_getCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         let unknownId = try await unknownButWellFormedCartId()
 
         do {
@@ -167,6 +174,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// The same for the add path, which recovers differently: it starts a fresh cart carrying the
     /// line rather than emptying the bag, so it needs the same type to arrive.
     func test_addToCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         try XCTSkipUnless(
             addAndUpdateReportAnUnknownCartAs404,
             "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"
@@ -226,41 +234,39 @@ final class CartIntegrationTests: IntegrationTestCase {
 
     // MARK: - Seed discovery
 
-    /// Two distinct variants from the seed store, with the platform ids every cart write needs.
-    /// Discovered over the wire rather than hardcoded so a seed-data change doesn't break the test —
-    /// and read raw because the domain `Product.Variant` does not yet carry a platform id.
+    /// Two in-stock variants of `products.default`, with the platform ids every cart write needs.
+    /// Read raw because the domain `Product.Variant` does not yet carry a platform id. Swap for a
+    /// dedicated anchor once https://github.com/Mindera/Alfie-BFF/issues/155 publishes one.
     private func twoAddableVariants() async throws -> (CartLineInput, CartLineInput) {
         let body = try await rawGraphQL(
             query: """
             query($handle: String!) {
-                productList(collectionHandle: $handle, limit: 20) {
-                    products { variants { id productId } }
+                productDetails(handle: $handle) {
+                    variants { id productId inventory { available } }
                 }
             }
             """,
-            variables: ["handle": IntegrationSeed.collectionHandle]
+            variables: ["handle": SeedAnchors.Products.default]
         )
 
         let data = try XCTUnwrap(body["data"] as? [String: Any])
-        let products = try XCTUnwrap((data["productList"] as? [String: Any])?["products"] as? [[String: Any]])
+        let product = try XCTUnwrap(data["productDetails"] as? [String: Any])
+        let variants = try XCTUnwrap(product["variants"] as? [[String: Any]])
 
-        let variants: [CartLineInput] = products
-            .compactMap { $0["variants"] as? [[String: Any]] }
-            .flatMap { $0 }
-            .compactMap { variant in
-                guard
-                    let variantId = variant["id"] as? String,
-                    let productId = variant["productId"] as? String
-                else {
-                    return nil
-                }
-                return CartLineInput(productId: productId, variantId: variantId, quantity: 1)
+        let inStock: [CartLineInput] = variants.compactMap { variant in
+            guard
+                let variantId = variant["id"] as? String,
+                let productId = variant["productId"] as? String,
+                let available = (variant["inventory"] as? [String: Any])?["available"] as? Int,
+                available > 0
+            else {
+                return nil
             }
-
-        guard variants.count >= 2 else {
-            throw XCTSkip("Seed store exposed fewer than two addable variants in \(IntegrationSeed.collectionHandle)")
+            return CartLineInput(productId: productId, variantId: variantId, quantity: 1)
         }
-        return (variants[0], variants[1])
+
+        let shortfall = "'\(SeedAnchors.Products.default)' has fewer than two in-stock variants"
+        return (try XCTUnwrap(inStock.first, shortfall), try XCTUnwrap(inStock.dropFirst().first, shortfall))
     }
 
     /// Posts a query straight at the endpoint and returns the decoded JSON body. Used for seed
