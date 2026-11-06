@@ -7,14 +7,14 @@ import XCTest
 final class ProductListIntegrationTests: IntegrationTestCase {
     func test_productList_happyPath_returnsWellFormedProducts() async throws {
         let listing = try await sut.productList(
-            collectionHandle: SeedAnchors.collections.women,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 10,
             sort: nil,
             filters: nil
         )
 
-        try XCTSkipUnless(!listing.products.isEmpty, "Seed BFF returned no products for \(SeedAnchors.collections.women)")
+        XCTAssertFalse(listing.products.isEmpty, "Seed BFF returned no products for \(SeedAnchors.Collections.women)")
         for product in listing.products {
             XCTAssertFalse(product.id.isEmpty)
             XCTAssertFalse(product.name.isEmpty)
@@ -23,18 +23,18 @@ final class ProductListIntegrationTests: IntegrationTestCase {
 
     func test_productList_pagination_secondPageDiffersFromFirst() async throws {
         let firstPage = try await sut.productList(
-            collectionHandle: SeedAnchors.collections.women,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 2,
             sort: nil,
             filters: nil
         )
 
-        try XCTSkipUnless(firstPage.pagination.hasNextPage, "Not enough seed data for a second page")
+        XCTAssertTrue(firstPage.pagination.hasNextPage, "Seed should span more than one page")
         let cursor = try XCTUnwrap(firstPage.pagination.endCursor, "hasNextPage but no endCursor")
 
         let secondPage = try await sut.productList(
-            collectionHandle: SeedAnchors.collections.women,
+            collectionHandle: SeedAnchors.Collections.women,
             after: cursor,
             limit: 2,
             sort: nil,
@@ -52,7 +52,7 @@ final class ProductListIntegrationTests: IntegrationTestCase {
     func test_productList_sort_returnsWellFormedPage() async throws {
         // Assert the sorted request round-trips and decodes; order semantics aren't contracted here.
         let listing = try await sut.productList(
-            collectionHandle: SeedAnchors.collections.women,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 10,
             sort: Constants.sortLowToHigh,
@@ -65,7 +65,7 @@ final class ProductListIntegrationTests: IntegrationTestCase {
     func test_productList_filter_returnsWellFormedPage() async throws {
         // A filter may legitimately narrow results to empty; only require a well-formed, decodable page.
         let listing = try await sut.productList(
-            collectionHandle: SeedAnchors.collections.women,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 10,
             sort: nil,

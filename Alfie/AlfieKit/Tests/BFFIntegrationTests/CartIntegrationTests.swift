@@ -85,7 +85,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     }
 
     func test_update_cart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
-        try await skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         try XCTSkipUnless(
             addAndUpdateReportAnUnknownCartAs404,
             "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"
@@ -136,7 +136,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// syntactically invalid id is a different failure: the platform rejects it before the lookup
     /// and the BFF reports `status` 500, so it would not exercise the recovery path at all.
     func test_an_unknown_cart_id_comes_back_with_a_404_status_extension() async throws {
-        try await skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         let body = try await rawGraphQL(
             query: "query($cartId: String!) { cart(cartId: $cartId) { id } }",
             variables: ["cartId": try await unknownButWellFormedCartId()]
@@ -157,7 +157,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// and `getCart` has to apply the mapping. Neither is visible from the raw shape, and a unit
     /// test cannot see them either — it stubs the error it wants at the client boundary.
     func test_getCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
-        try await skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         let unknownId = try await unknownButWellFormedCartId()
 
         do {
@@ -174,7 +174,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     /// The same for the add path, which recovers differently: it starts a fresh cart carrying the
     /// line rather than emptying the bag, so it needs the same type to arrive.
     func test_addToCart_with_an_unknown_cart_id_arrives_as_a_cart_not_found_error() async throws {
-        try await skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
+        try skipOnMockBFF(Self.mockBFFNeverAnswersCartNotFound)
         try XCTSkipUnless(
             addAndUpdateReportAnUnknownCartAs404,
             "Blocked on https://github.com/Mindera/Alfie-iOS/issues/155 — the BFF answers 400 here"
@@ -246,7 +246,7 @@ final class CartIntegrationTests: IntegrationTestCase {
                 }
             }
             """,
-            variables: ["handle": SeedAnchors.products.default]
+            variables: ["handle": SeedAnchors.Products.default]
         )
 
         let data = try XCTUnwrap(body["data"] as? [String: Any])
@@ -265,7 +265,7 @@ final class CartIntegrationTests: IntegrationTestCase {
             return CartLineInput(productId: productId, variantId: variantId, quantity: 1)
         }
 
-        let shortfall = "'\(SeedAnchors.products.default)' has fewer than two in-stock variants"
+        let shortfall = "'\(SeedAnchors.Products.default)' has fewer than two in-stock variants"
         return (try XCTUnwrap(inStock.first, shortfall), try XCTUnwrap(inStock.dropFirst().first, shortfall))
     }
 

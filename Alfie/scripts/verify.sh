@@ -15,25 +15,6 @@ set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Read-only: ls-remote instead of fetch, so the BFF checkout and its refs are never touched.
-warn_if_bff_checkout_differs_from_main() {
-    local bff_path="${ALFIE_BFF_PATH:-$SCRIPT_DIR/../../../Alfie-BFF}"
-    git -C "$bff_path" rev-parse --git-dir >/dev/null 2>&1 || return 0
-
-    local branch
-    branch="$(git -C "$bff_path" symbolic-ref --short -q HEAD || echo "detached HEAD")"
-    if [ "$branch" != "main" ]; then
-        echo "⚠️  BFF checkout at $bff_path is on '$branch', not main; CI tests against main."
-    fi
-
-    local remote_main
-    remote_main="$(GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5" \
-        git -C "$bff_path" ls-remote origin refs/heads/main 2>/dev/null | cut -f1)"
-    if [ -n "$remote_main" ] && ! git -C "$bff_path" merge-base --is-ancestor "$remote_main" HEAD 2>/dev/null; then
-        echo "⚠️  BFF checkout at $bff_path is behind origin/main ($remote_main); CI tests against main."
-    fi
-}
-
 # Parse our own flags; pass everything else through to the unit-test runner.
 RUN_INTEGRATION=true
 TEST_ARGS=()
@@ -87,7 +68,6 @@ if [ "$RUN_INTEGRATION" = true ]; then
     echo ""
     echo "🌐 STEP 3: Integration Test Verification (Mock BFF)"
     echo "-------------------------------"
-    warn_if_bff_checkout_differs_from_main
     "$SCRIPT_DIR/run-integration-tests.sh"
     INTEGRATION_RESULT=$?
 
