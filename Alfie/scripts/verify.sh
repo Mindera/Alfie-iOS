@@ -27,7 +27,8 @@ warn_if_bff_checkout_differs_from_main() {
     fi
 
     local remote_main
-    remote_main="$(git -C "$bff_path" ls-remote origin refs/heads/main 2>/dev/null | cut -f1)"
+    remote_main="$(GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5" \
+        git -C "$bff_path" ls-remote origin refs/heads/main 2>/dev/null | cut -f1)"
     if [ -n "$remote_main" ] && ! git -C "$bff_path" merge-base --is-ancestor "$remote_main" HEAD 2>/dev/null; then
         echo "⚠️  BFF checkout at $bff_path is behind origin/main ($remote_main); CI tests against main."
     fi

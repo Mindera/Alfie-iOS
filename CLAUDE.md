@@ -48,8 +48,8 @@ Keep `Alfie-BFF` on an up-to-date `main`: `verify.sh` warns, without touching it
 is behind `origin/main` or on another branch. A Live BFF is opt-in only, by overriding the start
 command (`ALFIE_BFF_START_CMD`).
 
-Done means an unfiltered `verify.sh` prints **"✅ FULL VERIFICATION PASSED"**. Only when Node or
-`Alfie-BFF` is unavailable: an unfiltered `--skip-integration` run printing
+Done means an unfiltered `verify.sh` prints **"✅ FULL VERIFICATION PASSED"**. Only when Node, yarn
+or `Alfie-BFF` is unavailable: an unfiltered `--skip-integration` run printing
 **"✅ VERIFICATION PASSED (... integration skipped)"**, reported as integration skipped. A
 `prototype/*` branch follows `docs/agents/prototype.md` §Done instead.
 
