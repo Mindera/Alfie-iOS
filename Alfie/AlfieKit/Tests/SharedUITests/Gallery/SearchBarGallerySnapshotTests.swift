@@ -14,8 +14,8 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
     }
 
     // The text cursor blinks off wall-clock time; the precision allowance covers its few pixels only.
-    func test_focused_search_bar_shows_focus_placeholder_and_cancel() {
-        let window = hostedInKeyWindow(searchBar(style: .light, autoFocus: .on(delay: 0)))
+    func test_focused_search_bar_shows_focus_placeholder_and_cancel() throws {
+        let window = try hostedInKeyWindow(searchBar(style: .light, autoFocus: .on(delay: 0)))
 
         assertSnapshot(of: window, as: .defaultImage(precision: 0.999), record: isRecording)
     }
@@ -35,7 +35,7 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
         .padding(16)
     }
 
-    private func hostedInKeyWindow(_ view: some View) -> UIWindow {
+    private func hostedInKeyWindow(_ view: some View) throws -> UIWindow {
         let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
         let window = scene.map(UIWindow.init(windowScene:)) ?? UIWindow()
         window.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
@@ -46,14 +46,20 @@ final class SearchBarGallerySnapshotTests: XCTestCase {
         )
         window.makeKeyAndVisible()
         addTeardownBlock { window.isHidden = true }
-        let focused = expectation(for: NSPredicate { _, _ in Self.hasFirstResponder(in: window) },
+        let focused = expectation(for: NSPredicate { _, _ in Self.firstResponder(in: window) != nil },
                                   evaluatedWith: nil)
         wait(for: [focused], timeout: .default)
+        // A Simulator with "Connect Hardware Keyboard" on never shows the software keyboard; an empty
+        // input view gives every machine that same keyboard-less layout.
+        let textField = try XCTUnwrap(Self.firstResponder(in: window) as? UITextField)
+        textField.inputView = UIView(frame: .zero)
+        textField.reloadInputViews()
         window.layoutIfNeeded()
         return window
     }
 
-    private static func hasFirstResponder(in view: UIView) -> Bool {
-        view.isFirstResponder || view.subviews.contains { hasFirstResponder(in: $0) }
+    private static func firstResponder(in view: UIView) -> UIView? {
+        if view.isFirstResponder { return view }
+        return view.subviews.lazy.compactMap { firstResponder(in: $0) }.first
     }
 }
