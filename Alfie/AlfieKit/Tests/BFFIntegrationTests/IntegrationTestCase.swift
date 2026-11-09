@@ -85,6 +85,13 @@ class IntegrationTestCase: XCTestCase {
         }
     }
 
+    /// `run-integration-tests.sh` exports `TEST_RUNNER_ALFIE_BFF_PLATFORM`; xcodebuild strips the prefix.
+    func skipOnMockBFF(_ reason: String) throws {
+        if ProcessInfo.processInfo.environment["ALFIE_BFF_PLATFORM"] == "mock" {
+            throw XCTSkip(reason)
+        }
+    }
+
     /// The probe must derive `/graphql` exactly as `BFFClientService` does, so the readiness check
     /// and the real requests target the same URL.
     var graphQLEndpoint: URL {

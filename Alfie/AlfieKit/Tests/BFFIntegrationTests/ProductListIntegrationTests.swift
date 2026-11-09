@@ -1,4 +1,5 @@
 import Model
+import TestSeed
 import XCTest
 
 /// Exercises the real `productList` operation against a running BFF. Assertions are structural
@@ -6,14 +7,14 @@ import XCTest
 final class ProductListIntegrationTests: IntegrationTestCase {
     func test_productList_happyPath_returnsWellFormedProducts() async throws {
         let listing = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 10,
             sort: nil,
             filters: nil
         )
 
-        try XCTSkipUnless(!listing.products.isEmpty, "Seed BFF returned no products for \(IntegrationSeed.collectionHandle)")
+        XCTAssertFalse(listing.products.isEmpty, "Seed BFF returned no products for \(SeedAnchors.Collections.women)")
         for product in listing.products {
             XCTAssertFalse(product.id.isEmpty)
             XCTAssertFalse(product.name.isEmpty)
@@ -22,18 +23,18 @@ final class ProductListIntegrationTests: IntegrationTestCase {
 
     func test_productList_pagination_secondPageDiffersFromFirst() async throws {
         let firstPage = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 2,
             sort: nil,
             filters: nil
         )
 
-        try XCTSkipUnless(firstPage.pagination.hasNextPage, "Not enough seed data for a second page")
+        XCTAssertTrue(firstPage.pagination.hasNextPage, "Seed should span more than one page")
         let cursor = try XCTUnwrap(firstPage.pagination.endCursor, "hasNextPage but no endCursor")
 
         let secondPage = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: cursor,
             limit: 2,
             sort: nil,
@@ -51,10 +52,10 @@ final class ProductListIntegrationTests: IntegrationTestCase {
     func test_productList_sort_returnsWellFormedPage() async throws {
         // Assert the sorted request round-trips and decodes; order semantics aren't contracted here.
         let listing = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 10,
-            sort: IntegrationSeed.sortLowToHigh,
+            sort: Constants.sortLowToHigh,
             filters: nil
         )
 
@@ -64,7 +65,7 @@ final class ProductListIntegrationTests: IntegrationTestCase {
     func test_productList_filter_returnsWellFormedPage() async throws {
         // A filter may legitimately narrow results to empty; only require a well-formed, decodable page.
         let listing = try await sut.productList(
-            collectionHandle: IntegrationSeed.collectionHandle,
+            collectionHandle: SeedAnchors.Collections.women,
             after: nil,
             limit: 10,
             sort: nil,
@@ -73,4 +74,8 @@ final class ProductListIntegrationTests: IntegrationTestCase {
 
         XCTAssertTrue(listing.products.allSatisfy { !$0.id.isEmpty })
     }
+}
+
+private enum Constants {
+    static let sortLowToHigh = "LOW_TO_HIGH"
 }

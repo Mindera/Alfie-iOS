@@ -6,17 +6,19 @@ The local development loop for working against the BFF:
 
 ### 1. Start the BFF locally
 
-The BFF team owns the canonical "run the BFF locally" docs. In short, from the
-**Alfie-BFF** repo:
+The BFF team owns the canonical "run the BFF locally" docs (`docs/mock-platform.md` in
+**Alfie-BFF** for the Mock BFF). To boot the Mock BFF the way the integration tests do, in
+`../Alfie-BFF`:
 
 ```bash
-cd ../Alfie-BFF
-npm install          # first time only
-npm run start:dev    # watch mode
+yarn install --frozen-lockfile && yarn build
+BFF_JWT_SECRET=$(openssl rand -hex 32) PLATFORM=mock AUTH_DISABLED=true PORT=3000 \
+  MOCK_ASSETS_BASE_URL=http://localhost:3000 node dist/main
 ```
 
-It listens on `http://localhost:3000` (`PORT` in the BFF's `.env`); the GraphQL
-endpoint is `http://localhost:3000/graphql`.
+Always pass `PORT=3000`: the BFF itself defaults to 4000. The GraphQL endpoint is
+`http://localhost:3000/graphql`. For a Live BFF, drop the mock variables and let the BFF's `.env`
+pick the platform (`yarn start:dev`).
 
 ### 2. Point the app at it
 

@@ -38,6 +38,8 @@ References are pixel comparisons, so rendering must be comparable between record
   per screen past `perceptualPrecision`'s budget — enough to fail `precision: 1.0`. Measured on
   `ProductListingViewSnapshotTests`, where 3 of 6 cases failed on CI purely from that gap.
 - Record on **the pinned version**, not merely the pinned major.
+- **Language pinned in the test plan.** `Alfie.xctestplan` runs tests in `en` / `US` whatever the
+  simulator's own language: a `vi` preferred language adds line height and fails every text snapshot.
 
 `SNAPSHOT_OS_VERSION` (in `Alfie/scripts/test-for-verification.sh`, default `26.4`) pins the exact
 iOS **major.minor** references are recorded on, and must stay in lockstep with `SCAN_DEVICE` in

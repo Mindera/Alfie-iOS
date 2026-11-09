@@ -1,18 +1,19 @@
 import Model
+import TestSeed
 import XCTest
 
 /// Exercises the real `searchProducts` operation against a running BFF.
 final class SearchIntegrationTests: IntegrationTestCase {
     func test_searchProducts_happyPath_returnsResults() async throws {
         let listing = try await sut.searchProducts(
-            searchTerm: IntegrationSeed.searchTerm,
+            searchTerm: SeedAnchors.SearchTerms.many,
             after: nil,
             limit: 10,
             sort: nil,
             filters: nil
         )
 
-        try XCTSkipUnless(!listing.products.isEmpty, "Seed BFF returned no results for '\(IntegrationSeed.searchTerm)'")
+        XCTAssertFalse(listing.products.isEmpty, "Seed BFF returned no results for '\(SeedAnchors.SearchTerms.many)'")
         for product in listing.products {
             XCTAssertFalse(product.id.isEmpty)
             XCTAssertFalse(product.name.isEmpty)
@@ -21,18 +22,18 @@ final class SearchIntegrationTests: IntegrationTestCase {
 
     func test_searchProducts_pagination_secondPageDiffersFromFirst() async throws {
         let firstPage = try await sut.searchProducts(
-            searchTerm: IntegrationSeed.searchTerm,
+            searchTerm: SeedAnchors.SearchTerms.many,
             after: nil,
             limit: 2,
             sort: nil,
             filters: nil
         )
 
-        try XCTSkipUnless(firstPage.pagination.hasNextPage, "Not enough seed data for a second page")
+        XCTAssertTrue(firstPage.pagination.hasNextPage, "Seed should span more than one page")
         let cursor = try XCTUnwrap(firstPage.pagination.endCursor, "hasNextPage but no endCursor")
 
         let secondPage = try await sut.searchProducts(
-            searchTerm: IntegrationSeed.searchTerm,
+            searchTerm: SeedAnchors.SearchTerms.many,
             after: cursor,
             limit: 2,
             sort: nil,
