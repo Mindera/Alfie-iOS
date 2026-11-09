@@ -248,8 +248,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Mindera/SwiftGenPlugin",
       "state" : {
-        "revision" : "f095dbce796c58a9bf4b3cb2628709b7c88cb1eb",
-        "version" : "6.6.5-mindera"
+        "revision" : "dfe53830b14c9c73206140701b8ed547b992f0b1",
+        "version" : "6.6.4-mindera.1"
       }
     },
     {
