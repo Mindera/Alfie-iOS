@@ -30,7 +30,6 @@ READINESS_TIMEOUT=60
 
 fail() { echo "❌ $1"; exit 1; }
 
-# Read-only: ls-remote instead of fetch.
 warn_if_bff_checkout_differs_from_main() {
     git -C "$BFF_PATH" rev-parse --git-dir >/dev/null 2>&1 || return 0
 
@@ -54,9 +53,6 @@ command -v yarn >/dev/null 2>&1 || fail "yarn not found — install it (corepack
 [ -d "$BFF_PATH" ] || fail "BFF repo not found at '$BFF_PATH'. Clone Alfie-BFF as a sibling or set ALFIE_BFF_PATH."
 
 if [ -n "$ALFIE_BFF_START_CMD" ]; then
-    case "$ALFIE_BFF_START_CMD" in
-        *npm*) command -v npm >/dev/null 2>&1 || fail "npm not found — ALFIE_BFF_START_CMD needs it." ;;
-    esac
     BFF_START_CMD="$ALFIE_BFF_START_CMD"
     ALFIE_BFF_PLATFORM="${ALFIE_BFF_PLATFORM:-custom}"
 else

@@ -2,8 +2,7 @@ import Model
 import TestSeed
 import XCTest
 
-/// Exercises the real `getProduct` operation. A product handle is discovered by chaining off
-/// `productList` (resolving by `slug`) so the test stays seed-agnostic.
+/// Exercises the real `getProduct` operation against Products reached through `SeedAnchors`.
 final class ProductDetailsIntegrationTests: IntegrationTestCase {
     func test_getProduct_happyPath_returnsProduct() async throws {
         let slug = try await firstProductSlug()

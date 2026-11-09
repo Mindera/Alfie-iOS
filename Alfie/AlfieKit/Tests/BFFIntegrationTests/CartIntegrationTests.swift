@@ -10,7 +10,8 @@ import XCTest
 /// on it — if it were false, quantity would have to be tracked client-side.
 final class CartIntegrationTests: IntegrationTestCase {
     /// Shopify reports an unknown cart in `userErrors`, which the BFF maps to 400, so the 404 that
-    /// `mappingCartNotFound()` keys on never reaches the add and update paths. Flip once #155 lands.
+    /// `mappingCartNotFound()` keys on never reaches the add and update paths. Flip once
+    /// https://github.com/Mindera/Alfie-iOS/issues/155 lands.
     private let addAndUpdateReportAnUnknownCartAs404 = false
 
     private static let mockBFFNeverAnswersCartNotFound =
