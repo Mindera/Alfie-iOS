@@ -170,7 +170,7 @@ This project utilizes [SwiftGenPlugin](https://github.com/SwiftGen/SwiftGenPlugi
 
 #### SwiftGen & SwiftGenPlugin notes
 
-Both dependencies currently rely on forks of the original repositories, as the original projects appear to be abandoned. The solution for supporting string catalogues is still pending merge in a long-standing pull request ([PR link](https://github.com/SwiftGen/SwiftGen/pull/1124)).
+The original projects appear to be abandoned, and string catalogue support is still pending merge in a long-standing pull request ([PR link](https://github.com/SwiftGen/SwiftGen/pull/1124)). We depend on Mindera's [SwiftGenPlugin](https://github.com/Mindera/SwiftGenPlugin) fork, which hosts a prebuilt SwiftGen `6.6.4-mindera` binary with that support as a release asset. Mindera's SwiftGen fork no longer exists, so that binary can't be rebuilt; keep the release asset.
 
 The SwiftGenPlugin leverages Swift Package Manager (SPM) plugins by providing both a build tool plugin and a command plugin. While both plugins serve the same purpose of generating type-safe files, there are key differences:
 
