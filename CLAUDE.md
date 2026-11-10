@@ -38,11 +38,11 @@ Native iOS e-commerce app: SwiftUI (iOS 16+), MVVM with Flow-based navigation, S
 | A single test file | `./Alfie/scripts/verify.sh --skip-integration --filter <Target>[/<Class>]` | After each slice |
 | The full test suite | `./Alfie/scripts/verify.sh` | Once, before calling the work done |
 
-`verify.sh` runs build + unit tests (mocked BFF) + integration tests against the **Mock BFF**,
-which it installs, builds (yarn) and boots itself on port 3000 with `PLATFORM=mock`, overriding
-the BFF's `.env`. It needs Node, yarn and the `Alfie-BFF` repo beside this one; from a worktree, point
-`ALFIE_BFF_PATH` at it. `--skip-integration` drops the integration stage. Integration tests pin only
-to `SeedAnchors` (`TestSeed` module).
+`verify.sh` builds once, then runs unit tests (mocked BFF), then the `AlfieIntegration` and
+`AlfieUI` test plans against the **Mock BFF**, which it installs, builds (yarn) and boots itself on
+port 3000 with `PLATFORM=mock`, overriding the BFF's `.env`. It needs Node, yarn and the `Alfie-BFF`
+repo beside this one; from a worktree, point `ALFIE_BFF_PATH` at it. `--skip-integration` drops the
+integration and UI stage. Integration tests pin only to `SeedAnchors` (`TestSeed` module).
 
 Keep `Alfie-BFF` on an up-to-date `main`: `verify.sh` warns, without touching it, when the checkout
 is behind `origin/main` or on another branch. A Live BFF is opt-in only, by overriding the start

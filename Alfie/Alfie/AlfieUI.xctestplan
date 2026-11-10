@@ -1,0 +1,27 @@
+{
+  "configurations" : [
+    {
+      "id" : "2208FDD9-FD9F-4D7A-A323-F55CF8C8436A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "selectedTests" : [
+        "AlfieUITestsLaunchTests"
+      ],
+      "target" : {
+        "containerPath" : "container:Alfie.xcodeproj",
+        "identifier" : "BE8B023D2B616979007AE489",
+        "name" : "AlfieUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

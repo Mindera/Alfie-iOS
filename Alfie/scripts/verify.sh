@@ -4,8 +4,8 @@
 # Runs both build and test verification after code changes
 # This ensures code compiles AND business logic is preserved
 #
-# Scope (default): build + UNIT tests (mocked BFF) + INTEGRATION tests against the Mock BFF
-# (delegates to run-integration-tests.sh; needs Node, yarn + the Alfie-BFF repo).
+# Scope (default): one build + UNIT tests (mocked BFF) + INTEGRATION then UI tests against the Mock
+# BFF, all from that build (delegates to run-integration-tests.sh; needs Node, yarn + the Alfie-BFF repo).
 # Pass --skip-integration to run only build + unit tests (fast, server-free) — use this when the
 # local BFF / Node toolchain isn't available.
 #
@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ "$RUN_INTEGRATION" = true ]; then
-    echo "🔄 Running full verification (build + unit tests + integration tests)..."
+    echo "🔄 Running full verification (build + unit tests + integration and UI tests)..."
 else
     echo "🔄 Running verification (build + unit tests, integration skipped)..."
 fi
@@ -62,18 +62,18 @@ if [ $TEST_RESULT -ne 0 ]; then
     exit 1
 fi
 
-# Step 3: Integration tests against a real local BFF (unless skipped)
+# Step 3: Integration then UI tests against the Mock BFF, reusing step 1's build (unless skipped)
 if [ "$RUN_INTEGRATION" = true ]; then
     echo ""
     echo ""
-    echo "🌐 STEP 3: Integration Test Verification (Mock BFF)"
+    echo "🌐 STEP 3: Integration + UI Test Verification (Mock BFF)"
     echo "-------------------------------"
-    "$SCRIPT_DIR/run-integration-tests.sh"
+    "$SCRIPT_DIR/run-integration-tests.sh" --skip-build
     INTEGRATION_RESULT=$?
 
     if [ $INTEGRATION_RESULT -ne 0 ]; then
         echo ""
-        echo "❌ VERIFICATION FAILED at integration test step"
+        echo "❌ VERIFICATION FAILED at integration/UI test step"
         echo "(Re-run with --skip-integration if the local BFF is unavailable.)"
         exit 1
     fi
@@ -82,7 +82,7 @@ fi
 echo ""
 echo "================================================"
 if [ "$RUN_INTEGRATION" = true ]; then
-    echo "✅ FULL VERIFICATION PASSED (build + unit + integration)"
+    echo "✅ FULL VERIFICATION PASSED (build + unit + integration + UI)"
 else
     echo "✅ VERIFICATION PASSED (build + unit tests; integration skipped)"
 fi

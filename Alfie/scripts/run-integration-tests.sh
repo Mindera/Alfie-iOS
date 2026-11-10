@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Builds and boots the Mock BFF, runs the BFFIntegrationTests target against it, and tears the BFF
-# down on exit. ALFIE_BFF_START_CMD overrides the start command (e.g. a Live BFF platform); set
+# Builds and boots the Mock BFF, runs one build-for-testing, then the AlfieIntegration and AlfieUI
+# test plans against it without rebuilding, and tears the BFF down on exit. --skip-build reuses the
+# products of an earlier build-for-testing (verify.sh's build step).
+# ALFIE_BFF_START_CMD overrides the start command (e.g. a Live BFF platform); set
 # ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF.
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched.
+#
+# Usage: run-integration-tests.sh [--skip-build]
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree
@@ -12,8 +16,17 @@ set -m  # job control: backgrounded BFF becomes its own process group leader so 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
-TEST_PLAN="AlfieIntegration"
-TEST_LOG="/tmp/alfie_integration_test.log"
+BUILD_LOG="/tmp/alfie_bff_tests_build.log"
+
+SKIP_BUILD=false
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --skip-build) SKIP_BUILD=true; shift ;;
+        *) echo "Unknown option: $1"; exit 1 ;;
+    esac
+done
+
+source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -109,41 +122,52 @@ done
 [ "$ready" = true ] || fail "BFF did not become ready at $GRAPHQL_URL within ${READINESS_TIMEOUT}s."
 echo "✅ BFF is ready."
 
-# --- Discover a simulator (same approach as test-for-verification.sh) ---------
-DESTINATION='platform=iOS Simulator,name=Any iOS Simulator Device'
-echo "🧪 Running $TEST_PLAN test plan..."
-xcodebuild test \
-    -project "$PROJECT_FILE" \
-    -scheme "$SCHEME" \
-    -testPlan "$TEST_PLAN" \
-    -destination "$DESTINATION" 2>&1 | tee "$TEST_LOG"
-TEST_RESULT=${PIPESTATUS[0]}
+# --- Simulator: the pinned iPhone unit tests use, else the newest -----------
+SIMULATOR_ID="$(pinned_iphone_udid)"
+[ -n "$SIMULATOR_ID" ] || SIMULATOR_ID="$(newest_iphone | cut -d' ' -f1)"
+[ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
+DESTINATION="id=$SIMULATOR_ID"
+echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
 
-if [ $TEST_RESULT -ne 0 ] && grep -q "Unable to find a device matching the provided destination" "$TEST_LOG"; then
-    echo "⚠️  Generic destination failed, trying a specific iPhone simulator..."
-    SIMULATOR_ID=$(xcrun simctl list devices available | grep -E "iPhone" | grep -v "unavailable" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-    [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
-    echo "📱 Using simulator: $SIMULATOR_ID"
-    xcodebuild test \
+if [ "$SKIP_BUILD" = true ]; then
+    echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
+else
+    echo "🔨 build-for-testing (log: $BUILD_LOG)..."
+    xcodebuild build-for-testing \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
-        -testPlan "$TEST_PLAN" \
-        -destination "id=$SIMULATOR_ID" 2>&1 | tee "$TEST_LOG"
-    TEST_RESULT=${PIPESTATUS[0]}
+        -destination "$DESTINATION" 2>&1 | tee "$BUILD_LOG"
+    [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
 fi
 
-if [ $TEST_RESULT -eq 0 ]; then
-    # Guard against a false green: xcodebuild exits 0 when every test XCTSkips (e.g. the BFF was
-    # reachable for the readiness probe but the per-test seed-data/env guards all skipped). Count
-    # test cases that actually ran (passed or failed); zero executed means nothing exercised the BFF.
-    EXECUTED=$(grep -cE "Test Case '.*' (passed|failed)" "$TEST_LOG" || true)
-    if [ "$EXECUTED" -eq 0 ]; then
-        echo "❌ INTEGRATION TESTS DID NOT RUN — 0 tests executed (all skipped)."
-        echo "   BFF was reachable but tests skipped; check seed data and ALFIE_BFF_BASE_URL."
-        exit 1
+# Runs one test plan without rebuilding. Guards against a false green: xcodebuild exits 0 when every
+# test XCTSkips, so zero executed test cases fails the plan.
+run_plan() {
+    local plan="$1" log="$2" bundle="$3"
+    echo ""
+    echo "🧪 Running $plan test plan (test-without-building)..."
+    rm -rf "$bundle"
+    xcodebuild test-without-building \
+        -project "$PROJECT_FILE" \
+        -scheme "$SCHEME" \
+        -testPlan "$plan" \
+        -destination "$DESTINATION" \
+        -resultBundlePath "$bundle" 2>&1 | tee "$log"
+    local result=${PIPESTATUS[0]}
+
+    if [ "$result" -ne 0 ]; then
+        echo "❌ $plan TESTS FAILED (log: $log, results: $bundle)"
+        return "$result"
     fi
-    echo "✅ INTEGRATION TESTS PASSED ($EXECUTED executed)"
-else
-    echo "❌ INTEGRATION TESTS FAILED (log: $TEST_LOG)"
-fi
-exit $TEST_RESULT
+    local executed
+    executed=$(grep -cE "Test Case '.*' (passed|failed)" "$log" || true)
+    if [ "$executed" -eq 0 ]; then
+        echo "❌ $plan TESTS DID NOT RUN — 0 tests executed (all skipped)."
+        echo "   BFF was reachable but tests skipped; check seed data and ALFIE_BFF_BASE_URL."
+        return 1
+    fi
+    echo "✅ $plan TESTS PASSED ($executed executed)"
+}
+
+run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult || exit 1
+run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult || exit 1
