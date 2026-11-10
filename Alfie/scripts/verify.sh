@@ -62,7 +62,6 @@ if [ $TEST_RESULT -ne 0 ]; then
     exit 1
 fi
 
-# Step 3: Integration then UI tests against the Mock BFF, reusing step 1's build (unless skipped)
 if [ "$RUN_INTEGRATION" = true ]; then
     echo ""
     echo ""

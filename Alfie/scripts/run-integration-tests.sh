@@ -7,8 +7,6 @@
 # ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF.
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched.
-#
-# Usage: run-integration-tests.sh [--skip-build]
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree
@@ -26,7 +24,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
+source "$PROJECT_DIR/Alfie/scripts/simulator.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -169,5 +167,11 @@ run_plan() {
     echo "✅ $plan TESTS PASSED ($executed executed)"
 }
 
-run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult || exit 1
-run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult || exit 1
+run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult
+INTEGRATION_RESULT=$?
+# A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
+# checks"), so wait for the boot to finish first.
+xcrun simctl bootstatus "$SIMULATOR_ID" -b >/dev/null || fail "Simulator $SIMULATOR_ID did not boot."
+run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
+UI_RESULT=$?
+[ "$INTEGRATION_RESULT" -eq 0 ] && [ "$UI_RESULT" -eq 0 ]
