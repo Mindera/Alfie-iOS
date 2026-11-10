@@ -68,7 +68,7 @@ non-deterministic; prefer re-recording over loosening precision to chase a rende
 
 1. Set `isRecording = true` in the test file.
 2. Record the PNG. Either run the single test from Xcode, or run the script with the guard bypassed:
-   `SNAPSHOT_ALLOW_RECORD=1 ./Alfie/scripts/verify.sh --skip-integration --filter <TestClass>`
+   `SNAPSHOT_ALLOW_RECORD=1 ./Alfie/scripts/verify.sh --only-unit --filter <TestClass>`
    (record mode always *fails* — that's expected; it writes the PNG).
 3. **Inspect the produced PNG** before trusting it.
 4. Set `isRecording = false`, re-run to confirm it asserts green, and commit the PNG.

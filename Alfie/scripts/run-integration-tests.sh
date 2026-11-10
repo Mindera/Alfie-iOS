@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-source "$PROJECT_DIR/Alfie/scripts/simulator.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -121,8 +121,7 @@ done
 echo "✅ BFF is ready."
 
 # --- Simulator: the pinned iPhone unit tests use, else the newest -----------
-SIMULATOR_ID="$(pinned_iphone_udid)"
-[ -n "$SIMULATOR_ID" ] || SIMULATOR_ID="$(newest_iphone | cut -d' ' -f1)"
+SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
@@ -171,7 +170,13 @@ run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration
 INTEGRATION_RESULT=$?
 # A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
 # checks"), so wait for the boot to finish first.
-xcrun simctl bootstatus "$SIMULATOR_ID" -b >/dev/null || fail "Simulator $SIMULATOR_ID did not boot."
-run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
-UI_RESULT=$?
-[ "$INTEGRATION_RESULT" -eq 0 ] && [ "$UI_RESULT" -eq 0 ]
+if xcrun simctl bootstatus "$SIMULATOR_ID" -b >/dev/null; then
+    run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
+    UI_RESULT=$?
+else
+    echo "❌ Simulator $SIMULATOR_ID did not boot; AlfieUI not run."
+    UI_RESULT=1
+fi
+
+[ "$INTEGRATION_RESULT" -eq 0 ] && [ "$UI_RESULT" -eq 0 ] && exit 0
+exit 1
