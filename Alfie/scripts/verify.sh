@@ -69,9 +69,9 @@ if [ "$RUN_BFF_TESTS" = true ]; then
     echo "🌐 STEP 3: Integration + UI Test Verification (Mock BFF)"
     echo "-------------------------------"
     "$SCRIPT_DIR/run-integration-tests.sh" --skip-build
-    INTEGRATION_RESULT=$?
+    BFF_TESTS_RESULT=$?
 
-    if [ $INTEGRATION_RESULT -ne 0 ]; then
+    if [ $BFF_TESTS_RESULT -ne 0 ]; then
         echo ""
         echo "❌ VERIFICATION FAILED at integration/UI test step"
         echo "(Re-run with --only-unit if the local BFF is unavailable.)"

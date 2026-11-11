@@ -137,8 +137,8 @@ else
     [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
 fi
 
-# Runs one test plan without rebuilding. Guards against a false green: xcodebuild exits 0 when every
-# test XCTSkips, so zero executed test cases fails the plan.
+# Guards against a false green: xcodebuild exits 0 when every test XCTSkips, so zero executed test
+# cases fails the plan.
 run_plan() {
     local plan="$1" log="$2" bundle="$3"
     echo ""
@@ -160,7 +160,7 @@ run_plan() {
     executed=$(grep -cE "Test Case '.*' (passed|failed)" "$log" || true)
     if [ "$executed" -eq 0 ]; then
         echo "❌ $plan TESTS DID NOT RUN — 0 tests executed (all skipped)."
-        echo "   BFF was reachable but tests skipped; check seed data and ALFIE_BFF_BASE_URL."
+        echo "   Every test skipped; see the skip reasons in $log."
         return 1
     fi
     echo "✅ $plan TESTS PASSED ($executed executed)"
