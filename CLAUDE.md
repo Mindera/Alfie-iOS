@@ -23,7 +23,7 @@ Native iOS e-commerce app: SwiftUI (iOS 16+), MVVM with Flow-based navigation, S
 
 | Never | Instead |
 |---|---|
-| Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh`, or build (`L10n`) |
+| Hand-edit generated code (`L10n+Generated.swift`, `BFFGraph/API/`, `BFFGraph/Mocks/`, `SharedUI/GeneratedTokens/`, `TestSeed/SeedAnchors+Generated.swift`) | Change the source, then rerun `run-apollo-codegen.sh` / `generate-design-tokens.sh` / `generate-seed-anchors.sh`, or build (`L10n`) |
 | Call `fatalError` | Call `queuedFatalError` |
 | Edit `Alfie.xcodeproj/project.pbxproj` | Ask the user to make the change in Xcode (new files need none: `docs/Architecture.md` §What Needs Xcode) |
 | Commit sensitive files unencrypted | Follow `docs/QuickReference.md` §Adding Sensitive Files (`git secret`) |

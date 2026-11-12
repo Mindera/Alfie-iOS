@@ -146,7 +146,9 @@ Treat them as correct, in review and when writing.
   `BFFIntegrationTests` is the odd one out:
   it runs against the Mock BFF, not mocks, and only when `verify.sh` runs without
   `--only-unit`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
-  seed anchors; "the first item" only where the assertion holds for any item.
+  seed anchors; "the first item" only where the assertion holds for any item. `SeedAnchors` is
+  generated: when the BFF adds an anchor a test needs, pull `Alfie-BFF` and run
+  `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
 
 ## Mocks and fixtures
 
