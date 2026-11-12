@@ -154,6 +154,7 @@ fi
 SIMULATOR_NAME=$(simulator_name "$SIMULATOR_ID")
 
 echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — $SIMULATOR_OS_LABEL"
+use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not set $SIMULATOR_ID to light appearance; snapshot tests may fail."
 echo ""
 
 rm -rf "$RESULT_BUNDLE" "$RESULT_BUNDLE_SHA"

@@ -52,3 +52,22 @@ preferred_iphone_udid() {
     [ -n "$udid" ] || udid="$(newest_iphone | cut -d' ' -f1)"
     echo "$udid"
 }
+
+BOOT_TIMEOUT="${BOOT_TIMEOUT:-120}"
+
+# Boots the simulator if needed and waits up to $BOOT_TIMEOUT seconds; bootstatus alone can hang.
+wait_for_boot() {
+    xcrun simctl bootstatus "$1" -b >/dev/null &
+    local pid=$!
+    for _ in $(seq 1 "$BOOT_TIMEOUT"); do
+        kill -0 "$pid" 2>/dev/null || { wait "$pid"; return; }
+        sleep 1
+    done
+    kill "$pid" 2>/dev/null
+    return 1
+}
+
+# Snapshot references are recorded in light appearance; the UI launch tests leave the simulator dark.
+use_light_appearance() {
+    wait_for_boot "$1" && xcrun simctl ui "$1" appearance light
+}

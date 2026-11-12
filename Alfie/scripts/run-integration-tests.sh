@@ -38,7 +38,6 @@ case "$_hostport" in
 esac
 GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
-BOOT_TIMEOUT=120
 
 fail() { echo "❌ $1"; exit 1; }
 
@@ -167,17 +166,6 @@ run_plan() {
     echo "✅ $plan TESTS PASSED ($executed executed)"
 }
 
-wait_for_boot() {
-    xcrun simctl bootstatus "$1" -b >/dev/null &
-    local pid=$!
-    for _ in $(seq 1 "$BOOT_TIMEOUT"); do
-        kill -0 "$pid" 2>/dev/null || { wait "$pid"; return; }
-        sleep 1
-    done
-    kill "$pid" 2>/dev/null
-    return 1
-}
-
 run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult
 INTEGRATION_RESULT=$?
 # A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
@@ -185,6 +173,7 @@ INTEGRATION_RESULT=$?
 if wait_for_boot "$SIMULATOR_ID"; then
     run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
     UI_RESULT=$?
+    use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not reset $SIMULATOR_ID to light appearance."
 else
     echo "❌ Simulator $SIMULATOR_ID did not boot within ${BOOT_TIMEOUT}s; AlfieUI not run."
     UI_RESULT=1
