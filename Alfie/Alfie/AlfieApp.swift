@@ -46,13 +46,13 @@ struct AlfieApp: App {
                 Color.clear
                     .onAppear {
                         // Lazy initialize once appDelegate is ready
-                        appFeatureViewModel = ProcessInfo.isUITest
-                            ? AppFeatureViewModel(
-                                serviceProvider: appDelegate.serviceProvider,
-                                log: log,
-                                startupCompletionDelay: 0
-                            )
-                            : AppFeatureViewModel(serviceProvider: appDelegate.serviceProvider, log: log)
+                        appFeatureViewModel = AppFeatureViewModel(
+                            serviceProvider: appDelegate.serviceProvider,
+                            log: log,
+                            startupCompletionDelay: ProcessInfo.isUITest
+                                ? 0
+                                : AppFeatureViewModel.defaultStartupCompletionDelay
+                        )
                     }
             }
         }

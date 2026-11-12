@@ -22,6 +22,8 @@ final class AlfieUITests: AlfieUITestCase {
         hierarchy.name = "Accessibility hierarchy — \(name)"
         hierarchy.lifetime = .deleteOnSuccess
         add(hierarchy)
+
+        try super.tearDownWithError()
     }
 
     // MARK: - Tests

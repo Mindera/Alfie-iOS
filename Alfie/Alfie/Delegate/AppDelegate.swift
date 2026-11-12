@@ -66,12 +66,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         } else if ProcessInfo.isUITest {
             Alfie.log = Log.DummyLogger()
             SharedUILogger.set(logger: log)
-            serviceProvider = ServiceProvider(usesFirebase: false)
+            serviceProvider = ServiceProvider(isUITest: true)
         } else {
             Alfie.log = createLogger()
             CoreBootstrap.bootstrapFirebaseApp(log: log)
             SharedUILogger.set(logger: log)
-            serviceProvider = ServiceProvider(usesFirebase: true)
+            serviceProvider = ServiceProvider(isUITest: false)
             if let application {
                 application.registerForRemoteNotifications()
                 serviceProvider.notificationsService.start()

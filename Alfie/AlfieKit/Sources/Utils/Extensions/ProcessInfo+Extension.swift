@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Foundation
 
 extension ProcessInfo {
@@ -7,7 +8,7 @@ extension ProcessInfo {
 
     public static let isUITest: Bool = {
         #if DEBUG
-        processInfo.environment["ALFIE_UI_TEST"] == "1"
+        processInfo.environment[UITestSignal.environmentKey] == UITestSignal.enabledValue
         #else
         false
         #endif

@@ -370,7 +370,10 @@ let package = Package(
         ),
 
         .target(
-            name: "Utils"
+            name: "Utils",
+            dependencies: [
+                "AccessibilityIdentifiers",
+            ]
         ),
 
         .target(

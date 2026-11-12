@@ -91,7 +91,7 @@ final class ProductListingPage {
 }
 ```
 
-Every UI test class subclasses `AlfieUITestCase`, which launches the app with the **UI test signal**
+Every UI test class subclasses `AlfieUITestCase`, which launches the app with the UI test signal
 (`ALFIE_UI_TEST=1` in the launch environment, read by `ProcessInfo.isUITest`, Debug builds only) and
 pinned to `en_US`. With the signal the app clears its saved state, skips Firebase, Braze and the push
 prompt, reads Remote Config from the bundled local config only, and skips the splash delay.

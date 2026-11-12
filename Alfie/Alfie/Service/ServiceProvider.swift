@@ -32,7 +32,7 @@ final class ServiceProvider: ServiceProviderProtocol {
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
-    init(usesFirebase: Bool) {
+    init(isUITest: Bool) {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.bffApiKeyService = BFFApiKeyService(userDefaults: userDefaults, apiEndpointService: apiEndpointService)
@@ -42,13 +42,13 @@ final class ServiceProvider: ServiceProviderProtocol {
         let defaultInitializationCountry = "AU"
 
         authenticationService = AuthenticationService()
-        analytics = usesFirebase
-            ? FirebaseAnalyticsTracker().eraseToAnyAnalyticsTracker()
-            : NoOpAnalyticsTracker().eraseToAnyAnalyticsTracker()
+        analytics = isUITest
+            ? NoOpAnalyticsTracker().eraseToAnyAnalyticsTracker()
+            : FirebaseAnalyticsTracker().eraseToAnyAnalyticsTracker()
 
         var providers: [ConfigurationProviderProtocol] = [LocalConfigurationProvider()]
 
-        if usesFirebase {
+        if !isUITest {
             let firebaseProvider = FirebaseRemoteConfigurationProvider(
                 minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800,
                 log: log

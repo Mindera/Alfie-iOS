@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import XCTest
 
 class AlfieUITestCase: XCTestCase {
@@ -10,14 +11,23 @@ class AlfieUITestCase: XCTestCase {
         app.launch()
     }
 
+    override func tearDownWithError() throws {
+        app = nil
+    }
+
     static func makeApp() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchEnvironment["ALFIE_UI_TEST"] = "1"
+        app.launchEnvironment[UITestSignal.environmentKey] = UITestSignal.enabledValue
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         return app
     }
 
-    func waitFor(_ element: XCUIElement, _ message: String) {
-        XCTAssertTrue(element.waitForExistence(timeout: timeout), message)
+    func waitFor(
+        _ element: XCUIElement,
+        _ message: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        XCTAssertTrue(element.waitForExistence(timeout: timeout), message, file: file, line: line)
     }
 }
