@@ -38,6 +38,7 @@ case "$_hostport" in
 esac
 GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
+BOOT_TIMEOUT=120
 
 fail() { echo "❌ $1"; exit 1; }
 
@@ -77,6 +78,23 @@ else
     ALFIE_BFF_PLATFORM=mock
 fi
 export TEST_RUNNER_ALFIE_BFF_PLATFORM="$ALFIE_BFF_PLATFORM"
+
+# --- Simulator: the pinned iPhone unit tests use, else the newest -----------
+SIMULATOR_ID="$(preferred_iphone_udid)"
+[ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
+DESTINATION="id=$SIMULATOR_ID"
+echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
+
+if [ "$SKIP_BUILD" = true ]; then
+    echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
+else
+    echo "🔨 build-for-testing (log: $BUILD_LOG)..."
+    xcodebuild build-for-testing \
+        -project "$PROJECT_FILE" \
+        -scheme "$SCHEME" \
+        -destination "$DESTINATION" 2>&1 | tee "$BUILD_LOG"
+    [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
+fi
 
 warn_if_bff_checkout_differs_from_main
 echo "🔖 BFF: $(git -C "$BFF_PATH" rev-parse HEAD 2>/dev/null || echo unknown) ($BFF_PATH)"
@@ -120,23 +138,6 @@ done
 [ "$ready" = true ] || fail "BFF did not become ready at $GRAPHQL_URL within ${READINESS_TIMEOUT}s."
 echo "✅ BFF is ready."
 
-# --- Simulator: the pinned iPhone unit tests use, else the newest -----------
-SIMULATOR_ID="$(preferred_iphone_udid)"
-[ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
-DESTINATION="id=$SIMULATOR_ID"
-echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
-
-if [ "$SKIP_BUILD" = true ]; then
-    echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
-else
-    echo "🔨 build-for-testing (log: $BUILD_LOG)..."
-    xcodebuild build-for-testing \
-        -project "$PROJECT_FILE" \
-        -scheme "$SCHEME" \
-        -destination "$DESTINATION" 2>&1 | tee "$BUILD_LOG"
-    [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
-fi
-
 # Guards against a false green: xcodebuild exits 0 when every test XCTSkips, so zero executed test
 # cases fails the plan.
 run_plan() {
@@ -166,15 +167,26 @@ run_plan() {
     echo "✅ $plan TESTS PASSED ($executed executed)"
 }
 
+wait_for_boot() {
+    xcrun simctl bootstatus "$1" -b >/dev/null &
+    local pid=$!
+    for _ in $(seq 1 "$BOOT_TIMEOUT"); do
+        kill -0 "$pid" 2>/dev/null || { wait "$pid"; return; }
+        sleep 1
+    done
+    kill "$pid" 2>/dev/null
+    return 1
+}
+
 run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult
 INTEGRATION_RESULT=$?
 # A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
 # checks"), so wait for the boot to finish first.
-if xcrun simctl bootstatus "$SIMULATOR_ID" -b >/dev/null; then
+if wait_for_boot "$SIMULATOR_ID"; then
     run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
     UI_RESULT=$?
 else
-    echo "❌ Simulator $SIMULATOR_ID did not boot; AlfieUI not run."
+    echo "❌ Simulator $SIMULATOR_ID did not boot within ${BOOT_TIMEOUT}s; AlfieUI not run."
     UI_RESULT=1
 fi
 

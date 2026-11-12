@@ -21,6 +21,7 @@ TEST_ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --only-unit) RUN_BFF_TESTS=false; shift ;;
+        --skip-integration) echo "⚠️  --skip-integration is deprecated; use --only-unit"; RUN_BFF_TESTS=false; shift ;;
         *) TEST_ARGS+=("$1"); shift ;;
     esac
 done

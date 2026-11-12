@@ -42,7 +42,7 @@ if best:
 }
 
 simulator_name() {
-    xcrun simctl list devices available | grep "$1" | sed -E 's/^[[:space:]]+(.+) \([A-F0-9-]+\).*/\1/'
+    xcrun simctl list devices available | grep -F -- "($1)" | sed -E 's/^[[:space:]]+(.+) \([A-F0-9-]+\).*/\1/'
 }
 
 # Prints the UDID of the pinned iPhone, else of the newest one, or nothing.
