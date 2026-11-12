@@ -1,4 +1,3 @@
-import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -53,7 +52,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
         }
         .padding(.vertical, theme.sizing.spacingSpacingXs)
         .modifier(TapHighlightableModifier { viewModel.didTapRecentSearch(recentSearch) })
-        .accessibilityIdentifier(AccessibilityID.Search.recentSearchRow)
+        .accessibilityIdentifier(AccessibilityId.recentSearchItem)
     }
 
     private func recentSearchRemoveButton(for recentSearch: RecentSearch) -> some View {
@@ -76,6 +75,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
 
 private enum AccessibilityId {
     static let recentSearchHeaderTitle = "recent-search-title"
+    static let recentSearchItem = "recent-search-item"
     static let removeRecentSearchButton = "remove-recent-search-item"
 }
 

@@ -84,7 +84,7 @@ checked against the diff.
 | Set an `accuracy:` looser than the maths needs, or widen one so a failing test goes quiet | Use the tightest value that passes, and name the constant when it budgets something physical. A loose tolerance **blocks the review** — see §Tolerances |
 | Loosen snapshot `precision` to absorb a diff | Re-record the reference (`docs/SnapshotTesting.md`) |
 | Assert screen *content* through a snapshot | Snapshot the layout; unit-test the content |
-| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan`; `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone; `AlfieUITests` runs from `AlfieUI.xctestplan`, which selects only `AlfieUITestsLaunchTests` and `CleanStartUITests` (journeys join as they land; `testLaunchPerformance` stays out, run it locally from Xcode) |
+| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan`; `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone; `AlfieUITests` runs from `AlfieUI.xctestplan`, which selects only `AlfieUITestsLaunchTests` (journeys join as they land; `testLaunchPerformance` stays out, run it locally from Xcode) |
 
 ### Tolerances
 

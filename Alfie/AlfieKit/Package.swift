@@ -314,7 +314,6 @@ let package = Package(
         .target(
             name: "Search",
             dependencies: [
-                "AccessibilityIdentifiers",
                 "Model",
                 "SharedUI",
                 "Utils",

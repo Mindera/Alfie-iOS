@@ -1,4 +1,3 @@
-import AccessibilityIdentifiers
 import SwiftUI
 
 // MARK: - ThemedSearchBarView
@@ -177,7 +176,7 @@ public struct ThemedSearchBarView: View {
         self.submitLabel = submitLabel
         self.autocorrectionDisabled = autocorrectionDisabled
         self.autoFocusWhenAppearing = autoFocusWhenAppearing
-        self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityID.Search.input
+        self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityId.inputAccessibilityId
         self.clearAccessibilityId = clearAccessibilityId ?? AccessibilityId.clearAccessibilityId
         self.iconLayout = iconLayout
         self.onCancelTap = onCancelTap
@@ -216,8 +215,12 @@ public struct ThemedSearchBarView: View {
                 .submitLabel(submitLabel)
                 .font(Font(theme.font.body.medium.uiFont))
                 .autocorrectionDisabled(autocorrectionDisabled)
-                .accessibilityLabel(currentPlaceholder)
-                .accessibilityIdentifier(inputAccessibilityId)
+                .accessibilityRepresentation {
+                    TextField(text: $text) {
+                        Text(currentPlaceholder)
+                    }
+                    .accessibilityIdentifier(inputAccessibilityId)
+                }
                 // Make sure this is set before the clearButton overlay to avoid overwriting
                 .onTapGesture {
                     isFocused = true
@@ -352,6 +355,7 @@ public struct ThemedSearchBarView: View {
 // MARK: - Accessibility
 
 private enum AccessibilityId {
+    static let inputAccessibilityId: String = "search-input"
     static let clearAccessibilityId: String = "close-btn"
     static let cancelAccessibilityId: String = "back-btn"
 }

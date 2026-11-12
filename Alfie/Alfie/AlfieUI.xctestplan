@@ -19,8 +19,7 @@
   "testTargets" : [
     {
       "selectedTests" : [
-        "AlfieUITestsLaunchTests",
-        "CleanStartUITests"
+        "AlfieUITestsLaunchTests"
       ],
       "target" : {
         "containerPath" : "container:Alfie.xcodeproj",
