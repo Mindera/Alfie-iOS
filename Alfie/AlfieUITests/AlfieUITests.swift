@@ -1,19 +1,11 @@
 import AccessibilityIdentifiers
 import XCTest
 
-final class AlfieUITests: XCTestCase {
-    private var app: XCUIApplication!
-    private let timeout: TimeInterval = 5
+final class AlfieUITests: AlfieUITestCase {
     /// A cart write is a real round trip to the BFF, so it gets longer than a local UI transition.
     private let writeTimeout: TimeInterval = 20
     /// `MainMenu.graphql` requests three levels of items, so the menu cannot nest deeper than that.
     private let menuDepthLimit = 3
-
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-        app = XCUIApplication()
-        app.launch()
-    }
 
     override func tearDownWithError() throws {
         // Attach screenshot + accessibility hierarchy on every test; both use
@@ -30,10 +22,6 @@ final class AlfieUITests: XCTestCase {
         hierarchy.name = "Accessibility hierarchy — \(name)"
         hierarchy.lifetime = .deleteOnSuccess
         add(hierarchy)
-    }
-
-    private func waitFor(_ element: XCUIElement, _ message: String) {
-        XCTAssertTrue(element.waitForExistence(timeout: timeout), message)
     }
 
     // MARK: - Tests
@@ -380,7 +368,7 @@ final class AlfieUITests: XCTestCase {
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
+                Self.makeApp().launch()
             }
         }
     }

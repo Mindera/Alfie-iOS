@@ -32,7 +32,7 @@ final class ServiceProvider: ServiceProviderProtocol {
 
     private(set) var authenticationService: AuthenticationServiceProtocol
 
-    init() {
+    init(usesFirebase: Bool) {
         self.userDefaults = UserDefaults.standard
         self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
         self.bffApiKeyService = BFFApiKeyService(userDefaults: userDefaults, apiEndpointService: apiEndpointService)
@@ -42,19 +42,23 @@ final class ServiceProvider: ServiceProviderProtocol {
         let defaultInitializationCountry = "AU"
 
         authenticationService = AuthenticationService()
-        analytics = FirebaseAnalyticsTracker().eraseToAnyAnalyticsTracker()
+        analytics = usesFirebase
+            ? FirebaseAnalyticsTracker().eraseToAnyAnalyticsTracker()
+            : NoOpAnalyticsTracker().eraseToAnyAnalyticsTracker()
 
-        let firebaseProvider = FirebaseRemoteConfigurationProvider(
-            minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800,
-            log: log
-        )
-        let localProvider = LocalConfigurationProvider()
+        var providers: [ConfigurationProviderProtocol] = [LocalConfigurationProvider()] // Order matters!
 
-        var providers: [ConfigurationProviderProtocol] = [firebaseProvider, localProvider] // Order matters!
+        if usesFirebase {
+            let firebaseProvider = FirebaseRemoteConfigurationProvider(
+                minimumFetchInterval: ReleaseConfigurator.isDebug ? 30 : 1800,
+                log: log
+            )
+            providers.insert(firebaseProvider, at: 0)
 
-        #if DEBUG
-        providers.insert(DebugConfigurationProvider.shared, at: 0)
-        #endif
+            #if DEBUG
+            providers.insert(DebugConfigurationProvider.shared, at: 0)
+            #endif
+        }
 
         configurationService = ConfigurationService(
             providers: providers,

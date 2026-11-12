@@ -35,6 +35,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.instance = self
+        if ProcessInfo.isUITest {
+            SavedState.clear()
+        }
         bootstrap(application: application)
         return true
     }
@@ -60,11 +63,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             serviceProvider = MockServiceProvider()
             Alfie.log = Log.DummyLogger()
             #endif
+        } else if ProcessInfo.isUITest {
+            Alfie.log = Log.DummyLogger()
+            SharedUILogger.set(logger: log)
+            serviceProvider = ServiceProvider(usesFirebase: false)
         } else {
             Alfie.log = createLogger()
             CoreBootstrap.bootstrapFirebaseApp(log: log)
             SharedUILogger.set(logger: log)
-            serviceProvider = ServiceProvider()
+            serviceProvider = ServiceProvider(usesFirebase: true)
             if let application {
                 application.registerForRemoteNotifications()
                 serviceProvider.notificationsService.start()

@@ -185,6 +185,13 @@ public enum AccessibilityID {
         public static let scanButton = "home.scan.button"
     }
 
+    // MARK: - Search
+
+    public enum Search {
+        public static let input = "search.input.textField"
+        public static let recentSearchRow = "search.recentSearch.row"
+    }
+
     // MARK: - Account
 
     public enum Account {
