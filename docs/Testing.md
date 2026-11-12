@@ -1,8 +1,9 @@
 # Testing
 
 This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`.
-`AlfieUITests` (XCUITest, in `AlfieUI.xctestplan`) and the standalone package `Tools/DesignTokenGen`
-(Swift Testing) keep their own conventions.
+`AlfieUITests` (XCUITest, in `AlfieUI.xctestplan`) and the standalone generator packages
+`Tools/DesignTokenGen` and `Tools/SeedAnchorGen` (Swift Testing, run by their `generate-*.sh`
+script, never by `verify.sh`) keep their own conventions.
 
 `/tdd` drives the red-green loop; where its guidance on how a test is written differs from this
 file, this file wins.
@@ -146,7 +147,9 @@ Treat them as correct, in review and when writing.
   `BFFIntegrationTests` is the odd one out:
   it runs against the Mock BFF, not mocks, and only when `verify.sh` runs without
   `--only-unit`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
-  seed anchors; "the first item" only where the assertion holds for any item.
+  seed anchors; "the first item" only where the assertion holds for any item. `SeedAnchors` is
+  generated: when the BFF adds an anchor a test needs, pull `Alfie-BFF` and run
+  `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
 
 ## Mocks and fixtures
 
