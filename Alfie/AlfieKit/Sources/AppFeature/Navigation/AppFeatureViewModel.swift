@@ -46,10 +46,12 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         appStartupScreenCondition.first { $0.value }?.key ?? .landing
     }
 
+    public static let defaultStartupCompletionDelay: CGFloat = 2
+
     public init(
         serviceProvider: ServiceProviderProtocol,
         log: Logger,
-        startupCompletionDelay: CGFloat = 2,
+        startupCompletionDelay: CGFloat = AppFeatureViewModel.defaultStartupCompletionDelay,
         scheduler: AnySchedulerOf<DispatchQueue> = .main,
         spawn: @escaping Spawn = { operation in
             Task { await operation() }
