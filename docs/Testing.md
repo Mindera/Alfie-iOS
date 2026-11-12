@@ -1,8 +1,9 @@
 # Testing
 
 This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`.
-`AlfieUITests` (XCUITest, in `AlfieUI.xctestplan`) and the standalone package `Tools/DesignTokenGen`
-(Swift Testing) keep their own conventions.
+`AlfieUITests` (XCUITest, in `AlfieUI.xctestplan`) and the standalone generator packages
+`Tools/DesignTokenGen` and `Tools/SeedAnchorGen` (Swift Testing, run by their `generate-*.sh`
+script, never by `verify.sh`) keep their own conventions.
 
 `/tdd` drives the red-green loop; where its guidance on how a test is written differs from this
 file, this file wins.

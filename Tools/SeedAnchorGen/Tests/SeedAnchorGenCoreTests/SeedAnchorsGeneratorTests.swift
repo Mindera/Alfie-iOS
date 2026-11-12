@@ -41,6 +41,19 @@ struct SeedAnchorsGeneratorTests {
         #expect(try source(json) == expected)
     }
 
+    @Test("a group whose enum name is a Swift keyword is escaped")
+    func keywordGroupName() throws {
+        let expected = header + """
+        public enum SeedAnchors {
+            public enum `Type` {
+                public static let shirt = "shirt"
+            }
+        }
+
+        """
+        #expect(try source(#"{ "type": { "shirt": "shirt" } }"#) == expected)
+    }
+
     @Test("the same anchors give the same source whatever order the JSON lists them in")
     func keyOrderIndependent() throws {
         let one = #"{ "menuHandle": "main-menu", "collections": { "women": "women", "men": "men" } }"#
@@ -66,12 +79,20 @@ struct SeedAnchorsGeneratorTests {
             (#"{ "inStock": true }"#, "inStock"),
             (#"{ "variantIds": ["a", 2] }"#, "variantIds"),
             (#"{ "search-terms": { "many": "shirt" } }"#, "search-terms"),
+            (#"{ "many\n": "shirt" }"#, "many\n"),
             (#"["women"]"#, "<root>"),
         ]
     )
     func unsupportedAnchor(json: String, path: String) {
         #expect(throws: SeedAnchorsError.unsupportedAnchor(path: path)) {
             try source(json)
+        }
+    }
+
+    @Test("a group and a sibling anchor that would share one Swift name fail, naming the anchor")
+    func nameCollision() {
+        #expect(throws: SeedAnchorsError.duplicateName(path: "products")) {
+            try source(#"{ "Products": "x", "products": { "default": "alfie-oxford-shirt" } }"#)
         }
     }
 

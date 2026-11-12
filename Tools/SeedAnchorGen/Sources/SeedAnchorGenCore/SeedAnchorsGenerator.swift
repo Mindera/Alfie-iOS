@@ -2,9 +2,13 @@ import Foundation
 
 public enum SeedAnchorsError: Error, Equatable, CustomStringConvertible {
     case unsupportedAnchor(path: String)
+    case duplicateName(path: String)
 
     public var description: String {
         switch self {
+        case .duplicateName(let path):
+            "Seed anchor '\(path)' gets the same Swift name as a sibling anchor"
+
         case .unsupportedAnchor(let path):
             "Seed anchor '\(path)' is not a string, a list of strings or a group keyed by Swift identifiers"
         }
@@ -28,10 +32,15 @@ public enum SeedAnchorsGenerator {
 
     private static func enumDeclaration(name: String, members: [String: Any], path: [String], indent: String) throws -> String {
         let memberIndent = indent + "    "
+        var declaredNames: Set<String> = []
         let body = try members.keys.sorted().map { key in
             let memberPath = path + [key]
             guard isIdentifier(key) else {
                 throw SeedAnchorsError.unsupportedAnchor(path: memberPath.joined(separator: "."))
+            }
+            let groupName = key.prefix(1).uppercased() + key.dropFirst()
+            guard declaredNames.insert(members[key] is [String: Any] ? groupName : key).inserted else {
+                throw SeedAnchorsError.duplicateName(path: memberPath.joined(separator: "."))
             }
 
             switch members[key] {
@@ -45,7 +54,7 @@ public enum SeedAnchorsGenerator {
 
             case let group as [String: Any]:
                 return try enumDeclaration(
-                    name: key.prefix(1).uppercased() + key.dropFirst(),
+                    name: escaped(groupName),
                     members: group,
                     path: memberPath,
                     indent: memberIndent
@@ -59,7 +68,7 @@ public enum SeedAnchorsGenerator {
     }
 
     private static func isIdentifier(_ key: String) -> Bool {
-        key.range(of: "^[A-Za-z_][A-Za-z0-9_]*$", options: .regularExpression) != nil
+        key.range(of: "[A-Za-z_][A-Za-z0-9_]*", options: .regularExpression) == key.startIndex..<key.endIndex
     }
 
     private static func escaped(_ key: String) -> String {
@@ -78,6 +87,6 @@ public enum SeedAnchorsGenerator {
         "var", "break", "case", "continue", "default", "defer", "do", "else", "fallthrough",
         "for", "guard", "if", "in", "repeat", "return", "switch", "where", "while", "as",
         "catch", "false", "is", "nil", "self", "super", "throw", "throws", "true", "try",
-        "Any", "Protocol", "Type",
+        "Any", "Protocol", "Self", "Type",
     ]
 }
