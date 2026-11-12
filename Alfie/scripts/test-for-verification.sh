@@ -15,12 +15,7 @@ TEST_LOG="/tmp/alfie_test.log"
 # view bodies) -- without that line an unexercised body is indistinguishable from a skipped suite.
 RESULT_BUNDLE="/tmp/alfie_test.xcresult"
 RESULT_BUNDLE_SHA="$RESULT_BUNDLE.sha"
-# Snapshot references are recorded on this exact iOS version. A major-only pin is not enough: glyph
-# antialiasing differs between minors (26.2 vs 26.4 drifts ~24 px/screen, enough to fail precision 1.0),
-# so a machine holding several 26.x runtimes could otherwise record against one and assert on another.
-# Keep in lockstep with SCAN_DEVICE in fastlane/.env.default. Overridable per run, but changing it
-# means re-recording every reference.
-SNAPSHOT_OS_VERSION="${SNAPSHOT_OS_VERSION:-26.4}"
+source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 
 # Parse arguments
 TEST_FILTER=""
@@ -113,20 +108,7 @@ fi
 
 # Snapshot references are pinned to an exact iOS version, so resolve an iPhone on that runtime rather
 # than accepting whatever generic destination xcodebuild picks (which may be another minor).
-SIMULATOR_ID=$(xcrun simctl list devices available --json | \
-    SNAPSHOT_OS_VERSION="$SNAPSHOT_OS_VERSION" /usr/bin/python3 -c '
-import json, os, re, sys
-
-wanted = os.environ["SNAPSHOT_OS_VERSION"].replace(".", "-")
-for runtime, devices in json.load(sys.stdin)["devices"].items():
-    match = re.search(r"iOS-(\d+-\d+)", runtime)
-    if not match or match.group(1) != wanted:
-        continue
-    for device in devices:
-        if "iPhone" in device["name"]:
-            print(device["udid"])
-            sys.exit(0)
-')
+SIMULATOR_ID=$(pinned_iphone_udid)
 
 SNAPSHOT_SKIP_ARGS=()
 
@@ -136,21 +118,7 @@ else
     # No iPhone on the pinned iOS version. Rather than block the whole suite, fall back to the newest
     # available iPhone and skip the snapshot classes: their references are pinned to iOS
     # $SNAPSHOT_OS_VERSION and would fail on another version, but every non-snapshot test still runs.
-    FALLBACK=$(xcrun simctl list devices available --json | /usr/bin/python3 -c '
-import json, re, sys
-
-best = None
-for runtime, devices in json.load(sys.stdin)["devices"].items():
-    match = re.search(r"iOS-(\d+)-(\d+)", runtime)
-    if not match:
-        continue
-    version = (int(match.group(1)), int(match.group(2)))
-    for device in devices:
-        if "iPhone" in device["name"] and (best is None or version > best[0]):
-            best = (version, device["udid"], "%s.%s" % (match.group(1), match.group(2)))
-if best:
-    print("%s %s" % (best[1], best[2]))
-')
+    FALLBACK=$(newest_iphone)
     SIMULATOR_ID="${FALLBACK%% *}"
     FALLBACK_OS="${FALLBACK##* }"
     FALLBACK_OS_MAJOR="${FALLBACK_OS%%.*}"
@@ -183,11 +151,10 @@ if best:
     SIMULATOR_OS_LABEL="iOS $FALLBACK_OS (fallback — snapshots skipped)"
 fi
 
-SIMULATOR_NAME=$(xcrun simctl list devices available | \
-    grep "$SIMULATOR_ID" | \
-    sed -E 's/^[[:space:]]+(.+) \([A-F0-9-]+\).*/\1/')
+SIMULATOR_NAME=$(simulator_name "$SIMULATOR_ID")
 
 echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — $SIMULATOR_OS_LABEL"
+use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not set $SIMULATOR_ID to light appearance; snapshot tests may fail."
 echo ""
 
 rm -rf "$RESULT_BUNDLE" "$RESULT_BUNDLE_SHA"

@@ -35,22 +35,22 @@ Native iOS e-commerce app: SwiftUI (iOS 16+), MVVM with Flow-based navigation, S
 | Check | Run | When |
 |---|---|---|
 | Typecheck | `./Alfie/scripts/build-for-verification.sh` | While editing |
-| A single test file | `./Alfie/scripts/verify.sh --skip-integration --filter <Target>[/<Class>]` | After each slice |
+| A single test file | `./Alfie/scripts/verify.sh --only-unit --filter <Target>[/<Class>]` | After each slice |
 | The full test suite | `./Alfie/scripts/verify.sh` | Once, before calling the work done |
 
-`verify.sh` runs build + unit tests (mocked BFF) + integration tests against the **Mock BFF**,
-which it installs, builds (yarn) and boots itself on port 3000 with `PLATFORM=mock`, overriding
-the BFF's `.env`. It needs Node, yarn and the `Alfie-BFF` repo beside this one; from a worktree, point
-`ALFIE_BFF_PATH` at it. `--skip-integration` drops the integration stage. Integration tests pin only
-to `SeedAnchors` (`TestSeed` module).
+`verify.sh` builds once, then runs unit tests (mocked BFF), then the `AlfieIntegration` and
+`AlfieUI` test plans against the **Mock BFF**, which it installs, builds (yarn) and boots itself on
+port 3000 with `PLATFORM=mock`, overriding the BFF's `.env`. It needs Node, yarn and the `Alfie-BFF`
+repo beside this one; from a worktree, point `ALFIE_BFF_PATH` at it. `--only-unit` drops the
+integration and UI stage. Integration tests pin only to `SeedAnchors` (`TestSeed` module).
 
 Keep `Alfie-BFF` on an up-to-date `main`: `verify.sh` warns, without touching it, when the checkout
 is behind `origin/main` or on another branch. A Live BFF is opt-in only, by overriding the start
 command (`ALFIE_BFF_START_CMD`); the Mock-only skips then run, unless `ALFIE_BFF_PLATFORM=mock`.
 
 Done means an unfiltered `verify.sh` prints **"✅ FULL VERIFICATION PASSED"**. Only when Node, yarn
-or `Alfie-BFF` is unavailable: an unfiltered `--skip-integration` run printing
-**"✅ VERIFICATION PASSED (... integration skipped)"**, reported as integration skipped. A
+or `Alfie-BFF` is unavailable: an unfiltered `--only-unit` run printing
+**"✅ VERIFICATION PASSED (... integration and UI skipped)"**, reported as integration and UI skipped. A
 `prototype/*` branch follows `docs/agents/prototype.md` §Done instead.
 
 Run one verification at a time: the scripts write to fixed `/tmp/alfie_*` paths, so parallel runs

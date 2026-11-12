@@ -8,6 +8,7 @@ set -o pipefail  # Ensure pipe returns the exit code of the failing command
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
+source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 
 echo "🔨 Building Alfie iOS project..."
 echo "📂 Project: $PROJECT_FILE"
@@ -33,23 +34,16 @@ fi
 if grep -q "Unable to find a device matching the provided destination" /tmp/alfie_build.log; then
     echo "⚠️  Generic destination failed, trying specific iPhone simulator..."
     
-    # Get first available iPhone simulator
-    SIMULATOR_ID=$(xcrun simctl list devices available | \
-        grep -E "iPhone" | \
-        grep -v "unavailable" | \
-        head -1 | \
-        sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-    
+    SIMULATOR_ID="$(preferred_iphone_udid)"
+
     if [ -z "$SIMULATOR_ID" ]; then
         echo "❌ ERROR: No iPhone simulator found"
         echo "Please install iPhone simulators via Xcode"
         exit 1
     fi
-    
-    SIMULATOR_NAME=$(xcrun simctl list devices available | \
-        grep "$SIMULATOR_ID" | \
-        sed -E 's/^[[:space:]]+(.+) \(.+\).*/\1/')
-    
+
+    SIMULATOR_NAME="$(simulator_name "$SIMULATOR_ID")"
+
     echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID)"
     echo ""
     

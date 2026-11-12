@@ -1,8 +1,8 @@
 # Testing
 
-This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`. `AlfieUITests`
-(XCUITest, run from its own scheme) and the standalone package `Tools/DesignTokenGen` (Swift Testing)
-sit in neither plan and keep their own conventions.
+This standard covers every target in `Alfie.xctestplan` and `AlfieIntegration.xctestplan`.
+`AlfieUITests` (XCUITest, in `AlfieUI.xctestplan`) and the standalone package `Tools/DesignTokenGen`
+(Swift Testing) keep their own conventions.
 
 `/tdd` drives the red-green loop; where its guidance on how a test is written differs from this
 file, this file wins.
@@ -84,7 +84,7 @@ checked against the diff.
 | Set an `accuracy:` looser than the maths needs, or widen one so a failing test goes quiet | Use the tightest value that passes, and name the constant when it budgets something physical. A loose tolerance **blocks the review** — see §Tolerances |
 | Loosen snapshot `precision` to absorb a diff | Re-record the reference (`docs/SnapshotTesting.md`) |
 | Assert screen *content* through a snapshot | Snapshot the layout; unit-test the content |
-| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan`; `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone |
+| Leave a test target out of its test plan | Add it — an absent target is skipped silently and still reports green. Unit targets belong to `Alfie.xctestplan`; `BFFIntegrationTests` is the sole integration target and belongs to `AlfieIntegration.xctestplan` alone; `AlfieUITests` runs from `AlfieUI.xctestplan`, which selects only `AlfieUITestsLaunchTests` (journeys join as they land; `testLaunchPerformance` stays out, run it locally from Xcode) |
 
 ### Tolerances
 
@@ -145,7 +145,7 @@ Treat them as correct, in review and when writing.
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
   `BFFIntegrationTests` is the odd one out:
   it runs against the Mock BFF, not mocks, and only when `verify.sh` runs without
-  `--skip-integration`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
+  `--only-unit`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
   seed anchors; "the first item" only where the assertion holds for any item.
 
 ## Mocks and fixtures
@@ -187,8 +187,8 @@ uncovered because nothing executed them, which is a measurement gap rather than 
 
 Two things the bundle does not cover. A `--filter` run writes to
 `/tmp/alfie_test_filtered.xcresult` and is never stamped, because its coverage describes a subset of
-the suite. And `AlfieIntegration.xctestplan` collects nothing, so anything exercised only by
-`BFFIntegrationTests` reads as 0%.
+the suite. And `AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` collect nothing, so anything exercised
+only by `BFFIntegrationTests` or `AlfieUITests` reads as 0%.
 
 Coverage is off in CI (`SCAN_CODE_COVERAGE=false` in `fastlane/.env.default`): the run has no
 consumer there, and the xcresult is uploaded only on failure.

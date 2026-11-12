@@ -113,4 +113,4 @@ For each file:
 
 - **Build + tests:** `CLAUDE.md` §Verification
 - **Identifier propagation:** Run on a simulator → Xcode → Open Developer Tool → Accessibility Inspector → hover the element → confirm the identifier matches.
-- **UI tests:** `xcodebuild test -scheme Alfie -only-testing:AlfieUITests/ProductListingUITests` (after Xcode linkage above).
+- **UI tests:** `./Alfie/scripts/run-integration-tests.sh` runs the `AlfieUI` plan against the Mock BFF. One class, with the Mock BFF up on port 3000: `xcodebuild test -project Alfie/Alfie.xcodeproj -scheme AlfieUITests -destination 'platform=iOS Simulator,name=<iPhone>' -only-testing:AlfieUITests/<Class>` (after Xcode linkage above).
