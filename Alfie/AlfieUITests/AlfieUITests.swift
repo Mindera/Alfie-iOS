@@ -337,7 +337,9 @@ final class AlfieUITests: XCTestCase {
     /// `variables` rather than interpolated into the document, so a value carrying a quote cannot
     /// reshape the query into something that fails opaquely.
     private func bffQuery(_ document: String, variables: [String: Any] = [:]) throws -> [String: Any] {
-        let origin = ProcessInfo.processInfo.environment["ALFIE_BFF_BASE_URL"] ?? "http://localhost:3000"
+        // Forwarded by AlfieUI.xctestplan; empty or un-expanded (`$(…)`) means "not overridden".
+        let forwarded = ProcessInfo.processInfo.environment["ALFIE_BFF_BASE_URL"] ?? ""
+        let origin = forwarded.isEmpty || forwarded.hasPrefix("$(") ? "http://localhost:3000" : forwarded
         guard let url = URL(string: origin + "/graphql") else {
             throw SeedError.badOrigin(origin)
         }
