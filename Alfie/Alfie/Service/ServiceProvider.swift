@@ -46,7 +46,7 @@ final class ServiceProvider: ServiceProviderProtocol {
             ? FirebaseAnalyticsTracker().eraseToAnyAnalyticsTracker()
             : NoOpAnalyticsTracker().eraseToAnyAnalyticsTracker()
 
-        var providers: [ConfigurationProviderProtocol] = [LocalConfigurationProvider()] // Order matters!
+        var providers: [ConfigurationProviderProtocol] = [LocalConfigurationProvider()]
 
         if usesFirebase {
             let firebaseProvider = FirebaseRemoteConfigurationProvider(
