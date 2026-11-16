@@ -357,8 +357,8 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     func test_tapping_recent_search_makes_no_request() {
         mockRecentsService.recentSearches = [.text(value: "linen")]
         let sut = makeSUT()
-
         sut.recentSearchesViewModel.didTapRecentSearch(.text(value: "linen"))
+
         scheduler.advance(by: .milliseconds(500))
 
         XCTAssertEqual(sut.state, .recentSearches)
@@ -421,37 +421,62 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         }
     }
 
-    private func showSuggestions(for searchText: String, in sut: SearchViewModel) {
-        showSuggestions(in: sut) {
+    private func showSuggestions(
+        for searchText: String,
+        in sut: SearchViewModel,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        showSuggestions(in: sut, file: file, line: line) {
             sut.searchText = searchText
             self.scheduler.advance(by: .milliseconds(500))
         }
     }
 
-    private func showSuggestions(in sut: SearchViewModel, after trigger: @escaping () -> Void) {
-        XCTAssertEmitsValue(from: sut.$state, where: { $0 != .suggestions(.loading) }, afterTrigger: trigger)
+    private func showSuggestions(
+        in sut: SearchViewModel,
+        file: StaticString = #filePath,
+        line: UInt = #line,
+        after trigger: @escaping () -> Void
+    ) {
+        let shown = XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0 != .suggestions(.loading) },
+            afterTrigger: trigger
+        )
+        XCTAssertNotNil(shown, "Suggestions never left loading", file: file, line: line)
     }
 
     @MainActor
-    private func awaitSuggestions(for searchText: String, in sut: SearchViewModel) async {
-        let shown = expectation(description: "suggestions shown")
+    private func awaitSuggestions(
+        for searchText: String,
+        in sut: SearchViewModel,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async {
+        let shown = XCTestExpectation(description: "suggestions shown")
         let cancellable = sut.$state
             .dropFirst()
             .first { $0 != .suggestions(.loading) }
             .sink { _ in shown.fulfill() }
         sut.searchText = searchText
         await scheduler.advance(by: .milliseconds(500))
-        await fulfillment(of: [shown], timeout: .default)
+        let result = await XCTWaiter().fulfillment(of: [shown], timeout: .default)
         cancellable.cancel()
+        XCTAssertEqual(result, .completed, "Suggestions never left loading", file: file, line: line)
     }
 
     @MainActor
-    private func assertStateStaysUnchanged(in sut: SearchViewModel) async {
-        let changed = expectation(description: "state must not change")
-        changed.isInverted = true
+    private func assertStateStaysUnchanged(
+        in sut: SearchViewModel,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async {
+        let changed = XCTestExpectation(description: "state changed")
         let cancellable = sut.$state.dropFirst().sink { _ in changed.fulfill() }
-        await fulfillment(of: [changed], timeout: 0.5)
+        let result = await XCTWaiter().fulfillment(of: [changed], timeout: .inverted)
         cancellable.cancel()
+        XCTAssertEqual(result, .timedOut, "State changed", file: file, line: line)
     }
 }
 

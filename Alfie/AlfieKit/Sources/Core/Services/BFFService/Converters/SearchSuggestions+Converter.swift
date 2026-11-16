@@ -6,12 +6,24 @@ extension BFFGraphAPI.SuggestionFragment {
     public func convertToSearchSuggestions() -> SearchSuggestions {
         var seenProductIDs = Set<String>()
         return SearchSuggestions(
-            keywords: keywords.map { KeywordSuggestion(value: $0.value) },
-            brands: brands.map { BrandSuggestion(key: $0.key, name: $0.value) },
+            keywords: keywords.map { $0.fragments.suggestionKeywordFragment.convertToKeywordSuggestion() },
+            brands: brands.map { $0.fragments.suggestionBrandFragment.convertToBrandSuggestion() },
             products: products
                 .map { $0.fragments.suggestionProductFragment.convertToProductSuggestion() }
                 .filter { seenProductIDs.insert($0.id).inserted }
         )
+    }
+}
+
+extension BFFGraphAPI.SuggestionKeywordFragment {
+    public func convertToKeywordSuggestion() -> KeywordSuggestion {
+        KeywordSuggestion(value: value)
+    }
+}
+
+extension BFFGraphAPI.SuggestionBrandFragment {
+    public func convertToBrandSuggestion() -> BrandSuggestion {
+        BrandSuggestion(key: key, name: value)
     }
 }
 

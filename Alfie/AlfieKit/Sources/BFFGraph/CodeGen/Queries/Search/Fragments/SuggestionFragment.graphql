@@ -1,10 +1,9 @@
 fragment SuggestionFragment on Suggestion {
     brands {
-        key
-        value
+        ...SuggestionBrandFragment
     }
     keywords {
-        value
+        ...SuggestionKeywordFragment
     }
     products {
         ...SuggestionProductFragment

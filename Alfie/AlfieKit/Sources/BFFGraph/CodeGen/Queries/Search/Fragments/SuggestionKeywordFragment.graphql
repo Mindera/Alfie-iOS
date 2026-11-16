@@ -1,0 +1,3 @@
+fragment SuggestionKeywordFragment on SuggestionKeyword {
+    value
+}

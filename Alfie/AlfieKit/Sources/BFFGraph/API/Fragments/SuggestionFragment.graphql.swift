@@ -6,7 +6,7 @@
 public extension BFFGraphAPI {
   struct SuggestionFragment: BFFGraphAPI.SelectionSet, Fragment {
     public static var fragmentDefinition: StaticString {
-      #"fragment SuggestionFragment on Suggestion { __typename brands { __typename key value } keywords { __typename value } products { __typename ...SuggestionProductFragment } }"#
+      #"fragment SuggestionFragment on Suggestion { __typename brands { __typename ...SuggestionBrandFragment } keywords { __typename ...SuggestionKeywordFragment } products { __typename ...SuggestionProductFragment } }"#
     }
 
     public let __data: DataDict
@@ -34,13 +34,19 @@ public extension BFFGraphAPI {
       public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.SuggestionBrand }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
-        .field("key", String.self),
-        .field("value", String.self),
+        .fragment(SuggestionBrandFragment.self),
       ] }
 
       /// Opaque brand key, resolved per platform: pass it to `filters.brandNames` to list the brand. Not URL-safe on every platform; URL-encode it for deeplinks.
       public var key: String { __data["key"] }
       public var value: String { __data["value"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var suggestionBrandFragment: SuggestionBrandFragment { _toFragment() }
+      }
     }
 
     /// Keyword
@@ -53,10 +59,17 @@ public extension BFFGraphAPI {
       public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.SuggestionKeyword }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
-        .field("value", String.self),
+        .fragment(SuggestionKeywordFragment.self),
       ] }
 
       public var value: String { __data["value"] }
+
+      public struct Fragments: FragmentContainer {
+        public let __data: DataDict
+        public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var suggestionKeywordFragment: SuggestionKeywordFragment { _toFragment() }
+      }
     }
 
     /// Product

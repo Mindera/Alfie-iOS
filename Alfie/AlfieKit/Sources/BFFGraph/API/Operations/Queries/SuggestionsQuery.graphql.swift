@@ -9,7 +9,7 @@ public extension BFFGraphAPI {
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
         #"query SuggestionsQuery($searchTerm: String!, $limit: Int!) { suggestion(query: $searchTerm, limit: $limit) { __typename ...SuggestionFragment } }"#,
-        fragments: [ImageFragment.self, MoneyFragment.self, SuggestionFragment.self, SuggestionProductFragment.self]
+        fragments: [ImageFragment.self, MoneyFragment.self, SuggestionBrandFragment.self, SuggestionFragment.self, SuggestionKeywordFragment.self, SuggestionProductFragment.self]
       ))
 
     public var searchTerm: String
