@@ -26,7 +26,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
     }
 
     private var recentSearchesHeader: some View {
-        Text.build(theme.font.heading.small(L10n.Search.Screen.RecentSearches.Header.title))
+        Text.build(theme.font.heading.xSmall(L10n.Search.Screen.RecentSearches.Header.title))
             .accessibilityIdentifier(AccessibilityID.Search.recentSearchHeaderTitle)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, theme.sizing.spacingSpacingMd)
