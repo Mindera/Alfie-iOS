@@ -144,9 +144,8 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
     // MARK: - Results
 
-    func test_product_suggestions_are_shown_once_per_id() {
-        let repeated = ProductSuggestion.fixture(id: "shirt-1", name: "Repeated", handle: "repeated")
-        stubSuggestions { [shirt, dress] _ in .fixture(products: [shirt, repeated, dress]) }
+    func test_product_suggestions_are_shown_in_order() {
+        stubSuggestions { [shirt, dress] _ in .fixture(products: [shirt, dress]) }
         let sut = makeSUT()
 
         showSuggestions(for: "shirt", in: sut)

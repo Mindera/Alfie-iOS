@@ -119,17 +119,22 @@ extension SearchViewModel {
             return
         }
         searchTerm = newSearchTerm
+
+        guard !searchTerm.isEmpty else {
+            cancelPendingSuggestions()
+            showRecentSearchesOrBlank()
+            return
+        }
         loadSuggestions(debounced: true)
     }
 
-    private func loadSuggestions(debounced: Bool) {
+    private func cancelPendingSuggestions() {
         suggestionsTask?.cancel()
         suggestionsGeneration += 1
+    }
 
-        guard !searchTerm.isEmpty else {
-            showRecentSearchesIfSearchTermIsBlank()
-            return
-        }
+    private func loadSuggestions(debounced: Bool) {
+        cancelPendingSuggestions()
         state = .suggestions(.loading)
 
         guard debounced else {
@@ -154,7 +159,9 @@ extension SearchViewModel {
                     searchTerm: requestedSearchTerm,
                     limit: Constants.suggestionsLimit
                 )
-                newState = Self.state(showing: suggestions, for: requestedSearchTerm)
+                newState = suggestions.products.isEmpty
+                    ? .suggestions(.error(.noResults(searchTerm: requestedSearchTerm)))
+                    : .suggestions(.success(suggestions))
             } catch {
                 newState = .suggestions(.error(.generic(searchTerm: requestedSearchTerm)))
             }
@@ -166,17 +173,6 @@ extension SearchViewModel {
         }
     }
 
-    private static func state(showing suggestions: SearchSuggestions, for searchTerm: String) -> SearchViewState {
-        var seenProductIDs = Set<String>()
-        let products = suggestions.products.filter { seenProductIDs.insert($0.id).inserted }
-        guard !products.isEmpty else {
-            return .suggestions(.error(.noResults(searchTerm: searchTerm)))
-        }
-        return .suggestions(
-            .success(SearchSuggestions(keywords: suggestions.keywords, brands: suggestions.brands, products: products))
-        )
-    }
-
     private func showResults(for searchTerm: String) {
         searchText = searchTerm
         navigate(.searchIntent(.productListing(searchTerm: searchTerm, category: nil)))
@@ -186,6 +182,10 @@ extension SearchViewModel {
         guard searchTerm.isEmpty else {
             return
         }
+        showRecentSearchesOrBlank()
+    }
+
+    private func showRecentSearchesOrBlank() {
         state = dependencies.recentsService?.recentSearches.isEmpty == false ? .recentSearches : .blank
     }
 }

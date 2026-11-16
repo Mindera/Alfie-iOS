@@ -4,10 +4,13 @@ import Model
 
 extension BFFGraphAPI.SuggestionFragment {
     public func convertToSearchSuggestions() -> SearchSuggestions {
-        SearchSuggestions(
+        var seenProductIDs = Set<String>()
+        return SearchSuggestions(
             keywords: keywords.map { KeywordSuggestion(value: $0.value) },
             brands: brands.map { BrandSuggestion(key: $0.key, name: $0.value) },
-            products: products.map { $0.fragments.suggestionProductFragment.convertToProductSuggestion() }
+            products: products
+                .map { $0.fragments.suggestionProductFragment.convertToProductSuggestion() }
+                .filter { seenProductIDs.insert($0.id).inserted }
         )
     }
 }

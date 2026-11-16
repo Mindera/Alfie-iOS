@@ -60,6 +60,23 @@ final class SearchSuggestionsConverterTests: XCTestCase {
         XCTAssertNil(suggestions.products.first?.imageURL)
     }
 
+    func test_product_suggestions_are_kept_once_per_id_in_order() {
+        let suggestion = Mock<Suggestion>(
+            brands: [],
+            keywords: [],
+            products: [
+                makeProduct(id: "prod-1", name: "Oxford Shirt"),
+                makeProduct(id: "prod-1", name: "Repeated"),
+                makeProduct(id: "prod-2", name: "Linen Dress")
+            ]
+        )
+
+        let suggestions = convert(suggestion)
+
+        XCTAssertEqual(suggestions.products.map(\.id), ["prod-1", "prod-2"])
+        XCTAssertEqual(suggestions.products.map(\.name), ["Oxford Shirt", "Linen Dress"])
+    }
+
     func test_suggestion_with_no_kinds_converts_to_empty_lists() {
         let suggestions = convert(Mock<Suggestion>(brands: [], keywords: [], products: []))
 
@@ -77,15 +94,17 @@ final class SearchSuggestionsConverterTests: XCTestCase {
     }
 
     private func makeProduct(
+        id: String = "prod-1",
+        name: String = "Oxford Shirt",
         brandName: String? = "Acme",
         images: [Mock<Image>] = [Mock<Image>(altText: nil, url: "https://cdn.alfie.test/front.jpg")],
         price: Mock<BFFGraph.Money>? = Mock<BFFGraph.Money>(amount: 19.99, currencyCode: "GBP")
     ) -> Mock<SuggestionProduct> {
         Mock<SuggestionProduct>(
             brandName: brandName,
-            id: "prod-1",
+            id: id,
             images: images,
-            name: "Oxford Shirt",
+            name: name,
             price: price,
             slug: "oxford-shirt"
         )
