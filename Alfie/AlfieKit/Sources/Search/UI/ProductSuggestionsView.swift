@@ -24,7 +24,7 @@ struct ProductSuggestionsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: theme.sizing.spacingSpacingMd) {
-                Text.build(theme.font.heading.small(L10n.Search.Screen.SuggestionsProducts.Header.title))
+                Text.build(theme.font.heading.xSmall(L10n.Search.Screen.SuggestionsProducts.Header.title))
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 LazyVGrid(columns: columns, spacing: theme.sizing.spacingSpacingMd) {
