@@ -33,7 +33,7 @@ final class SearchSuggestionsConverterTests: XCTestCase {
         XCTAssertEqual(product?.id, "prod-1")
         XCTAssertEqual(product?.name, "Oxford Shirt")
         XCTAssertEqual(product?.brandName, "Acme")
-        XCTAssertEqual(product?.slug, "oxford-shirt")
+        XCTAssertEqual(product?.handle, "oxford-shirt")
         XCTAssertEqual(product?.price?.amount, 1999)
         XCTAssertEqual(product?.price?.currencyCode, "GBP")
         XCTAssertEqual(product?.imageURL?.absoluteString, "https://cdn.alfie.test/front.jpg")
@@ -69,7 +69,7 @@ final class SearchSuggestionsConverterTests: XCTestCase {
     // MARK: - Helpers
 
     private func convert(_ suggestion: Mock<Suggestion>) -> SearchSuggestions {
-        BFFGraphAPI.SuggestionsQuery.Data.Suggestion.from(suggestion).convertToSearchSuggestions()
+        BFFGraphAPI.SuggestionFragment.from(suggestion).convertToSearchSuggestions()
     }
 
     private func makeSuggestion(product: Mock<SuggestionProduct>) -> Mock<Suggestion> {

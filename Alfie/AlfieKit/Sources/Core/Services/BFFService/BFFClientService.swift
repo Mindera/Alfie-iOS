@@ -193,7 +193,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
             let response = try await executor.fetch(
                 BFFGraphAPI.SuggestionsQuery(query: searchTerm, limit: limit)
             )
-            let suggestions = response.suggestion.convertToSearchSuggestions()
+            let suggestions = response.suggestion.fragments.suggestionFragment.convertToSearchSuggestions()
 
             log.info("suggestion ← keywords=\(suggestions.keywords.count) brands=\(suggestions.brands.count) products=\(suggestions.products.count)")
 

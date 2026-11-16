@@ -54,9 +54,9 @@ public enum AccessibilityID {
     // MARK: - Search
 
     public enum Search {
-        public static let recentSearchHeaderTitle = "recent-search-title"
-        public static let recentSearchItem = "recent-search-item"
-        public static let removeRecentSearchButton = "remove-recent-search-item"
+        public static let recentSearchHeaderTitle = "search.recentSearches.title.label"
+        public static let recentSearchItem = "search.recentSearches.item.button"
+        public static let removeRecentSearchButton = "search.recentSearches.item.remove.button"
         public static let suggestionsLoading = "search.suggestions.loading.view"
         public static let moreProductsButton = "search.suggestions.moreProducts.button"
         public static let suggestionsError = "search.suggestions.error.view"

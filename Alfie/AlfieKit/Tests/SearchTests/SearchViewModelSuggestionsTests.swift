@@ -15,8 +15,8 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     private var requests: [SuggestionsRequest]!
     private var capturedRoutes: [SearchRoute]!
 
-    private let shirt = ProductSuggestion.fixture(id: "shirt-1", slug: "oxford-shirt")
-    private let dress = ProductSuggestion.fixture(id: "dress-1", slug: "linen-dress")
+    private let shirt = ProductSuggestion.fixture(id: "shirt-1", handle: "oxford-shirt")
+    private let dress = ProductSuggestion.fixture(id: "dress-1", handle: "linen-dress")
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -146,7 +146,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     // MARK: - Results
 
     func test_product_suggestions_are_shown_once_per_id() {
-        let repeated = ProductSuggestion.fixture(id: "shirt-1", name: "Repeated", slug: "repeated")
+        let repeated = ProductSuggestion.fixture(id: "shirt-1", name: "Repeated", handle: "repeated")
         stubSuggestions { [shirt, dress] _ in .fixture(products: [shirt, repeated, dress]) }
         let sut = makeSUT()
 

@@ -31,7 +31,7 @@ final class SearchIntegrationTests: IntegrationTestCase {
         for product in suggestions.products {
             XCTAssertFalse(product.id.isEmpty)
             XCTAssertFalse(product.name.isEmpty)
-            XCTAssertFalse(product.slug.isEmpty)
+            XCTAssertFalse(product.handle.isEmpty)
         }
     }
 

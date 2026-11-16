@@ -28,10 +28,10 @@ extension ProductSuggestion {
         id: String = "1",
         name: String = "Oxford Shirt",
         brandName: String? = "Alfie",
-        slug: String = "oxford-shirt",
+        handle: String = "oxford-shirt",
         price: Money? = .fixture(),
         imageURL: URL? = nil
     ) -> ProductSuggestion {
-        .init(id: id, name: name, brandName: brandName, slug: slug, price: price, imageURL: imageURL)
+        .init(id: id, name: name, brandName: brandName, handle: handle, price: price, imageURL: imageURL)
     }
 }

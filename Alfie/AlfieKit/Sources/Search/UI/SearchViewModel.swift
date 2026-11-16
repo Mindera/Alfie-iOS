@@ -86,7 +86,7 @@ extension SearchViewModel {
     }
 
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
-        navigate(.searchIntent(.productDetails(productID: productSuggestion.slug, product: nil)))
+        navigate(.searchIntent(.productDetails(productID: productSuggestion.handle, product: nil)))
     }
 
     public func didTapMoreProducts() {
