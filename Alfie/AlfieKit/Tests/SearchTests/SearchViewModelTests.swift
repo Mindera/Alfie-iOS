@@ -195,7 +195,7 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEqual(sut.searchText, "shoes")
     }
 
-    func test_tapping_recent_search_shows_its_results_and_puts_search_term_in_field() {
+    func test_tapping_recent_search_shows_its_results_and_keeps_recent_searches() {
         mockRecentsService.recentSearches = [.text(value: "linen")]
         var capturedRoutes: [SearchRoute] = []
         let sut = makeSUT(navigate: { capturedRoutes.append($0) })
@@ -203,7 +203,8 @@ final class SearchViewModelTests: XCTestCase {
         sut.recentSearchesViewModel.didTapRecentSearch(.text(value: "linen"))
 
         XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen", category: nil))])
-        XCTAssertEqual(sut.searchText, "linen")
+        XCTAssertEqual(sut.searchText, "")
+        XCTAssertEqual(sut.state, .recentSearches)
     }
 
     // MARK: - Lifecycle

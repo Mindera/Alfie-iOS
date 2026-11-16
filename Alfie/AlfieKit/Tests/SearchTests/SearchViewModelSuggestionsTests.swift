@@ -352,7 +352,18 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "shirt", category: nil))])
     }
 
-    // MARK: - Recent searches changes
+    // MARK: - Recent searches
+
+    func test_tapping_recent_search_makes_no_request() {
+        mockRecentsService.recentSearches = [.text(value: "linen")]
+        let sut = makeSUT()
+
+        sut.recentSearchesViewModel.didTapRecentSearch(.text(value: "linen"))
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertEqual(sut.state, .recentSearches)
+        XCTAssertEqual(requests, [])
+    }
 
     func test_recent_searches_changing_keeps_suggestions() {
         let recentSearches = PassthroughSubject<[RecentSearch], Never>()

@@ -82,6 +82,7 @@ extension SearchViewModel {
         }
         dependencies.recentsService?.add(.text(value: searchTerm))
         dependencies.analytics.trackSearch(term: searchTerm)
+        searchText = searchTerm
         showResults(for: searchTerm)
     }
 
@@ -174,7 +175,6 @@ extension SearchViewModel {
     }
 
     private func showResults(for searchTerm: String) {
-        searchText = searchTerm
         navigate(.searchIntent(.productListing(searchTerm: searchTerm, category: nil)))
     }
 
