@@ -334,7 +334,6 @@ let package = Package(
             // only the generated Swift under GeneratedTokens/ is a normal source.
             exclude: ["DesignTokens"],
             resources: [
-                .copy("Theme/Typography/Resources/SF-Pro-Display-Medium.otf"),
                 .copy("Theme/Typography/Resources/LibreBaskerville-OFL.txt"),
                 .copy("Theme/Components/Loader/spin.gif"),
                 .process("Theme/Images/ThemedImages.xcassets"),

@@ -6,14 +6,12 @@ import class UIKit.UIFont
 // MARK: - FontNames
 
 public enum FontNames: String, CaseIterable {
-    case sfProMedium = "SF Pro Display Medium"
+    // The system font (SF Pro) is supplied by iOS via `UIFont.systemFont`, so it is not bundled.
     // rawValue is the PostScript name (resolved via UIFont(name:)); fileName is the .dataset name.
     case libreBaskerville = "LibreBaskerville-Regular"
 
     public var fileName: String {
         switch self {
-        case .sfProMedium:
-            return "SF-Pro-Display-Medium"
         case .libreBaskerville:
             return "LibreBaskerville-Regular"
         }
