@@ -59,7 +59,7 @@ final class SearchViewModelTests: XCTestCase {
 
         sut.searchText = "shoes"
 
-        XCTAssertEqual(sut.state, .loading)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     func test_searchText_clearedWithRecentSearches_setsRecentSearchesState() {
@@ -104,7 +104,7 @@ final class SearchViewModelTests: XCTestCase {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         recentSearches.send([.text(value: "polo")])
 
-        XCTAssertEqual(sut.state, .loading)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     // MARK: - Submission

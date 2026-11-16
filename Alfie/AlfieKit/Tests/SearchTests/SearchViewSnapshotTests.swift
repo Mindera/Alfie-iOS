@@ -44,7 +44,7 @@ final class SearchViewSnapshotTests: XCTestCase {
     // Covers only the static parts: LoadingSpinner rotates off wall-clock time, so the snapshot
     // asserts at 0.9 as SplashViewSnapshotTests does.
     func test_search_view_loading_suggestions_shows_spinner_alone() {
-        mockViewModel.state = .loading
+        mockViewModel.state = .suggestions(.loading)
         mockViewModel.searchText = "shirt"
 
         let sut = SearchView(viewModel: mockViewModel)
@@ -59,27 +59,24 @@ final class SearchViewSnapshotTests: XCTestCase {
             (URL(string: "https://cdn.alfie.test/suggestion-2.jpg")!, .systemPurple)
         ]
         mockViewModel.searchText = "shirt"
-        mockViewModel.state = .suggestions(
+        let products: [ProductSuggestion] = [
             .fixture(
-                products: [
-                    .fixture(
-                        id: "1",
-                        name: "Oxford Shirt",
-                        brandName: "Alfie",
-                        price: .fixture(amountFormatted: "£45.00"),
-                        imageURL: photos[0].url
-                    ),
-                    .fixture(id: "2", name: "Linen Shirt With No Price", brandName: "Acme", price: nil, imageURL: photos[1].url),
-                    .fixture(
-                        id: "3",
-                        name: "Shirt With No Brand",
-                        brandName: nil,
-                        price: .fixture(amountFormatted: "£30.00"),
-                        imageURL: photos[2].url
-                    )
-                ]
+                id: "1",
+                name: "Oxford Shirt",
+                brandName: "Alfie",
+                price: .fixture(amountFormatted: "£45.00"),
+                imageURL: photos[0].url
+            ),
+            .fixture(id: "2", name: "Linen Shirt With No Price", brandName: "Acme", price: nil, imageURL: photos[1].url),
+            .fixture(
+                id: "3",
+                name: "Shirt With No Brand",
+                brandName: nil,
+                price: .fixture(amountFormatted: "£30.00"),
+                imageURL: photos[2].url
             )
-        )
+        ]
+        mockViewModel.state = .suggestions(.success(.fixture(products: products)))
 
         let sut = SearchView(viewModel: mockViewModel)
             .remoteImageFixtures(Dictionary(uniqueKeysWithValues: photos.map { ($0.url, UIImage.solid($0.colour)) }))
@@ -89,7 +86,7 @@ final class SearchViewSnapshotTests: XCTestCase {
 
     func test_search_view_without_product_suggestions_shows_no_results_message() {
         mockViewModel.searchText = "zzz"
-        mockViewModel.state = .noResults(searchTerm: "zzz")
+        mockViewModel.state = .suggestions(.error(.noResults(searchTerm: "zzz")))
 
         let sut = SearchView(viewModel: mockViewModel)
 
@@ -98,7 +95,7 @@ final class SearchViewSnapshotTests: XCTestCase {
 
     func test_search_view_with_failed_suggestions_shows_error_with_try_again() {
         mockViewModel.searchText = "shirt"
-        mockViewModel.state = .error(searchTerm: "shirt")
+        mockViewModel.state = .suggestions(.error(.generic(searchTerm: "shirt")))
 
         let sut = SearchView(viewModel: mockViewModel)
 

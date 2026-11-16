@@ -114,11 +114,11 @@ extension SearchViewModel {
 
 extension SearchViewModel {
     private func handleSearchTextChange() {
-        let term = searchText.trim()
-        guard term != searchTerm else {
+        let newSearchTerm = searchText.trim()
+        guard newSearchTerm != searchTerm else {
             return
         }
-        searchTerm = term
+        searchTerm = newSearchTerm
         loadSuggestions(debounced: true)
     }
 
@@ -130,11 +130,10 @@ extension SearchViewModel {
             showRecentSearchesIfSearchTermIsBlank()
             return
         }
-        state = .loading
+        state = .suggestions(.loading)
 
-        let term = searchTerm
         guard debounced else {
-            requestSuggestions(for: term)
+            requestSuggestions(for: searchTerm)
             return
         }
         let generation = suggestionsGeneration
@@ -143,44 +142,44 @@ extension SearchViewModel {
             guard let self, generation == suggestionsGeneration else {
                 return
             }
-            requestSuggestions(for: term)
+            requestSuggestions(for: searchTerm)
         }
     }
 
-    private func requestSuggestions(for term: String) {
+    private func requestSuggestions(for requestedSearchTerm: String) {
         suggestionsTask = Task { @MainActor [weak self, dependencies] in
             let newState: SearchViewState
             do {
                 let suggestions = try await dependencies.searchService.suggestions(
-                    searchTerm: term,
+                    searchTerm: requestedSearchTerm,
                     limit: Constants.suggestionsLimit
                 )
-                newState = Self.state(showing: suggestions, for: term)
+                newState = Self.state(showing: suggestions, for: requestedSearchTerm)
             } catch {
-                newState = .error(searchTerm: term)
+                newState = .suggestions(.error(.generic(searchTerm: requestedSearchTerm)))
             }
 
-            guard let self, !Task.isCancelled, term == searchTerm else {
+            guard let self, !Task.isCancelled, requestedSearchTerm == searchTerm else {
                 return
             }
             state = newState
         }
     }
 
-    private static func state(showing suggestions: SearchSuggestions, for term: String) -> SearchViewState {
+    private static func state(showing suggestions: SearchSuggestions, for searchTerm: String) -> SearchViewState {
         var seenProductIDs = Set<String>()
         let products = suggestions.products.filter { seenProductIDs.insert($0.id).inserted }
         guard !products.isEmpty else {
-            return .noResults(searchTerm: term)
+            return .suggestions(.error(.noResults(searchTerm: searchTerm)))
         }
         return .suggestions(
-            SearchSuggestions(keywords: suggestions.keywords, brands: suggestions.brands, products: products)
+            .success(SearchSuggestions(keywords: suggestions.keywords, brands: suggestions.brands, products: products))
         )
     }
 
-    private func showResults(for term: String) {
-        searchText = term
-        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
+    private func showResults(for searchTerm: String) {
+        searchText = searchTerm
+        navigate(.searchIntent(.productListing(searchTerm: searchTerm, category: nil)))
     }
 
     private func showRecentSearchesIfSearchTermIsBlank() {

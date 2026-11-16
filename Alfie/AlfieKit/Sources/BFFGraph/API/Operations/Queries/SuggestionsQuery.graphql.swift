@@ -8,23 +8,23 @@ public extension BFFGraphAPI {
     public static let operationName: String = "SuggestionsQuery"
     public static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query SuggestionsQuery($query: String!, $limit: Int!) { suggestion(query: $query, limit: $limit) { __typename ...SuggestionFragment } }"#,
+        #"query SuggestionsQuery($searchTerm: String!, $limit: Int!) { suggestion(query: $searchTerm, limit: $limit) { __typename ...SuggestionFragment } }"#,
         fragments: [ImageFragment.self, MoneyFragment.self, SuggestionFragment.self, SuggestionProductFragment.self]
       ))
 
-    public var query: String
+    public var searchTerm: String
     public var limit: Int
 
     public init(
-      query: String,
+      searchTerm: String,
       limit: Int
     ) {
-      self.query = query
+      self.searchTerm = searchTerm
       self.limit = limit
     }
 
     public var __variables: Variables? { [
-      "query": query,
+      "searchTerm": searchTerm,
       "limit": limit
     ] }
 
@@ -35,7 +35,7 @@ public extension BFFGraphAPI {
       public static var __parentType: any ApolloAPI.ParentType { BFFGraphAPI.Objects.Query }
       public static var __selections: [ApolloAPI.Selection] { [
         .field("suggestion", Suggestion.self, arguments: [
-          "query": .variable("query"),
+          "query": .variable("searchTerm"),
           "limit": .variable("limit")
         ]),
       ] }

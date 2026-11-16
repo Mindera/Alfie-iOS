@@ -46,7 +46,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.searchText = "s"
 
-        XCTAssertEqual(sut.state, .loading)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     func test_typing_makes_no_request_before_500ms() {
@@ -55,7 +55,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         scheduler.advance(by: .milliseconds(499))
 
-        XCTAssertNoEmit(from: sut.$state)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
         XCTAssertEqual(requests, [])
     }
 
@@ -65,7 +65,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(in: sut) { self.scheduler.advance(by: .milliseconds(500)) }
 
-        XCTAssertEqual(requests, [SuggestionsRequest(term: "shirt", limit: 6)])
+        XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
     func test_single_character_starts_a_request() {
@@ -73,7 +73,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "s", in: sut)
 
-        XCTAssertEqual(requests, [SuggestionsRequest(term: "s", limit: 6)])
+        XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "s", limit: 6)])
     }
 
     func test_typing_in_quick_succession_requests_only_the_last_search_term() {
@@ -83,7 +83,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(requests, [SuggestionsRequest(term: "shirt", limit: 6)])
+        XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
     func test_edit_leaving_trimmed_search_term_unchanged_does_nothing() {
@@ -95,8 +95,8 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
             self.scheduler.advance(by: .milliseconds(500))
         }
 
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [shirt])))
-        XCTAssertEqual(requests, [SuggestionsRequest(term: "shirt", limit: 6)])
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
+        XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
     func test_changing_search_term_replaces_suggestions_with_loading_at_once() {
@@ -105,7 +105,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.searchText = "shirts"
 
-        XCTAssertEqual(sut.state, .loading)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     // MARK: - Blank Search term
@@ -126,7 +126,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         scheduler.advance(by: .milliseconds(500))
 
-        XCTAssertNoEmit(from: sut.$state)
+        XCTAssertEqual(sut.state, .blank)
         XCTAssertEqual(requests, [])
     }
 
@@ -138,7 +138,6 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         scheduler.advance(by: .milliseconds(500))
 
-        XCTAssertNoEmit(from: sut.$state)
         XCTAssertEqual(requests, [])
         XCTAssertEqual(sut.state, .blank)
     }
@@ -152,7 +151,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [shirt, dress])))
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt, dress]))))
     }
 
     func test_no_product_suggestions_shows_no_results_for_the_search_term() {
@@ -161,7 +160,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: " zzz ", in: sut)
 
-        XCTAssertEqual(sut.state, .noResults(searchTerm: "zzz"))
+        XCTAssertEqual(sut.state, .suggestions(.error(.noResults(searchTerm: "zzz"))))
     }
 
     func test_failed_request_shows_error_for_the_search_term() {
@@ -170,56 +169,59 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: " shirt ", in: sut)
 
-        XCTAssertEqual(sut.state, .error(searchTerm: "shirt"))
+        XCTAssertEqual(sut.state, .suggestions(.error(.generic(searchTerm: "shirt"))))
     }
 
-    func test_late_result_for_an_older_search_term_is_never_shown() {
+    @MainActor
+    func test_late_result_for_an_older_search_term_is_never_shown() async {
         let gate = makeGate()
         holdRequest(for: "shirt", at: gate) { [shirt] in .fixture(products: [shirt]) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        scheduler.advance(by: .milliseconds(500))
-        wait(for: [gate.held], timeout: .default)
-        showSuggestions(for: "dress", in: sut)
+        await scheduler.advance(by: .milliseconds(500))
+        await fulfillment(of: [gate.held], timeout: .default)
+        await awaitSuggestions(for: "dress", in: sut)
 
-        Task { await gate.open() }
+        await gate.open()
 
-        wait(for: [gate.released], timeout: .default)
-        XCTAssertNoEmit(from: sut.$state)
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [dress])))
+        await fulfillment(of: [gate.released], timeout: .default)
+        await assertStateStaysUnchanged(in: sut)
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [dress]))))
     }
 
-    func test_late_error_for_an_older_search_term_is_never_shown() {
+    @MainActor
+    func test_late_error_for_an_older_search_term_is_never_shown() async {
         let gate = makeGate()
         holdRequest(for: "shirt", at: gate) { throw BFFRequestError(type: .timeout) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        scheduler.advance(by: .milliseconds(500))
-        wait(for: [gate.held], timeout: .default)
-        showSuggestions(for: "dress", in: sut)
+        await scheduler.advance(by: .milliseconds(500))
+        await fulfillment(of: [gate.held], timeout: .default)
+        await awaitSuggestions(for: "dress", in: sut)
 
-        Task { await gate.open() }
+        await gate.open()
 
-        wait(for: [gate.released], timeout: .default)
-        XCTAssertNoEmit(from: sut.$state)
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [dress])))
+        await fulfillment(of: [gate.released], timeout: .default)
+        await assertStateStaysUnchanged(in: sut)
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [dress]))))
     }
 
-    func test_result_of_a_cancelled_request_is_never_shown_when_its_search_term_is_typed_again() {
+    @MainActor
+    func test_result_of_a_cancelled_request_is_never_shown_when_its_search_term_is_typed_again() async {
         let gate = makeGate()
         holdRequest(for: "shirt", at: gate) { [shirt] in .fixture(products: [shirt]) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        scheduler.advance(by: .milliseconds(500))
-        wait(for: [gate.held], timeout: .default)
+        await scheduler.advance(by: .milliseconds(500))
+        await fulfillment(of: [gate.held], timeout: .default)
         sut.searchText = "shirts"
         sut.searchText = "shirt"
 
-        Task { await gate.open() }
+        await gate.open()
 
-        wait(for: [gate.released], timeout: .default)
-        XCTAssertNoEmit(from: sut.$state)
-        XCTAssertEqual(sut.state, .loading)
+        await fulfillment(of: [gate.released], timeout: .default)
+        await assertStateStaysUnchanged(in: sut)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     // MARK: - Try again
@@ -231,7 +233,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.didTapRetrySuggestions()
 
-        XCTAssertEqual(sut.state, .loading)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     func test_try_again_requests_current_search_term_without_debounce() {
@@ -246,10 +248,10 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(in: sut) { sut.didTapRetrySuggestions() }
 
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [shirt])))
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
         XCTAssertEqual(
             requests,
-            [SuggestionsRequest(term: "shirt", limit: 6), SuggestionsRequest(term: "shirt", limit: 6)]
+            [SuggestionsRequest(searchTerm: "shirt", limit: 6), SuggestionsRequest(searchTerm: "shirt", limit: 6)]
         )
     }
 
@@ -285,7 +287,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         sut.viewDidAppear()
 
         XCTAssertEqual(sut.searchText, "shirt")
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [shirt])))
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
     }
 
     // MARK: - More Products
@@ -362,7 +364,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         recentSearches.send([.text(value: "polo")])
 
-        XCTAssertEqual(sut.state, .suggestions(.fixture(products: [shirt])))
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
     }
 
     // MARK: - Helpers
@@ -382,9 +384,9 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     }
 
     private func stubSuggestions(_ answer: @escaping (String) throws -> SearchSuggestions) {
-        mockSearchService.onSuggestionsCalled = { @MainActor [weak self] term, limit in
-            self?.requests?.append(SuggestionsRequest(term: term, limit: limit))
-            return try answer(term)
+        mockSearchService.onSuggestionsCalled = { @MainActor [weak self] searchTerm, limit in
+            self?.requests?.append(SuggestionsRequest(searchTerm: searchTerm, limit: limit))
+            return try answer(searchTerm)
         }
     }
 
@@ -396,12 +398,12 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     }
 
     private func holdRequest(
-        for heldTerm: String,
+        for heldSearchTerm: String,
         at gate: SuggestionsGate,
         answer: @escaping () throws -> SearchSuggestions
     ) {
-        mockSearchService.onSuggestionsCalled = { [dress] term, _ in
-            guard term == heldTerm else {
+        mockSearchService.onSuggestionsCalled = { [dress] searchTerm, _ in
+            guard searchTerm == heldSearchTerm else {
                 return .fixture(products: [dress])
             }
             await gate.hold()
@@ -417,7 +419,29 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     }
 
     private func showSuggestions(in sut: SearchViewModel, after trigger: @escaping () -> Void) {
-        XCTAssertEmitsValue(from: sut.$state, where: { $0 != .loading }, afterTrigger: trigger)
+        XCTAssertEmitsValue(from: sut.$state, where: { $0 != .suggestions(.loading) }, afterTrigger: trigger)
+    }
+
+    @MainActor
+    private func awaitSuggestions(for searchText: String, in sut: SearchViewModel) async {
+        let shown = expectation(description: "suggestions shown")
+        let cancellable = sut.$state
+            .dropFirst()
+            .first { $0 != .suggestions(.loading) }
+            .sink { _ in shown.fulfill() }
+        sut.searchText = searchText
+        await scheduler.advance(by: .milliseconds(500))
+        await fulfillment(of: [shown], timeout: .default)
+        cancellable.cancel()
+    }
+
+    @MainActor
+    private func assertStateStaysUnchanged(in sut: SearchViewModel) async {
+        let changed = expectation(description: "state must not change")
+        changed.isInverted = true
+        let cancellable = sut.$state.dropFirst().sink { _ in changed.fulfill() }
+        await fulfillment(of: [changed], timeout: 0.5)
+        cancellable.cancel()
     }
 }
 
@@ -446,6 +470,6 @@ private actor SuggestionsGate {
 }
 
 private struct SuggestionsRequest: Equatable {
-    let term: String
+    let searchTerm: String
     let limit: Int
 }

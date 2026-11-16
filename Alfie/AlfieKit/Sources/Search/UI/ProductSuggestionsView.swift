@@ -29,12 +29,13 @@ struct ProductSuggestionsView: View {
 
                 LazyVGrid(columns: columns, spacing: theme.sizing.spacingSpacingMd) {
                     ForEach(products) { product in
-                        VerticalProductCard(viewModel: cardViewModel(for: product)) { _, _ in }
-                            .fixedSize(horizontal: false, vertical: true)
-                            .contentShape(Rectangle())
-                            .onTapGesture { onSelect(product) }
-                            .accessibilityAddTraits(.isButton)
-                            .accessibilityIdentifier(AccessibilityID.Search.productSuggestion(id: product.id))
+                        Button(action: { onSelect(product) }, label: {
+                            VerticalProductCard(viewModel: cardViewModel(for: product)) { _, _ in }
+                                .fixedSize(horizontal: false, vertical: true)
+                                .contentShape(Rectangle())
+                        })
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier(AccessibilityID.Search.productSuggestion(id: product.id))
                     }
                 }
 

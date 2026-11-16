@@ -191,7 +191,7 @@ public final class BFFClientService: BFFClientServiceProtocol {
 
         do {
             let response = try await executor.fetch(
-                BFFGraphAPI.SuggestionsQuery(query: searchTerm, limit: limit)
+                BFFGraphAPI.SuggestionsQuery(searchTerm: searchTerm, limit: limit)
             )
             let suggestions = response.suggestion.fragments.suggestionFragment.convertToSearchSuggestions()
 

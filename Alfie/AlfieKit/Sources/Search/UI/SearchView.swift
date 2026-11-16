@@ -58,26 +58,26 @@ extension SearchView {
         case .recentSearches:
             RecentSearchesView(viewModel: viewModel.recentSearchesViewModel)
 
-        case .loading:
+        case .suggestions(.loading):
             LoadingSpinner(size: .medium)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityIdentifier(AccessibilityID.Search.suggestionsLoading)
 
-        case .suggestions(let suggestions):
+        case .suggestions(.success(let suggestions)):
             ProductSuggestionsView(
                 products: suggestions.products,
                 onSelect: { viewModel.didTapProductSuggestion($0) },
                 onMoreProducts: { viewModel.didTapMoreProducts() }
             )
 
-        case .noResults(let searchTerm):
+        case .suggestions(.error(.noResults(let searchTerm))):
             suggestionsMessage(
                 title: L10n.Search.Screen.Suggestions.NoResults.title(searchTerm),
                 message: L10n.Search.Screen.Suggestions.NoResults.message,
                 accessibilityIdentifier: AccessibilityID.Search.noResults
             )
 
-        case .error(let searchTerm):
+        case .suggestions(.error(.generic(let searchTerm))):
             suggestionsMessage(
                 title: L10n.Search.Screen.Suggestions.Error.title,
                 message: L10n.Search.Screen.Suggestions.Error.message(searchTerm),
@@ -134,22 +134,24 @@ extension SearchView {
 }
 
 #Preview("Loading") {
-    SearchView(viewModel: MockSearchViewModel(state: .loading))
+    SearchView(viewModel: MockSearchViewModel(state: .suggestions(.loading)))
 }
 
 #Preview("Product Suggestions") {
     SearchView(
         viewModel: MockSearchViewModel(
-            state: .suggestions(.fixture(products: [.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]))
+            state: .suggestions(
+                .success(.fixture(products: [.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]))
+            )
         )
     )
 }
 
 #Preview("No Results") {
-    SearchView(viewModel: MockSearchViewModel(state: .noResults(searchTerm: "zzz")))
+    SearchView(viewModel: MockSearchViewModel(state: .suggestions(.error(.noResults(searchTerm: "zzz")))))
 }
 
 #Preview("Error") {
-    SearchView(viewModel: MockSearchViewModel(state: .error(searchTerm: "shirt")))
+    SearchView(viewModel: MockSearchViewModel(state: .suggestions(.error(.generic(searchTerm: "shirt")))))
 }
 #endif

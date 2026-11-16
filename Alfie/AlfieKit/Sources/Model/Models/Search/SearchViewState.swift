@@ -1,10 +1,12 @@
 import Foundation
 
+public enum SearchSuggestionsViewErrorType: Error, Equatable {
+    case generic(searchTerm: String)
+    case noResults(searchTerm: String)
+}
+
 public enum SearchViewState: Equatable {
     case blank
     case recentSearches
-    case loading
-    case suggestions(SearchSuggestions)
-    case noResults(searchTerm: String)
-    case error(searchTerm: String)
+    case suggestions(ViewState<SearchSuggestions, SearchSuggestionsViewErrorType>)
 }

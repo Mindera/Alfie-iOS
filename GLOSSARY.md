@@ -82,7 +82,7 @@ Real products currently on screen. Skeleton placeholders are not loaded products
 _Avoid_: Grid, products on screen
 
 **No results**:
-A first page or refresh that finds no products to show. On a first page it is a blocking error; on a refresh over loaded products, a transient error.
+A first page or refresh that finds no products to show. On a first page it is a blocking error; on a refresh over loaded products, a transient error. For Suggestions: a Search term that has no Product suggestions.
 _Avoid_: Empty error
 
 **Blocking error**:
