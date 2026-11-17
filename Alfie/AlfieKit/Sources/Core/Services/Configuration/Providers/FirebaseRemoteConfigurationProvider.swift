@@ -36,6 +36,15 @@ public final class FirebaseRemoteConfigurationProvider: ConfigurationProviderPro
         }
     }
 
+    public static func clearCache(bundleIdentifier: String) {
+        let suiteName = "group.\(bundleIdentifier).firebase"
+        UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
+        let fileManager = FileManager.default
+        if let applicationSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            try? fileManager.removeItem(at: applicationSupport.appendingPathComponent("Google/RemoteConfig"))
+        }
+    }
+
     // MARK: - ConfigurationProviderProtocol
 
     public func bool(for key: ConfigurationKey) -> Bool? {
