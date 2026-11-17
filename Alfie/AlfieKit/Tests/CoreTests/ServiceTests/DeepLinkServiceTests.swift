@@ -25,6 +25,28 @@ final class DeepLinkServiceTests: XCTestCase {
         try super.tearDownWithError()
     }
 
+    // MARK: - Handler Availability
+
+    func test_handlers_installed_after_availability_was_turned_on_are_ready() {
+        let handler = MockDeepLinkHandler()
+        handler.isReadyToHandleLinks = false
+
+        sut = .init(parsers: [], configuration: configuration, log: log)
+        sut.updateAvailabilityOfHandlers(to: true)
+        sut.update(handlers: [handler])
+
+        XCTAssertTrue(handler.isReadyToHandleLinks)
+    }
+
+    func test_handlers_installed_before_availability_is_turned_on_are_not_ready() {
+        let handler = MockDeepLinkHandler()
+
+        sut = .init(parsers: [], configuration: configuration, log: log)
+        sut.update(handlers: [handler])
+
+        XCTAssertFalse(handler.isReadyToHandleLinks)
+    }
+
     // MARK: - Can Handle URL
 
     func test_cant_handle_url_if_no_parsers_are_available() {
