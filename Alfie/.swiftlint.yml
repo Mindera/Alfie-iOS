@@ -5,6 +5,7 @@ excluded:
   - .build
   - AlfieKit/Sources/SharedUI/Localization/L10n+Generated.swift
   - AlfieKit/Sources/SharedUI/GeneratedTokens
+  - AlfieKit/Sources/TestSeed/SeedAnchors+Generated.swift
   - scripts
   - DerivedData
   - AlfieKit/.build
