@@ -17,7 +17,13 @@ final class WishlistJourneyTests: AlfieUITestCase {
 
         XCTContext.runActivity(named: "Add it to the wishlist") { _ in
             waitFor(pdp.addToWishlistButton, "The PDP should show the wishlist heart")
+            let addToWishlistLabel = pdp.addToWishlistButton.label
             pdp.tapAddToWishlist()
+            waitFor(
+                pdp.addToWishlistButton,
+                toStopReading: addToWishlistLabel,
+                "The heart should switch to remove once the product is in the wishlist"
+            )
         }
 
         XCTContext.runActivity(named: "The Wishlist tab shows one item") { _ in

@@ -40,4 +40,19 @@ class AlfieUITestCase: XCTestCase {
     ) {
         XCTAssertTrue(element.waitForExistence(timeout: timeout), message, file: file, line: line)
     }
+
+    func waitFor(
+        _ element: XCUIElement,
+        toStopReading label: String,
+        _ message: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let labelChanged = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label != %@", label),
+            object: element
+        )
+        let result = XCTWaiter().wait(for: [labelChanged], timeout: timeout)
+        XCTAssertEqual(result, .completed, message, file: file, line: line)
+    }
 }
