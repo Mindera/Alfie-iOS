@@ -34,7 +34,11 @@ final class ServiceProvider: ServiceProviderProtocol {
 
     init(isUITest: Bool) {
         self.userDefaults = UserDefaults.standard
-        self.apiEndpointService = ApiEndpointService(appDelegate: AppDelegate.instance, userDefaults: userDefaults)
+        self.apiEndpointService = ApiEndpointService(
+            appDelegate: AppDelegate.instance,
+            userDefaults: userDefaults,
+            usesStoredEndpoint: !isUITest
+        )
         self.bffApiKeyService = BFFApiKeyService(userDefaults: userDefaults, apiEndpointService: apiEndpointService)
         self.webUrlProvider = WebURLProvider(host: ThemedURL.preferredHost, log: log)
 

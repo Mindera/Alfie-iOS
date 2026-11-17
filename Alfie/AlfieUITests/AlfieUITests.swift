@@ -146,8 +146,6 @@ final class AlfieUITests: AlfieUITestCase {
         }
 
         XCTContext.runActivity(named: "Swiping a line and tapping Remove drops it on the server") { _ in
-            // The cart id persists across launches, so the bag may hold lines from earlier runs.
-            // Asserting the count fell by one is stable where asserting it reached zero is not.
             bag.removeLine(bag.lineItems.element(boundBy: 0))
 
             let expected = lineCountAfterAdd - 1

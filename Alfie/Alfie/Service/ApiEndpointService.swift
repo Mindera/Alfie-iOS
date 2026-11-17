@@ -9,13 +9,17 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
     private let rebootDelay: TimeInterval
     private weak var appDelegate: AppDelegateProtocol?
 
+    static let defaultUserDefaultsKey = "com.alfie.config.api.endpoint"
+    static let defaultCustomUrlUserDefaultsKey = "com.alfie.config.api.endpoint.custom"
+
     private(set) var currentApiEndpoint: ApiEndpointOption
 
     init(
         appDelegate: AppDelegateProtocol,
         userDefaults: UserDefaultsProtocol,
-        userDefaultsKey: String = "com.alfie.config.api.endpoint",
-        customUrlUserDefaultsKey: String = "com.alfie.config.api.endpoint.custom",
+        userDefaultsKey: String = ApiEndpointService.defaultUserDefaultsKey,
+        customUrlUserDefaultsKey: String = ApiEndpointService.defaultCustomUrlUserDefaultsKey,
+        usesStoredEndpoint: Bool = true,
         rebootDelay: TimeInterval = 5
     ) {
         self.appDelegate = appDelegate
@@ -23,7 +27,7 @@ final class ApiEndpointService: NSObject, ApiEndpointServiceProtocol {
         self.apiUrlUserDefaultsKey = userDefaultsKey
         self.customApiUrlUserDefaultsKey = customUrlUserDefaultsKey
         self.rebootDelay = rebootDelay
-        let storedApiUrl: String? = userDefaults.value(for: userDefaultsKey)
+        let storedApiUrl: String? = usesStoredEndpoint ? userDefaults.value(for: userDefaultsKey) : nil
         self.currentApiEndpoint = ApiEndpointOption.option(with: storedApiUrl)
     }
 

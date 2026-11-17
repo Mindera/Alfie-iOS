@@ -36,7 +36,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AppDelegate.instance = self
         if ProcessInfo.isUITest {
-            SavedState.clear()
+            SavedState.clear(
+                preservingDefaults: [
+                    ApiEndpointService.defaultUserDefaultsKey,
+                    ApiEndpointService.defaultCustomUrlUserDefaultsKey,
+                    BFFApiKeyService.defaultStorageKey,
+                ]
+            )
         }
         bootstrap(application: application)
         return true
