@@ -318,6 +318,7 @@ let package = Package(
                 "Model",
                 "SharedUI",
                 "Utils",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 
@@ -528,6 +529,7 @@ let package = Package(
                 "Mocks",
                 "Search",
                 "TestUtils",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 
