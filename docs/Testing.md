@@ -149,7 +149,9 @@ Treat them as correct, in review and when writing.
   `--only-unit`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
   seed anchors; "the first item" only where the assertion holds for any item. `SeedAnchors` is
   generated: when the BFF adds an anchor a test needs, pull `Alfie-BFF` and run
-  `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
+  `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff. `verify.sh` fails before the Mock BFF
+  boots when the committed file no longer matches the BFF checkout's anchors. What each anchor
+  promises is in the BFF's `docs/mock-platform.md` §Seed anchors.
 
 ## Mocks and fixtures
 
