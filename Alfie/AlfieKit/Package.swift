@@ -314,9 +314,11 @@ let package = Package(
         .target(
             name: "Search",
             dependencies: [
+                "AccessibilityIdentifiers",
                 "Model",
                 "SharedUI",
                 "Utils",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 
@@ -526,6 +528,7 @@ let package = Package(
                 "Mocks",
                 "Search",
                 "TestUtils",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 

@@ -1,0 +1,11 @@
+fragment SuggestionFragment on Suggestion {
+    brands {
+        ...SuggestionBrandFragment
+    }
+    keywords {
+        ...SuggestionKeywordFragment
+    }
+    products {
+        ...SuggestionProductFragment
+    }
+}

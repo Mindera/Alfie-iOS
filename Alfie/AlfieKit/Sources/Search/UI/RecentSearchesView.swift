@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -25,8 +26,8 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
     }
 
     private var recentSearchesHeader: some View {
-        Text.build(theme.font.heading.small(L10n.Search.Screen.RecentSearches.Header.title))
-            .accessibilityIdentifier(AccessibilityId.recentSearchHeaderTitle)
+        Text.build(theme.font.heading.xSmall(L10n.Search.Screen.RecentSearches.Header.title))
+            .accessibilityIdentifier(AccessibilityID.Search.recentSearchHeaderTitle)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, theme.sizing.spacingSpacingMd)
             .padding(.bottom, theme.sizing.spacingSpacingMd)
@@ -52,7 +53,7 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
         }
         .padding(.vertical, theme.sizing.spacingSpacingXs)
         .modifier(TapHighlightableModifier { viewModel.didTapRecentSearch(recentSearch) })
-        .accessibilityIdentifier(AccessibilityId.recentSearchItem)
+        .accessibilityIdentifier(AccessibilityID.Search.recentSearchItem)
     }
 
     private func recentSearchRemoveButton(for recentSearch: RecentSearch) -> some View {
@@ -68,15 +69,9 @@ struct RecentSearchesView<ViewModel: RecentSearchesViewModelProtocol>: View {
                 .frame(width: theme.sizing.iconsIconSmall, height: theme.sizing.iconsIconSmall)
                 .foregroundStyle(theme.color.contentContentPrimary)
         })
-        .accessibilityIdentifier(AccessibilityId.removeRecentSearchButton)
+        .accessibilityIdentifier(AccessibilityID.Search.removeRecentSearchButton)
         .accessibilityLabel(Text(L10n.Accessibility.removeRecentSearch))
     }
-}
-
-private enum AccessibilityId {
-    static let recentSearchHeaderTitle = "recent-search-title"
-    static let recentSearchItem = "recent-search-item"
-    static let removeRecentSearchButton = "remove-recent-search-item"
 }
 
 #if DEBUG

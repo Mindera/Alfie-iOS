@@ -632,10 +632,30 @@ public enum L10n {
         }
       }
       public enum Suggestions {
+        public enum Error {
+          /// We couldn't load suggestions. You can still search for "%@".
+          public static func message(_ p1: Any) -> String {
+            return L10n.tr("L10n", "search.screen.suggestions.error.message", String(describing: p1))
+          }
+          /// Something went wrong
+          public static let title = L10n.tr("L10n", "search.screen.suggestions.error.title")
+          public enum Button {
+            /// Try again
+            public static let cta = L10n.tr("L10n", "search.screen.suggestions.error.button.cta")
+          }
+        }
         public enum More {
           public enum Button {
             /// More Products
             public static let cta = L10n.tr("L10n", "search.screen.suggestions.more.button.cta")
+          }
+        }
+        public enum NoResults {
+          /// Please check the spelling or try different words.
+          public static let message = L10n.tr("L10n", "search.screen.suggestions.no_results.message")
+          /// No results found for "%@"
+          public static func title(_ p1: Any) -> String {
+            return L10n.tr("L10n", "search.screen.suggestions.no_results.title", String(describing: p1))
           }
         }
       }
@@ -989,7 +1009,12 @@ public extension L10n {
       case searchScreenNoResultsViewMessage = "search.screen.no_results_view.message"
       case searchScreenNoResultsViewTerm = "search.screen.no_results_view.term"
       case searchScreenRecentSearchesHeaderTitle = "search.screen.recent_searches.header.title"
+      case searchScreenSuggestionsErrorMessage = "search.screen.suggestions.error.message"
+      case searchScreenSuggestionsErrorTitle = "search.screen.suggestions.error.title"
+      case searchScreenSuggestionsErrorButtonCta = "search.screen.suggestions.error.button.cta"
       case searchScreenSuggestionsMoreButtonCta = "search.screen.suggestions.more.button.cta"
+      case searchScreenSuggestionsNoResultsMessage = "search.screen.suggestions.no_results.message"
+      case searchScreenSuggestionsNoResultsTitle = "search.screen.suggestions.no_results.title"
       case searchScreenSuggestionsBrandsHeaderTitle = "search.screen.suggestions_brands.header.title"
       case searchScreenSuggestionsProductsHeaderTitle = "search.screen.suggestions_products.header.title"
       case searchScreenSuggestionsTermsHeaderTitle = "search.screen.suggestions_terms.header.title"

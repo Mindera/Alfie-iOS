@@ -1,27 +1,28 @@
 import Combine
+import CombineSchedulers
 import Core
 import Foundation
 import Model
 import Utils
 
 public final class SearchViewModel: SearchViewModelProtocol {
+    private enum Constants {
+        static let suggestionsDebounce: DispatchQueue.SchedulerTimeType.Stride = .milliseconds(500)
+        static let suggestionsLimit = 6
+    }
+
     // MARK: - Private Properties
 
     private let dependencies: SearchDependencyContainer
-    private let didUpdateSearchTermPassthrough: PassthroughSubject<String, Never> = .init()
     private var subscriptions: Set<AnyCancellable> = .init()
+    private var searchTerm = ""
+    private var suggestionsTask: Task<Void, Never>?
+    private var suggestionsGeneration = 0
     @Published public var state: SearchViewState = .blank
     @Published public var searchText: String {
         didSet {
-            guard oldValue != searchText else {
-                return
-            }
-            didUpdateSearchTermPassthrough.send(searchText)
+            handleSearchTextChange()
         }
-    }
-
-    private var canShowRecentSearches: Bool {
-        searchText.isEmpty && dependencies.recentsService?.recentSearches.isEmpty == false
     }
 
     public var recentSearchesViewModel: RecentSearchesViewModel {
@@ -34,7 +35,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     // MARK: - Internal Properties
 
     public var isSearchSubmissionAllowed: Bool {
-        !searchText.trim().isEmpty
+        !searchTerm.isEmpty
     }
 
     private let navigate: (SearchRoute) -> Void
@@ -51,8 +52,12 @@ public final class SearchViewModel: SearchViewModelProtocol {
         self.navigate = navigate
         self.closeSearchAction = closeSearchAction
         self.searchText = ""
-        self.state = canShowRecentSearches ? .recentSearches : .blank
+        showRecentSearchesIfSearchTermIsBlank()
         configureSubscriptions()
+    }
+
+    deinit {
+        suggestionsTask?.cancel()
     }
 }
 
@@ -60,15 +65,9 @@ public final class SearchViewModel: SearchViewModelProtocol {
 
 extension SearchViewModel {
     private func configureSubscriptions() {
-        didUpdateSearchTermPassthrough
-            .sink { [weak self] searchText in
-                self?.handleChange(on: searchText)
-            }
-            .store(in: &subscriptions)
-
         dependencies.recentsService?.recentSearchesPublisher
             .sink { [weak self] _ in
-                self?.handleEmptyText()
+                self?.showRecentSearchesIfSearchTermIsBlank()
             }
             .store(in: &subscriptions)
     }
@@ -78,20 +77,29 @@ extension SearchViewModel {
 
 extension SearchViewModel {
     public func onSubmitSearch() {
-        let term = searchText.trim()
-        guard !term.isEmpty else {
+        guard !searchTerm.isEmpty else {
             return
         }
-        dependencies.recentsService?.add(.text(value: term))
-        dependencies.analytics.trackSearch(term: term)
-        showResults(for: term)
+        dependencies.recentsService?.add(.text(value: searchTerm))
+        dependencies.analytics.trackSearch(term: searchTerm)
+        searchText = searchTerm
+        showResults(for: searchTerm)
+    }
+
+    public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
+        navigate(.searchIntent(.productDetails(productID: productSuggestion.handle, product: nil)))
+    }
+
+    public func didTapMoreProducts() {
+        onSubmitSearch()
+    }
+
+    public func didTapRetrySuggestions() {
+        loadSuggestions(debounced: false)
     }
 
     public func viewDidAppear() {
-        guard canShowRecentSearches else {
-            return
-        }
-        state = .recentSearches
+        showRecentSearchesIfSearchTermIsBlank()
     }
 
     public func viewDidDisappear() {
@@ -106,20 +114,78 @@ extension SearchViewModel {
 // MARK: - Private Methods
 
 extension SearchViewModel {
-    private func handleChange(on searchText: String) {
-        guard searchText.isEmpty else {
-            state = .blank
+    private func handleSearchTextChange() {
+        let newSearchTerm = searchText.trim()
+        guard newSearchTerm != searchTerm else {
             return
         }
-        handleEmptyText()
+        searchTerm = newSearchTerm
+
+        guard !searchTerm.isEmpty else {
+            cancelPendingSuggestions()
+            showRecentSearchesOrBlank()
+            return
+        }
+        loadSuggestions(debounced: true)
     }
 
-    private func showResults(for term: String) {
-        searchText = term
-        navigate(.searchIntent(.productListing(searchTerm: term, category: nil)))
+    private func cancelPendingSuggestions() {
+        suggestionsTask?.cancel()
+        suggestionsGeneration += 1
     }
 
-    private func handleEmptyText() {
-        state = canShowRecentSearches ? .recentSearches : .blank
+    private func loadSuggestions(debounced: Bool) {
+        cancelPendingSuggestions()
+        state = .suggestions(.loading)
+
+        guard debounced else {
+            requestSuggestions(for: searchTerm)
+            return
+        }
+        let generation = suggestionsGeneration
+        let scheduler = dependencies.scheduler
+        scheduler.schedule(after: scheduler.now.advanced(by: Constants.suggestionsDebounce)) { [weak self] in
+            guard let self, generation == suggestionsGeneration else {
+                return
+            }
+            requestSuggestions(for: searchTerm)
+        }
+    }
+
+    private func requestSuggestions(for requestedSearchTerm: String) {
+        suggestionsTask = Task { @MainActor [weak self, dependencies] in
+            let newState: SearchViewState
+            do {
+                let suggestions = try await dependencies.searchService.suggestions(
+                    searchTerm: requestedSearchTerm,
+                    limit: Constants.suggestionsLimit
+                )
+                newState = suggestions.products.isEmpty
+                    ? .suggestions(.error(.noResults(searchTerm: requestedSearchTerm)))
+                    : .suggestions(.success(suggestions))
+            } catch {
+                newState = .suggestions(.error(.generic(searchTerm: requestedSearchTerm)))
+            }
+
+            guard let self, !Task.isCancelled, requestedSearchTerm == searchTerm else {
+                return
+            }
+            state = newState
+        }
+    }
+
+    private func showResults(for searchTerm: String) {
+        navigate(.searchIntent(.productListing(searchTerm: searchTerm, category: nil)))
+    }
+
+    private func showRecentSearchesIfSearchTermIsBlank() {
+        guard searchTerm.isEmpty else {
+            return
+        }
+        showRecentSearchesOrBlank()
+    }
+
+    private func showRecentSearchesOrBlank() {
+        state = dependencies.recentsService?.recentSearches.isEmpty == false ? .recentSearches : .blank
     }
 }

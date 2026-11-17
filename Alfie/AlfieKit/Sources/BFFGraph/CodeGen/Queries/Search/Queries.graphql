@@ -1,0 +1,5 @@
+query SuggestionsQuery($searchTerm: String!, $limit: Int!) {
+    suggestion(query: $searchTerm, limit: $limit) {
+        ...SuggestionFragment
+    }
+}

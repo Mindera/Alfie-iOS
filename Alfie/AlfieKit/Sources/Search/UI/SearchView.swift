@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Model
 import SharedUI
 import SwiftUI
@@ -56,7 +57,53 @@ extension SearchView {
 
         case .recentSearches:
             RecentSearchesView(viewModel: viewModel.recentSearchesViewModel)
+
+        case .suggestions(.loading):
+            LoadingSpinner(size: .medium)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .accessibilityIdentifier(AccessibilityID.Search.suggestionsLoading)
+
+        case .suggestions(.success(let suggestions)):
+            ProductSuggestionsView(
+                products: suggestions.products,
+                onSelect: { viewModel.didTapProductSuggestion($0) },
+                onMoreProducts: { viewModel.didTapMoreProducts() }
+            )
+
+        case .suggestions(.error(.noResults(let searchTerm))):
+            suggestionsMessage(
+                title: L10n.Search.Screen.Suggestions.NoResults.title(searchTerm),
+                message: L10n.Search.Screen.Suggestions.NoResults.message,
+                accessibilityIdentifier: AccessibilityID.Search.noResults
+            )
+
+        case .suggestions(.error(.generic(let searchTerm))):
+            suggestionsMessage(
+                title: L10n.Search.Screen.Suggestions.Error.title,
+                message: L10n.Search.Screen.Suggestions.Error.message(searchTerm),
+                buttons: [
+                    .init(
+                        cta: L10n.Search.Screen.Suggestions.Error.Button.cta,
+                        accessibilityId: AccessibilityID.Search.suggestionsRetryButton,
+                        action: { viewModel.didTapRetrySuggestions() }
+                    ),
+                ],
+                accessibilityIdentifier: AccessibilityID.Search.suggestionsError
+            )
         }
+    }
+
+    private func suggestionsMessage(
+        title: String,
+        message: String,
+        buttons: [ErrorView.ButtonConfiguration] = [],
+        accessibilityIdentifier: String
+    ) -> some View {
+        ErrorView(icon: nil, title: title, message: message, buttons: buttons)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, theme.sizing.spacingSpacingMd)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(accessibilityIdentifier)
     }
 }
 
@@ -84,5 +131,27 @@ extension SearchView {
 
 #Preview("Recent Searches") {
     SearchView(viewModel: MockSearchViewModel(state: .recentSearches))
+}
+
+#Preview("Loading") {
+    SearchView(viewModel: MockSearchViewModel(state: .suggestions(.loading)))
+}
+
+#Preview("Product Suggestions") {
+    SearchView(
+        viewModel: MockSearchViewModel(
+            state: .suggestions(
+                .success(.fixture(products: [.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]))
+            )
+        )
+    )
+}
+
+#Preview("No Results") {
+    SearchView(viewModel: MockSearchViewModel(state: .suggestions(.error(.noResults(searchTerm: "zzz")))))
+}
+
+#Preview("Error") {
+    SearchView(viewModel: MockSearchViewModel(state: .suggestions(.error(.generic(searchTerm: "shirt")))))
 }
 #endif

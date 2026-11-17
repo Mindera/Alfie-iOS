@@ -179,6 +179,7 @@ public extension BFFGraphAPI {
       public var compareAtPrice: CompareAtPrice? { __data["compareAtPrice"] }
       public var inventory: Inventory? { __data["inventory"] }
       public var optionValues: [OptionValue] { __data["optionValues"] }
+      /// The Variant image: a photo the platform ties to this one variant. At most one image, and usually empty; null and [] both mean no Variant image. This is not a gallery — use OmniProduct.images for the Gallery. Some platforms (Shopify) return the product's featured image when the variant has none, so its presence does not mean it is variant-specific.
       public var media: [Medium?]? { __data["media"] }
 
       /// Variant.Price

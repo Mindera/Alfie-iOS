@@ -10,6 +10,7 @@ final class SearchFlowViewModelTests: XCTestCase {
         SearchFlowViewModel(
             dependencies: SearchDependencyContainer(
                 recentsService: MockRecentsService(),
+                searchService: MockSearchService(),
                 analytics: MockAnalyticsTracker().eraseToAnyAnalyticsTracker(),
                 log: Log.DummyLogger()
             ),

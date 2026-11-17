@@ -1756,6 +1756,39 @@
         }
       }
     },
+    "search.screen.suggestions.error.button.cta" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Try again"
+          }
+        }
+      }
+    },
+    "search.screen.suggestions.error.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "We couldn't load suggestions. You can still search for \"%@\"."
+          }
+        }
+      }
+    },
+    "search.screen.suggestions.error.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Something went wrong"
+          }
+        }
+      }
+    },
     "search.screen.suggestions.more.button.cta" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1763,6 +1796,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "More Products"
+          }
+        }
+      }
+    },
+    "search.screen.suggestions.no_results.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Please check the spelling or try different words."
+          }
+        }
+      }
+    },
+    "search.screen.suggestions.no_results.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No results found for \"%@\""
           }
         }
       }

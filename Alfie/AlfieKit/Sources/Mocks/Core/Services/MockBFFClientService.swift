@@ -43,6 +43,14 @@ public class MockBFFClientService: BFFClientServiceProtocol {
         return productListing
     }
 
+    public var onSuggestionsCalled: ((String, Int) async throws -> SearchSuggestions)?
+    public func suggestions(searchTerm: String, limit: Int) async throws -> SearchSuggestions {
+        guard let suggestions = try await onSuggestionsCalled?(searchTerm, limit) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return suggestions
+    }
+
     public var onCategoryPriceRangeCalled: ((String) throws -> PriceRange?)?
     public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
         try onCategoryPriceRangeCalled?(collectionHandle)

@@ -51,6 +51,23 @@ public enum AccessibilityID {
         public static let scanButton = "shop.scan.button"
     }
 
+    // MARK: - Search
+
+    public enum Search {
+        public static let recentSearchHeaderTitle = "search.recentSearches.title.label"
+        public static let recentSearchItem = "search.recentSearches.item.button"
+        public static let removeRecentSearchButton = "search.recentSearches.item.remove.button"
+        public static let suggestionsLoading = "search.suggestions.loading.view"
+        public static let moreProductsButton = "search.suggestions.moreProducts.button"
+        public static let suggestionsError = "search.suggestions.error.view"
+        public static let suggestionsRetryButton = "search.suggestions.error.retry.button"
+        public static let noResults = "search.suggestions.noResults.view"
+
+        public static func productSuggestion(id: String) -> String {
+            "search.suggestions.product.\(id).button"
+        }
+    }
+
     // MARK: - Scanner
 
     public enum Scanner {

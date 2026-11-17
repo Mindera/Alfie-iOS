@@ -82,8 +82,7 @@ Real products currently on screen. Skeleton placeholders are not loaded products
 _Avoid_: Grid, products on screen
 
 **No results**:
-A first page or refresh that finds no products to show. On a first page it is a blocking error; on a refresh over loaded products, a transient error.
-_Avoid_: Empty error
+A first page or refresh that finds no products to show. On a first page it is a blocking error; on a refresh over loaded products, a transient error._Avoid_: Empty error
 
 **Blocking error**:
 A page request failure shown as a full-screen error that replaces the listing. Only raised when there are no loaded products.
@@ -92,6 +91,21 @@ _Avoid_: Error screen, full-screen error
 **Transient error**:
 A page request failure shown as a dismissible Snackbar over loaded products, which stay on screen.
 _Avoid_: Refresh error
+
+### Search
+
+**Search term**:
+The text a shopper types to find Products, with surrounding whitespace removed.
+_Avoid_: query, keyword, search text
+
+**Search results**:
+The product listing a shopper reaches by submitting a Search term.
+_Avoid_: results page, SRP
+
+**Recent search**:
+A Search term or brand the shopper searched for before, kept on the device and offered while the
+Search term is empty.
+_Avoid_: search history, recents
 
 ### Failures
 

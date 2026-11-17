@@ -50,6 +50,30 @@ final class SearchServiceTests: XCTestCase {
         XCTAssertEqual(call.sort, "sort")
         XCTAssertEqual(call.filters, filters)
     }
+
+    func test_suggestions_passes_bff_errors_through_untouched() async {
+        mockClientService.onSuggestionsCalled = { _, _ in throw BFFRequestError.passThroughFixture }
+
+        await assertPassesBFFErrorThroughUntouched {
+            _ = try await sut.suggestions(searchTerm: "polo", limit: 6)
+        }
+    }
+
+    func test_suggestions_asks_bff_for_search_term_and_limit() async throws {
+        var captured: [(searchTerm: String, limit: Int)] = []
+        let expected = SearchSuggestions.fixture(products: [.fixture(id: "prod-1")])
+        mockClientService.onSuggestionsCalled = { searchTerm, limit in
+            captured.append((searchTerm, limit))
+            return expected
+        }
+
+        let suggestions = try await sut.suggestions(searchTerm: "polo", limit: 6)
+
+        XCTAssertEqual(suggestions, expected)
+        XCTAssertEqual(captured.count, 1)
+        XCTAssertEqual(captured.first?.searchTerm, "polo")
+        XCTAssertEqual(captured.first?.limit, 6)
+    }
 }
 
 // MARK: - Helpers
