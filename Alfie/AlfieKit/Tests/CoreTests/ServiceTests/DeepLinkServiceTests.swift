@@ -19,6 +19,7 @@ final class DeepLinkServiceTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        sut = nil
         testUrl = nil
         configuration = nil
         log = nil
@@ -30,9 +31,9 @@ final class DeepLinkServiceTests: XCTestCase {
     func test_handlers_installed_after_availability_was_turned_on_are_ready() {
         let handler = MockDeepLinkHandler()
         handler.isReadyToHandleLinks = false
-
         sut = .init(parsers: [], configuration: configuration, log: log)
         sut.updateAvailabilityOfHandlers(to: true)
+
         sut.update(handlers: [handler])
 
         XCTAssertTrue(handler.isReadyToHandleLinks)
@@ -40,8 +41,8 @@ final class DeepLinkServiceTests: XCTestCase {
 
     func test_handlers_installed_before_availability_is_turned_on_are_not_ready() {
         let handler = MockDeepLinkHandler()
-
         sut = .init(parsers: [], configuration: configuration, log: log)
+
         sut.update(handlers: [handler])
 
         XCTAssertFalse(handler.isReadyToHandleLinks)

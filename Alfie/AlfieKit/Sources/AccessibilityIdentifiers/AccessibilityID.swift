@@ -6,6 +6,10 @@
 /// Use static constants for fixed elements and pure functions for dynamic ones
 /// (always derived from a stable model id, never from an array index).
 public enum AccessibilityID {
+    /// A row's Remove button is nested under the row's own identifier, so this is the part that
+    /// tells the two apart.
+    public static let removeButtonSuffix = ".remove.button"
+
     // MARK: - Brands
 
     public enum Brands {
@@ -29,12 +33,9 @@ public enum AccessibilityID {
         /// Returns a line-scoped prefix, keyed on the server-assigned line id rather than a row
         /// index so removing a line does not renumber the rows a UI test is holding on to.
         public static func lineItem(id: String) -> String { lineItemPrefix + id }
-        /// Exposed as well as composed: a row's Remove button is nested under the row's own
-        /// identifier, so this is the part that tells the two apart.
-        public static let lineItemRemoveButtonSuffix = ".remove.button"
 
         public static func lineItemRemoveButton(id: String) -> String {
-            lineItem(id: id) + lineItemRemoveButtonSuffix
+            lineItem(id: id) + removeButtonSuffix
         }
     }
 
@@ -210,7 +211,6 @@ public enum AccessibilityID {
         public static let emptyState = "wishlist.emptyState.view"
 
         public static let itemPrefix = "wishlist.item."
-        public static let removeButtonSuffix = ".remove.button"
 
         public static func item(id: String) -> String { itemPrefix + id }
         public static func removeButton(id: String) -> String { item(id: id) + removeButtonSuffix }

@@ -17,11 +17,8 @@ final class WishlistPage {
     /// One per item: item ids come from the BFF, so they are matched by prefix and suffix.
     var removeButtons: XCUIElementQuery {
         app.buttons.matching(
-            NSPredicate(
-                format: "identifier BEGINSWITH %@ AND identifier ENDSWITH %@",
-                AccessibilityID.Wishlist.itemPrefix,
-                AccessibilityID.Wishlist.removeButtonSuffix
-            )
+            identifierPrefix: AccessibilityID.Wishlist.itemPrefix,
+            suffix: AccessibilityID.removeButtonSuffix
         )
     }
 

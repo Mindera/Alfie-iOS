@@ -28,11 +28,8 @@ final class BagPage {
     /// that — so against a live BFF this is every line.
     var lineItems: XCUIElementQuery {
         app.buttons.matching(
-            NSPredicate(
-                format: "identifier BEGINSWITH %@ AND NOT identifier ENDSWITH %@",
-                AccessibilityID.Bag.lineItemPrefix,
-                AccessibilityID.Bag.lineItemRemoveButtonSuffix
-            )
+            identifierPrefix: AccessibilityID.Bag.lineItemPrefix,
+            excludingSuffix: AccessibilityID.removeButtonSuffix
         )
     }
 
