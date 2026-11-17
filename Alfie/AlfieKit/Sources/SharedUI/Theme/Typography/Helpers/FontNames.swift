@@ -6,7 +6,6 @@ import class UIKit.UIFont
 // MARK: - FontNames
 
 public enum FontNames: String, CaseIterable {
-    // The system font (SF Pro) is supplied by iOS via `UIFont.systemFont`, so it is not bundled.
     // rawValue is the PostScript name (resolved via UIFont(name:)); fileName is the .dataset name.
     case libreBaskerville = "LibreBaskerville-Regular"
 
