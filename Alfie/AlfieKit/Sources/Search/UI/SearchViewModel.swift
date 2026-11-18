@@ -161,9 +161,10 @@ extension SearchViewModel {
                     searchTerm: requestedSearchTerm,
                     limit: Constants.suggestionsLimit
                 )
-                newState = suggestions.keywords.isEmpty && suggestions.products.isEmpty
+                let sections = Self.sections(from: suggestions)
+                newState = sections.isEmpty
                     ? .suggestions(.error(.noResults(searchTerm: requestedSearchTerm)))
-                    : .suggestions(.success(suggestions))
+                    : .suggestions(.success(sections))
             } catch {
                 newState = .suggestions(.error(.generic(searchTerm: requestedSearchTerm)))
             }
@@ -173,6 +174,18 @@ extension SearchViewModel {
             }
             state = newState
         }
+    }
+
+    private static func sections(from suggestions: SearchSuggestions) -> [SuggestionsSection] {
+        let keywords = suggestions.keywords.uniqued { $0.value.lowercased() }
+        var sections: [SuggestionsSection] = []
+        if !keywords.isEmpty {
+            sections.append(.keywords(keywords))
+        }
+        if !suggestions.products.isEmpty {
+            sections.append(.products(suggestions.products))
+        }
+        return sections
     }
 
     private func submit(_ term: String) {

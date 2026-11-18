@@ -6,9 +6,7 @@ import Utils
 extension BFFGraphAPI.SuggestionFragment {
     public func convertToSearchSuggestions() -> SearchSuggestions {
         SearchSuggestions(
-            keywords: keywords
-                .map { $0.fragments.suggestionKeywordFragment.convertToKeywordSuggestion() }
-                .uniqued { $0.value.lowercased() },
+            keywords: keywords.map { $0.fragments.suggestionKeywordFragment.convertToKeywordSuggestion() },
             brands: brands.map { $0.fragments.suggestionBrandFragment.convertToBrandSuggestion() },
             products: products
                 .map { $0.fragments.suggestionProductFragment.convertToProductSuggestion() }

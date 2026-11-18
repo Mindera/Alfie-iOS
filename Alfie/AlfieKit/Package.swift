@@ -524,7 +524,6 @@ let package = Package(
         .testTarget(
             name: "SearchTests",
             dependencies: [
-                "BFFGraph",
                 "Core",
                 "Mocks",
                 "Search",

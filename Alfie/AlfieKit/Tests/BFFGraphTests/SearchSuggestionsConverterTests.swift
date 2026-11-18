@@ -77,23 +77,6 @@ final class SearchSuggestionsConverterTests: XCTestCase {
         XCTAssertEqual(suggestions.products.map(\.name), ["Oxford Shirt", "Linen Dress"])
     }
 
-    func test_keyword_suggestions_are_kept_once_per_value_ignoring_case_in_order() {
-        let suggestion = Mock<Suggestion>(
-            brands: [],
-            keywords: [
-                Mock<SuggestionKeyword>(value: "Linen Shirt"),
-                Mock<SuggestionKeyword>(value: "linen shirt"),
-                Mock<SuggestionKeyword>(value: "linen dress"),
-                Mock<SuggestionKeyword>(value: "LINEN SHIRT")
-            ],
-            products: []
-        )
-
-        let suggestions = convert(suggestion)
-
-        XCTAssertEqual(suggestions.keywords.map(\.value), ["Linen Shirt", "linen dress"])
-    }
-
     func test_suggestion_with_no_kinds_converts_to_empty_lists() {
         let suggestions = convert(Mock<Suggestion>(brands: [], keywords: [], products: []))
 

@@ -76,7 +76,7 @@ final class SearchViewSnapshotTests: XCTestCase {
                 imageURL: photos[2].url
             )
         ]
-        mockViewModel.state = .suggestions(.success(.fixture(products: products)))
+        mockViewModel.state = .suggestions(.success([.products(products)]))
 
         let sut = SearchView(viewModel: mockViewModel)
             .remoteImageFixtures(Dictionary(uniqueKeysWithValues: photos.map { ($0.url, UIImage.solid($0.colour)) }))
@@ -90,23 +90,27 @@ final class SearchViewSnapshotTests: XCTestCase {
         mockViewModel.searchTerm = "shirt"
         mockViewModel.state = .suggestions(
             .success(
-                .fixture(
-                    keywords: [
-                        .fixture(value: "linen shirt"),
-                        .fixture(value: "Shirt dress with a shirt collar"),
-                        .fixture(value: "oversized long sleeve cotton poplin shirt in washed sky blue stripe"),
-                        .fixture(value: "polo")
-                    ],
-                    products: [
-                        .fixture(
-                            id: "1",
-                            name: "Oxford Shirt",
-                            brandName: "Alfie",
-                            price: .fixture(amountFormatted: "£45.00"),
-                            imageURL: photo
-                        )
-                    ]
-                )
+                [
+                    .keywords(
+                        [
+                            .fixture(value: "linen shirt"),
+                            .fixture(value: "Shirt dress with a shirt collar"),
+                            .fixture(value: "oversized long sleeve cotton poplin shirt in washed sky blue stripe"),
+                            .fixture(value: "polo")
+                        ]
+                    ),
+                    .products(
+                        [
+                            .fixture(
+                                id: "1",
+                                name: "Oxford Shirt",
+                                brandName: "Alfie",
+                                price: .fixture(amountFormatted: "£45.00"),
+                                imageURL: photo
+                            )
+                        ]
+                    )
+                ]
             )
         )
 

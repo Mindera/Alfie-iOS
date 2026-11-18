@@ -63,9 +63,9 @@ extension SearchView {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityIdentifier(AccessibilityID.Search.suggestionsLoading)
 
-        case .suggestions(.success(let suggestions)):
+        case .suggestions(.success(let sections)):
             SuggestionsView(
-                suggestions: suggestions,
+                sections: sections,
                 searchTerm: viewModel.searchTerm,
                 onSelectKeyword: { viewModel.didTapKeywordSuggestion($0) },
                 onSelectProduct: { viewModel.didTapProductSuggestion($0) },
@@ -144,10 +144,10 @@ extension SearchView {
         viewModel: MockSearchViewModel(
             state: .suggestions(
                 .success(
-                    .fixture(
-                        keywords: [.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")],
-                        products: [.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]
-                    )
+                    [
+                        .keywords([.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")]),
+                        .products([.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")])
+                    ]
                 )
             ),
             searchText: "shirt",

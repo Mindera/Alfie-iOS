@@ -1,9 +1,6 @@
 import AlicerceLogging
-import ApolloTestSupport
-@testable import BFFGraph
 import Combine
 import CombineSchedulers
-import Core
 import Mocks
 import Model
 import TestUtils
@@ -107,7 +104,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
             self.scheduler.advance(by: .milliseconds(500))
         }
 
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
@@ -162,7 +159,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt, dress]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt, dress])])))
     }
 
     func test_no_suggestions_shows_no_results_for_the_search_term() {
@@ -180,37 +177,45 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(keywords: [linenShirt]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.keywords([linenShirt])])))
     }
 
-    func test_product_suggestions_without_keyword_suggestions_are_shown_with_no_keywords() {
+    func test_keyword_suggestions_are_shown_above_product_suggestions() {
+        stubSuggestions { [linenShirt, shirt] _ in .fixture(keywords: [linenShirt], products: [shirt]) }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(sut.state, .suggestions(.success([.keywords([linenShirt]), .products([shirt])])))
+    }
+
+    func test_no_keyword_suggestions_hides_the_keywords_section() {
         stubSuggestions { [shirt] _ in .fixture(keywords: [], products: [shirt]) }
         let sut = makeSUT()
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(keywords: [], products: [shirt]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
     }
 
     func test_keyword_suggestions_repeated_in_the_answer_are_shown_once_ignoring_case() {
-        let answer = Mock<Suggestion>(
-            brands: [],
-            keywords: [
-                Mock<SuggestionKeyword>(value: "Linen Shirt"),
-                Mock<SuggestionKeyword>(value: "linen shirt"),
-                Mock<SuggestionKeyword>(value: "linen dress"),
-                Mock<SuggestionKeyword>(value: "LINEN SHIRT")
-            ],
-            products: []
-        )
-        stubSuggestions { _ in BFFGraphAPI.SuggestionFragment.from(answer).convertToSearchSuggestions() }
+        stubSuggestions { _ in
+            .fixture(
+                keywords: [
+                    .fixture(value: "Linen Shirt"),
+                    .fixture(value: "linen shirt"),
+                    .fixture(value: "linen dress"),
+                    .fixture(value: "LINEN SHIRT")
+                ]
+            )
+        }
         let sut = makeSUT()
 
         showSuggestions(for: "linen", in: sut)
 
         XCTAssertEqual(
             sut.state,
-            .suggestions(.success(.fixture(keywords: [.fixture(value: "Linen Shirt"), .fixture(value: "linen dress")])))
+            .suggestions(.success([.keywords([.fixture(value: "Linen Shirt"), .fixture(value: "linen dress")])]))
         )
     }
 
@@ -237,7 +242,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         await fulfillment(of: [gate.released], timeout: .default)
         await assertStateStaysUnchanged(in: sut)
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [dress]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([dress])])))
     }
 
     @MainActor
@@ -254,7 +259,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         await fulfillment(of: [gate.released], timeout: .default)
         await assertStateStaysUnchanged(in: sut)
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [dress]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([dress])])))
     }
 
     @MainActor
@@ -299,7 +304,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(in: sut) { sut.didTapRetrySuggestions() }
 
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
         XCTAssertEqual(
             requests,
             [SuggestionsRequest(searchTerm: "shirt", limit: 6), SuggestionsRequest(searchTerm: "shirt", limit: 6)]
@@ -338,7 +343,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         sut.viewDidAppear()
 
         XCTAssertEqual(sut.searchText, "shirt")
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
     }
 
     // MARK: - Keyword suggestion
@@ -458,7 +463,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         recentSearches.send([.text(value: "polo")])
 
-        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
     }
 
     // MARK: - Helpers
