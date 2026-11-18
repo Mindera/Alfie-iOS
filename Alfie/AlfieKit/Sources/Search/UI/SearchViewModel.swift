@@ -15,10 +15,10 @@ public final class SearchViewModel: SearchViewModelProtocol {
 
     private let dependencies: SearchDependencyContainer
     private var subscriptions: Set<AnyCancellable> = .init()
-    private var searchTerm = ""
     private var suggestionsTask: Task<Void, Never>?
     private var suggestionsGeneration = 0
     @Published public var state: SearchViewState = .blank
+    public private(set) var searchTerm = ""
     @Published public var searchText: String {
         didSet {
             handleSearchTextChange()
@@ -175,11 +175,11 @@ extension SearchViewModel {
         }
     }
 
-    private func submit(_ submittedSearchTerm: String) {
-        dependencies.recentsService?.add(.text(value: submittedSearchTerm))
-        dependencies.analytics.trackSearch(term: submittedSearchTerm)
-        searchText = submittedSearchTerm
-        showResults(for: submittedSearchTerm)
+    private func submit(_ term: String) {
+        dependencies.recentsService?.add(.text(value: term))
+        dependencies.analytics.trackSearch(term: term)
+        searchText = term
+        showResults(for: term)
     }
 
     private func showResults(for searchTerm: String) {

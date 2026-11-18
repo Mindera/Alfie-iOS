@@ -6,31 +6,45 @@ final class HighlightedAttributedStringTests: XCTestCase {
     private let highlightFont = UIFont.systemFont(ofSize: 16, weight: .bold)
 
     func test_every_occurrence_of_the_term_is_highlighted() {
-        XCTAssertEqual(highlightedParts(of: "Lorem ipsum lorem", term: "lor"), ["Lor", "lor"])
+        let parts = highlightedParts(of: "Lorem ipsum lorem", term: "lor")
+
+        XCTAssertEqual(parts, ["Lor", "lor"])
     }
 
     func test_match_ignores_case() {
-        XCTAssertEqual(highlightedParts(of: "Linen SHIRT", term: "shirt"), ["SHIRT"])
+        let parts = highlightedParts(of: "Linen SHIRT", term: "shirt")
+
+        XCTAssertEqual(parts, ["SHIRT"])
     }
 
     func test_term_with_an_open_parenthesis_is_matched_literally() {
-        XCTAssertEqual(highlightedParts(of: "blue shirt( slim", term: "shirt("), ["shirt("])
+        let parts = highlightedParts(of: "blue shirt( slim", term: "shirt(")
+
+        XCTAssertEqual(parts, ["shirt("])
     }
 
     func test_term_with_an_open_bracket_is_matched_literally() {
-        XCTAssertEqual(highlightedParts(of: "size [m] shirt", term: "["), ["["])
+        let parts = highlightedParts(of: "size [m] shirt", term: "[")
+
+        XCTAssertEqual(parts, ["["])
     }
 
     func test_dot_highlights_only_dots() {
-        XCTAssertEqual(highlightedParts(of: "st. ives", term: "."), ["."])
+        let parts = highlightedParts(of: "st. ives", term: ".")
+
+        XCTAssertEqual(parts, ["."])
     }
 
     func test_term_that_does_not_occur_highlights_nothing() {
-        XCTAssertEqual(highlightedParts(of: "linen dress", term: "shirt("), [])
+        let parts = highlightedParts(of: "linen dress", term: "shirt(")
+
+        XCTAssertEqual(parts, [])
     }
 
     func test_empty_term_highlights_nothing() {
-        XCTAssertEqual(highlightedParts(of: "linen dress", term: ""), [])
+        let parts = highlightedParts(of: "linen dress", term: "")
+
+        XCTAssertEqual(parts, [])
     }
 
     func test_text_is_unchanged() {

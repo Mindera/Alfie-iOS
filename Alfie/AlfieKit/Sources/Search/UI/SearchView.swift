@@ -66,7 +66,7 @@ extension SearchView {
         case .suggestions(.success(let suggestions)):
             SuggestionsView(
                 suggestions: suggestions,
-                searchTerm: viewModel.searchText.trimmingCharacters(in: .whitespacesAndNewlines),
+                searchTerm: viewModel.searchTerm,
                 onSelectKeyword: { viewModel.didTapKeywordSuggestion($0) },
                 onSelectProduct: { viewModel.didTapProductSuggestion($0) },
                 onMoreProducts: { viewModel.didTapMoreProducts() }
@@ -150,7 +150,8 @@ extension SearchView {
                     )
                 )
             ),
-            searchText: "shirt"
+            searchText: "shirt",
+            searchTerm: "shirt"
         )
     )
 }

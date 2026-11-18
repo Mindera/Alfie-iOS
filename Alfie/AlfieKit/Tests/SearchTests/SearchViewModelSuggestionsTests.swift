@@ -69,6 +69,14 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
+    func test_search_term_is_the_typed_text_without_surrounding_whitespace() {
+        let sut = makeSUT()
+
+        sut.searchText = " linen shirt "
+
+        XCTAssertEqual(sut.searchTerm, "linen shirt")
+    }
+
     func test_single_character_starts_a_request() {
         let sut = makeSUT()
 
@@ -154,7 +162,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt, dress]))))
     }
 
-    func test_no_product_suggestions_shows_no_results_for_the_search_term() {
+    func test_no_suggestions_shows_no_results_for_the_search_term() {
         stubSuggestions { _ in .fixture(products: []) }
         let sut = makeSUT()
 
