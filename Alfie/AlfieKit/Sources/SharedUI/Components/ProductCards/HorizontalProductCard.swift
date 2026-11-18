@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Core
 import Model
 import SwiftUI
@@ -12,7 +13,7 @@ public struct HorizontalProductCard: View {
     public var body: some View {
         HStack(alignment: .top, spacing: theme.sizing.spacingSpacingMd) {
             productImageView
-                .accessibilityIdentifier(AccessibilityId.productImage)
+                .accessibilityIdentifier(AccessibilityID.ProductCard.image)
             VStack(alignment: .leading, spacing: theme.sizing.spacingSpacingNone) {
                 productDesignerView
                     .padding(.bottom, theme.sizing.spacingSpacingXs)
@@ -28,7 +29,7 @@ public struct HorizontalProductCard: View {
             Spacer()
         }
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityId.productCard)
+        .accessibilityIdentifier(AccessibilityID.ProductCard.card)
     }
 
     @ViewBuilder private var productImageView: some View {
@@ -50,14 +51,14 @@ public struct HorizontalProductCard: View {
     private var productDesignerView: some View {
         Text.build(theme.font.body.small(viewModel.designer))
             .lineLimit(Constants.productDesignerLineLimit)
-            .accessibilityIdentifier(AccessibilityId.productDesigner)
+            .accessibilityIdentifier(AccessibilityID.ProductCard.designer)
     }
 
     private var productNameView: some View {
         Text.build(theme.font.body.small(viewModel.name))
             .lineLimit(Constants.productNameLineLimit)
             .foregroundStyle(theme.color.contentContentTerciary)
-            .accessibilityIdentifier(AccessibilityId.productName)
+            .accessibilityIdentifier(AccessibilityID.ProductCard.name)
     }
 
     private var productColorView: some View {
@@ -73,7 +74,7 @@ public struct HorizontalProductCard: View {
         }
         .lineLimit(Constants.productColorLineLimit)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityId.productColor)
+        .accessibilityIdentifier(AccessibilityID.ProductCard.color)
     }
 
     private var productSizeView: some View {
@@ -89,7 +90,7 @@ public struct HorizontalProductCard: View {
         }
         .lineLimit(Constants.productSizeLineLimit)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityId.productSize)
+        .accessibilityIdentifier(AccessibilityID.ProductCard.size)
     }
 
     private var productPriceView: some View {
@@ -98,18 +99,8 @@ public struct HorizontalProductCard: View {
             configuration: .init(preferredDistribution: .horizontal, size: .small, textAlignment: .leading)
         )
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityId.productPrice)
+        .accessibilityIdentifier(AccessibilityID.ProductCard.price)
     }
-}
-
-private enum AccessibilityId {
-    static let productCard = "product-card"
-    static let productImage = "product-image"
-    static let productDesigner = "product-designer"
-    static let productName = "product-name"
-    static let productColor = "product-color"
-    static let productSize = "product-size"
-    static let productPrice = "product-price-component"
 }
 
 private enum Constants {

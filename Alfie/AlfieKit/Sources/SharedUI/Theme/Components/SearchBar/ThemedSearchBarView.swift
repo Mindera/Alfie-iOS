@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import SwiftUI
 
 // MARK: - ThemedSearchBarView
@@ -85,7 +86,7 @@ public struct ThemedSearchBarView: View {
 
         public init(type: DismissType = .back, accessibilityId: String? = nil) {
             self.type = type
-            self.accessibilityId = accessibilityId ?? AccessibilityId.cancelAccessibilityId
+            self.accessibilityId = accessibilityId ?? AccessibilityID.SearchBar.dismissButton
         }
 
         var isCancelType: Bool {
@@ -176,8 +177,8 @@ public struct ThemedSearchBarView: View {
         self.submitLabel = submitLabel
         self.autocorrectionDisabled = autocorrectionDisabled
         self.autoFocusWhenAppearing = autoFocusWhenAppearing
-        self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityId.inputAccessibilityId
-        self.clearAccessibilityId = clearAccessibilityId ?? AccessibilityId.clearAccessibilityId
+        self.inputAccessibilityId = inputAccessibilityId ?? AccessibilityID.SearchBar.input
+        self.clearAccessibilityId = clearAccessibilityId ?? AccessibilityID.SearchBar.clearButton
         self.iconLayout = iconLayout
         self.onCancelTap = onCancelTap
         self.onClearTap = onClearTap
@@ -215,12 +216,8 @@ public struct ThemedSearchBarView: View {
                 .submitLabel(submitLabel)
                 .font(Font(theme.font.body.medium.uiFont))
                 .autocorrectionDisabled(autocorrectionDisabled)
-                .accessibilityRepresentation {
-                    TextField(text: $text) {
-                        Text(currentPlaceholder)
-                    }
-                    .accessibilityIdentifier(inputAccessibilityId)
-                }
+                .accessibilityIdentifier(inputAccessibilityId)
+                .accessibilityLabel(Text(currentPlaceholder))
                 // Make sure this is set before the clearButton overlay to avoid overwriting
                 .onTapGesture {
                     isFocused = true
@@ -350,14 +347,6 @@ public struct ThemedSearchBarView: View {
             EmptyView()
         }
     }
-}
-
-// MARK: - Accessibility
-
-private enum AccessibilityId {
-    static let inputAccessibilityId: String = "search-input"
-    static let clearAccessibilityId: String = "close-btn"
-    static let cancelAccessibilityId: String = "back-btn"
 }
 
 // MARK: - ThemedSearchBarRightIconModifier

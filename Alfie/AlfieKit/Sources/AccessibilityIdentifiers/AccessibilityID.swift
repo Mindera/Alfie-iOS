@@ -51,6 +51,15 @@ public enum AccessibilityID {
         public static let scanButton = "shop.scan.button"
     }
 
+    // MARK: - SearchBar
+
+    /// The editable search bar's defaults; a caller that passes its own identifiers overrides them.
+    public enum SearchBar {
+        public static let input = "searchBar.input.textField"
+        public static let clearButton = "searchBar.clear.button"
+        public static let dismissButton = "searchBar.dismiss.button"
+    }
+
     // MARK: - Search
 
     public enum Search {
@@ -152,6 +161,21 @@ public enum AccessibilityID {
         public static let view = "snackbar.view"
         public static let text = "snackbar.text"
         public static let actionButton = "snackbar.action.button"
+    }
+
+    // MARK: - ProductCard
+
+    /// Shared by every card on screen: a test picks one by position, which holds only where any
+    /// card will do.
+    public enum ProductCard {
+        public static let card = "productCard.view"
+        public static let image = "productCard.image"
+        public static let designer = "productCard.designer.label"
+        public static let name = "productCard.name.label"
+        public static let color = "productCard.color.label"
+        public static let size = "productCard.size.label"
+        public static let price = "productCard.price.view"
+        public static let wishlistButton = "productCard.wishlist.button"
     }
 
     // MARK: - ProductListing

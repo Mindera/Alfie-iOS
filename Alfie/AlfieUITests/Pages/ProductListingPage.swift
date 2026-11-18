@@ -30,6 +30,15 @@ final class ProductListingPage {
         app.buttons[AccessibilityID.ProductListing.listStyleListButton]
     }
 
+    /// The grid is disabled while its first page loads, so an enabled card is a loaded one, not a
+    /// skeleton.
+    var firstLoadedProductCard: XCUIElement {
+        app.descendants(matching: .any)
+            .matching(identifier: AccessibilityID.ProductCard.card)
+            .matching(NSPredicate(format: "isEnabled == true"))
+            .firstMatch
+    }
+
     // MARK: - Actions
 
     @discardableResult

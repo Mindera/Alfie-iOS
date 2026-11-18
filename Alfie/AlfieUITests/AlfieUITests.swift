@@ -40,8 +40,7 @@ final class AlfieUITests: AlfieUITestCase {
     /// it here.
     ///
     /// Locators outside PDP still use raw identifier strings
-    /// (`shop-tab`, `category-item`, `product-image`, `bag-tab`,
-    /// `product-name`). Migrating the remainder into the
+    /// (`category-item`). Migrating the remainder into the
     /// `AccessibilityIdentifiers` module is tracked as a separate follow-up.
     func testAddToBagFullFlow() throws {
         let pdp = ProductDetailsPage(app: app)
@@ -66,7 +65,7 @@ final class AlfieUITests: AlfieUITestCase {
                 waitFor(firstCategory, "At least one category should be available")
                 firstCategory.tap()
 
-                let firstProduct = app.images.matching(identifier: "product-image").element(boundBy: 0)
+                let firstProduct = app.images.matching(identifier: AccessibilityID.ProductCard.image).element(boundBy: 0)
                 if firstProduct.waitForExistence(timeout: timeout) {
                     return
                 }
@@ -75,7 +74,7 @@ final class AlfieUITests: AlfieUITestCase {
         }
 
         XCTContext.runActivity(named: "Open the first product in the listing") { _ in
-            let firstProduct = app.images.matching(identifier: "product-image").element(boundBy: 0)
+            let firstProduct = app.images.matching(identifier: AccessibilityID.ProductCard.image).element(boundBy: 0)
             waitFor(firstProduct, "At least one product should be available")
             firstProduct.tap()
         }
