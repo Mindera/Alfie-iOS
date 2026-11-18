@@ -55,7 +55,7 @@ public enum AccessibilityID {
 
     /// The editable search bar's defaults; a caller that passes its own identifiers overrides them.
     public enum SearchBar {
-        public static let input = "searchBar.input"
+        public static let input = "searchBar.input.textField"
         public static let clearButton = "searchBar.clear.button"
         public static let dismissButton = "searchBar.dismiss.button"
     }

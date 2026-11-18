@@ -8,13 +8,13 @@ final class SearchJourneyTests: AlfieUITestCase {
         static let none = "zzz-no-results"
     }
 
-    func testSearchJourney() throws {
+    func test_search_term_with_results_opens_a_product_from_the_results() throws {
         let search = SearchPage(app: app)
         let listing = ProductListingPage(app: app)
         let pdp = ProductDetailsPage(app: app)
 
         XCTContext.runActivity(named: "Search a term with results") { _ in
-            type(SearchTerms.many, into: search)
+            openSearch(search, andType: SearchTerms.many)
             waitFor(search.moreProductsButton, "A term with results should suggest products")
             search.submit()
         }
@@ -30,15 +30,15 @@ final class SearchJourneyTests: AlfieUITestCase {
         }
     }
 
-    func testSearchWithNoResultsShowsTheNoResultsState() throws {
+    func test_search_term_with_no_matches_shows_the_no_results_state() throws {
         let search = SearchPage(app: app)
 
-        type(SearchTerms.none, into: search)
+        openSearch(search, andType: SearchTerms.none)
 
         waitFor(search.noResults, "A term with no matches should show the no-results state")
     }
 
-    private func type(_ term: String, into search: SearchPage) {
+    private func openSearch(_ search: SearchPage, andType term: String) {
         waitFor(search.entryButton, "Home should show the search entry")
         search.open()
         waitFor(search.input, "Search should show its input")
