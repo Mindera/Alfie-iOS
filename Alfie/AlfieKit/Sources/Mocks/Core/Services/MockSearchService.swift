@@ -17,4 +17,12 @@ public final class MockSearchService: SearchServiceProtocol {
         }
         return productListing
     }
+
+    public var onSuggestionsCalled: ((String, Int) async throws -> SearchSuggestions)?
+    public func suggestions(searchTerm: String, limit: Int) async throws -> SearchSuggestions {
+        guard let suggestions = try await onSuggestionsCalled?(searchTerm, limit) else {
+            throw BFFRequestError(type: .emptyResponse)
+        }
+        return suggestions
+    }
 }

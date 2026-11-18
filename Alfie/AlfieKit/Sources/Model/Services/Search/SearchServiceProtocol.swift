@@ -8,4 +8,6 @@ public protocol SearchServiceProtocol {
         sort: String?,
         filters: ProductFilterInput?
     ) async throws -> ProductListing
+
+    func suggestions(searchTerm: String, limit: Int) async throws -> SearchSuggestions
 }

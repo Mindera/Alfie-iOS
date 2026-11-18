@@ -1,5 +1,6 @@
 import AlicerceLogging
 import Combine
+import CombineSchedulers
 import XCTest
 import Mocks
 import Model
@@ -16,7 +17,9 @@ final class SearchViewModelTests: XCTestCase {
         mockRecentsService = .init()
         dependencies = SearchDependencyContainer(
             recentsService: mockRecentsService,
+            searchService: MockSearchService(),
             analytics: mockAnalytics,
+            scheduler: DispatchQueue.test.eraseToAnyScheduler(),
             log: log
         )
     }
@@ -50,13 +53,13 @@ final class SearchViewModelTests: XCTestCase {
 
     // MARK: - Search text changes
 
-    func test_typing_with_recent_searches_is_blank() {
+    func test_typing_with_recent_searches_replaces_them_with_loading() {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         let sut = makeSUT()
 
         sut.searchText = "shoes"
 
-        XCTAssertEqual(sut.state, .blank)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     func test_searchText_clearedWithRecentSearches_setsRecentSearchesState() {
@@ -92,7 +95,7 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state, .blank)
     }
 
-    func test_recent_searches_changing_while_typing_stays_blank() {
+    func test_recent_searches_changing_while_typing_stays_loading() {
         let recentSearches = CurrentValueSubject<[RecentSearch], Never>([])
         mockRecentsService.recentSearchesPublisher = recentSearches.eraseToAnyPublisher()
         let sut = makeSUT()
@@ -101,7 +104,7 @@ final class SearchViewModelTests: XCTestCase {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         recentSearches.send([.text(value: "polo")])
 
-        XCTAssertEqual(sut.state, .blank)
+        XCTAssertEqual(sut.state, .suggestions(.loading))
     }
 
     // MARK: - Submission
@@ -192,7 +195,7 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertEqual(sut.searchText, "shoes")
     }
 
-    func test_tapping_recent_search_shows_its_results_and_puts_search_term_in_field() {
+    func test_tapping_recent_search_shows_its_results_and_keeps_recent_searches() {
         mockRecentsService.recentSearches = [.text(value: "linen")]
         var capturedRoutes: [SearchRoute] = []
         let sut = makeSUT(navigate: { capturedRoutes.append($0) })
@@ -200,7 +203,8 @@ final class SearchViewModelTests: XCTestCase {
         sut.recentSearchesViewModel.didTapRecentSearch(.text(value: "linen"))
 
         XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen", category: nil))])
-        XCTAssertEqual(sut.searchText, "linen")
+        XCTAssertEqual(sut.searchText, "")
+        XCTAssertEqual(sut.state, .recentSearches)
     }
 
     // MARK: - Lifecycle

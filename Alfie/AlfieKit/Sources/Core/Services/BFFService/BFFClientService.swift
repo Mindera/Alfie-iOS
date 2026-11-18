@@ -186,6 +186,24 @@ public final class BFFClientService: BFFClientServiceProtocol {
         }
     }
 
+    public func suggestions(searchTerm: String, limit: Int) async throws -> SearchSuggestions {
+        log.info("suggestion → searchTerm=\(searchTerm) limit=\(limit)")
+
+        do {
+            let response = try await executor.fetch(
+                BFFGraphAPI.SuggestionsQuery(searchTerm: searchTerm, limit: limit)
+            )
+            let suggestions = response.suggestion.fragments.suggestionFragment.convertToSearchSuggestions()
+
+            log.info("suggestion ← keywords=\(suggestions.keywords.count) brands=\(suggestions.brands.count) products=\(suggestions.products.count)")
+
+            return suggestions
+        } catch {
+            log.error("suggestion failed: \(error)")
+            throw error
+        }
+    }
+
     public func categoryPriceRange(collectionHandle: String) async throws -> PriceRange? {
         log.info("categoryPriceRange → collectionHandle=\(collectionHandle)")
 

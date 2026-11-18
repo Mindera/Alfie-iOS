@@ -118,6 +118,7 @@ final class CategorySelectorFlowViewModelTests: XCTestCase {
             ),
             searchDependencyContainer: SearchDependencyContainer(
                 recentsService: serviceProvider.recentsService,
+                searchService: serviceProvider.searchService,
                 analytics: serviceProvider.analytics,
                 log: log
             ),

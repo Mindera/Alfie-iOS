@@ -78,6 +78,10 @@ else
 fi
 export TEST_RUNNER_ALFIE_BFF_PLATFORM="$ALFIE_BFF_PLATFORM"
 
+if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
+    ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
+fi
+
 # --- Simulator: the pinned iPhone unit tests use, else the newest -----------
 SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."

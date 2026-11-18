@@ -25,4 +25,8 @@ public final class SearchService: SearchServiceProtocol {
             filters: filters
         )
     }
+
+    public func suggestions(searchTerm: String, limit: Int) async throws -> SearchSuggestions {
+        try await bffClient.suggestions(searchTerm: searchTerm, limit: limit)
+    }
 }

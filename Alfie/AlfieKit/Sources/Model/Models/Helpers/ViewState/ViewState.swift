@@ -42,3 +42,5 @@ public extension ViewState {
         return type
     }
 }
+
+extension ViewState: Equatable where Value: Equatable, StateError: Equatable {}

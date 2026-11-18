@@ -20,7 +20,7 @@ type BarcodeMatch {
 }
 
 type Cart {
-  checkoutUrl: String
+  checkoutUrl: String @deprecated(reason: "Use the prepareCheckout mutation.")
   createdAt: String
   customerId: String
   externalReferences: CartExternalReferences!
@@ -73,15 +73,79 @@ type CategoryPriceRange {
   minVariantPrice: Money!
 }
 
+"""
+What Alfie-Web's checkout page needs to mount the platform's checkout component (AF-73).
+"""
+type CheckoutEmbed {
+  """The JWT's `exp`."""
+  expiresAt: DateTime!
+
+  """The component's `jwt` attribute."""
+  jwt: String!
+
+  """For the component's sign-in setup. Not a secret."""
+  oauthClientId: String!
+
+  """The component's script, for this shop."""
+  scriptUrl: String!
+}
+
+"""
+Open `url` in a web view or Checkout Kit. It may be single-use: call `prepareCheckout` again every time checkout opens, and never cache it.
+"""
+type CheckoutRedirect {
+  url: String!
+}
+
 input CreateCartInput {
   customerAccessToken: String
   lines: [CartLineInput!]
 }
 
+"""
+How the channel logs a customer in: through the platform's hosted login page, or with an email and password sent to the BFF.
+"""
+enum CustomerLoginMethod {
+  HOSTED
+  PASSWORD
+}
+
+"""
+Open `url` in the in-app browser. The platform redirects back with `code` and `state`; pass both to `customerLoginComplete`.
+"""
+type CustomerLoginStart {
+  """Single use, valid for ten minutes."""
+  state: String!
+  url: String!
+}
+
+"""
+Send `token` as `Authorization: Bearer <token>` while logged in. It works until `expiresAt`, when the session ends; then log in again.
+"""
+type CustomerSessionToken {
+  """When the session, and so the token, ends. ISO 8601 UTC."""
+  expiresAt: String!
+  token: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Dimensions {
   height: Float
   length: Float
   width: Float
+}
+
+input ExchangeGuestCheckoutCodeInput {
+  cartId: ID!
+
+  """
+  The authorization code the checkout component gives after a guest signs in.
+  """
+  code: String!
 }
 
 type Facet {
@@ -99,6 +163,15 @@ type FacetValue {
   count: Int!
   label: String!
   value: String!
+}
+
+"""
+A signed-in guest: hand `accessToken` and the fresh `embed` to the checkout component (AF-73).
+"""
+type GuestCheckout {
+  accessToken: String!
+  accessTokenExpiresAt: DateTime!
+  embed: CheckoutEmbed!
 }
 
 type Image {
@@ -154,8 +227,72 @@ type MoneyRange {
 type Mutation {
   addToCart(input: AddToCartInput!): Cart!
   createCart(input: CreateCartInput!): Cart!
+
+  """Finishes a hosted login with the `code` and `state` from the redirect."""
+  customerLoginComplete(code: String!, state: String!): CustomerSessionToken!
+
+  """Only for platforms whose customerLoginMethod is HOSTED."""
+  customerLoginStart: CustomerLoginStart!
+
+  """Only for platforms whose customerLoginMethod is PASSWORD."""
+  customerLoginWithPassword(
+    """
+    The cart filled as a guest, to keep it after login. An unknown id is ignored.
+    """
+    cartId: String
+    email: String!
+    password: String!
+  ): CustomerSessionToken!
+
+  """
+  Ends the session in the BFF and at the platform. The token stops working at once.
+  """
+  customerLogout: Boolean!
+
+  """A new token for the same session; never past its end."""
+  customerSessionRefresh: CustomerSessionToken!
+
+  """
+  For Alfie-Web's checkout page only, called from its server with the shopper's IP in X-Shopper-IP and user agent in X-Shopper-User-Agent. BAD_REQUEST on a platform with no checkout page. BAD_REQUEST for a bad, expired or used code means the shopper signs in again.
+  """
+  exchangeGuestCheckoutCode(input: ExchangeGuestCheckoutCodeInput!): GuestCheckout!
+
+  """
+  Hands the cart off to the platform's checkout. Call it every time checkout opens. An empty cart is BAD_REQUEST; see docs/checkout.md for the errors on each platform.
+  """
+  prepareCheckout(input: PrepareCheckoutInput!): PrepareCheckoutResult!
+
+  """
+  For Alfie-Web's checkout page only, called from its server. BAD_REQUEST on a platform with no checkout page. Fails like prepareCheckout for an empty or unknown cart.
+  """
+  prepareCheckoutEmbed(cartId: ID!): CheckoutEmbed!
   removeFromCart(cartId: String!, lineId: String!): Cart!
   updateCart(input: UpdateCartInput!): Cart!
+}
+
+type OmniCustomer {
+  addresses: [OmniCustomerAddress!]!
+  email: String!
+  firstName: String
+  id: ID!
+  lastName: String
+  phone: String
+}
+
+type OmniCustomerAddress {
+  city: String!
+  company: String
+
+  """ISO 3166-1 alpha-2 country code."""
+  country: String!
+  id: ID
+  line1: String
+  line2: String
+  phone: String
+  postalCode: String
+
+  """State, province or region."""
+  region: String
 }
 
 type OmniProduct {
@@ -177,6 +314,11 @@ type OmniProduct {
   productType: String
   relatedProducts: [String]
   seo: Seo
+
+  """
+  Where the PDP "Size Guide" link points. Null means no size guide is configured for this product's category or brand — hide the link rather than falling back to a default. Only populated by productDetails: this is always null on search, listing and related-product responses, which do not fetch it.
+  """
+  sizeGuideUrl: String
   slug: String!
   tags: [String]
   taxCategory: String
@@ -190,6 +332,15 @@ type PageInfo {
   hasPreviousPage: Boolean!
   startCursor: String
 }
+
+input PrepareCheckoutInput {
+  cartId: ID!
+}
+
+"""
+More members will be added. Handle a `__typename` you do not know, for example by showing an error.
+"""
+union PrepareCheckoutResult = CheckoutRedirect
 
 input ProductFilterInput {
   brandNames: [String!]
@@ -235,6 +386,10 @@ type ProductVariant {
   dimensions: Dimensions
   id: ID!
   inventory: Inventory
+
+  """
+  The Variant image: a photo the platform ties to this one variant. At most one image, and usually empty; null and [] both mean no Variant image. This is not a gallery — use OmniProduct.images for the Gallery. Some platforms (Shopify) return the product's featured image when the variant has none, so its presence does not mean it is variant-specific.
+  """
   media: [Image]
   optionValues: [VariantOption!]!
   position: Int
@@ -249,20 +404,63 @@ type ProductVariant {
 
 type Query {
   cart(cartId: String!): Cart!
-  cartCheckoutUrl(cartId: String!): String!
   categoryPriceRange(collectionHandle: String!): CategoryPriceRange
+
+  """
+  Which login to show: HOSTED (customerLoginStart) or PASSWORD (customerLoginWithPassword).
+  """
+  customerLoginMethod: CustomerLoginMethod!
+
+  """The logged-in customer. Needs a customer session token."""
+  me: OmniCustomer!
   menu(handle: String! = "main-menu"): Menu!
   productByBarcode(barcode: String!): BarcodeMatch
   productDetails(handle: String!, productMetafields: [MetafieldIdentifierInput!], variantMetafields: [MetafieldIdentifierInput!]): OmniProduct
   productList(after: String, collectionHandle: String!, filters: ProductFilterInput, limit: Int! = 25, sort: ProductSortEnum! = NEWEST): ProductListResponse!
   relatedProducts(handle: String!, limit: Int! = 8): [OmniProduct!]!
   searchProducts(after: String, filters: ProductFilterInput, limit: Int! = 10, searchTerm: String!, sort: ProductSortEnum! = NEWEST): ProductListResponse!
+  suggestion(
+    """
+    Maximum results per suggestion type: up to this many brands, keywords and products each. Clamped to 1..20; a platform may return fewer.
+    """
+    limit: Int! = 6
+    query: String!
+  ): Suggestion!
 }
 
 type Seo {
   description: String
   keywords: [String]
   title: String
+}
+
+type Suggestion {
+  brands: [SuggestionBrand!]!
+  keywords: [SuggestionKeyword!]!
+  products: [SuggestionProduct!]!
+}
+
+type SuggestionBrand {
+  """
+  Opaque brand key, resolved per platform: pass it to `filters.brandNames` to list the brand. Not URL-safe on every platform; URL-encode it for deeplinks.
+  """
+  key: String!
+  results: Int
+  value: String!
+}
+
+type SuggestionKeyword {
+  results: Int
+  value: String!
+}
+
+type SuggestionProduct {
+  brandName: String
+  id: ID!
+  images: [Image!]!
+  name: String!
+  price: Money
+  slug: String!
 }
 
 input UpdateCartInput {

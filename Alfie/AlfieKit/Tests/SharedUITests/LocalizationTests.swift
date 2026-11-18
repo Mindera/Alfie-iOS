@@ -26,6 +26,27 @@ final class LocalizationTests: XCTestCase {
         }
     }
 
+    func test_localizable_search_suggestions_with_args() {
+        localizations.forEach { localization in
+            let resources: [String] = [
+                L10n.Search.Screen.Suggestions.NoResults.title("test"),
+                L10n.Search.Screen.Suggestions.Error.message("test")
+            ]
+            XCTAssertTrue(validateLocalizedStrings(resources, for: localization))
+        }
+    }
+
+    func test_search_suggestions_no_results_title_quotes_the_search_term() {
+        XCTAssertEqual(L10n.Search.Screen.Suggestions.NoResults.title("zzz"), "No results found for \"zzz\"")
+    }
+
+    func test_search_suggestions_error_message_quotes_the_search_term() {
+        XCTAssertEqual(
+            L10n.Search.Screen.Suggestions.Error.message("shirt"),
+            "We couldn't load suggestions. You can still search for \"shirt\"."
+        )
+    }
+
     func testLocalizableProductListingResultsWithArgs() {
         localizations.forEach { localization in
             let resources = [0, 1, 2].map { L10n.Plp.NumberOfResults.message($0) }

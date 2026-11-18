@@ -46,6 +46,10 @@ public extension BFFGraphAPI {
       case "ProductListResponse": return BFFGraphAPI.Objects.ProductListResponse
       case "ProductVariant": return BFFGraphAPI.Objects.ProductVariant
       case "Query": return BFFGraphAPI.Objects.Query
+      case "Suggestion": return BFFGraphAPI.Objects.Suggestion
+      case "SuggestionBrand": return BFFGraphAPI.Objects.SuggestionBrand
+      case "SuggestionKeyword": return BFFGraphAPI.Objects.SuggestionKeyword
+      case "SuggestionProduct": return BFFGraphAPI.Objects.SuggestionProduct
       case "VariantOption": return BFFGraphAPI.Objects.VariantOption
       default: return nil
       }

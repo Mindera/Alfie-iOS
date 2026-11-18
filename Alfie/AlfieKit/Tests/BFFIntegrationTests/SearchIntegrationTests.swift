@@ -20,6 +20,21 @@ final class SearchIntegrationTests: IntegrationTestCase {
         }
     }
 
+    func test_suggestion_answer_converts_to_product_suggestions() async throws {
+        let suggestions = try await sut.suggestions(searchTerm: SeedAnchors.SearchTerms.many, limit: 6)
+
+        XCTAssertFalse(
+            suggestions.products.isEmpty,
+            "BFF returned no Product suggestions for '\(SeedAnchors.SearchTerms.many)'"
+        )
+        XCTAssertLessThanOrEqual(suggestions.products.count, 6)
+        for product in suggestions.products {
+            XCTAssertFalse(product.id.isEmpty)
+            XCTAssertFalse(product.name.isEmpty)
+            XCTAssertFalse(product.handle.isEmpty)
+        }
+    }
+
     func test_searchProducts_pagination_secondPageDiffersFromFirst() async throws {
         let firstPage = try await sut.searchProducts(
             searchTerm: SeedAnchors.SearchTerms.many,
