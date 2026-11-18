@@ -1833,6 +1833,17 @@
         }
       }
     },
+    "search.screen.suggestions_keywords.header.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Suggestions"
+          }
+        }
+      }
+    },
     "search.screen.suggestions_products.header.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1840,17 +1851,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Product Suggestions"
-          }
-        }
-      }
-    },
-    "search.screen.suggestions_terms.header.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search Suggestions"
           }
         }
       }
