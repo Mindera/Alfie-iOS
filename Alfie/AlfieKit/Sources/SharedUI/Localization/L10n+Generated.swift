@@ -665,16 +665,16 @@ public enum L10n {
           public static let title = L10n.tr("L10n", "search.screen.suggestions_brands.header.title")
         }
       }
-      public enum SuggestionsKeywords {
-        public enum Header {
-          /// Search Suggestions
-          public static let title = L10n.tr("L10n", "search.screen.suggestions_keywords.header.title")
-        }
-      }
       public enum SuggestionsProducts {
         public enum Header {
           /// Product Suggestions
           public static let title = L10n.tr("L10n", "search.screen.suggestions_products.header.title")
+        }
+      }
+      public enum SuggestionsTerms {
+        public enum Header {
+          /// Search Suggestions
+          public static let title = L10n.tr("L10n", "search.screen.suggestions_terms.header.title")
         }
       }
     }
@@ -1016,8 +1016,8 @@ public extension L10n {
       case searchScreenSuggestionsNoResultsMessage = "search.screen.suggestions.no_results.message"
       case searchScreenSuggestionsNoResultsTitle = "search.screen.suggestions.no_results.title"
       case searchScreenSuggestionsBrandsHeaderTitle = "search.screen.suggestions_brands.header.title"
-      case searchScreenSuggestionsKeywordsHeaderTitle = "search.screen.suggestions_keywords.header.title"
       case searchScreenSuggestionsProductsHeaderTitle = "search.screen.suggestions_products.header.title"
+      case searchScreenSuggestionsTermsHeaderTitle = "search.screen.suggestions_terms.header.title"
       case searchBarCancel = "search_bar.cancel"
       case searchBarPlaceholder = "search_bar.placeholder"
       case searchBarFocusedPlaceholder = "search_bar.focused.placeholder"

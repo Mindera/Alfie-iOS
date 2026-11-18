@@ -19,7 +19,7 @@ struct KeywordSuggestionsView: View {
 
     var body: some View {
         VStack(spacing: theme.sizing.spacingSpacingNone) {
-            Text.build(theme.font.heading.xSmall(L10n.Search.Screen.SuggestionsKeywords.Header.title))
+            Text.build(theme.font.heading.xSmall(L10n.Search.Screen.SuggestionsTerms.Header.title))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, theme.sizing.spacingSpacingMd)
                 .padding(.bottom, theme.sizing.spacingSpacingXs)
