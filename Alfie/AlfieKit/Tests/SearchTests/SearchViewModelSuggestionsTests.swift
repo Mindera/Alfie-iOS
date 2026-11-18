@@ -1,6 +1,9 @@
 import AlicerceLogging
+import ApolloTestSupport
+@testable import BFFGraph
 import Combine
 import CombineSchedulers
+import Core
 import Mocks
 import Model
 import TestUtils
@@ -178,6 +181,37 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         showSuggestions(for: "shirt", in: sut)
 
         XCTAssertEqual(sut.state, .suggestions(.success(.fixture(keywords: [linenShirt]))))
+    }
+
+    func test_product_suggestions_without_keyword_suggestions_are_shown_with_no_keywords() {
+        stubSuggestions { [shirt] _ in .fixture(keywords: [], products: [shirt]) }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(keywords: [], products: [shirt]))))
+    }
+
+    func test_keyword_suggestions_repeated_in_the_answer_are_shown_once_ignoring_case() {
+        let answer = Mock<Suggestion>(
+            brands: [],
+            keywords: [
+                Mock<SuggestionKeyword>(value: "Linen Shirt"),
+                Mock<SuggestionKeyword>(value: "linen shirt"),
+                Mock<SuggestionKeyword>(value: "linen dress"),
+                Mock<SuggestionKeyword>(value: "LINEN SHIRT")
+            ],
+            products: []
+        )
+        stubSuggestions { _ in BFFGraphAPI.SuggestionFragment.from(answer).convertToSearchSuggestions() }
+        let sut = makeSUT()
+
+        showSuggestions(for: "linen", in: sut)
+
+        XCTAssertEqual(
+            sut.state,
+            .suggestions(.success(.fixture(keywords: [.fixture(value: "Linen Shirt"), .fixture(value: "linen dress")])))
+        )
     }
 
     func test_failed_request_shows_error_for_the_search_term() {
