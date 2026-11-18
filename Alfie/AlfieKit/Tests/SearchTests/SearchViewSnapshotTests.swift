@@ -84,6 +84,37 @@ final class SearchViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
     }
 
+    func test_search_view_with_keyword_and_product_suggestions_shows_keywords_first_with_search_term_in_bold() {
+        let photo = URL(string: "https://cdn.alfie.test/suggestion-0.jpg")!
+        mockViewModel.searchText = " shirt "
+        mockViewModel.state = .suggestions(
+            .success(
+                .fixture(
+                    keywords: [
+                        .fixture(value: "linen shirt"),
+                        .fixture(value: "Shirt dress with a shirt collar"),
+                        .fixture(value: "oversized long sleeve cotton poplin shirt in washed sky blue stripe"),
+                        .fixture(value: "polo")
+                    ],
+                    products: [
+                        .fixture(
+                            id: "1",
+                            name: "Oxford Shirt",
+                            brandName: "Alfie",
+                            price: .fixture(amountFormatted: "£45.00"),
+                            imageURL: photo
+                        )
+                    ]
+                )
+            )
+        )
+
+        let sut = SearchView(viewModel: mockViewModel)
+            .remoteImageFixtures([photo: UIImage.solid(.systemTeal)])
+
+        assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
+    }
+
     func test_search_view_without_product_suggestions_shows_no_results_message() {
         mockViewModel.searchText = "zzz"
         mockViewModel.state = .suggestions(.error(.noResults(searchTerm: "zzz")))

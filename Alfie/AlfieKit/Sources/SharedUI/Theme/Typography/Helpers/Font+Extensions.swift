@@ -147,11 +147,17 @@ extension NSAttributedString {
     }
 
     public func hightlightedAttributedString(with subString: String, font: UIFont, color: UIColor) -> AttributedString {
-        // swiftlint:disable:next legacy_objc_type
-        let range = (self.string.lowercased() as NSString).range(of: subString.lowercased())
         let highlightedSuggestion: NSMutableAttributedString = .init(attributedString: self)
-        highlightedSuggestion.addAttribute(NSAttributedString.Key.font, value: font, range: range)
-        highlightedSuggestion.addAttribute(NSAttributedString.Key.foregroundColor, value: color, range: range)
+        var searchStart = string.startIndex
+        while
+            let match = string.range(of: subString, options: .caseInsensitive, range: searchStart..<string.endIndex),
+            !match.isEmpty {
+            highlightedSuggestion.addAttributes(
+                [.font: font, .foregroundColor: color],
+                range: NSRange(match, in: string)
+            )
+            searchStart = match.upperBound
+        }
         return AttributedString(highlightedSuggestion)
     }
 }

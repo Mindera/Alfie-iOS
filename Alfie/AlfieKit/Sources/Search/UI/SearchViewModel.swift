@@ -80,10 +80,11 @@ extension SearchViewModel {
         guard !searchTerm.isEmpty else {
             return
         }
-        dependencies.recentsService?.add(.text(value: searchTerm))
-        dependencies.analytics.trackSearch(term: searchTerm)
-        searchText = searchTerm
-        showResults(for: searchTerm)
+        submit(searchTerm)
+    }
+
+    public func didTapKeywordSuggestion(_ keywordSuggestion: KeywordSuggestion) {
+        submit(keywordSuggestion.value)
     }
 
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
@@ -160,7 +161,7 @@ extension SearchViewModel {
                     searchTerm: requestedSearchTerm,
                     limit: Constants.suggestionsLimit
                 )
-                newState = suggestions.products.isEmpty
+                newState = suggestions.keywords.isEmpty && suggestions.products.isEmpty
                     ? .suggestions(.error(.noResults(searchTerm: requestedSearchTerm)))
                     : .suggestions(.success(suggestions))
             } catch {
@@ -172,6 +173,13 @@ extension SearchViewModel {
             }
             state = newState
         }
+    }
+
+    private func submit(_ submittedSearchTerm: String) {
+        dependencies.recentsService?.add(.text(value: submittedSearchTerm))
+        dependencies.analytics.trackSearch(term: submittedSearchTerm)
+        searchText = submittedSearchTerm
+        showResults(for: submittedSearchTerm)
     }
 
     private func showResults(for searchTerm: String) {

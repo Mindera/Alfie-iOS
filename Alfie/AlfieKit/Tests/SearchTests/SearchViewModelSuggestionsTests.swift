@@ -16,6 +16,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     private var capturedRoutes: [SearchRoute]!
 
     private let shirt = ProductSuggestion.fixture(id: "shirt-1", handle: "oxford-shirt")
+    private let linenShirt = KeywordSuggestion.fixture(value: "linen shirt")
     private let dress = ProductSuggestion.fixture(id: "dress-1", handle: "linen-dress")
 
     override func setUpWithError() throws {
@@ -162,6 +163,15 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(sut.state, .suggestions(.error(.noResults(searchTerm: "zzz"))))
     }
 
+    func test_keyword_suggestions_without_product_suggestions_are_shown() {
+        stubSuggestions { [linenShirt] _ in .fixture(keywords: [linenShirt]) }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(sut.state, .suggestions(.success(.fixture(keywords: [linenShirt]))))
+    }
+
     func test_failed_request_shows_error_for_the_search_term() {
         stubSuggestions { _ in throw BFFRequestError(type: .noInternet) }
         let sut = makeSUT()
@@ -287,6 +297,38 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         XCTAssertEqual(sut.searchText, "shirt")
         XCTAssertEqual(sut.state, .suggestions(.success(.fixture(products: [shirt]))))
+    }
+
+    // MARK: - Keyword suggestion
+
+    func test_tapping_keyword_suggestion_shows_search_results_for_it() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapKeywordSuggestion(linenShirt)
+
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen shirt", category: nil))])
+    }
+
+    func test_tapping_keyword_suggestion_puts_it_in_the_search_field() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapKeywordSuggestion(linenShirt)
+
+        XCTAssertEqual(sut.searchText, "linen shirt")
+    }
+
+    func test_tapping_keyword_suggestion_saves_recent_search_and_tracks_search() {
+        var added: [RecentSearch] = []
+        mockRecentsService.onAdd = { added.append($0) }
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapKeywordSuggestion(linenShirt)
+
+        XCTAssertEqual(added, [.text(value: "linen shirt")])
+        XCTAssertEqual(mockAnalytics.trackedValues(of: .searchTerm, for: .search), ["linen shirt"])
     }
 
     // MARK: - More Products

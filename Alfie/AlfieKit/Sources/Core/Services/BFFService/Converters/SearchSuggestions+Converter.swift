@@ -4,9 +4,12 @@ import Model
 
 extension BFFGraphAPI.SuggestionFragment {
     public func convertToSearchSuggestions() -> SearchSuggestions {
+        var seenKeywords = Set<String>()
         var seenProductIDs = Set<String>()
         return SearchSuggestions(
-            keywords: keywords.map { $0.fragments.suggestionKeywordFragment.convertToKeywordSuggestion() },
+            keywords: keywords
+                .map { $0.fragments.suggestionKeywordFragment.convertToKeywordSuggestion() }
+                .filter { seenKeywords.insert($0.value.lowercased()).inserted },
             brands: brands.map { $0.fragments.suggestionBrandFragment.convertToBrandSuggestion() },
             products: products
                 .map { $0.fragments.suggestionProductFragment.convertToProductSuggestion() }

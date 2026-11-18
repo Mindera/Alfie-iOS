@@ -35,6 +35,21 @@ final class SearchIntegrationTests: IntegrationTestCase {
         }
     }
 
+    func test_suggestion_answer_converts_to_keyword_suggestions() async throws {
+        try skipOnMockBFF("Only Shopify answers Keyword suggestions")
+
+        let suggestions = try await sut.suggestions(searchTerm: SeedAnchors.SearchTerms.many, limit: 6)
+
+        XCTAssertFalse(
+            suggestions.keywords.isEmpty,
+            "BFF returned no Keyword suggestions for '\(SeedAnchors.SearchTerms.many)'; only Shopify answers them"
+        )
+        XCTAssertLessThanOrEqual(suggestions.keywords.count, 6)
+        for keyword in suggestions.keywords {
+            XCTAssertFalse(keyword.value.isEmpty)
+        }
+    }
+
     func test_searchProducts_pagination_secondPageDiffersFromFirst() async throws {
         let firstPage = try await sut.searchProducts(
             searchTerm: SeedAnchors.SearchTerms.many,
