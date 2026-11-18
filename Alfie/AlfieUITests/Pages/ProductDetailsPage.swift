@@ -63,6 +63,10 @@ final class ProductDetailsPage {
         app.buttons[AccessibilityID.ProductDetails.addToWishlistButton]
     }
 
+    var removeFromWishlistButton: XCUIElement {
+        app.buttons[AccessibilityID.ProductDetails.removeFromWishlistButton]
+    }
+
     // MARK: - Actions
 
     @discardableResult

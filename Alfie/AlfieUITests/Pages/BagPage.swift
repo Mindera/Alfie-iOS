@@ -29,7 +29,7 @@ final class BagPage {
     var lineItems: XCUIElementQuery {
         app.buttons.matching(
             identifierPrefix: AccessibilityID.Bag.lineItemPrefix,
-            excludingSuffix: AccessibilityID.removeButtonSuffix
+            excludingSuffix: AccessibilityID.Bag.lineItemRemoveButtonSuffix
         )
     }
 

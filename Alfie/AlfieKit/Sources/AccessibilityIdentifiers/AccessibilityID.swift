@@ -8,7 +8,7 @@
 public enum AccessibilityID {
     /// A row's Remove button is nested under the row's own identifier, so this is the part that
     /// tells the two apart.
-    public static let removeButtonSuffix = ".remove.button"
+    private static let rowRemoveButtonSuffix = ".remove.button"
 
     // MARK: - Brands
 
@@ -34,8 +34,10 @@ public enum AccessibilityID {
         /// index so removing a line does not renumber the rows a UI test is holding on to.
         public static func lineItem(id: String) -> String { lineItemPrefix + id }
 
+        public static let lineItemRemoveButtonSuffix = rowRemoveButtonSuffix
+
         public static func lineItemRemoveButton(id: String) -> String {
-            lineItem(id: id) + removeButtonSuffix
+            lineItem(id: id) + lineItemRemoveButtonSuffix
         }
     }
 
@@ -127,6 +129,7 @@ public enum AccessibilityID {
         public static let bagQuantityDecreaseButton = "productDetails.bagQuantity.decrease.button"
         public static let bagQuantityIncreaseButton = "productDetails.bagQuantity.increase.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
+        public static let removeFromWishlistButton = "productDetails.removeFromWishlist.button"
         public static let relatedProductsSection = "productDetails.relatedProducts.section"
         public static let relatedProductsTitleLabel = "productDetails.relatedProducts.title.label"
         public static let errorRetryButton = "productDetails.error.retry.button"
@@ -228,6 +231,7 @@ public enum AccessibilityID {
         public static let emptyState = "wishlist.emptyState.view"
 
         public static let itemPrefix = "wishlist.item."
+        public static let removeButtonSuffix = rowRemoveButtonSuffix
 
         public static func item(id: String) -> String { itemPrefix + id }
         public static func removeButton(id: String) -> String { item(id: id) + removeButtonSuffix }
