@@ -14,7 +14,7 @@ final class WishlistPage {
         app.otherElements[AccessibilityID.TabBar.wishlist]
     }
 
-    /// One per item: item ids come from the BFF, so they are matched by prefix and suffix.
+    /// One per item; item ids come from the BFF.
     var removeButtons: XCUIElementQuery {
         app.buttons.matching(
             identifierPrefix: AccessibilityID.Wishlist.itemPrefix,

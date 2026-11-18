@@ -43,7 +43,7 @@ class AlfieUITestCase: XCTestCase {
 
     func waitFor(
         _ element: XCUIElement,
-        toStopReading label: String,
+        labelToChangeFrom label: String,
         _ message: String,
         file: StaticString = #filePath,
         line: UInt = #line

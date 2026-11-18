@@ -21,7 +21,7 @@ final class WishlistJourneyTests: AlfieUITestCase {
             pdp.tapAddToWishlist()
             waitFor(
                 pdp.addToWishlistButton,
-                toStopReading: addToWishlistLabel,
+                labelToChangeFrom: addToWishlistLabel,
                 "The heart should switch to remove once the product is in the wishlist"
             )
         }
