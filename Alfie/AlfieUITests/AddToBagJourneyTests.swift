@@ -1,11 +1,8 @@
 import AccessibilityIdentifiers
+import TestSeed
 import XCTest
 
 final class AddToBagJourneyTests: AlfieUITestCase {
-    /// `SeedAnchors.Products.default` and `SeedAnchors.Barcode.variantId`, mirrored until the UI
-    /// test target links `TestSeed` (#255).
-    private let defaultProductHandle = "alfie-oxford-shirt"
-    private let inStockVariantId = "mock-variant-alfie-oxford-shirt-white-xs"
     private let writeTimeout: TimeInterval = 20
 
     func testAddToBagJourney() throws {
@@ -14,7 +11,7 @@ final class AddToBagJourneyTests: AlfieUITestCase {
 
         XCTContext.runActivity(named: "Open the in-stock variant by deep link") { _ in
             waitFor(bag.tab, "The tab bar should be up before the deep link is opened")
-            pdp.open(handle: defaultProductHandle, variantId: inStockVariantId)
+            pdp.open(handle: SeedAnchors.Products.default, variantId: SeedAnchors.Barcode.variantId)
             pdp.assertVisible()
         }
 
