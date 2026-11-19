@@ -43,7 +43,7 @@ GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
 
 fail() { echo "❌ $1"; exit 1; }
-fail_with_bff_log() { tail -n 40 "$BFF_LOG"; fail "$1 (log: $BFF_LOG)."; }
+fail_with_bff_log() { tail -n 40 "$BFF_LOG"; fail "$1 (log: $BFF_LOG)"; }
 
 warn_if_bff_checkout_differs_from_main() {
     git -C "$BFF_PATH" rev-parse --git-dir >/dev/null 2>&1 || return 0
@@ -86,8 +86,12 @@ if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
     ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
 fi
 
-# --- Simulator: the pinned iPhone unit tests use, else the newest -----------
-SIMULATOR_ID="$(preferred_iphone_udid)"
+# --- Simulator: the pinned iPhone unit tests use; outside CI, else the newest
+SIMULATOR_ID="$(pinned_iphone_udid)"
+if [ -z "$SIMULATOR_ID" ]; then
+    [ -z "$CI" ] || fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
+    SIMULATOR_ID="$(newest_iphone | cut -d' ' -f1)"
+fi
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"

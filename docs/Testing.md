@@ -144,14 +144,14 @@ Treat them as correct, in review and when writing.
 
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
-  `BFFIntegrationTests` is the odd one out:
-  it runs against the Mock BFF, not mocks: in CI's `bff-tests` job (§CI), and locally only when
-  `verify.sh` runs without `--only-unit`. It pins only to `SeedAnchors` (the `TestSeed` module),
-  the Mock BFF's seed anchors; "the first item" only where the assertion holds for any item. `SeedAnchors` is
-  generated: when the BFF adds an anchor a test needs, pull `Alfie-BFF` and run
-  `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff. `verify.sh` fails before the Mock BFF
-  boots when the committed file no longer matches the BFF checkout's anchors. What each anchor
-  promises is in the BFF's `docs/mock-platform.md` §Seed anchors.
+  `BFFIntegrationTests` is the odd one out: it runs against the Mock BFF, not mocks: in CI's
+  `bff-tests` job (§CI), and locally only when `verify.sh` runs without `--only-unit`. It pins only
+  to `SeedAnchors` (the `TestSeed` module), the Mock BFF's seed anchors; "the first item" only where
+  the assertion holds for any item. `SeedAnchors` is generated: when the BFF adds an anchor a test
+  needs, pull `Alfie-BFF` and run `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
+  `verify.sh` fails before the Mock BFF boots when the committed file no longer matches the BFF
+  checkout's anchors. What each anchor promises is in the BFF's `docs/mock-platform.md` §Seed
+  anchors.
 
 ## CI
 
@@ -169,6 +169,8 @@ queue and on `main`. `release` needs both.
 - on failure uploads the `bff-test-results` artifact (both result bundles and the BFF log, kept
   7 days);
 - is skipped on fork and Dependabot PRs, which get no secrets;
+- fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
+  newest;
 - reads the private `Alfie-BFF` through an org GitHub App with read-only Contents on that repo
   alone. Its credentials are the repo secrets `BFF_READER_APP_CLIENT_ID` and
   `BFF_READER_APP_PRIVATE_KEY`.

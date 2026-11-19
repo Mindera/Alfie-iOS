@@ -16,6 +16,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -70,10 +73,9 @@ jobs:
       github.actor != 'dependabot[bot]')
     runs-on: macos-26
     timeout-minutes: 45
-    permissions:
-      contents: read
     env:
       BFF_CHECKOUT: Alfie-BFF
+      NODE_VERSION: 20
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -106,7 +108,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: yarn
           cache-dependency-path: ${{ env.BFF_CHECKOUT }}/yarn.lock
 
@@ -114,7 +116,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ env.BFF_CHECKOUT }}/node_modules
-          key: bff-node-modules-${{ runner.os }}-node20-${{ hashFiles(format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
+          key: bff-node-modules-${{ runner.os }}-node${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
 
       - name: Set up iOS job
         uses: ./.github/actions/setup-ios
@@ -124,10 +126,13 @@ jobs:
           spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
 
       - name: Run Integration and UI Tests
-        run: ./Alfie/scripts/run-integration-tests.sh
+        run: |
+          ALFIE_XCODEBUILD_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
+          [ -n "$ALFIE_XCODEBUILD_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
+          export ALFIE_XCODEBUILD_ARGS
+          ./Alfie/scripts/run-integration-tests.sh
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
-          ALFIE_XCODEBUILD_ARGS: "-onlyUsePackageVersionsFromResolvedFile -skipPackagePluginValidation -skipMacroValidation"
 
       - name: Upload Test Results
         if: failure()
@@ -135,9 +140,9 @@ jobs:
         with:
           name: bff-test-results
           path: |
-            /tmp/alfie_integration_test.xcresult
-            /tmp/alfie_ui_test.xcresult
+            /tmp/alfie_*_test.xcresult
             /tmp/alfie_bff.log
+          if-no-files-found: error
           retention-days: 7
 
   release:
@@ -145,6 +150,8 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 60
     if: github.event_name == 'push'
+    permissions:
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
