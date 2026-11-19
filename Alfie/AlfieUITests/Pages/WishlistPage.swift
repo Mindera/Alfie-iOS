@@ -18,7 +18,7 @@ final class WishlistPage {
     var removeButtons: XCUIElementQuery {
         app.buttons.matching(
             identifierPrefix: AccessibilityID.Wishlist.itemPrefix,
-            suffix: AccessibilityID.Wishlist.removeButtonSuffix
+            suffix: AccessibilityID.Wishlist.itemRemoveButtonSuffix
         )
     }
 

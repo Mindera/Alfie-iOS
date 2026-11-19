@@ -231,10 +231,10 @@ public enum AccessibilityID {
         public static let emptyState = "wishlist.emptyState.view"
 
         public static let itemPrefix = "wishlist.item."
-        public static let removeButtonSuffix = rowRemoveButtonSuffix
+        public static let itemRemoveButtonSuffix = rowRemoveButtonSuffix
 
         public static func item(id: String) -> String { itemPrefix + id }
-        public static func removeButton(id: String) -> String { item(id: id) + removeButtonSuffix }
+        public static func removeButton(id: String) -> String { item(id: id) + itemRemoveButtonSuffix }
     }
 
     // MARK: - DebugMenu
