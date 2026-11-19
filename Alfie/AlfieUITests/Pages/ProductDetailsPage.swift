@@ -70,12 +70,22 @@ final class ProductDetailsPage {
     // MARK: - Actions
 
     @discardableResult
-    func open(handle: String, file: StaticString = #filePath, line: UInt = #line) -> Self {
+    func open(
+        handle: String,
+        variantId: String? = nil,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> Self {
         guard #available(iOS 16.4, *) else {
             XCTFail("Opening a deep link needs iOS 16.4 or newer", file: file, line: line)
             return self
         }
-        guard let url = URL(string: "alfie://alfie.target/product/\(handle)") else {
+        var components = URLComponents()
+        components.scheme = "alfie"
+        components.host = "alfie.target"
+        components.path = "/product/\(handle)"
+        components.queryItems = variantId.map { [URLQueryItem(name: "variantId", value: $0)] }
+        guard let url = components.url else {
             XCTFail("\(handle) does not make a product deep link", file: file, line: line)
             return self
         }

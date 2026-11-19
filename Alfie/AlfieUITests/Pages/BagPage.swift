@@ -33,6 +33,10 @@ final class BagPage {
         )
     }
 
+    var emptyState: XCUIElement {
+        app.descendants(matching: .any)[AccessibilityID.Bag.emptyState]
+    }
+
     var grandTotal: XCUIElement {
         app.descendants(matching: .any)[AccessibilityID.Bag.grandTotal]
     }
