@@ -142,7 +142,8 @@ jobs:
           path: |
             /tmp/alfie_*_test.xcresult
             /tmp/alfie_bff.log
-          if-no-files-found: error
+            /tmp/alfie_bff_tests_build.log
+          if-no-files-found: warn
           retention-days: 7
 
   release:

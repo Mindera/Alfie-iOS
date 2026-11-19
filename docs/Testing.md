@@ -167,7 +167,7 @@ queue and on `main`. `release` needs both.
 
 - writes the BFF commit it tested to the job summary, which tells an iOS break from a BFF break;
 - on failure or cancel (the timeout included) uploads the `bff-test-results` artifact (both result
-  bundles and the BFF log, kept 7 days);
+  bundles, the BFF log and the build log, kept 7 days);
 - is skipped on fork and Dependabot PRs, which get no secrets;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
