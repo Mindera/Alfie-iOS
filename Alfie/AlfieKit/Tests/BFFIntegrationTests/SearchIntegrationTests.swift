@@ -36,7 +36,7 @@ final class SearchIntegrationTests: IntegrationTestCase {
     }
 
     func test_suggestion_answer_converts_to_keyword_suggestions() async throws {
-        try skipOnMockBFF("Only Shopify answers Keyword suggestions")
+        try skipUnlessShopifyBFF("Only Shopify answers Keyword suggestions; run with ALFIE_BFF_PLATFORM=shopify")
 
         let suggestions = try await sut.suggestions(searchTerm: SeedAnchors.SearchTerms.many, limit: 6)
 

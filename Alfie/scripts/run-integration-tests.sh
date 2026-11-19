@@ -4,7 +4,8 @@
 # test plans against it without rebuilding, and tears the BFF down on exit. --skip-build reuses the
 # products of an earlier build-for-testing (verify.sh's build step).
 # ALFIE_BFF_START_CMD overrides the start command (e.g. a Live BFF platform); set
-# ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF.
+# ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF, or
+# ALFIE_BFF_PLATFORM=shopify if it boots a Live BFF on Shopify (runs the Shopify-only tests).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched.
 
