@@ -12,6 +12,8 @@ on:
       - "**/*.md"
       - "docs/**"
 
+  merge_group:
+
   workflow_dispatch:
 
 concurrency:
@@ -107,8 +109,118 @@ jobs:
             ${{ env.ARTIFACTS_PATH }}/*.junit
           retention-days: 7
 
+  bff-tests:
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]')
+    runs-on: macos-26
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      BFF_CHECKOUT: Alfie-BFF
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Mint Alfie-BFF read token
+        id: bff-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ secrets.BFF_READER_APP_CLIENT_ID }}
+          private-key: ${{ secrets.BFF_READER_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: Alfie-BFF
+          permission-contents: read
+
+      - name: Checkout Alfie-BFF main
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          repository: ${{ github.repository_owner }}/Alfie-BFF
+          ref: main
+          token: ${{ steps.bff-token.outputs.token }}
+          path: ${{ env.BFF_CHECKOUT }}
+          persist-credentials: false
+
+      - name: Report BFF commit
+        run: |
+          echo "Mock BFF: \`$GITHUB_REPOSITORY_OWNER/Alfie-BFF@$(git -C "$BFF_CHECKOUT" rev-parse HEAD)\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 20
+          cache: yarn
+          cache-dependency-path: ${{ env.BFF_CHECKOUT }}/yarn.lock
+
+      - name: Cache BFF node_modules
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.BFF_CHECKOUT }}/node_modules
+          key: bff-node-modules-${{ runner.os }}-node20-${{ hashFiles(format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
+
+      - name: Cache Homebrew
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+            /usr/local/Homebrew
+          key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
+          restore-keys: |
+            brew-${{ runner.os }}-
+
+      - name: Restore Swift Package Manager Cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Install Homebrew formulas
+        run: brew bundle install
+
+      - name: Import GPG Private Key and Decrypt sensitive files
+        env:
+          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+        run: |
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+          chmod 600 ~/.gnupg/gpg-agent.conf
+          chmod 600 ~/.gnupg/gpg.conf
+          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          gpg-connect-agent reloadagent /bye || true
+          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
+
+      - name: Run Integration and UI Tests
+        run: ./Alfie/scripts/run-integration-tests.sh
+        env:
+          ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
+          ALFIE_XCODEBUILD_ARGS: "-onlyUsePackageVersionsFromResolvedFile -skipPackagePluginValidation -skipMacroValidation"
+
+      - name: Upload Test Results
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: bff-test-results
+          path: |
+            /tmp/alfie_integration_test.xcresult
+            /tmp/alfie_ui_test.xcresult
+            /tmp/alfie_bff.log
+          retention-days: 7
+
   release:
-    needs: [unit-tests]
+    needs: [unit-tests, bff-tests]
     runs-on: macos-26
     timeout-minutes: 60
     if: github.event_name == 'push'
