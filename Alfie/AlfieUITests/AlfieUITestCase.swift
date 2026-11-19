@@ -24,10 +24,21 @@ class AlfieUITestCase: XCTestCase {
 
     func waitFor(
         _ element: XCUIElement,
+        timeout: TimeInterval? = nil,
         _ message: String,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        XCTAssertTrue(element.waitForExistence(timeout: timeout), message, file: file, line: line)
+        XCTAssertTrue(
+            element.waitForExistence(timeout: timeout ?? self.timeout),
+            message,
+            file: file,
+            line: line
+        )
     }
+}
+
+extension TimeInterval {
+    /// A cart write is a real round trip to the BFF, so it gets longer than a local UI transition.
+    static let bffWrite: TimeInterval = 20
 }
