@@ -6,6 +6,10 @@
 /// Use static constants for fixed elements and pure functions for dynamic ones
 /// (always derived from a stable model id, never from an array index).
 public enum AccessibilityID {
+    /// A row's Remove button is nested under the row's own identifier, so this is the part that
+    /// tells the two apart.
+    private static let rowRemoveButtonSuffix = ".remove.button"
+
     // MARK: - Brands
 
     public enum Brands {
@@ -29,9 +33,8 @@ public enum AccessibilityID {
         /// Returns a line-scoped prefix, keyed on the server-assigned line id rather than a row
         /// index so removing a line does not renumber the rows a UI test is holding on to.
         public static func lineItem(id: String) -> String { lineItemPrefix + id }
-        /// Exposed as well as composed: a row's Remove button is nested under the row's own
-        /// identifier, so this is the part that tells the two apart.
-        public static let lineItemRemoveButtonSuffix = ".remove.button"
+
+        public static let lineItemRemoveButtonSuffix = rowRemoveButtonSuffix
 
         public static func lineItemRemoveButton(id: String) -> String {
             lineItem(id: id) + lineItemRemoveButtonSuffix
@@ -127,6 +130,7 @@ public enum AccessibilityID {
         public static let bagQuantityDecreaseButton = "productDetails.bagQuantity.decrease.button"
         public static let bagQuantityIncreaseButton = "productDetails.bagQuantity.increase.button"
         public static let addToWishlistButton = "productDetails.addToWishlist.button"
+        public static let removeFromWishlistButton = "productDetails.removeFromWishlist.button"
         public static let relatedProductsSection = "productDetails.relatedProducts.section"
         public static let relatedProductsTitleLabel = "productDetails.relatedProducts.title.label"
         public static let errorRetryButton = "productDetails.error.retry.button"
@@ -227,8 +231,11 @@ public enum AccessibilityID {
         public static let grid = "wishlist.grid.view"
         public static let emptyState = "wishlist.emptyState.view"
 
-        public static func item(id: String) -> String { "wishlist.item.\(id)" }
-        public static func removeButton(id: String) -> String { item(id: id) + ".remove.button" }
+        public static let itemPrefix = "wishlist.item."
+        public static let itemRemoveButtonSuffix = rowRemoveButtonSuffix
+
+        public static func item(id: String) -> String { itemPrefix + id }
+        public static func removeButton(id: String) -> String { item(id: id) + itemRemoveButtonSuffix }
     }
 
     // MARK: - DebugMenu
