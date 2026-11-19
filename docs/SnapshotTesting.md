@@ -41,7 +41,7 @@ References are pixel comparisons, so rendering must be comparable between record
 - **Language pinned in the test plan.** `Alfie.xctestplan` runs tests in `en` / `US` whatever the
   simulator's own language: a `vi` preferred language adds line height and fails every text snapshot.
 
-`SNAPSHOT_OS_VERSION` (in `Alfie/scripts/test-for-verification.sh`, default `26.4`) pins the exact
+`SNAPSHOT_OS_VERSION` (in `Alfie/scripts/simulator.sh`, default `26.4`) pins the exact
 iOS **major.minor** references are recorded on, and must stay in lockstep with `SCAN_DEVICE` in
 `fastlane/.env.default` so CI asserts on the same runtime. Override per run —
 `SNAPSHOT_OS_VERSION=26.5 ./Alfie/scripts/verify.sh` — but changing the pin for good means updating
