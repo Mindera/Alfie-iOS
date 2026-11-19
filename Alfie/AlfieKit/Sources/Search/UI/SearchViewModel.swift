@@ -19,7 +19,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     private var suggestionsGeneration = 0
     private var areSuggestionsOutdated = false
     @Published public var state: SearchViewState = .blank
-    public private(set) var searchTerm = ""
+    private var searchTerm = ""
     @Published public var searchText: String {
         didSet {
             handleSearchTextChange()
@@ -169,7 +169,7 @@ extension SearchViewModel {
                 let sections = Self.sections(from: suggestions)
                 newState = sections.isEmpty
                     ? .suggestions(.error(.noResults(searchTerm: requestedSearchTerm)))
-                    : .suggestions(.success(sections))
+                    : .suggestions(.success(.init(searchTerm: requestedSearchTerm, sections: sections)))
             } catch {
                 newState = .suggestions(.error(.generic(searchTerm: requestedSearchTerm)))
             }

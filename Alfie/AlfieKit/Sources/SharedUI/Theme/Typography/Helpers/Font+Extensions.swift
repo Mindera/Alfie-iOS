@@ -134,18 +134,6 @@ extension NSAttributedString {
         return attributedSubstring(from: range)
     }
 
-    public func underline(selectedString: String?) -> AttributedString {
-        guard let selectedString else {
-            return AttributedString(self)
-        }
-
-        let mutableString: NSMutableAttributedString = .init(attributedString: self)
-        // swiftlint:disable:next legacy_objc_type
-        let range = (string.lowercased() as NSString).range(of: selectedString.lowercased())
-        mutableString.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
-        return AttributedString(mutableString)
-    }
-
     public func hightlightedAttributedString(with subString: String, font: UIFont, color: UIColor) -> AttributedString {
         let highlightedSuggestion: NSMutableAttributedString = .init(attributedString: self)
         var searchStart = string.startIndex

@@ -5,7 +5,6 @@ public protocol SearchViewModelProtocol: ObservableObject {
 
     var isSearchSubmissionAllowed: Bool { get }
     var searchText: String { get set }
-    var searchTerm: String { get }
     var state: SearchViewState { get }
     var recentSearchesViewModel: RecentSearchesViewModel { get }
 

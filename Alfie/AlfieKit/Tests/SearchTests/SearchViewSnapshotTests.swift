@@ -76,7 +76,7 @@ final class SearchViewSnapshotTests: XCTestCase {
                 imageURL: photos[2].url
             )
         ]
-        mockViewModel.state = .suggestions(.success([.products(products)]))
+        mockViewModel.state = .suggestions(.success(.init(searchTerm: "shirt", sections: [.products(products)])))
 
         let sut = SearchView(viewModel: mockViewModel)
             .remoteImageFixtures(Dictionary(uniqueKeysWithValues: photos.map { ($0.url, UIImage.solid($0.colour)) }))
@@ -87,32 +87,28 @@ final class SearchViewSnapshotTests: XCTestCase {
     func test_search_view_with_keyword_suggestions_lists_them_above_products() {
         let photo = URL(string: "https://cdn.alfie.test/suggestion-0.jpg")!
         mockViewModel.searchText = "shirt"
-        mockViewModel.searchTerm = "shirt"
-        mockViewModel.state = .suggestions(
-            .success(
+        let sections: [SuggestionsSection] = [
+            .keywords(
                 [
-                    .keywords(
-                        [
-                            .fixture(value: "linen shirt"),
-                            .fixture(value: "Shirt dress with a shirt collar"),
-                            .fixture(value: "oversized long sleeve cotton poplin shirt in washed sky blue stripe"),
-                            .fixture(value: "polo")
-                        ]
-                    ),
-                    .products(
-                        [
-                            .fixture(
-                                id: "1",
-                                name: "Oxford Shirt",
-                                brandName: "Alfie",
-                                price: .fixture(amountFormatted: "£45.00"),
-                                imageURL: photo
-                            )
-                        ]
+                    .fixture(value: "linen shirt"),
+                    .fixture(value: "Shirt dress with a shirt collar"),
+                    .fixture(value: "oversized long sleeve cotton poplin shirt in washed sky blue stripe"),
+                    .fixture(value: "polo")
+                ]
+            ),
+            .products(
+                [
+                    .fixture(
+                        id: "1",
+                        name: "Oxford Shirt",
+                        brandName: "Alfie",
+                        price: .fixture(amountFormatted: "£45.00"),
+                        imageURL: photo
                     )
                 ]
             )
-        )
+        ]
+        mockViewModel.state = .suggestions(.success(.init(searchTerm: "shirt", sections: sections)))
 
         let sut = SearchView(viewModel: mockViewModel)
             .remoteImageFixtures([photo: UIImage.solid(.systemTeal)])

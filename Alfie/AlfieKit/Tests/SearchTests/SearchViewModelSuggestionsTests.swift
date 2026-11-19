@@ -69,14 +69,6 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
-    func test_search_term_is_the_typed_text_without_surrounding_whitespace() {
-        let sut = makeSUT()
-
-        sut.searchText = " linen shirt "
-
-        XCTAssertEqual(sut.searchTerm, "linen shirt")
-    }
-
     func test_single_character_starts_a_request() {
         let sut = makeSUT()
 
@@ -104,7 +96,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
             self.scheduler.advance(by: .milliseconds(500))
         }
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt])]))
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
 
@@ -159,7 +151,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt, dress])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt, dress])]))
     }
 
     func test_no_suggestions_shows_no_results_for_the_search_term() {
@@ -177,7 +169,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.keywords([linenShirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.keywords([linenShirt])]))
     }
 
     func test_keyword_suggestions_are_shown_above_product_suggestions() {
@@ -186,7 +178,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.keywords([linenShirt]), .products([shirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.keywords([linenShirt]), .products([shirt])]))
     }
 
     func test_no_keyword_suggestions_hides_the_keywords_section() {
@@ -195,7 +187,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(for: "shirt", in: sut)
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt])]))
     }
 
     func test_keyword_suggestions_repeated_in_the_answer_are_shown_once_ignoring_case() {
@@ -215,7 +207,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         XCTAssertEqual(
             sut.state,
-            .suggestions(.success([.keywords([.fixture(value: "Linen Shirt"), .fixture(value: "linen dress")])]))
+            suggestions(for: "linen", [.keywords([.fixture(value: "Linen Shirt"), .fixture(value: "linen dress")])])
         )
     }
 
@@ -242,7 +234,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         await fulfillment(of: [gate.released], timeout: .default)
         await assertStateStaysUnchanged(in: sut)
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([dress])])))
+        XCTAssertEqual(sut.state, suggestions(for: "dress", [.products([dress])]))
     }
 
     @MainActor
@@ -259,7 +251,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         await fulfillment(of: [gate.released], timeout: .default)
         await assertStateStaysUnchanged(in: sut)
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([dress])])))
+        XCTAssertEqual(sut.state, suggestions(for: "dress", [.products([dress])]))
     }
 
     @MainActor
@@ -304,7 +296,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(in: sut) { sut.didTapRetrySuggestions() }
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt])]))
         XCTAssertEqual(
             requests,
             [SuggestionsRequest(searchTerm: "shirt", limit: 6), SuggestionsRequest(searchTerm: "shirt", limit: 6)]
@@ -343,7 +335,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         sut.viewDidAppear()
 
         XCTAssertEqual(sut.searchText, "shirt")
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt])]))
     }
 
     // MARK: - Keyword suggestion
@@ -413,7 +405,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         showSuggestions(in: sut) { sut.viewDidAppear() }
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([dress])])))
+        XCTAssertEqual(sut.state, suggestions(for: "linen shirt", [.products([dress])]))
         XCTAssertEqual(
             requests,
             [SuggestionsRequest(searchTerm: "shirt", limit: 6), SuggestionsRequest(searchTerm: "linen shirt", limit: 6)]
@@ -516,7 +508,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         mockRecentsService.recentSearches = [.text(value: "polo")]
         recentSearches.send([.text(value: "polo")])
 
-        XCTAssertEqual(sut.state, .suggestions(.success([.products([shirt])])))
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt])]))
     }
 
     // MARK: - Helpers
@@ -533,6 +525,10 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
             navigate: { [weak self] in self?.capturedRoutes.append($0) },
             closeSearchAction: {}
         )
+    }
+
+    private func suggestions(for searchTerm: String, _ sections: [SuggestionsSection]) -> SearchViewState {
+        .suggestions(.success(.init(searchTerm: searchTerm, sections: sections)))
     }
 
     private func stubSuggestions(_ answer: @escaping (String) throws -> SearchSuggestions) {
