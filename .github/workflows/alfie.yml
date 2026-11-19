@@ -32,35 +32,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
-      - name: Cache Homebrew
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: |
-            ~/Library/Caches/Homebrew
-            /usr/local/Homebrew
-          key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
-          restore-keys: |
-            brew-${{ runner.os }}-
-
-      - name: Restore Ruby Gems
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: vendor/bundle
-          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
-          restore-keys: |
-            gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
-            gems-${{ runner.os }}-
-
-      - name: Restore Swift Package Manager Cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: |
-            ~/Library/Caches/org.swift.swiftpm
-            ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: |
-            spm-${{ runner.os }}-
-
       - name: Cache Xcode DerivedData
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
@@ -69,30 +40,13 @@ jobs:
           restore-keys: |
             derived-${{ runner.os }}-
 
-      - name: Install Homebrew formulas
-        run: brew bundle install
-
-      - name: Install Ruby dependencies
-        run: |
-          bundle config set --local path 'vendor/bundle'
-          bundle install --jobs 4 --retry 3
-
-      - name: Import GPG Private Key and Decrypt sensitive files
-        env:
-          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
-          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-        run: |
-          git config --global user.email "${{ secrets.GIT_EMAIL }}"
-          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
-          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
-          chmod 600 ~/.gnupg/gpg-agent.conf
-          chmod 600 ~/.gnupg/gpg.conf
-          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
-          gpg-connect-agent reloadagent /bye || true
-          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
+      - name: Set up iOS job
+        uses: ./.github/actions/setup-ios
+        with:
+          gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          ruby: true
 
       - name: Run Tests
         run: bundle exec fastlane ios test --env default
@@ -162,45 +116,12 @@ jobs:
           path: ${{ env.BFF_CHECKOUT }}/node_modules
           key: bff-node-modules-${{ runner.os }}-node20-${{ hashFiles(format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
 
-      - name: Cache Homebrew
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Set up iOS job
+        uses: ./.github/actions/setup-ios
         with:
-          path: |
-            ~/Library/Caches/Homebrew
-            /usr/local/Homebrew
-          key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
-          restore-keys: |
-            brew-${{ runner.os }}-
-
-      - name: Restore Swift Package Manager Cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: |
-            ~/Library/Caches/org.swift.swiftpm
-            ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: |
-            spm-${{ runner.os }}-
-
-      - name: Install Homebrew formulas
-        run: brew bundle install
-
-      - name: Import GPG Private Key and Decrypt sensitive files
-        env:
-          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
-          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-        run: |
-          git config --global user.email "${{ secrets.GIT_EMAIL }}"
-          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
-          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
-          chmod 600 ~/.gnupg/gpg-agent.conf
-          chmod 600 ~/.gnupg/gpg.conf
-          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
-          gpg-connect-agent reloadagent /bye || true
-          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
+          gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
 
       - name: Run Integration and UI Tests
         run: ./Alfie/scripts/run-integration-tests.sh
@@ -228,42 +149,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
-      - name: Cache Homebrew
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Set up iOS job
+        uses: ./.github/actions/setup-ios
         with:
-          path: |
-            ~/Library/Caches/Homebrew
-            /usr/local/Homebrew
-          key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
-          restore-keys: |
-            brew-${{ runner.os }}-
-
-      - name: Restore Ruby Gems
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: vendor/bundle
-          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
-          restore-keys: |
-            gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
-            gems-${{ runner.os }}-
-
-      - name: Restore Swift Package Manager Cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: |
-            ~/Library/Caches/org.swift.swiftpm
-            ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: |
-            spm-${{ runner.os }}-
-
-      - name: Install Homebrew formulas
-        run: brew bundle install
-
-      - name: Configure Bundler
-        run: |
-          bundle config set --local path 'vendor/bundle'
-          bundle install --jobs 4 --retry 3
+          gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          ruby: true
 
       - name: Set up SSH for match repo
         run: |
@@ -271,23 +163,6 @@ jobs:
           echo "${{ secrets.MATCH_GIT_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
-
-      - name: Import GPG Private Key and Decrypt sensitive files
-        env:
-          SECRETS_GPG_PRIVATE_KEY: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
-          SECRETS_GPG_PASSPHRASE: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-        run: |
-          git config --global user.email "${{ secrets.GIT_EMAIL }}"
-          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
-          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
-          chmod 600 ~/.gnupg/gpg-agent.conf
-          chmod 600 ~/.gnupg/gpg.conf
-          echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
-          gpg-connect-agent reloadagent /bye || true
-          git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
 
       - name: Build and deploy release to TestFlight
         run: bundle exec fastlane ios release --env default
