@@ -136,7 +136,7 @@ Treat them as correct, in review and when writing.
 | Table-driven `for` loops over cases | XCTest has no parameterized tests; the loop is the workaround. |
 | `do { … XCTFail() } catch is SomeError {}` on error paths | The typed `catch` expresses what `XCTAssertThrowsError`'s `Error`-typed closure cannot. The typed form is the house idiom. |
 | No `// Given` / `// When` / `// Then` labels | Blank lines separate the three phases already. Comments are spent on *why* a behaviour matters, citing the issue the behaviour comes from (`(#170)`). Older citations such as `(AC 5)` or `(Q36)` index specs retired in ADR-0005. |
-| No CI test retries | Retries suit unreliable external services; CI runs the unit plan only, so a flake there is a real bug. |
+| No CI test retries | Retries suit unreliable external services; CI runs the unit plan on mocks and the integration and UI plans on the Mock BFF's fixed seed, so a flake in any of them is a real bug. |
 | Test code is held to this document, not to SwiftLint | `Alfie/.swiftlint.yml` excludes `AlfieKit/Tests` and `AlfieKit/Sources/Mocks`, so no lint runs on either. Review test code against the rules above — naming, seams, the state matrix — and leave formatting alone. Lifting the exclusion is a repo-wide call, not a per-PR one. |
 
 
@@ -144,14 +144,36 @@ Treat them as correct, in review and when writing.
 
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
-  `BFFIntegrationTests` is the odd one out:
-  it runs against the Mock BFF, not mocks, and only when `verify.sh` runs without
-  `--only-unit`. It pins only to `SeedAnchors` (the `TestSeed` module), the Mock BFF's
-  seed anchors; "the first item" only where the assertion holds for any item. `SeedAnchors` is
-  generated: when the BFF adds an anchor a test needs, pull `Alfie-BFF` and run
-  `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff. `verify.sh` fails before the Mock BFF
-  boots when the committed file no longer matches the BFF checkout's anchors. What each anchor
-  promises is in the BFF's `docs/mock-platform.md` §Seed anchors.
+  `BFFIntegrationTests` is the odd one out: it runs against the Mock BFF, not mocks, in CI's
+  `bff-tests` job (§CI) and locally only when `verify.sh` runs without `--only-unit`. It pins only
+  to `SeedAnchors` (the `TestSeed` module), the Mock BFF's seed anchors; "the first item" only where
+  the assertion holds for any item. `SeedAnchors` is generated: when the BFF adds an anchor a test
+  needs, pull `Alfie-BFF` and run `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
+  `verify.sh` fails before the Mock BFF boots when the committed file no longer matches the BFF
+  checkout's anchors. What each anchor promises is in the BFF's `docs/mock-platform.md` §Seed
+  anchors.
+
+## CI
+
+The `Alfie CI/CD` workflow runs two test jobs on every PR that changes more than docs, in the merge
+queue and on `main`. `release` needs both.
+
+| Job | Runs |
+|---|---|
+| `unit-tests` | `Alfie.xctestplan` through fastlane |
+| `bff-tests` | `run-integration-tests.sh`: `AlfieIntegration.xctestplan` then `AlfieUI.xctestplan`, against the Mock BFF built from `Alfie-BFF` `main` |
+
+`bff-tests`:
+
+- writes the BFF commit it tested to the job summary, which tells an iOS break from a BFF break;
+- on failure or cancel (the timeout included) uploads the `bff-test-results` artifact (both result
+  bundles, the BFF log and the build log, kept 7 days);
+- is skipped on fork and Dependabot PRs, which get no secrets;
+- fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
+  newest;
+- reads the private `Alfie-BFF` through an org GitHub App with read-only Contents on that repo
+  alone. Its credentials are the repo secrets `BFF_READER_APP_CLIENT_ID` and
+  `BFF_READER_APP_PRIVATE_KEY`.
 
 ## Mocks and fixtures
 
