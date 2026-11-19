@@ -4,6 +4,7 @@ import Model
 
 public final class DeepLinkService: DeepLinkServiceProtocol {
     private var handlers: [DeepLinkHandlerProtocol]
+    private var areHandlersAvailable = false
     private let parsers: [DeepLinkParserProtocol]
     private let linkConfiguration: LinkConfigurationProtocol
     private let log: Logger
@@ -23,11 +24,13 @@ public final class DeepLinkService: DeepLinkServiceProtocol {
     // MARK: - DeepLinkServiceProtocol
 
     public func updateAvailabilityOfHandlers(to availability: Bool) {
+        areHandlersAvailable = availability
         handlers.forEach { $0.isReadyToHandleLinks = availability }
     }
 
     public func update(handlers: [DeepLinkHandlerProtocol]) {
         self.handlers = handlers
+        handlers.forEach { $0.isReadyToHandleLinks = areHandlersAvailable }
     }
 
     public func deepLinkType(_ url: URL) -> DeepLink.LinkType? {
