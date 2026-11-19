@@ -11,7 +11,7 @@ final class HighlightedAttributedStringTests: XCTestCase {
         XCTAssertEqual(parts, ["Lor", "lor"])
     }
 
-    func test_match_ignores_case() {
+    func test_term_in_another_case_is_highlighted() {
         let parts = highlightedParts(of: "Linen SHIRT", term: "shirt")
 
         XCTAssertEqual(parts, ["SHIRT"])
@@ -29,7 +29,7 @@ final class HighlightedAttributedStringTests: XCTestCase {
         XCTAssertEqual(parts, ["["])
     }
 
-    func test_dot_highlights_only_dots() {
+    func test_dot_term_highlights_only_dots() {
         let parts = highlightedParts(of: "st. ives", term: ".")
 
         XCTAssertEqual(parts, ["."])
@@ -47,7 +47,7 @@ final class HighlightedAttributedStringTests: XCTestCase {
         XCTAssertEqual(parts, [])
     }
 
-    func test_text_is_unchanged() {
+    func test_highlighting_a_term_keeps_the_text_unchanged() {
         let highlighted = NSAttributedString(string: "Linen Shirt")
             .hightlightedAttributedString(with: "shirt", font: highlightFont, color: .black)
 

@@ -378,6 +378,59 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(mockAnalytics.trackedValues(of: .searchTerm, for: .search), ["linen shirt"])
     }
 
+    func test_tapping_keyword_suggestion_with_surrounding_whitespace_uses_it_trimmed() {
+        var added: [RecentSearch] = []
+        mockRecentsService.onAdd = { added.append($0) }
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapKeywordSuggestion(.fixture(value: " linen shirt "))
+
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.productListing(searchTerm: "linen shirt", category: nil))])
+        XCTAssertEqual(added, [.text(value: "linen shirt")])
+        XCTAssertEqual(mockAnalytics.trackedValues(of: .searchTerm, for: .search), ["linen shirt"])
+    }
+
+    func test_tapping_keyword_suggestion_requests_no_suggestions() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertNoEmit(from: sut.$state) {
+            sut.didTapKeywordSuggestion(self.linenShirt)
+            self.scheduler.advance(by: .milliseconds(500))
+        }
+
+        XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
+    }
+
+    func test_view_appearing_again_after_keyword_tap_shows_suggestions_for_the_keyword() {
+        stubSuggestions { [shirt, dress] searchTerm in
+            .fixture(products: [searchTerm == "linen shirt" ? dress : shirt])
+        }
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+        sut.didTapKeywordSuggestion(linenShirt)
+
+        showSuggestions(in: sut) { sut.viewDidAppear() }
+
+        XCTAssertEqual(sut.state, .suggestions(.success([.products([dress])])))
+        XCTAssertEqual(
+            requests,
+            [SuggestionsRequest(searchTerm: "shirt", limit: 6), SuggestionsRequest(searchTerm: "linen shirt", limit: 6)]
+        )
+    }
+
+    func test_view_appearing_again_after_keyword_tap_requests_suggestions_only_once() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+        sut.didTapKeywordSuggestion(linenShirt)
+        showSuggestions(in: sut) { sut.viewDidAppear() }
+
+        XCTAssertNoEmit(from: sut.$state) {
+            sut.viewDidAppear()
+        }
+    }
+
     // MARK: - More Products
 
     func test_more_products_shows_search_results_for_current_search_term() {

@@ -40,7 +40,6 @@ struct SuggestionsView: View {
                             onSelect: onSelectProduct,
                             onMoreProducts: onMoreProducts
                         )
-                        .padding(.horizontal, theme.sizing.spacingSpacingMd)
                     }
                 }
             }

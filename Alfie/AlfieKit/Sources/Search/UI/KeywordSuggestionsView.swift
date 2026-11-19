@@ -19,8 +19,7 @@ struct KeywordSuggestionsView: View {
 
     var body: some View {
         VStack(spacing: theme.sizing.spacingSpacingNone) {
-            Text.build(theme.font.heading.xSmall(L10n.Search.Screen.SuggestionsTerms.Header.title))
-                .frame(maxWidth: .infinity, alignment: .leading)
+            SearchSectionHeader(title: L10n.Search.Screen.SuggestionsTerms.Header.title)
                 .padding(.horizontal, theme.sizing.spacingSpacingMd)
                 .padding(.bottom, theme.sizing.spacingSpacingXs)
 
@@ -39,7 +38,7 @@ struct KeywordSuggestionsView: View {
                 .modifier(
                     TapHighlightableModifier(
                         action: { onSelect(keyword) },
-                        accessibilityId: AccessibilityID.Search.keywordSuggestionItem
+                        accessibilityId: AccessibilityID.Search.keywordSuggestion(value: keyword.value)
                     )
                 )
             }

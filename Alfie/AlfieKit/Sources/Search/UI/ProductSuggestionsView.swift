@@ -23,8 +23,7 @@ struct ProductSuggestionsView: View {
 
     var body: some View {
         VStack(spacing: theme.sizing.spacingSpacingMd) {
-            Text.build(theme.font.heading.xSmall(L10n.Search.Screen.SuggestionsProducts.Header.title))
-                .frame(maxWidth: .infinity, alignment: .leading)
+            SearchSectionHeader(title: L10n.Search.Screen.SuggestionsProducts.Header.title)
 
             LazyVGrid(columns: columns, spacing: theme.sizing.spacingSpacingMd) {
                 ForEach(products) { product in
@@ -45,6 +44,7 @@ struct ProductSuggestionsView: View {
             )
             .accessibilityIdentifier(AccessibilityID.Search.moreProductsButton)
         }
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private var columns: [GridItem] {
