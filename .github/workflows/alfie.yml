@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
 
       - name: Cache Xcode DerivedData
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -75,7 +77,6 @@ jobs:
     timeout-minutes: 45
     env:
       BFF_CHECKOUT: Alfie-BFF
-      NODE_VERSION: 20
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -108,7 +109,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: ${{ env.BFF_CHECKOUT }}/.nvmrc
           cache: yarn
           cache-dependency-path: ${{ env.BFF_CHECKOUT }}/yarn.lock
 
@@ -116,7 +117,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ env.BFF_CHECKOUT }}/node_modules
-          key: bff-node-modules-${{ runner.os }}-node${{ env.NODE_VERSION }}-${{ hashFiles(format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
+          key: bff-node-modules-${{ runner.os }}-${{ hashFiles(format('{0}/.nvmrc', env.BFF_CHECKOUT), format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
 
       - name: Set up iOS job
         uses: ./.github/actions/setup-ios

@@ -87,12 +87,11 @@ if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
     ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
 fi
 
-# --- Simulator: the pinned iPhone unit tests use; outside CI, else the newest
-SIMULATOR_ID="$(pinned_iphone_udid)"
-if [ -z "$SIMULATOR_ID" ]; then
-    [ -z "$CI" ] || fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
-    SIMULATOR_ID="$(newest_iphone | cut -d' ' -f1)"
+# --- Simulator: iPhone on the pinned iOS; outside CI, else the newest --------
+if [ -n "$CI" ] && [ -z "$(pinned_iphone_udid)" ]; then
+    fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
 fi
+SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"

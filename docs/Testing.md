@@ -144,8 +144,8 @@ Treat them as correct, in review and when writing.
 
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
-  `BFFIntegrationTests` is the odd one out: it runs against the Mock BFF, not mocks: in CI's
-  `bff-tests` job (§CI), and locally only when `verify.sh` runs without `--only-unit`. It pins only
+  `BFFIntegrationTests` is the odd one out: it runs against the Mock BFF, not mocks, in CI's
+  `bff-tests` job (§CI) and locally only when `verify.sh` runs without `--only-unit`. It pins only
   to `SeedAnchors` (the `TestSeed` module), the Mock BFF's seed anchors; "the first item" only where
   the assertion holds for any item. `SeedAnchors` is generated: when the BFF adds an anchor a test
   needs, pull `Alfie-BFF` and run `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
