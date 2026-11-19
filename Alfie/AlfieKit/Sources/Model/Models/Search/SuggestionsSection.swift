@@ -4,12 +4,12 @@ public enum SuggestionsSection: Equatable, Identifiable {
     case keywords([KeywordSuggestion])
     case products([ProductSuggestion])
 
-    public enum ID {
+    public enum Kind {
         case keywords
         case products
     }
 
-    public var id: ID {
+    public var id: Kind {
         switch self {
         case .keywords:
             .keywords

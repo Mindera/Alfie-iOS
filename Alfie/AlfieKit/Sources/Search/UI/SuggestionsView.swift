@@ -54,7 +54,7 @@ struct SuggestionsView: View {
     SuggestionsView(
         sections: [
             .keywords([.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")]),
-            .products([.fixture(id: "1"), .fixture(id: "2")])
+            .products([.fixture(id: "1"), .fixture(id: "2")]),
         ],
         searchTerm: "shirt",
         onSelectKeyword: { _ in },

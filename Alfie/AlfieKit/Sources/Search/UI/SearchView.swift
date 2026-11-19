@@ -146,7 +146,7 @@ extension SearchView {
                 .success(
                     [
                         .keywords([.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")]),
-                        .products([.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")])
+                        .products([.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]),
                     ]
                 )
             ),
