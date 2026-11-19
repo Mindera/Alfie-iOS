@@ -135,7 +135,7 @@ jobs:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
 
       - name: Upload Test Results
-        if: failure()
+        if: failure() || cancelled()
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: bff-test-results

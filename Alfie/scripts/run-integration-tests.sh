@@ -5,7 +5,8 @@
 # products of an earlier build-for-testing (verify.sh's build step).
 # ALFIE_BFF_START_CMD overrides the start command (e.g. a Live BFF platform); set
 # ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF.
-# ALFIE_XCODEBUILD_ARGS adds space-separated flags to every xcodebuild call (CI's package flags).
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to this script's xcodebuild calls (CI's package
+# flags).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched. The BFF's output goes to /tmp/alfie_bff.log.
 
