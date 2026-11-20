@@ -9,6 +9,7 @@ public protocol SearchViewModelProtocol: ObservableObject {
     var recentSearchesViewModel: RecentSearchesViewModel { get }
 
     func onSubmitSearch()
+    func didTapKeywordSuggestion(_ keywordSuggestion: KeywordSuggestion)
     func didTapProductSuggestion(_ productSuggestion: ProductSuggestion)
     func didTapMoreProducts()
     func didTapRetrySuggestions()

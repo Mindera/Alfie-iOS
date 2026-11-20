@@ -107,6 +107,23 @@ A Search term or brand the shopper searched for before, kept on the device and o
 Search term is empty.
 _Avoid_: search history, recents
 
+**Suggestion**:
+A hint offered for a partly typed Search term, before the shopper submits it. Exactly three kinds:
+**Keyword suggestion**, **Brand suggestion**, **Product suggestion**. A platform may offer none of a
+kind.
+_Avoid_: autocomplete, typeahead, hint, search result
+
+**Keyword suggestion**:
+A Suggestion that is a fuller Search term. Choosing it shows the Search results for that term.
+_Avoid_: term suggestion, query suggestion
+
+**Brand suggestion**:
+A Suggestion that is a brand. Choosing it shows that brand's Products.
+
+**Product suggestion**:
+A Suggestion that is one Product. Choosing it opens its PDP.
+_Avoid_: product preview
+
 ### Failures
 
 **Server error**:

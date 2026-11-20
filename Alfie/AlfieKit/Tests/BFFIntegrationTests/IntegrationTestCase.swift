@@ -92,6 +92,12 @@ class IntegrationTestCase: XCTestCase {
         }
     }
 
+    func skipUnlessShopifyBFF(_ reason: String) throws {
+        if ProcessInfo.processInfo.environment["ALFIE_BFF_PLATFORM"] != "shopify" {
+            throw XCTSkip(reason)
+        }
+    }
+
     /// The probe must derive `/graphql` exactly as `BFFClientService` does, so the readiness check
     /// and the real requests target the same URL.
     var graphQLEndpoint: URL {

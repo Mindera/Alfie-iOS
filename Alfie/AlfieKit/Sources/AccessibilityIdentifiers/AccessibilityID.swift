@@ -66,6 +66,10 @@ public enum AccessibilityID {
         public static let suggestionsRetryButton = "search.suggestions.error.retry.button"
         public static let noResults = "search.suggestions.noResults.view"
 
+        public static func keywordSuggestion(value: String) -> String {
+            "search.suggestions.keyword.\(value).button"
+        }
+
         public static func productSuggestion(id: String) -> String {
             "search.suggestions.product.\(id).button"
         }

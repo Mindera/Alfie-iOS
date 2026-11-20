@@ -15,10 +15,11 @@ public final class SearchViewModel: SearchViewModelProtocol {
 
     private let dependencies: SearchDependencyContainer
     private var subscriptions: Set<AnyCancellable> = .init()
-    private var searchTerm = ""
     private var suggestionsTask: Task<Void, Never>?
     private var suggestionsGeneration = 0
+    private var areSuggestionsOutdated = false
     @Published public var state: SearchViewState = .blank
+    private var searchTerm = ""
     @Published public var searchText: String {
         didSet {
             handleSearchTextChange()
@@ -80,10 +81,11 @@ extension SearchViewModel {
         guard !searchTerm.isEmpty else {
             return
         }
-        dependencies.recentsService?.add(.text(value: searchTerm))
-        dependencies.analytics.trackSearch(term: searchTerm)
-        searchText = searchTerm
-        showResults(for: searchTerm)
+        submit(searchTerm)
+    }
+
+    public func didTapKeywordSuggestion(_ keywordSuggestion: KeywordSuggestion) {
+        submit(keywordSuggestion.value.trim())
     }
 
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
@@ -100,6 +102,9 @@ extension SearchViewModel {
 
     public func viewDidAppear() {
         showRecentSearchesIfSearchTermIsBlank()
+        if areSuggestionsOutdated {
+            loadSuggestions(debounced: false)
+        }
     }
 
     public func viewDidDisappear() {
@@ -132,6 +137,7 @@ extension SearchViewModel {
     private func cancelPendingSuggestions() {
         suggestionsTask?.cancel()
         suggestionsGeneration += 1
+        areSuggestionsOutdated = false
     }
 
     private func loadSuggestions(debounced: Bool) {
@@ -160,9 +166,10 @@ extension SearchViewModel {
                     searchTerm: requestedSearchTerm,
                     limit: Constants.suggestionsLimit
                 )
-                newState = suggestions.products.isEmpty
+                let sections = Self.sections(from: suggestions)
+                newState = sections.isEmpty
                     ? .suggestions(.error(.noResults(searchTerm: requestedSearchTerm)))
-                    : .suggestions(.success(suggestions))
+                    : .suggestions(.success(.init(searchTerm: requestedSearchTerm, sections: sections)))
             } catch {
                 newState = .suggestions(.error(.generic(searchTerm: requestedSearchTerm)))
             }
@@ -172,6 +179,30 @@ extension SearchViewModel {
             }
             state = newState
         }
+    }
+
+    private static func sections(from suggestions: SearchSuggestions) -> [SuggestionsSection] {
+        let keywords = suggestions.keywords.uniqued { $0.value.lowercased() }
+        var sections: [SuggestionsSection] = []
+        if !keywords.isEmpty {
+            sections.append(.keywords(keywords))
+        }
+        if !suggestions.products.isEmpty {
+            sections.append(.products(suggestions.products))
+        }
+        return sections
+    }
+
+    private func submit(_ term: String) {
+        dependencies.recentsService?.add(.text(value: term))
+        dependencies.analytics.trackSearch(term: term)
+        if term != searchTerm {
+            cancelPendingSuggestions()
+            searchTerm = term
+            areSuggestionsOutdated = true
+        }
+        searchText = term
+        showResults(for: term)
     }
 
     private func showResults(for searchTerm: String) {

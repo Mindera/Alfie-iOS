@@ -8,5 +8,5 @@ public enum SearchSuggestionsViewErrorType: Error, Equatable {
 public enum SearchViewState: Equatable {
     case blank
     case recentSearches
-    case suggestions(ViewState<SearchSuggestions, SearchSuggestionsViewErrorType>)
+    case suggestions(ViewState<SuggestionsContent, SearchSuggestionsViewErrorType>)
 }

@@ -22,32 +22,29 @@ struct ProductSuggestionsView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: theme.sizing.spacingSpacingMd) {
-                Text.build(theme.font.heading.xSmall(L10n.Search.Screen.SuggestionsProducts.Header.title))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(spacing: theme.sizing.spacingSpacingMd) {
+            SearchSectionHeader(title: L10n.Search.Screen.SuggestionsProducts.Header.title)
 
-                LazyVGrid(columns: columns, spacing: theme.sizing.spacingSpacingMd) {
-                    ForEach(products) { product in
-                        Button(action: { onSelect(product) }, label: {
-                            VerticalProductCard(viewModel: cardViewModel(for: product)) { _, _ in }
-                                .fixedSize(horizontal: false, vertical: true)
-                                .contentShape(Rectangle())
-                        })
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier(AccessibilityID.Search.productSuggestion(id: product.id))
-                    }
+            LazyVGrid(columns: columns, spacing: theme.sizing.spacingSpacingMd) {
+                ForEach(products) { product in
+                    Button(action: { onSelect(product) }, label: {
+                        VerticalProductCard(viewModel: cardViewModel(for: product)) { _, _ in }
+                            .fixedSize(horizontal: false, vertical: true)
+                            .contentShape(Rectangle())
+                    })
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier(AccessibilityID.Search.productSuggestion(id: product.id))
                 }
-
-                ThemedButton(
-                    text: L10n.Search.Screen.Suggestions.More.Button.cta,
-                    style: .secondary,
-                    action: onMoreProducts
-                )
-                .accessibilityIdentifier(AccessibilityID.Search.moreProductsButton)
             }
-            .padding(theme.sizing.spacingSpacingMd)
+
+            ThemedButton(
+                text: L10n.Search.Screen.Suggestions.More.Button.cta,
+                style: .secondary,
+                action: onMoreProducts
+            )
+            .accessibilityIdentifier(AccessibilityID.Search.moreProductsButton)
         }
+        .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
 
     private var columns: [GridItem] {
