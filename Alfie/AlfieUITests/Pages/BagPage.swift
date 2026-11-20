@@ -25,7 +25,7 @@ final class BagPage {
     /// The narrowing is deliberate but not free: a line the BFF sent without a slug stays a plain
     /// container and is invisible here, so counts taken from this query are counts of openable
     /// rows. Every line of a real cart carries a slug — `CartIntegrationTests` asserts exactly
-    /// that — so against a live BFF this is every line.
+    /// that — so against the BFF this is every line.
     var lineItems: XCUIElementQuery {
         app.buttons.matching(
             identifierPrefix: AccessibilityID.Bag.lineItemPrefix,
@@ -33,12 +33,8 @@ final class BagPage {
         )
     }
 
-    var grandTotal: XCUIElement {
-        app.descendants(matching: .any)[AccessibilityID.Bag.grandTotal]
-    }
-
-    var continueButton: XCUIElement {
-        app.buttons[AccessibilityID.Bag.continueButton]
+    var emptyState: XCUIElement {
+        app.descendants(matching: .any)[AccessibilityID.Bag.emptyState]
     }
 
     // MARK: - Actions
