@@ -83,22 +83,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Mint Alfie-BFF read token
-        id: bff-token
-        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
-        with:
-          client-id: ${{ secrets.BFF_READER_APP_CLIENT_ID }}
-          private-key: ${{ secrets.BFF_READER_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: Alfie-BFF
-          permission-contents: read
-
       - name: Checkout Alfie-BFF main
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           repository: ${{ github.repository_owner }}/Alfie-BFF
           ref: main
-          token: ${{ steps.bff-token.outputs.token }}
+          token: ${{ secrets.BFF_READ_TOKEN }}
           path: ${{ env.BFF_CHECKOUT }}
           persist-credentials: false
 

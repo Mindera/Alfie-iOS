@@ -171,9 +171,9 @@ queue and on `main`. `release` needs both.
 - is skipped on fork and Dependabot PRs, which get no secrets;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
-- reads the private `Alfie-BFF` through an org GitHub App with read-only Contents on that repo
-  alone. Its credentials are the repo secrets `BFF_READER_APP_CLIENT_ID` and
-  `BFF_READER_APP_PRIVATE_KEY`.
+- reads the private `Alfie-BFF` with the repo secret `BFF_READ_TOKEN`, a fine-grained personal
+  access token with read-only Contents on that repo alone. It belongs to one person and expires:
+  when the BFF checkout fails on authentication, renew it.
 
 ## Mocks and fixtures
 
