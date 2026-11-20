@@ -24,6 +24,11 @@ public final class MockSearchViewModel: SearchViewModelProtocol {
         onDidTapKeywordSuggestionCalled?(keywordSuggestion)
     }
 
+    public var onDidTapBrandSuggestionCalled: ((BrandSuggestion) -> Void)?
+    public func didTapBrandSuggestion(_ brandSuggestion: BrandSuggestion) {
+        onDidTapBrandSuggestionCalled?(brandSuggestion)
+    }
+
     public var onDidTapProductSuggestionCalled: ((ProductSuggestion) -> Void)?
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
         onDidTapProductSuggestionCalled?(productSuggestion)

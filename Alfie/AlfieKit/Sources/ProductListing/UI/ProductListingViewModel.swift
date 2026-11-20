@@ -10,6 +10,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let dependencies: ProductListingDependencyContainer
     private let category: String?
     private let query: String?
+    private let pinnedBrandKey: String?
     private let mode: ProductListingViewMode
     @Published public var style: ProductListingListStyle
     @Published public var showRefine = false
@@ -51,6 +52,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         mode == .searchResults ? query : nil
     }
 
+    public var isBrandListing: Bool {
+        pinnedBrandKey != nil
+    }
+
     public var totalNumberOfProducts: Int {
         pager.pagination?.totalCount ?? 0
     }
@@ -67,6 +72,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         dependencies: ProductListingDependencyContainer,
         category: String? = nil,
         searchText: String? = nil,
+        pinnedBrandKey: String? = nil,
         sort: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
@@ -77,6 +83,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
         self.category = category
+        self.pinnedBrandKey = pinnedBrandKey
         self.mode = mode
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
@@ -265,8 +272,13 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
                 searchTerm: searchTerm,
                 after: after,
                 sort: sortOption,
-                filters: filters
+                filters: searchFilters
             )
         }
+    }
+
+    private var searchFilters: ProductFilterInput? {
+        guard let pinnedBrandKey else { return filters }
+        return (filters ?? .init()).withBrandNames([pinnedBrandKey])
     }
 }

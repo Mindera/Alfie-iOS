@@ -27,6 +27,19 @@ public struct ProductFilterInput: Hashable {
     }
 }
 
+public extension ProductFilterInput {
+    func withBrandNames(_ brandNames: [String]?) -> ProductFilterInput {
+        .init(
+            brandNames: brandNames,
+            inventory: inventory,
+            maxPrice: maxPrice,
+            metafields: metafields,
+            minPrice: minPrice,
+            productTypes: productTypes
+        )
+    }
+}
+
 /// Domain-side mirror of the BFF's `MetafieldFilterInput`.
 public struct MetafieldFilterInput: Hashable {
     public let key: String

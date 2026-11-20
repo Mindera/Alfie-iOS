@@ -101,6 +101,17 @@ public final class TabOverlayCoordinator {
                 )
             )
 
+        case .brandListing(let key, let name):
+            return AnyView(
+                ProductListingView(
+                    viewModel: makeProductListingViewModelForSearch(
+                        searchTerm: name,
+                        category: nil,
+                        pinnedBrandKey: key
+                    )
+                )
+            )
+
         case .productDetails(let productID, let product):
             let configuration: ProductDetailsConfiguration
             if let product {
@@ -125,12 +136,14 @@ public final class TabOverlayCoordinator {
 
     private func makeProductListingViewModelForSearch(
         searchTerm: String?,
-        category: String?
+        category: String?,
+        pinnedBrandKey: String? = nil
     ) -> some ProductListingViewModelProtocol {
         ProductListingViewModel(
             dependencies: dependencies.productListing,
             category: category,
             searchText: searchTerm,
+            pinnedBrandKey: pinnedBrandKey,
             urlQueryParameters: nil,
             mode: .searchResults,
             navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },

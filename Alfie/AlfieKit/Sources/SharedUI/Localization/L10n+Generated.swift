@@ -661,7 +661,7 @@ public enum L10n {
       }
       public enum SuggestionsBrands {
         public enum Header {
-          /// Brand
+          /// Brands
           public static let title = L10n.tr("L10n", "search.screen.suggestions_brands.header.title")
         }
       }

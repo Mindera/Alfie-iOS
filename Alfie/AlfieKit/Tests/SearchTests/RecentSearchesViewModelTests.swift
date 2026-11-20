@@ -1,5 +1,6 @@
 import Combine
 import Mocks
+import Model
 import XCTest
 import TestUtils
 @testable import Search
@@ -40,17 +41,26 @@ final class RecentSearchesViewModelTests: XCTestCase {
         waitForExpectations(timeout: .default)
     }
 
-    private func makeSUT(showResults: @escaping (String) -> Void = { _ in }) -> RecentSearchesViewModel {
+    private func makeSUT(showResults: @escaping (RecentSearch) -> Void = { _ in }) -> RecentSearchesViewModel {
         RecentSearchesViewModel(recentsService: mockRecentsService, showResults: showResults)
     }
 
-    func test_did_tap_recent_search_shows_results_for_its_search_term() {
-        var capturedTerms: [String] = []
-        sut = makeSUT { capturedTerms.append($0) }
+    func test_did_tap_search_term_recent_search_shows_results_for_it() {
+        var captured: [RecentSearch] = []
+        sut = makeSUT { captured.append($0) }
 
         sut.didTapRecentSearch(.text(value: "linen"))
 
-        XCTAssertEqual(capturedTerms, ["linen"])
+        XCTAssertEqual(captured, [.text(value: "linen")])
+    }
+
+    func test_did_tap_brand_recent_search_shows_results_for_it() {
+        var captured: [RecentSearch] = []
+        sut = makeSUT { captured.append($0) }
+
+        sut.didTapRecentSearch(.brand(name: "Acme", key: "acme-key"))
+
+        XCTAssertEqual(captured, [.brand(name: "Acme", key: "acme-key")])
     }
 
     func test_OnViewDidDisappear_InRecentsService_CallsSave() {

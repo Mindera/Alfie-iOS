@@ -48,6 +48,43 @@ final class RecentsServiceTests: XCTestCase {
         XCTAssertNoEmit(from: sut.recentSearchesPublisher, afterTrigger: { self.sut.add(.recentSearch1) })
     }
 
+    func test_add_brand_with_same_text_as_a_search_term_keeps_both_entries() {
+        sut.add(.text(value: "Acme"))
+
+        sut.add(.brand(name: "Acme", key: "acme-key"))
+
+        XCTAssertEqual(sut.recentSearches, [.brand(name: "Acme", key: "acme-key"), .text(value: "Acme")])
+    }
+
+    func test_add_brand_already_saved_keeps_one_entry() {
+        sut.add(.brand(name: "Acme", key: "acme-key"))
+
+        sut.add(.brand(name: "Acme", key: "acme-key"))
+
+        XCTAssertEqual(sut.recentSearches, [.brand(name: "Acme", key: "acme-key")])
+    }
+
+    func test_stored_brands_from_before_brand_keys_are_dropped_and_search_terms_kept() {
+        let stored = Data(
+            """
+            [
+                {"text": {"value": "jeans"}},
+                {"reccomendation": {"value": "Gucci", "path": "/brand/gucci"}},
+                {"brand": {"name": "Acme", "key": "acme-key"}},
+                {"text": {"value": "linen"}}
+            ]
+            """.utf8
+        )
+        mockStorageService.onLoadCalled = { _, type, _ in try JSONDecoder().decode(type, from: stored) }
+
+        sut = .init(autoSaveEnabled: true, storageService: mockStorageService, storageKey: "")
+
+        XCTAssertEqual(
+            sut.recentSearches,
+            [.text(value: "jeans"), .brand(name: "Acme", key: "acme-key"), .text(value: "linen")]
+        )
+    }
+
     func test_AddRecentSearch_WithMaxItems_RemovesLastItem() {
         let expectedRecentSearches: [RecentSearch] = [
             .recentSearch6,
