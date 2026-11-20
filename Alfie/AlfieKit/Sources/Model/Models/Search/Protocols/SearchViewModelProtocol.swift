@@ -10,6 +10,7 @@ public protocol SearchViewModelProtocol: ObservableObject {
 
     func onSubmitSearch()
     func didTapKeywordSuggestion(_ keywordSuggestion: KeywordSuggestion)
+    func didTapBrandSuggestion(_ brandSuggestion: BrandSuggestion)
     func didTapProductSuggestion(_ productSuggestion: ProductSuggestion)
     func didTapMoreProducts()
     func didTapRetrySuggestions()

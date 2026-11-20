@@ -70,6 +70,10 @@ public enum AccessibilityID {
             "search.suggestions.keyword.\(value).button"
         }
 
+        public static func brandSuggestion(key: String) -> String {
+            "search.suggestions.brand.\(key).button"
+        }
+
         public static func productSuggestion(id: String) -> String {
             "search.suggestions.product.\(id).button"
         }

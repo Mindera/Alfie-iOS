@@ -133,6 +133,7 @@ public struct ProductListingView<ViewModel: ProductListingViewModelProtocol>: Vi
                 listStyle: $viewModel.style,
                 priceBounds: viewModel.priceBounds,
                 appliedFilters: viewModel.filters,
+                isBrandPinned: viewModel.isBrandListing,
                 appliedSort: viewModel.sortOption.flatMap(SortByType.init(rawValue:))
             ) { filters, sort in
                 viewModel.didApplyFilters(filters, sort: sort?.rawValue)

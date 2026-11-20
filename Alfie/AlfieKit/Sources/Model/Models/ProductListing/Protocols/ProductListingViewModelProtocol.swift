@@ -18,6 +18,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     var priceBounds: PriceFilterBounds? { get }
     var title: String { get }
     var searchTerm: String? { get }
+    var isBrandListing: Bool { get }
     var totalNumberOfProducts: Int { get }
     var showSearchButton: Bool { get }
     var isWishlistEnabled: Bool { get }

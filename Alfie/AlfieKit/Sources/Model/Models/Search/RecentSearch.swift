@@ -1,14 +1,16 @@
 public enum RecentSearch {
     case text(value: String)
-    case reccomendation(value: String, path: String)
+    case brand(name: String, key: String)
 }
 
 public extension RecentSearch {
     var value: String {
         switch self {
-        case .text(let value),
-             .reccomendation(let value, _): // swiftlint:disable:this indentation_width
-            return value
+        case .text(let value):
+            value
+
+        case .brand(let name, _):
+            name
         }
     }
 }

@@ -68,6 +68,7 @@ extension SearchView {
                 sections: content.sections,
                 searchTerm: content.searchTerm,
                 onSelectKeyword: { viewModel.didTapKeywordSuggestion($0) },
+                onSelectBrand: { viewModel.didTapBrandSuggestion($0) },
                 onSelectProduct: { viewModel.didTapProductSuggestion($0) },
                 onMoreProducts: { viewModel.didTapMoreProducts() }
             )
@@ -148,6 +149,7 @@ extension SearchView {
                         searchTerm: "shirt",
                         sections: [
                             .keywords([.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")]),
+                            .brands([.fixture(key: "shirt-co", name: "The Shirt Co")]),
                             .products([.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]),
                         ]
                     )

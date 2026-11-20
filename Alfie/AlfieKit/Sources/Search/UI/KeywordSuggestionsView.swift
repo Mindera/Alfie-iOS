@@ -24,22 +24,11 @@ struct KeywordSuggestionsView: View {
                 .padding(.bottom, theme.sizing.spacingSpacingXs)
 
             ForEach(keywords, id: \.value) { keyword in
-                Text.build(
-                    theme.font.body.medium(keyword.value),
-                    highlighting: searchTerm,
-                    font: theme.font.body.mediumBold.uiFont,
-                    color: theme.color.contentContentPrimary
-                )
-                .foregroundStyle(theme.color.contentContentPrimary)
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, theme.sizing.spacingSpacingMd)
-                .padding(.vertical, theme.sizing.spacingSpacingSm)
-                .modifier(
-                    TapHighlightableModifier(
-                        action: { onSelect(keyword) },
-                        accessibilityId: AccessibilityID.Search.keywordSuggestion(value: keyword.value)
-                    )
+                SuggestionRow(
+                    text: keyword.value,
+                    searchTerm: searchTerm,
+                    accessibilityId: AccessibilityID.Search.keywordSuggestion(value: keyword.value),
+                    onSelect: { onSelect(keyword) }
                 )
             }
         }

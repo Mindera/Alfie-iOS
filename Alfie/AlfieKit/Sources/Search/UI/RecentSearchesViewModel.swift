@@ -3,14 +3,14 @@ import Model
 
 public final class RecentSearchesViewModel: RecentSearchesViewModelProtocol {
     private let recentsService: RecentsServiceProtocol?
-    private let showResults: (String) -> Void
+    private let showResults: (RecentSearch) -> Void
     private var subscriptions: Set<AnyCancellable> = []
 
     @Published public var recentSearches: [RecentSearch]
 
     init(
         recentsService: RecentsServiceProtocol?,
-        showResults: @escaping (String) -> Void
+        showResults: @escaping (RecentSearch) -> Void
     ) {
         self.recentsService = recentsService
         self.showResults = showResults
@@ -21,7 +21,7 @@ public final class RecentSearchesViewModel: RecentSearchesViewModelProtocol {
     }
 
     public func didTapRecentSearch(_ recentSearch: RecentSearch) {
-        showResults(recentSearch.value)
+        showResults(recentSearch)
     }
 
     public func didTapRemove(on recentSearch: RecentSearch) {
