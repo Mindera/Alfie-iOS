@@ -124,6 +124,7 @@ jobs:
           ./Alfie/scripts/run-integration-tests.sh
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
+          BOOT_TIMEOUT: 600
 
       - name: Upload Test Results
         if: failure() || cancelled()
