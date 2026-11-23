@@ -49,7 +49,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public var searchTerm: String? {
-        mode == .searchResults ? query : nil
+        mode == .searchResults ? brand?.name ?? query : nil
     }
 
     public var totalNumberOfProducts: Int {
@@ -86,7 +86,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.brand = brand
         self.mode = mode
         sortOption = sort
-        query = brand?.name ?? searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
+        query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         let initialState: ProductListingPager.State = .loadingFirstPage(
             .init(title: "", products: Product.skeletons(count: skeletonItemsSize))
         )
@@ -267,7 +267,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             )
 
         case .searchResults:
-            guard let searchTerm = query else { return nil }
+            guard let searchTerm = isBrandListing ? "" : query else { return nil }
             return try await dependencies.productListingService.searchPage(
                 searchTerm: searchTerm,
                 after: after,

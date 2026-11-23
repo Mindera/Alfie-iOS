@@ -280,13 +280,13 @@ final class ProductListingViewModelTests: XCTestCase {
 
     // MARK: - Brand listing
 
-    func test_brand_listing_searches_the_brand_name_pinned_to_its_key() {
+    func test_brand_listing_searches_a_blank_term_pinned_to_the_brand_key_and_shows_the_brand_name() {
         sut = makeBrandListingSUT()
         let searches = recordSearches()
 
         XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
-        XCTAssertEqual(searches.all, [.init(searchTerm: "Acme", after: nil, sort: nil, filters: .init(brandNames: ["acme-key"]))])
+        XCTAssertEqual(searches.all, [.init(searchTerm: "", after: nil, sort: nil, filters: .init(brandNames: ["acme-key"]))])
         XCTAssertEqual(sut.searchTerm, "Acme")
         XCTAssertTrue(sut.isBrandListing)
     }
@@ -321,7 +321,7 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(
             searches.all.last,
             .init(
-                searchTerm: "Acme",
+                searchTerm: "",
                 after: nil,
                 sort: "PRICE_ASC",
                 filters: .init(brandNames: ["acme-key"], maxPrice: 120, minPrice: 40, productTypes: ["Bags"])
@@ -348,7 +348,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertEqual(
             searches.all.last,
-            .init(searchTerm: "Acme", after: "cursor-1", sort: nil, filters: .init(brandNames: ["acme-key"]))
+            .init(searchTerm: "", after: "cursor-1", sort: nil, filters: .init(brandNames: ["acme-key"]))
         )
     }
 

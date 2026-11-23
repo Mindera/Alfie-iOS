@@ -121,8 +121,8 @@ _Avoid_: term suggestion, query suggestion
 A Suggestion that is a brand. Choosing it shows that brand's Products.
 
 **Brand listing**:
-The Search results a shopper reaches by choosing a Brand suggestion or a brand Recent search: a search
-for the brand's name, limited to that brand.
+The Search results a shopper reaches by choosing a Brand suggestion or a brand Recent search: every
+Product of that brand, with the brand's name shown where the Search term normally is.
 _Avoid_: brand page, brand PLP
 
 **Product suggestion**:
