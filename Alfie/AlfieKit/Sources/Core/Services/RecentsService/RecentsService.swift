@@ -28,15 +28,13 @@ public final class RecentsService: RecentsServiceProtocol {
 
     public func add(_ recentSearch: RecentSearch) {
         guard
-            !recentSearches.contains(where: recentSearch.isSameSearch(as:)),
+            !recentSearches.contains(recentSearch),
             !recentSearch.value.isEmpty
         else {
             return
         }
-        if recentSearches.count >= Constants.recentSearchesCountLimit {
-            recentSearchesSubject.value.removeLast()
-        }
-        recentSearchesSubject.value.insert(recentSearch, at: 0)
+        let otherSearches = recentSearches.filter { !$0.isSameSearch(as: recentSearch) }
+        recentSearchesSubject.value = Array(([recentSearch] + otherSearches).prefix(Constants.recentSearchesCountLimit))
         hasPendingChanges = true
         saveIfNeeded()
     }

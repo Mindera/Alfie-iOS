@@ -48,12 +48,22 @@ final class RecentsServiceTests: XCTestCase {
         XCTAssertNoEmit(from: sut.recentSearchesPublisher, afterTrigger: { self.sut.add(.recentSearch1) })
     }
 
-    func test_add_brand_with_same_text_as_a_search_term_keeps_both_entries() {
-        sut.add(.text(value: "Acme"))
+    func test_add_brand_named_like_a_saved_search_term_replaces_it() {
+        sut.add(.text(value: "acme"))
+        sut.add(.recentSearch1)
 
         sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme")), .text(value: "Acme")])
+        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme")), .recentSearch1])
+    }
+
+    func test_add_search_term_named_like_a_saved_brand_replaces_it() {
+        sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
+        sut.add(.recentSearch1)
+
+        sut.add(.text(value: "acme"))
+
+        XCTAssertEqual(sut.recentSearches, [.text(value: "acme"), .recentSearch1])
     }
 
     func test_add_brand_already_saved_keeps_one_entry() {
@@ -64,12 +74,12 @@ final class RecentsServiceTests: XCTestCase {
         XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme"))])
     }
 
-    func test_add_brand_already_saved_under_another_name_keeps_the_saved_entry() {
+    func test_add_brand_already_saved_under_another_name_keeps_only_the_new_name() {
         sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
 
         sut.add(.brand(.fixture(key: "acme-key", name: "Acme Ltd")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme"))])
+        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme Ltd"))])
     }
 
     func test_stored_brands_from_before_brand_keys_are_dropped_and_search_terms_kept() {

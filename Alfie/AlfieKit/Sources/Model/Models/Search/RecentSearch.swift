@@ -15,13 +15,10 @@ public extension RecentSearch {
     }
 
     func isSameSearch(as other: RecentSearch) -> Bool {
-        switch (self, other) {
-        case let (.brand(brand), .brand(otherBrand)):
-            brand.key == otherBrand.key
-
-        default:
-            self == other
+        if case let (.brand(brand), .brand(otherBrand)) = (self, other), brand.key == otherBrand.key {
+            return true
         }
+        return value.caseInsensitiveCompare(other.value) == .orderedSame
     }
 }
 
