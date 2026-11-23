@@ -41,7 +41,7 @@ References are pixel comparisons, so rendering must be comparable between record
 - **Language pinned in the test plan.** `Alfie.xctestplan` runs tests in `en` / `US` whatever the
   simulator's own language: a `vi` preferred language adds line height and fails every text snapshot.
 
-`SNAPSHOT_OS_VERSION` (in `Alfie/scripts/test-for-verification.sh`, default `26.4`) pins the exact
+`SNAPSHOT_OS_VERSION` (in `Alfie/scripts/simulator.sh`, default `26.4`) pins the exact
 iOS **major.minor** references are recorded on, and must stay in lockstep with `SCAN_DEVICE` in
 `fastlane/.env.default` so CI asserts on the same runtime. Override per run —
 `SNAPSHOT_OS_VERSION=26.5 ./Alfie/scripts/verify.sh` — but changing the pin for good means updating
@@ -92,7 +92,7 @@ of the build.
 | `HomeViewSnapshotTests` | `HomeTests` | Home search bar + hero carousel, with and without banners |
 | `ProductDetailsViewSnapshotTests` | `ProductDetailsTests` | PDP colour/size variants, a several-photo Gallery with page indicators, loading, out-of-stock, error screen with Retry (generic, server error, rate limited, no connection), related products (6, 3, skeleton) |
 | `ProductListingViewSnapshotTests` | `ProductListingTests` | PLP grid and list style, both loading states, Blocking error (generic, server error, rate limited, no connection), search results header, transient-error Snackbar with Retry |
-| `SearchViewSnapshotTests` | `SearchTests` | Search screen blank, with recent searches, loading Suggestions, Product suggestions grid with "More Products", no results, Suggestions error with "Try again" |
+| `SearchViewSnapshotTests` | `SearchTests` | Search screen blank, with recent searches, loading Suggestions, Keyword suggestions above the Product suggestions grid, Product suggestions grid with "More Products", no results, Suggestions error with "Try again" |
 | `BagViewSnapshotTests` | `BagTests` | Bag lines and totals, empty, loading, generic and offline errors, a nameless line, an unpriced one, unpriced totals |
 | `WishlistViewSnapshotTests` | `WishlistTests` | Populated Wishlist grid, including an out-of-stock Variant; empty Wishlist; grid with the Removed Snackbar |
 | `ZoomableCarouselSnapshotTests` | `SharedUITests` | Full-screen carousel pages loading images through the pipeline injected above it |
