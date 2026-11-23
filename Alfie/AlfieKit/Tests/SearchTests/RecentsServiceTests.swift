@@ -52,13 +52,13 @@ final class RecentsServiceTests: XCTestCase {
         sut.add(.text(value: "acme"))
         sut.add(.recentSearch1)
 
-        sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
+        sut.add(.brand(suggestion: .fixture(key: "acme-key", name: "Acme")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme")), .recentSearch1])
+        XCTAssertEqual(sut.recentSearches, [.brand(suggestion: .fixture(key: "acme-key", name: "Acme")), .recentSearch1])
     }
 
     func test_add_search_term_named_like_a_saved_brand_replaces_it() {
-        sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
+        sut.add(.brand(suggestion: .fixture(key: "acme-key", name: "Acme")))
         sut.add(.recentSearch1)
 
         sut.add(.text(value: "acme"))
@@ -67,19 +67,19 @@ final class RecentsServiceTests: XCTestCase {
     }
 
     func test_add_brand_already_saved_keeps_one_entry() {
-        sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
+        sut.add(.brand(suggestion: .fixture(key: "acme-key", name: "Acme")))
 
-        sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
+        sut.add(.brand(suggestion: .fixture(key: "acme-key", name: "Acme")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme"))])
+        XCTAssertEqual(sut.recentSearches, [.brand(suggestion: .fixture(key: "acme-key", name: "Acme"))])
     }
 
     func test_add_brand_already_saved_under_another_name_keeps_only_the_new_name() {
-        sut.add(.brand(.fixture(key: "acme-key", name: "Acme")))
+        sut.add(.brand(suggestion: .fixture(key: "acme-key", name: "Acme")))
 
-        sut.add(.brand(.fixture(key: "acme-key", name: "Acme Ltd")))
+        sut.add(.brand(suggestion: .fixture(key: "acme-key", name: "Acme Ltd")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(.fixture(key: "acme-key", name: "Acme Ltd"))])
+        XCTAssertEqual(sut.recentSearches, [.brand(suggestion: .fixture(key: "acme-key", name: "Acme Ltd"))])
     }
 
     func test_stored_brands_from_before_brand_keys_are_dropped_and_search_terms_kept() {
@@ -88,7 +88,7 @@ final class RecentsServiceTests: XCTestCase {
             [
                 {"text": {"value": "jeans"}},
                 {"reccomendation": {"value": "Gucci", "path": "/brand/gucci"}},
-                {"brand": {"_0": {"name": "Acme", "key": "acme-key"}}},
+                {"brand": {"suggestion": {"name": "Acme", "key": "acme-key"}}},
                 {"text": {"value": "linen"}}
             ]
             """.utf8
@@ -99,7 +99,7 @@ final class RecentsServiceTests: XCTestCase {
 
         XCTAssertEqual(
             sut.recentSearches,
-            [.text(value: "jeans"), .brand(.fixture(key: "acme-key", name: "Acme")), .text(value: "linen")]
+            [.text(value: "jeans"), .brand(suggestion: .fixture(key: "acme-key", name: "Acme")), .text(value: "linen")]
         )
     }
 

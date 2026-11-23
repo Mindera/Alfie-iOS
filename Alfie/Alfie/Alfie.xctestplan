@@ -24,6 +24,13 @@
     {
       "target" : {
         "containerPath" : "container:AlfieKit",
+        "identifier" : "TabFlowTests",
+        "name" : "TabFlowTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AlfieKit",
         "identifier" : "CategorySelectorTests",
         "name" : "CategorySelectorTests"
       }

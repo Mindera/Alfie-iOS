@@ -89,7 +89,7 @@ extension SearchViewModel {
     }
 
     public func didTapBrandSuggestion(_ brandSuggestion: BrandSuggestion) {
-        dependencies.recentsService?.add(.brand(brandSuggestion))
+        dependencies.recentsService?.add(.brand(suggestion: brandSuggestion))
         showBrandListing(brandSuggestion)
     }
 

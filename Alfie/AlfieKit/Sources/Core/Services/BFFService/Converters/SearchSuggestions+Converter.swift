@@ -7,7 +7,9 @@ extension BFFGraphAPI.SuggestionFragment {
     public func convertToSearchSuggestions() -> SearchSuggestions {
         SearchSuggestions(
             keywords: keywords.map { $0.fragments.suggestionKeywordFragment.convertToKeywordSuggestion() },
-            brands: brands.map { $0.fragments.suggestionBrandFragment.convertToBrandSuggestion() },
+            brands: brands
+                .map { $0.fragments.suggestionBrandFragment.convertToBrandSuggestion() }
+                .filter { !$0.name.isEmpty },
             products: products
                 .map { $0.fragments.suggestionProductFragment.convertToProductSuggestion() }
                 .uniqued(on: \.id)

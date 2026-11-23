@@ -514,7 +514,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.didTapBrandSuggestion(shirtCo)
 
-        XCTAssertEqual(added, [.brand(.fixture(key: "shirt-co-key", name: "The Shirt Co"))])
+        XCTAssertEqual(added, [.brand(suggestion: .fixture(key: "shirt-co-key", name: "The Shirt Co"))])
         XCTAssertTrue(mockAnalytics.trackedEvents.isEmpty)
     }
 
@@ -620,7 +620,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     }
 
     func test_tapping_brand_recent_search_reopens_the_brand_listing_by_its_key() {
-        let recentSearch = RecentSearch.brand(.fixture(key: "shirt-co-key", name: "The Shirt Co"))
+        let recentSearch = RecentSearch.brand(suggestion: .fixture(key: "shirt-co-key", name: "The Shirt Co"))
         mockRecentsService.recentSearches = [recentSearch]
         let sut = makeSUT()
 
@@ -631,7 +631,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     }
 
     func test_tapping_brand_recent_search_tracks_nothing_and_makes_no_request() {
-        let recentSearch = RecentSearch.brand(.fixture(key: "shirt-co-key", name: "The Shirt Co"))
+        let recentSearch = RecentSearch.brand(suggestion: .fixture(key: "shirt-co-key", name: "The Shirt Co"))
         mockRecentsService.recentSearches = [recentSearch]
         let sut = makeSUT()
 

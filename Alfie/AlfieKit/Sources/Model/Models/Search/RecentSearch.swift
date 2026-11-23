@@ -1,6 +1,6 @@
 public enum RecentSearch {
     case text(value: String)
-    case brand(BrandSuggestion)
+    case brand(suggestion: BrandSuggestion)
 }
 
 public extension RecentSearch {
