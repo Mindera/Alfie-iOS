@@ -97,18 +97,18 @@ public final class TabOverlayCoordinator {
         case .productListing(let searchTerm, let category):
             return AnyView(
                 ProductListingView(
-                    viewModel: makeProductListingViewModelForSearch(searchTerm: searchTerm, category: category)
+                    viewModel: makeProductListingViewModelForSearch(
+                        searchTerm: searchTerm,
+                        category: category,
+                        brand: nil
+                    )
                 )
             )
 
         case .brandListing(let brand):
             return AnyView(
                 ProductListingView(
-                    viewModel: makeProductListingViewModelForSearch(
-                        searchTerm: brand.name,
-                        category: nil,
-                        pinnedBrandKey: brand.key
-                    )
+                    viewModel: makeProductListingViewModelForSearch(searchTerm: nil, category: nil, brand: brand)
                 )
             )
 
@@ -137,13 +137,13 @@ public final class TabOverlayCoordinator {
     private func makeProductListingViewModelForSearch(
         searchTerm: String?,
         category: String?,
-        pinnedBrandKey: String? = nil
+        brand: BrandSuggestion?
     ) -> some ProductListingViewModelProtocol {
         ProductListingViewModel(
             dependencies: dependencies.productListing,
             category: category,
             searchText: searchTerm,
-            pinnedBrandKey: pinnedBrandKey,
+            brand: brand,
             urlQueryParameters: nil,
             mode: .searchResults,
             navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },

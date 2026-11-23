@@ -122,7 +122,7 @@ final class ProductListingViewModelTests: XCTestCase {
     private func makeSUT(
         category: String? = nil,
         searchText: String? = nil,
-        pinnedBrandKey: String? = nil,
+        brand: BrandSuggestion? = nil,
         sort: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
@@ -141,7 +141,7 @@ final class ProductListingViewModelTests: XCTestCase {
             ),
             category: category,
             searchText: searchText,
-            pinnedBrandKey: pinnedBrandKey,
+            brand: brand,
             sort: sort,
             urlQueryParameters: urlQueryParameters,
             mode: mode,
@@ -288,6 +288,7 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertEqual(searches.all, [.init(searchTerm: "Acme", after: nil, sort: nil, filters: .init(brandNames: ["acme-key"]))])
         XCTAssertEqual(sut.searchTerm, "Acme")
+        XCTAssertTrue(sut.isBrandListing)
     }
 
     func test_brand_listing_applying_another_brand_keeps_only_the_pinned_key() {
@@ -360,10 +361,15 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.failure, .noResults)
     }
 
+    func test_search_results_for_a_search_term_are_not_a_brand_listing() {
+        sut = makeSUT(searchText: "Acme", mode: .searchResults)
+
+        XCTAssertFalse(sut.isBrandListing)
+    }
+
     private func makeBrandListingSUT() -> ProductListingViewModel {
         makeSUT(
-            searchText: "Acme",
-            pinnedBrandKey: "acme-key",
+            brand: .fixture(key: "acme-key", name: "Acme"),
             mode: .searchResults,
             searchNavigation: .searchResults(goBack: {}, editSearchTerm: {})
         )

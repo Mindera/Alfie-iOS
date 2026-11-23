@@ -23,7 +23,7 @@ extension BFFGraphAPI.SuggestionKeywordFragment {
 
 extension BFFGraphAPI.SuggestionBrandFragment {
     public func convertToBrandSuggestion() -> BrandSuggestion {
-        BrandSuggestion(key: key, name: value)
+        BrandSuggestion(key: key, name: value.trim())
     }
 }
 

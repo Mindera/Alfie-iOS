@@ -3,17 +3,17 @@ import Model
 
 public final class RecentSearchesViewModel: RecentSearchesViewModelProtocol {
     private let recentsService: RecentsServiceProtocol?
-    private let showResults: (RecentSearch) -> Void
+    private let showListing: (RecentSearch) -> Void
     private var subscriptions: Set<AnyCancellable> = []
 
     @Published public var recentSearches: [RecentSearch]
 
     init(
         recentsService: RecentsServiceProtocol?,
-        showResults: @escaping (RecentSearch) -> Void
+        showListing: @escaping (RecentSearch) -> Void
     ) {
         self.recentsService = recentsService
-        self.showResults = showResults
+        self.showListing = showListing
         self.recentSearches = recentsService?.recentSearches ?? []
         recentsService?.recentSearchesPublisher
             .assignWeakly(to: \.recentSearches, on: self)
@@ -21,7 +21,7 @@ public final class RecentSearchesViewModel: RecentSearchesViewModelProtocol {
     }
 
     public func didTapRecentSearch(_ recentSearch: RecentSearch) {
-        showResults(recentSearch)
+        showListing(recentSearch)
     }
 
     public func didTapRemove(on recentSearch: RecentSearch) {

@@ -39,6 +39,18 @@ final class SearchSuggestionsConverterTests: XCTestCase {
         XCTAssertEqual(product?.imageURL?.absoluteString, "https://cdn.alfie.test/front.jpg")
     }
 
+    func test_brand_suggestion_name_is_trimmed() {
+        let suggestion = Mock<Suggestion>(
+            brands: [Mock<SuggestionBrand>(key: "acme-key", value: " Acme ")],
+            keywords: [],
+            products: []
+        )
+
+        let suggestions = convert(suggestion)
+
+        XCTAssertEqual(suggestions.brands, [BrandSuggestion(key: "acme-key", name: "Acme")])
+    }
+
     func test_product_suggestion_without_price_has_no_price() {
         let suggestions = convert(makeSuggestion(product: makeProduct(price: nil)))
 

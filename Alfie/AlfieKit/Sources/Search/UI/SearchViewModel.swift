@@ -29,7 +29,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     public var recentSearchesViewModel: RecentSearchesViewModel {
         RecentSearchesViewModel(
             recentsService: dependencies.recentsService,
-            showResults: { [weak self] in self?.open($0) }
+            showListing: { [weak self] in self?.showListing(for: $0) }
         )
     }
 
@@ -89,9 +89,8 @@ extension SearchViewModel {
     }
 
     public func didTapBrandSuggestion(_ brandSuggestion: BrandSuggestion) {
-        let brand = BrandSuggestion(key: brandSuggestion.key, name: brandSuggestion.name.trim())
-        dependencies.recentsService?.add(.brand(brand))
-        showBrandListing(brand)
+        dependencies.recentsService?.add(.brand(brandSuggestion))
+        showBrandListing(brandSuggestion)
     }
 
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
@@ -219,7 +218,7 @@ extension SearchViewModel {
         searchText = term
     }
 
-    private func open(_ recentSearch: RecentSearch) {
+    private func showListing(for recentSearch: RecentSearch) {
         switch recentSearch {
         case .text(let value):
             showResults(for: value)

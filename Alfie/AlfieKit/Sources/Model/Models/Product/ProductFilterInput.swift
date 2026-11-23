@@ -3,7 +3,7 @@ import Foundation
 /// Domain-side mirror of the BFF's `ProductFilterInput` GraphQL input type.
 /// All fields are optional — only populated dimensions are forwarded to the BFF.
 public struct ProductFilterInput: Hashable {
-    public let brandNames: [String]?
+    public private(set) var brandNames: [String]?
     public let inventory: Bool?
     public let maxPrice: Double?
     public let metafields: [MetafieldFilterInput]?
@@ -28,15 +28,16 @@ public struct ProductFilterInput: Hashable {
 }
 
 public extension ProductFilterInput {
-    func withBrandNames(_ brandNames: [String]?) -> ProductFilterInput {
-        .init(
-            brandNames: brandNames,
-            inventory: inventory,
-            maxPrice: maxPrice,
-            metafields: metafields,
-            minPrice: minPrice,
-            productTypes: productTypes
-        )
+    func pinned(toBrandKey brandKey: String) -> ProductFilterInput {
+        var pinned = self
+        pinned.brandNames = [brandKey]
+        return pinned
+    }
+
+    func withoutBrands() -> ProductFilterInput {
+        var unbranded = self
+        unbranded.brandNames = nil
+        return unbranded
     }
 }
 

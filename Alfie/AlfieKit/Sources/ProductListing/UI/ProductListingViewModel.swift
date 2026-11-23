@@ -10,7 +10,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let dependencies: ProductListingDependencyContainer
     private let category: String?
     private let query: String?
-    private let pinnedBrandKey: String?
+    private let brand: BrandSuggestion?
     private let mode: ProductListingViewMode
     @Published public var style: ProductListingListStyle
     @Published public var showRefine = false
@@ -60,6 +60,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         !(state.isLoadingFirstPage || mode == .searchResults)
     }
 
+    public var isBrandListing: Bool {
+        brand != nil
+    }
+
     public var isWishlistEnabled: Bool {
         dependencies.configurationService.isFeatureEnabled(.wishlist)
     }
@@ -68,7 +72,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         dependencies: ProductListingDependencyContainer,
         category: String? = nil,
         searchText: String? = nil,
-        pinnedBrandKey: String? = nil,
+        brand: BrandSuggestion? = nil,
         sort: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
@@ -79,10 +83,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
         self.category = category
-        self.pinnedBrandKey = pinnedBrandKey
+        self.brand = brand
         self.mode = mode
         sortOption = sort
-        query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
+        query = brand?.name ?? searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
         let initialState: ProductListingPager.State = .loadingFirstPage(
             .init(title: "", products: Product.skeletons(count: skeletonItemsSize))
         )
@@ -274,7 +278,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     private var searchFilters: ProductFilterInput? {
-        guard let pinnedBrandKey else { return filters }
-        return (filters ?? .init()).withBrandNames([pinnedBrandKey])
+        guard let brand else { return filters }
+        return (filters ?? .init()).pinned(toBrandKey: brand.key)
     }
 }
