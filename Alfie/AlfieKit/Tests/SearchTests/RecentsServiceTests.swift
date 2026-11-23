@@ -51,17 +51,25 @@ final class RecentsServiceTests: XCTestCase {
     func test_add_brand_with_same_text_as_a_search_term_keeps_both_entries() {
         sut.add(.text(value: "Acme"))
 
-        sut.add(.brand(name: "Acme", key: "acme-key"))
+        sut.add(.brand(.init(key: "acme-key", name: "Acme")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(name: "Acme", key: "acme-key"), .text(value: "Acme")])
+        XCTAssertEqual(sut.recentSearches, [.brand(.init(key: "acme-key", name: "Acme")), .text(value: "Acme")])
     }
 
     func test_add_brand_already_saved_keeps_one_entry() {
-        sut.add(.brand(name: "Acme", key: "acme-key"))
+        sut.add(.brand(.init(key: "acme-key", name: "Acme")))
 
-        sut.add(.brand(name: "Acme", key: "acme-key"))
+        sut.add(.brand(.init(key: "acme-key", name: "Acme")))
 
-        XCTAssertEqual(sut.recentSearches, [.brand(name: "Acme", key: "acme-key")])
+        XCTAssertEqual(sut.recentSearches, [.brand(.init(key: "acme-key", name: "Acme"))])
+    }
+
+    func test_add_brand_already_saved_under_another_name_keeps_the_saved_entry() {
+        sut.add(.brand(.init(key: "acme-key", name: "Acme")))
+
+        sut.add(.brand(.init(key: "acme-key", name: "Acme Ltd")))
+
+        XCTAssertEqual(sut.recentSearches, [.brand(.init(key: "acme-key", name: "Acme"))])
     }
 
     func test_stored_brands_from_before_brand_keys_are_dropped_and_search_terms_kept() {
@@ -70,7 +78,7 @@ final class RecentsServiceTests: XCTestCase {
             [
                 {"text": {"value": "jeans"}},
                 {"reccomendation": {"value": "Gucci", "path": "/brand/gucci"}},
-                {"brand": {"name": "Acme", "key": "acme-key"}},
+                {"brand": {"_0": {"name": "Acme", "key": "acme-key"}}},
                 {"text": {"value": "linen"}}
             ]
             """.utf8
@@ -81,7 +89,7 @@ final class RecentsServiceTests: XCTestCase {
 
         XCTAssertEqual(
             sut.recentSearches,
-            [.text(value: "jeans"), .brand(name: "Acme", key: "acme-key"), .text(value: "linen")]
+            [.text(value: "jeans"), .brand(.init(key: "acme-key", name: "Acme")), .text(value: "linen")]
         )
     }
 

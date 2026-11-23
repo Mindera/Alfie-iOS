@@ -494,7 +494,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.didTapBrandSuggestion(shirtCo)
 
-        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(key: "shirt-co-key", name: "The Shirt Co"))])
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(.init(key: "shirt-co-key", name: "The Shirt Co")))])
     }
 
     func test_tapping_brand_suggestion_puts_the_brand_name_in_the_search_field() {
@@ -514,7 +514,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.didTapBrandSuggestion(shirtCo)
 
-        XCTAssertEqual(added, [.brand(name: "The Shirt Co", key: "shirt-co-key")])
+        XCTAssertEqual(added, [.brand(.init(key: "shirt-co-key", name: "The Shirt Co"))])
         XCTAssertTrue(mockAnalytics.trackedEvents.isEmpty)
     }
 
@@ -551,8 +551,8 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         sut.didTapBrandSuggestion(.fixture(key: "shirt-co-key", name: " The Shirt Co "))
 
-        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(key: "shirt-co-key", name: "The Shirt Co"))])
-        XCTAssertEqual(added, [.brand(name: "The Shirt Co", key: "shirt-co-key")])
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(.init(key: "shirt-co-key", name: "The Shirt Co")))])
+        XCTAssertEqual(added, [.brand(.init(key: "shirt-co-key", name: "The Shirt Co"))])
         XCTAssertEqual(sut.searchText, "The Shirt Co")
     }
 
@@ -633,18 +633,18 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     }
 
     func test_tapping_brand_recent_search_reopens_the_brand_listing_by_its_key() {
-        let recentSearch = RecentSearch.brand(name: "The Shirt Co", key: "shirt-co-key")
+        let recentSearch = RecentSearch.brand(.init(key: "shirt-co-key", name: "The Shirt Co"))
         mockRecentsService.recentSearches = [recentSearch]
         let sut = makeSUT()
 
         sut.recentSearchesViewModel.didTapRecentSearch(recentSearch)
 
-        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(key: "shirt-co-key", name: "The Shirt Co"))])
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(.init(key: "shirt-co-key", name: "The Shirt Co")))])
         XCTAssertEqual(sut.searchText, "The Shirt Co")
     }
 
     func test_tapping_brand_recent_search_tracks_nothing_and_makes_no_request() {
-        let recentSearch = RecentSearch.brand(name: "The Shirt Co", key: "shirt-co-key")
+        let recentSearch = RecentSearch.brand(.init(key: "shirt-co-key", name: "The Shirt Co"))
         mockRecentsService.recentSearches = [recentSearch]
         let sut = makeSUT()
 

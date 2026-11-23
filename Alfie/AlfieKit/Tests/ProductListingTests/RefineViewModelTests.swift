@@ -254,41 +254,17 @@ final class RefineViewModelTests: XCTestCase {
         XCTAssertTrue(sut.hasActiveFilters)
     }
 
-    // MARK: - Brand listing
-
-    func test_brand_listing_offers_no_brand_filter_to_remove() {
-        let sut = makeSUT(appliedFilters: .init(brandNames: ["acme-key"]), isBrandPinned: true)
-
-        XCTAssertFalse(sut.hasActiveFilters)
-    }
-
-    func test_brand_listing_applies_no_brand_filter() {
-        var applied: ProductFilterInput?
-        let sut = makeSUT(
-            appliedFilters: .init(brandNames: ["Other"], productTypes: ["Bags"]),
-            isBrandPinned: true,
-            onApply: { filters, _ in applied = filters }
-        )
-        sut.pendingMinPrice = 40
-
-        sut.apply()
-
-        XCTAssertEqual(applied, .init(minPrice: 40, productTypes: ["Bags"]))
-    }
-
     // MARK: - Helpers
 
     private func makeSUT(
         bounds: PriceFilterBounds? = PriceFilterBounds(currencyCode: "GBP", minimum: 8, maximum: 480),
         appliedFilters: ProductFilterInput? = nil,
-        isBrandPinned: Bool = false,
         appliedSort: SortByType? = nil,
         onApply: @escaping (ProductFilterInput?, SortByType?) -> Void = { _, _ in }
     ) -> RefineViewModel {
         RefineViewModel(
             priceBounds: bounds,
             appliedFilters: appliedFilters,
-            isBrandPinned: isBrandPinned,
             appliedSort: appliedSort,
             onApply: onApply
         )

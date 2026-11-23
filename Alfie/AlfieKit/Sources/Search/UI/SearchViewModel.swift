@@ -89,9 +89,9 @@ extension SearchViewModel {
     }
 
     public func didTapBrandSuggestion(_ brandSuggestion: BrandSuggestion) {
-        let name = brandSuggestion.name.trim()
-        dependencies.recentsService?.add(.brand(name: name, key: brandSuggestion.key))
-        showBrandListing(key: brandSuggestion.key, name: name)
+        let brand = BrandSuggestion(key: brandSuggestion.key, name: brandSuggestion.name.trim())
+        dependencies.recentsService?.add(.brand(brand))
+        showBrandListing(brand)
     }
 
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
@@ -224,8 +224,8 @@ extension SearchViewModel {
         case .text(let value):
             showResults(for: value)
 
-        case .brand(let name, let key):
-            showBrandListing(key: key, name: name)
+        case .brand(let brand):
+            showBrandListing(brand)
         }
     }
 
@@ -233,9 +233,9 @@ extension SearchViewModel {
         navigate(.searchIntent(.productListing(searchTerm: searchTerm, category: nil)))
     }
 
-    private func showBrandListing(key: String, name: String) {
-        putInSearchField(name)
-        navigate(.searchIntent(.brandListing(key: key, name: name)))
+    private func showBrandListing(_ brand: BrandSuggestion) {
+        putInSearchField(brand.name)
+        navigate(.searchIntent(.brandListing(brand)))
     }
 
     private func showRecentSearchesIfSearchTermIsBlank() {

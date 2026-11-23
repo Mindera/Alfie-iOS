@@ -101,13 +101,13 @@ public final class TabOverlayCoordinator {
                 )
             )
 
-        case .brandListing(let key, let name):
+        case .brandListing(let brand):
             return AnyView(
                 ProductListingView(
                     viewModel: makeProductListingViewModelForSearch(
-                        searchTerm: name,
+                        searchTerm: brand.name,
                         category: nil,
-                        pinnedBrandKey: key
+                        pinnedBrandKey: brand.key
                     )
                 )
             )

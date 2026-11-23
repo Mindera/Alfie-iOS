@@ -288,7 +288,6 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertEqual(searches.all, [.init(searchTerm: "Acme", after: nil, sort: nil, filters: .init(brandNames: ["acme-key"]))])
         XCTAssertEqual(sut.searchTerm, "Acme")
-        XCTAssertTrue(sut.isBrandListing)
     }
 
     func test_brand_listing_applying_another_brand_keeps_only_the_pinned_key() {
@@ -359,12 +358,6 @@ final class ProductListingViewModelTests: XCTestCase {
         XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEqual(sut.state.failure, .noResults)
-    }
-
-    func test_search_results_for_a_search_term_are_not_a_brand_listing() {
-        sut = makeSUT(searchText: "Acme", mode: .searchResults)
-
-        XCTAssertFalse(sut.isBrandListing)
     }
 
     private func makeBrandListingSUT() -> ProductListingViewModel {

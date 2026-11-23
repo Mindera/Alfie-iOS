@@ -58,9 +58,9 @@ final class RecentSearchesViewModelTests: XCTestCase {
         var captured: [RecentSearch] = []
         sut = makeSUT { captured.append($0) }
 
-        sut.didTapRecentSearch(.brand(name: "Acme", key: "acme-key"))
+        sut.didTapRecentSearch(.brand(.init(key: "acme-key", name: "Acme")))
 
-        XCTAssertEqual(captured, [.brand(name: "Acme", key: "acme-key")])
+        XCTAssertEqual(captured, [.brand(.init(key: "acme-key", name: "Acme"))])
     }
 
     func test_OnViewDidDisappear_InRecentsService_CallsSave() {

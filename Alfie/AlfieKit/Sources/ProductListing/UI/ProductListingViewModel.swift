@@ -52,10 +52,6 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         mode == .searchResults ? query : nil
     }
 
-    public var isBrandListing: Bool {
-        pinnedBrandKey != nil
-    }
-
     public var totalNumberOfProducts: Int {
         pager.pagination?.totalCount ?? 0
     }

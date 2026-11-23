@@ -45,12 +45,11 @@ final class RefineViewModel: RefineViewModelProtocol {
     init(
         priceBounds: PriceFilterBounds?,
         appliedFilters: ProductFilterInput?,
-        isBrandPinned: Bool = false,
         appliedSort: SortByType?,
         onApply: @escaping (ProductFilterInput?, SortByType?) -> Void
     ) {
         self.priceBounds = priceBounds
-        carriedFilters = isBrandPinned ? appliedFilters?.withBrandNames(nil) : appliedFilters
+        carriedFilters = appliedFilters
         self.onApply = onApply
         pendingMinPrice = appliedFilters?.minPrice
         pendingMaxPrice = appliedFilters?.maxPrice

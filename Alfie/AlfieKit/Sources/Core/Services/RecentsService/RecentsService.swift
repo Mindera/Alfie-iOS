@@ -28,7 +28,7 @@ public final class RecentsService: RecentsServiceProtocol {
 
     public func add(_ recentSearch: RecentSearch) {
         guard
-            !recentSearches.contains(recentSearch),
+            !recentSearches.contains(where: recentSearch.isSameSearch(as:)),
             !recentSearch.value.isEmpty
         else {
             return
