@@ -125,6 +125,7 @@ jobs:
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
           BOOT_TIMEOUT: 600
+          ALFIE_XCODEBUILD_TEST_ARGS: -retry-tests-on-failure -test-iterations 2
 
       - name: Upload Test Results
         if: failure() || cancelled()

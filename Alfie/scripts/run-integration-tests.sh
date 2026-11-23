@@ -7,7 +7,7 @@
 # ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF, or
 # ALFIE_BFF_PLATFORM=shopify if it boots a Live BFF on Shopify (runs the Shopify-only tests).
 # ALFIE_XCODEBUILD_ARGS adds space-separated flags to this script's xcodebuild calls (CI's package
-# flags).
+# flags); ALFIE_XCODEBUILD_TEST_ARGS adds them to the test runs only (CI's retry on failure).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched. The BFF's output goes to /tmp/alfie_bff.log.
 
@@ -20,6 +20,7 @@ SCHEME="Alfie"
 BUILD_LOG="/tmp/alfie_bff_tests_build.log"
 BFF_LOG="/tmp/alfie_bff.log"
 read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
+read -r -a XCODEBUILD_TEST_ARGS <<< "${ALFIE_XCODEBUILD_TEST_ARGS:-}"
 
 SKIP_BUILD=false
 while [[ $# -gt 0 ]]; do
@@ -164,7 +165,7 @@ run_plan() {
         -testPlan "$plan" \
         -destination "$DESTINATION" \
         -resultBundlePath "$bundle" \
-        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
+        "${XCODEBUILD_ARGS[@]}" "${XCODEBUILD_TEST_ARGS[@]}" 2>&1 | tee "$log"
     local result=${PIPESTATUS[0]}
 
     if [ "$result" -ne 0 ]; then
