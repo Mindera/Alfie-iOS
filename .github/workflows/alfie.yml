@@ -100,8 +100,6 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: ${{ env.BFF_CHECKOUT }}/.nvmrc
-          cache: yarn
-          cache-dependency-path: ${{ env.BFF_CHECKOUT }}/yarn.lock
 
       - name: Cache BFF node_modules
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -124,8 +122,6 @@ jobs:
           ./Alfie/scripts/run-integration-tests.sh
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
-          BOOT_TIMEOUT: 600
-          ALFIE_XCODEBUILD_TEST_ARGS: -retry-tests-on-failure -test-iterations 2
 
       - name: Upload Test Results
         if: failure() || cancelled()

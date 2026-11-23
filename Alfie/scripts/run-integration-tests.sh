@@ -7,7 +7,7 @@
 # ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF, or
 # ALFIE_BFF_PLATFORM=shopify if it boots a Live BFF on Shopify (runs the Shopify-only tests).
 # ALFIE_XCODEBUILD_ARGS adds space-separated flags to this script's xcodebuild calls (CI's package
-# flags); ALFIE_XCODEBUILD_TEST_ARGS adds them to the test runs only (CI's retry on failure).
+# flags).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched. The BFF's output goes to /tmp/alfie_bff.log.
 
@@ -20,7 +20,6 @@ SCHEME="Alfie"
 BUILD_LOG="/tmp/alfie_bff_tests_build.log"
 BFF_LOG="/tmp/alfie_bff.log"
 read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
-read -r -a XCODEBUILD_TEST_ARGS <<< "${ALFIE_XCODEBUILD_TEST_ARGS:-}"
 
 SKIP_BUILD=false
 while [[ $# -gt 0 ]]; do
@@ -89,7 +88,7 @@ if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
     ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
 fi
 
-# --- Simulator: iPhone on the pinned iOS; outside CI, else the newest --------
+# --- Simulator ---------------------------------------------------------------
 if [ -n "$CI" ] && [ -z "$(pinned_iphone_udid)" ]; then
     fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
 fi
@@ -97,6 +96,9 @@ SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
+# Boot now so the simulator settles during the build: on a freshly booted one the first app launch
+# outlasts Xcode's launch timeout.
+xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null
 
 if [ "$SKIP_BUILD" = true ]; then
     echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
@@ -165,7 +167,7 @@ run_plan() {
         -testPlan "$plan" \
         -destination "$DESTINATION" \
         -resultBundlePath "$bundle" \
-        "${XCODEBUILD_ARGS[@]}" "${XCODEBUILD_TEST_ARGS[@]}" 2>&1 | tee "$log"
+        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
     local result=${PIPESTATUS[0]}
 
     if [ "$result" -ne 0 ]; then

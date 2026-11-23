@@ -171,8 +171,6 @@ queue and on `main`. `release` needs both.
 - is skipped on fork and Dependabot PRs, which get no secrets;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
-- retries a failed test once and waits up to 10 minutes for the simulator to boot: the runner's
-  cold simulator can time out the first app launch. A local run does neither;
 - reads the private `Alfie-BFF` with the repo secret `BFF_READ_TOKEN`, a fine-grained personal
   access token with read-only Contents on that repo alone. It belongs to one person and expires:
   when the BFF checkout fails on authentication, renew it.
