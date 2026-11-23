@@ -41,4 +41,5 @@ class AlfieUITestCase: XCTestCase {
 extension TimeInterval {
     /// A cart write is a real round trip to the BFF, so it gets longer than a local UI transition.
     static let bffWrite: TimeInterval = 20
+    static let bffRead: TimeInterval = 10
 }

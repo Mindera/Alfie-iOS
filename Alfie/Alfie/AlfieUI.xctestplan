@@ -21,6 +21,7 @@
       "selectedTests" : [
         "AddToBagJourneyTests",
         "AlfieUITestsLaunchTests",
+        "SearchJourneyTests",
         "WishlistJourneyTests"
       ],
       "target" : {

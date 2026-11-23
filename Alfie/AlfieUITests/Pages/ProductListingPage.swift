@@ -30,7 +30,18 @@ final class ProductListingPage {
         app.buttons[AccessibilityID.ProductListing.listStyleListButton]
     }
 
+    /// Loaded products only: skeleton cards are hidden from accessibility.
+    var productCards: XCUIElementQuery {
+        app.descendants(matching: .any).matching(identifier: AccessibilityID.ProductCard.card)
+    }
+
     // MARK: - Actions
+
+    @discardableResult
+    func tapFirstProduct() -> Self {
+        productCards.firstMatch.tap()
+        return self
+    }
 
     @discardableResult
     func tapFilter() -> Self {
