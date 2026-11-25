@@ -20,7 +20,7 @@ public struct KeywordSuggestion: Equatable {
     }
 }
 
-public struct BrandSuggestion: Equatable {
+public struct BrandSuggestion: Hashable, Codable {
     public let key: String
     public let name: String
 

@@ -11,6 +11,7 @@ public class MockProductListingViewModel: ProductListingViewModelProtocol {
     public var wishlistContent: [SelectedProduct]
     public var title: String = "Title"
     public var searchTerm: String?
+    public var isBrandListing = false
     public var totalNumberOfProducts: Int
     public var style: ProductListingListStyle = .grid
     public var sortOption: String?
