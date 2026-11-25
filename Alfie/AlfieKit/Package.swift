@@ -545,6 +545,21 @@ let package = Package(
         ),
 
         .testTarget(
+            name: "TabFlowTests",
+            dependencies: [
+                "Mocks",
+                "Model",
+                "ProductDetails",
+                "ProductListing",
+                "Scanner",
+                "Search",
+                "TabFlow",
+                "TestUtils",
+                "Web",
+            ]
+        ),
+
+        .testTarget(
             name: "WebTests",
             dependencies: [
                 "Mocks",

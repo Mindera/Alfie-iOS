@@ -29,7 +29,7 @@ public final class SearchViewModel: SearchViewModelProtocol {
     public var recentSearchesViewModel: RecentSearchesViewModel {
         RecentSearchesViewModel(
             recentsService: dependencies.recentsService,
-            showResults: { [weak self] in self?.showResults(for: $0) }
+            showListing: { [weak self] in self?.showListing(for: $0) }
         )
     }
 
@@ -86,6 +86,11 @@ extension SearchViewModel {
 
     public func didTapKeywordSuggestion(_ keywordSuggestion: KeywordSuggestion) {
         submit(keywordSuggestion.value.trim())
+    }
+
+    public func didTapBrandSuggestion(_ brandSuggestion: BrandSuggestion) {
+        dependencies.recentsService?.add(.brand(suggestion: brandSuggestion))
+        showBrandListing(brandSuggestion)
     }
 
     public func didTapProductSuggestion(_ productSuggestion: ProductSuggestion) {
@@ -183,9 +188,13 @@ extension SearchViewModel {
 
     private static func sections(from suggestions: SearchSuggestions) -> [SuggestionsSection] {
         let keywords = suggestions.keywords.uniqued { $0.value.lowercased() }
+        let brands = suggestions.brands.uniqued(on: \.key)
         var sections: [SuggestionsSection] = []
         if !keywords.isEmpty {
             sections.append(.keywords(keywords))
+        }
+        if !brands.isEmpty {
+            sections.append(.brands(brands))
         }
         if !suggestions.products.isEmpty {
             sections.append(.products(suggestions.products))
@@ -196,17 +205,36 @@ extension SearchViewModel {
     private func submit(_ term: String) {
         dependencies.recentsService?.add(.text(value: term))
         dependencies.analytics.trackSearch(term: term)
+        putInSearchField(term)
+        showResults(for: term)
+    }
+
+    private func putInSearchField(_ term: String) {
         if term != searchTerm {
             cancelPendingSuggestions()
             searchTerm = term
             areSuggestionsOutdated = true
         }
         searchText = term
-        showResults(for: term)
+    }
+
+    private func showListing(for recentSearch: RecentSearch) {
+        switch recentSearch {
+        case .text(let value):
+            showResults(for: value)
+
+        case .brand(let brand):
+            showBrandListing(brand)
+        }
     }
 
     private func showResults(for searchTerm: String) {
         navigate(.searchIntent(.productListing(searchTerm: searchTerm, category: nil)))
+    }
+
+    private func showBrandListing(_ brand: BrandSuggestion) {
+        putInSearchField(brand.name)
+        navigate(.searchIntent(.brandListing(brand)))
     }
 
     private func showRecentSearchesIfSearchTermIsBlank() {

@@ -101,6 +101,9 @@ public final class TabOverlayCoordinator {
                 )
             )
 
+        case .brandListing(let brand):
+            return AnyView(ProductListingView(viewModel: makeBrandListingViewModel(brand: brand)))
+
         case .productDetails(let productID, let product):
             let configuration: ProductDetailsConfiguration
             if let product {
@@ -127,10 +130,23 @@ public final class TabOverlayCoordinator {
         searchTerm: String?,
         category: String?
     ) -> some ProductListingViewModelProtocol {
+        makeSearchResultsViewModel(searchTerm: searchTerm, category: category, brand: nil)
+    }
+
+    func makeBrandListingViewModel(brand: BrandSuggestion) -> ProductListingViewModel {
+        makeSearchResultsViewModel(searchTerm: nil, category: nil, brand: brand)
+    }
+
+    private func makeSearchResultsViewModel(
+        searchTerm: String?,
+        category: String?,
+        brand: BrandSuggestion?
+    ) -> ProductListingViewModel {
         ProductListingViewModel(
             dependencies: dependencies.productListing,
             category: category,
             searchText: searchTerm,
+            brand: brand,
             urlQueryParameters: nil,
             mode: .searchResults,
             navigate: { [weak self] in self?.searchFlowViewModel.navigate(.searchIntent(SearchIntent(route: $0))) },
