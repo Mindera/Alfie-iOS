@@ -55,6 +55,7 @@ public enum SeedAnchors {
     ]
     public enum SearchTerms {
         public static let few = "dress"
+        public static let keywords = "shirt"
         public static let many = "shirt"
         public static let none = "zzz-no-results"
     }
