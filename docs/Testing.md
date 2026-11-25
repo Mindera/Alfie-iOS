@@ -145,7 +145,7 @@ Treat them as correct, in review and when writing.
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
   `BFFIntegrationTests` is the odd one out: it runs against the Mock BFF, not mocks, in CI's
-  `bff-tests` job (§CI) and locally only when `verify.sh` runs without `--only-unit`. It pins only
+  `tests` job (§CI) and locally only when `verify.sh` runs without `--only-unit`. It pins only
   to `SeedAnchors` (the `TestSeed` module), the Mock BFF's seed anchors; "the first item" only where
   the assertion holds for any item. `SeedAnchors` is generated: when the BFF adds an anchor a test
   needs, pull `Alfie-BFF` and run `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
@@ -155,20 +155,22 @@ Treat them as correct, in review and when writing.
 
 ## CI
 
-The `Alfie CI/CD` workflow runs two test jobs on every PR that changes more than docs, in the merge
-queue and on `main`. `release` needs both.
+The `Alfie CI/CD` workflow runs one test job, `tests`, on every PR that changes more than docs, in
+the merge queue and on `main`. `release` needs it.
 
-| Job | Runs |
-|---|---|
-| `unit-tests` | `Alfie.xctestplan` through fastlane |
-| `bff-tests` | `run-integration-tests.sh`: `AlfieIntegration.xctestplan` then `AlfieUI.xctestplan`, against the Mock BFF built from `Alfie-BFF` `main` |
+`tests` runs `verify.sh`, the local "Done" check: one `build-for-testing`, then `Alfie.xctestplan`,
+`AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` from that build, the last two against the
+Mock BFF built from `Alfie-BFF` `main`. Each stage is a group in the job log with its result line
+below it. CI adds its xcodebuild flags (package flags, coverage off, DerivedData path) through
+`ALFIE_XCODEBUILD_ARGS`.
 
-`bff-tests`:
+`tests`:
 
 - writes the BFF commit it tested to the job summary, which tells an iOS break from a BFF break;
-- on failure or cancel (the timeout included) uploads the `bff-test-results` artifact (both result
-  bundles, the BFF log and the build log, kept 7 days);
-- is skipped on fork and Dependabot PRs, which get no secrets;
+- on failure or cancel (the timeout included) uploads the `test-results` artifact (every
+  `/tmp/alfie_*` result bundle and log, kept 7 days);
+- runs `verify.sh --only-unit` on fork and Dependabot PRs, which cannot read `Alfie-BFF`, and skips
+  the BFF checkout, Node and BFF cache steps;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
 - reads the private `Alfie-BFF` with the repo secret `BFF_READ_TOKEN`, a fine-grained personal
@@ -217,5 +219,5 @@ Two things the bundle does not cover. A `--filter` run writes to
 the suite. And `AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` collect nothing, so anything exercised
 only by `BFFIntegrationTests` or `AlfieUITests` reads as 0%.
 
-Coverage is off in CI (`SCAN_CODE_COVERAGE=false` in `fastlane/.env.default`): the run has no
-consumer there, and the xcresult is uploaded only on failure.
+Coverage is off in CI (`-enableCodeCoverage NO` in the `tests` job's `ALFIE_XCODEBUILD_ARGS`): the
+run has no consumer there, and the xcresult is uploaded only on failure.

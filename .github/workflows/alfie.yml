@@ -28,19 +28,51 @@ env:
   SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
 
 jobs:
-  unit-tests:
+  tests:
     runs-on: macos-26
-    timeout-minutes: 30
+    timeout-minutes: 60
+    env:
+      BFF_CHECKOUT: Alfie-BFF
+      CAN_READ_BFF: ${{ github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
+      DERIVED_DATA_PATH: build/DerivedData
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
 
+      - name: Checkout Alfie-BFF main
+        if: env.CAN_READ_BFF == 'true'
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          repository: ${{ github.repository_owner }}/Alfie-BFF
+          ref: main
+          token: ${{ secrets.BFF_READ_TOKEN }}
+          path: ${{ env.BFF_CHECKOUT }}
+          persist-credentials: false
+
+      - name: Report BFF commit
+        if: env.CAN_READ_BFF == 'true'
+        run: |
+          echo "Mock BFF: \`$GITHUB_REPOSITORY_OWNER/Alfie-BFF@$(git -C "$BFF_CHECKOUT" rev-parse HEAD)\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Node
+        if: env.CAN_READ_BFF == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ${{ env.BFF_CHECKOUT }}/.nvmrc
+
+      - name: Cache BFF node_modules
+        if: env.CAN_READ_BFF == 'true'
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.BFF_CHECKOUT }}/node_modules
+          key: bff-node-modules-${{ runner.os }}-${{ hashFiles(format('{0}/.nvmrc', env.BFF_CHECKOUT), format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
+
       - name: Cache Xcode DerivedData
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
-          path: build/DerivedData
+          path: ${{ env.DERIVED_DATA_PATH }}
           key: derived-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             derived-${{ runner.os }}-
@@ -51,75 +83,17 @@ jobs:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
           spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-          ruby: true
 
-      - name: Run Tests
-        run: bundle exec fastlane ios test --env default
-        env:
-          BUILD_CONFIGURATION: "Debug"
-
-      - name: Upload Test Results
-        if: failure()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-        with:
-          name: test-results
-          path: |
-            ${{ env.ARTIFACTS_PATH }}/*.xcresult
-            ${{ env.ARTIFACTS_PATH }}/*.junit
-          retention-days: 7
-
-  bff-tests:
-    if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]')
-    runs-on: macos-26
-    timeout-minutes: 45
-    env:
-      BFF_CHECKOUT: Alfie-BFF
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-        with:
-          persist-credentials: false
-
-      - name: Checkout Alfie-BFF main
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-        with:
-          repository: ${{ github.repository_owner }}/Alfie-BFF
-          ref: main
-          token: ${{ secrets.BFF_READ_TOKEN }}
-          path: ${{ env.BFF_CHECKOUT }}
-          persist-credentials: false
-
-      - name: Report BFF commit
+      - name: Verify
         run: |
-          echo "Mock BFF: \`$GITHUB_REPOSITORY_OWNER/Alfie-BFF@$(git -C "$BFF_CHECKOUT" rev-parse HEAD)\`" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Set up Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: ${{ env.BFF_CHECKOUT }}/.nvmrc
-
-      - name: Cache BFF node_modules
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ env.BFF_CHECKOUT }}/node_modules
-          key: bff-node-modules-${{ runner.os }}-${{ hashFiles(format('{0}/.nvmrc', env.BFF_CHECKOUT), format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
-
-      - name: Set up iOS job
-        uses: ./.github/actions/setup-ios
-        with:
-          gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
-          gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
-
-      - name: Run Integration and UI Tests
-        run: |
-          ALFIE_XCODEBUILD_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
-          [ -n "$ALFIE_XCODEBUILD_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
-          export ALFIE_XCODEBUILD_ARGS
-          ./Alfie/scripts/run-integration-tests.sh
+          PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
+          [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
+          export ALFIE_XCODEBUILD_ARGS="$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH"
+          if [ "$CAN_READ_BFF" = true ]; then
+            ./Alfie/scripts/verify.sh
+          else
+            ./Alfie/scripts/verify.sh --only-unit
+          fi
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
 
@@ -127,16 +101,15 @@ jobs:
         if: failure() || cancelled()
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
-          name: bff-test-results
+          name: test-results
           path: |
-            /tmp/alfie_*_test.xcresult
-            /tmp/alfie_bff.log
-            /tmp/alfie_bff_tests_build.log
+            /tmp/alfie_*.xcresult
+            /tmp/alfie_*.log
           if-no-files-found: warn
           retention-days: 7
 
   release:
-    needs: [unit-tests, bff-tests]
+    needs: [tests]
     runs-on: macos-26
     timeout-minutes: 60
     if: github.event_name == 'push'
