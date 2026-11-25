@@ -8,9 +8,6 @@ on:
   pull_request:
     branches:
       - "main"
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
 
   merge_group:
 
@@ -20,21 +17,22 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   ARTIFACTS_PATH: "/tmp/alfie-artifacts"
   SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
+  DERIVED_DATA_PATH: build/DerivedData
 
 jobs:
   tests:
+    if: github.event_name != 'push'
     runs-on: macos-26
     timeout-minutes: 60
     env:
       BFF_CHECKOUT: Alfie-BFF
       CAN_READ_BFF: ${{ github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
-      DERIVED_DATA_PATH: build/DerivedData
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -42,8 +40,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Detect docs-only change
+        id: changes
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && 'HEAD^1' || github.event.merge_group.base_sha }}
+        run: |
+          DOCS_ONLY="$(./Alfie/scripts/ci-docs-only.sh "$BASE")"
+          echo "docs_only=$DOCS_ONLY" >> "$GITHUB_OUTPUT"
+          [ "$DOCS_ONLY" = false ] || echo "Docs-only change: build and tests skipped." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Checkout Alfie-BFF main
-        if: env.CAN_READ_BFF == 'true'
+        if: steps.changes.outputs.docs_only != 'true' && env.CAN_READ_BFF == 'true'
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           repository: ${{ github.repository_owner }}/Alfie-BFF
@@ -53,18 +60,18 @@ jobs:
           persist-credentials: false
 
       - name: Report BFF commit
-        if: env.CAN_READ_BFF == 'true'
+        if: steps.changes.outputs.docs_only != 'true' && env.CAN_READ_BFF == 'true'
         run: |
           echo "Mock BFF: \`$GITHUB_REPOSITORY_OWNER/Alfie-BFF@$(git -C "$BFF_CHECKOUT" rev-parse HEAD)\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Set up Node
-        if: env.CAN_READ_BFF == 'true'
+        if: steps.changes.outputs.docs_only != 'true' && env.CAN_READ_BFF == 'true'
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: ${{ env.BFF_CHECKOUT }}/.nvmrc
 
       - name: Cache BFF node_modules
-        if: env.CAN_READ_BFF == 'true'
+        if: steps.changes.outputs.docs_only != 'true' && env.CAN_READ_BFF == 'true'
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ env.BFF_CHECKOUT }}/node_modules
@@ -72,30 +79,24 @@ jobs:
 
       - name: Set up iOS job
         id: setup-ios
+        if: steps.changes.outputs.docs_only != 'true'
         uses: ./.github/actions/setup-ios
         with:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
           spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
 
-      - name: Restore Xcode DerivedData
-        id: derived-cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      - name: Restore build cache
+        if: steps.changes.outputs.docs_only != 'true'
+        uses: ./.github/actions/restore-build-cache
         with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: derived-${{ runner.os }}-xcode${{ steps.setup-ios.outputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-${{ github.sha }}
-          restore-keys: |
-            derived-${{ runner.os }}-xcode${{ steps.setup-ios.outputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-
-
-      - name: Restore file modification dates
-        run: ./Alfie/scripts/restore-mtimes.sh
+          xcode-version: ${{ steps.setup-ios.outputs.xcode-version }}
+          derived-data-path: ${{ env.DERIVED_DATA_PATH }}
 
       - name: Verify
         id: verify
+        if: steps.changes.outputs.docs_only != 'true'
         run: |
-          PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
-          [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
-          export ALFIE_XCODEBUILD_ARGS="$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH"
           if [ "$CAN_READ_BFF" = true ]; then
             ./Alfie/scripts/verify.sh
           else
@@ -103,21 +104,6 @@ jobs:
           fi
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
-          ALFIE_RESTORED_DERIVED_DATA: ${{ steps.derived-cache.outputs.cache-matched-key && format('{0}/{1}', github.workspace, env.DERIVED_DATA_PATH) || '' }}
-
-      - name: Save Swift Package Manager Cache
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.setup-ios.outputs.spm-cache-hit != 'true'
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ steps.setup-ios.outputs.spm-cache-path }}
-          key: ${{ steps.setup-ios.outputs.spm-cache-key }}
-
-      - name: Save Xcode DerivedData
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.derived-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: ${{ steps.derived-cache.outputs.cache-primary-key }}
 
       - name: Upload Test Results
         if: failure() || cancelled()
@@ -141,11 +127,69 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+  build-cache:
+    if: github.event_name == 'push'
+    runs-on: macos-26
+    timeout-minutes: 45
+    concurrency:
+      group: ${{ github.workflow }}-build-cache-${{ github.event_name == 'push' && github.ref || github.run_id }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up iOS job
+        id: setup-ios
+        uses: ./.github/actions/setup-ios
+        with:
+          gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
+          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+
+      - name: Restore build cache
+        id: build-cache
+        uses: ./.github/actions/restore-build-cache
+        with:
+          xcode-version: ${{ steps.setup-ios.outputs.xcode-version }}
+          derived-data-path: ${{ env.DERIVED_DATA_PATH }}
+
+      - name: Build
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        run: ./Alfie/scripts/build-for-verification.sh
+
+      - name: Save Swift Package Manager Cache
+        if: steps.setup-ios.outputs.spm-cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.setup-ios.outputs.spm-cache-path }}
+          key: ${{ steps.setup-ios.outputs.spm-cache-key }}
+
+      - name: Save Xcode DerivedData
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.DERIVED_DATA_PATH }}
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
+
+      - name: Upload Build Log
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: build-cache-log
+          path: /tmp/alfie_build.log
+          if-no-files-found: warn
+          retention-days: 7
+
   release:
-    needs: [tests]
+    if: github.event_name == 'push'
     runs-on: macos-26
     timeout-minutes: 60
-    if: github.event_name == 'push'
+    concurrency:
+      group: ${{ github.workflow }}-release-${{ github.event_name == 'push' && github.ref || github.run_id }}
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:

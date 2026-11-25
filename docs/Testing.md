@@ -156,14 +156,34 @@ Treat them as correct, in review and when writing.
 
 ## CI
 
-The `Alfie CI/CD` workflow runs one test job, `tests`, on every PR that changes more than docs, in
-the merge queue and on `main`. `release` needs it.
+The `Alfie CI/CD` workflow runs one test job, `tests`, on every PR, in the merge queue and on manual
+dispatch. `tests` is a required status check on `main`, so the merge queue is the test gate: a push
+to `main` starts no test job.
+
+| Event | Jobs |
+|---|---|
+| `pull_request`, `merge_group`, `workflow_dispatch` | `tests` |
+| `push` to `main` | `release`, `build-cache` (independent of each other) |
+
+When a PR or a merge group changes only docs (`*.md`, `docs/**`; decided by `ci-docs-only.sh`),
+`tests` still starts, skips every build and test step and reports success, because a required check
+that never reports blocks the merge. Keep the job id `tests`: the ruleset names it.
+
+`release` ships each push to `main` to TestFlight without waiting for a test job. Releases run one
+at a time (two would race on the build-number tag), and one in progress is never cancelled; a push
+that arrives while another release is already waiting replaces the waiting one, whose commits ship
+with it.
+
+`build-cache` runs `build-for-testing` on each push to `main` and saves the DerivedData and Swift
+package caches, keyed per commit. It is the only job that saves them; `tests` restores the newest
+entry and saves nothing. Both go through the `restore-build-cache` action, so they build with the
+same flags and file dates and the cache stays reusable.
 
 `tests` runs `verify.sh`, the local "Done" check: one `build-for-testing`, then `Alfie.xctestplan`,
 `AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` from that build, the last two against the
 Mock BFF built from `Alfie-BFF` `main`. Each stage is a group in the job log with its result line
 below it. CI adds its xcodebuild flags (package flags, coverage off, DerivedData path) through
-`ALFIE_XCODEBUILD_ARGS`.
+`ALFIE_XCODEBUILD_ARGS`, which `restore-build-cache` exports.
 
 `tests`:
 
