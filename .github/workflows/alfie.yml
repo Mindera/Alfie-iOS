@@ -85,6 +85,7 @@ jobs:
           spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
 
       - name: Verify
+        id: verify
         run: |
           PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
           [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
@@ -105,6 +106,17 @@ jobs:
           path: |
             /tmp/alfie_*.xcresult
             /tmp/alfie_*.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload UI Runner Stall Evidence
+        if: success() && steps.verify.outputs.ui_runner_stalled == 'true'
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: ui-runner-stall
+          path: |
+            /tmp/alfie_ui_test.xcresult
+            /tmp/alfie_ui_*.log
           if-no-files-found: warn
           retention-days: 7
 
