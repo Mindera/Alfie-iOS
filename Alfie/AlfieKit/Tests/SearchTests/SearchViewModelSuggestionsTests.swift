@@ -289,7 +289,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         holdRequest(for: "shirt", at: gate) { [shirt] in .fixture(products: [shirt]) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         await fulfillment(of: [gate.held], timeout: .default)
         await awaitSuggestions(for: "dress", in: sut)
 
@@ -306,7 +306,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         holdRequest(for: "shirt", at: gate) { throw BFFRequestError(type: .timeout) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         await fulfillment(of: [gate.held], timeout: .default)
         await awaitSuggestions(for: "dress", in: sut)
 
@@ -323,7 +323,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         holdRequest(for: "shirt", at: gate) { [shirt] in .fixture(products: [shirt]) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         await fulfillment(of: [gate.held], timeout: .default)
         sut.searchText = "shirts"
         sut.searchText = "shirt"
@@ -681,6 +681,10 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         }
     }
 
+    private func advanceDebounce() {
+        scheduler.advance(by: .milliseconds(500))
+    }
+
     private func makeGate() -> SuggestionsGate {
         SuggestionsGate(
             held: expectation(description: "request held"),
@@ -741,7 +745,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
             .first { $0 != .suggestions(.loading) }
             .sink { _ in shown.fulfill() }
         sut.searchText = searchText
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         let result = await XCTWaiter().fulfillment(of: [shown], timeout: .default)
         cancellable.cancel()
         XCTAssertEqual(result, .completed, "Suggestions never left loading", file: file, line: line)

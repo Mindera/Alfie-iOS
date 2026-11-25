@@ -77,6 +77,7 @@ checked against the diff.
 |---|---|
 | Branch in the assert phase — an `if` wrapping an assertion reports green on the run where the branch never fires | Split into separate tests, or drive a table of cases with a per-row failure message. Branching *inside a mock closure* to route on its argument is the stub doing its job, not logic in the test |
 | `Task.sleep`, `Thread.sleep` or `asyncAfter` to wait for async work | `await` the call, use the `TestUtils` publisher helpers, or gate it |
+| `await scheduler.advance(...)` on a `TestScheduler` — the async overload hops through background-priority tasks 20 times per step, which a busy CI runner starves for seconds | Call the synchronous `advance` from a non-`async` helper, then await the work with `fulfillment(of:)` or a gate |
 | Test a `private` method, or widen access to reach one | Assert the public behaviour that calls it |
 | Touch the network, disk, real `UserDefaults` or the real BFF in a unit test | Use a mock — `MockUserDefaults` for defaults; real-BFF coverage belongs in `BFFIntegrationTests`. `ProductListingStyleProviderTests` still drives a real suite and tears it down: debt, not precedent |
 | `zip` two collections to pair test inputs | Pair them in one array of tuples — `zip` truncates to the shorter side and drops cases silently |
