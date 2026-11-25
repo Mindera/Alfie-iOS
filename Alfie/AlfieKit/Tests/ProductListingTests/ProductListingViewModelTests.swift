@@ -122,6 +122,7 @@ final class ProductListingViewModelTests: XCTestCase {
     private func makeSUT(
         category: String? = nil,
         searchText: String? = nil,
+        brand: BrandSuggestion? = nil,
         sort: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
@@ -140,6 +141,7 @@ final class ProductListingViewModelTests: XCTestCase {
             ),
             category: category,
             searchText: searchText,
+            brand: brand,
             sort: sort,
             urlQueryParameters: urlQueryParameters,
             mode: mode,
@@ -274,6 +276,114 @@ final class ProductListingViewModelTests: XCTestCase {
 
         XCTAssertTrue(sut.state.isSuccess)
         XCTAssertEqual(sut.totalNumberOfProducts, 5)
+    }
+
+    // MARK: - Brand listing
+
+    func test_brand_listing_searches_a_blank_term_pinned_to_the_brand_key_and_shows_the_brand_name() {
+        sut = makeBrandListingSUT()
+        let searches = recordSearches()
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(searches.all, [.init(searchTerm: "", after: nil, sort: nil, filters: .init(brandNames: ["acme-key"]))])
+        XCTAssertEqual(sut.searchTerm, "Acme")
+        XCTAssertTrue(sut.isBrandListing)
+    }
+
+    func test_brand_listing_applying_another_brand_keeps_only_the_pinned_key() {
+        sut = makeBrandListingSUT()
+        let searches = recordSearches()
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: \.isSuccess,
+            afterTrigger: { self.sut.didApplyFilters(.init(brandNames: ["Other", "More"]), sort: nil) }
+        )
+
+        XCTAssertEqual(searches.all.last?.filters, .init(brandNames: ["acme-key"]))
+    }
+
+    func test_brand_listing_passes_sort_and_other_filters_through() {
+        sut = makeBrandListingSUT()
+        let searches = recordSearches()
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: \.isSuccess,
+            afterTrigger: {
+                self.sut.didApplyFilters(.init(maxPrice: 120, minPrice: 40, productTypes: ["Bags"]), sort: "PRICE_ASC")
+            }
+        )
+
+        XCTAssertEqual(
+            searches.all.last,
+            .init(
+                searchTerm: "",
+                after: nil,
+                sort: "PRICE_ASC",
+                filters: .init(brandNames: ["acme-key"], maxPrice: 120, minPrice: 40, productTypes: ["Bags"])
+            )
+        )
+    }
+
+    func test_brand_listing_next_page_keeps_the_pinned_key() {
+        sut = makeBrandListingSUT()
+        let products = Array(Product.fixtures.prefix(2))
+        let searches = recordSearches { after in
+            .fixture(
+                pagination: .fixture(endCursor: after == nil ? "cursor-1" : nil, hasNextPage: after == nil),
+                products: after == nil ? products : [.fixture(id: "next-page")]
+            )
+        }
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: \.isSuccess,
+            afterTrigger: { self.sut.didDisplay(products[1]) }
+        )
+
+        XCTAssertEqual(
+            searches.all.last,
+            .init(searchTerm: "", after: "cursor-1", sort: nil, filters: .init(brandNames: ["acme-key"]))
+        )
+    }
+
+    func test_brand_listing_with_no_products_shows_no_results_blocking_error() {
+        sut = makeBrandListingSUT()
+        mockProductListing.onSearchPageCalled = { _, _, _, _ in throw BFFRequestError(type: .emptyResponse) }
+
+        XCTAssertEmitsValue(from: sut.$state, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure, .noResults)
+    }
+
+    func test_search_results_for_a_search_term_are_not_a_brand_listing() {
+        sut = makeSUT(searchText: "Acme", mode: .searchResults)
+
+        XCTAssertFalse(sut.isBrandListing)
+    }
+
+    private func makeBrandListingSUT() -> ProductListingViewModel {
+        makeSUT(
+            brand: .fixture(key: "acme-key", name: "Acme"),
+            mode: .searchResults,
+            searchNavigation: .searchResults(goBack: {}, editSearchTerm: {})
+        )
+    }
+
+    private func recordSearches(
+        answer: @escaping (String?) -> ProductListing = { _ in .fixture(products: Array(Product.fixtures.prefix(2))) }
+    ) -> SearchRecorder {
+        let recorder = SearchRecorder()
+        mockProductListing.onSearchPageCalled = { searchTerm, after, sort, filters in
+            recorder.all.append(.init(searchTerm: searchTerm, after: after, sort: sort, filters: filters))
+            return answer(after)
+        }
+        return recorder
     }
 
     func test_fetch_first_page_failure_returns_error() {
@@ -1291,4 +1401,15 @@ private actor FetchGate {
         continuation?.resume()
         continuation = nil
     }
+}
+
+private final class SearchRecorder {
+    struct Search: Equatable {
+        let searchTerm: String
+        let after: String?
+        let sort: String?
+        let filters: ProductFilterInput?
+    }
+
+    var all: [Search] = []
 }

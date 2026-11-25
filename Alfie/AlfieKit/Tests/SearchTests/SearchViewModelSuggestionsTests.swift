@@ -18,6 +18,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     private let shirt = ProductSuggestion.fixture(id: "shirt-1", handle: "oxford-shirt")
     private let linenShirt = KeywordSuggestion.fixture(value: "linen shirt")
     private let dress = ProductSuggestion.fixture(id: "dress-1", handle: "linen-dress")
+    private let shirtCo = BrandSuggestion.fixture(key: "shirt-co-key", name: "The Shirt Co")
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -208,6 +209,68 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         XCTAssertEqual(
             sut.state,
             suggestions(for: "linen", [.keywords([.fixture(value: "Linen Shirt"), .fixture(value: "linen dress")])])
+        )
+    }
+
+    func test_brand_suggestions_are_shown_between_keyword_and_product_suggestions() {
+        stubSuggestions { [linenShirt, shirtCo, shirt] _ in
+            .fixture(keywords: [linenShirt], brands: [shirtCo], products: [shirt])
+        }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(
+            sut.state,
+            suggestions(for: "shirt", [.keywords([linenShirt]), .brands([shirtCo]), .products([shirt])])
+        )
+    }
+
+    func test_brand_suggestions_alone_are_shown() {
+        stubSuggestions { [shirtCo] _ in .fixture(brands: [shirtCo]) }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.brands([shirtCo])]))
+    }
+
+    func test_no_brand_suggestions_hides_the_brands_section() {
+        stubSuggestions { [linenShirt, shirt] _ in .fixture(keywords: [linenShirt], brands: [], products: [shirt]) }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(sut.state, suggestions(for: "shirt", [.keywords([linenShirt]), .products([shirt])]))
+    }
+
+    func test_brand_suggestions_repeating_a_key_in_the_same_case_are_shown_once() {
+        stubSuggestions { _ in
+            .fixture(
+                brands: [
+                    .fixture(key: "shirt-co-key", name: "The Shirt Co"),
+                    .fixture(key: "shirt-co-key", name: "Shirt Co"),
+                    .fixture(key: "SHIRT-CO-KEY", name: "The Shirt Co")
+                ]
+            )
+        }
+        let sut = makeSUT()
+
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertEqual(
+            sut.state,
+            suggestions(
+                for: "shirt",
+                [
+                    .brands(
+                        [
+                            .fixture(key: "shirt-co-key", name: "The Shirt Co"),
+                            .fixture(key: "SHIRT-CO-KEY", name: "The Shirt Co")
+                        ]
+                    )
+                ]
+            )
         )
     }
 
@@ -423,6 +486,63 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         }
     }
 
+    // MARK: - Brand suggestion
+
+    func test_tapping_brand_suggestion_opens_the_brand_listing_with_its_key_and_name() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapBrandSuggestion(shirtCo)
+
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(.fixture(key: "shirt-co-key", name: "The Shirt Co")))])
+    }
+
+    func test_tapping_brand_suggestion_puts_the_brand_name_in_the_search_field() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapBrandSuggestion(shirtCo)
+
+        XCTAssertEqual(sut.searchText, "The Shirt Co")
+    }
+
+    func test_tapping_brand_suggestion_saves_brand_recent_search_and_tracks_nothing() {
+        var added: [RecentSearch] = []
+        mockRecentsService.onAdd = { added.append($0) }
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        sut.didTapBrandSuggestion(shirtCo)
+
+        XCTAssertEqual(added, [.brand(suggestion: .fixture(key: "shirt-co-key", name: "The Shirt Co"))])
+        XCTAssertTrue(mockAnalytics.trackedEvents.isEmpty)
+    }
+
+    func test_tapping_brand_suggestion_requests_no_suggestions() {
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+
+        XCTAssertNoEmit(from: sut.$state) {
+            sut.didTapBrandSuggestion(self.shirtCo)
+            self.scheduler.advance(by: .milliseconds(500))
+        }
+
+        XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
+    }
+
+    func test_view_appearing_again_after_brand_tap_shows_suggestions_for_the_brand_name() {
+        stubSuggestions { [shirt, dress] searchTerm in
+            .fixture(products: [searchTerm == "The Shirt Co" ? dress : shirt])
+        }
+        let sut = makeSUT()
+        showSuggestions(for: "shirt", in: sut)
+        sut.didTapBrandSuggestion(shirtCo)
+
+        showSuggestions(in: sut) { sut.viewDidAppear() }
+
+        XCTAssertEqual(sut.state, suggestions(for: "The Shirt Co", [.products([dress])]))
+    }
+
     // MARK: - More Products
 
     func test_more_products_shows_search_results_for_current_search_term() {
@@ -496,6 +616,29 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         scheduler.advance(by: .milliseconds(500))
 
         XCTAssertEqual(sut.state, .recentSearches)
+        XCTAssertEqual(requests, [])
+    }
+
+    func test_tapping_brand_recent_search_reopens_the_brand_listing_by_its_key() {
+        let recentSearch = RecentSearch.brand(suggestion: .fixture(key: "shirt-co-key", name: "The Shirt Co"))
+        mockRecentsService.recentSearches = [recentSearch]
+        let sut = makeSUT()
+
+        sut.recentSearchesViewModel.didTapRecentSearch(recentSearch)
+
+        XCTAssertEqual(capturedRoutes, [.searchIntent(.brandListing(.fixture(key: "shirt-co-key", name: "The Shirt Co")))])
+        XCTAssertEqual(sut.searchText, "The Shirt Co")
+    }
+
+    func test_tapping_brand_recent_search_tracks_nothing_and_makes_no_request() {
+        let recentSearch = RecentSearch.brand(suggestion: .fixture(key: "shirt-co-key", name: "The Shirt Co"))
+        mockRecentsService.recentSearches = [recentSearch]
+        let sut = makeSUT()
+
+        sut.recentSearchesViewModel.didTapRecentSearch(recentSearch)
+        scheduler.advance(by: .milliseconds(500))
+
+        XCTAssertTrue(mockAnalytics.trackedEvents.isEmpty)
         XCTAssertEqual(requests, [])
     }
 

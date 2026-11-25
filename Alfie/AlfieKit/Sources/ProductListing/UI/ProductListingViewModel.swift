@@ -10,6 +10,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     private let dependencies: ProductListingDependencyContainer
     private let category: String?
     private let query: String?
+    private let brand: BrandSuggestion?
     private let mode: ProductListingViewMode
     @Published public var style: ProductListingListStyle
     @Published public var showRefine = false
@@ -48,7 +49,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
     }
 
     public var searchTerm: String? {
-        mode == .searchResults ? query : nil
+        mode == .searchResults ? brand?.name ?? query : nil
     }
 
     public var totalNumberOfProducts: Int {
@@ -59,6 +60,10 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         !(state.isLoadingFirstPage || mode == .searchResults)
     }
 
+    public var isBrandListing: Bool {
+        brand != nil
+    }
+
     public var isWishlistEnabled: Bool {
         dependencies.configurationService.isFeatureEnabled(.wishlist)
     }
@@ -67,6 +72,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         dependencies: ProductListingDependencyContainer,
         category: String? = nil,
         searchText: String? = nil,
+        brand: BrandSuggestion? = nil,
         sort: String? = nil,
         urlQueryParameters: [String: String]? = nil,
         mode: ProductListingViewMode = .listing,
@@ -77,6 +83,7 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
         self.dependencies = dependencies
         style = dependencies.plpStyleListProvider.style
         self.category = category
+        self.brand = brand
         self.mode = mode
         sortOption = sort
         query = searchText ?? urlQueryParameters.map(\.values)?.joined(separator: ",")
@@ -260,13 +267,18 @@ public final class ProductListingViewModel: ProductListingViewModelProtocol {
             )
 
         case .searchResults:
-            guard let searchTerm = query else { return nil }
+            guard let searchTerm = isBrandListing ? "" : query else { return nil }
             return try await dependencies.productListingService.searchPage(
                 searchTerm: searchTerm,
                 after: after,
                 sort: sortOption,
-                filters: filters
+                filters: searchFilters
             )
         }
+    }
+
+    private var searchFilters: ProductFilterInput? {
+        guard let brand else { return filters }
+        return (filters ?? .init()).pinned(toBrandKey: brand.key)
     }
 }

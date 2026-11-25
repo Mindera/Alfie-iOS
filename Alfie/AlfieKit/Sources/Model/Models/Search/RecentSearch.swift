@@ -1,15 +1,24 @@
 public enum RecentSearch {
     case text(value: String)
-    case reccomendation(value: String, path: String)
+    case brand(suggestion: BrandSuggestion)
 }
 
 public extension RecentSearch {
     var value: String {
         switch self {
-        case .text(let value),
-             .reccomendation(let value, _): // swiftlint:disable:this indentation_width
-            return value
+        case .text(let value):
+            value
+
+        case .brand(let brand):
+            brand.name
         }
+    }
+
+    func isSameSearch(as other: RecentSearch) -> Bool {
+        if case let (.brand(brand), .brand(otherBrand)) = (self, other), brand.key == otherBrand.key {
+            return true
+        }
+        return value.caseInsensitiveCompare(other.value) == .orderedSame
     }
 }
 
