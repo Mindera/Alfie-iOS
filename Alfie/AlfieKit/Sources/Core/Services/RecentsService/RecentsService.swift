@@ -20,7 +20,8 @@ public final class RecentsService: RecentsServiceProtocol {
         self.storageKey = storageKey
         self.storageService = storageService
         self.recentSearchesSubject = .init(
-            (try? storageService?.load(for: storageKey, as: [RecentSearch].self, expiry: .never)) ?? []
+            (try? storageService?.load(for: storageKey, as: [StoredRecentSearch].self, expiry: .never))?
+                .compactMap(\.recentSearch) ?? []
         )
         self.recentSearchesPublisher = recentSearchesSubject.eraseToAnyPublisher()
     }
@@ -32,10 +33,8 @@ public final class RecentsService: RecentsServiceProtocol {
         else {
             return
         }
-        if recentSearches.count >= Constants.recentSearchesCountLimit {
-            recentSearchesSubject.value.removeLast()
-        }
-        recentSearchesSubject.value.insert(recentSearch, at: 0)
+        let otherSearches = recentSearches.filter { !$0.isSameSearch(as: recentSearch) }
+        recentSearchesSubject.value = Array(([recentSearch] + otherSearches).prefix(Constants.recentSearchesCountLimit))
         hasPendingChanges = true
         saveIfNeeded()
     }
@@ -79,5 +78,17 @@ public final class RecentsService: RecentsServiceProtocol {
 extension RecentsService {
     private enum Constants {
         static let recentSearchesCountLimit: Int = 5
+    }
+}
+
+private struct StoredRecentSearch: Codable {
+    let recentSearch: RecentSearch?
+
+    init(from decoder: Decoder) throws {
+        recentSearch = try? RecentSearch(from: decoder)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try recentSearch.encode(to: encoder)
     }
 }

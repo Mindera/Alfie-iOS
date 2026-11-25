@@ -8,6 +8,7 @@ import XCTest
 
 final class SearchViewSnapshotTests: XCTestCase {
     private let isRecording = false
+    private let suggestionPhoto = URL(string: "https://cdn.alfie.test/suggestion-0.jpg")!
     private var mockViewModel: MockSearchViewModel!
 
     override func setUpWithError() throws {
@@ -76,7 +77,7 @@ final class SearchViewSnapshotTests: XCTestCase {
                 imageURL: photos[2].url
             )
         ]
-        mockViewModel.state = .suggestions(.success(.fixture(products: products)))
+        mockViewModel.state = .suggestions(.success(.init(searchTerm: "shirt", sections: [.products(products)])))
 
         let sut = SearchView(viewModel: mockViewModel)
             .remoteImageFixtures(Dictionary(uniqueKeysWithValues: photos.map { ($0.url, UIImage.solid($0.colour)) }))
@@ -84,7 +85,57 @@ final class SearchViewSnapshotTests: XCTestCase {
         assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
     }
 
-    func test_search_view_without_product_suggestions_shows_no_results_message() {
+    func test_search_view_with_keyword_suggestions_lists_them_above_products() {
+        let photo = URL(string: "https://cdn.alfie.test/suggestion-0.jpg")!
+        mockViewModel.searchText = "shirt"
+        let sections: [SuggestionsSection] = [
+            .keywords(
+                [
+                    .fixture(value: "linen shirt"),
+                    .fixture(value: "Shirt dress with a shirt collar"),
+                    .fixture(value: "oversized long sleeve cotton poplin shirt in washed sky blue stripe"),
+                    .fixture(value: "polo")
+                ]
+            ),
+            .products(
+                [
+                    .fixture(
+                        id: "1",
+                        name: "Oxford Shirt",
+                        brandName: "Alfie",
+                        price: .fixture(amountFormatted: "£45.00"),
+                        imageURL: photo
+                    )
+                ]
+            )
+        ]
+        mockViewModel.state = .suggestions(.success(.init(searchTerm: "shirt", sections: sections)))
+
+        let sut = SearchView(viewModel: mockViewModel)
+            .remoteImageFixtures([photo: UIImage.solid(.systemTeal)])
+
+        assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
+    }
+
+    func test_search_view_with_all_three_suggestion_kinds_keeps_long_brand_names_on_one_line() {
+        let sut = makeSUT(
+            showing: [
+                .keywords([.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")]),
+                .brands(brandSuggestions),
+                .products([productSuggestion])
+            ]
+        )
+
+        assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
+    }
+
+    func test_search_view_with_brand_and_product_suggestions_only_hides_the_keywords_section() {
+        let sut = makeSUT(showing: [.brands(brandSuggestions), .products([productSuggestion])])
+
+        assertSnapshot(of: sut.embededInFullHeightContainer(), as: .defaultImage(), record: isRecording)
+    }
+
+    func test_search_view_without_suggestions_shows_no_results_message() {
         mockViewModel.searchText = "zzz"
         mockViewModel.state = .suggestions(.error(.noResults(searchTerm: "zzz")))
 
@@ -100,5 +151,30 @@ final class SearchViewSnapshotTests: XCTestCase {
         let sut = SearchView(viewModel: mockViewModel)
 
         assertSnapshot(of: sut.embededInContainer(), as: .defaultImage(), record: isRecording)
+    }
+
+    private var brandSuggestions: [BrandSuggestion] {
+        [
+            .fixture(key: "shirt-co", name: "The Shirt Co"),
+            .fixture(key: "long", name: "Shirtmakers Of The Old Northern Quarter And Sons Tailoring Company Limited"),
+            .fixture(key: "alfie", name: "Alfie")
+        ]
+    }
+
+    private var productSuggestion: ProductSuggestion {
+        .fixture(
+            id: "1",
+            name: "Oxford Shirt",
+            brandName: "Alfie",
+            price: .fixture(amountFormatted: "£45.00"),
+            imageURL: suggestionPhoto
+        )
+    }
+
+    private func makeSUT(showing sections: [SuggestionsSection]) -> some View {
+        mockViewModel.searchText = "shirt"
+        mockViewModel.state = .suggestions(.success(.init(searchTerm: "shirt", sections: sections)))
+        return SearchView(viewModel: mockViewModel)
+            .remoteImageFixtures([suggestionPhoto: UIImage.solid(.systemTeal)])
     }
 }

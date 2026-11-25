@@ -4,9 +4,12 @@
 # test plans against it without rebuilding, and tears the BFF down on exit. --skip-build reuses the
 # products of an earlier build-for-testing (verify.sh's build step).
 # ALFIE_BFF_START_CMD overrides the start command (e.g. a Live BFF platform); set
-# ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF.
+# ALFIE_BFF_PLATFORM=mock alongside it if the override still boots the Mock BFF, or
+# ALFIE_BFF_PLATFORM=shopify if it boots a Live BFF on Shopify (runs the Shopify-only tests).
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to this script's xcodebuild calls (CI's package
+# flags).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
-# never touched.
+# never touched. The BFF's output goes to /tmp/alfie_bff.log.
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree
@@ -15,6 +18,8 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 BUILD_LOG="/tmp/alfie_bff_tests_build.log"
+BFF_LOG="/tmp/alfie_bff.log"
+read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
 
 SKIP_BUILD=false
 while [[ $# -gt 0 ]]; do
@@ -40,6 +45,7 @@ GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
 
 fail() { echo "❌ $1"; exit 1; }
+fail_with_bff_log() { tail -n 40 "$BFF_LOG"; fail "$1 (log: $BFF_LOG)"; }
 
 warn_if_bff_checkout_differs_from_main() {
     git -C "$BFF_PATH" rev-parse --git-dir >/dev/null 2>&1 || return 0
@@ -82,11 +88,17 @@ if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
     ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
 fi
 
-# --- Simulator: the pinned iPhone unit tests use, else the newest -----------
+# --- Simulator ---------------------------------------------------------------
+if [ -n "$CI" ] && [ -z "$(pinned_iphone_udid)" ]; then
+    fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
+fi
 SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
+# Boot now so the simulator settles during the build: on a freshly booted one the first app launch
+# outlasts Xcode's launch timeout.
+xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null
 
 if [ "$SKIP_BUILD" = true ]; then
     echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
@@ -95,7 +107,8 @@ else
     xcodebuild build-for-testing \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
-        -destination "$DESTINATION" 2>&1 | tee "$BUILD_LOG"
+        -destination "$DESTINATION" \
+        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$BUILD_LOG"
     [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
 fi
 
@@ -112,10 +125,10 @@ if lsof -i ":$BFF_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
 fi
 
 # --- Boot the BFF in its own process group -----------------------------------
-echo "🚀 Booting BFF: $BFF_START_CMD (cwd: $BFF_PATH)"
+echo "🚀 Booting BFF: $BFF_START_CMD (cwd: $BFF_PATH, log: $BFF_LOG)"
 # Run via `bash -c` so ALFIE_BFF_START_CMD overrides with quoting/compound commands work; for a
 # single command bash execs it directly, so it still becomes the process-group leader.
-( cd "$BFF_PATH" && exec bash -c "$BFF_START_CMD" ) &
+( cd "$BFF_PATH" && exec bash -c "$BFF_START_CMD" ) >"$BFF_LOG" 2>&1 &
 BFF_PGID=$!
 # Kill the whole process group (npm spawns child node procs that a plain `kill $PID` would orphan).
 trap 'echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT INT TERM
@@ -125,7 +138,7 @@ echo "⏳ Waiting for GraphQL at $GRAPHQL_URL (timeout ${READINESS_TIMEOUT}s)...
 ready=false
 for _ in $(seq 1 "$READINESS_TIMEOUT"); do
     if ! kill -0 "$BFF_PGID" 2>/dev/null; then
-        fail "BFF process exited before becoming ready. Check the BFF logs."
+        fail_with_bff_log "BFF process exited before becoming ready"
     fi
     # A POST with a trivial query uniquely identifies a live GraphQL endpoint (a GET returns
     # 200-landing/404/405 inconsistently).
@@ -138,7 +151,7 @@ for _ in $(seq 1 "$READINESS_TIMEOUT"); do
     fi
     sleep 1
 done
-[ "$ready" = true ] || fail "BFF did not become ready at $GRAPHQL_URL within ${READINESS_TIMEOUT}s."
+[ "$ready" = true ] || fail_with_bff_log "BFF did not become ready at $GRAPHQL_URL within ${READINESS_TIMEOUT}s"
 echo "✅ BFF is ready."
 
 # Guards against a false green: xcodebuild exits 0 when every test XCTSkips, so zero executed test
@@ -153,7 +166,8 @@ run_plan() {
         -scheme "$SCHEME" \
         -testPlan "$plan" \
         -destination "$DESTINATION" \
-        -resultBundlePath "$bundle" 2>&1 | tee "$log"
+        -resultBundlePath "$bundle" \
+        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
     local result=${PIPESTATUS[0]}
 
     if [ "$result" -ne 0 ]; then

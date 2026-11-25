@@ -63,10 +63,13 @@ extension SearchView {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityIdentifier(AccessibilityID.Search.suggestionsLoading)
 
-        case .suggestions(.success(let suggestions)):
-            ProductSuggestionsView(
-                products: suggestions.products,
-                onSelect: { viewModel.didTapProductSuggestion($0) },
+        case .suggestions(.success(let content)):
+            SuggestionsView(
+                sections: content.sections,
+                searchTerm: content.searchTerm,
+                onSelectKeyword: { viewModel.didTapKeywordSuggestion($0) },
+                onSelectBrand: { viewModel.didTapBrandSuggestion($0) },
+                onSelectProduct: { viewModel.didTapProductSuggestion($0) },
                 onMoreProducts: { viewModel.didTapMoreProducts() }
             )
 
@@ -137,12 +140,22 @@ extension SearchView {
     SearchView(viewModel: MockSearchViewModel(state: .suggestions(.loading)))
 }
 
-#Preview("Product Suggestions") {
+#Preview("Suggestions") {
     SearchView(
         viewModel: MockSearchViewModel(
             state: .suggestions(
-                .success(.fixture(products: [.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]))
-            )
+                .success(
+                    .init(
+                        searchTerm: "shirt",
+                        sections: [
+                            .keywords([.fixture(value: "linen shirt"), .fixture(value: "Shirt dress")]),
+                            .brands([.fixture(key: "shirt-co", name: "The Shirt Co")]),
+                            .products([.fixture(id: "1"), .fixture(id: "2"), .fixture(id: "3")]),
+                        ]
+                    )
+                )
+            ),
+            searchText: "shirt"
         )
     )
 }

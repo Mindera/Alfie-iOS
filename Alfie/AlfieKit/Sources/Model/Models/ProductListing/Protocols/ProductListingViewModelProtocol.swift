@@ -7,6 +7,7 @@ public protocol ProductListingViewModelProtocol: ObservableObject {
     var transientError: ProductListingTransientError? { get }
     // Pull-to-refresh draws its own spinner; a refresh re-sent from the Snackbar has none.
     var isRetryingRefresh: Bool { get }
+    var isBrandListing: Bool { get }
     var products: [Product] { get }
     var wishlistContent: [SelectedProduct] { get }
     var style: ProductListingListStyle { get set }

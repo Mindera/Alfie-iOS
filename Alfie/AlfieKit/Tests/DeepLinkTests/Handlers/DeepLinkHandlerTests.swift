@@ -1,5 +1,6 @@
 import AlicerceLogging
 import CombineSchedulers
+import Core
 import Mocks
 import Model
 import TestUtils
@@ -354,6 +355,19 @@ final class DeepLinkHandlerTests: XCTestCase {
         testScheduler.advance()
 
         wait(for: [expectation], timeout: .default)
+    }
+
+    func test_pending_link_is_delivered_when_the_handler_is_installed_after_availability_was_turned_on() {
+        var receivedLinkTypes: [DeepLink.LinkType] = []
+        sut = sutWithNavigationAndTestScheduler { receivedLinkTypes.append($0) }
+        sut.handleDeepLink(DeepLink(type: .home, fullUrl: testUrl))
+        let service = DeepLinkService(parsers: [], configuration: MockLinkConfiguration(), log: Log.DummyLogger())
+        service.updateAvailabilityOfHandlers(to: true)
+
+        service.update(handlers: [sut])
+        testScheduler.advance()
+
+        XCTAssertEqual(receivedLinkTypes, [.home])
     }
 
     // MARK: - Private

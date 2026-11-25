@@ -19,8 +19,10 @@
   "testTargets" : [
     {
       "selectedTests" : [
+        "AddToBagJourneyTests",
         "AlfieUITestsLaunchTests",
-        "SearchJourneyTests"
+        "SearchJourneyTests",
+        "WishlistJourneyTests"
       ],
       "target" : {
         "containerPath" : "container:Alfie.xcodeproj",

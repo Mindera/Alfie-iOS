@@ -653,7 +653,11 @@ extension ProductDetailsView {
                 viewModel.didTapAddToWishlist()
             }
             .frame(width: theme.sizing.spacingSpacing2xl, height: theme.sizing.spacingSpacing2xl)
-            .accessibilityIdentifier(AccessibilityID.ProductDetails.addToWishlistButton)
+            .accessibilityIdentifier(
+                viewModel.isInWishlist
+                    ? AccessibilityID.ProductDetails.removeFromWishlistButton
+                    : AccessibilityID.ProductDetails.addToWishlistButton
+            )
         }
     }
 

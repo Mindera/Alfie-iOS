@@ -27,6 +27,7 @@ struct ProductListingFilter: View {
         listStyle: Binding<ProductListingListStyle>,
         priceBounds: PriceFilterBounds?,
         appliedFilters: ProductFilterInput?,
+        isBrandListing: Bool = false,
         appliedSort: SortByType?,
         onApply: @escaping (ProductFilterInput?, SortByType?) -> Void
     ) {
@@ -37,6 +38,7 @@ struct ProductListingFilter: View {
             wrappedValue: RefineViewModel(
                 priceBounds: priceBounds,
                 appliedFilters: appliedFilters,
+                isBrandListing: isBrandListing,
                 appliedSort: appliedSort,
                 onApply: onApply
             )

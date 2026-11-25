@@ -63,7 +63,35 @@ final class ProductDetailsPage {
         app.buttons[AccessibilityID.ProductDetails.addToWishlistButton]
     }
 
+    var removeFromWishlistButton: XCUIElement {
+        app.buttons[AccessibilityID.ProductDetails.removeFromWishlistButton]
+    }
+
     // MARK: - Actions
+
+    @discardableResult
+    func open(
+        handle: String,
+        variantId: String? = nil,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) -> Self {
+        guard #available(iOS 16.4, *) else {
+            XCTFail("Opening a deep link needs iOS 16.4 or newer", file: file, line: line)
+            return self
+        }
+        var components = URLComponents()
+        components.scheme = "alfie"
+        components.host = "alfie.target"
+        components.path = "/product/\(handle)"
+        components.queryItems = variantId.map { [URLQueryItem(name: "variantId", value: $0)] }
+        guard let url = components.url else {
+            XCTFail("\(handle) does not make a product deep link", file: file, line: line)
+            return self
+        }
+        app.open(url)
+        return self
+    }
 
     @discardableResult
     func tapAddToBag() -> Self {
