@@ -43,7 +43,8 @@ start_stall_capture() {
     rm -f "$UI_SIMULATOR_LOG" "$UI_STARTUP_FILE" "$UI_SAMPLE_PREFIX"*.log
     : > "$log"
     UI_PLAN_STARTED_AT=$SECONDS
-    xcrun simctl spawn "$simulator" log stream --level info --style compact > "$UI_SIMULATOR_LOG" 2>&1 &
+    xcrun simctl spawn "$simulator" log stream --level info --style compact \
+        --predicate 'process != "apsd"' > "$UI_SIMULATOR_LOG" 2>&1 &
     UI_SIMULATOR_LOG_PID=$!
     watch_runner_start "$log" xcodebuild $$ &
     UI_WATCH_PID=$!
