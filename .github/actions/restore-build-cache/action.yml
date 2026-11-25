@@ -1,0 +1,47 @@
+name: Restore build cache
+description: Restores the newest Xcode DerivedData cache (never saved here), sets file modification dates back to their commit dates and exports CI's xcodebuild flags as ALFIE_XCODEBUILD_ARGS. Run after setup-ios on a full-history checkout, in every job that builds, so they all build the same way.
+
+inputs:
+  xcode-version:
+    description: The xcode-version output of setup-ios
+    required: true
+  derived-data-path:
+    description: DerivedData directory, relative to the workspace
+    required: true
+
+outputs:
+  cache-hit:
+    description: "'true' when this commit's DerivedData cache already exists"
+    value: ${{ steps.derived-cache.outputs.cache-hit }}
+  cache-primary-key:
+    description: Per-commit key of the DerivedData cache, for actions/cache/save
+    value: ${{ steps.derived-cache.outputs.cache-primary-key }}
+
+runs:
+  using: composite
+  steps:
+    - name: Restore Xcode DerivedData
+      id: derived-cache
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      with:
+        path: ${{ inputs.derived-data-path }}
+        key: derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-${{ github.sha }}
+        restore-keys: |
+          derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-
+
+    - name: Restore file modification dates
+      shell: bash
+      run: ./Alfie/scripts/restore-mtimes.sh
+
+    - name: Export xcodebuild flags
+      shell: bash
+      env:
+        DERIVED_DATA_PATH: ${{ inputs.derived-data-path }}
+        RESTORED_DERIVED_DATA: ${{ steps.derived-cache.outputs.cache-matched-key && format('{0}/{1}', github.workspace, inputs.derived-data-path) || '' }}
+      run: |
+        PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
+        [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
+        {
+          echo "ALFIE_XCODEBUILD_ARGS=$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH"
+          echo "ALFIE_RESTORED_DERIVED_DATA=$RESTORED_DERIVED_DATA"
+        } >> "$GITHUB_ENV"
