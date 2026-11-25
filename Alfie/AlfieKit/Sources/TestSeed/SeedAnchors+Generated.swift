@@ -21,6 +21,21 @@ public enum SeedAnchors {
         public static let shirts = "shirts"
         public static let women = "women"
     }
+    public enum Customers {
+        public enum Default {
+            public static let email = "customer@mock.invalid"
+            public static let firstName = "Casey"
+            public static let id = "mock-customer-default"
+            public static let lastName = "Customer"
+        }
+        public enum Expired {
+            public static let email = "expired@mock.invalid"
+            public static let firstName = "Eli"
+            public static let id = "mock-customer-expired"
+            public static let lastName = "Expired"
+        }
+        public static let password = "mock-password"
+    }
     public enum InStockVariants {
         public static let productSlug = "alfie-oxford-shirt"
         public static let variantIds: [String] = [
@@ -55,6 +70,7 @@ public enum SeedAnchors {
     ]
     public enum SearchTerms {
         public static let few = "dress"
+        public static let keywords = "shirt"
         public static let many = "shirt"
         public static let none = "zzz-no-results"
     }
