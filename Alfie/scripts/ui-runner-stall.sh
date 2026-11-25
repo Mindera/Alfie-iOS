@@ -37,15 +37,15 @@ watch_runner_start() {
     done
 }
 
-# start_stall_capture <simulator udid> <test log> [process name]
+# start_stall_capture <simulator udid> <test log>
 start_stall_capture() {
-    local simulator="$1" log="$2" process="${3:-xcodebuild}"
+    local simulator="$1" log="$2"
     rm -f "$UI_SIMULATOR_LOG" "$UI_STARTUP_FILE" "$UI_SAMPLE_PREFIX"*.log
     : > "$log"
     UI_PLAN_STARTED_AT=$SECONDS
     xcrun simctl spawn "$simulator" log stream --level info --style compact > "$UI_SIMULATOR_LOG" 2>&1 &
     UI_SIMULATOR_LOG_PID=$!
-    watch_runner_start "$log" "$process" $$ &
+    watch_runner_start "$log" xcodebuild $$ &
     UI_WATCH_PID=$!
 }
 
@@ -59,21 +59,21 @@ kill_stall_capture() {
     UI_SIMULATOR_LOG_PID=""
 }
 
-# stop_stall_capture <plan name> <plan exit code>
+# stop_stall_capture <plan exit code>
 stop_stall_capture() {
-    local plan="$1" plan_result="$2" elapsed=$((SECONDS - UI_PLAN_STARTED_AT)) startup
+    local plan_result="$1" elapsed=$((SECONDS - UI_PLAN_STARTED_AT)) startup
     kill_stall_capture
     startup="$(cat "$UI_STARTUP_FILE" 2>/dev/null)"
     rm -f "$UI_STARTUP_FILE"
     if [ -n "$startup" ]; then
-        echo "⏱️  $plan runner start-up: ${startup}s"
+        echo "⏱️  AlfieUI runner start-up: ${startup}s"
     else
-        echo "⏱️  $plan runner did not start (${elapsed}s)"
+        echo "⏱️  AlfieUI runner did not start (${elapsed}s)"
         startup=$elapsed
     fi
 
     if [ "$startup" -gt "$UI_STARTUP_THRESHOLD" ]; then
-        echo "⚠️  $plan runner start-up over ${UI_STARTUP_THRESHOLD}s; evidence kept:"
+        echo "⚠️  AlfieUI runner start-up over ${UI_STARTUP_THRESHOLD}s; evidence kept:"
         ls "$UI_SIMULATOR_LOG" "$UI_SAMPLE_PREFIX"*.log 2>/dev/null | sed 's/^/   /'
         [ -z "$GITHUB_OUTPUT" ] || echo "ui_runner_stalled=true" >> "$GITHUB_OUTPUT"
     elif [ "$plan_result" -eq 0 ]; then

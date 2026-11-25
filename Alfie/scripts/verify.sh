@@ -16,6 +16,7 @@
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ci-log.sh"
 
 # Parse our own flags; pass everything else through to the unit-test runner.
 RUN_BFF_TESTS=true
@@ -41,6 +42,7 @@ echo "📦 STEP 1: Build Verification"
 echo "--------------------------------"
 "$SCRIPT_DIR/build-for-verification.sh"
 BUILD_RESULT=$?
+summarize_stage "Build" "$BUILD_RESULT"
 
 if [ $BUILD_RESULT -ne 0 ]; then
     echo ""
@@ -57,6 +59,7 @@ echo "🧪 STEP 2: Unit Test Verification"
 echo "-------------------------------"
 "$SCRIPT_DIR/test-for-verification.sh" --skip-build "${TEST_ARGS[@]}"
 TEST_RESULT=$?
+summarize_stage "Unit tests" "$TEST_RESULT"
 
 if [ $TEST_RESULT -ne 0 ]; then
     echo ""
@@ -80,6 +83,9 @@ if [ "$RUN_BFF_TESTS" = true ]; then
         echo "(Re-run with --only-unit if the local BFF is unavailable.)"
         exit 1
     fi
+else
+    summarize_stage "Integration tests" skipped
+    summarize_stage "UI tests" skipped
 fi
 
 echo ""

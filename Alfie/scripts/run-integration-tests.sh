@@ -10,8 +10,6 @@
 # flags).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched. The BFF's output goes to /tmp/alfie_bff.log.
-# The AlfieUI plan reports its runner's start-up time and keeps evidence of a slow one
-# (ui-runner-stall.sh).
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree
@@ -21,7 +19,6 @@ PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 BUILD_LOG="/tmp/alfie_bff_tests_build.log"
 BFF_LOG="/tmp/alfie_bff.log"
-read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
 
 SKIP_BUILD=false
 while [[ $# -gt 0 ]]; do
@@ -48,7 +45,12 @@ esac
 GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
 
-fail() { echo "❌ $1"; exit 1; }
+fail() {
+    echo "❌ $1"
+    summarize_stage "Integration tests" not-run
+    summarize_stage "UI tests" not-run
+    exit 1
+}
 fail_with_bff_log() { tail -n 40 "$BFF_LOG"; fail "$1 (log: $BFF_LOG)"; }
 
 warn_if_bff_checkout_differs_from_main() {
@@ -94,7 +96,7 @@ fi
 
 # --- Simulator ---------------------------------------------------------------
 if [ -n "$CI" ] && [ -z "$(pinned_iphone_udid)" ]; then
-    fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
+    fail "$NO_PINNED_IPHONE"
 fi
 SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
@@ -108,15 +110,12 @@ if [ "$SKIP_BUILD" = true ]; then
     echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
 else
     echo "🔨 build-for-testing (log: $BUILD_LOG)..."
-    log_group "build-for-testing"
-    xcodebuild build-for-testing \
+    run_logged "build-for-testing" "$BUILD_LOG" \
+        xcodebuild build-for-testing \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -destination "$DESTINATION" \
-        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$BUILD_LOG"
-    BUILD_RESULT=${PIPESTATUS[0]}
-    log_endgroup
-    [ "$BUILD_RESULT" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
+        "${XCODEBUILD_ARGS[@]}" || fail "build-for-testing failed (log: $BUILD_LOG)"
 fi
 
 warn_if_bff_checkout_differs_from_main
@@ -173,17 +172,16 @@ run_plan() {
     echo "🧪 Running $plan test plan (test-without-building)..."
     rm -rf "$bundle"
     [ "$plan" != AlfieUI ] || start_stall_capture "$SIMULATOR_ID" "$log"
-    log_group "$plan test plan"
-    xcodebuild test-without-building \
+    run_logged "$plan test plan" "$log" \
+        xcodebuild test-without-building \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -testPlan "$plan" \
         -destination "$DESTINATION" \
         -resultBundlePath "$bundle" \
-        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
-    local result=${PIPESTATUS[0]}
-    log_endgroup
-    [ "$plan" != AlfieUI ] || stop_stall_capture "$plan" "$result"
+        "${XCODEBUILD_ARGS[@]}"
+    local result=$?
+    [ "$plan" != AlfieUI ] || stop_stall_capture "$result"
 
     if [ "$result" -ne 0 ]; then
         echo "❌ $plan TESTS FAILED (log: $log, results: $bundle)"
@@ -201,14 +199,17 @@ run_plan() {
 
 run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult
 INTEGRATION_RESULT=$?
+summarize_stage "Integration tests" "$INTEGRATION_RESULT"
 # A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
 # checks"), so wait for the boot to finish first.
 if wait_for_boot "$SIMULATOR_ID"; then
     run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
     UI_RESULT=$?
+    summarize_stage "UI tests" "$UI_RESULT"
     use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not reset $SIMULATOR_ID to light appearance."
 else
     echo "❌ Simulator $SIMULATOR_ID did not boot within ${BOOT_TIMEOUT}s; AlfieUI not run."
+    summarize_stage "UI tests" not-run
     UI_RESULT=1
 fi
 
