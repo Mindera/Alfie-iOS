@@ -79,6 +79,27 @@ public enum AccessibilityID {
         }
     }
 
+    // MARK: - SearchBar
+
+    public enum SearchBar {
+        public static let input = "searchBar.input.textField"
+        public static let clearButton = "searchBar.clear.button"
+        public static let dismissButton = "searchBar.dismiss.button"
+    }
+
+    // MARK: - ProductCard
+
+    public enum ProductCard {
+        public static let card = "productCard.view"
+        public static let image = "productCard.image"
+        public static let designer = "productCard.designer.label"
+        public static let name = "productCard.name.label"
+        public static let colour = "productCard.colour.label"
+        public static let size = "productCard.size.label"
+        public static let price = "productCard.price.view"
+        public static let wishlistButton = "productCard.wishlist.button"
+    }
+
     // MARK: - Scanner
 
     public enum Scanner {
