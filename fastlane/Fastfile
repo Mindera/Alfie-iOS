@@ -3,16 +3,6 @@
 # update_fastlane
 
 platform :ios do
-  desc "Run Tests"
-  lane :test do
-
-    # ensure_devices_found: scan treats an unresolvable SCAN_DEVICE as advisory and silently
-    # falls back to the newest runtime. That defeats the iOS-26 pin in .env.default, so fail hard
-    # instead — a green run then proves the pinned simulator was actually used.
-    scan(ensure_devices_found: true)
-
-  end
-
   desc "Build and deploy app release to TestFlight"
   lane :release do
 

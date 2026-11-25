@@ -2,6 +2,7 @@
 
 # Build script for AI agents to verify code changes
 # Works across different developer machines by automatically selecting an available simulator
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to the xcodebuild calls (CI's package flags).
 
 set -o pipefail  # Ensure pipe returns the exit code of the failing command
 
@@ -9,6 +10,8 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
+read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
 
 echo "🔨 Building Alfie iOS project..."
 echo "📂 Project: $PROJECT_FILE"
@@ -17,12 +20,15 @@ echo ""
 
 # Try to build test bundles with generic iOS Simulator destination (most portable)
 echo "🎯 Attempting build-for-testing with generic iOS Simulator destination..."
+log_group "build-for-testing"
 xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+    "${XCODEBUILD_ARGS[@]}" \
     build-for-testing 2>&1 | tee /tmp/alfie_build.log
 
 BUILD_RESULT=${PIPESTATUS[0]}
+log_endgroup
 
 if [ $BUILD_RESULT -eq 0 ]; then
     echo ""
@@ -48,13 +54,16 @@ if grep -q "Unable to find a device matching the provided destination" /tmp/alfi
     echo ""
     
     # Build test bundles with specific simulator
+    log_group "build-for-testing ($SIMULATOR_NAME)"
     xcodebuild -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -destination "id=$SIMULATOR_ID" \
+        "${XCODEBUILD_ARGS[@]}" \
         build-for-testing 2>&1 | tee /tmp/alfie_build.log
-    
+
     BUILD_RESULT=${PIPESTATUS[0]}
-    
+    log_endgroup
+
     if [ $BUILD_RESULT -eq 0 ]; then
         echo ""
         echo "✅ BUILD SUCCEEDED"

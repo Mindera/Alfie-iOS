@@ -10,6 +10,8 @@
 # local BFF / Node toolchain isn't available.
 #
 # Usage: verify.sh [--only-unit] [args passed through to test-for-verification.sh, e.g. --filter X]
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to every xcodebuild call (CI's package flags,
+# coverage off, DerivedData path).
 
 set -o pipefail
 

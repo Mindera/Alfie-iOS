@@ -30,6 +30,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -104,12 +105,15 @@ if [ "$SKIP_BUILD" = true ]; then
     echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
 else
     echo "🔨 build-for-testing (log: $BUILD_LOG)..."
+    log_group "build-for-testing"
     xcodebuild build-for-testing \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -destination "$DESTINATION" \
         "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$BUILD_LOG"
-    [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
+    BUILD_RESULT=${PIPESTATUS[0]}
+    log_endgroup
+    [ "$BUILD_RESULT" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
 fi
 
 warn_if_bff_checkout_differs_from_main
@@ -117,7 +121,11 @@ echo "🔖 BFF: $(git -C "$BFF_PATH" rev-parse HEAD 2>/dev/null || echo unknown)
 echo "🧩 BFF platform: $ALFIE_BFF_PLATFORM"
 
 echo "📦 Installing and building the BFF (yarn)..."
-( cd "$BFF_PATH" && yarn install --frozen-lockfile && yarn build ) || fail "yarn install/build failed in $BFF_PATH"
+log_group "BFF yarn install and build"
+( cd "$BFF_PATH" && yarn install --frozen-lockfile && yarn build )
+BFF_BUILD_RESULT=$?
+log_endgroup
+[ "$BFF_BUILD_RESULT" -eq 0 ] || fail "yarn install/build failed in $BFF_PATH"
 
 # --- Pre-flight: refuse to reuse a stale server ------------------------------
 if lsof -i ":$BFF_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
@@ -161,6 +169,7 @@ run_plan() {
     echo ""
     echo "🧪 Running $plan test plan (test-without-building)..."
     rm -rf "$bundle"
+    log_group "$plan test plan"
     xcodebuild test-without-building \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
@@ -169,6 +178,7 @@ run_plan() {
         -resultBundlePath "$bundle" \
         "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
     local result=${PIPESTATUS[0]}
+    log_endgroup
 
     if [ "$result" -ne 0 ]; then
         echo "❌ $plan TESTS FAILED (log: $log, results: $bundle)"
