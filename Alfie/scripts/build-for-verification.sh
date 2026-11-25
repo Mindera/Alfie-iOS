@@ -3,6 +3,8 @@
 # Build script for AI agents to verify code changes
 # Works across different developer machines by automatically selecting an available simulator
 # ALFIE_XCODEBUILD_ARGS adds space-separated flags to the xcodebuild calls (CI's package flags).
+# ALFIE_RESTORED_DERIVED_DATA names a DerivedData directory restored from a cache: a failed build
+# deletes it and builds clean once, so a stale cache cannot fail a build that passes clean.
 
 set -o pipefail  # Ensure pipe returns the exit code of the failing command
 
@@ -69,6 +71,13 @@ if grep -q "Unable to find a device matching the provided destination" /tmp/alfi
         echo "✅ BUILD SUCCEEDED"
         exit 0
     fi
+fi
+
+if [ -n "${ALFIE_RESTORED_DERIVED_DATA:-}" ] && [ -d "$ALFIE_RESTORED_DERIVED_DATA" ]; then
+    echo ""
+    echo "⚠️  Build failed on the restored DerivedData, deleting it and building clean..."
+    rm -rf "$ALFIE_RESTORED_DERIVED_DATA"
+    ALFIE_RESTORED_DERIVED_DATA="" exec "${BASH_SOURCE[0]}" "$@"
 fi
 
 # Build failed
