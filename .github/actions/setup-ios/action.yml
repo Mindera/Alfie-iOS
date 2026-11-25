@@ -1,0 +1,77 @@
+name: Set up iOS job
+description: Restores the Homebrew, SPM and (optionally) gems caches, installs Homebrew formulas and reveals the git-secret files. Run after actions/checkout.
+
+inputs:
+  gpg-private-key:
+    description: GPG private key that decrypts the git-secret files
+    required: true
+  gpg-passphrase:
+    description: Passphrase of the GPG private key
+    required: true
+  spm-cloned-dependencies-path:
+    description: Directory xcodebuild clones Swift packages into
+    required: true
+  ruby:
+    description: Also restore the gems cache and run bundle install
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Cache Homebrew
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      with:
+        path: |
+          ~/Library/Caches/Homebrew
+          /usr/local/Homebrew
+        key: brew-${{ runner.os }}-${{ hashFiles('Brewfile') }}
+        restore-keys: |
+          brew-${{ runner.os }}-
+
+    - name: Restore Ruby Gems
+      if: inputs.ruby == 'true'
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      with:
+        path: vendor/bundle
+        key: gems-${{ runner.os }}-${{ hashFiles('Gemfile', 'Gemfile.lock') }}
+        restore-keys: |
+          gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
+          gems-${{ runner.os }}-
+
+    - name: Restore Swift Package Manager Cache
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      with:
+        path: |
+          ~/Library/Caches/org.swift.swiftpm
+          ${{ inputs.spm-cloned-dependencies-path }}
+        key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+        restore-keys: |
+          spm-${{ runner.os }}-
+
+    - name: Install Homebrew formulas
+      shell: bash
+      run: brew bundle install
+
+    - name: Install Ruby dependencies
+      if: inputs.ruby == 'true'
+      shell: bash
+      run: |
+        bundle config set --local path 'vendor/bundle'
+        bundle install --jobs 4 --retry 3
+
+    - name: Import GPG Private Key and Decrypt sensitive files
+      shell: bash
+      env:
+        SECRETS_GPG_PRIVATE_KEY: ${{ inputs.gpg-private-key }}
+        SECRETS_GPG_PASSPHRASE: ${{ inputs.gpg-passphrase }}
+      run: |
+        mkdir -p ~/.gnupg
+        chmod 700 ~/.gnupg
+        echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+        echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+        chmod 600 ~/.gnupg/gpg-agent.conf
+        chmod 600 ~/.gnupg/gpg.conf
+        echo "$SECRETS_GPG_PRIVATE_KEY" | gpg --batch --yes --import
+        gpg-connect-agent reloadagent /bye || true
+        git secret reveal -p "$SECRETS_GPG_PASSPHRASE"
