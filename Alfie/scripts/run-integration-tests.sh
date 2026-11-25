@@ -10,6 +10,8 @@
 # flags).
 # Every run writes the BFF checkout's node_modules and dist (yarn install + build); its git refs are
 # never touched. The BFF's output goes to /tmp/alfie_bff.log.
+# The AlfieUI plan reports its runner's start-up time and keeps evidence of a slow one
+# (ui-runner-stall.sh).
 
 set -o pipefail
 set -m  # job control: backgrounded BFF becomes its own process group leader so we can kill the whole tree
@@ -31,6 +33,7 @@ done
 
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/ui-runner-stall.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -139,7 +142,7 @@ echo "🚀 Booting BFF: $BFF_START_CMD (cwd: $BFF_PATH, log: $BFF_LOG)"
 ( cd "$BFF_PATH" && exec bash -c "$BFF_START_CMD" ) >"$BFF_LOG" 2>&1 &
 BFF_PGID=$!
 # Kill the whole process group (npm spawns child node procs that a plain `kill $PID` would orphan).
-trap 'echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT INT TERM
+trap 'kill_stall_capture; echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT INT TERM
 
 # --- Wait for GraphQL readiness ----------------------------------------------
 echo "⏳ Waiting for GraphQL at $GRAPHQL_URL (timeout ${READINESS_TIMEOUT}s)..."
@@ -169,6 +172,7 @@ run_plan() {
     echo ""
     echo "🧪 Running $plan test plan (test-without-building)..."
     rm -rf "$bundle"
+    [ "$plan" != AlfieUI ] || start_stall_capture "$SIMULATOR_ID" "$log"
     log_group "$plan test plan"
     xcodebuild test-without-building \
         -project "$PROJECT_FILE" \
@@ -179,6 +183,7 @@ run_plan() {
         "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
     local result=${PIPESTATUS[0]}
     log_endgroup
+    [ "$plan" != AlfieUI ] || stop_stall_capture "$plan" "$result"
 
     if [ "$result" -ne 0 ]; then
         echo "❌ $plan TESTS FAILED (log: $log, results: $bundle)"
