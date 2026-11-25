@@ -1,3 +1,4 @@
+import AccessibilityIdentifiers
 import Core
 import Model
 import SwiftUI
@@ -38,7 +39,7 @@ public struct VerticalProductCard: View {
         VStack(alignment: .leading, spacing: viewModel.configuration.verticalInterSpacing) {
             productImageView
                 .shimmering(while: $isSkeleton)
-                .accessibilityIdentifier(AccessibilityId.productImage)
+                .accessibilityIdentifier(AccessibilityID.ProductCard.image)
 
             HStack(alignment: .lastTextBaseline, spacing: theme.sizing.spacingSpacingNone) {
                 VStack(alignment: .leading, spacing: theme.sizing.spacingSpacing2xs) {
@@ -65,7 +66,8 @@ public struct VerticalProductCard: View {
         }
         .frame(width: viewModel.configuration.cardSize.value)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(AccessibilityId.productCard)
+        .accessibilityIdentifier(AccessibilityID.ProductCard.card)
+        .accessibilityHidden(isSkeleton)
     }
 
     @ViewBuilder private var productImageView: some View {
@@ -92,7 +94,7 @@ public struct VerticalProductCard: View {
                 lines: Constants.productDesignerLineLimit,
                 font: viewModel.configuration.designerFont
             )
-            .accessibilityIdentifier(AccessibilityId.productDesigner)
+            .accessibilityIdentifier(AccessibilityID.ProductCard.designer)
     }
 
     @ViewBuilder private var productNameView: some View {
@@ -110,14 +112,14 @@ public struct VerticalProductCard: View {
                 lines: Constants.productNameLineLimit,
                 font: viewModel.configuration.nameFont
             )
-            .accessibilityIdentifier(AccessibilityId.productName)
+            .accessibilityIdentifier(AccessibilityID.ProductCard.name)
     }
 
     private var productPriceView: some View {
         PriceComponentView(type: viewModel.priceType, configuration: viewModel.configuration.priceConfiguration)
             .shimmering(while: $isSkeleton)
             .accessibilityElement(children: .contain)
-            .accessibilityIdentifier(AccessibilityId.productPrice)
+            .accessibilityIdentifier(AccessibilityID.ProductCard.price)
     }
 
     @ViewBuilder private var addToBagView: some View {
@@ -166,19 +168,10 @@ public struct VerticalProductCard: View {
                     )
                     .contentShape(Rectangle())
             })
-            .accessibilityIdentifier(actionAccessibilityIdentifier ?? AccessibilityId.productWishlistButton)
+            .accessibilityIdentifier(actionAccessibilityIdentifier ?? AccessibilityID.ProductCard.wishlistButton)
             .accessibilityLabel(Text(actionAccessibilityLabel ?? L10n.Accessibility.wishlist))
         }
     }
-}
-
-private enum AccessibilityId {
-    static let productCard = "product-card"
-    static let productImage = "product-image"
-    static let productDesigner = "product-designer"
-    static let productName = "product-name"
-    static let productPrice = "product-price-component"
-    static let productWishlistButton = "product-add-wishlist-btn"
 }
 
 private enum Constants: ThemeReading {

@@ -86,14 +86,18 @@ class IntegrationTestCase: XCTestCase {
     }
 
     /// `run-integration-tests.sh` exports `TEST_RUNNER_ALFIE_BFF_PLATFORM`; xcodebuild strips the prefix.
+    private var bffPlatform: String? {
+        ProcessInfo.processInfo.environment["ALFIE_BFF_PLATFORM"]
+    }
+
     func skipOnMockBFF(_ reason: String) throws {
-        if ProcessInfo.processInfo.environment["ALFIE_BFF_PLATFORM"] == "mock" {
+        if bffPlatform == "mock" {
             throw XCTSkip(reason)
         }
     }
 
-    func skipUnlessShopifyBFF(_ reason: String) throws {
-        if ProcessInfo.processInfo.environment["ALFIE_BFF_PLATFORM"] != "shopify" {
+    func skipUnlessBFFPlatform(isOneOf platforms: Set<String>, _ reason: String) throws {
+        guard let bffPlatform, platforms.contains(bffPlatform) else {
             throw XCTSkip(reason)
         }
     }
