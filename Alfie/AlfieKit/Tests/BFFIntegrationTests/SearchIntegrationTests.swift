@@ -36,13 +36,16 @@ final class SearchIntegrationTests: IntegrationTestCase {
     }
 
     func test_suggestion_answer_converts_to_keyword_suggestions() async throws {
-        try skipUnlessShopifyBFF("Only Shopify answers Keyword suggestions; run with ALFIE_BFF_PLATFORM=shopify")
+        try skipUnlessBFFPlatform(
+            isOneOf: ["mock", "shopify"],
+            "Only the Mock BFF and Shopify answer Keyword suggestions; on Shopify run with ALFIE_BFF_PLATFORM=shopify"
+        )
 
-        let suggestions = try await sut.suggestions(searchTerm: SeedAnchors.SearchTerms.many, limit: 6)
+        let suggestions = try await sut.suggestions(searchTerm: SeedAnchors.SearchTerms.keywords, limit: 6)
 
         XCTAssertFalse(
             suggestions.keywords.isEmpty,
-            "BFF returned no Keyword suggestions for '\(SeedAnchors.SearchTerms.many)'; only Shopify answers them"
+            "BFF returned no Keyword suggestions for '\(SeedAnchors.SearchTerms.keywords)'"
         )
         XCTAssertLessThanOrEqual(suggestions.keywords.count, 6)
         for keyword in suggestions.keywords {
