@@ -177,13 +177,17 @@ with it.
 `build-cache` runs `build-for-testing` on each push to `main` and saves the DerivedData and Swift
 package caches, keyed per commit. It is the only job that saves them; `tests` restores the newest
 entry and saves nothing. Both go through the `restore-build-cache` action, so they build with the
-same flags and file dates and the cache stays reusable.
+same flags and file dates and the cache stays reusable. Swift packages are cloned into
+`build/DerivedData/SourcePackages` in every job (`release` included) and live in the package cache
+only. After saving, `build-cache` deletes the older entries of those two caches on `main`
+(`prune-build-caches.sh`), so they hold one build's worth of the repository's 10 GB.
 
 `tests` runs `verify.sh`, the local "Done" check: one `build-for-testing`, then `Alfie.xctestplan`,
 `AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` from that build, the last two against the
 Mock BFF built from `Alfie-BFF` `main`. Each stage is a group in the job log with its result line
-below it. CI adds its xcodebuild flags (package flags, coverage off, DerivedData path) through
-`ALFIE_XCODEBUILD_ARGS`, which `restore-build-cache` exports.
+below it, and a row in the job summary's result table. CI adds its xcodebuild flags (package flags,
+coverage off, DerivedData and package paths) through `ALFIE_XCODEBUILD_ARGS`, which
+`restore-build-cache` exports.
 
 `tests`:
 
@@ -191,7 +195,8 @@ below it. CI adds its xcodebuild flags (package flags, coverage off, DerivedData
 - on failure or cancel (the timeout included) uploads the `test-results` artifact (every
   `/tmp/alfie_*` result bundle and log, kept 7 days);
 - runs `verify.sh --only-unit` on fork and Dependabot PRs, which cannot read `Alfie-BFF`, and skips
-  the BFF checkout, Node and BFF cache steps;
+  the BFF checkout, Node and BFF cache steps. Today those PRs stop earlier, at `setup-ios`: they
+  get no secrets, so the git-secret `GoogleService-Info.plist` the build copies cannot be revealed;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
 - reads the private `Alfie-BFF` with the repo secret `BFF_READ_TOKEN`, a fine-grained personal

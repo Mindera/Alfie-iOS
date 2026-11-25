@@ -9,7 +9,7 @@ inputs:
     description: Passphrase of the GPG private key
     required: true
   spm-cloned-dependencies-path:
-    description: Directory xcodebuild clones Swift packages into
+    description: Directory xcodebuild clones Swift packages into, relative to the workspace
     required: true
   ruby:
     description: Also restore the gems cache and run bundle install
@@ -33,6 +33,15 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Require the git-secret key
+      shell: bash
+      env:
+        SECRETS_GPG_PRIVATE_KEY: ${{ inputs.gpg-private-key }}
+      run: |
+        [ -n "$SECRETS_GPG_PRIVATE_KEY" ] && exit 0
+        echo "::error title=No repository secrets::This run gets no secrets (fork or Dependabot pull request), so the git-secret files cannot be revealed and the app cannot build: its Copy GoogleService-Info.plist build phase needs Alfie/Alfie/Configuration/Debug/GoogleService-Info.plist."
+        exit 1
+
     - name: Read Xcode version
       id: xcode
       shell: bash

@@ -1,8 +1,9 @@
 # Sourced, not run. Snapshot references are recorded on this exact iOS version. A major-only pin is
 # not enough: glyph antialiasing differs between minors (26.2 vs 26.4 drifts ~24 px/screen, enough to
-# fail precision 1.0). CI runs on the same pin. Overridable per run, but changing it means
-# re-recording every reference.
+# fail precision 1.0). Overridable per run, but changing it means re-recording every reference.
 SNAPSHOT_OS_VERSION="${SNAPSHOT_OS_VERSION:-26.4}"
+# shellcheck disable=SC2034
+NO_PINNED_IPHONE="No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
 
 # Prints the UDID of an iPhone on iOS $SNAPSHOT_OS_VERSION, or nothing.
 pinned_iphone_udid() {

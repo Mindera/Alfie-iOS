@@ -18,7 +18,6 @@ RESULT_BUNDLE="/tmp/alfie_test.xcresult"
 RESULT_BUNDLE_SHA="$RESULT_BUNDLE.sha"
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
-read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
 
 # Parse arguments
 TEST_FILTER=""
@@ -118,7 +117,7 @@ SNAPSHOT_SKIP_ARGS=()
 if [ -n "$SIMULATOR_ID" ]; then
     SIMULATOR_OS_LABEL="iOS $SNAPSHOT_OS_VERSION"
 elif [ -n "$CI" ]; then
-    echo "❌ No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
+    echo "❌ $NO_PINNED_IPHONE"
     exit 1
 else
     # No iPhone on the pinned iOS version. Rather than block the whole suite, fall back to the newest
@@ -165,18 +164,16 @@ echo ""
 
 rm -rf "$RESULT_BUNDLE" "$RESULT_BUNDLE_SHA"
 
-log_group "Alfie test plan"
-xcodebuild -project "$PROJECT_FILE" \
+run_logged "Alfie test plan" "$TEST_LOG" \
+    xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination "id=$SIMULATOR_ID" \
     -resultBundlePath "$RESULT_BUNDLE" \
     $FILTER_ARG \
     "${SNAPSHOT_SKIP_ARGS[@]}" \
     "${XCODEBUILD_ARGS[@]}" \
-    $TEST_ACTION 2>&1 | tee "$TEST_LOG"
-
-TEST_RESULT=${PIPESTATUS[0]}
-log_endgroup
+    $TEST_ACTION
+TEST_RESULT=$?
 
 if [ $TEST_RESULT -eq 0 ]; then
     # Only stamp the bundle for an unfiltered run: a filtered run's coverage describes a subset of

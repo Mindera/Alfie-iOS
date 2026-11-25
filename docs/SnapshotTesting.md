@@ -45,7 +45,8 @@ References are pixel comparisons, so rendering must be comparable between record
 iOS **major.minor** references are recorded on; CI runs the same scripts, so it asserts on the same
 runtime and fails when the runner lacks it. Override per run —
 `SNAPSHOT_OS_VERSION=26.5 ./Alfie/scripts/verify.sh` — but changing the pin for good means
-re-recording every reference; overriding without re-recording asserts against the wrong OS. The `macos-26` runner image ships iOS 26.2, 26.4 and 26.5, so the pin must name one of those.
+re-recording every reference; overriding without re-recording asserts against the wrong OS. The
+`macos-26` runner image ships iOS 26.2, 26.4 and 26.5, so the pin must name one of those.
 
 ### Precision
 

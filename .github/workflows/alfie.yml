@@ -22,8 +22,8 @@ concurrency:
 
 env:
   ARTIFACTS_PATH: "/tmp/alfie-artifacts"
-  SPM_CLONED_DEPENDENCIES_PATH: "/tmp/SourcePackages"
   DERIVED_DATA_PATH: build/DerivedData
+  SOURCE_PACKAGES_PATH: build/DerivedData/SourcePackages
 
 jobs:
   tests:
@@ -84,7 +84,7 @@ jobs:
         with:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          spm-cloned-dependencies-path: ${{ env.SOURCE_PACKAGES_PATH }}
 
       - name: Restore build cache
         if: steps.changes.outputs.docs_only != 'true'
@@ -92,6 +92,7 @@ jobs:
         with:
           xcode-version: ${{ steps.setup-ios.outputs.xcode-version }}
           derived-data-path: ${{ env.DERIVED_DATA_PATH }}
+          source-packages-path: ${{ env.SOURCE_PACKAGES_PATH }}
 
       - name: Verify
         id: verify
@@ -134,6 +135,9 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-build-cache-${{ github.event_name == 'push' && github.ref || github.run_id }}
       cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
@@ -147,7 +151,7 @@ jobs:
         with:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          spm-cloned-dependencies-path: ${{ env.SOURCE_PACKAGES_PATH }}
 
       - name: Restore build cache
         id: build-cache
@@ -155,6 +159,7 @@ jobs:
         with:
           xcode-version: ${{ steps.setup-ios.outputs.xcode-version }}
           derived-data-path: ${{ env.DERIVED_DATA_PATH }}
+          source-packages-path: ${{ env.SOURCE_PACKAGES_PATH }}
 
       - name: Build
         if: steps.build-cache.outputs.cache-hit != 'true'
@@ -167,12 +172,22 @@ jobs:
           path: ${{ steps.setup-ios.outputs.spm-cache-path }}
           key: ${{ steps.setup-ios.outputs.spm-cache-key }}
 
+      - name: Leave the Swift packages out of the DerivedData cache
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        run: rm -rf "$SOURCE_PACKAGES_PATH"
+
       - name: Save Xcode DerivedData
         if: steps.build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ env.DERIVED_DATA_PATH }}
           key: ${{ steps.build-cache.outputs.cache-primary-key }}
+
+      - name: Delete the caches this run replaced
+        run: ./Alfie/scripts/prune-build-caches.sh "$GITHUB_REF" "derived-$RUNNER_OS-xcode" "spm-$RUNNER_OS-xcode"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
 
       - name: Upload Build Log
         if: failure() || cancelled()
@@ -201,7 +216,7 @@ jobs:
         with:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
-          spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+          spm-cloned-dependencies-path: ${{ env.SOURCE_PACKAGES_PATH }}
           ruby: true
 
       - name: Set up SSH for match repo
@@ -214,6 +229,7 @@ jobs:
       - name: Build and deploy release to TestFlight
         run: bundle exec fastlane ios release --env default
         env:
+          SPM_CLONED_DEPENDENCIES_PATH: ${{ github.workspace }}/${{ env.SOURCE_PACKAGES_PATH }}
           BUILD_CONFIGURATION: "Release"
           APPSTORE_CONNECT_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
           APPSTORE_CONNECT_KEY_CONTENT_BASE64: ${{ secrets.APPSTORE_CONNECT_KEY_CONTENT_BASE64 }}

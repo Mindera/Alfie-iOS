@@ -8,6 +8,9 @@ inputs:
   derived-data-path:
     description: DerivedData directory, relative to the workspace
     required: true
+  source-packages-path:
+    description: Directory xcodebuild clones Swift packages into, relative to the workspace
+    required: true
 
 outputs:
   cache-hit:
@@ -20,14 +23,21 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Compute DerivedData key prefix
+      id: key
+      shell: bash
+      env:
+        PREFIX: derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-
+      run: echo "prefix=$PREFIX" >> "$GITHUB_OUTPUT"
+
     - name: Restore Xcode DerivedData
       id: derived-cache
       uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: ${{ inputs.derived-data-path }}
-        key: derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-${{ github.sha }}
+        key: ${{ steps.key.outputs.prefix }}${{ github.sha }}
         restore-keys: |
-          derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-
+          ${{ steps.key.outputs.prefix }}
 
     - name: Restore file modification dates
       shell: bash
@@ -37,11 +47,12 @@ runs:
       shell: bash
       env:
         DERIVED_DATA_PATH: ${{ inputs.derived-data-path }}
+        SOURCE_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.source-packages-path }}
         RESTORED_DERIVED_DATA: ${{ steps.derived-cache.outputs.cache-matched-key && format('{0}/{1}', github.workspace, inputs.derived-data-path) || '' }}
       run: |
         PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
         [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
         {
-          echo "ALFIE_XCODEBUILD_ARGS=$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH"
+          echo "ALFIE_XCODEBUILD_ARGS=$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH -clonedSourcePackagesDirPath $SOURCE_PACKAGES_PATH"
           echo "ALFIE_RESTORED_DERIVED_DATA=$RESTORED_DERIVED_DATA"
         } >> "$GITHUB_ENV"
