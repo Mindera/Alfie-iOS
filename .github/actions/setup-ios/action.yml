@@ -1,5 +1,5 @@
 name: Set up iOS job
-description: Restores the Homebrew, SPM and (optionally) gems caches, installs Homebrew formulas and reveals the git-secret files. Run after actions/checkout.
+description: Restores the Homebrew, SPM (never saved here) and (optionally) gems caches, installs Homebrew formulas and reveals the git-secret files. Run after actions/checkout.
 
 inputs:
   gpg-private-key:
@@ -16,9 +16,28 @@ inputs:
     required: false
     default: "false"
 
+outputs:
+  xcode-version:
+    description: Version and build of the selected Xcode, for cache keys
+    value: ${{ steps.xcode.outputs.version }}
+  spm-cache-path:
+    description: Paths of the Swift package cache, for actions/cache/save
+    value: ${{ steps.spm-cache-paths.outputs.paths }}
+  spm-cache-key:
+    description: Per-commit key of the Swift package cache, for actions/cache/save
+    value: ${{ steps.spm-cache.outputs.cache-primary-key }}
+  spm-cache-hit:
+    description: "'true' when this commit's Swift package cache already exists"
+    value: ${{ steps.spm-cache.outputs.cache-hit }}
+
 runs:
   using: composite
   steps:
+    - name: Read Xcode version
+      id: xcode
+      shell: bash
+      run: echo "version=$(xcodebuild -version | awk '{print $NF}' | paste -sd- -)" >> "$GITHUB_OUTPUT"
+
     - name: Cache Homebrew
       uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
@@ -39,14 +58,27 @@ runs:
           gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
           gems-${{ runner.os }}-
 
+    - name: List Swift Package Manager cache paths
+      id: spm-cache-paths
+      shell: bash
+      env:
+        SPM_CLONED_DEPENDENCIES_PATH: ${{ inputs.spm-cloned-dependencies-path }}
+      run: |
+        {
+          echo "paths<<EOF"
+          echo "~/Library/Caches/org.swift.swiftpm"
+          echo "$SPM_CLONED_DEPENDENCIES_PATH"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
     - name: Restore Swift Package Manager Cache
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      id: spm-cache
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
-        path: |
-          ~/Library/Caches/org.swift.swiftpm
-          ${{ inputs.spm-cloned-dependencies-path }}
-        key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+        path: ${{ steps.spm-cache-paths.outputs.paths }}
+        key: spm-${{ runner.os }}-xcode${{ steps.xcode.outputs.version }}-${{ github.sha }}
         restore-keys: |
+          spm-${{ runner.os }}-xcode${{ steps.xcode.outputs.version }}-
           spm-${{ runner.os }}-
 
     - name: Install Homebrew formulas

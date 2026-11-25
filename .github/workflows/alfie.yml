@@ -40,6 +40,7 @@ jobs:
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Checkout Alfie-BFF main
         if: env.CAN_READ_BFF == 'true'
@@ -69,20 +70,25 @@ jobs:
           path: ${{ env.BFF_CHECKOUT }}/node_modules
           key: bff-node-modules-${{ runner.os }}-${{ hashFiles(format('{0}/.nvmrc', env.BFF_CHECKOUT), format('{0}/yarn.lock', env.BFF_CHECKOUT)) }}
 
-      - name: Cache Xcode DerivedData
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
-          key: derived-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: |
-            derived-${{ runner.os }}-
-
       - name: Set up iOS job
+        id: setup-ios
         uses: ./.github/actions/setup-ios
         with:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
           spm-cloned-dependencies-path: ${{ env.SPM_CLONED_DEPENDENCIES_PATH }}
+
+      - name: Restore Xcode DerivedData
+        id: derived-cache
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.DERIVED_DATA_PATH }}
+          key: derived-${{ runner.os }}-xcode${{ steps.setup-ios.outputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-${{ github.sha }}
+          restore-keys: |
+            derived-${{ runner.os }}-xcode${{ steps.setup-ios.outputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-
+
+      - name: Restore file modification dates
+        run: ./Alfie/scripts/restore-mtimes.sh
 
       - name: Verify
         run: |
@@ -96,6 +102,21 @@ jobs:
           fi
         env:
           ALFIE_BFF_PATH: ${{ github.workspace }}/${{ env.BFF_CHECKOUT }}
+          ALFIE_RESTORED_DERIVED_DATA: ${{ steps.derived-cache.outputs.cache-matched-key && format('{0}/{1}', github.workspace, env.DERIVED_DATA_PATH) || '' }}
+
+      - name: Save Swift Package Manager Cache
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.setup-ios.outputs.spm-cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ steps.setup-ios.outputs.spm-cache-path }}
+          key: ${{ steps.setup-ios.outputs.spm-cache-key }}
+
+      - name: Save Xcode DerivedData
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.derived-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.DERIVED_DATA_PATH }}
+          key: ${{ steps.derived-cache.outputs.cache-primary-key }}
 
       - name: Upload Test Results
         if: failure() || cancelled()
