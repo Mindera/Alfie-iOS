@@ -13,6 +13,7 @@ final class SearchJourneyTests: AlfieUITestCase {
         }
 
         XCTContext.runActivity(named: "The results list products") { _ in
+            listing.assertVisible(timeout: .bffRead)
             waitFor(
                 listing.productCards.firstMatch,
                 timeout: .bffRead,
@@ -26,7 +27,7 @@ final class SearchJourneyTests: AlfieUITestCase {
         }
     }
 
-    func testSearchWithNoResultsShowsNoResultsState() throws {
+    func test_typing_a_term_with_no_matches_shows_the_suggestions_no_results_state() throws {
         let search = SearchPage(app: app)
 
         openSearch(search)
