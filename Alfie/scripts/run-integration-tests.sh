@@ -91,7 +91,9 @@ fi
 export TEST_RUNNER_ALFIE_BFF_PLATFORM="$ALFIE_BFF_PLATFORM"
 
 if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
+    PHASE_STARTED=$SECONDS
     ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
+    log_elapsed "SeedAnchors check" "$PHASE_STARTED"
 fi
 
 # --- Simulator ---------------------------------------------------------------
@@ -120,6 +122,7 @@ warn_if_bff_checkout_differs_from_main
 echo "🔖 BFF: $(git -C "$BFF_PATH" rev-parse HEAD 2>/dev/null || echo unknown) ($BFF_PATH)"
 echo "🧩 BFF platform: $ALFIE_BFF_PLATFORM"
 
+PHASE_STARTED=$SECONDS
 echo "📦 Installing and building the BFF (yarn)..."
 log_group "BFF yarn install and build"
 ( cd "$BFF_PATH" && yarn install --frozen-lockfile && yarn build )
@@ -163,6 +166,7 @@ for _ in $(seq 1 "$READINESS_TIMEOUT"); do
 done
 [ "$ready" = true ] || fail_with_bff_log "BFF did not become ready at $GRAPHQL_URL within ${READINESS_TIMEOUT}s"
 echo "✅ BFF is ready."
+log_elapsed "BFF install, build and boot" "$PHASE_STARTED"
 
 # Guards against a false green: xcodebuild exits 0 when every test XCTSkips, so zero executed test
 # cases fails the plan.
@@ -197,15 +201,17 @@ run_plan() {
     echo "✅ $plan TESTS PASSED ($executed executed)"
 }
 
+PHASE_STARTED=$SECONDS
 run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult
 INTEGRATION_RESULT=$?
-summarize_stage "Integration tests" "$INTEGRATION_RESULT"
+summarize_stage "Integration tests" "$INTEGRATION_RESULT" $((SECONDS - PHASE_STARTED))
 # A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
 # checks"), so wait for the boot to finish first.
 if wait_for_boot "$SIMULATOR_ID"; then
+    PHASE_STARTED=$SECONDS
     run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
     UI_RESULT=$?
-    summarize_stage "UI tests" "$UI_RESULT"
+    summarize_stage "UI tests" "$UI_RESULT" $((SECONDS - PHASE_STARTED))
     use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not reset $SIMULATOR_ID to light appearance."
 else
     echo "❌ Simulator $SIMULATOR_ID did not boot within ${BOOT_TIMEOUT}s; AlfieUI not run."

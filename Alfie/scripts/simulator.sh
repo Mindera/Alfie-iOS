@@ -5,9 +5,23 @@ SNAPSHOT_OS_VERSION="${SNAPSHOT_OS_VERSION:-26.4}"
 # shellcheck disable=SC2034
 NO_PINNED_IPHONE="No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
 
+# One simctl listing serves a whole verify.sh run: each call costs 10-80 s on a busy CI runner.
+remember_available_devices() {
+    ALFIE_SIMULATOR_DEVICES="$(xcrun simctl list devices available --json)"
+    export ALFIE_SIMULATOR_DEVICES
+}
+
+available_devices() {
+    if [ -n "${ALFIE_SIMULATOR_DEVICES:-}" ]; then
+        printf '%s\n' "$ALFIE_SIMULATOR_DEVICES"
+    else
+        xcrun simctl list devices available --json
+    fi
+}
+
 # Prints the UDID of an iPhone on iOS $SNAPSHOT_OS_VERSION, or nothing.
 pinned_iphone_udid() {
-    xcrun simctl list devices available --json | \
+    available_devices | \
         SNAPSHOT_OS_VERSION="$SNAPSHOT_OS_VERSION" /usr/bin/python3 -c '
 import json, os, re, sys
 
@@ -25,7 +39,7 @@ for runtime, devices in json.load(sys.stdin)["devices"].items():
 
 # Prints "<udid> <major.minor>" of an iPhone on the newest available iOS, or nothing.
 newest_iphone() {
-    xcrun simctl list devices available --json | /usr/bin/python3 -c '
+    available_devices | /usr/bin/python3 -c '
 import json, re, sys
 
 best = None
@@ -43,7 +57,15 @@ if best:
 }
 
 simulator_name() {
-    xcrun simctl list devices available | grep -F -- "($1)" | sed -E 's/^[[:space:]]+(.+) \([A-F0-9-]+\).*/\1/'
+    available_devices | UDID="$1" /usr/bin/python3 -c '
+import json, os, sys
+
+for devices in json.load(sys.stdin)["devices"].values():
+    for device in devices:
+        if device["udid"] == os.environ["UDID"]:
+            print(device["name"])
+            sys.exit(0)
+'
 }
 
 # Prints the UDID of the pinned iPhone, else of the newest one, or nothing.

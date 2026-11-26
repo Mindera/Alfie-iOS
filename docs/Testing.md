@@ -185,9 +185,12 @@ only. After saving, `build-cache` deletes the older entries of those two caches 
 `tests` runs `verify.sh`, the local "Done" check: one `build-for-testing`, then `Alfie.xctestplan`,
 `AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` from that build, the last two against the
 Mock BFF built from `Alfie-BFF` `main`. Each stage is a group in the job log with its result line
-below it, and a row in the job summary's result table. CI adds its xcodebuild flags (package flags,
-coverage off, DerivedData and package paths) through `ALFIE_XCODEBUILD_ARGS`, which
-`restore-build-cache` exports.
+below it, and a row with its duration in the job summary's result table. The summary also names the
+runner's CPU count, memory and load, and the DerivedData cache restored. Every `⏱️` line in the log
+is a phase duration (`grep '⏱️'` gives a run's timeline): an xcodebuild call's line carries the
+second it started, resolved packages, began compiling and started its first test suite. CI adds
+its xcodebuild flags (package flags, coverage off, DerivedData and package paths) through
+`ALFIE_XCODEBUILD_ARGS`, which `restore-build-cache` exports.
 
 `tests`:
 

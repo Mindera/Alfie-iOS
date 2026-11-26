@@ -38,14 +38,19 @@ fi
 echo "================================================"
 echo ""
 
+log_runner
+STAGE_STARTED=$SECONDS
+remember_available_devices
 start_booting "$(preferred_iphone_udid)"
+log_elapsed "Simulator lookup" "$STAGE_STARTED"
 
 # Step 1: Build
 echo "📦 STEP 1: Build Verification"
 echo "--------------------------------"
+STAGE_STARTED=$SECONDS
 "$SCRIPT_DIR/build-for-verification.sh"
 BUILD_RESULT=$?
-summarize_stage "Build" "$BUILD_RESULT"
+summarize_stage "Build" "$BUILD_RESULT" $((SECONDS - STAGE_STARTED))
 
 if [ $BUILD_RESULT -ne 0 ]; then
     echo ""
@@ -60,9 +65,10 @@ echo ""
 # Step 2: Unit tests (mocked BFF)
 echo "🧪 STEP 2: Unit Test Verification"
 echo "-------------------------------"
+STAGE_STARTED=$SECONDS
 "$SCRIPT_DIR/test-for-verification.sh" --skip-build "${TEST_ARGS[@]}"
 TEST_RESULT=$?
-summarize_stage "Unit tests" "$TEST_RESULT"
+summarize_stage "Unit tests" "$TEST_RESULT" $((SECONDS - STAGE_STARTED))
 
 if [ $TEST_RESULT -ne 0 ]; then
     echo ""
@@ -92,6 +98,7 @@ else
 fi
 
 echo ""
+log_elapsed "Verification" 0
 echo "================================================"
 if [ "$RUN_BFF_TESTS" = true ]; then
     echo "✅ FULL VERIFICATION PASSED (build + unit + integration + UI)"
