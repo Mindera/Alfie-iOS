@@ -236,8 +236,7 @@ final class CartIntegrationTests: IntegrationTestCase {
     // MARK: - Seed discovery
 
     /// Two in-stock variants of `products.default`, with the platform ids every cart write needs.
-    /// Read raw because the domain `Product.Variant` does not yet carry a platform id. Swap for a
-    /// dedicated anchor once https://github.com/Mindera/Alfie-BFF/issues/155 publishes one.
+    /// Read raw because the domain `Product.Variant` does not yet carry a platform id.
     private func twoAddableVariants() async throws -> (CartLineInput, CartLineInput) {
         let body = try await rawGraphQL(
             query: """
