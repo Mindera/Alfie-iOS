@@ -46,13 +46,13 @@ runs:
     - name: Export xcodebuild flags
       shell: bash
       env:
-        DERIVED_DATA_PATH: ${{ inputs.derived-data-path }}
+        DERIVED_DATA_PATH: ${{ github.workspace }}/${{ inputs.derived-data-path }}
         SOURCE_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.source-packages-path }}
-        RESTORED_DERIVED_DATA: ${{ steps.derived-cache.outputs.cache-matched-key && format('{0}/{1}', github.workspace, inputs.derived-data-path) || '' }}
+        RESTORED: ${{ steps.derived-cache.outputs.cache-matched-key != '' }}
       run: |
         PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
         [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
         {
           echo "ALFIE_XCODEBUILD_ARGS=$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH -clonedSourcePackagesDirPath $SOURCE_PACKAGES_PATH"
-          echo "ALFIE_RESTORED_DERIVED_DATA=$RESTORED_DERIVED_DATA"
+          [ "$RESTORED" != true ] || echo "ALFIE_RESTORED_DERIVED_DATA=$DERIVED_DATA_PATH"
         } >> "$GITHUB_ENV"

@@ -30,7 +30,7 @@ done
 
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/ui-runner-stall.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/runner-stall.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -102,9 +102,7 @@ SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
-# Boot now so the simulator settles during the build: on a freshly booted one the first app launch
-# outlasts Xcode's launch timeout.
-xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null
+start_booting "$SIMULATOR_ID"
 
 if [ "$SKIP_BUILD" = true ]; then
     echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
@@ -141,7 +139,9 @@ echo "🚀 Booting BFF: $BFF_START_CMD (cwd: $BFF_PATH, log: $BFF_LOG)"
 ( cd "$BFF_PATH" && exec bash -c "$BFF_START_CMD" ) >"$BFF_LOG" 2>&1 &
 BFF_PGID=$!
 # Kill the whole process group (npm spawns child node procs that a plain `kill $PID` would orphan).
-trap 'kill_stall_capture; echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT INT TERM
+trap 'kill_stall_capture; echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 # --- Wait for GraphQL readiness ----------------------------------------------
 echo "⏳ Waiting for GraphQL at $GRAPHQL_URL (timeout ${READINESS_TIMEOUT}s)..."
@@ -171,7 +171,7 @@ run_plan() {
     echo ""
     echo "🧪 Running $plan test plan (test-without-building)..."
     rm -rf "$bundle"
-    [ "$plan" != AlfieUI ] || start_stall_capture "$SIMULATOR_ID" "$log"
+    [ "$plan" != AlfieUI ] || start_stall_capture ui "$plan" "$SIMULATOR_ID" "$log"
     run_logged "$plan test plan" "$log" \
         xcodebuild test-without-building \
         -project "$PROJECT_FILE" \

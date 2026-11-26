@@ -85,6 +85,7 @@ jobs:
           gpg-private-key: ${{ secrets.SECRETS_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.SECRETS_GPG_PASSPHRASE }}
           spm-cloned-dependencies-path: ${{ env.SOURCE_PACKAGES_PATH }}
+          placeholder-firebase-config: ${{ env.CAN_READ_BFF != 'true' }}
 
       - name: Restore build cache
         if: steps.changes.outputs.docs_only != 'true'
@@ -117,14 +118,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-      - name: Upload UI Runner Stall Evidence
-        if: success() && steps.verify.outputs.ui_runner_stalled == 'true'
+      - name: Upload Runner Stall Evidence
+        if: success() && steps.verify.outputs.runner_stalled == 'true'
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
-          name: ui-runner-stall
+          name: runner-stall
           path: |
             /tmp/alfie_ui_test.xcresult
-            /tmp/alfie_ui_*.log
+            /tmp/alfie_*_simulator.log
+            /tmp/alfie_*_xcodebuild_sample_*.log
+            /tmp/alfie_simulator_boot.log
+            /tmp/alfie_test.log
+            /tmp/alfie_ui_test.log
           if-no-files-found: warn
           retention-days: 7
 
@@ -194,7 +199,7 @@ jobs:
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-cache-log
-          path: /tmp/alfie_build.log
+          path: /tmp/alfie_build*.log
           if-no-files-found: warn
           retention-days: 7
 

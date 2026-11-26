@@ -11,6 +11,8 @@ set -o pipefail  # Ensure pipe returns the exit code of the failing command
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
+BUILD_LOG="/tmp/alfie_build.log"
+RESTORED_BUILD_LOG="/tmp/alfie_build_restored_cache.log"
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
 
@@ -21,7 +23,7 @@ echo ""
 
 # Try to build test bundles with generic iOS Simulator destination (most portable)
 echo "🎯 Attempting build-for-testing with generic iOS Simulator destination..."
-run_logged "build-for-testing" /tmp/alfie_build.log \
+run_logged "build-for-testing" "$BUILD_LOG" \
     xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
@@ -36,7 +38,7 @@ if [ $BUILD_RESULT -eq 0 ]; then
 fi
 
 # Check if it was a destination error (exit code 70 or specific error message)
-if grep -q "Unable to find a device matching the provided destination" /tmp/alfie_build.log; then
+if grep -q "Unable to find a device matching the provided destination" "$BUILD_LOG"; then
     echo "⚠️  Generic destination failed, trying specific iPhone simulator..."
     
     SIMULATOR_ID="$(preferred_iphone_udid)"
@@ -53,7 +55,7 @@ if grep -q "Unable to find a device matching the provided destination" /tmp/alfi
     echo ""
     
     # Build test bundles with specific simulator
-    run_logged "build-for-testing ($SIMULATOR_NAME)" /tmp/alfie_build.log \
+    run_logged "build-for-testing ($SIMULATOR_NAME)" "$BUILD_LOG" \
         xcodebuild -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -destination "id=$SIMULATOR_ID" \
@@ -71,7 +73,9 @@ fi
 if [ -n "${ALFIE_RESTORED_DERIVED_DATA:-}" ] && [ -d "$ALFIE_RESTORED_DERIVED_DATA" ]; then
     echo ""
     echo "⚠️  Build failed on the restored DerivedData, deleting it and building clean..."
-    rm -rf "$ALFIE_RESTORED_DERIVED_DATA"
+    echo "📋 Failed build log kept at: $RESTORED_BUILD_LOG"
+    cp "$BUILD_LOG" "$RESTORED_BUILD_LOG"
+    find "$ALFIE_RESTORED_DERIVED_DATA" -mindepth 1 -maxdepth 1 ! -name SourcePackages -exec rm -rf {} +
     ALFIE_RESTORED_DERIVED_DATA="" exec "${BASH_SOURCE[0]}" "$@"
 fi
 
@@ -79,7 +83,7 @@ fi
 echo ""
 echo "❌ BUILD FAILED"
 echo ""
-echo "📋 Build log saved to: /tmp/alfie_build.log"
+echo "📋 Build log saved to: $BUILD_LOG"
 echo ""
 echo "Common issues to check:"
 echo "  - Missing imports (import Models, import StyleGuide, etc.)"

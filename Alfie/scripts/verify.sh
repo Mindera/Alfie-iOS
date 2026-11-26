@@ -17,6 +17,7 @@ set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/ci-log.sh"
+source "$SCRIPT_DIR/simulator.sh"
 
 # Parse our own flags; pass everything else through to the unit-test runner.
 RUN_BFF_TESTS=true
@@ -36,6 +37,8 @@ else
 fi
 echo "================================================"
 echo ""
+
+start_booting "$(preferred_iphone_udid)"
 
 # Step 1: Build
 echo "📦 STEP 1: Build Verification"

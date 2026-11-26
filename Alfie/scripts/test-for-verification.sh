@@ -18,6 +18,7 @@ RESULT_BUNDLE="/tmp/alfie_test.xcresult"
 RESULT_BUNDLE_SHA="$RESULT_BUNDLE.sha"
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/runner-stall.sh"
 
 # Parse arguments
 TEST_FILTER=""
@@ -159,11 +160,21 @@ fi
 SIMULATOR_NAME=$(simulator_name "$SIMULATOR_ID")
 
 echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — $SIMULATOR_OS_LABEL"
-use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not set $SIMULATOR_ID to light appearance; snapshot tests may fail."
+BOOTED=true
+if wait_for_boot "$SIMULATOR_ID"; then
+    xcrun simctl ui "$SIMULATOR_ID" appearance light ||
+        echo "⚠️  Could not set $SIMULATOR_ID to light appearance; snapshot tests may fail."
+else
+    BOOTED=false
+fi
 echo ""
 
 rm -rf "$RESULT_BUNDLE" "$RESULT_BUNDLE_SHA"
 
+if [ "$BOOTED" = false ]; then
+    trap kill_stall_capture EXIT
+    start_stall_capture unit Alfie "$SIMULATOR_ID" "$TEST_LOG"
+fi
 run_logged "Alfie test plan" "$TEST_LOG" \
     xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
@@ -174,6 +185,7 @@ run_logged "Alfie test plan" "$TEST_LOG" \
     "${XCODEBUILD_ARGS[@]}" \
     $TEST_ACTION
 TEST_RESULT=$?
+[ "$BOOTED" = true ] || stop_stall_capture "$TEST_RESULT"
 
 if [ $TEST_RESULT -eq 0 ]; then
     # Only stamp the bundle for an unfiltered run: a filtered run's coverage describes a subset of

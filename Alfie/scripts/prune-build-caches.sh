@@ -16,6 +16,6 @@ for prefix in "$@"; do
         --json id,key --jq '.[1:][] | "\(.id) \(.key)"' |
         while read -r id key; do
             echo "Deleting $key"
-            gh cache delete "$id"
+            gh cache delete "$id" || echo "⚠️  Could not delete $key"
         done
 done

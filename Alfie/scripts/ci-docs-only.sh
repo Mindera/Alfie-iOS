@@ -10,7 +10,7 @@ set -uo pipefail
 BASE="${1:-}"
 
 if [ -n "$BASE" ] &&
-    CHANGED="$(git diff --name-only "$BASE" HEAD -- 2>/dev/null)" &&
+    CHANGED="$(git diff --name-only --no-renames "$BASE" HEAD -- 2>/dev/null)" &&
     [ -n "$CHANGED" ] &&
     ! grep -qvE '(\.md$|^docs/)' <<< "$CHANGED"; then
     echo true

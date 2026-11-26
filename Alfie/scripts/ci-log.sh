@@ -17,7 +17,6 @@ run_logged() {
     return "$result"
 }
 
-# summarize_stage <stage> <exit code | skipped | not-run>
 summarize_stage() {
     [ -n "${GITHUB_STEP_SUMMARY:-}" ] || return 0
     local result

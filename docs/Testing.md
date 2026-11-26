@@ -195,10 +195,16 @@ coverage off, DerivedData and package paths) through `ALFIE_XCODEBUILD_ARGS`, wh
 - on failure or cancel (the timeout included) uploads the `test-results` artifact (every
   `/tmp/alfie_*` result bundle and log, kept 7 days);
 - runs `verify.sh --only-unit` on fork and Dependabot PRs, which cannot read `Alfie-BFF`, and skips
-  the BFF checkout, Node and BFF cache steps. Today those PRs stop earlier, at `setup-ios`: they
-  get no secrets, so the git-secret `GoogleService-Info.plist` the build copies cannot be revealed;
+  the BFF checkout, Node and BFF cache steps. Those PRs get no secrets, so `setup-ios` writes an
+  empty Debug `GoogleService-Info.plist` in place of the git-secret one: the build only copies it,
+  and tests never start Firebase;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
+- starts booting the simulator before the build (`verify.sh` does, locally too) and prints how long
+  each stage then waited for it. A simulator still booting after `BOOT_TIMEOUT` (120 s) does not
+  stop the unit stage, which prints the boot progress and records runner-stall evidence instead;
+- uploads the `runner-stall` artifact when a passing run's test runner took over 120 s to start or
+  went silent for 120 s (`runner-stall.sh`: simulator log and samples of `xcodebuild`);
 - reads the private `Alfie-BFF` with the repo secret `BFF_READ_TOKEN`, a fine-grained personal
   access token with read-only Contents on that repo alone. It belongs to one person and expires:
   when the BFF checkout fails on authentication, renew it.

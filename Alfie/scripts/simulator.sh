@@ -55,16 +55,32 @@ preferred_iphone_udid() {
 }
 
 BOOT_TIMEOUT="${BOOT_TIMEOUT:-120}"
+BOOT_LOG="/tmp/alfie_simulator_boot.log"
+
+# Starts the boot without waiting, so the simulator settles while something else runs: on a freshly
+# booted one the first app launch outlasts Xcode's launch timeout.
+start_booting() {
+    [ -z "$1" ] || xcrun simctl boot "$1" >/dev/null 2>&1 &
+}
 
 # Boots the simulator if needed and waits up to $BOOT_TIMEOUT seconds; bootstatus alone can hang.
 wait_for_boot() {
-    xcrun simctl bootstatus "$1" -b >/dev/null &
-    local pid=$!
-    for _ in $(seq 1 "$BOOT_TIMEOUT"); do
-        kill -0 "$pid" 2>/dev/null || { wait "$pid"; return; }
+    local started=$SECONDS pid
+    : > "$BOOT_LOG"
+    xcrun simctl bootstatus "$1" -b > "$BOOT_LOG" 2>&1 &
+    pid=$!
+    while [ $((SECONDS - started)) -lt "$BOOT_TIMEOUT" ]; do
+        if ! kill -0 "$pid" 2>/dev/null; then
+            wait "$pid" || break
+            echo "⏱️  Simulator ready after a $((SECONDS - started))s wait"
+            return 0
+        fi
         sleep 1
     done
     kill "$pid" 2>/dev/null
+    wait "$pid" 2>/dev/null
+    echo "⚠️  Simulator $1 not booted after $((SECONDS - started))s ($(uptime | sed 's/.*load/load/')). Boot progress:"
+    sed 's/^/   /' "$BOOT_LOG"
     return 1
 }
 
