@@ -44,7 +44,6 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
                             placeholderView(category)
                         } else {
                             categoryView(category)
-                                .accessibilityIdentifier(AccessibilityId.categoryItem)
                         }
                     }
                 }
@@ -71,11 +70,14 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
             showChevron: category.hasSubCategories
         )
             .modifier(
-                TapHighlightableModifier {
-                    withAnimation(.standard) {
-                        viewModel.didSelectCategory(category)
-                    }
-                }
+                TapHighlightableModifier(
+                    action: {
+                        withAnimation(.standard) {
+                            viewModel.didSelectCategory(category)
+                        }
+                    },
+                    accessibilityId: AccessibilityID.Categories.item
+                )
             )
     }
 
@@ -144,10 +146,6 @@ struct CategoriesView<ViewModel: CategoriesViewModelProtocol>: View {
         .frame(height: Constants.categoryViewHeight)
         .padding(.horizontal, theme.sizing.spacingSpacingMd)
     }
-}
-
-private enum AccessibilityId {
-    static let categoryItem = "category-item"
 }
 
 private enum Constants: ThemeReading {
