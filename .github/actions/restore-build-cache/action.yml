@@ -11,6 +11,9 @@ inputs:
   source-packages-path:
     description: Directory xcodebuild clones Swift packages into, relative to the workspace
     required: true
+  any-build-graph:
+    description: "'true' also restores a cache built from another project, package or test plan graph when this one has none. Not for the job that saves the cache: it would carry stale modules forward."
+    default: "false"
 
 outputs:
   cache-hit:
@@ -27,8 +30,12 @@ runs:
       id: key
       shell: bash
       env:
-        PREFIX: derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}-
-      run: echo "prefix=$PREFIX" >> "$GITHUB_OUTPUT"
+        XCODE_PREFIX: derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-
+        GRAPH: ${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
+        ANY_GRAPH: ${{ inputs.any-build-graph }}
+      run: |
+        echo "prefix=$XCODE_PREFIX$GRAPH-" >> "$GITHUB_OUTPUT"
+        [ "$ANY_GRAPH" != true ] || echo "fallback=$XCODE_PREFIX" >> "$GITHUB_OUTPUT"
 
     - name: Restore Xcode DerivedData
       id: derived-cache
@@ -38,6 +45,7 @@ runs:
         key: ${{ steps.key.outputs.prefix }}${{ github.sha }}
         restore-keys: |
           ${{ steps.key.outputs.prefix }}
+          ${{ steps.key.outputs.fallback }}
 
     - name: Restore file modification dates
       shell: bash

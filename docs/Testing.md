@@ -165,9 +165,10 @@ to `main` starts no test job.
 | `pull_request`, `merge_group`, `workflow_dispatch` | `tests` |
 | `push` to `main` | `release`, `build-cache` (independent of each other) |
 
-When a PR or a merge group changes only docs (`*.md`, `docs/**`; decided by `ci-docs-only.sh`),
-`tests` still starts, skips every build and test step and reports success, because a required check
-that never reports blocks the merge. Keep the job id `tests`: the ruleset names it.
+When a PR or a merge group changes only docs (`*.md`, `docs/**`; decided by `ci-docs-only.sh` in
+the ubuntu `changes` job), `tests` is skipped, which satisfies the required check without waiting
+for a macOS runner. `tests` runs whenever `changes` does not answer "docs only", a failed `changes`
+included. Keep the job id `tests`: the ruleset names it.
 
 `release` ships each push to `main` to TestFlight without waiting for a test job. Releases run one
 at a time (two would race on the build-number tag), and one in progress is never cancelled; a push
@@ -176,7 +177,8 @@ with it.
 
 `build-cache` runs `build-for-testing` on each push to `main` and saves the DerivedData and Swift
 package caches, keyed per commit. It is the only job that saves them; `tests` restores the newest
-entry and saves nothing. Both go through the `restore-build-cache` action, so they build with the
+entry built from the same project, package and test plan files, else the newest of any (a build
+that fails on a restored cache rebuilds clean once), and saves nothing. Both go through the `restore-build-cache` action, so they build with the
 same flags and file dates and the cache stays reusable. Swift packages are cloned into
 `build/DerivedData/SourcePackages` in every job (`release` included) and live in the package cache
 only. After saving, `build-cache` deletes the older entries of those two caches on `main`
