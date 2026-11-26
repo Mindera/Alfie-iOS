@@ -235,38 +235,35 @@ final class CartIntegrationTests: IntegrationTestCase {
 
     // MARK: - Seed discovery
 
-    /// Two in-stock variants of `products.default`, with the platform ids every cart write needs.
+    /// The `inStockVariants` anchor's variants, with the platform ids every cart write needs.
     /// Read raw because the domain `Product.Variant` does not yet carry a platform id.
     private func twoAddableVariants() async throws -> (CartLineInput, CartLineInput) {
         let body = try await rawGraphQL(
             query: """
             query($handle: String!) {
                 productDetails(handle: $handle) {
-                    variants { id productId inventory { available } }
+                    variants { id productId }
                 }
             }
             """,
-            variables: ["handle": SeedAnchors.Products.default]
+            variables: ["handle": SeedAnchors.InStockVariants.productSlug]
         )
 
         let data = try XCTUnwrap(body["data"] as? [String: Any])
         let product = try XCTUnwrap(data["productDetails"] as? [String: Any])
         let variants = try XCTUnwrap(product["variants"] as? [[String: Any]])
 
-        let inStock: [CartLineInput] = variants.compactMap { variant in
-            guard
-                let variantId = variant["id"] as? String,
-                let productId = variant["productId"] as? String,
-                let available = (variant["inventory"] as? [String: Any])?["available"] as? Int,
-                available > 0
-            else {
-                return nil
-            }
+        let anchored: [CartLineInput] = try SeedAnchors.InStockVariants.variantIds.map { variantId in
+            let variant = variants.first { $0["id"] as? String == variantId }
+            let productId = try XCTUnwrap(
+                variant?["productId"] as? String,
+                "'\(SeedAnchors.InStockVariants.productSlug)' has no variant '\(variantId)'"
+            )
             return CartLineInput(productId: productId, variantId: variantId, quantity: 1)
         }
 
-        let shortfall = "'\(SeedAnchors.Products.default)' has fewer than two in-stock variants"
-        return (try XCTUnwrap(inStock.first, shortfall), try XCTUnwrap(inStock.dropFirst().first, shortfall))
+        let shortfall = "The inStockVariants anchor names fewer than two variants"
+        return (try XCTUnwrap(anchored.first, shortfall), try XCTUnwrap(anchored.dropFirst().first, shortfall))
     }
 
     /// Posts a query straight at the endpoint and returns the decoded JSON body. Used for seed

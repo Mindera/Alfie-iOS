@@ -15,19 +15,26 @@ final class BrowseJourneyTests: AlfieUITestCase {
         }
 
         XCTContext.runActivity(named: "Follow the first category down to a leaf") { _ in
+            var path = ["Shop"]
             for _ in 0 ..< menuDepthLimit where !listing.filterButton.exists {
-                waitFor(shop.firstCategory, timeout: .bffRead, "Shop should list at least one category")
+                waitFor(
+                    shop.firstCategory,
+                    timeout: .bffRead,
+                    "\(path.joined(separator: " → ")) should list at least one category"
+                )
                 let tappedTitle = shop.firstCategory.label
                 shop.tapFirstCategory()
+                path.append(tappedTitle)
                 waitForListingOrSubCategories(of: tappedTitle, shop: shop, listing: listing)
             }
-            listing.assertVisible()
+            waitFor(listing.filterButton, "\(path.joined(separator: " → ")) should end on a product listing")
         }
 
         XCTContext.runActivity(named: "The first product opens its product page") { _ in
             waitFor(listing.productCards.firstMatch, timeout: .bffRead, "The leaf category should list a product")
             listing.tapFirstProduct()
             pdp.assertVisible(timeout: .bffRead)
+            waitFor(pdp.addToBagButton, timeout: .bffRead, "The product page should finish loading")
             XCTAssertFalse(pdp.productName.label.isEmpty, "The product page should show a non-empty name")
         }
     }
@@ -39,10 +46,10 @@ final class BrowseJourneyTests: AlfieUITestCase {
         let settled = XCTNSPredicateExpectation(
             predicate: NSPredicate { _, _ in
                 listing.filterButton.exists
-                    || (shop.firstCategory.exists && shop.firstCategory.label != tappedTitle)
+                    || shop.firstCategoryTitle.map { $0 != tappedTitle } == true
             },
             object: nil
         )
-        _ = XCTWaiter.wait(for: [settled], timeout: .bffRead)
+        _ = XCTWaiter.wait(for: [settled], timeout: timeout)
     }
 }

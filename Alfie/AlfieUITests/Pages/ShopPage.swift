@@ -23,6 +23,11 @@ final class ShopPage {
         categories.firstMatch
     }
 
+    /// One lookup, so a list that leaves the screen mid-read yields `nil` rather than a failure.
+    var firstCategoryTitle: String? {
+        (try? firstCategory.snapshot())?.label
+    }
+
     // MARK: - Actions
 
     @discardableResult
