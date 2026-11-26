@@ -16,8 +16,8 @@ final class BrowseJourneyTests: AlfieUITestCase {
 
         XCTContext.runActivity(named: "Follow the first category down to a leaf") { _ in
             for _ in 0 ..< menuDepthLimit where !listing.filterButton.exists {
-                waitFor(shop.categories.firstMatch, timeout: .bffRead, "Shop should list at least one category")
-                let tappedTitle = shop.categories.firstMatch.label
+                waitFor(shop.firstCategory, timeout: .bffRead, "Shop should list at least one category")
+                let tappedTitle = shop.firstCategory.label
                 shop.tapFirstCategory()
                 waitForListingOrSubCategories(of: tappedTitle, shop: shop, listing: listing)
             }
@@ -33,15 +33,16 @@ final class BrowseJourneyTests: AlfieUITestCase {
     }
 
     /// A parent category pushes the same list under the same identifier, so only a changed first
-    /// title tells a sub-list from the list that was tapped.
+    /// title tells a sub-list from the list that was tapped. A sub-list that repeats its parent's title
+    /// times out here, and the caller's loop carries on.
     private func waitForListingOrSubCategories(of tappedTitle: String, shop: ShopPage, listing: ProductListingPage) {
         let settled = XCTNSPredicateExpectation(
             predicate: NSPredicate { _, _ in
                 listing.filterButton.exists
-                    || (shop.categories.firstMatch.exists && shop.categories.firstMatch.label != tappedTitle)
+                    || (shop.firstCategory.exists && shop.firstCategory.label != tappedTitle)
             },
             object: nil
         )
-        _ = XCTWaiter.wait(for: [settled], timeout: timeout)
+        _ = XCTWaiter.wait(for: [settled], timeout: .bffRead)
     }
 }

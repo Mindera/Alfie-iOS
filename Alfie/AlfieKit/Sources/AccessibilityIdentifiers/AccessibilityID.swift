@@ -44,7 +44,7 @@ public enum AccessibilityID {
     // MARK: - Categories
 
     public enum Categories {
-        public static let item = "category-item"
+        public static let item = "categories.item.button"
         public static let retryButton = "categories.retry.button"
     }
 

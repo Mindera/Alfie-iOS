@@ -19,6 +19,10 @@ final class ShopPage {
         app.buttons.matching(identifier: AccessibilityID.Categories.item)
     }
 
+    var firstCategory: XCUIElement {
+        categories.firstMatch
+    }
+
     // MARK: - Actions
 
     @discardableResult
@@ -29,7 +33,7 @@ final class ShopPage {
 
     @discardableResult
     func tapFirstCategory() -> Self {
-        categories.firstMatch.tap()
+        firstCategory.tap()
         return self
     }
 }
