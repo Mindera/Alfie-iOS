@@ -6,7 +6,6 @@
 # `bundle exec fastlane ...`
 #
 #  e.g.
-# `bundle exec fastlane ios test --env default`
 # `bundle exec fastlane ios release --env default`
 # `bundle exec fastlane ios renew_code_signing --env default`
 # 

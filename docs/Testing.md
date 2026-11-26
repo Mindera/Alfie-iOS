@@ -77,6 +77,7 @@ checked against the diff.
 |---|---|
 | Branch in the assert phase — an `if` wrapping an assertion reports green on the run where the branch never fires | Split into separate tests, or drive a table of cases with a per-row failure message. Branching *inside a mock closure* to route on its argument is the stub doing its job, not logic in the test |
 | `Task.sleep`, `Thread.sleep` or `asyncAfter` to wait for async work | `await` the call, use the `TestUtils` publisher helpers, or gate it |
+| `await scheduler.advance(...)` on a `TestScheduler` — the async overload hops through background-priority tasks 20 times per step, which a busy CI runner starves for seconds | Call the synchronous `advance` from a non-`async` helper, then await the work with `fulfillment(of:)` or a gate |
 | Test a `private` method, or widen access to reach one | Assert the public behaviour that calls it |
 | Touch the network, disk, real `UserDefaults` or the real BFF in a unit test | Use a mock — `MockUserDefaults` for defaults; real-BFF coverage belongs in `BFFIntegrationTests`. `ProductListingStyleProviderTests` still drives a real suite and tears it down: debt, not precedent |
 | `zip` two collections to pair test inputs | Pair them in one array of tuples — `zip` truncates to the shorter side and drops cases silently |
@@ -145,7 +146,7 @@ Treat them as correct, in review and when writing.
 - **Location**: `Alfie/AlfieKit/Tests/` — one test target per module, named `<Module>Tests`
   (`ls Alfie/AlfieKit/Tests/` for the current set), plus the app-level `Alfie/AlfieTests`.
   `BFFIntegrationTests` is the odd one out: it runs against the Mock BFF, not mocks, in CI's
-  `bff-tests` job (§CI) and locally only when `verify.sh` runs without `--only-unit`. It pins only
+  `tests` job (§CI) and locally only when `verify.sh` runs without `--only-unit`. It pins only
   to `SeedAnchors` (the `TestSeed` module), the Mock BFF's seed anchors; "the first item" only where
   the assertion holds for any item. `SeedAnchors` is generated: when the BFF adds an anchor a test
   needs, pull `Alfie-BFF` and run `./Alfie/scripts/generate-seed-anchors.sh`, then commit the diff.
@@ -155,22 +156,60 @@ Treat them as correct, in review and when writing.
 
 ## CI
 
-The `Alfie CI/CD` workflow runs two test jobs on every PR that changes more than docs, in the merge
-queue and on `main`. `release` needs both.
+The `Alfie CI/CD` workflow runs one test job, `tests`, on every PR, in the merge queue and on manual
+dispatch. `tests` is a required status check on `main`, so the merge queue is the test gate: a push
+to `main` starts no test job.
 
-| Job | Runs |
+| Event | Jobs |
 |---|---|
-| `unit-tests` | `Alfie.xctestplan` through fastlane |
-| `bff-tests` | `run-integration-tests.sh`: `AlfieIntegration.xctestplan` then `AlfieUI.xctestplan`, against the Mock BFF built from `Alfie-BFF` `main` |
+| `pull_request`, `merge_group`, `workflow_dispatch` | `tests` |
+| `push` to `main` | `release`, `build-cache` (independent of each other) |
 
-`bff-tests`:
+When a PR or a merge group changes only docs (`*.md`, `docs/**`; decided by `ci-docs-only.sh` in
+the ubuntu `changes` job), `tests` is skipped, which satisfies the required check without waiting
+for a macOS runner. `tests` runs whenever `changes` does not answer "docs only", a failed `changes`
+included. Keep the job id `tests`: the ruleset names it.
+
+`release` ships each push to `main` to TestFlight without waiting for a test job. Releases run one
+at a time (two would race on the build-number tag), and one in progress is never cancelled; a push
+that arrives while another release is already waiting replaces the waiting one, whose commits ship
+with it.
+
+`build-cache` runs `build-for-testing` on each push to `main` and saves the DerivedData and Swift
+package caches, keyed per commit. It is the only job that saves them; `tests` restores the newest
+entry built from the same project, package and test plan files, else the newest of any (a build
+that fails on a restored cache rebuilds clean once), and saves nothing. Both go through the `restore-build-cache` action, so they build with the
+same flags and file dates and the cache stays reusable. Swift packages are cloned into
+`build/DerivedData/SourcePackages` in every job (`release` included) and live in the package cache
+only. After saving, `build-cache` deletes the older entries of those two caches on `main`
+(`prune-build-caches.sh`), so they hold one build's worth of the repository's 10 GB.
+
+`tests` runs `verify.sh`, the local "Done" check: one `build-for-testing`, then `Alfie.xctestplan`,
+`AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` from that build, the last two against the
+Mock BFF built from `Alfie-BFF` `main`. Each stage is a group in the job log with its result line
+below it, and a row with its duration in the job summary's result table. The summary also names the
+runner's CPU count, memory and load, and the DerivedData cache restored. Every `⏱️` line in the log
+is a phase duration (`grep '⏱️'` gives a run's timeline): an xcodebuild call's line carries the
+second it started, resolved packages, began compiling and started its first test suite. CI adds
+its xcodebuild flags (package flags, coverage off, DerivedData and package paths) through
+`ALFIE_XCODEBUILD_ARGS`, which `restore-build-cache` exports.
+
+`tests`:
 
 - writes the BFF commit it tested to the job summary, which tells an iOS break from a BFF break;
-- on failure or cancel (the timeout included) uploads the `bff-test-results` artifact (both result
-  bundles, the BFF log and the build log, kept 7 days);
-- is skipped on fork and Dependabot PRs, which get no secrets;
+- on failure or cancel (the timeout included) uploads the `test-results` artifact (every
+  `/tmp/alfie_*` result bundle and log, kept 7 days);
+- runs `verify.sh --only-unit` on fork and Dependabot PRs, which cannot read `Alfie-BFF`, and skips
+  the BFF checkout, Node and BFF cache steps. Those PRs get no secrets, so `setup-ios` writes an
+  empty Debug `GoogleService-Info.plist` in place of the git-secret one: the build only copies it,
+  and tests never start Firebase;
 - fails when the runner has no iPhone on the pinned iOS version, where a local run falls back to the
   newest;
+- starts booting the simulator before the build (`verify.sh` does, locally too) and prints how long
+  each stage then waited for it. A simulator still booting after `BOOT_TIMEOUT` (120 s) does not
+  stop the unit stage, which prints the boot progress and records runner-stall evidence instead;
+- uploads the `runner-stall` artifact when a passing run's test runner took over 120 s to start or
+  went silent for 120 s (`runner-stall.sh`: simulator log and samples of `xcodebuild`);
 - reads the private `Alfie-BFF` with the repo secret `BFF_READ_TOKEN`, a fine-grained personal
   access token with read-only Contents on that repo alone. It belongs to one person and expires:
   when the BFF checkout fails on authentication, renew it.
@@ -217,5 +256,5 @@ Two things the bundle does not cover. A `--filter` run writes to
 the suite. And `AlfieIntegration.xctestplan` and `AlfieUI.xctestplan` collect nothing, so anything exercised
 only by `BFFIntegrationTests` or `AlfieUITests` reads as 0%.
 
-Coverage is off in CI (`SCAN_CODE_COVERAGE=false` in `fastlane/.env.default`): the run has no
-consumer there, and the xcresult is uploaded only on failure.
+Coverage is off in CI (`-enableCodeCoverage NO` in the `tests` job's `ALFIE_XCODEBUILD_ARGS`): the
+run has no consumer there, and the xcresult is uploaded only on failure.

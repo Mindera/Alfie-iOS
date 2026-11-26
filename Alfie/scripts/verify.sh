@@ -10,10 +10,14 @@
 # local BFF / Node toolchain isn't available.
 #
 # Usage: verify.sh [--only-unit] [args passed through to test-for-verification.sh, e.g. --filter X]
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to every xcodebuild call (CI's package flags,
+# coverage off, DerivedData path).
 
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ci-log.sh"
+source "$SCRIPT_DIR/simulator.sh"
 
 # Parse our own flags; pass everything else through to the unit-test runner.
 RUN_BFF_TESTS=true
@@ -34,11 +38,19 @@ fi
 echo "================================================"
 echo ""
 
+log_runner
+STAGE_STARTED=$SECONDS
+remember_available_devices
+start_booting "$(preferred_iphone_udid)"
+log_elapsed "Simulator lookup" "$STAGE_STARTED"
+
 # Step 1: Build
 echo "📦 STEP 1: Build Verification"
 echo "--------------------------------"
+STAGE_STARTED=$SECONDS
 "$SCRIPT_DIR/build-for-verification.sh"
 BUILD_RESULT=$?
+summarize_stage "Build" "$BUILD_RESULT" $((SECONDS - STAGE_STARTED))
 
 if [ $BUILD_RESULT -ne 0 ]; then
     echo ""
@@ -53,8 +65,10 @@ echo ""
 # Step 2: Unit tests (mocked BFF)
 echo "🧪 STEP 2: Unit Test Verification"
 echo "-------------------------------"
+STAGE_STARTED=$SECONDS
 "$SCRIPT_DIR/test-for-verification.sh" --skip-build "${TEST_ARGS[@]}"
 TEST_RESULT=$?
+summarize_stage "Unit tests" "$TEST_RESULT" $((SECONDS - STAGE_STARTED))
 
 if [ $TEST_RESULT -ne 0 ]; then
     echo ""
@@ -78,9 +92,13 @@ if [ "$RUN_BFF_TESTS" = true ]; then
         echo "(Re-run with --only-unit if the local BFF is unavailable.)"
         exit 1
     fi
+else
+    summarize_stage "Integration tests" skipped
+    summarize_stage "UI tests" skipped
 fi
 
 echo ""
+log_elapsed "Verification" 0
 echo "================================================"
 if [ "$RUN_BFF_TESTS" = true ]; then
     echo "✅ FULL VERIFICATION PASSED (build + unit + integration + UI)"

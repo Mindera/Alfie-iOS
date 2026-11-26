@@ -2,27 +2,46 @@
 
 # Build script for AI agents to verify code changes
 # Works across different developer machines by automatically selecting an available simulator
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to the xcodebuild calls (CI's package flags).
+# ALFIE_RESTORED_DERIVED_DATA names a DerivedData directory restored from a cache: a failed build
+# deletes it and builds clean once, so a stale cache cannot fail a build that passes clean.
 
 set -o pipefail  # Ensure pipe returns the exit code of the failing command
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
+BUILD_LOG="/tmp/alfie_build.log"
+RESTORED_BUILD_LOG="/tmp/alfie_build_restored_cache.log"
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
 
 echo "🔨 Building Alfie iOS project..."
 echo "📂 Project: $PROJECT_FILE"
 echo "📱 Scheme: $SCHEME"
 echo ""
 
-# Try to build test bundles with generic iOS Simulator destination (most portable)
-echo "🎯 Attempting build-for-testing with generic iOS Simulator destination..."
-xcodebuild -project "$PROJECT_FILE" \
-    -scheme "$SCHEME" \
-    -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
-    build-for-testing 2>&1 | tee /tmp/alfie_build.log
+SIMULATOR_ID="$(preferred_iphone_udid)"
 
-BUILD_RESULT=${PIPESTATUS[0]}
+if [ -z "$SIMULATOR_ID" ]; then
+    echo "❌ ERROR: No iPhone simulator found"
+    echo "Please install iPhone simulators via Xcode"
+    exit 1
+fi
+
+SIMULATOR_NAME="$(simulator_name "$SIMULATOR_ID")"
+
+echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID)"
+echo ""
+
+run_logged "build-for-testing ($SIMULATOR_NAME)" "$BUILD_LOG" \
+    xcodebuild -project "$PROJECT_FILE" \
+    -scheme "$SCHEME" \
+    -destination "id=$SIMULATOR_ID" \
+    -showBuildTimingSummary \
+    "${XCODEBUILD_ARGS[@]}" \
+    build-for-testing
+BUILD_RESULT=$?
 
 if [ $BUILD_RESULT -eq 0 ]; then
     echo ""
@@ -30,43 +49,20 @@ if [ $BUILD_RESULT -eq 0 ]; then
     exit 0
 fi
 
-# Check if it was a destination error (exit code 70 or specific error message)
-if grep -q "Unable to find a device matching the provided destination" /tmp/alfie_build.log; then
-    echo "⚠️  Generic destination failed, trying specific iPhone simulator..."
-    
-    SIMULATOR_ID="$(preferred_iphone_udid)"
-
-    if [ -z "$SIMULATOR_ID" ]; then
-        echo "❌ ERROR: No iPhone simulator found"
-        echo "Please install iPhone simulators via Xcode"
-        exit 1
-    fi
-
-    SIMULATOR_NAME="$(simulator_name "$SIMULATOR_ID")"
-
-    echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID)"
+if [ -n "${ALFIE_RESTORED_DERIVED_DATA:-}" ] && [ -d "$ALFIE_RESTORED_DERIVED_DATA" ]; then
     echo ""
-    
-    # Build test bundles with specific simulator
-    xcodebuild -project "$PROJECT_FILE" \
-        -scheme "$SCHEME" \
-        -destination "id=$SIMULATOR_ID" \
-        build-for-testing 2>&1 | tee /tmp/alfie_build.log
-    
-    BUILD_RESULT=${PIPESTATUS[0]}
-    
-    if [ $BUILD_RESULT -eq 0 ]; then
-        echo ""
-        echo "✅ BUILD SUCCEEDED"
-        exit 0
-    fi
+    echo "⚠️  Build failed on the restored DerivedData, deleting it and building clean..."
+    echo "📋 Failed build log kept at: $RESTORED_BUILD_LOG"
+    cp "$BUILD_LOG" "$RESTORED_BUILD_LOG"
+    find "$ALFIE_RESTORED_DERIVED_DATA" -mindepth 1 -maxdepth 1 ! -name SourcePackages -exec rm -rf {} +
+    ALFIE_RESTORED_DERIVED_DATA="" exec "${BASH_SOURCE[0]}" "$@"
 fi
 
 # Build failed
 echo ""
 echo "❌ BUILD FAILED"
 echo ""
-echo "📋 Build log saved to: /tmp/alfie_build.log"
+echo "📋 Build log saved to: $BUILD_LOG"
 echo ""
 echo "Common issues to check:"
 echo "  - Missing imports (import Models, import StyleGuide, etc.)"

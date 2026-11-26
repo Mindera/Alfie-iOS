@@ -65,7 +65,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         let sut = makeSUT()
         sut.searchText = " shirt "
 
-        showSuggestions(in: sut) { self.scheduler.advance(by: .milliseconds(500)) }
+        showSuggestions(in: sut) { self.advanceDebounce() }
 
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
     }
@@ -94,7 +94,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         XCTAssertNoEmit(from: sut.$state) {
             sut.searchText = "shirt "
-            self.scheduler.advance(by: .milliseconds(500))
+            self.advanceDebounce()
         }
 
         XCTAssertEqual(sut.state, suggestions(for: "shirt", [.products([shirt])]))
@@ -126,7 +126,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         let sut = makeSUT()
         sut.searchText = "   "
 
-        scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
 
         XCTAssertEqual(sut.state, .blank)
         XCTAssertEqual(requests, [])
@@ -138,7 +138,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         scheduler.advance(by: .milliseconds(300))
         sut.searchText = ""
 
-        scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
 
         XCTAssertEqual(requests, [])
         XCTAssertEqual(sut.state, .blank)
@@ -289,7 +289,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         holdRequest(for: "shirt", at: gate) { [shirt] in .fixture(products: [shirt]) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         await fulfillment(of: [gate.held], timeout: .default)
         await awaitSuggestions(for: "dress", in: sut)
 
@@ -306,7 +306,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         holdRequest(for: "shirt", at: gate) { throw BFFRequestError(type: .timeout) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         await fulfillment(of: [gate.held], timeout: .default)
         await awaitSuggestions(for: "dress", in: sut)
 
@@ -323,7 +323,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         holdRequest(for: "shirt", at: gate) { [shirt] in .fixture(products: [shirt]) }
         let sut = makeSUT()
         sut.searchText = "shirt"
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         await fulfillment(of: [gate.held], timeout: .default)
         sut.searchText = "shirts"
         sut.searchText = "shirt"
@@ -452,7 +452,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         XCTAssertNoEmit(from: sut.$state) {
             sut.didTapKeywordSuggestion(self.linenShirt)
-            self.scheduler.advance(by: .milliseconds(500))
+            self.advanceDebounce()
         }
 
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
@@ -524,7 +524,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
 
         XCTAssertNoEmit(from: sut.$state) {
             sut.didTapBrandSuggestion(self.shirtCo)
-            self.scheduler.advance(by: .milliseconds(500))
+            self.advanceDebounce()
         }
 
         XCTAssertEqual(requests, [SuggestionsRequest(searchTerm: "shirt", limit: 6)])
@@ -613,7 +613,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         let sut = makeSUT()
         sut.recentSearchesViewModel.didTapRecentSearch(.text(value: "linen"))
 
-        scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
 
         XCTAssertEqual(sut.state, .recentSearches)
         XCTAssertEqual(requests, [])
@@ -636,7 +636,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         let sut = makeSUT()
 
         sut.recentSearchesViewModel.didTapRecentSearch(recentSearch)
-        scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
 
         XCTAssertTrue(mockAnalytics.trackedEvents.isEmpty)
         XCTAssertEqual(requests, [])
@@ -681,6 +681,10 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
         }
     }
 
+    private func advanceDebounce() {
+        scheduler.advance(by: .milliseconds(500))
+    }
+
     private func makeGate() -> SuggestionsGate {
         SuggestionsGate(
             held: expectation(description: "request held"),
@@ -710,7 +714,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
     ) {
         showSuggestions(in: sut, file: file, line: line) {
             sut.searchText = searchText
-            self.scheduler.advance(by: .milliseconds(500))
+            self.advanceDebounce()
         }
     }
 
@@ -741,7 +745,7 @@ final class SearchViewModelSuggestionsTests: XCTestCase {
             .first { $0 != .suggestions(.loading) }
             .sink { _ in shown.fulfill() }
         sut.searchText = searchText
-        await scheduler.advance(by: .milliseconds(500))
+        advanceDebounce()
         let result = await XCTWaiter().fulfillment(of: [shown], timeout: .default)
         cancellable.cancel()
         XCTAssertEqual(result, .completed, "Suggestions never left loading", file: file, line: line)

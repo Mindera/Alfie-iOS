@@ -1,5 +1,5 @@
 name: Set up iOS job
-description: Restores the Homebrew, SPM and (optionally) gems caches, installs Homebrew formulas and reveals the git-secret files. Run after actions/checkout.
+description: Restores the Homebrew, SPM (never saved here) and (optionally) gems caches, installs Homebrew formulas and reveals the git-secret files (or, where a run gets no secrets and asks for it, writes an empty Firebase config in their place). Run after actions/checkout.
 
 inputs:
   gpg-private-key:
@@ -9,16 +9,56 @@ inputs:
     description: Passphrase of the GPG private key
     required: true
   spm-cloned-dependencies-path:
-    description: Directory xcodebuild clones Swift packages into
+    description: Directory xcodebuild clones Swift packages into, relative to the workspace
     required: true
   ruby:
     description: Also restore the gems cache and run bundle install
     required: false
     default: "false"
+  placeholder-firebase-config:
+    description: Without the GPG private key, write an empty Debug GoogleService-Info.plist instead of failing. Only for jobs that build Debug and run tests, which never start Firebase.
+    required: false
+    default: "false"
+
+outputs:
+  xcode-version:
+    description: Version and build of the selected Xcode, for cache keys
+    value: ${{ steps.xcode.outputs.version }}
+  spm-cache-path:
+    description: Paths of the Swift package cache, for actions/cache/save
+    value: ${{ steps.spm-cache-paths.outputs.paths }}
+  spm-cache-key:
+    description: Per-commit key of the Swift package cache, for actions/cache/save
+    value: ${{ steps.spm-cache.outputs.cache-primary-key }}
+  spm-cache-hit:
+    description: "'true' when this commit's Swift package cache already exists"
+    value: ${{ steps.spm-cache.outputs.cache-hit }}
 
 runs:
   using: composite
   steps:
+    - name: Check the git-secret key
+      id: secrets
+      shell: bash
+      env:
+        SECRETS_GPG_PRIVATE_KEY: ${{ inputs.gpg-private-key }}
+        PLACEHOLDER_FIREBASE_CONFIG: ${{ inputs.placeholder-firebase-config }}
+      run: |
+        if [ -n "$SECRETS_GPG_PRIVATE_KEY" ]; then
+          echo "available=true" >> "$GITHUB_OUTPUT"
+        elif [ "$PLACEHOLDER_FIREBASE_CONFIG" = true ]; then
+          plutil -create xml1 Alfie/Alfie/Configuration/Debug/GoogleService-Info.plist
+          echo "::notice title=No repository secrets::This run gets no secrets (fork or Dependabot pull request), so it builds with an empty Debug GoogleService-Info.plist. Tests never start Firebase."
+        else
+          echo "::error title=No repository secrets::This run gets no secrets, so the git-secret files cannot be revealed and the app cannot build: its Copy GoogleService-Info.plist build phase needs Alfie/Alfie/Configuration/<configuration>/GoogleService-Info.plist."
+          exit 1
+        fi
+
+    - name: Read Xcode version
+      id: xcode
+      shell: bash
+      run: echo "version=$(xcodebuild -version | awk '{print $NF}' | paste -sd- -)" >> "$GITHUB_OUTPUT"
+
     - name: Cache Homebrew
       uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
@@ -39,14 +79,27 @@ runs:
           gems-${{ runner.os }}-${{ hashFiles('Gemfile') }}-
           gems-${{ runner.os }}-
 
+    - name: List Swift Package Manager cache paths
+      id: spm-cache-paths
+      shell: bash
+      env:
+        SPM_CLONED_DEPENDENCIES_PATH: ${{ inputs.spm-cloned-dependencies-path }}
+      run: |
+        {
+          echo "paths<<EOF"
+          echo "~/Library/Caches/org.swift.swiftpm"
+          echo "$SPM_CLONED_DEPENDENCIES_PATH"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
     - name: Restore Swift Package Manager Cache
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      id: spm-cache
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
-        path: |
-          ~/Library/Caches/org.swift.swiftpm
-          ${{ inputs.spm-cloned-dependencies-path }}
-        key: spm-${{ runner.os }}-${{ hashFiles('Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved', 'Alfie/Alfie.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+        path: ${{ steps.spm-cache-paths.outputs.paths }}
+        key: spm-${{ runner.os }}-xcode${{ steps.xcode.outputs.version }}-${{ github.sha }}
         restore-keys: |
+          spm-${{ runner.os }}-xcode${{ steps.xcode.outputs.version }}-
           spm-${{ runner.os }}-
 
     - name: Install Homebrew formulas
@@ -61,6 +114,7 @@ runs:
         bundle install --jobs 4 --retry 3
 
     - name: Import GPG Private Key and Decrypt sensitive files
+      if: steps.secrets.outputs.available == 'true'
       shell: bash
       env:
         SECRETS_GPG_PRIVATE_KEY: ${{ inputs.gpg-private-key }}

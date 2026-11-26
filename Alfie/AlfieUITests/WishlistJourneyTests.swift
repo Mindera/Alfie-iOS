@@ -10,7 +10,7 @@ final class WishlistJourneyTests: AlfieUITestCase {
         XCTContext.runActivity(named: "Open the product by deep link") { _ in
             waitFor(wishlist.tab, "The bundled local config should enable the Wishlist tab")
             pdp.open(handle: SeedAnchors.Products.default)
-            pdp.assertVisible()
+            pdp.assertVisible(timeout: .deepLinkRelaunch)
         }
 
         XCTContext.runActivity(named: "Add it to the wishlist") { _ in

@@ -19,7 +19,6 @@ PROJECT_FILE="$PROJECT_DIR/Alfie/Alfie.xcodeproj"
 SCHEME="Alfie"
 BUILD_LOG="/tmp/alfie_bff_tests_build.log"
 BFF_LOG="/tmp/alfie_bff.log"
-read -r -a XCODEBUILD_ARGS <<< "${ALFIE_XCODEBUILD_ARGS:-}"
 
 SKIP_BUILD=false
 while [[ $# -gt 0 ]]; do
@@ -30,6 +29,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/runner-stall.sh"
 
 BFF_PATH="${ALFIE_BFF_PATH:-$PROJECT_DIR/../Alfie-BFF}"
 export ALFIE_BFF_BASE_URL="${ALFIE_BFF_BASE_URL:-http://localhost:3000}"  # origin only; service appends /graphql
@@ -44,7 +45,12 @@ esac
 GRAPHQL_URL="$ALFIE_BFF_BASE_URL/graphql"
 READINESS_TIMEOUT=60
 
-fail() { echo "❌ $1"; exit 1; }
+fail() {
+    echo "❌ $1"
+    summarize_stage "Integration tests" not-run
+    summarize_stage "UI tests" not-run
+    exit 1
+}
 fail_with_bff_log() { tail -n 40 "$BFF_LOG"; fail "$1 (log: $BFF_LOG)"; }
 
 warn_if_bff_checkout_differs_from_main() {
@@ -85,39 +91,44 @@ fi
 export TEST_RUNNER_ALFIE_BFF_PLATFORM="$ALFIE_BFF_PLATFORM"
 
 if [ "$ALFIE_BFF_PLATFORM" = mock ]; then
+    PHASE_STARTED=$SECONDS
     ALFIE_BFF_PATH="$BFF_PATH" "$PROJECT_DIR/Alfie/scripts/generate-seed-anchors.sh" --check || fail "SeedAnchors drifted from the BFF's seed anchors."
+    log_elapsed "SeedAnchors check" "$PHASE_STARTED"
 fi
 
 # --- Simulator ---------------------------------------------------------------
 if [ -n "$CI" ] && [ -z "$(pinned_iphone_udid)" ]; then
-    fail "No iPhone simulator on iOS $SNAPSHOT_OS_VERSION on this runner."
+    fail "$NO_PINNED_IPHONE"
 fi
 SIMULATOR_ID="$(preferred_iphone_udid)"
 [ -n "$SIMULATOR_ID" ] || fail "No iPhone simulator found. Install one via Xcode."
 DESTINATION="id=$SIMULATOR_ID"
 echo "📱 Using simulator: $(simulator_name "$SIMULATOR_ID") ($SIMULATOR_ID)"
-# Boot now so the simulator settles during the build: on a freshly booted one the first app launch
-# outlasts Xcode's launch timeout.
-xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null
+start_booting "$SIMULATOR_ID"
 
 if [ "$SKIP_BUILD" = true ]; then
     echo "⏭️  Skipping build-for-testing (reusing the earlier build)"
 else
     echo "🔨 build-for-testing (log: $BUILD_LOG)..."
-    xcodebuild build-for-testing \
+    run_logged "build-for-testing" "$BUILD_LOG" \
+        xcodebuild build-for-testing \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -destination "$DESTINATION" \
-        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$BUILD_LOG"
-    [ "${PIPESTATUS[0]}" -eq 0 ] || fail "build-for-testing failed (log: $BUILD_LOG)"
+        "${XCODEBUILD_ARGS[@]}" || fail "build-for-testing failed (log: $BUILD_LOG)"
 fi
 
 warn_if_bff_checkout_differs_from_main
 echo "🔖 BFF: $(git -C "$BFF_PATH" rev-parse HEAD 2>/dev/null || echo unknown) ($BFF_PATH)"
 echo "🧩 BFF platform: $ALFIE_BFF_PLATFORM"
 
+PHASE_STARTED=$SECONDS
 echo "📦 Installing and building the BFF (yarn)..."
-( cd "$BFF_PATH" && yarn install --frozen-lockfile && yarn build ) || fail "yarn install/build failed in $BFF_PATH"
+log_group "BFF yarn install and build"
+( cd "$BFF_PATH" && yarn install --frozen-lockfile && yarn build )
+BFF_BUILD_RESULT=$?
+log_endgroup
+[ "$BFF_BUILD_RESULT" -eq 0 ] || fail "yarn install/build failed in $BFF_PATH"
 
 # --- Pre-flight: refuse to reuse a stale server ------------------------------
 if lsof -i ":$BFF_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
@@ -131,7 +142,9 @@ echo "🚀 Booting BFF: $BFF_START_CMD (cwd: $BFF_PATH, log: $BFF_LOG)"
 ( cd "$BFF_PATH" && exec bash -c "$BFF_START_CMD" ) >"$BFF_LOG" 2>&1 &
 BFF_PGID=$!
 # Kill the whole process group (npm spawns child node procs that a plain `kill $PID` would orphan).
-trap 'echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT INT TERM
+trap 'kill_stall_capture; echo "🧹 Stopping BFF..."; kill -- -"$BFF_PGID" 2>/dev/null' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 # --- Wait for GraphQL readiness ----------------------------------------------
 echo "⏳ Waiting for GraphQL at $GRAPHQL_URL (timeout ${READINESS_TIMEOUT}s)..."
@@ -153,6 +166,7 @@ for _ in $(seq 1 "$READINESS_TIMEOUT"); do
 done
 [ "$ready" = true ] || fail_with_bff_log "BFF did not become ready at $GRAPHQL_URL within ${READINESS_TIMEOUT}s"
 echo "✅ BFF is ready."
+log_elapsed "BFF install, build and boot" "$PHASE_STARTED"
 
 # Guards against a false green: xcodebuild exits 0 when every test XCTSkips, so zero executed test
 # cases fails the plan.
@@ -161,14 +175,17 @@ run_plan() {
     echo ""
     echo "🧪 Running $plan test plan (test-without-building)..."
     rm -rf "$bundle"
-    xcodebuild test-without-building \
+    [ "$plan" != AlfieUI ] || start_stall_capture ui "$plan" "$SIMULATOR_ID" "$log"
+    run_logged "$plan test plan" "$log" \
+        xcodebuild test-without-building \
         -project "$PROJECT_FILE" \
         -scheme "$SCHEME" \
         -testPlan "$plan" \
         -destination "$DESTINATION" \
         -resultBundlePath "$bundle" \
-        "${XCODEBUILD_ARGS[@]}" 2>&1 | tee "$log"
-    local result=${PIPESTATUS[0]}
+        "${XCODEBUILD_ARGS[@]}"
+    local result=$?
+    [ "$plan" != AlfieUI ] || stop_stall_capture "$result"
 
     if [ "$result" -ne 0 ]; then
         echo "❌ $plan TESTS FAILED (log: $log, results: $bundle)"
@@ -184,16 +201,21 @@ run_plan() {
     echo "✅ $plan TESTS PASSED ($executed executed)"
 }
 
+PHASE_STARTED=$SECONDS
 run_plan AlfieIntegration /tmp/alfie_integration_test.log /tmp/alfie_integration_test.xcresult
 INTEGRATION_RESULT=$?
+summarize_stage "Integration tests" "$INTEGRATION_RESULT" $((SECONDS - PHASE_STARTED))
 # A cold-booting simulator refuses to launch the UI test runner ("Busy: Application failed preflight
 # checks"), so wait for the boot to finish first.
 if wait_for_boot "$SIMULATOR_ID"; then
+    PHASE_STARTED=$SECONDS
     run_plan AlfieUI /tmp/alfie_ui_test.log /tmp/alfie_ui_test.xcresult
     UI_RESULT=$?
+    summarize_stage "UI tests" "$UI_RESULT" $((SECONDS - PHASE_STARTED))
     use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not reset $SIMULATOR_ID to light appearance."
 else
     echo "❌ Simulator $SIMULATOR_ID did not boot within ${BOOT_TIMEOUT}s; AlfieUI not run."
+    summarize_stage "UI tests" not-run
     UI_RESULT=1
 fi
 
