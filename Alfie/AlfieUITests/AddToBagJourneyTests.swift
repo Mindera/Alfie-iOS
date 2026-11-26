@@ -13,7 +13,7 @@ final class AddToBagJourneyTests: AlfieUITestCase {
                 handle: SeedAnchors.InStockVariants.productSlug,
                 variantId: SeedAnchors.InStockVariants.variantIds[0]
             )
-            pdp.assertVisible()
+            pdp.assertVisible(timeout: .deepLinkRelaunch)
         }
 
         XCTContext.runActivity(named: "Add it to the bag") { _ in

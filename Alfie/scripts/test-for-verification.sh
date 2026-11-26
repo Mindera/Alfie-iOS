@@ -2,6 +2,7 @@
 
 # Test script for AI agents to verify code changes
 # Selects an iPhone simulator on the pinned iOS major so snapshot references stay comparable
+# ALFIE_XCODEBUILD_ARGS adds space-separated flags to the xcodebuild call (CI's package flags).
 
 set -o pipefail  # Ensure pipe returns the exit code of the failing command
 
@@ -16,6 +17,8 @@ TEST_LOG="/tmp/alfie_test.log"
 RESULT_BUNDLE="/tmp/alfie_test.xcresult"
 RESULT_BUNDLE_SHA="$RESULT_BUNDLE.sha"
 source "$(dirname "${BASH_SOURCE[0]}")/simulator.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/ci-log.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/runner-stall.sh"
 
 # Parse arguments
 TEST_FILTER=""
@@ -114,6 +117,9 @@ SNAPSHOT_SKIP_ARGS=()
 
 if [ -n "$SIMULATOR_ID" ]; then
     SIMULATOR_OS_LABEL="iOS $SNAPSHOT_OS_VERSION"
+elif [ -n "$CI" ]; then
+    echo "❌ $NO_PINNED_IPHONE"
+    exit 1
 else
     # No iPhone on the pinned iOS version. Rather than block the whole suite, fall back to the newest
     # available iPhone and skip the snapshot classes: their references are pinned to iOS
@@ -154,20 +160,32 @@ fi
 SIMULATOR_NAME=$(simulator_name "$SIMULATOR_ID")
 
 echo "📱 Using simulator: $SIMULATOR_NAME ($SIMULATOR_ID) — $SIMULATOR_OS_LABEL"
-use_light_appearance "$SIMULATOR_ID" || echo "⚠️  Could not set $SIMULATOR_ID to light appearance; snapshot tests may fail."
+BOOTED=true
+if wait_for_boot "$SIMULATOR_ID"; then
+    xcrun simctl ui "$SIMULATOR_ID" appearance light ||
+        echo "⚠️  Could not set $SIMULATOR_ID to light appearance; snapshot tests may fail."
+else
+    BOOTED=false
+fi
 echo ""
 
 rm -rf "$RESULT_BUNDLE" "$RESULT_BUNDLE_SHA"
 
-xcodebuild -project "$PROJECT_FILE" \
+if [ "$BOOTED" = false ]; then
+    trap kill_stall_capture EXIT
+    start_stall_capture unit Alfie "$SIMULATOR_ID" "$TEST_LOG"
+fi
+run_logged "Alfie test plan" "$TEST_LOG" \
+    xcodebuild -project "$PROJECT_FILE" \
     -scheme "$SCHEME" \
     -destination "id=$SIMULATOR_ID" \
     -resultBundlePath "$RESULT_BUNDLE" \
     $FILTER_ARG \
     "${SNAPSHOT_SKIP_ARGS[@]}" \
-    $TEST_ACTION 2>&1 | tee "$TEST_LOG"
-
-TEST_RESULT=${PIPESTATUS[0]}
+    "${XCODEBUILD_ARGS[@]}" \
+    $TEST_ACTION
+TEST_RESULT=$?
+[ "$BOOTED" = true ] || stop_stall_capture "$TEST_RESULT"
 
 if [ $TEST_RESULT -eq 0 ]; then
     # Only stamp the bundle for an unfiltered run: a filtered run's coverage describes a subset of

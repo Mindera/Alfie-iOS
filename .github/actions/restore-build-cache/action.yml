@@ -1,0 +1,68 @@
+name: Restore build cache
+description: Restores the newest Xcode DerivedData cache (never saved here), sets file modification dates back to their commit dates and exports CI's xcodebuild flags as ALFIE_XCODEBUILD_ARGS. Run after setup-ios on a full-history checkout, in every job that builds, so they all build the same way.
+
+inputs:
+  xcode-version:
+    description: The xcode-version output of setup-ios
+    required: true
+  derived-data-path:
+    description: DerivedData directory, relative to the workspace
+    required: true
+  source-packages-path:
+    description: Directory xcodebuild clones Swift packages into, relative to the workspace
+    required: true
+  any-build-graph:
+    description: "'true' also restores a cache built from another project, package or test plan graph when this one has none. Not for the job that saves the cache: it would carry stale modules forward."
+    default: "false"
+
+outputs:
+  cache-hit:
+    description: "'true' when this commit's DerivedData cache already exists"
+    value: ${{ steps.derived-cache.outputs.cache-hit }}
+  cache-primary-key:
+    description: Per-commit key of the DerivedData cache, for actions/cache/save
+    value: ${{ steps.derived-cache.outputs.cache-primary-key }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compute DerivedData key prefix
+      id: key
+      shell: bash
+      env:
+        XCODE_PREFIX: derived-${{ runner.os }}-xcode${{ inputs.xcode-version }}-
+        GRAPH: ${{ hashFiles('Alfie/Alfie.xcodeproj/**', 'Alfie/**/*.xctestplan', 'Alfie/AlfieKit/Package.swift', 'Alfie/AlfieKit/Package.resolved') }}
+        ANY_GRAPH: ${{ inputs.any-build-graph }}
+      run: |
+        echo "prefix=$XCODE_PREFIX$GRAPH-" >> "$GITHUB_OUTPUT"
+        [ "$ANY_GRAPH" != true ] || echo "fallback=$XCODE_PREFIX" >> "$GITHUB_OUTPUT"
+
+    - name: Restore Xcode DerivedData
+      id: derived-cache
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      with:
+        path: ${{ inputs.derived-data-path }}
+        key: ${{ steps.key.outputs.prefix }}${{ github.sha }}
+        restore-keys: |
+          ${{ steps.key.outputs.prefix }}
+          ${{ steps.key.outputs.fallback }}
+
+    - name: Restore file modification dates
+      shell: bash
+      run: ./Alfie/scripts/restore-mtimes.sh
+
+    - name: Export xcodebuild flags
+      shell: bash
+      env:
+        DERIVED_DATA_PATH: ${{ github.workspace }}/${{ inputs.derived-data-path }}
+        SOURCE_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.source-packages-path }}
+        RESTORED: ${{ steps.derived-cache.outputs.cache-matched-key != '' }}
+        MATCHED_KEY: ${{ steps.derived-cache.outputs.cache-matched-key }}
+      run: |
+        PACKAGE_ARGS="$(sed -n 's/^EXTRA_XCARGS="\(.*\)"$/\1/p' fastlane/.env.default)"
+        [ -n "$PACKAGE_ARGS" ] || { echo "EXTRA_XCARGS not found in fastlane/.env.default"; exit 1; }
+        {
+          echo "ALFIE_XCODEBUILD_ARGS=$PACKAGE_ARGS -enableCodeCoverage NO -derivedDataPath $DERIVED_DATA_PATH -clonedSourcePackagesDirPath $SOURCE_PACKAGES_PATH"
+          [ "$RESTORED" != true ] || echo "ALFIE_RESTORED_DERIVED_DATA=$DERIVED_DATA_PATH"
+        } >> "$GITHUB_ENV"
+        echo "DerivedData cache: ${MATCHED_KEY:-none restored}" | tee -a "$GITHUB_STEP_SUMMARY"
