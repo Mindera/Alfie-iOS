@@ -69,7 +69,6 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
 
         let bagDependencyContainer = BagDependencyContainer(
             cartService: serviceProvider.cartService,
-            configurationService: serviceProvider.configurationService,
             analytics: serviceProvider.analytics,
             log: log
         )
@@ -146,10 +145,8 @@ public final class AppFeatureViewModel: AppFeatureViewModelProtocol {
         let bagFlowViewModel = BagFlowViewModel(
             dependencies: .init(
                 bagDependencyContainer: bagDependencyContainer,
-                myAccountDependencyContainer: myAccountDependencyContainer,
                 productDetailsDependencyContainer: productDetailsDependencyContainer,
-                webDependencyContainer: webDependencyContainer,
-                wishlistDependencyContainer: wishlistDependencyContainer
+                webDependencyContainer: webDependencyContainer
             )
         )
         let categorySelectorFlowViewModel = CategorySelectorFlowViewModel(

@@ -142,10 +142,10 @@ let package = Package(
             name: "Bag",
             dependencies: [
                 "Model",
-                "MyAccount",
                 "ProductDetails",
                 "SharedUI",
-                "Wishlist",
+                "Web",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 
@@ -395,6 +395,7 @@ let package = Package(
                 "ProductDetails",
                 "SharedUI",
                 "Web",
+                .product(name: "CombineSchedulers", package: "combine-schedulers"),
             ]
         ),
 

@@ -2,15 +2,14 @@ import Model
 
 public class MockBagViewModel: BagViewModelProtocol {
     public var state: ViewState<Cart?, BFFRequestError>
-    public var isWishlistEnabled: Bool = false
-    public var removalFailure: BFFRequestError.BFFRequestErrorType?
+    public var transientFailure: BFFRequestError.BFFRequestErrorType?
 
     public init(
         state: ViewState<Cart?, BFFRequestError> = .success(nil),
-        removalFailure: BFFRequestError.BFFRequestErrorType? = nil
+        transientFailure: BFFRequestError.BFFRequestErrorType? = nil
     ) {
         self.state = state
-        self.removalFailure = removalFailure
+        self.transientFailure = transientFailure
     }
 
     public var onViewDidAppearCalled: (() -> Void)?
@@ -33,18 +32,8 @@ public class MockBagViewModel: BagViewModelProtocol {
         onDidSelectLineCalled?(line)
     }
 
-    public var onDidDismissRemovalFailureCalled: (() -> Void)?
-    public func didDismissRemovalFailure() {
-        onDidDismissRemovalFailureCalled?()
-    }
-
-    public var onDidTapMyAccountCalled: (() -> Void)?
-    public func didTapMyAccount() {
-        onDidTapMyAccountCalled?()
-    }
-
-    public var onDidTapWishlistCalled: (() -> Void)?
-    public func didTapWishlist() {
-        onDidTapWishlistCalled?()
+    public var onDidDismissTransientFailureCalled: (() -> Void)?
+    public func didDismissTransientFailure() {
+        onDidDismissTransientFailureCalled?()
     }
 }

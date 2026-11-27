@@ -13,11 +13,8 @@ public struct BagFlowView<ViewModel: BagFlowViewModelProtocol>: View {
                 .navigationDestination(for: BagRoute.self) { route in
                     route.destination(
                         bagViewModel: viewModel.makeBagViewModel,
-                        accountViewModel: viewModel.makeAccountViewModel,
                         productDetailsViewModel: viewModel.makeProductDetailsViewModel(configuration:),
-                        webViewModel: viewModel.makeWebViewModel(feature:),
-                        wishlistViewModel: viewModel.makeWishlistViewModel,
-                        myAccountIntentViewBuilder: viewModel.myAccountIntentViewBuilder
+                        webViewModel: viewModel.makeWebViewModel(feature:)
                     )
                 }
         }
