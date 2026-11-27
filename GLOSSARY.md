@@ -84,10 +84,6 @@ _Avoid_: Grid, products on screen
 **No results**:
 A first page or refresh that finds no products to show. On a first page it is a blocking error; on a refresh over loaded products, a transient error._Avoid_: Empty error
 
-**Blocking error**:
-A page request failure shown as a full-screen error that replaces the listing. Only raised when there are no loaded products.
-_Avoid_: Error screen, full-screen error
-
 ### Search
 
 **Search term**:
@@ -126,6 +122,10 @@ A Suggestion that is one Product. Choosing it opens its PDP.
 _Avoid_: product preview
 
 ### Failures
+
+**Blocking error**:
+A failure shown in place of the content, with a retry. Only raised when there is nothing on screen to keep.
+_Avoid_: Error screen, full-screen error
 
 **Transient error**:
 A failure shown over content already on screen, which stays. The shopper is told and nothing is replaced.

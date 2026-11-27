@@ -25,8 +25,9 @@ stale against it.
 
 ## Consequences
 
-- Offline, the Bag is an error with retry and a write is refused with a snackbar. Within a session
-  the last good Cart stays on screen through a failed write.
+- Offline, a Bag with no Cart to show is an error with retry, and a write is refused with a
+  snackbar. Within a session the last good Cart stays on screen through a failed write or a failed
+  read.
 - The PDP's add and quantity controls disable while their write is in flight; a Bag removal has no
   such guard.
 - Every cart operation, reads included, queues behind the one before it. Unordered, two adds each
