@@ -91,6 +91,112 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertFalse(sawLoading)
     }
 
+    // MARK: - A failed re-read
+
+    func test_aFailedReRead_keepsTheLinesAndReportsWhy() {
+        showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
+
+        XCTAssertEmitsValue(
+            from: sut.$transientFailure,
+            where: { $0 == .noInternet },
+            afterTrigger: { self.sut.viewDidAppear() }
+        )
+
+        XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
+    }
+
+    func test_aSecondFailedReRead_reportsAgainAfterTheFirstWasDismissed() {
+        showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
+        XCTAssertEmitsValue(
+            from: sut.$transientFailure,
+            where: { $0 == .noInternet },
+            afterTrigger: { self.sut.viewDidAppear() }
+        )
+        sut.didDismissTransientFailure()
+
+        XCTAssertEmitsValue(
+            from: sut.$transientFailure,
+            where: { $0 == .noInternet },
+            afterTrigger: { self.sut.viewDidAppear() }
+        )
+    }
+
+    func test_aFailedFirstRead_withACartAlreadyHeld_showsTheLinesAndReportsWhy() {
+        mockCartService.send(cart: .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .timeout) }
+        sut = .init(dependencies: mockDependencies) { _ in }
+
+        XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
+
+        XCTAssertEmitsValue(
+            from: sut.$transientFailure,
+            where: { $0 == .timeout },
+            afterTrigger: { self.sut.viewDidAppear() }
+        )
+
+        XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
+    }
+
+    func test_aFailedReRead_withNoCart_isABlockingError() {
+        mockCartService.onFetchCalled = { nil }
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
+
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure?.type, .noInternet)
+        XCTAssertNil(sut.transientFailure)
+    }
+
+    func test_aFailedReRead_overACartWithNoLines_isABlockingError() {
+        showCart(.fixture(id: "cart-1", lines: []))
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
+
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEqual(sut.state.failure?.type, .noInternet)
+        XCTAssertNil(sut.transientFailure)
+    }
+
+    // MARK: - Following the cart
+
+    func test_aCartPublishedWithoutAReadFromTheBag_updatesTheLines() {
+        showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 1)]))
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.cart?.totalQuantity == 3 },
+            afterTrigger: {
+                self.mockCartService.send(cart: .fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 3)]))
+            }
+        )
+    }
+
+    func test_aCartWithLinesPublishedDuringABlockingError_showsTheLines() {
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess },
+            afterTrigger: { self.mockCartService.send(cart: .fixture(id: "cart-1", lines: [.fixture(id: "line-1")])) }
+        )
+
+        XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
+    }
+
+    func test_aNilCartPublished_emptiesTheBag() {
+        showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess && $0.cart == nil },
+            afterTrigger: { self.mockCartService.send(cart: nil) }
+        )
+    }
+
     // MARK: - An empty bag
 
     func test_aShopperWithNoCartSeesAnEmptyBagRatherThanAnError() {
@@ -162,7 +268,11 @@ final class BagViewModelTests: XCTestCase {
             afterTrigger: { self.sut.didSelectDelete(line) }
         )
 
-        XCTAssertEqual(mockAnalytics.trackedActions, [.removeFromBag])
+        let tracked = XCTNSPredicateExpectation(
+            predicate: NSPredicate { [mockAnalytics] _, _ in mockAnalytics?.trackedActions == [.removeFromBag] },
+            object: nil
+        )
+        wait(for: [tracked], timeout: .default)
     }
 
     func test_didSelectDelete_thatFails_tracksNothingAndLeavesTheBagStanding() {
@@ -186,27 +296,27 @@ final class BagViewModelTests: XCTestCase {
         mockCartService.onRemoveCalled = { _ in throw BFFRequestError(type: .noInternet) }
 
         XCTAssertEmitsValue(
-            from: sut.$removalFailure,
+            from: sut.$transientFailure,
             where: { $0 == .noInternet },
             afterTrigger: { self.sut.didSelectDelete(line) }
         )
     }
 
-    func test_didDismissRemovalFailure_clearsIt() {
+    func test_didDismissTransientFailure_clearsIt() {
         // Cleared on dismissal so an identical later failure re-presents rather than being
         // swallowed as an unchanged value.
         let line = CartLine.fixture(id: "line-1")
         showCart(.fixture(id: "cart-1", lines: [line]))
         mockCartService.onRemoveCalled = { _ in throw BFFRequestError(type: .noInternet) }
         XCTAssertEmitsValue(
-            from: sut.$removalFailure,
+            from: sut.$transientFailure,
             where: { $0 != nil },
             afterTrigger: { self.sut.didSelectDelete(line) }
         )
 
-        sut.didDismissRemovalFailure()
+        sut.didDismissTransientFailure()
 
-        XCTAssertNil(sut.removalFailure)
+        XCTAssertNil(sut.transientFailure)
     }
 
     // MARK: - Opening a line's product

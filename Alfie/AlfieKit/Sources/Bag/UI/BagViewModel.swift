@@ -1,13 +1,22 @@
+import Combine
 import Foundation
 import Model
 
 public final class BagViewModel: BagViewModelProtocol {
     @Published public private(set) var state: ViewState<Cart?, BFFRequestError> = .loading
-    @Published public private(set) var removalFailure: BFFRequestError.BFFRequestErrorType?
+    @Published public private(set) var transientFailure: BFFRequestError.BFFRequestErrorType?
     public var isWishlistEnabled: Bool
+
+    private enum Read {
+        case inFlight
+        case settled
+        case failed(BFFRequestError)
+    }
 
     private let dependencies: BagDependencyContainer
     private let navigate: (BagRoute) -> Void
+    private var read: Read = .inFlight
+    private var cartSubscription: AnyCancellable?
 
     init(
         dependencies: BagDependencyContainer,
@@ -16,6 +25,12 @@ public final class BagViewModel: BagViewModelProtocol {
         self.isWishlistEnabled = dependencies.configurationService.isFeatureEnabled(.wishlist)
         self.dependencies = dependencies
         self.navigate = navigate
+
+        show(dependencies.cartService.cart)
+        cartSubscription = dependencies.cartService.cartPublisher
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in self?.show($0) }
     }
 
     // MARK: - BagViewModelProtocol
@@ -35,12 +50,11 @@ public final class BagViewModel: BagViewModelProtocol {
                 // Only once the server has dropped the line. Firing on the swipe would count
                 // removals that failed.
                 dependencies.analytics.trackRemoveFromBag(productID: line.productId)
-                state = .success(dependencies.cartService.cart)
             } catch {
                 dependencies.log.error("Error removing line \(line.id) from the cart: \(error)")
                 // The bag is left exactly as it was, so without this the row just snaps back and
                 // the shopper is told nothing.
-                removalFailure = (error as? BFFRequestError)?.type ?? .generic
+                transientFailure = (error as? BFFRequestError)?.type ?? .generic
             }
         }
     }
@@ -55,8 +69,8 @@ public final class BagViewModel: BagViewModelProtocol {
         navigate(.productDetails(.productDetails(.deepLink(handle: slug, sku: line.sku, variantId: line.variantId))))
     }
 
-    public func didDismissRemovalFailure() {
-        removalFailure = nil
+    public func didDismissTransientFailure() {
+        transientFailure = nil
     }
 
     public func didTapMyAccount() {
@@ -70,19 +84,50 @@ public final class BagViewModel: BagViewModelProtocol {
     // MARK: - Private
 
     private func fetchCart() {
-        // Every return to the tab re-reads. A bag already on screen stays put while that happens —
-        // only a screen with nothing to show yet drops to the skeleton.
         if !state.isSuccess {
             state = .loading
         }
+        read = .inFlight
+        transientFailure = nil
         Task { @MainActor in
             do {
                 try await dependencies.cartService.fetch()
-                state = .success(dependencies.cartService.cart)
+                read = .settled
             } catch {
                 dependencies.log.error("Error fetching the cart: \(error)")
-                state = .error(error as? BFFRequestError ?? BFFRequestError(type: .generic, error: error))
+                let error = error as? BFFRequestError ?? BFFRequestError(type: .generic, error: error)
+                if Self.hasLines(dependencies.cartService.cart) {
+                    read = .settled
+                    transientFailure = error.type
+                } else {
+                    read = .failed(error)
+                }
             }
+            show(dependencies.cartService.cart)
         }
+    }
+
+    private func show(_ cart: Cart?) {
+        if Self.hasLines(cart) {
+            read = .settled
+            state = .success(cart)
+            return
+        }
+        switch read {
+        case .inFlight:
+            if state.isSuccess {
+                state = .success(cart)
+            }
+
+        case .settled:
+            state = .success(cart)
+
+        case .failed(let error):
+            state = .error(error)
+        }
+    }
+
+    private static func hasLines(_ cart: Cart?) -> Bool {
+        cart?.lines.isEmpty == false
     }
 }

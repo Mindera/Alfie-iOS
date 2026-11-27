@@ -5,11 +5,11 @@ public protocol BagViewModelProtocol: ObservableObject {
     /// cart with no lines identically — both are an empty bag, neither is an error.
     var state: ViewState<Cart?, BFFRequestError> { get }
     var isWishlistEnabled: Bool { get }
-    /// Why the last removal failed, surfaced as a Snackbar and cleared when it is dismissed. A
-    /// blocked write tells the shopper so rather than leaving the row to snap back in silence.
+    /// Why the last removal or re-read over Lines on screen failed, surfaced as a Snackbar and
+    /// cleared when it is dismissed. The Lines stay; the latest failure wins.
     /// The type rather than the error because the view only picks copy from it — and
     /// `BFFRequestError` is not `Equatable`, so `onChange` could not observe it.
-    var removalFailure: BFFRequestError.BFFRequestErrorType? { get }
+    var transientFailure: BFFRequestError.BFFRequestErrorType? { get }
 
     func viewDidAppear()
     func didTapRetry()
@@ -19,7 +19,7 @@ public protocol BagViewModelProtocol: ObservableObject {
     /// line that carries one. The guard here is what makes that a contract of the type rather than
     /// a promise the view happens to keep.
     func didSelectLine(_ line: CartLine)
-    func didDismissRemovalFailure()
+    func didDismissTransientFailure()
     func didTapMyAccount()
     func didTapWishlist()
 }

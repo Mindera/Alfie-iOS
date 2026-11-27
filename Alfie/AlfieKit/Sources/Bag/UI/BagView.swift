@@ -8,7 +8,7 @@ import Mocks
 
 struct BagView<ViewModel: BagViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
-    @State private var removalSnackbarConfiguration: SnackbarViewConfiguration?
+    @State private var snackbarConfiguration: SnackbarViewConfiguration?
 
     init(viewModel: ViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -20,19 +20,19 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
             .onAppear {
                 viewModel.viewDidAppear()
             }
-            // A failed removal is transient and never leaves the bag. Dismissing the Snackbar
-            // clears the outcome so an identical later one re-presents cleanly.
-            .onChange(of: viewModel.removalFailure) { failure in
+            // A Transient error never replaces the Lines. Dismissing the Snackbar clears the outcome
+            // so an identical later one re-presents cleanly.
+            .onChange(of: viewModel.transientFailure) { failure in
                 guard let failure else {
-                    removalSnackbarConfiguration = nil
+                    snackbarConfiguration = nil
                     return
                 }
-                removalSnackbarConfiguration = .init(
+                snackbarConfiguration = .init(
                     type: .error,
                     text: Self.errorMessage(for: failure),
                     showCloseButton: true,
                     icon: Icon.warning.image,
-                    onDismiss: viewModel.didDismissRemovalFailure
+                    onDismiss: viewModel.didDismissTransientFailure
                 )
             }
     }
@@ -52,13 +52,13 @@ struct BagView<ViewModel: BagViewModelProtocol>: View {
                         onSelect: viewModel.didSelectLine,
                         onDelete: viewModel.didSelectDelete
                     )
-                    .snackbarView(configuration: $removalSnackbarConfiguration)
+                    .snackbarView(configuration: $snackbarConfiguration)
                     BagPurchaseSummary(total: cart.grandTotal.amountFormattedOrUnavailable)
                 }
                 // The Snackbar goes with the list, so a failure cannot outlive it and re-present later.
                 .onDisappear {
-                    removalSnackbarConfiguration = nil
-                    viewModel.didDismissRemovalFailure()
+                    snackbarConfiguration = nil
+                    viewModel.didDismissTransientFailure()
                 }
             } else {
                 EmptyStateView(icon: .bag, title: L10n.Bag.Empty.title)
