@@ -5,7 +5,6 @@ import Model
 public final class BagViewModel: BagViewModelProtocol {
     @Published public private(set) var state: ViewState<Cart?, BFFRequestError> = .loading
     @Published public private(set) var transientFailure: BFFRequestError.BFFRequestErrorType?
-    public var isWishlistEnabled: Bool
 
     private enum Read {
         case inFlight
@@ -22,7 +21,6 @@ public final class BagViewModel: BagViewModelProtocol {
         dependencies: BagDependencyContainer,
         navigate: @escaping (BagRoute) -> Void
     ) {
-        self.isWishlistEnabled = dependencies.configurationService.isFeatureEnabled(.wishlist)
         self.dependencies = dependencies
         self.navigate = navigate
 
@@ -71,14 +69,6 @@ public final class BagViewModel: BagViewModelProtocol {
 
     public func didDismissTransientFailure() {
         transientFailure = nil
-    }
-
-    public func didTapMyAccount() {
-        navigate(.myAccount(.myAccount))
-    }
-
-    public func didTapWishlist() {
-        navigate(.wishlist(.wishlist))
     }
 
     // MARK: - Private

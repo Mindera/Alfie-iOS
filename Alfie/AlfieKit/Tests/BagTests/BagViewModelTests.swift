@@ -26,7 +26,6 @@ final class BagViewModelTests: XCTestCase {
         mockAnalytics = MockAnalyticsTracker()
         mockDependencies = BagDependencyContainer(
             cartService: mockCartService,
-            configurationService: MockConfigurationService(),
             analytics: mockAnalytics.eraseToAnyAnalyticsTracker(),
             log: Log.DummyLogger()
         )

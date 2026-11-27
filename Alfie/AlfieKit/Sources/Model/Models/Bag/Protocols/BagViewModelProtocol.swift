@@ -4,7 +4,6 @@ public protocol BagViewModelProtocol: ObservableObject {
     /// `nil` inside `.success` is a shopper with no cart on the server. The view treats that and a
     /// cart with no lines identically — both are an empty bag, neither is an error.
     var state: ViewState<Cart?, BFFRequestError> { get }
-    var isWishlistEnabled: Bool { get }
     /// Why the last removal or re-read over Lines on screen failed, surfaced as a Snackbar and
     /// cleared when it is dismissed. The Lines stay; the latest failure wins.
     /// The type rather than the error because the view only picks copy from it — and
@@ -20,6 +19,4 @@ public protocol BagViewModelProtocol: ObservableObject {
     /// a promise the view happens to keep.
     func didSelectLine(_ line: CartLine)
     func didDismissTransientFailure()
-    func didTapMyAccount()
-    func didTapWishlist()
 }

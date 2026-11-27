@@ -142,10 +142,9 @@ let package = Package(
             name: "Bag",
             dependencies: [
                 "Model",
-                "MyAccount",
                 "ProductDetails",
                 "SharedUI",
-                "Wishlist",
+                "Web",
             ]
         ),
 

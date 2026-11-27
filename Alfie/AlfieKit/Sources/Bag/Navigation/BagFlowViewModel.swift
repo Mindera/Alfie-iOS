@@ -1,9 +1,7 @@
 import Model
-import MyAccount
 import ProductDetails
 import SwiftUI
 import Web
-import Wishlist
 
 public final class BagFlowViewModel: BagFlowViewModelProtocol {
     public typealias Route = BagRoute
@@ -22,12 +20,6 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
         }
     }
 
-    public func makeAccountViewModel() -> AccountViewModel {
-        AccountViewModel(dependencies: dependencies.myAccountDependencyContainer) { [weak self] in
-            self?.navigate(.myAccount($0))
-        }
-    }
-
     public func makeProductDetailsViewModel(configuration: ProductDetailsConfiguration) -> ProductDetailsViewModel {
         ProductDetailsViewModel(
             configuration: configuration,
@@ -43,26 +35,6 @@ public final class BagFlowViewModel: BagFlowViewModelProtocol {
             webFeature: feature,
             dependencies: dependencies.webDependencyContainer
         )
-    }
-
-    public func makeWishlistViewModel() -> WishlistViewModel {
-        WishlistViewModel(
-            hasNavigationSeparator: true,
-            dependencies: dependencies.wishlistDependencyContainer
-        ) { [weak self] in
-            self?.navigate(.wishlist($0))
-        }
-    }
-
-    // MARK: - View Models for MyAccountIntent
-
-    public func myAccountIntentViewBuilder(for intent: MyAccountIntent) -> AnyView {
-        switch intent {
-        case .wishlist:
-            AnyView(
-                WishlistView(viewModel: makeWishlistViewModel())
-            )
-        }
     }
 
     // MARK: - FlowViewModelProtocol

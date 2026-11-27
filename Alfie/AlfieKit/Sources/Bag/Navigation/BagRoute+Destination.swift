@@ -1,44 +1,24 @@
 import Model
-import MyAccount
 import ProductDetails
 import SwiftUI
 import Web
-import Wishlist
 
-// swiftlint:disable function_parameter_count
 public extension BagRoute {
     @ViewBuilder
     func destination(
         bagViewModel: () -> some BagViewModelProtocol,
-        accountViewModel: () -> some AccountViewModelProtocol,
         productDetailsViewModel: (ProductDetailsConfiguration) -> some ProductDetailsViewModelProtocol,
-        webViewModel: (WebFeature) -> some WebViewModelProtocol,
-        wishlistViewModel: () -> some WishlistViewModelProtocol,
-        myAccountIntentViewBuilder: @escaping (MyAccountIntent) -> AnyView
+        webViewModel: (WebFeature) -> some WebViewModelProtocol
     ) -> some View {
         switch self {
         case .bag:
             BagView(viewModel: bagViewModel())
-
-        case .myAccount(let myAccountRoute):
-            myAccountRoute.destination(
-                accountViewModel: accountViewModel,
-                intentViewBuilder: myAccountIntentViewBuilder
-            )
 
         case .productDetails(let productDetailsRoute):
             productDetailsRoute.destination(
                 productDetailsViewModel: productDetailsViewModel,
                 webViewModel: webViewModel
             )
-
-        case .wishlist(let wishlistRoute):
-            wishlistRoute.destination(
-                productDetailsViewModel: productDetailsViewModel,
-                webViewModel: webViewModel,
-                wishlistViewModel: wishlistViewModel
-            )
         }
     }
 }
-// swiftlint:enable function_parameter_count
