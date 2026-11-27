@@ -6,7 +6,7 @@ public final class BagViewModel: BagViewModelProtocol {
     @Published public private(set) var state: ViewState<Cart?, BFFRequestError> = .loading
     @Published public private(set) var transientFailure: BFFRequestError.BFFRequestErrorType?
 
-    private enum Read {
+    private enum ReadPhase {
         case inFlight
         case settled
         case failed(BFFRequestError)
@@ -14,7 +14,8 @@ public final class BagViewModel: BagViewModelProtocol {
 
     private let dependencies: BagDependencyContainer
     private let navigate: (BagRoute) -> Void
-    private var read: Read = .inFlight
+    private var readPhase: ReadPhase = .inFlight
+    private var latestReadID = 0
     private var cartSubscription: AnyCancellable?
 
     init(
@@ -26,9 +27,8 @@ public final class BagViewModel: BagViewModelProtocol {
 
         show(dependencies.cartService.cart)
         cartSubscription = dependencies.cartService.cartPublisher
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.show($0) }
+            .receive(on: dependencies.scheduler)
+            .sink { [weak self] in self?.cartDidChange(to: $0) }
     }
 
     // MARK: - BagViewModelProtocol
@@ -77,39 +77,47 @@ public final class BagViewModel: BagViewModelProtocol {
         if !state.isSuccess {
             state = .loading
         }
-        read = .inFlight
+        readPhase = .inFlight
         transientFailure = nil
+        latestReadID += 1
+        let readID = latestReadID
         Task { @MainActor in
             do {
                 try await dependencies.cartService.fetch()
-                read = .settled
+                guard readID == latestReadID else { return }
+                readPhase = .settled
             } catch {
                 dependencies.log.error("Error fetching the cart: \(error)")
+                guard readID == latestReadID else { return }
                 let error = error as? BFFRequestError ?? BFFRequestError(type: .generic, error: error)
+                readPhase = .failed(error)
                 if Self.hasLines(dependencies.cartService.cart) {
-                    read = .settled
                     transientFailure = error.type
-                } else {
-                    read = .failed(error)
                 }
             }
             show(dependencies.cartService.cart)
         }
     }
 
+    private func cartDidChange(to cart: Cart?) {
+        // A failed read publishes nothing, so a Cart arriving over a Blocking error is news.
+        if case .failed = readPhase {
+            readPhase = .settled
+        }
+        show(cart)
+    }
+
     private func show(_ cart: Cart?) {
         if Self.hasLines(cart) {
-            read = .settled
+            readPhase = .settled
             state = .success(cart)
             return
         }
-        switch read {
-        case .inFlight:
-            if state.isSuccess {
-                state = .success(cart)
-            }
+        switch readPhase {
+        case .inFlight where !state.isSuccess:
+            break
 
-        case .settled:
+        case .inFlight, .settled:
             state = .success(cart)
 
         case .failed(let error):

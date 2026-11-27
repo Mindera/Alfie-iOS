@@ -92,7 +92,7 @@ final class BagViewModelTests: XCTestCase {
 
     // MARK: - A failed re-read
 
-    func test_aFailedReRead_keepsTheLinesAndReportsWhy() {
+    func test_a_failed_re_read_keeps_the_lines_and_reports_why() {
         showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
         mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
 
@@ -105,7 +105,7 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
     }
 
-    func test_aSecondFailedReRead_reportsAgainAfterTheFirstWasDismissed() {
+    func test_a_second_failed_re_read_reports_again_after_the_first_was_dismissed() {
         showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
         mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
         XCTAssertEmitsValue(
@@ -122,12 +122,18 @@ final class BagViewModelTests: XCTestCase {
         )
     }
 
-    func test_aFailedFirstRead_withACartAlreadyHeld_showsTheLinesAndReportsWhy() {
+    func test_a_cart_already_held_shows_its_lines_before_any_read() {
         mockCartService.send(cart: .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
-        mockCartService.onFetchCalled = { throw BFFRequestError(type: .timeout) }
+
         sut = .init(dependencies: mockDependencies) { _ in }
 
         XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
+    }
+
+    func test_a_failed_first_read_with_a_cart_already_held_keeps_the_lines_and_reports_why() {
+        mockCartService.send(cart: .fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .timeout) }
+        sut = .init(dependencies: mockDependencies) { _ in }
 
         XCTAssertEmitsValue(
             from: sut.$transientFailure,
@@ -138,7 +144,7 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
     }
 
-    func test_aFailedReRead_withNoCart_isABlockingError() {
+    func test_a_failed_re_read_with_no_cart_is_a_blocking_error() {
         mockCartService.onFetchCalled = { nil }
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
         mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
@@ -149,7 +155,7 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertNil(sut.transientFailure)
     }
 
-    func test_aFailedReRead_overACartWithNoLines_isABlockingError() {
+    func test_a_failed_re_read_over_a_cart_with_no_lines_is_a_blocking_error() {
         showCart(.fixture(id: "cart-1", lines: []))
         mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
 
@@ -161,7 +167,7 @@ final class BagViewModelTests: XCTestCase {
 
     // MARK: - Following the cart
 
-    func test_aCartPublishedWithoutAReadFromTheBag_updatesTheLines() {
+    func test_a_cart_published_without_a_read_from_the_bag_updates_the_lines() {
         showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1", quantity: 1)]))
 
         XCTAssertEmitsValue(
@@ -173,7 +179,7 @@ final class BagViewModelTests: XCTestCase {
         )
     }
 
-    func test_aCartWithLinesPublishedDuringABlockingError_showsTheLines() {
+    func test_a_cart_with_lines_published_during_a_blocking_error_shows_the_lines() {
         mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
         XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
 
@@ -186,8 +192,19 @@ final class BagViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state.cart?.lines.map(\.id), ["line-1"])
     }
 
-    func test_aNilCartPublished_emptiesTheBag() {
+    func test_a_nil_cart_published_empties_the_bag() {
         showCart(.fixture(id: "cart-1", lines: [.fixture(id: "line-1")]))
+
+        XCTAssertEmitsValue(
+            from: sut.$state,
+            where: { $0.isSuccess && $0.cart == nil },
+            afterTrigger: { self.mockCartService.send(cart: nil) }
+        )
+    }
+
+    func test_a_nil_cart_published_during_a_blocking_error_empties_the_bag() {
+        mockCartService.onFetchCalled = { throw BFFRequestError(type: .noInternet) }
+        XCTAssertEmitsValue(from: sut.$state, where: { $0.didFail }, afterTrigger: { self.sut.viewDidAppear() })
 
         XCTAssertEmitsValue(
             from: sut.$state,
@@ -354,7 +371,7 @@ final class BagViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    /// Puts the view model into `.success` holding `cart`, the state every removal starts from.
+    /// Puts the view model into `.success` holding `cart`.
     private func showCart(_ cart: Cart) {
         mockCartService.onFetchCalled = { cart }
         XCTAssertEmitsValue(from: sut.$state, where: { $0.isSuccess }, afterTrigger: { self.sut.viewDidAppear() })
