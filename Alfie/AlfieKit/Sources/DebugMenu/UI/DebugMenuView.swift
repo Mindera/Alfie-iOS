@@ -28,6 +28,7 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
                     link(for: .brazeInfo, text: "Braze Push")
                     #if DEBUG
                     link(for: .featureToggle, text: "Feature Toggle")
+                    link(for: .bagRereadFailurePrototype, text: "Prototype · Bag re-read failure (#189)")
                     #endif
                     link(for: .endpoint, text: "Environment")
                 }
@@ -94,6 +95,14 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
                 .modifier(
                     ContainerDemoViewModifier(headerTitle: L10n.FeatureToggle.title, embedInScrollView: true)
                 )
+
+        #if DEBUG
+        case .bagRereadFailurePrototype:
+            BagRereadFailurePrototypeView()
+                .modifier(
+                    ContainerDemoViewModifier(headerTitle: "Bag re-read failure", embedInScrollView: false)
+                )
+        #endif
         }
     }
 
@@ -104,6 +113,9 @@ public struct DebugMenuView<ViewModel: DebugMenuViewModel>: View {
         case brazeInfo
         case endpoint
         case featureToggle
+        #if DEBUG
+        case bagRereadFailurePrototype
+        #endif
     }
 }
 
